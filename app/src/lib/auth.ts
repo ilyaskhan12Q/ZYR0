@@ -33,21 +33,27 @@ export async function signIn({ email, password }: SignInData) {
 }
 
 /** Google OAuth — redirects to Google, then back to /auth/callback */
-export async function signInWithGoogle() {
+export async function signInWithGoogle(role?: UserRole) {
+  const redirectTo = role 
+    ? `${window.location.origin}/auth/callback?role=${role}` 
+    : `${window.location.origin}/auth/callback`;
   return supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo,
     },
   });
 }
 
 /** LinkedIn OAuth — redirects to LinkedIn, then back to /auth/callback */
-export async function signInWithLinkedIn() {
+export async function signInWithLinkedIn(role?: UserRole) {
+  const redirectTo = role 
+    ? `${window.location.origin}/auth/callback?role=${role}` 
+    : `${window.location.origin}/auth/callback`;
   return supabase.auth.signInWithOAuth({
     provider: 'linkedin_oidc',
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo,
     },
   });
 }

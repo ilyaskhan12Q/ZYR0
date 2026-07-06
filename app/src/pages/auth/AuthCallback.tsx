@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import type { UserRole } from '@/lib/database.types';
 
 /**
@@ -9,11 +10,27 @@ import type { UserRole } from '@/lib/database.types';
  * We wait for the session, then redirect to the correct dashboard.
  */
 export default function AuthCallback() {
-  const { profile, loading } = useAuth();
+  const { profile, loading, user, refreshProfile } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    if (!loading) {
+    async function handleAuth() {
+      if (loading) return;
+
+      const roleParam = searchParams.get('role') as UserRole | null;
+
+      if (user && roleParam && profile && profile.role !== roleParam) {
+        // Update profile role to match requested OAuth registration role
+        await supabase
+          .from('profiles')
+          .update({ role: roleParam })
+          .eq('id', user.id);
+        
+        await refreshProfile();
+        return;
+      }
+
       if (profile) {
         const dashboardMap: Record<UserRole, string> = {
           student: '/student/dashboard',
@@ -27,7 +44,9 @@ export default function AuthCallback() {
         navigate('/login', { replace: true });
       }
     }
-  }, [profile, loading, navigate]);
+
+    handleAuth();
+  }, [profile, loading, user, searchParams, navigate, refreshProfile]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
