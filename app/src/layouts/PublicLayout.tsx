@@ -6,8 +6,7 @@ import {
   Briefcase, Settings,
   Twitter, Linkedin, Github
 } from 'lucide-react';
-import { currentUser } from '@/data/mockData';
-
+import { useAuth } from '@/contexts/AuthContext';
 const navLinks = [
   { label: 'Internships', href: '/internships' },
   { label: 'Companies', href: '/companies' },
@@ -16,6 +15,7 @@ const navLinks = [
 ];
 
 export default function PublicLayout() {
+  const { user, profile, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -75,7 +75,7 @@ export default function PublicLayout() {
 
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-4">
-              {currentUser ? (
+              {user ? (
                 <>
                   <button className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-white/10 text-white'}`}>
                     <Bell className="w-5 h-5" />
@@ -86,9 +86,9 @@ export default function PublicLayout() {
                       onClick={() => setProfileOpen(!profileOpen)}
                       className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
                     >
-                      <img src={currentUser.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      <img src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />
                       <span className={`text-sm font-medium ${scrolled ? 'text-foreground' : 'text-white'}`}>
-                        {currentUser.name}
+                        {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
                       </span>
                       <ChevronDown className={`w-4 h-4 ${scrolled ? 'text-muted-foreground' : 'text-white/70'}`} />
                     </button>
@@ -101,22 +101,22 @@ export default function PublicLayout() {
                           className="absolute right-0 mt-2 w-56 bg-card rounded-xl border border-border shadow-lg py-2 z-50"
                         >
                           <div className="px-4 py-3 border-b border-border">
-                            <p className="text-sm font-medium">{currentUser.name}</p>
-                            <p className="text-xs text-muted-foreground">{currentUser.email}</p>
+                            <p className="text-sm font-medium">{user.user_metadata?.full_name || 'User'}</p>
+                            <p className="text-xs text-muted-foreground">{user.email}</p>
                           </div>
                           <div className="py-1">
-                            <button onClick={() => navigate(`/${currentUser.role}/dashboard`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => navigate(`/${profile?.role || 'student'}/dashboard`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <LayoutDashboard className="w-4 h-4" /> Dashboard
                             </button>
-                            <button onClick={() => navigate(`/${currentUser.role}/profile`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => navigate(`/${profile?.role || 'student'}/profile`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <User className="w-4 h-4" /> Profile
                             </button>
-                            <button onClick={() => navigate(`/${currentUser.role}/settings`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => navigate(`/${profile?.role || 'student'}/settings`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <Settings className="w-4 h-4" /> Settings
                             </button>
                           </div>
                           <div className="border-t border-border pt-1">
-                            <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
                               <LogOut className="w-4 h-4" /> Sign Out
                             </button>
                           </div>
