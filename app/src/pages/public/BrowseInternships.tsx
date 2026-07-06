@@ -1,32 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, DollarSign, Bookmark, Filter,
-  ChevronDown, X, Briefcase, Clock, ArrowRight
+  X, Clock, ArrowRight, Loader2
 } from 'lucide-react';
-import { internships } from '@/data/mockData';
+import { getInternships, getInternshipDomains } from '@/services/internships';
 
-const domains = ['All', 'Engineering', 'Design', 'Data Science', 'Marketing', 'Business', 'Research'];
 const locations = ['All', 'Remote', 'On-site', 'Hybrid'];
 const types = ['All', 'Full-time', 'Part-time'];
-const durations = ['All', '1-3 months', '3-6 months', '6+ months'];
 
 export default function BrowseInternships() {
   const [search, setSearch] = useState('');
   const [selectedDomain, setSelectedDomain] = useState('All');
   const [selectedLocation, setSelectedLocation] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
-  const [selectedDuration, setSelectedDuration] = useState('All');
   const [showFilters, setShowFilters] = useState(false);
+  
+  const [internships, setInternships] = useState<any[]>([]);
+  const [domains, setDomains] = useState<string[]>(['All']);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      const [internshipsRes, domainsRes] = await Promise.all([
+        getInternships(),
+        getInternshipDomains()
+      ]);
+      
+      if (internshipsRes.data) {
+        setInternships(internshipsRes.data);
+      }
+      if (domainsRes) {
+        setDomains(['All', ...domainsRes]);
+      }
+      setLoading(false);
+    }
+    loadData();
+  }, []);
 
   const filtered = internships.filter((i) => {
-    const matchSearch = !search || i.title.toLowerCase().includes(search.toLowerCase()) || i.company.toLowerCase().includes(search.toLowerCase()) || i.skills.some(s => s.toLowerCase().includes(search.toLowerCase()));
+    const company = Array.isArray(i.company) ? i.company[0] : i.company;
+    const matchSearch = !search || 
+      i.title.toLowerCase().includes(search.toLowerCase()) || 
+      company?.name?.toLowerCase().includes(search.toLowerCase());
+    
     const matchDomain = selectedDomain === 'All' || i.domain === selectedDomain;
-    const matchLocation = selectedLocation === 'All' || i.locationType === selectedLocation;
+    const matchLocation = selectedLocation === 'All' || i.location_type === selectedLocation;
     const matchType = selectedType === 'All' || i.type === selectedType;
-    const matchDuration = selectedDuration === 'All' || i.duration === selectedDuration;
-    return matchSearch && matchDomain && matchLocation && matchType && matchDuration;
+    return matchSearch && matchDomain && matchLocation && matchType;
   });
 
   return (
@@ -47,7 +70,7 @@ export default function BrowseInternships() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by title, company, or skills..."
+                placeholder="Search by title or company..."
                 className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
               />
               {search && (
@@ -62,14 +85,14 @@ export default function BrowseInternships() {
             >
               <Filter className="w-4 h-4" />
               Filters
-              {(selectedDomain !== 'All' || selectedLocation !== 'All' || selectedType !== 'All' || selectedDuration !== 'All') && (
+              {(selectedDomain !== 'All' || selectedLocation !== 'All' || selectedType !== 'All') && (
                 <span className="w-2 h-2 bg-accent rounded-full" />
               )}
             </button>
           </div>
 
           {showFilters && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1 block">Domain</label>
                 <select value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
@@ -88,17 +111,11 @@ export default function BrowseInternships() {
                   {types.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Duration</label>
-                <select value={selectedDuration} onChange={(e) => setSelectedDuration(e.target.value)} className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
-                  {durations.map(d => <option key={d} value={d}>{d}</option>)}
-                </select>
-              </div>
             </motion.div>
           )}
 
           {/* Active filters */}
-          {(selectedDomain !== 'All' || selectedLocation !== 'All' || selectedType !== 'All' || selectedDuration !== 'All') && (
+          {(selectedDomain !== 'All' || selectedLocation !== 'All' || selectedType !== 'All') && (
             <div className="mt-3 flex flex-wrap gap-2">
               {selectedDomain !== 'All' && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full">
@@ -115,104 +132,110 @@ export default function BrowseInternships() {
                   {selectedType} <button onClick={() => setSelectedType('All')}><X className="w-3 h-3" /></button>
                 </span>
               )}
-              {selectedDuration !== 'All' && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full">
-                  {selectedDuration} <button onClick={() => setSelectedDuration('All')}><X className="w-3 h-3" /></button>
-                </span>
-              )}
-              <button onClick={() => { setSelectedDomain('All'); setSelectedLocation('All'); setSelectedType('All'); setSelectedDuration('All'); }} className="text-xs text-muted-foreground hover:text-accent transition-colors">
+              <button onClick={() => { setSelectedDomain('All'); setSelectedLocation('All'); setSelectedType('All'); }} className="text-xs text-muted-foreground hover:text-accent transition-colors">
                 Clear all
               </button>
             </div>
           )}
         </motion.div>
 
-        {/* Results count */}
-        <p className="text-sm text-muted-foreground mb-4">Showing {filtered.length} of {internships.length} internships</p>
-
-        {/* Internship Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filtered.map((internship, i) => (
-            <motion.div
-              key={internship.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="internship-card"
-            >
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <img src={internship.companyLogo} alt="" className="w-10 h-10 rounded-lg object-cover" />
-                    <div>
-                      <p className="text-sm font-medium">{internship.company}</p>
-                      <p className="text-xs text-muted-foreground">{internship.postedDate}</p>
-                    </div>
-                  </div>
-                  <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-                    <Bookmark className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
-
-                {/* Title */}
-                <h3 className="mt-4 text-lg font-semibold">{internship.title}</h3>
-
-                {/* Tags */}
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <span className="px-2.5 py-0.5 bg-accent/10 text-accent text-xs rounded-full font-medium">{internship.domain}</span>
-                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">{internship.stipendType}</span>
-                  <span className="px-2.5 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">{internship.locationType}</span>
-                </div>
-
-                {/* Description */}
-                <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{internship.description}</p>
-
-                {/* Details */}
-                <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5" /> {internship.duration}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5" /> {internship.location}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <DollarSign className="w-3.5 h-3.5" /> {internship.stipend}
-                  </span>
-                </div>
-
-                {/* Footer */}
-                <div className="mt-5 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    Deadline: {new Date(internship.deadline).toLocaleDateString()}
-                  </span>
-                  <Link
-                    to={`/internships/${internship.id}`}
-                    className="inline-flex items-center gap-1.5 bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors"
-                  >
-                    Apply Now
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-10 h-10 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold">No internships found</h3>
-            <p className="text-sm text-muted-foreground mt-2">Try adjusting your filters or search terms</p>
-            <button
-              onClick={() => { setSearch(''); setSelectedDomain('All'); setSelectedLocation('All'); setSelectedType('All'); setSelectedDuration('All'); }}
-              className="mt-4 inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors"
-            >
-              <X className="w-4 h-4" /> Clear Filters
-            </button>
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-accent" />
           </div>
+        ) : (
+          <>
+            {/* Results count */}
+            <p className="text-sm text-muted-foreground mb-4">Showing {filtered.length} of {internships.length} internships</p>
+
+            {/* Internship Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filtered.map((internship, i) => {
+                const company = Array.isArray(internship.company) ? internship.company[0] : internship.company;
+                return (
+                  <motion.div
+                    key={internship.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: i * 0.08 }}
+                    className="internship-card"
+                  >
+                    <div className="p-6">
+                      {/* Header */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          <img src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                          <div>
+                            <p className="text-sm font-medium">{company?.name || 'Unknown Company'}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(internship.posted_date || internship.created_at).toLocaleDateString()}</p>
+                          </div>
+                        </div>
+                        <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
+                          <Bookmark className="w-4 h-4 text-muted-foreground" />
+                        </button>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="mt-4 text-lg font-semibold">{internship.title}</h3>
+
+                      {/* Tags */}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <span className="px-2.5 py-0.5 bg-accent/10 text-accent text-xs rounded-full font-medium">{internship.domain}</span>
+                        <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">{internship.stipend_type}</span>
+                        <span className="px-2.5 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">{internship.location_type}</span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="mt-3 text-sm text-muted-foreground line-clamp-2">{internship.description}</p>
+
+                      {/* Details */}
+                      <div className="mt-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5" /> {internship.duration || 'Flexible'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5" /> {internship.location || 'Remote'}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <DollarSign className="w-3.5 h-3.5" /> {internship.stipend || 'Unpaid'}
+                        </span>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="mt-5 flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          Deadline: {internship.deadline ? new Date(internship.deadline).toLocaleDateString() : 'Rolling'}
+                        </span>
+                        <Link
+                          to={`/internships/${internship.id}`}
+                          className="inline-flex items-center gap-1.5 bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors"
+                        >
+                          View Details
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {filtered.length === 0 && (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-10 h-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold">No internships found</h3>
+                <p className="text-sm text-muted-foreground mt-2">Try adjusting your filters or search terms</p>
+                <button
+                  onClick={() => { setSearch(''); setSelectedDomain('All'); setSelectedLocation('All'); setSelectedType('All'); }}
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors"
+                >
+                  <X className="w-4 h-4" /> Clear Filters
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
