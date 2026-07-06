@@ -15,38 +15,75 @@ export default function AuthCallback() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    let active = true;
+
     async function handleAuth() {
-      if (loading) return;
+      // Directly check for session to parse token from URL hash immediately
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!active) return;
 
-      const roleParam = searchParams.get('role') as UserRole | null;
+      if (session?.user) {
+        const user = session.user;
+        const roleParam = searchParams.get('role') as UserRole | null;
 
-      if (user && roleParam && profile && profile.role !== roleParam) {
-        // Update profile role to match requested OAuth registration role
-        await supabase
+        // Fetch user profile
+        let { data: currentProfile } = await supabase
           .from('profiles')
-          .update({ role: roleParam })
-          .eq('id', user.id);
-        
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (roleParam && (!currentProfile || currentProfile.role !== roleParam)) {
+          // If profile is missing or role doesn't match register choice, upsert it
+          const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              role: roleParam,
+              full_name: user.user_metadata.full_name || user.email,
+              avatar_url: user.user_metadata.avatar_url || null,
+            })
+            .select()
+            .single();
+          
+          if (updatedProfile) {
+            currentProfile = updatedProfile;
+          }
+        }
+
         await refreshProfile();
-        return;
+
+        if (currentProfile) {
+          const dashboardMap: Record<UserRole, string> = {
+            student: '/student/dashboard',
+            company: '/company/dashboard',
+            mentor: '/mentor/dashboard',
+            admin: '/admin/dashboard',
+          };
+          navigate(dashboardMap[currentProfile.role as UserRole], { replace: true });
+          return;
+        }
       }
 
-      if (profile) {
-        const dashboardMap: Record<UserRole, string> = {
-          student: '/student/dashboard',
-          company: '/company/dashboard',
-          mentor: '/mentor/dashboard',
-          admin: '/admin/dashboard',
-        };
-        navigate(dashboardMap[profile.role], { replace: true });
-      } else {
-        // Auth failed or session not established
-        navigate('/login', { replace: true });
-      }
+      // If session is still loading/processing, wait up to 3 seconds before redirecting to login
+      const timeout = setTimeout(() => {
+        if (active) {
+          navigate('/login', { replace: true });
+        }
+      }, 3000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
     }
 
     handleAuth();
-  }, [profile, loading, user, searchParams, navigate, refreshProfile]);
+
+    return () => {
+      active = false;
+    };
+  }, [searchParams, navigate, refreshProfile]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
