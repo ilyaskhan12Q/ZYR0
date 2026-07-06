@@ -18,12 +18,16 @@ export async function getMyCertificates() {
 
 /** Verify a certificate by credential ID (public — no auth needed) */
 export async function verifyCertificate(credentialId: string) {
-  // Edge Functions only support POST via supabase.functions.invoke,
-  // so we call the Edge Function with POST body containing the credential_id.
-  // The verify-certificate function accepts { credential_id } in POST body.
-  return supabase.functions.invoke('verify-certificate', {
-    body: { credential_id: credentialId },
-  });
+  return supabase
+    .from('certificates')
+    .select(`
+      *,
+      recipient:profiles!recipient_id (id, full_name, avatar_url),
+      company:companies!company_id (id, name, logo_url),
+      internship:internships!internship_id (id, title)
+    `)
+    .eq('credential_id', credentialId)
+    .single();
 }
 
 

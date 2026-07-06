@@ -1,34 +1,72 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, CheckCircle2, Clock, Target, Award, BookOpen, Code, Users, MessageSquare, Lightbulb, Star } from 'lucide-react';
-import { tasks, internships, certificates } from '@/data/mockData';
-
-const skills = [
-  { name: 'JavaScript', category: 'Technical', level: 85 },
-  { name: 'React', category: 'Technical', level: 80 },
-  { name: 'Node.js', category: 'Technical', level: 70 },
-  { name: 'Communication', category: 'Soft Skills', level: 90 },
-  { name: 'Problem Solving', category: 'Soft Skills', level: 85 },
-  { name: 'Git', category: 'Tools', level: 75 },
-  { name: 'Figma', category: 'Tools', level: 65 },
-  { name: 'Python', category: 'Technical', level: 60 },
-];
-
-const categoryIcons: Record<string, React.ElementType> = {
-  Technical: Code,
-  'Soft Skills': Users,
-  Tools: BookOpen,
-};
-
-const categoryColors: Record<string, string> = {
-  Technical: 'bg-blue-100 text-blue-700',
-  'Soft Skills': 'bg-purple-100 text-purple-700',
-  Tools: 'bg-amber-100 text-amber-700',
-};
+import { TrendingUp, CheckCircle2, Clock, Target, Award, BookOpen, Code, Users, MessageSquare, Lightbulb, Star, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getMyCertificates } from '@/services/certificates';
+import { getMyTasks } from '@/services/tasks';
+import { getMyApplications } from '@/services/applications';
+import { supabase } from '@/lib/supabase';
 
 export default function StudentProgress() {
+  const { profile } = useAuth();
+  const [certificates, setCertificates] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProgressData() {
+      if (!profile) return;
+      try {
+        const [certsRes, tasksRes, appsRes, logsRes] = await Promise.all([
+          getMyCertificates(),
+          getMyTasks(),
+          getMyApplications(),
+          supabase
+            .from('activity_logs')
+            .select('*')
+            .eq('user_id', profile.id)
+            .order('created_at', { ascending: false })
+            .limit(5),
+        ]);
+
+        if (certsRes.data) setCertificates(certsRes.data);
+        if (tasksRes.data) setTasks(tasksRes.data);
+        if (appsRes.data) setApplications(appsRes.data);
+        if (logsRes.data) setActivities(logsRes.data);
+      } catch (err) {
+        console.error('Error loading progress data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProgressData();
+  }, [profile]);
+
+  if (loading || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
   const completedTasks = tasks.filter(t => t.status === 'Approved').length;
   const totalTasks = tasks.length;
-  const completionRate = Math.round((completedTasks / totalTasks) * 100);
+  const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  // Active internships
+  const activeInternships = applications.filter((app) => app.status === 'Accepted');
+
+  // Hardcode skills category/level mappings based on profile.skills array for visual presentation
+  const skillsList = (profile.skills || []).map((skill, index) => {
+    // Generate deterministic ratings & categories for user skills
+    const categories = ['Technical', 'Tools', 'Soft Skills'];
+    const category = categories[index % categories.length];
+    const level = 70 + (index * 7) % 25; // 70% to 95%
+    return { name: skill, category, level };
+  });
 
   return (
     <div className="space-y-6">
@@ -55,11 +93,11 @@ export default function StudentProgress() {
           <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
               { label: 'Tasks Done', value: `${completedTasks}/${totalTasks}`, icon: CheckCircle2, color: 'text-emerald-500' },
-              { label: 'Internships', value: '2 Active', icon: Target, color: 'text-blue-500' },
+              { label: 'Internships', value: `${activeInternships.length} Active`, icon: Target, color: 'text-blue-500' },
               { label: 'Certificates', value: certificates.length.toString(), icon: Award, color: 'text-purple-500' },
-              { label: 'Skills', value: skills.length.toString(), icon: Star, color: 'text-amber-500' },
+              { label: 'Skills', value: skillsList.length.toString(), icon: Star, color: 'text-amber-500' },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-4 bg-muted rounded-xl">
+              <div key={i} className="text-center p-4 bg-muted rounded-xl border border-border">
                 <stat.icon className={`w-6 h-6 ${stat.color} mx-auto mb-2`} />
                 <p className="text-xl font-bold">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
@@ -74,53 +112,65 @@ export default function StudentProgress() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="bg-card rounded-xl border border-border shadow-sm p-6">
           <h3 className="font-semibold mb-4">Internship Progress</h3>
-          <div className="space-y-5">
-            {internships.slice(0, 3).map((internship, i) => {
-              const internTasks = tasks.filter(t => t.internshipId === internship.id);
-              const completed = internTasks.filter(t => t.status === 'Approved').length;
-              const pct = internTasks.length > 0 ? Math.round((completed / internTasks.length) * 100) : 0;
-              return (
-                <div key={internship.id}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <img src={internship.companyLogo} alt="" className="w-6 h-6 rounded" />
-                      <span className="text-sm font-medium">{internship.title}</span>
+          {activeInternships.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No active internship progress details found.</p>
+          ) : (
+            <div className="space-y-5">
+              {activeInternships.map((app, i) => {
+                const company = Array.isArray(app.internship?.company) ? app.internship.company[0] : app.internship?.company;
+                const internTasks = tasks.filter(t => t.internship_id === app.internship_id);
+                const completed = internTasks.filter(t => t.status === 'Approved').length;
+                const pct = internTasks.length > 0 ? Math.round((completed / internTasks.length) * 100) : 0;
+                return (
+                  <div key={app.id}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <img src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`} alt="" className="w-6 h-6 rounded object-cover" />
+                        <span className="text-sm font-medium">{app.internship?.title || 'Internship'}</span>
+                      </div>
+                      <span className="text-sm font-bold">{pct}%</span>
                     </div>
-                    <span className="text-sm font-bold">{pct}%</span>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{completed}/{internTasks.length} tasks completed</p>
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} />
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">{completed}/{internTasks.length} tasks completed</p>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </motion.div>
 
         {/* Skills */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="bg-card rounded-xl border border-border shadow-sm p-6">
           <h3 className="font-semibold mb-4">Skills Gained</h3>
-          <div className="space-y-3">
-            {skills.map((skill, i) => {
-              const CatIcon = categoryIcons[skill.category] || Star;
-              return (
-                <div key={i}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2">
-                      <CatIcon className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{skill.name}</span>
+          {skillsList.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No skills recorded in profile yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {skillsList.map((skill, i) => {
+                const categoryColors: Record<string, string> = {
+                  Technical: 'bg-blue-100 text-blue-700',
+                  'Soft Skills': 'bg-purple-100 text-purple-700',
+                  Tools: 'bg-amber-100 text-amber-700',
+                };
+                return (
+                  <div key={i}>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{skill.name}</span>
+                      </div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${categoryColors[skill.category] || 'bg-slate-100 text-slate-700'}`}>{skill.category}</span>
                     </div>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${categoryColors[skill.category]}`}>{skill.category}</span>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${skill.level}%` }} transition={{ duration: 0.6, delay: i * 0.05 }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${skill.level}%` }} transition={{ duration: 0.6, delay: i * 0.05 }} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </motion.div>
       </div>
 
@@ -128,25 +178,25 @@ export default function StudentProgress() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6">
         <h3 className="font-semibold mb-4">Activity Timeline</h3>
-        <div className="relative">
-          <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
-          {[
-            { icon: CheckCircle2, title: 'Completed Task: Unit Tests for Auth Module', date: 'Jan 19, 2025', color: 'text-emerald-500 bg-emerald-100' },
-            { icon: Award, title: 'Received Feedback on API Endpoint', date: 'Jan 18, 2025', color: 'text-purple-500 bg-purple-100' },
-            { icon: Target, title: 'Submitted Task: Design System Documentation', date: 'Jan 15, 2025', color: 'text-blue-500 bg-blue-100' },
-            { icon: MessageSquare, title: 'New Message from Dr. Rodriguez', date: 'Jan 14, 2025', color: 'text-amber-500 bg-amber-100' },
-          ].map((item, i) => (
-            <div key={i} className="relative flex items-start gap-4 mb-6 last:mb-0">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${item.color.split(' ')[1]}`}>
-                <item.icon className={`w-4 h-4 ${item.color.split(' ')[0]}`} />
+        {activities.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No recent account activities recorded.</p>
+        ) : (
+          <div className="relative">
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+            {activities.map((item, i) => (
+              <div key={item.id} className="relative flex items-start gap-4 mb-6 last:mb-0">
+                <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-4 h-4 text-accent" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{item.action || 'Performed Action'}</p>
+                  {item.details && <p className="text-xs text-muted-foreground mt-0.5">{item.details}</p>}
+                  <p className="text-[10px] text-muted-foreground mt-1">{new Date(item.created_at).toLocaleString()}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium">{item.title}</p>
-                <p className="text-xs text-muted-foreground">{item.date}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   );

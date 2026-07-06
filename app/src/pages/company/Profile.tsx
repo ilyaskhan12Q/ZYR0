@@ -1,56 +1,157 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, Globe, MapPin, Save, Plus, X, Upload } from 'lucide-react';
-import { companies } from '@/data/mockData';
+import { Mail, Phone, Globe, MapPin, Save, Plus, X, Upload, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getMyCompany, updateCompany, createCompany, uploadCompanyLogo } from '@/services/companies';
 
 export default function CompanyProfile() {
-  const company = companies[0];
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [company, setCompany] = useState<any>(null);
+
   const [form, setForm] = useState({
-    name: company.name,
-    email: company.email,
-    phone: company.phone,
-    website: company.website,
-    location: company.location,
-    size: company.size,
-    industry: company.industry,
-    founded: company.founded,
-    description: company.description,
+    name: '',
+    email: '',
+    phone: '',
+    website: '',
+    location: '',
+    size: '1-10 employees',
+    industry: '',
+    founded: '',
+    description: '',
   });
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    async function loadCompany() {
+      try {
+        const { data } = await getMyCompany();
+        if (data) {
+          setCompany(data);
+          setForm({
+            name: data.name || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            website: data.website || '',
+            location: data.location || '',
+            size: data.size || '1-10 employees',
+            industry: data.industry || '',
+            founded: data.founded || '',
+            description: data.description || '',
+          });
+        }
+      } catch (err: any) {
+        setError('Failed to fetch company profile');
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (user) {
+      loadCompany();
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      if (company?.id) {
+        const { data, error: err } = await updateCompany(company.id, form);
+        if (err) throw err;
+        setCompany(data);
+      } else {
+        const { data, error: err } = await createCompany(form);
+        if (err) throw err;
+        setCompany(data);
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !company?.id) return;
+    setUploadingLogo(true);
+    setError(null);
+    try {
+      const publicUrl = await uploadCompanyLogo(company.id, file);
+      setCompany((prev: any) => ({ ...prev, logo_url: publicUrl }));
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload logo');
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Company Profile</h1>
-        <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90">
-          <Save className="w-4 h-4" /> {saved ? 'Saved!' : 'Save Changes'}
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 disabled:opacity-50"
+        >
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
 
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-primary to-accent relative">
-          <button className="absolute bottom-3 right-3 px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs rounded-lg flex items-center gap-1.5">
-            <Upload className="w-3 h-3" /> Change Cover
-          </button>
+      {error && (
+        <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium">
+          {error}
         </div>
-        <div className="px-6 pb-6">
-          <div className="flex items-end -mt-10 mb-4 gap-4">
-            <div className="relative">
-              <img src={company.logo} alt="" className="w-20 h-20 rounded-2xl border-4 border-card shadow-lg" />
-              <button className="absolute -bottom-1 -right-1 w-7 h-7 bg-accent text-white rounded-full flex items-center justify-center shadow-md">
-                <Upload className="w-3 h-3" />
-              </button>
+      )}
+
+      {/* Header / Cover Logo */}
+      {company && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+          <div className="h-32 bg-gradient-to-r from-primary to-accent relative" />
+          <div className="px-6 pb-6">
+            <div className="flex items-end -mt-10 mb-4 gap-4">
+              <div className="relative">
+                <img
+                  src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name || 'Company'}`}
+                  alt=""
+                  className="w-20 h-20 rounded-2xl border-4 border-card shadow-lg object-cover"
+                />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleLogoUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingLogo}
+                  className="absolute -bottom-1 -right-1 w-7 h-7 bg-accent text-white rounded-full flex items-center justify-center shadow-md hover:bg-accent/90 disabled:opacity-50"
+                >
+                  {uploadingLogo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Basic Info */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
@@ -79,7 +180,7 @@ export default function CompanyProfile() {
             </select>
           </div>
           <div>
-            <label className="text-sm font-medium mb-1.5 block">Founded</label>
+            <label className="text-sm font-medium mb-1.5 block">Founded (Year)</label>
             <input type="text" value={form.founded} onChange={(e) => setForm({ ...form, founded: e.target.value })}
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>

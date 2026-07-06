@@ -1,20 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Search, Edit, Eye, XCircle, Users, TrendingUp, Calendar, MapPin, DollarSign } from 'lucide-react';
-import { internships } from '@/data/mockData';
+import { Plus, Search, Edit, Eye, XCircle, Users, TrendingUp, Calendar, MapPin, DollarSign, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { getMyCompany } from '@/services/companies';
+import { getInternships, closeInternship } from '@/services/internships';
+import { getAllCompanyApplications } from '@/services/applications';
 
 const tabs = ['All', 'Active', 'Closed', 'Draft'];
 
 export default function CompanyInternships() {
+  const { user } = useAuth();
+  const [company, setCompany] = useState<any>(null);
+  const [internships, setInternships] = useState<any[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('All');
   const [search, setSearch] = useState('');
+  const [updating, setUpdating] = useState<string | null>(null);
+
+  async function loadData() {
+    const { data: co } = await getMyCompany();
+    if (co) {
+      setCompany(co);
+      const [internshipsRes, appsRes] = await Promise.all([
+        getInternships({ company_id: co.id, status: 'all' }),
+        getAllCompanyApplications(co.id)
+      ]);
+      if (internshipsRes.data) setInternships(internshipsRes.data);
+      if (appsRes.data) setApplications(appsRes.data);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
   const filtered = internships.filter(i => {
     const matchTab = activeTab === 'All' || i.status === activeTab;
     const matchSearch = !search || i.title.toLowerCase().includes(search.toLowerCase());
     return matchTab && matchSearch;
   });
+
+  async function handleCloseInternship(id: string) {
+    if (!window.confirm('Are you sure you want to close this internship?')) return;
+    setUpdating(id);
+    const { error } = await closeInternship(id);
+    if (!error) {
+      setInternships(prev => prev.map(i => i.id === id ? { ...i, status: 'Closed' } : i));
+    }
+    setUpdating(null);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -34,7 +81,7 @@ export default function CompanyInternships() {
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search internships..."
             className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
         </div>
-        <div className="flex gap-1 bg-muted rounded-lg p-1">
+        <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
           {tabs.map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
@@ -45,36 +92,59 @@ export default function CompanyInternships() {
       </div>
 
       <div className="space-y-3">
-        {filtered.map((internship, i) => (
-          <motion.div key={internship.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <h3 className="font-semibold">{internship.title}</h3>
-                  <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                    internship.status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
-                    internship.status === 'Closed' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                  }`}>{internship.status}</span>
+        {filtered.length === 0 ? (
+          <p className="text-muted-foreground text-center py-10">No internships found.</p>
+        ) : (
+          filtered.map((internship, idx) => {
+            const appCount = applications.filter(a => {
+              const ai = Array.isArray(a.internship) ? a.internship[0] : a.internship;
+              return ai?.id === internship.id;
+            }).length;
+            const isUpdating = updating === internship.id;
+
+            return (
+              <motion.div key={internship.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
+                className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <h3 className="font-semibold">{internship.title}</h3>
+                      <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
+                        internship.status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
+                        internship.status === 'Closed' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                      }`}>{internship.status}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {internship.location || 'Remote'}</span>
+                      <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> {internship.stipend || 'Unpaid'}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Deadline: {internship.deadline ? new Date(internship.deadline).toLocaleDateString() : 'Rolling'}</span>
+                    </div>
+                    <div className="flex gap-4 mt-3 text-sm">
+                      <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-muted-foreground" /> {appCount} applicant{appCount !== 1 ? 's' : ''}</span>
+                      <span className="flex items-center gap-1.5"><TrendingUp className="w-4 h-4 text-muted-foreground" /> {internship.view_count || 0} view{internship.view_count !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {isUpdating ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <Link to={`/internships/${internship.id}`} className="p-2 hover:bg-muted rounded-lg transition-colors" title="View">
+                          <Eye className="w-4 h-4 text-muted-foreground" />
+                        </Link>
+                        {internship.status !== 'Closed' && (
+                          <button onClick={() => handleCloseInternship(internship.id)} className="p-2 hover:bg-muted rounded-lg transition-colors" title="Close">
+                            <XCircle className="w-4 h-4 text-red-500" />
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {internship.location}</span>
-                  <span className="flex items-center gap-1"><DollarSign className="w-3.5 h-3.5" /> {internship.stipend}</span>
-                  <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Deadline: {new Date(internship.deadline).toLocaleDateString()}</span>
-                </div>
-                <div className="flex gap-4 mt-3 text-sm">
-                  <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-muted-foreground" /> {internship.applicants} applicants</span>
-                  <span className="flex items-center gap-1.5"><TrendingUp className="w-4 h-4 text-muted-foreground" /> {internship.views} views</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <button className="p-2 hover:bg-muted rounded-lg transition-colors" title="View"><Eye className="w-4 h-4 text-muted-foreground" /></button>
-                <button className="p-2 hover:bg-muted rounded-lg transition-colors" title="Edit"><Edit className="w-4 h-4 text-muted-foreground" /></button>
-                <button className="p-2 hover:bg-muted rounded-lg transition-colors" title="Close"><XCircle className="w-4 h-4 text-muted-foreground" /></button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+              </motion.div>
+            );
+          })
+        )}
       </div>
     </div>
   );

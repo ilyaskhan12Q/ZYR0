@@ -1,14 +1,144 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Plus, ClipboardList, CheckCircle2, Clock, Circle, Calendar, Paperclip, ChevronRight, User } from 'lucide-react';
-import { tasks } from '@/data/mockData';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, ClipboardList, CheckCircle2, Clock, Circle, Calendar, Paperclip, ChevronRight, User, Loader2, X, AlertCircle } from 'lucide-react';
+import { getTasksAssignedByMe, createTask, reviewSubmission } from '@/services/tasks';
+import { getMyCompany } from '@/services/companies';
+import { getAllCompanyApplications } from '@/services/applications';
+import { getInternships } from '@/services/internships';
 
-const tabs = ['All', 'Pending', 'Submitted', 'Approved'];
+const tabs = ['All', 'Pending', 'Submitted', 'Approved', 'Rejected'];
 
 export default function CompanyTasks() {
   const [activeTab, setActiveTab] = useState('All');
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [company, setCompany] = useState<any>(null);
+  const [interns, setInterns] = useState<any[]>([]);
+  const [internships, setInternships] = useState<any[]>([]);
+
+  // Create task modal state
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [newPriority, setNewPriority] = useState<'Low' | 'Medium' | 'High'>('Medium');
+  const [newDueDate, setNewDueDate] = useState('');
+  const [newInternshipId, setNewInternshipId] = useState('');
+  const [newAssignedTo, setNewAssignedTo] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Review submission state
+  const [reviewingTask, setReviewingTask] = useState<any>(null);
+  const [reviewFeedback, setReviewFeedback] = useState('');
+  const [reviewGrade, setReviewGrade] = useState('');
+  const [reviewing, setReviewing] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const { data: co } = await getMyCompany();
+      if (co) {
+        setCompany(co);
+        const [tasksRes, appsRes, internshipsRes] = await Promise.all([
+          getTasksAssignedByMe(),
+          getAllCompanyApplications(co.id),
+          getInternships({ company_id: co.id, status: 'Active' }),
+        ]);
+
+        if (tasksRes.data) {
+          setTasks(tasksRes.data);
+        }
+        if (appsRes.data) {
+          // Find all accepted applications - these are active interns
+          const activeInterns = appsRes.data.filter((app: any) => app.status === 'Accepted');
+          setInterns(activeInterns);
+        }
+        if (internshipsRes.data) {
+          setInternships(internshipsRes.data);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTitle.trim() || !newInternshipId || !newAssignedTo) return;
+    setSubmitting(true);
+    try {
+      const { error } = await createTask({
+        title: newTitle.trim(),
+        description: newDescription.trim(),
+        priority: newPriority,
+        due_date: newDueDate || null,
+        internship_id: newInternshipId,
+        assigned_to: newAssignedTo,
+        status: 'Pending',
+      });
+      if (!error) {
+        setShowCreateModal(false);
+        // Reset form
+        setNewTitle('');
+        setNewDescription('');
+        setNewPriority('Medium');
+        setNewDueDate('');
+        setNewInternshipId('');
+        setNewAssignedTo('');
+        await loadData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReviewSubmission = async (status: 'Approved' | 'Rejected') => {
+    if (!reviewingTask || !reviewingTask.submissions?.[0]) return;
+    setReviewing(true);
+    try {
+      const submission = reviewingTask.submissions[0];
+      const gradeVal = reviewGrade ? parseInt(reviewGrade, 10) : undefined;
+      const { error } = await reviewSubmission(submission.id, {
+        status,
+        feedback: reviewFeedback.trim() || undefined,
+        grade: gradeVal,
+      });
+
+      if (!error) {
+        // Also update task status to match approved/rejected
+        const { error: taskErr } = await createTask({
+          ...reviewingTask,
+          id: reviewingTask.id,
+          status,
+        } as any);
+
+        setReviewingTask(null);
+        setReviewFeedback('');
+        setReviewGrade('');
+        await loadData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setReviewing(false);
+    }
+  };
+
   const filtered = activeTab === 'All' ? tasks : tasks.filter(t => t.status === activeTab);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -17,66 +147,198 @@ export default function CompanyTasks() {
           <h1 className="text-2xl font-bold">Task Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Create and manage tasks for your interns</p>
         </div>
-        <Link to="/company/tasks/new" className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90">
+        <button onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
           <Plus className="w-4 h-4" /> Create Task
-        </Link>
+        </button>
       </div>
 
       <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
         {tabs.map(tab => (
           <button key={tab} onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
-            {tab} {tab !== 'All' && <span className="text-xs text-muted-foreground">({tasks.filter(t => t.status === tab).length})</span>}
+            {tab} <span className="text-xs text-muted-foreground">({tab === 'All' ? tasks.length : tasks.filter(t => t.status === tab).length})</span>
           </button>
         ))}
       </div>
 
       <div className="space-y-3">
-        {filtered.map((task, i) => (
-          <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-            className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start gap-3">
-                {task.status === 'Approved' ? <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" /> :
-                 task.status === 'Submitted' ? <Clock className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" /> :
-                 <Circle className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />}
-                <div>
-                  <h3 className="font-semibold">{task.title}</h3>
-                  <p className="text-sm text-muted-foreground">{task.internshipTitle}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
-                  <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Due: {new Date(task.dueDate).toLocaleDateString()}</span>
-                    <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {task.assignedToName}</span>
-                    {task.attachments.length > 0 && <span className="flex items-center gap-1"><Paperclip className="w-3.5 h-3.5" /> {task.attachments.length} files</span>}
+        {filtered.length === 0 ? (
+          <div className="text-center py-12 bg-card border border-border rounded-xl">
+            <ClipboardList className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg font-medium">No tasks found</h3>
+            <p className="text-muted-foreground mt-1">Create a task to assign work to your active interns.</p>
+          </div>
+        ) : (
+          filtered.map((task, i) => {
+            const submission = task.submissions?.[0];
+            return (
+              <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    {task.status === 'Approved' ? <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 flex-shrink-0" /> :
+                     task.status === 'Submitted' ? <Clock className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" /> :
+                     task.status === 'Rejected' ? <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" /> :
+                     <Circle className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />}
+                    <div>
+                      <h3 className="font-semibold">{task.title}</h3>
+                      <p className="text-sm text-muted-foreground">{task.internship?.title || 'Internship'}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{task.description}</p>
+                      <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No date'}</span>
+                        <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {task.assignee?.full_name || 'Unassigned'}</span>
+                        {task.attachments && task.attachments.length > 0 && <span className="flex items-center gap-1"><Paperclip className="w-3.5 h-3.5" /> {task.attachments.length} files</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
+                      task.priority === 'High' ? 'bg-red-100 text-red-700' : task.priority === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                    }`}>{task.priority}</span>
+                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
+                      task.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' :
+                      task.status === 'Submitted' ? 'bg-amber-100 text-amber-700' :
+                      task.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>{task.status}</span>
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
-                  task.priority === 'High' ? 'bg-red-100 text-red-700' : task.priority === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
-                }`}>{task.priority}</span>
-                <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
-                  task.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : task.status === 'Submitted' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
-                }`}>{task.status}</span>
-              </div>
-            </div>
 
-            {task.submissions.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-border">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm">
-                    Submitted by <span className="font-medium">{task.submissions[0].studentName}</span> on {new Date(task.submissions[0].submittedDate).toLocaleDateString()}
-                    {task.submissions[0].grade && <span className="ml-2 text-emerald-600 font-medium">Grade: {task.submissions[0].grade}%</span>}
-                  </p>
-                  <button className="px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-medium hover:bg-accent/90">
-                    Review
-                  </button>
+                {submission && (
+                  <div className="mt-4 pt-3 border-t border-border">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm">
+                          Submitted by <span className="font-medium">{task.assignee?.full_name}</span> on {new Date(submission.submitted_at).toLocaleDateString()}
+                          {submission.grade !== null && submission.grade !== undefined && <span className="ml-2 text-emerald-600 font-medium">Grade: {submission.grade}%</span>}
+                        </p>
+                        {submission.notes && <p className="text-xs text-muted-foreground mt-1 bg-muted p-2.5 rounded-lg border border-border">Note: {submission.notes}</p>}
+                        {submission.feedback && <p className="text-xs text-muted-foreground italic">&ldquo;{submission.feedback}&rdquo;</p>}
+                      </div>
+                      {task.status === 'Submitted' && (
+                        <button onClick={() => setReviewingTask(task)} className="px-3 py-1.5 bg-accent text-white rounded-lg text-xs font-medium hover:bg-accent/90 transition-colors">
+                          Review
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Create Task Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-card border border-border w-full max-w-lg rounded-2xl shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h2 className="font-bold text-lg">Create New Task</h2>
+              <button onClick={() => setShowCreateModal(false)} className="p-1 hover:bg-muted rounded-full transition-colors"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleCreateTask} className="p-6 space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-1 block">Title</label>
+                <input type="text" required value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="e.g. Design Homepage Mockups"
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20" />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">Description</label>
+                <textarea required rows={3} value={newDescription} onChange={(e) => setNewDescription(e.target.value)} placeholder="Provide detailed instructions for the task..."
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Internship Project</label>
+                  <select required value={newInternshipId} onChange={(e) => setNewInternshipId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
+                    <option value="">Select Internship</option>
+                    {internships.map(i => <option key={i.id} value={i.id}>{i.title}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Assign To (Intern)</label>
+                  <select required value={newAssignedTo} onChange={(e) => setNewAssignedTo(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
+                    <option value="">Select Intern</option>
+                    {interns.map(i => <option key={i.student.id} value={i.student.id}>{i.student.full_name}</option>)}
+                  </select>
                 </div>
               </div>
-            )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Priority</label>
+                  <select value={newPriority} onChange={(e: any) => setNewPriority(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Due Date</label>
+                  <input type="date" value={newDueDate} onChange={(e) => setNewDueDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20" />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                <button type="button" onClick={() => setShowCreateModal(false)} className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">Cancel</button>
+                <button type="submit" disabled={submitting} className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-1.5">
+                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Task'}
+                </button>
+              </div>
+            </form>
           </motion.div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {/* Review Submission Modal */}
+      {reviewingTask && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-card border border-border w-full max-w-lg rounded-2xl shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h2 className="font-bold text-lg">Review Task Submission</h2>
+              <button onClick={() => setReviewingTask(null)} className="p-1 hover:bg-muted rounded-full transition-colors"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <h3 className="font-semibold text-base">{reviewingTask.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{reviewingTask.description}</p>
+              </div>
+
+              <div className="bg-muted p-4 rounded-xl border border-border space-y-2">
+                <div className="flex justify-between items-center text-xs text-muted-foreground">
+                  <span>Student Submission Notes</span>
+                  <span>{new Date(reviewingTask.submissions[0].submitted_at).toLocaleString()}</span>
+                </div>
+                <p className="text-sm text-foreground">{reviewingTask.submissions[0].notes || 'No submission notes provided.'}</p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-1 block">Feedback (Optional)</label>
+                <textarea rows={3} value={reviewFeedback} onChange={(e) => setReviewFeedback(e.target.value)} placeholder="Provide constructive feedback for the student..."
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none" />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium mb-1 block">Grade (0-100, Optional)</label>
+                <input type="number" min="0" max="100" value={reviewGrade} onChange={(e) => setReviewGrade(e.target.value)} placeholder="e.g. 95"
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20" />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Rejected')} className="px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
+                  Reject
+                </button>
+                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Approved')} className="px-4 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors">
+                  Approve
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

@@ -118,7 +118,6 @@ function App() {
           <Route path="applicants" element={<CompanyApplicants />} />
           <Route path="interns" element={<CompanyInterns />} />
           <Route path="tasks" element={<CompanyTasks />} />
-          <Route path="tasks/new" element={<PostInternship />} />
           <Route path="analytics" element={<CompanyAnalytics />} />
           <Route path="certificates" element={<CompanyCertificates />} />
           <Route path="team" element={<CompanyTeam />} />

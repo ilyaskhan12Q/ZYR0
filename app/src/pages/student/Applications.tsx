@@ -3,14 +3,15 @@ import { motion } from 'framer-motion';
 import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, Loader2 } from 'lucide-react';
 import { getMyApplications } from '@/services/applications';
 
-const tabs = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
+const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
 
 const statusConfig: Record<string, { color: string; icon: React.ElementType }> = {
-  Pending: { color: 'bg-blue-100 text-blue-700', icon: FileCheck },
+  Applied: { color: 'bg-blue-100 text-blue-700', icon: FileCheck },
   'Under Review': { color: 'bg-amber-100 text-amber-700', icon: Clock },
-  Shortlisted: { color: 'bg-blue-100 text-blue-700', icon: Star },
+  Shortlisted: { color: 'bg-purple-100 text-purple-700', icon: Star },
   Accepted: { color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
   Rejected: { color: 'bg-red-100 text-red-700', icon: XCircle },
+  Withdrawn: { color: 'bg-slate-100 text-slate-700', icon: XCircle },
 };
 
 export default function StudentApplications() {
@@ -67,7 +68,7 @@ export default function StudentApplications() {
           </div>
         ) : (
           filtered.map((app, i) => {
-            const config = statusConfig[app.status] || statusConfig.Pending;
+            const config = statusConfig[app.status] || statusConfig.Applied;
             const StatusIcon = config.icon;
             
             // Handle Supabase join array vs object safely
@@ -97,7 +98,7 @@ export default function StudentApplications() {
                 <div className="mt-5 pt-4 border-t border-border">
                   <div className="flex items-center justify-between">
                     {['Submitted', 'Under Review', 'Interview', 'Decision'].map((step, idx) => {
-                      const statusOrder = ['Pending', 'Under Review', 'Shortlisted', 'Accepted'];
+                      const statusOrder = ['Applied', 'Under Review', 'Shortlisted', 'Accepted'];
                       const currentIdx = statusOrder.indexOf(app.status === 'Rejected' ? 'Accepted' : app.status);
                       const isCompleted = idx <= currentIdx;
                       const isCurrent = idx === currentIdx;

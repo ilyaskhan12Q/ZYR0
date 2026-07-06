@@ -1,29 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, ExternalLink, Copy, Check } from 'lucide-react';
-import { certificates } from '@/data/mockData';
+import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check } from 'lucide-react';
+import { verifyCertificate } from '@/services/certificates';
+import { supabase } from '@/lib/supabase';
 
 export default function Verify() {
   const [certId, setCertId] = useState('');
   const [result, setResult] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [loading, setLoading] = useState(false);
-  const [verifiedCert, setVerifiedCert] = useState<typeof certificates[0] | null>(null);
+  const [verifiedCert, setVerifiedCert] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [sampleCerts, setSampleCerts] = useState<string[]>([]);
 
-  const handleVerify = () => {
+  useEffect(() => {
+    async function loadSamples() {
+      const { data } = await supabase
+        .from('certificates')
+        .select('credential_id')
+        .limit(3);
+      if (data) {
+        setSampleCerts(data.map(c => c.credential_id));
+      }
+    }
+    loadSamples();
+  }, []);
+
+  const handleVerify = async () => {
     if (!certId.trim()) return;
     setLoading(true);
-    setTimeout(() => {
-      const cert = certificates.find(c => c.credentialId.toLowerCase() === certId.trim().toLowerCase());
-      if (cert) {
-        setResult('valid');
-        setVerifiedCert(cert);
-      } else {
+    setResult('idle');
+    setVerifiedCert(null);
+
+    try {
+      const { data, error } = await verifyCertificate(certId.trim());
+      if (error || !data) {
         setResult('invalid');
-        setVerifiedCert(null);
+      } else {
+        setResult('valid');
+        setVerifiedCert(data);
       }
+    } catch (err) {
+      setResult('invalid');
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   const handleCopy = () => {
@@ -63,17 +83,19 @@ export default function Verify() {
           </div>
 
           {/* Sample IDs */}
-          <div className="mt-4 pt-4 border-t border-border">
-            <p className="text-xs text-muted-foreground mb-2">Try these sample IDs:</p>
-            <div className="flex flex-wrap gap-2">
-              {certificates.map(c => (
-                <button key={c.id} onClick={() => { setCertId(c.credentialId); setResult('idle'); }}
-                  className="text-xs px-2.5 py-1 bg-muted rounded-full hover:bg-accent/10 hover:text-accent transition-colors">
-                  {c.credentialId}
-                </button>
-              ))}
+          {sampleCerts.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Try these sample IDs:</p>
+              <div className="flex flex-wrap gap-2">
+                {sampleCerts.map(id => (
+                  <button key={id} onClick={() => { setCertId(id); setResult('idle'); }}
+                    className="text-xs px-2.5 py-1 bg-muted rounded-full hover:bg-accent/10 hover:text-accent transition-colors">
+                    {id}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </motion.div>
 
         {/* Result */}
@@ -93,44 +115,48 @@ export default function Verify() {
                   <Award className="w-8 h-8 text-accent flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-lg">{verifiedCert.title}</p>
-                    <p className="text-sm text-muted-foreground">{verifiedCert.internshipTitle}</p>
+                    <p className="text-sm text-muted-foreground">{verifiedCert.internship?.title || 'Internship Opportunity'}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-muted rounded-lg p-3">
                     <p className="text-xs text-muted-foreground">Recipient</p>
-                    <p className="text-sm font-medium">{verifiedCert.recipientName}</p>
+                    <p className="text-sm font-medium">{verifiedCert.recipient?.full_name || 'N/A'}</p>
                   </div>
                   <div className="bg-muted rounded-lg p-3">
                     <p className="text-xs text-muted-foreground">Issuing Organization</p>
-                    <p className="text-sm font-medium">{verifiedCert.company}</p>
+                    <p className="text-sm font-medium">{verifiedCert.company?.name || 'N/A'}</p>
                   </div>
                   <div className="bg-muted rounded-lg p-3">
                     <p className="text-xs text-muted-foreground">Issue Date</p>
-                    <p className="text-sm font-medium">{new Date(verifiedCert.issueDate).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium">{new Date(verifiedCert.issue_date).toLocaleDateString()}</p>
                   </div>
                   <div className="bg-muted rounded-lg p-3">
                     <p className="text-xs text-muted-foreground">Credential ID</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium font-mono">{verifiedCert.credentialId}</p>
+                      <p className="text-sm font-medium font-mono">{verifiedCert.credential_id}</p>
                       <button onClick={handleCopy} className="text-accent hover:text-accent/80">
                         {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                       </button>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-2">Skills</p>
-                  <div className="flex flex-wrap gap-2">
-                    {verifiedCert.skills.map((s, i) => (
-                      <span key={i} className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full">{s}</span>
-                    ))}
+                {verifiedCert.skills && verifiedCert.skills.length > 0 && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">Skills</p>
+                    <div className="flex flex-wrap gap-2">
+                      {verifiedCert.skills.map((s: string, i: number) => (
+                        <span key={i} className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full">{s}</span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="bg-muted rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">Blockchain Hash</p>
-                  <p className="text-xs font-mono text-muted-foreground truncate">{verifiedCert.blockchainHash}</p>
-                </div>
+                )}
+                {verifiedCert.blockchain_hash && (
+                  <div className="bg-muted rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground">Blockchain Hash</p>
+                    <p className="text-xs font-mono text-muted-foreground truncate">{verifiedCert.blockchain_hash}</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}
