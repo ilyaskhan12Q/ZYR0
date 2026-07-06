@@ -1,90 +1,180 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Bookmark, Share2, CheckCircle2, Building2, ExternalLink } from 'lucide-react';
-import { internships, companies } from '@/data/mockData';
+import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Bookmark, Share2, CheckCircle2, Building2, ExternalLink, Loader2 } from 'lucide-react';
+import { getInternshipById } from '@/services/internships';
+import { applyToInternship, hasApplied } from '@/services/applications';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function InternshipDetail() {
   const { id } = useParams();
-  const internship = internships.find(i => i.id === id) || internships[0];
-  const company = companies.find(c => c.id === internship.companyId);
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+
+  const [internship, setInternship] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [applicationStatus, setApplicationStatus] = useState<any>(null);
+  const [applying, setApplying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      if (!id) return;
+      
+      const { data, error: loadErr } = await getInternshipById(id);
+      if (loadErr) {
+        setError("Failed to load internship");
+      } else {
+        setInternship(data);
+      }
+
+      if (user) {
+        const applied = await hasApplied(id);
+        setApplicationStatus(applied);
+      }
+
+      setLoading(false);
+    }
+    load();
+  }, [id, user]);
+
+  const handleApply = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // Must be a student to apply
+    if (profile?.role !== 'student') {
+      alert("Only student accounts can apply for internships.");
+      return;
+    }
+
+    try {
+      setApplying(true);
+      await applyToInternship({ internship_id: id! });
+      
+      // Refresh status
+      const applied = await hasApplied(id!);
+      setApplicationStatus(applied);
+    } catch (err: any) {
+      alert(err.message || "Failed to submit application.");
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen pt-20">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
+  if (error || !internship) {
+    return (
+      <div className="flex items-center justify-center min-h-screen pt-20">
+        <div className="text-center">
+          <h2 className="text-xl font-bold">Internship not found</h2>
+          <Link to="/internships" className="text-accent hover:underline mt-4 inline-block">Browse all internships</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const company = Array.isArray(internship.company) ? internship.company[0] : internship.company;
 
   const tabs = [
     { label: 'Overview', content: (
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-semibold mb-3">About This Role</h3>
-          <p className="text-muted-foreground leading-relaxed">{internship.description}</p>
+          <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">{internship.description}</p>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Responsibilities</h3>
-          <ul className="space-y-2">
-            {internship.responsibilities.map((r, i) => (
-              <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                {r}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3">What You Will Learn</h3>
-          <div className="flex flex-wrap gap-2">
-            {internship.skills.map((s, i) => (
-              <span key={i} className="px-3 py-1.5 bg-accent/10 text-accent text-sm rounded-lg font-medium">{s}</span>
-            ))}
+        
+        {internship.responsibilities && internship.responsibilities.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Responsibilities</h3>
+            <ul className="space-y-2">
+              {internship.responsibilities.map((r: string, i: number) => (
+                <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  {r}
+                </li>
+              ))}
+            </ul>
           </div>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Benefits</h3>
-          <div className="flex flex-wrap gap-2">
-            {internship.benefits.map((b, i) => (
-              <span key={i} className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm rounded-lg">{b}</span>
-            ))}
+        )}
+
+        {internship.skills && internship.skills.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">What You Will Learn</h3>
+            <div className="flex flex-wrap gap-2">
+              {internship.skills.map((s: string, i: number) => (
+                <span key={i} className="px-3 py-1.5 bg-accent/10 text-accent text-sm rounded-lg font-medium">{s}</span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {internship.benefits && internship.benefits.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Benefits</h3>
+            <div className="flex flex-wrap gap-2">
+              {internship.benefits.map((b: string, i: number) => (
+                <span key={i} className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm rounded-lg">{b}</span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     )},
     { label: 'Requirements', content: (
       <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Required Skills</h3>
-          <div className="flex flex-wrap gap-2">
-            {internship.skills.map((s, i) => (
-              <span key={i} className="px-3 py-1.5 bg-accent/10 text-accent text-sm rounded-lg font-medium">{s}</span>
-            ))}
+        {internship.skills && internship.skills.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Required Skills</h3>
+            <div className="flex flex-wrap gap-2">
+              {internship.skills.map((s: string, i: number) => (
+                <span key={i} className="px-3 py-1.5 bg-accent/10 text-accent text-sm rounded-lg font-medium">{s}</span>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div>
           <h3 className="text-lg font-semibold mb-3">Education & Experience</h3>
           <ul className="space-y-2">
             <li className="flex items-start gap-2 text-muted-foreground">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-              {internship.educationLevel}
+              {internship.education_level || 'Any degree'}
             </li>
             <li className="flex items-start gap-2 text-muted-foreground">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-              Experience Level: {internship.experienceLevel}
+              Experience Level: {internship.experience_level || 'Beginner'}
             </li>
           </ul>
         </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-3">Requirements</h3>
-          <ul className="space-y-2">
-            {internship.requirements.map((r, i) => (
-              <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                {r}
-              </li>
-            ))}
-          </ul>
-        </div>
+        
+        {internship.requirements && internship.requirements.length > 0 && (
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Requirements</h3>
+            <ul className="space-y-2">
+              {internship.requirements.map((r: string, i: number) => (
+                <li key={i} className="flex items-start gap-2 text-muted-foreground">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  {r}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     )},
     { label: 'About Company', content: company ? (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <img src={company.logo} alt="" className="w-16 h-16 rounded-xl" />
+          <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name}`} alt="" className="w-16 h-16 rounded-xl object-cover" />
           <div>
             <h3 className="text-lg font-semibold">{company.name}</h3>
             <p className="text-sm text-muted-foreground">{company.industry}</p>
@@ -94,21 +184,25 @@ export default function InternshipDetail() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-muted rounded-lg p-4">
             <p className="text-xs text-muted-foreground">Company Size</p>
-            <p className="text-sm font-medium mt-1">{company.size}</p>
+            <p className="text-sm font-medium mt-1">{company.size || 'Unknown'}</p>
           </div>
           <div className="bg-muted rounded-lg p-4">
             <p className="text-xs text-muted-foreground">Founded</p>
-            <p className="text-sm font-medium mt-1">{company.founded}</p>
+            <p className="text-sm font-medium mt-1">{company.founded || 'N/A'}</p>
           </div>
           <div className="bg-muted rounded-lg p-4">
             <p className="text-xs text-muted-foreground">Location</p>
-            <p className="text-sm font-medium mt-1">{company.location}</p>
+            <p className="text-sm font-medium mt-1">{company.location || 'Remote'}</p>
           </div>
           <div className="bg-muted rounded-lg p-4">
             <p className="text-xs text-muted-foreground">Website</p>
-            <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-accent mt-1 inline-flex items-center gap-1">
-              Visit <ExternalLink className="w-3 h-3" />
-            </a>
+            {company.website ? (
+              <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-accent mt-1 inline-flex items-center gap-1">
+                Visit <ExternalLink className="w-3 h-3" />
+              </a>
+            ) : (
+              <p className="text-sm font-medium mt-1">N/A</p>
+            )}
           </div>
         </div>
       </div>
@@ -132,11 +226,13 @@ export default function InternshipDetail() {
             <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                  <img src={internship.companyLogo} alt="" className="w-14 h-14 rounded-xl" />
+                  <img src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`} alt="" className="w-14 h-14 rounded-xl object-cover" />
                   <div>
-                    <Link to={`/companies/${internship.companyId}`} className="text-sm text-accent hover:underline flex items-center gap-1">
-                      {internship.company} <Building2 className="w-3 h-3" />
-                    </Link>
+                    {company && (
+                      <Link to={`/companies/${company.id}`} className="text-sm text-accent hover:underline flex items-center gap-1">
+                        {company.name} <Building2 className="w-3 h-3" />
+                      </Link>
+                    )}
                     <h1 className="text-2xl font-bold mt-1">{internship.title}</h1>
                   </div>
                 </div>
@@ -144,16 +240,16 @@ export default function InternshipDetail() {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full font-medium">{internship.type}</span>
-                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">{internship.stipendType}</span>
-                <span className="px-2.5 py-1 bg-muted text-muted-foreground text-xs rounded-full">{internship.locationType}</span>
+                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">{internship.stipend_type}</span>
+                <span className="px-2.5 py-1 bg-muted text-muted-foreground text-xs rounded-full">{internship.location_type}</span>
                 <span className="px-2.5 py-1 bg-muted text-muted-foreground text-xs rounded-full">{internship.domain}</span>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {internship.location}</span>
-                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {internship.duration}</span>
-                <span className="flex items-center gap-1.5"><DollarSign className="w-4 h-4" /> {internship.stipend}</span>
-                <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Deadline: {new Date(internship.deadline).toLocaleDateString()}</span>
+                <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> {internship.location || 'Remote'}</span>
+                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> {internship.duration || 'Not specified'}</span>
+                <span className="flex items-center gap-1.5"><DollarSign className="w-4 h-4" /> {internship.stipend || 'Unpaid'}</span>
+                <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Deadline: {internship.deadline ? new Date(internship.deadline).toLocaleDateString() : 'N/A'}</span>
               </div>
             </div>
 
@@ -193,17 +289,37 @@ export default function InternshipDetail() {
             <div className="bg-card rounded-xl border border-border p-6 shadow-sm sticky top-24">
               <div className="text-center mb-5">
                 <p className="text-sm text-muted-foreground">Application Deadline</p>
-                <p className="text-lg font-semibold">{new Date(internship.deadline).toLocaleDateString()}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {Math.ceil((new Date(internship.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days remaining
-                </p>
+                <p className="text-lg font-semibold">{internship.deadline ? new Date(internship.deadline).toLocaleDateString() : 'Rolling'}</p>
+                {internship.deadline && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {Math.max(0, Math.ceil((new Date(internship.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining
+                  </p>
+                )}
               </div>
-              <Link
-                to={`/student/applications`}
-                className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors"
-              >
-                Apply Now
-              </Link>
+              
+              {applicationStatus ? (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 py-3 rounded-lg font-medium transition-colors cursor-not-allowed"
+                >
+                  <CheckCircle2 className="w-5 h-5" /> Applied ({applicationStatus.status})
+                </button>
+              ) : (
+                <button
+                  onClick={handleApply}
+                  disabled={applying || (internship.deadline && new Date(internship.deadline).getTime() < Date.now())}
+                  className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {applying ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</>
+                  ) : internship.deadline && new Date(internship.deadline).getTime() < Date.now() ? (
+                    'Deadline Passed'
+                  ) : (
+                    'Apply Now'
+                  )}
+                </button>
+              )}
+              
               <div className="mt-3 flex gap-2">
                 <button className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
                   <Bookmark className="w-4 h-4" /> Save
@@ -218,19 +334,19 @@ export default function InternshipDetail() {
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Experience</span>
-                    <span className="font-medium">{internship.experienceLevel}</span>
+                    <span className="font-medium">{internship.experience_level || 'Beginner'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Openings</span>
-                    <span className="font-medium">{internship.openings}</span>
+                    <span className="font-medium">{internship.openings || 'Not specified'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Applicants</span>
-                    <span className="font-medium">{internship.applicants}</span>
+                    <span className="font-medium">{internship.applicants_count || 0}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Start Date</span>
-                    <span className="font-medium">{new Date(internship.startDate).toLocaleDateString()}</span>
+                    <span className="text-muted-foreground">Posted</span>
+                    <span className="font-medium">{new Date(internship.posted_date || internship.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
@@ -241,15 +357,15 @@ export default function InternshipDetail() {
               <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
                 <h4 className="text-sm font-semibold mb-3">Company</h4>
                 <div className="flex items-center gap-3 mb-4">
-                  <img src={company.logo} alt="" className="w-10 h-10 rounded-lg" />
+                  <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name}`} alt="" className="w-10 h-10 rounded-lg object-cover" />
                   <div>
                     <p className="text-sm font-medium">{company.name}</p>
                     <p className="text-xs text-muted-foreground">{company.industry}</p>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
-                  <p className="text-muted-foreground">{company.size}</p>
-                  <p className="text-muted-foreground">{company.location}</p>
+                  <p className="text-muted-foreground">{company.size || 'Unknown size'}</p>
+                  <p className="text-muted-foreground">{company.location || 'Unknown location'}</p>
                 </div>
                 <Link to={`/companies/${company.id}`} className="mt-4 inline-flex items-center gap-1 text-sm text-accent hover:underline">
                   View Company <ExternalLink className="w-3 h-3" />
