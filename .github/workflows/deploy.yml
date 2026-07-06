@@ -52,14 +52,13 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build for production
-        run: |
-          echo "VITE_SUPABASE_URL=https://iczhrvgzbnuvlgjfzeol.supabase.co" > .env.production
-          echo "VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTYxOTgsImV4cCI6MjA5ODg5MjE5OH0.XVlrp-DDrPtxRbcr52nmHvgIv_XZ6CZaBImgZQMmlOo" >> .env.production
-          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: app
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_SUPABASE_URL: "https://iczhrvgzbnuvlgjfzeol.supabase.co"
+          VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTYxOTgsImV4cCI6MjA5ODg5MjE5OH0.XVlrp-DDrPtxRbcr52nmHvgIv_XZ6CZaBImgZQMmlOo"
 
       - name: Deploy to production
         id: deploy
