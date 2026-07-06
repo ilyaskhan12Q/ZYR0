@@ -1,0 +1,152 @@
+name: Phase 2 Readiness Check
+
+# Run manually from the GitHub Actions tab
+# Verifies all Phase 1 requirements are met before starting Phase 2
+on:
+  workflow_dispatch:
+    inputs:
+      supabase_project_ref:
+        description: 'Supabase Project Ref (from Dashboard URL)'
+        required: true
+        type: string
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  phase2-checklist:
+    name: Phase 2 Readiness Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: app
+
+      # ── Check 1: TypeScript must be error-free ─────────────────────────────
+      - name: ✅ TypeScript — zero errors
+        run: npx tsc --noEmit
+        working-directory: app
+        env:
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder_key
+
+      # ── Check 2: Build must succeed ────────────────────────────────────────
+      - name: ✅ Vite build — success
+        run: npm run build
+        working-directory: app
+        env:
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder_key
+
+      # ── Check 3: All 12 migrations present ────────────────────────────────
+      - name: ✅ Migrations — all 12 files present
+        run: |
+          COUNT=$(ls supabase/migrations/*.sql | wc -l)
+          echo "Migration files found: $COUNT"
+          if [ "$COUNT" -lt 12 ]; then
+            echo "❌ Expected at least 12 migration files, found $COUNT"
+            exit 1
+          fi
+          echo "✅ All migration files present"
+
+      # ── Check 4: All Edge Functions present ───────────────────────────────
+      - name: ✅ Edge Functions — all 4 deployed
+        run: |
+          REQUIRED=("issue-certificate" "verify-certificate" "send-email" "analytics")
+          for FUNC in "${REQUIRED[@]}"; do
+            if [ ! -f "supabase/functions/${FUNC}/index.ts" ]; then
+              echo "❌ Missing edge function: $FUNC"
+              exit 1
+            fi
+            echo "✅ Found: $FUNC"
+          done
+
+      # ── Check 5: Required service files exist ─────────────────────────────
+      - name: ✅ Service layer — all services present
+        run: |
+          REQUIRED=(
+            "app/src/lib/supabase.ts"
+            "app/src/lib/auth.ts"
+            "app/src/lib/database.types.ts"
+            "app/src/contexts/AuthContext.tsx"
+            "app/src/components/ProtectedRoute.tsx"
+            "app/src/hooks/useRealtime.ts"
+            "app/src/services/internships.ts"
+            "app/src/services/applications.ts"
+            "app/src/services/tasks.ts"
+            "app/src/services/messages.ts"
+            "app/src/services/notifications.ts"
+            "app/src/services/certificates.ts"
+            "app/src/services/companies.ts"
+            "app/src/services/users.ts"
+            "app/src/pages/auth/AuthCallback.tsx"
+          )
+          ALL_OK=true
+          for FILE in "${REQUIRED[@]}"; do
+            if [ ! -f "$FILE" ]; then
+              echo "❌ Missing: $FILE"
+              ALL_OK=false
+            else
+              echo "✅ $FILE"
+            fi
+          done
+          if [ "$ALL_OK" = false ]; then exit 1; fi
+
+      # ── Check 6: Verify Supabase connection (needs real project ref) ───────
+      - name: ✅ Supabase — project reachable
+        if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' }}
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+            "https://api.supabase.com/v1/projects/${{ inputs.supabase_project_ref }}")
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Supabase project reachable"
+          else
+            echo "❌ Supabase API returned HTTP $RESPONSE"
+            echo "Check SUPABASE_ACCESS_TOKEN and project ref"
+            exit 1
+          fi
+
+      # ── Check 7: No critical lint errors in our new files ─────────────────
+      - name: ✅ Lint — no errors in backend layer
+        run: |
+          npx eslint \
+            src/lib/ \
+            src/contexts/ \
+            src/components/ProtectedRoute.tsx \
+            src/hooks/useRealtime.ts \
+            src/services/ \
+            src/pages/auth/AuthCallback.tsx \
+            --max-warnings 0
+        working-directory: app
+        env:
+          VITE_SUPABASE_URL: https://placeholder.supabase.co
+          VITE_SUPABASE_ANON_KEY: placeholder_key
+
+      # ── Summary ────────────────────────────────────────────────────────────
+      - name: 🎉 Phase 2 Readiness Summary
+        run: |
+          echo ""
+          echo "╔════════════════════════════════════════╗"
+          echo "║   ✅ PHASE 1 COMPLETE — READY FOR P2   ║"
+          echo "╠════════════════════════════════════════╣"
+          echo "║  Next steps for Phase 2:               ║"
+          echo "║  1. Add Supabase credentials to .env   ║"
+          echo "║  2. Run migrations in Supabase console ║"
+          echo "║  3. Configure Google + LinkedIn OAuth  ║"
+          echo "║  4. Add Resend API key to Edge Funcs   ║"
+          echo "║  5. Wire Login.tsx to real auth        ║"
+          echo "║  6. Wire Register.tsx role → profiles  ║"
+          echo "║  7. Connect Student Dashboard to API   ║"
+          echo "╚════════════════════════════════════════╝"

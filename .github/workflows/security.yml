@@ -1,0 +1,36 @@
+name: Dependency Security Audit
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: npm audit + outdated check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --audit-level=high
+        # Fails the job if any HIGH or CRITICAL vulnerabilities are found
+
+      - name: Check for outdated packages (informational)
+        run: npm outdated || true
+        # 'true' so this never fails CI — it's just a report

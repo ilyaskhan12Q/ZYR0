@@ -1,0 +1,133 @@
+name: Deploy — Production (main)
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: production
+  cancel-in-progress: false  # never cancel a prod deploy mid-flight
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ── Gate: CI must pass before we touch production ─────────────────────────
+  ci-check:
+    name: Verify CI Passes
+    uses: ./.github/workflows/ci.yml
+
+  # ── Deploy frontend to Vercel production ──────────────────────────────────
+  deploy-production:
+    name: Deploy to Vercel (Production)
+    runs-on: ubuntu-latest
+    needs: [ci-check]
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.prod_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Install app dependencies
+        run: npm ci
+        working-directory: app
+
+      - name: Pull Vercel environment (production)
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: app
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build for production
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: app
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy to production
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "prod_url=$URL" >> $GITHUB_OUTPUT
+          echo "✅ Deployed to production: $URL"
+        working-directory: app
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  # ── Apply Supabase migrations on production deploy ─────────────────────────
+  migrate-production:
+    name: Apply Supabase Migrations
+    runs-on: ubuntu-latest
+    needs: [ci-check]
+    # Run in parallel with frontend deploy (migrations don't need the build)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Apply migrations
+        run: |
+          supabase db push \
+            --db-url "${{ secrets.SUPABASE_DB_URL }}" \
+            --include-seed
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Notify on migration failure
+        if: failure()
+        run: |
+          echo "❌ Migration failed. Check Supabase dashboard for rollback."
+          exit 1
+
+  # ── Deploy Supabase Edge Functions ─────────────────────────────────────────
+  deploy-functions:
+    name: Deploy Edge Functions
+    runs-on: ubuntu-latest
+    needs: [ci-check, migrate-production]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy all Edge Functions
+        run: |
+          for FUNC in supabase/functions/*/; do
+            FUNC_NAME=$(basename "$FUNC")
+            echo "Deploying function: $FUNC_NAME"
+            supabase functions deploy "$FUNC_NAME" \
+              --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+          done
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Verify functions deployed
+        run: |
+          echo "✅ Edge Functions deployment complete"
+          supabase functions list --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
