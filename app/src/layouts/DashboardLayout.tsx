@@ -66,7 +66,6 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Settings', href: '/admin/settings', icon: Settings },
     { label: 'Logs', href: '/admin/logs', icon: Shield },
   ],
-  public: [],
 };
 
 export default function DashboardLayout({ role }: { role: UserRole }) {
