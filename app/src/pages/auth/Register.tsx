@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, CheckCircle2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
-type Role = 'student' | 'company' | 'mentor' | null;
+import { signUp } from '../../lib/auth';
+import type { UserRole } from '../../lib/database.types';
+
+type Role = UserRole | null;
 type Step = 'role' | 'form' | 'success';
 
 export default function Register() {
@@ -11,6 +14,7 @@ export default function Register() {
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
 
   const roles = [
@@ -23,13 +27,30 @@ export default function Register() {
     if (selectedRole) setStep('form');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      setLocalError("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
+    setLocalError(null);
+
+    const { error } = await signUp({
+      email: form.email,
+      password: form.password,
+      fullName: form.name,
+      role: selectedRole as UserRole
+    });
+
+    if (error) {
+      setLocalError(error.message);
+      setLoading(false);
+    } else {
       setLoading(false);
       setStep('success');
-    }, 1500);
+    }
   };
 
   return (
@@ -105,6 +126,14 @@ export default function Register() {
                   </h2>
                   <p className="text-sm text-muted-foreground mt-1">Fill in your details to get started</p>
                 </div>
+
+                {localError && (
+                  <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 border border-red-100 text-sm flex items-start gap-2">
+                    <span className="mt-0.5">⚠️</span>
+                    <span>{localError}</span>
+                  </div>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="text-sm font-medium mb-1.5 block">Full Name</label>
