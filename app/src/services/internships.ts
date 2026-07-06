@@ -84,5 +84,5 @@ export async function getInternshipDomains() {
     .select('domain')
     .eq('status', 'Active')
     .not('domain', 'is', null);
-  return [...new Set(data?.map((r) => r.domain).filter(Boolean))];
+  return [...new Set(data?.map((r: any) => r.domain).filter(Boolean))];
 }

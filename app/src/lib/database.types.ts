@@ -277,5 +277,17 @@ export interface Database {
       evaluations: { Row: Evaluation; Insert: Partial<Evaluation>; Update: Partial<Evaluation> };
       activity_logs: { Row: ActivityLog; Insert: Partial<ActivityLog>; Update: Partial<ActivityLog> };
     };
+    Views: {
+      [_ in never]: never
+    };
+    Functions: {
+      [_ in never]: never
+    };
+    Enums: {
+      [_ in never]: never
+    };
+    CompositeTypes: {
+      [_ in never]: never
+    };
   };
 }
