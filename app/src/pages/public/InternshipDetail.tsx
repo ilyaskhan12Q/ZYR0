@@ -16,6 +16,8 @@ export default function InternshipDetail() {
   const [applicationStatus, setApplicationStatus] = useState<any>(null);
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTabLabel, setActiveTabLabel] = useState('Overview');
+
 
   useEffect(() => {
     async function load() {
@@ -209,7 +211,7 @@ export default function InternshipDetail() {
     ) : <p className="text-muted-foreground">Company information not available.</p>},
   ];
 
-  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const currentTab = tabs.find((t) => t.label === activeTabLabel) || tabs[0];
 
   return (
     <div className="pt-20 pb-16 px-4">
@@ -259,9 +261,9 @@ export default function InternshipDetail() {
                 {tabs.map((tab) => (
                   <button
                     key={tab.label}
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => setActiveTabLabel(tab.label)}
                     className={`px-6 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                      activeTab.label === tab.label
+                      activeTabLabel === tab.label
                         ? 'border-accent text-accent'
                         : 'border-transparent text-muted-foreground hover:text-foreground'
                     }`}
@@ -272,12 +274,12 @@ export default function InternshipDetail() {
               </div>
               <div className="p-6">
                 <motion.div
-                  key={activeTab.label}
+                  key={currentTab.label}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {activeTab.content}
+                  {currentTab.content}
                 </motion.div>
               </div>
             </div>
