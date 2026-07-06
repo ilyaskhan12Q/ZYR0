@@ -8,8 +8,8 @@ import {
   Building2, ChevronLeft, ChevronRight,
   TrendingUp, Star, Flag
 } from 'lucide-react';
-import { currentUser } from '@/data/mockData';
-import type { UserRole } from '@/data/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import type { UserRole } from '@/lib/database.types';
 
 interface NavItem {
   label: string;
@@ -70,6 +70,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
 };
 
 export default function DashboardLayout({ role }: { role: UserRole }) {
+  const { user, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -259,8 +260,8 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
               >
-                <img src={currentUser.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
-                <span className="hidden sm:block text-sm font-medium">{currentUser.name}</span>
+                <img src={user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />
+                <span className="hidden sm:block text-sm font-medium">{user?.user_metadata?.full_name?.split(' ')[0] || 'User'}</span>
                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
               </button>
               <AnimatePresence>
@@ -272,7 +273,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                     className="absolute right-0 mt-2 w-56 bg-card rounded-xl border border-border shadow-lg py-2 z-50"
                   >
                     <div className="px-4 py-3 border-b border-border">
-                      <p className="text-sm font-medium">{currentUser.name}</p>
+                      <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'User'}</p>
                       <p className="text-xs text-muted-foreground capitalize">{role} Account</p>
                     </div>
                     <div className="py-1">
@@ -284,7 +285,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       </button>
                     </div>
                     <div className="border-t border-border pt-1">
-                      <button onClick={() => navigate('/')} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                      <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
                         <LogOut className="w-4 h-4" /> Sign Out
                       </button>
                     </div>
