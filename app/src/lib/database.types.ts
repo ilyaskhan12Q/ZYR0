@@ -144,6 +144,10 @@ export interface Task {
   attachments: TaskAttachment[];
   feedback: string | null;
   grade: number | null;
+  objectives?: string[];
+  acceptance_criteria?: string[];
+  difficulty?: ExperienceLevel;
+  estimated_duration?: string;
   created_at: string;
   updated_at: string;
   // Joined
@@ -162,6 +166,8 @@ export interface TaskSubmission {
   status: 'Submitted' | 'Under Review' | 'Approved' | 'Rejected';
   feedback: string | null;
   grade: number | null;
+  github_url?: string;
+  live_demo_url?: string;
   submitted_at: string;
   student?: Profile;
 }

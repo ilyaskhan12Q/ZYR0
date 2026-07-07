@@ -1,76 +1,88 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import PublicLayout from '@/layouts/PublicLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
-import AuthCallback from '@/pages/auth/AuthCallback';
+import { Spinner } from '@/components/ui/spinner';
+
+// Loading fallback component
+function RouteLoading() {
+  return (
+    <div className="flex min-h-[400px] w-full items-center justify-center">
+      <Spinner className="size-8 text-primary animate-spin" />
+    </div>
+  );
+}
 
 // Public Pages
-import Landing from '@/pages/public/Landing';
-import BrowseInternships from '@/pages/public/BrowseInternships';
-import InternshipDetail from '@/pages/public/InternshipDetail';
-import Companies from '@/pages/public/Companies';
-import CompanyDetail from '@/pages/public/CompanyDetail';
-import Verify from '@/pages/public/Verify';
-import About from '@/pages/public/About';
-import Contact from '@/pages/public/Contact';
+const Landing = lazy(() => import('@/pages/public/Landing'));
+const BrowseInternships = lazy(() => import('@/pages/public/BrowseInternships'));
+const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
+const Companies = lazy(() => import('@/pages/public/Companies'));
+const CompanyDetail = lazy(() => import('@/pages/public/CompanyDetail'));
+const Verify = lazy(() => import('@/pages/public/Verify'));
+const About = lazy(() => import('@/pages/public/About'));
+const Contact = lazy(() => import('@/pages/public/Contact'));
 
 // Auth Pages
-import Login from '@/pages/auth/Login';
-import Register from '@/pages/auth/Register';
-import ForgotPassword from '@/pages/auth/ForgotPassword';
+const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
+const Login = lazy(() => import('@/pages/auth/Login'));
+const Register = lazy(() => import('@/pages/auth/Register'));
+const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 
 // Student Pages
-import StudentDashboard from '@/pages/student/Dashboard';
-import StudentInternships from '@/pages/student/Internships';
-import StudentApplications from '@/pages/student/Applications';
-import StudentTasks from '@/pages/student/Tasks';
-import StudentProgress from '@/pages/student/Progress';
-import StudentMessages from '@/pages/student/Messages';
-import StudentCertificates from '@/pages/student/Certificates';
-import StudentPortfolio from '@/pages/student/Portfolio';
-import StudentProfile from '@/pages/student/Profile';
-import StudentSettings from '@/pages/student/Settings';
-import StudentOfferLetters from '@/pages/student/OfferLetters';
+const StudentDashboard = lazy(() => import('@/pages/student/Dashboard'));
+const StudentInternships = lazy(() => import('@/pages/student/Internships'));
+const StudentApplications = lazy(() => import('@/pages/student/Applications'));
+const StudentTasks = lazy(() => import('@/pages/student/Tasks'));
+const StudentProgress = lazy(() => import('@/pages/student/Progress'));
+const StudentMessages = lazy(() => import('@/pages/student/Messages'));
+const StudentCertificates = lazy(() => import('@/pages/student/Certificates'));
+const StudentPortfolio = lazy(() => import('@/pages/student/Portfolio'));
+const StudentProfile = lazy(() => import('@/pages/student/Profile'));
+const StudentSettings = lazy(() => import('@/pages/student/Settings'));
+const StudentOfferLetters = lazy(() => import('@/pages/student/OfferLetters'));
+const StudentWorkspace = lazy(() => import('@/pages/student/Workspace'));
 
 // Company Pages
-import CompanyDashboard from '@/pages/company/Dashboard';
-import CompanyProfile from '@/pages/company/Profile';
-import CompanyInternships from '@/pages/company/Internships';
-import PostInternship from '@/pages/company/PostInternship';
-import CompanyApplicants from '@/pages/company/Applicants';
-import CompanyInterns from '@/pages/company/Interns';
-import CompanyTasks from '@/pages/company/Tasks';
-import CompanyAnalytics from '@/pages/company/Analytics';
-import CompanyCertificates from '@/pages/company/Certificates';
-import CompanyTeam from '@/pages/company/Team';
-import CompanySettings from '@/pages/company/Settings';
-import CompanyOfferLetters from '@/pages/company/OfferLetters';
+const CompanyDashboard = lazy(() => import('@/pages/company/Dashboard'));
+const CompanyProfile = lazy(() => import('@/pages/company/Profile'));
+const CompanyInternships = lazy(() => import('@/pages/company/Internships'));
+const PostInternship = lazy(() => import('@/pages/company/PostInternship'));
+const CompanyApplicants = lazy(() => import('@/pages/company/Applicants'));
+const CompanyInterns = lazy(() => import('@/pages/company/Interns'));
+const CompanyTasks = lazy(() => import('@/pages/company/Tasks'));
+const CompanyAnalytics = lazy(() => import('@/pages/company/Analytics'));
+const CompanyCertificates = lazy(() => import('@/pages/company/Certificates'));
+const CompanyTeam = lazy(() => import('@/pages/company/Team'));
+const CompanySettings = lazy(() => import('@/pages/company/Settings'));
+const CompanyOfferLetters = lazy(() => import('@/pages/company/OfferLetters'));
 
 // Mentor Pages
-import MentorDashboard from '@/pages/mentor/Dashboard';
-import MentorInterns from '@/pages/mentor/Interns';
-import MentorTasks from '@/pages/mentor/Tasks';
-import MentorEvaluations from '@/pages/mentor/Evaluations';
-import MentorMessages from '@/pages/mentor/Messages';
-import MentorProfile from '@/pages/mentor/Profile';
-import MentorSettings from '@/pages/mentor/Settings';
+const MentorDashboard = lazy(() => import('@/pages/mentor/Dashboard'));
+const MentorInterns = lazy(() => import('@/pages/mentor/Interns'));
+const MentorTasks = lazy(() => import('@/pages/mentor/Tasks'));
+const MentorEvaluations = lazy(() => import('@/pages/mentor/Evaluations'));
+const MentorMessages = lazy(() => import('@/pages/mentor/Messages'));
+const MentorProfile = lazy(() => import('@/pages/mentor/Profile'));
+const MentorSettings = lazy(() => import('@/pages/mentor/Settings'));
 
 // Admin Pages
-import AdminDashboard from '@/pages/admin/Dashboard';
-import AdminUsers from '@/pages/admin/Users';
-import AdminCompanies from '@/pages/admin/Companies';
-import AdminInternships from '@/pages/admin/Internships';
-import AdminCertificates from '@/pages/admin/Certificates';
-import AdminApplications from '@/pages/admin/Applications';
-import AdminAnalytics from '@/pages/admin/Analytics';
-import AdminReports from '@/pages/admin/Reports';
-import AdminSettings from '@/pages/admin/Settings';
-import AdminLogs from '@/pages/admin/Logs';
-import AdminOfferLetters from '@/pages/admin/OfferLetters';
+const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
+const AdminUsers = lazy(() => import('@/pages/admin/Users'));
+const AdminCompanies = lazy(() => import('@/pages/admin/Companies'));
+const AdminInternships = lazy(() => import('@/pages/admin/Internships'));
+const AdminCertificates = lazy(() => import('@/pages/admin/Certificates'));
+const AdminApplications = lazy(() => import('@/pages/admin/Applications'));
+const AdminAnalytics = lazy(() => import('@/pages/admin/Analytics'));
+const AdminReports = lazy(() => import('@/pages/admin/Reports'));
+const AdminSettings = lazy(() => import('@/pages/admin/Settings'));
+const AdminLogs = lazy(() => import('@/pages/admin/Logs'));
+const AdminOfferLetters = lazy(() => import('@/pages/admin/OfferLetters'));
 
 function App() {
   return (
-
+    <Suspense fallback={<RouteLoading />}>
       <Routes>
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
@@ -96,6 +108,8 @@ function App() {
         <Route path="/student" element={<ProtectedRoute role="student"><DashboardLayout role="student" /></ProtectedRoute>}>
           <Route index element={<Navigate to="/student/dashboard" replace />} />
           <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="workspace" element={<StudentWorkspace />} />
+          <Route path="workspace/:internshipId" element={<StudentWorkspace />} />
           <Route path="internships" element={<StudentInternships />} />
           <Route path="internships/:id" element={<InternshipDetail />} />
           <Route path="applications" element={<StudentApplications />} />
@@ -167,7 +181,7 @@ function App() {
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
+    </Suspense>
   );
 }
 

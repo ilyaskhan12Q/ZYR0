@@ -72,6 +72,8 @@ export async function submitTask(data: {
   task_id: string;
   notes?: string;
   attachments?: TaskSubmission['attachments'];
+  github_url?: string;
+  live_demo_url?: string;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
