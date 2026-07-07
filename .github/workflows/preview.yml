@@ -51,6 +51,8 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_SUPABASE_URL: "https://iczhrvgzbnuvlgjfzeol.supabase.co"
+          VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTYxOTgsImV4cCI6MjA5ODg5MjE5OH0.XVlrp-DDrPtxRbcr52nmHvgIv_XZ6CZaBImgZQMmlOo"
 
       - name: Deploy to Vercel (Preview)
         id: deploy
