@@ -12,6 +12,7 @@ on:
 
 env:
   NODE_VERSION: '20'
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
 jobs:
   phase2-checklist:
@@ -105,10 +106,10 @@ jobs:
 
       # ── Check 6: Verify Supabase connection (needs real project ref) ───────
       - name: ✅ Supabase — project reachable
-        if: ${{ secrets.SUPABASE_ACCESS_TOKEN != '' }}
+        if: ${{ env.SUPABASE_ACCESS_TOKEN != '' }}
         run: |
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+            -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
             "https://api.supabase.com/v1/projects/${{ inputs.supabase_project_ref }}")
           if [ "$RESPONSE" = "200" ]; then
             echo "✅ Supabase project reachable"
