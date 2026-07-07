@@ -72,8 +72,8 @@ export default function Register() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
-            <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-10 h-10 object-contain rounded-xl" />
             </div>
             <span className="text-xl font-bold">Zyro</span>
           </Link>

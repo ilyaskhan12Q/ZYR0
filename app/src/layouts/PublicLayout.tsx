@@ -49,8 +49,8 @@ export default function PublicLayout() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                <Briefcase className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 flex items-center justify-center">
+                <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />
               </div>
               <span className={`text-xl font-bold transition-colors ${scrolled ? 'text-foreground' : 'text-white'}`}>
                 Zyro
@@ -197,8 +197,8 @@ export default function PublicLayout() {
               {/* Brand */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                    <Briefcase className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />
                   </div>
                   <span className="text-xl font-bold">Zyro</span>
                 </div>

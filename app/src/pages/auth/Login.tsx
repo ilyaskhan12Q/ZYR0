@@ -46,8 +46,8 @@ export default function Login() {
           <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(59,130,246,0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59,130,246,0.2) 0%, transparent 50%)' }} />
         </div>
         <div className="relative z-10 max-w-md px-8 text-center">
-          <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Briefcase className="w-8 h-8 text-white" />
+          <div className="w-16 h-16 flex items-center justify-center mx-auto mb-6">
+            <img src="/zyro-logo.png" alt="Zyro Logo" className="w-16 h-16 object-contain rounded-2xl" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">Welcome Back to Zyro</h2>
           <p className="text-white/70 mb-8">Your gateway to professional growth and meaningful internship experiences.</p>
@@ -73,8 +73,8 @@ export default function Login() {
           className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Briefcase className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 flex items-center justify-center mx-auto mb-3">
+              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-12 h-12 object-contain rounded-xl" />
             </div>
             <h1 className="text-2xl font-bold">Zyro</h1>
           </div>

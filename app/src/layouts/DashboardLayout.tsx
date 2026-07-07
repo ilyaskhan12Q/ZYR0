@@ -110,8 +110,8 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         {/* Sidebar Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
           <Link to={`/${role}/dashboard`} className="flex items-center gap-2.5 overflow-hidden">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center flex-shrink-0">
-              <Briefcase className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
+              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />
             </div>
             {!collapsed && (
               <motion.span
