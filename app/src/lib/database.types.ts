@@ -12,7 +12,8 @@ export type ApplicationStatus = 'Applied' | 'Under Review' | 'Shortlisted' | 'Ac
 export type TaskStatus = 'Pending' | 'Submitted' | 'Under Review' | 'Approved' | 'Rejected';
 export type TaskPriority = 'High' | 'Medium' | 'Low';
 export type CertificateStatus = 'Active' | 'Revoked';
-export type NotificationType = 'application' | 'task' | 'message' | 'certificate' | 'system' | 'deadline';
+export type OfferLetterStatus = 'Pending' | 'Sent' | 'Accepted' | 'Rejected' | 'Revoked' | 'Expired';
+export type NotificationType = 'application' | 'task' | 'message' | 'certificate' | 'offer_letter' | 'system' | 'deadline';
 export type EvaluationStatus = 'Draft' | 'Submitted';
 export type LocationType = 'Remote' | 'On-site' | 'Hybrid';
 export type InternshipType = 'Full-time' | 'Part-time' | 'Project-based';
@@ -185,6 +186,32 @@ export interface Certificate {
   internship?: Internship;
 }
 
+export interface OfferLetter {
+  id: string;
+  internship_id: string;
+  application_id: string;
+  student_id: string;
+  company_id: string;
+  status: OfferLetterStatus;
+  pdf_url: string | null;
+  issued_at: string | null;
+  expires_at: string | null;
+  accepted_at: string | null;
+  rejected_at: string | null;
+  revoked_at: string | null;
+  revoke_reason: string | null;
+  email_sent: boolean;
+  email_sent_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined
+  student?: Profile;
+  company?: Company;
+  internship?: Internship;
+  application?: Application;
+}
+
 export interface Conversation {
   id: string;
   last_message: string | null;
@@ -271,6 +298,7 @@ export interface Database {
       tasks: { Row: Task; Insert: Partial<Task>; Update: Partial<Task> };
       task_submissions: { Row: TaskSubmission; Insert: Partial<TaskSubmission>; Update: Partial<TaskSubmission> };
       certificates: { Row: Certificate; Insert: Partial<Certificate>; Update: Partial<Certificate> };
+      offer_letters: { Row: OfferLetter; Insert: Partial<OfferLetter>; Update: Partial<OfferLetter> };
       conversations: { Row: Conversation; Insert: Partial<Conversation>; Update: Partial<Conversation> };
       messages: { Row: Message; Insert: Partial<Message>; Update: Partial<Message> };
       notifications: { Row: Notification; Insert: Partial<Notification>; Update: Partial<Notification> };

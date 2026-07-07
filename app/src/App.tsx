@@ -30,6 +30,7 @@ import StudentCertificates from '@/pages/student/Certificates';
 import StudentPortfolio from '@/pages/student/Portfolio';
 import StudentProfile from '@/pages/student/Profile';
 import StudentSettings from '@/pages/student/Settings';
+import StudentOfferLetters from '@/pages/student/OfferLetters';
 
 // Company Pages
 import CompanyDashboard from '@/pages/company/Dashboard';
@@ -43,6 +44,7 @@ import CompanyAnalytics from '@/pages/company/Analytics';
 import CompanyCertificates from '@/pages/company/Certificates';
 import CompanyTeam from '@/pages/company/Team';
 import CompanySettings from '@/pages/company/Settings';
+import CompanyOfferLetters from '@/pages/company/OfferLetters';
 
 // Mentor Pages
 import MentorDashboard from '@/pages/mentor/Dashboard';
@@ -64,6 +66,7 @@ import AdminAnalytics from '@/pages/admin/Analytics';
 import AdminReports from '@/pages/admin/Reports';
 import AdminSettings from '@/pages/admin/Settings';
 import AdminLogs from '@/pages/admin/Logs';
+import AdminOfferLetters from '@/pages/admin/OfferLetters';
 
 function App() {
   return (
@@ -102,6 +105,7 @@ function App() {
           <Route path="messages" element={<StudentMessages />} />
           <Route path="messages/:id" element={<StudentMessages />} />
           <Route path="certificates" element={<StudentCertificates />} />
+          <Route path="offer-letters" element={<StudentOfferLetters />} />
           <Route path="portfolio" element={<StudentPortfolio />} />
           <Route path="profile" element={<StudentProfile />} />
           <Route path="settings" element={<StudentSettings />} />
@@ -120,6 +124,7 @@ function App() {
           <Route path="tasks" element={<CompanyTasks />} />
           <Route path="analytics" element={<CompanyAnalytics />} />
           <Route path="certificates" element={<CompanyCertificates />} />
+          <Route path="offer-letters" element={<CompanyOfferLetters />} />
           <Route path="team" element={<CompanyTeam />} />
           <Route path="settings" element={<CompanySettings />} />
           <Route path="messages" element={<MentorMessages />} />
@@ -151,6 +156,7 @@ function App() {
           <Route path="internships/:id" element={<AdminInternships />} />
           <Route path="certificates" element={<AdminCertificates />} />
           <Route path="certificates/:id" element={<AdminCertificates />} />
+          <Route path="offer-letters" element={<AdminOfferLetters />} />
           <Route path="applications" element={<AdminApplications />} />
           <Route path="analytics" element={<AdminAnalytics />} />
           <Route path="reports" element={<AdminReports />} />

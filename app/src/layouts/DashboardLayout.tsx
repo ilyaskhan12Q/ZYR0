@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, Bell, Search, ChevronDown, LogOut, User, Settings,
-  Home, FolderOpen, FileCheck, ClipboardList, CheckSquare, Award,
+  Home, FolderOpen, FileCheck, FileText, ClipboardList, CheckSquare, Award,
   Briefcase, BarChart3, Users, UserCog, Shield, MessageSquare,
   Building2, ChevronLeft, ChevronRight,
   TrendingUp, Star, Flag
@@ -28,6 +28,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Progress', href: '/student/progress', icon: TrendingUp },
     { label: 'Messages', href: '/student/messages', icon: MessageSquare, badge: 3 },
     { label: 'Certificates', href: '/student/certificates', icon: Award },
+    { label: 'Offer Letters', href: '/student/offer-letters', icon: FileText },
     { label: 'Portfolio', href: '/student/portfolio', icon: Briefcase },
     { label: 'Profile', href: '/student/profile', icon: User },
   ],
@@ -44,6 +45,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Messages', href: '/company/messages', icon: MessageSquare },
     { label: 'Analytics', href: '/company/analytics', icon: BarChart3 },
     { label: 'Certificates', href: '/company/certificates', icon: Award },
+    { label: 'Offer Letters', href: '/company/offer-letters', icon: FileText },
     { label: 'Team', href: '/company/team', icon: UserCog },
   ],
   mentor: [
@@ -60,6 +62,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Companies', href: '/admin/companies', icon: Building2 },
     { label: 'Internships', href: '/admin/internships', icon: FolderOpen },
     { label: 'Certificates', href: '/admin/certificates', icon: Award },
+    { label: 'Offer Letters', href: '/admin/offer-letters', icon: FileText },
     { label: 'Applications', href: '/admin/applications', icon: FileCheck },
     { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { label: 'Reports', href: '/admin/reports', icon: Flag },
