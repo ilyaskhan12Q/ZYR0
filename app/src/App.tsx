@@ -31,6 +31,7 @@ import StudentPortfolio from '@/pages/student/Portfolio';
 import StudentProfile from '@/pages/student/Profile';
 import StudentSettings from '@/pages/student/Settings';
 import StudentOfferLetters from '@/pages/student/OfferLetters';
+import StudentWorkspace from '@/pages/student/Workspace';
 
 // Company Pages
 import CompanyDashboard from '@/pages/company/Dashboard';
@@ -96,6 +97,8 @@ function App() {
         <Route path="/student" element={<ProtectedRoute role="student"><DashboardLayout role="student" /></ProtectedRoute>}>
           <Route index element={<Navigate to="/student/dashboard" replace />} />
           <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="workspace" element={<StudentWorkspace />} />
+          <Route path="workspace/:internshipId" element={<StudentWorkspace />} />
           <Route path="internships" element={<StudentInternships />} />
           <Route path="internships/:id" element={<InternshipDetail />} />
           <Route path="applications" element={<StudentApplications />} />

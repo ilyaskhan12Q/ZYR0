@@ -22,6 +22,7 @@ interface NavItem {
 const navConfig: Record<UserRole, NavItem[]> = {
   student: [
     { label: 'Dashboard', href: '/student/dashboard', icon: Home },
+    { label: 'Workspace', href: '/student/workspace', icon: Briefcase },
     { label: 'Internships', href: '/student/internships', icon: FolderOpen },
     { label: 'Applications', href: '/student/applications', icon: FileCheck, badge: 4 },
     { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, badge: 3 },
@@ -29,8 +30,8 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Messages', href: '/student/messages', icon: MessageSquare, badge: 3 },
     { label: 'Certificates', href: '/student/certificates', icon: Award },
     { label: 'Offer Letters', href: '/student/offer-letters', icon: FileText },
-    { label: 'Portfolio', href: '/student/portfolio', icon: Briefcase },
-    { label: 'Profile', href: '/student/profile', icon: User },
+    { label: 'Portfolio', href: '/student/portfolio', icon: User },
+    { label: 'Profile', href: '/student/profile', icon: UserCog },
   ],
   company: [
     { label: 'Dashboard', href: '/company/dashboard', icon: Home },

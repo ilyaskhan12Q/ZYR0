@@ -86,3 +86,23 @@ export async function getInternshipDomains() {
     .not('domain', 'is', null);
   return [...new Set(data?.map((r: any) => r.domain).filter(Boolean))];
 }
+
+/** Get active internships for the current logged-in student (where offer letter is Accepted) */
+export async function getMyActiveInternships() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [], error: new Error('Not authenticated') };
+
+  return supabase
+    .from('offer_letters')
+    .select(`
+      id,
+      status,
+      accepted_at,
+      internship:internships!internship_id (
+        *,
+        company:companies!company_id (id, name, logo_url, rating)
+      )
+    `)
+    .eq('student_id', user.id)
+    .eq('status', 'Accepted');
+}
