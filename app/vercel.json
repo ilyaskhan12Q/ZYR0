@@ -1,4 +1,5 @@
 {
+  "ignoreCommand": "echo 'Skipped: deployments run via GitHub Actions only' && exit 0",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
