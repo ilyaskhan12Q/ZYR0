@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getMyApplications } from '@/services/applications';
 import { getMyTasks } from '@/services/tasks';
 import { getUnreadCount, getMyConversations } from '@/services/messages';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, Award, Briefcase };
 
@@ -44,8 +45,101 @@ export default function StudentDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      <div className="space-y-6">
+        {/* Welcome Skeleton */}
+        <div className="space-y-2">
+          <Skeleton className="h-7 w-56" />
+          <Skeleton className="h-4 w-40" />
+        </div>
+
+        {/* Stats Skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-card rounded-xl border border-border shadow-sm p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <Skeleton className="w-10 h-10 rounded-lg" />
+                <Skeleton className="w-8 h-4 rounded-full" />
+              </div>
+              <Skeleton className="h-7 w-12 mt-2" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column Skeletons */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Applications Skeleton */}
+            <div className="bg-card rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-border">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-10 h-10 rounded-lg" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Tasks Skeleton */}
+            <div className="bg-card rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-border">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <div className="space-y-4">
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="space-y-2 py-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="w-5 h-5 rounded-full" />
+                        <Skeleton className="h-4 w-48" />
+                      </div>
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </div>
+                    <div className="pl-8">
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column Skeleton */}
+          <div className="space-y-6">
+            <div className="bg-card rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-border">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between py-1">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-8 h-8 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

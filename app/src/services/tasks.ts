@@ -1,12 +1,19 @@
 import { supabase } from '@/lib/supabase';
 import type { Task, TaskSubmission } from '@/lib/database.types';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 
 /** Get tasks assigned to current user */
-export async function getMyTasks() {
+export async function getMyTasks(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
 
-  return supabase
+  const cacheKey = `my_tasks_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const res = await supabase
     .from('tasks')
     .select(`
       *,
@@ -16,14 +23,25 @@ export async function getMyTasks() {
     `)
     .eq('assigned_to', user.id)
     .order('created_at', { ascending: false });
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Get tasks assigned by current user (mentor/company) */
-export async function getTasksAssignedByMe() {
+export async function getTasksAssignedByMe(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
 
-  return supabase
+  const cacheKey = `assigned_by_tasks_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const res = await supabase
     .from('tasks')
     .select(`
       *,
@@ -33,11 +51,22 @@ export async function getTasksAssignedByMe() {
     `)
     .eq('assigned_by', user.id)
     .order('created_at', { ascending: false });
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Get a single task with full details */
-export async function getTaskById(id: string) {
-  return supabase
+export async function getTaskById(id: string, useCache = true) {
+  const cacheKey = `task_${id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const res = await supabase
     .from('tasks')
     .select(`
       *,
@@ -48,6 +77,11 @@ export async function getTaskById(id: string) {
     `)
     .eq('id', id)
     .single();
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Create a task (mentor/company) */
@@ -55,16 +89,35 @@ export async function createTask(data: Partial<Task>) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  return supabase
+  const res = await supabase
     .from('tasks')
     .insert({ ...data, assigned_by: user.id })
     .select()
     .single();
+
+  if (!res.error) {
+    clearCache(`assigned_by_tasks_${user.id}`);
+    if (data.assigned_to) {
+      clearCache(`my_tasks_${data.assigned_to}`);
+    }
+  }
+  return res;
 }
 
 /** Update a task */
 export async function updateTask(id: string, data: Partial<Task>) {
-  return supabase.from('tasks').update(data).eq('id', id).select().single();
+  const res = await supabase.from('tasks').update(data).eq('id', id).select().single();
+  if (!res.error) {
+    clearCache(`task_${id}`);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      clearCache(`assigned_by_tasks_${user.id}`);
+    }
+    if (res.data?.assigned_to) {
+      clearCache(`my_tasks_${res.data.assigned_to}`);
+    }
+  }
+  return res;
 }
 
 /** Submit a task (student) */
@@ -78,11 +131,19 @@ export async function submitTask(data: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  return supabase
+  const res = await supabase
     .from('task_submissions')
     .insert({ ...data, student_id: user.id })
     .select()
     .single();
+
+  if (!res.error) {
+    clearCache(`my_tasks_${user.id}`);
+    clearCache(`task_${data.task_id}`);
+    // Also clear assignee's supervisor caches if we knew the supervisor ID,
+    // but clearing task details is sufficient as details fetch includes the submission.
+  }
+  return res;
 }
 
 /** Review a submission (mentor/company) */
@@ -94,10 +155,26 @@ export async function reviewSubmission(
     grade?: number;
   }
 ) {
-  return supabase
+  const res = await supabase
     .from('task_submissions')
     .update(data)
     .eq('id', submission_id)
     .select()
     .single();
+
+  if (!res.error) {
+    const studentId = res.data?.student_id;
+    const taskId = res.data?.task_id;
+    if (studentId) {
+      clearCache(`my_tasks_${studentId}`);
+    }
+    if (taskId) {
+      clearCache(`task_${taskId}`);
+    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      clearCache(`assigned_by_tasks_${user.id}`);
+    }
+  }
+  return res;
 }

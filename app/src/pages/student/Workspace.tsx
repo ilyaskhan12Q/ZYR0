@@ -11,6 +11,7 @@ import { getMyTasks, submitTask } from '@/services/tasks';
 import { getMyCertificates } from '@/services/certificates';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type WorkspaceTab = 'overview' | 'tasks' | 'submissions' | 'certificate';
 
@@ -156,9 +157,61 @@ export default function StudentWorkspace() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 className="w-10 h-10 animate-spin text-accent" />
-        <p className="text-muted-foreground text-sm animate-pulse">Loading active workspace environment...</p>
+      <div className="space-y-6">
+        {/* Header Panel Skeleton */}
+        <div className="bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-16 h-16 rounded-xl" />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-5 w-24 rounded-full" />
+              </div>
+              <Skeleton className="h-4 w-60" />
+            </div>
+          </div>
+          <div className="flex items-center gap-4 bg-muted/30 border border-border/60 rounded-xl p-4 md:w-80 w-full">
+            <div className="flex-1 space-y-2">
+              <div className="flex justify-between">
+                <Skeleton className="h-3 w-28" />
+                <Skeleton className="h-3 w-8" />
+              </div>
+              <Skeleton className="h-2 w-full rounded-full" />
+              <div className="flex justify-between">
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs skeleton */}
+        <div className="flex border border-border bg-card rounded-xl p-1 gap-1">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-9 w-28 md:w-36 rounded-lg" />
+          ))}
+        </div>
+
+        {/* Tab Body content skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main info */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-card rounded-xl border border-border p-6 space-y-4">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+          {/* Sidebar */}
+          <div className="space-y-6">
+            <div className="bg-card rounded-xl border border-border p-6 space-y-4">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -893,7 +946,36 @@ export default function StudentWorkspace() {
                         </div>
                       </div>
 
-                      <div className="pt-6 border-t border-border flex flex-wrap justify-center gap-4">
+                      {/* Digital Signatures */}
+                      <div className="grid grid-cols-2 gap-8 pt-8 pb-4 max-w-lg mx-auto border-t border-border">
+                        <div className="flex flex-col items-center">
+                          <div className="h-10 flex items-center justify-center relative select-none">
+                            <svg className="w-28 h-10 text-accent/70 absolute -top-2" viewBox="0 0 100 40" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <path d="M10 25 C 20 5, 40 35, 50 15 C 60 5, 70 30, 85 20 C 90 15, 95 10, 99 22" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M30 22 L 75 22" strokeLinecap="round" />
+                            </svg>
+                            <span className="font-serif italic text-sm text-foreground/80 mt-4">{company?.name || 'Supervisor'}</span>
+                          </div>
+                          <div className="w-32 border-t border-border mt-2 pt-1 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+                            Company Director
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col items-center">
+                          <div className="h-10 flex items-center justify-center relative select-none">
+                            <svg className="w-28 h-10 text-accent/70 absolute -top-2" viewBox="0 0 100 40" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <path d="M5 20 Q 20 5, 35 25 T 60 15 T 80 20 T 95 10" strokeLinecap="round" strokeLinejoin="round" />
+                              <path d="M15 15 C 25 25, 45 5, 55 25" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <span className="font-serif italic text-sm text-foreground/80 mt-4">Zyro Verifier</span>
+                          </div>
+                          <div className="w-32 border-t border-border mt-2 pt-1 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+                            Program Director
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 flex flex-wrap justify-center gap-4">
                         <Link
                           to={`/verify/${activeCertificate.credential_id}`}
                           className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-lg text-xs font-semibold shadow transition-colors"

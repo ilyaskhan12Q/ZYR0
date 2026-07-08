@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, CheckCircle2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
@@ -16,6 +16,18 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+
+  // Prefetch dashboard portals in the background once the registration page loads
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      import('@/pages/student/StudentPortal').catch(() => {});
+      import('@/pages/company/CompanyPortal').catch(() => {});
+      import('@/pages/mentor/MentorPortal').catch(() => {});
+      import('@/pages/admin/AdminPortal').catch(() => {});
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const roles = [
     { id: 'student' as Role, icon: GraduationCap, title: "I'm a Student", desc: 'Find internships, complete tasks, and earn verified certificates.', features: ['Browse 500+ internships', 'Track applications & tasks', 'Earn certificates'] },

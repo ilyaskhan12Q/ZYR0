@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/lib/database.types';
+import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
 
 interface NavItem {
   label: string;
@@ -77,10 +78,57 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
   const navItems = navConfig[role] || [];
+
+  useEffect(() => {
+    if (!user) return;
+
+    async function loadNotifications() {
+      try {
+        const [notifs, count] = await Promise.all([
+          getNotifications(5),
+          getUnreadNotificationCount()
+        ]);
+        const dbNotifs = notifs?.data || [];
+        if (dbNotifs.length === 0) {
+          setNotifications([
+            {
+              id: 'mock-1',
+              title: 'Welcome to Zyro!',
+              message: 'Your career accelerator is now ready. Start by exploring internships in the Portal.',
+              read: false,
+              created_at: new Date().toISOString(),
+              action_url: `/${role}/internships`
+            },
+            {
+              id: 'mock-2',
+              title: 'Complete Profile',
+              message: 'Optimize your portfolio profile to attract company recruiter lookups.',
+              read: true,
+              created_at: new Date(Date.now() - 3600000).toISOString(),
+              action_url: `/${role}/profile`
+            }
+          ]);
+          setUnreadCount(1);
+        } else {
+          setNotifications(dbNotifs);
+          setUnreadCount(count || 0);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    }
+
+    loadNotifications();
+    const interval = setInterval(loadNotifications, 15000);
+    return () => clearInterval(interval);
+  }, [user, role]);
 
   const toggleSection = (label: string) => {
     setExpandedSections(prev =>
@@ -254,13 +302,88 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             <button className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
               <Search className="w-5 h-5" />
             </button>
-            <button className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            </button>
             <div className="relative">
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={() => { setNotificationsOpen(!notificationsOpen); setProfileOpen(false); }}
+                className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                )}
+              </button>
+              
+              <AnimatePresence>
+                {notificationsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    className="absolute right-0 mt-2 w-80 bg-card rounded-xl border border-border shadow-lg py-2 z-50 overflow-hidden"
+                  >
+                    <div className="px-4 py-3 border-b border-border flex justify-between items-center bg-muted/20">
+                      <p className="text-sm font-semibold">Notifications</p>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={async () => {
+                            await markAllNotificationsRead();
+                            setUnreadCount(0);
+                            const updated = notifications.map(n => ({ ...n, read: true }));
+                            setNotifications(updated);
+                          }}
+                          className="text-[11px] text-accent hover:underline font-medium"
+                        >
+                          Mark all as read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-72 overflow-y-auto divide-y divide-border/60">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-muted-foreground">
+                          No new notifications
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <button
+                            key={notif.id}
+                            onClick={async () => {
+                              if (!notif.read && !notif.id.startsWith('mock-')) {
+                                await markNotificationRead(notif.id);
+                              }
+                              setUnreadCount(prev => Math.max(0, prev - 1));
+                              setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                              setNotificationsOpen(false);
+                              if (notif.action_url) navigate(notif.action_url);
+                            }}
+                            className={`w-full p-3 text-left transition-colors cursor-pointer hover:bg-muted/40 block ${
+                              !notif.read ? 'bg-accent/5' : ''
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <p className={`text-xs font-semibold ${!notif.read ? 'text-accent' : 'text-foreground'}`}>
+                                {notif.title}
+                              </p>
+                              {!notif.read && (
+                                <span className="w-1.5 h-1.5 bg-accent rounded-full mt-1.5 flex-shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
+                              {notif.message}
+                            </p>
+                            <p className="text-[9px] text-muted-foreground/60 mt-1">
+                              {new Date(notif.created_at).toLocaleDateString()}
+                            </p>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => { setProfileOpen(!profileOpen); setNotificationsOpen(false); }}
                 className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
               >
                 <img src={user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />

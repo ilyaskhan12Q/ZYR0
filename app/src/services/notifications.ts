@@ -1,22 +1,40 @@
 import { supabase } from '@/lib/supabase';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 
 /** Get current user's notifications */
-export async function getNotifications(limit = 50) {
+export async function getNotifications(limit = 50, useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], error: null };
 
-  return supabase
+  const cacheKey = `notifications_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const res = await supabase
     .from('notifications')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Count unread notifications */
-export async function getUnreadNotificationCount() {
+export async function getUnreadNotificationCount(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return 0;
+
+  const cacheKey = `unread_notifications_count_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<number>(cacheKey);
+    if (cached !== null) return cached;
+  }
 
   const { count } = await supabase
     .from('notifications')
@@ -24,12 +42,20 @@ export async function getUnreadNotificationCount() {
     .eq('user_id', user.id)
     .eq('read', false);
 
-  return count ?? 0;
+  const unreadCount = count ?? 0;
+  setCachedData(cacheKey, unreadCount);
+  return unreadCount;
 }
 
 /** Mark a notification as read */
 export async function markNotificationRead(id: string) {
-  return supabase.from('notifications').update({ read: true }).eq('id', id);
+  const { data: { user } } = await supabase.auth.getUser();
+  const res = await supabase.from('notifications').update({ read: true }).eq('id', id);
+  if (user) {
+    clearCache(`notifications_${user.id}`);
+    clearCache(`unread_notifications_count_${user.id}`);
+  }
+  return res;
 }
 
 /** Mark all notifications as read */
@@ -37,11 +63,15 @@ export async function markAllNotificationsRead() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
 
-  return supabase
+  const res = await supabase
     .from('notifications')
     .update({ read: true })
     .eq('user_id', user.id)
     .eq('read', false);
+
+  clearCache(`notifications_${user.id}`);
+  clearCache(`unread_notifications_count_${user.id}`);
+  return res;
 }
 
 /** Create a notification (for internal use / edge functions) */
@@ -52,5 +82,8 @@ export async function createNotification(data: {
   message: string;
   action_url?: string;
 }) {
-  return supabase.from('notifications').insert(data);
+  const res = await supabase.from('notifications').insert(data);
+  clearCache(`notifications_${data.user_id}`);
+  clearCache(`unread_notifications_count_${data.user_id}`);
+  return res;
 }

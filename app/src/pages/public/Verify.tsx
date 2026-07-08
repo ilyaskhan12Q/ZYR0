@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check } from 'lucide-react';
 import { verifyCertificate } from '@/services/certificates';
 import { supabase } from '@/lib/supabase';
 
 export default function Verify() {
+  const { code } = useParams();
   const [certId, setCertId] = useState('');
   const [result, setResult] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [loading, setLoading] = useState(false);
@@ -25,14 +27,15 @@ export default function Verify() {
     loadSamples();
   }, []);
 
-  const handleVerify = async () => {
-    if (!certId.trim()) return;
+  const handleVerify = async (idToVerify?: string) => {
+    const targetId = idToVerify || certId;
+    if (!targetId.trim()) return;
     setLoading(true);
     setResult('idle');
     setVerifiedCert(null);
 
     try {
-      const { data, error } = await verifyCertificate(certId.trim());
+      const { data, error } = await verifyCertificate(targetId.trim());
       if (error || !data) {
         setResult('invalid');
       } else {
@@ -45,6 +48,13 @@ export default function Verify() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (code) {
+      setCertId(code);
+      handleVerify(code);
+    }
+  }, [code]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(certId);
@@ -72,7 +82,7 @@ export default function Verify() {
                 className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                 onKeyDown={(e) => e.key === 'Enter' && handleVerify()} />
             </div>
-            <button onClick={handleVerify} disabled={loading || !certId.trim()}
+            <button onClick={() => handleVerify()} disabled={loading || !certId.trim()}
               className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               {loading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Verify'}
             </button>

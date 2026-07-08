@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Users } from 'lucide-react';
@@ -12,6 +12,18 @@ export default function Login() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  // Prefetch dashboard portals in the background once the login page loads
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      import('@/pages/student/StudentPortal').catch(() => {});
+      import('@/pages/company/CompanyPortal').catch(() => {});
+      import('@/pages/mentor/MentorPortal').catch(() => {});
+      import('@/pages/admin/AdminPortal').catch(() => {});
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

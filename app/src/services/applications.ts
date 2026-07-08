@@ -1,9 +1,19 @@
 import { supabase } from '@/lib/supabase';
 import type { Application } from '@/lib/database.types';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 
 /** Get applications for the current student */
-export async function getMyApplications() {
-  return supabase
+export async function getMyApplications(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: null, error: new Error('Not authenticated') };
+
+  const cacheKey = `my_applications_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const res = await supabase
     .from('applications')
     .select(`
       *,
@@ -13,11 +23,22 @@ export async function getMyApplications() {
       )
     `)
     .order('applied_at', { ascending: false });
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Get a single application */
-export async function getApplicationById(id: string) {
-  return supabase
+export async function getApplicationById(id: string, useCache = true) {
+  const cacheKey = `application_${id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const res = await supabase
     .from('applications')
     .select(`
       *,
@@ -28,6 +49,11 @@ export async function getApplicationById(id: string) {
     `)
     .eq('id', id)
     .single();
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Submit a new application */
@@ -40,25 +66,49 @@ export async function applyToInternship(data: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  return supabase
+  const res = await supabase
     .from('applications')
     .insert({ ...data, student_id: user.id })
     .select()
     .single();
+
+  if (!res.error) {
+    clearCache(`my_applications_${user.id}`);
+    clearCache(`has_applied_${user.id}_${data.internship_id}`);
+  }
+  return res;
 }
 
 /** Withdraw an application (student) */
 export async function withdrawApplication(id: string) {
-  return supabase
+  const { data: { user } } = await supabase.auth.getUser();
+  const res = await supabase
     .from('applications')
     .update({ status: 'Withdrawn' })
-    .eq('id', id);
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (!res.error && user) {
+    clearCache(`my_applications_${user.id}`);
+    clearCache(`application_${id}`);
+    if (res.data?.internship_id) {
+      clearCache(`has_applied_${user.id}_${res.data.internship_id}`);
+    }
+  }
+  return res;
 }
 
 /** Check if user has already applied */
-export async function hasApplied(internship_id: string) {
+export async function hasApplied(internship_id: string, useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return false;
+  if (!user) return null;
+
+  const cacheKey = `has_applied_${user.id}_${internship_id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached !== null) return cached;
+  }
 
   const { data } = await supabase
     .from('applications')
@@ -67,6 +117,7 @@ export async function hasApplied(internship_id: string) {
     .eq('student_id', user.id)
     .single();
 
+  setCachedData(cacheKey, data ?? null);
   return data ?? null;
 }
 
@@ -105,16 +156,28 @@ export async function getAllCompanyApplications(company_id: string) {
     .order('applied_at', { ascending: false });
 }
 
-
 /** Update application status (company: shortlist, accept, reject) */
 export async function updateApplicationStatus(
   id: string,
   status: Application['status']
 ) {
-  return supabase
+  const res = await supabase
     .from('applications')
     .update({ status })
     .eq('id', id)
     .select()
     .single();
+
+  if (!res.error) {
+    clearCache(`application_${id}`);
+    const studentId = res.data?.student_id;
+    const internshipId = res.data?.internship_id;
+    if (studentId) {
+      clearCache(`my_applications_${studentId}`);
+      if (internshipId) {
+        clearCache(`has_applied_${studentId}_${internshipId}`);
+      }
+    }
+  }
+  return res;
 }

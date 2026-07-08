@@ -1,9 +1,16 @@
 import { supabase } from '@/lib/supabase';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 
 /** Get all conversations for current user */
-export async function getMyConversations() {
+export async function getMyConversations(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
+
+  const cacheKey = `conversations_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   // Get conversation IDs this user is part of
   const { data: participations } = await supabase
@@ -15,7 +22,7 @@ export async function getMyConversations() {
 
   const conversationIds = participations.map((p) => p.conversation_id);
 
-  return supabase
+  const res = await supabase
     .from('conversations')
     .select(`
       *,
@@ -25,6 +32,11 @@ export async function getMyConversations() {
     `)
     .in('id', conversationIds)
     .order('last_message_at', { ascending: false });
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Get messages in a conversation */
@@ -48,7 +60,7 @@ export async function sendMessage(data: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  return supabase
+  const res = await supabase
     .from('messages')
     .insert({
       ...data,
@@ -60,6 +72,12 @@ export async function sendMessage(data: {
       sender:profiles!sender_id (id, full_name, avatar_url, role)
     `)
     .single();
+
+  if (!res.error) {
+    clearCache(`conversations_${user.id}`);
+    clearCache(`unread_count_${user.id}`);
+  }
+  return res;
 }
 
 /** Start or get a conversation with another user */
@@ -100,6 +118,9 @@ export async function getOrCreateConversation(otherUserId: string) {
     { conversation_id: conv.id, user_id: otherUserId },
   ]);
 
+  clearCache(`conversations_${user.id}`);
+  clearCache(`conversations_${otherUserId}`);
+
   return { data: conv, error: null };
 }
 
@@ -113,19 +134,31 @@ export async function markMessagesRead(conversation_id: string) {
     p_conversation_id: conversation_id,
     p_user_id: user.id,
   });
+
+  clearCache(`conversations_${user.id}`);
+  clearCache(`unread_count_${user.id}`);
 }
 
 /** Count unread messages for current user */
-export async function getUnreadCount() {
+export async function getUnreadCount(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return 0;
+
+  const cacheKey = `unread_count_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<number>(cacheKey);
+    if (cached !== null) return cached;
+  }
 
   const { data: participations } = await supabase
     .from('conversation_participants')
     .select('conversation_id')
     .eq('user_id', user.id);
 
-  if (!participations?.length) return 0;
+  if (!participations?.length) {
+    setCachedData(cacheKey, 0);
+    return 0;
+  }
 
   const convIds = participations.map((p) => p.conversation_id);
 
@@ -137,5 +170,7 @@ export async function getUnreadCount() {
     .not('sender_id', 'eq', user.id)
     .not('read_by', 'cs', `{${user.id}}`);
 
-  return count ?? 0;
+  const unreadCount = count ?? 0;
+  setCachedData(cacheKey, unreadCount);
+  return unreadCount;
 }
