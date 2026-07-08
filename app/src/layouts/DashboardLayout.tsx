@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/lib/database.types';
+import { supabase } from '@/lib/supabase';
 import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
 
 interface NavItem {
@@ -85,15 +86,14 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const location = useLocation();
   const navigate = useNavigate();
   const navItems = navConfig[role] || [];
-
   useEffect(() => {
     if (!user) return;
 
-    async function loadNotifications() {
+    async function loadNotifications(useCache = true) {
       try {
         const [notifs, count] = await Promise.all([
-          getNotifications(5),
-          getUnreadNotificationCount()
+          getNotifications(5, useCache),
+          getUnreadNotificationCount(useCache)
         ]);
         const dbNotifs = notifs?.data || [];
         if (dbNotifs.length === 0) {
@@ -126,10 +126,29 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
     }
 
     loadNotifications();
-    const interval = setInterval(loadNotifications, 15000);
-    return () => clearInterval(interval);
-  }, [user, role]);
 
+    // Subscribe to realtime Postgres changes for notifications table
+    const channel = supabase
+      .channel(`user-notifications-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // Bypass cache when a real-time event triggers to fetch the latest state
+          loadNotifications(false);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, role]);
   const toggleSection = (label: string) => {
     setExpandedSections(prev =>
       prev.includes(label) ? prev.filter(l => l !== label) : [...prev, label]
