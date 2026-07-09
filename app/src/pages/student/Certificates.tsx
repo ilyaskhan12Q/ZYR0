@@ -20,7 +20,7 @@ export default function StudentCertificates() {
         
         // If DB has no certificates, pre-load mock certificates for Alex Johnson or demo purposes
         if (list.length === 0) {
-          const userName = user?.full_name || 'Alex Johnson';
+          const userName = user?.user_metadata?.full_name || 'Alex Johnson';
           const filteredMocks = mockCertificates.filter(
             c => c.recipientName.toLowerCase() === userName.toLowerCase()
           );

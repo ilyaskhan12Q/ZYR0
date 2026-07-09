@@ -1,11 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check } from 'lucide-react';
-import { verifyCertificate } from '@/services/certificates';
-import { supabase } from '@/lib/supabase';
-
-import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check } from 'lucide-react';
