@@ -238,7 +238,7 @@ export default function Register() {
                   </div>
                 </motion.div>
                 <h2 className="mt-6 text-2xl font-bold">Account Created!</h2>
-                <p className="mt-2 text-muted-foreground">Welcome to Zyro! Your account has been successfully created.</p>
+                <p className="mt-2 text-muted-foreground">Please check your inbox at <span className="font-semibold text-foreground">{form.email}</span> to verify your email address before logging in.</p>
                 <Link to="/login" className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors">
                   Go to Login <ArrowRight className="w-4 h-4" />
                 </Link>
