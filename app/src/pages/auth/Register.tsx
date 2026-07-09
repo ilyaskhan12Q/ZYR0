@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, CheckCircle2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 import { signUp, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
 import type { UserRole } from '../../lib/database.types';
+import { supabase } from '../../lib/supabase';
 
 type Role = UserRole | null;
-type Step = 'role' | 'form' | 'success';
+type Step = 'role' | 'form' | 'otp' | 'success';
 
 export default function Register() {
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>('role');
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [otp, setOtp] = useState('');
 
   // Prefetch dashboard portals in the background once the registration page loads
   useEffect(() => {
@@ -62,6 +65,30 @@ export default function Register() {
         msg = "Registration failed (500: Error sending confirmation email). The Supabase built-in email provider limit has been reached. Please log in to your Supabase Dashboard, go to Authentication -> Providers -> Email, and toggle OFF 'Confirm email'.";
       }
       setLocalError(msg);
+      setLoading(false);
+    } else {
+      setLoading(false);
+      setStep('otp');
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      setLocalError("Please enter a valid 6-digit verification code.");
+      return;
+    }
+    setLoading(true);
+    setLocalError(null);
+
+    const { error } = await supabase.auth.verifyOtp({
+      email: form.email,
+      token: otp,
+      type: 'signup'
+    });
+
+    if (error) {
+      setLocalError(error.message);
       setLoading(false);
     } else {
       setLoading(false);
@@ -228,7 +255,67 @@ export default function Register() {
             </motion.div>
           )}
 
-          {/* Step 3: Success */}
+          {/* Step 3: OTP Verification */}
+          {step === 'otp' && (
+            <motion.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <div className="bg-card rounded-xl border border-border shadow-lg p-8">
+                <button onClick={() => setStep('form')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-accent mb-4">
+                  <ArrowLeft className="w-4 h-4" /> Back to Signup
+                </button>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold">Verify Your Email</h2>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    We sent a 6-digit confirmation code to <span className="font-semibold text-foreground">{form.email}</span>. Please enter it below to complete your registration.
+                  </p>
+                </div>
+
+                <form onSubmit={handleVerifyOtp} className="space-y-4">
+                  <div>
+                    <label htmlFor="otp-code" className="block text-sm font-medium text-muted-foreground mb-1.5">
+                      Verification Code
+                    </label>
+                    <input
+                      id="otp-code"
+                      type="text"
+                      maxLength={6}
+                      pattern="[0-9]{6}"
+                      inputMode="numeric"
+                      required
+                      placeholder="123456"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="w-full px-4 py-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent text-center font-mono text-2xl tracking-widest placeholder:text-muted-foreground/30 placeholder:tracking-normal placeholder:font-sans"
+                    />
+                  </div>
+
+                  {localError && (
+                    <div className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-start gap-2">
+                      <span className="shrink-0 mt-0.5">⚠️</span>
+                      <span>{localError}</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading || otp.length !== 6}
+                    className="w-full py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      'Verify Account'
+                    )}
+                  </button>
+                </form>
+
+                <p className="mt-6 text-center text-xs text-muted-foreground">
+                  Didn't receive the email? Check your spam folder or try registering again.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 4: Success */}
           {step === 'success' && (
             <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
               <div className="bg-card rounded-xl border border-border shadow-lg p-10">
@@ -237,11 +324,11 @@ export default function Register() {
                     <CheckCircle2 className="w-10 h-10 text-emerald-600" />
                   </div>
                 </motion.div>
-                <h2 className="mt-6 text-2xl font-bold">Account Created!</h2>
-                <p className="mt-2 text-muted-foreground">Please check your inbox at <span className="font-semibold text-foreground">{form.email}</span> to verify your email address before logging in.</p>
-                <Link to="/login" className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors">
-                  Go to Login <ArrowRight className="w-4 h-4" />
-                </Link>
+                <h2 className="mt-6 text-2xl font-bold">Email Verified! 🎉</h2>
+                <p className="mt-2 text-muted-foreground">Your email has been successfully verified, and your account is active. You can now access your dashboard.</p>
+                <button onClick={() => navigate('/')} className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors">
+                  Go to Dashboard <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </motion.div>
           )}
