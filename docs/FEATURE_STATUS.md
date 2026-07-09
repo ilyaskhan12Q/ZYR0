@@ -14,7 +14,7 @@ This document provides a quick reference for the implementation status of each m
 | Offer Letter Generation & Storage | ✅ (PNG storage) | Email is treated as a notification; acceptance flow pending. |
 | **GitHub Submission (first‑class)** | ✅ | Regex URL validation and database-level anti-plagiarism duplicate checking. |
 | **Internship Workspace & Progress Engine** | ✅ | Dynamic database-backed progress timeline with PostgreSQL triggers & real-time updates. |
-| Task Management (Create/Edit) | 🚧 | UI enhancements and validation needed. |
+| Task Management (Create/Edit) | ✅ | Dual-purpose Create/Edit modal with robust form validation and inline errors. |
 | Mentor Review & Scoring | 🚧 | Scoring rubric and revision workflow pending. |
 | Offer Letter Acceptance / Rejection | ✅ | Dedicated UI with Go‑to‑Workspace redirects and automatic application state triggers. |
 | Notification System (email/SMS) | 🚧 | Email notifications integrated for offers and updates. |
