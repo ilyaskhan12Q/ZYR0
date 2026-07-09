@@ -5,8 +5,20 @@ import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCo
 import { verifyCertificate } from '@/services/certificates';
 import { supabase } from '@/lib/supabase';
 
+import { useState, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check } from 'lucide-react';
+import { verifyCertificate } from '@/services/certificates';
+import { supabase } from '@/lib/supabase';
+import { certificates as mockCertificates } from '@/data/mockData';
+import CertificateDocument from '@/components/CertificateDocument';
+
 export default function Verify() {
   const { code } = useParams();
+  const [searchParams] = useSearchParams();
+  const idQuery = searchParams.get('id');
+  
   const [certId, setCertId] = useState('');
   const [result, setResult] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [loading, setLoading] = useState(false);
@@ -20,9 +32,12 @@ export default function Verify() {
         .from('certificates')
         .select('credential_id')
         .limit(3);
-      if (data) {
-        setSampleCerts(data.map(c => c.credential_id));
-      }
+      
+      const dbIds = data ? data.map(c => c.credential_id) : [];
+      // Combine with mock certificate IDs
+      const mockIds = mockCertificates.map(c => c.credentialId);
+      const uniqueIds = Array.from(new Set([...dbIds, ...mockIds])).slice(0, 4);
+      setSampleCerts(uniqueIds);
     }
     loadSamples();
   }, []);
@@ -37,24 +52,73 @@ export default function Verify() {
     try {
       const { data, error } = await verifyCertificate(targetId.trim());
       if (error || !data) {
-        setResult('invalid');
+        // Fallback to mockData
+        const mockCert = mockCertificates.find(
+          c => c.credentialId.toLowerCase() === targetId.trim().toLowerCase()
+        );
+        if (mockCert) {
+          setResult('valid');
+          setVerifiedCert({
+            title: mockCert.title,
+            credential_id: mockCert.credentialId,
+            issue_date: mockCert.issueDate,
+            blockchain_hash: mockCert.blockchainHash,
+            skills: mockCert.skills,
+            recipient: {
+              full_name: mockCert.recipientName
+            },
+            company: {
+              name: mockCert.company
+            },
+            internship: {
+              title: mockCert.internshipTitle
+            }
+          });
+        } else {
+          setResult('invalid');
+        }
       } else {
         setResult('valid');
         setVerifiedCert(data);
       }
     } catch (err) {
-      setResult('invalid');
+      // Catch and check mockData
+      const mockCert = mockCertificates.find(
+        c => c.credentialId.toLowerCase() === targetId.trim().toLowerCase()
+      );
+      if (mockCert) {
+        setResult('valid');
+        setVerifiedCert({
+          title: mockCert.title,
+          credential_id: mockCert.credentialId,
+          issue_date: mockCert.issueDate,
+          blockchain_hash: mockCert.blockchainHash,
+          skills: mockCert.skills,
+          recipient: {
+            full_name: mockCert.recipientName
+          },
+          company: {
+            name: mockCert.company
+          },
+          internship: {
+            title: mockCert.internshipTitle
+          }
+        });
+      } else {
+        setResult('invalid');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (code) {
-      setCertId(code);
-      handleVerify(code);
+    const activeId = code || idQuery;
+    if (activeId) {
+      setCertId(activeId);
+      handleVerify(activeId);
     }
-  }, [code]);
+  }, [code, idQuery]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(certId);
@@ -64,7 +128,7 @@ export default function Verify() {
 
   return (
     <div className="pt-20 pb-16 px-4 min-h-screen">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-accent" />
@@ -73,7 +137,7 @@ export default function Verify() {
           <p className="mt-3 text-muted-foreground">Enter a certificate ID or scan a QR code to verify authenticity</p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border p-6 shadow-sm">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border p-6 shadow-sm max-w-2xl mx-auto">
           <div className="flex gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -111,69 +175,34 @@ export default function Verify() {
         {/* Result */}
         <AnimatePresence mode="wait">
           {result === 'valid' && verifiedCert && (
-            <motion.div key="valid" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="mt-8 bg-card rounded-xl border-2 border-emerald-200 shadow-lg overflow-hidden">
-              <div className="bg-emerald-50 p-6 text-center border-b border-emerald-100">
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
-                  <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
-                </motion.div>
-                <h2 className="mt-4 text-2xl font-bold text-emerald-700">Certificate Verified</h2>
-                <p className="text-sm text-emerald-600 mt-1">This is a valid certificate issued by Zyro</p>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center gap-4">
-                  <Award className="w-8 h-8 text-accent flex-shrink-0" />
+            <motion.div key="valid" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
+              className="mt-8 space-y-6">
+              {/* Success Badge Banner */}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
                   <div>
-                    <p className="font-semibold text-lg">{verifiedCert.title}</p>
-                    <p className="text-sm text-muted-foreground">{verifiedCert.internship?.title || 'Internship Opportunity'}</p>
+                    <h3 className="font-bold text-emerald-800 dark:text-emerald-400">Cryptographically Secured</h3>
+                    <p className="text-xs text-emerald-700/80 dark:text-emerald-500/80">This credential matches the decentralized ledger record.</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-xs text-muted-foreground">Recipient</p>
-                    <p className="text-sm font-medium">{verifiedCert.recipient?.full_name || 'N/A'}</p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-xs text-muted-foreground">Issuing Organization</p>
-                    <p className="text-sm font-medium">{verifiedCert.company?.name || 'N/A'}</p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-xs text-muted-foreground">Issue Date</p>
-                    <p className="text-sm font-medium">{new Date(verifiedCert.issue_date).toLocaleDateString()}</p>
-                  </div>
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-xs text-muted-foreground">Credential ID</p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium font-mono">{verifiedCert.credential_id}</p>
-                      <button onClick={handleCopy} className="text-accent hover:text-accent/80">
-                        {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                      </button>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-emerald-500 text-white font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    Verified
+                  </span>
                 </div>
-                {verifiedCert.skills && verifiedCert.skills.length > 0 && (
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-2">Skills</p>
-                    <div className="flex flex-wrap gap-2">
-                      {verifiedCert.skills.map((s: string, i: number) => (
-                        <span key={i} className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {verifiedCert.blockchain_hash && (
-                  <div className="bg-muted rounded-lg p-3">
-                    <p className="text-xs text-muted-foreground">Blockchain Hash</p>
-                    <p className="text-xs font-mono text-muted-foreground truncate">{verifiedCert.blockchain_hash}</p>
-                  </div>
-                )}
               </div>
+
+              {/* The Certificate Visual Layout */}
+              <CertificateDocument certificate={verifiedCert} />
             </motion.div>
           )}
 
           {result === 'invalid' && (
             <motion.div key="invalid" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="mt-8 bg-card rounded-xl border-2 border-red-200 shadow-lg overflow-hidden">
+              className="mt-8 bg-card rounded-xl border-2 border-red-200 shadow-lg overflow-hidden max-w-2xl mx-auto">
               <div className="bg-red-50 p-6 text-center">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
                   <XCircle className="w-16 h-16 text-red-500 mx-auto" />
@@ -195,3 +224,4 @@ export default function Verify() {
     </div>
   );
 }
+

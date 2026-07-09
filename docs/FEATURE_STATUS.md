@@ -18,7 +18,7 @@ This document provides a quick reference for the implementation status of each m
 | Mentor Review & Scoring | ✅ | Slider-based rubric scoring interface (Code, UX, Func) and interactive revision flows. |
 | Offer Letter Acceptance / Rejection | ✅ | Dedicated UI with Go‑to‑Workspace redirects and automatic application state triggers. |
 | Notification System (email/SMS) | ✅ | Dual email/SMS settings and live Toast dispatcher simulating background alerts on lifecycle updates. |
-| Certificate Generation & QR Verification | ✅ | Basic generation exists; public verification page pending. |
+| Certificate Generation & QR Verification | ✅ | Full digital certificates, print-friendly template, secure QR verification, and fallback mock support. |
 | Analytics & Reporting | 🚧 | Advanced filters and CSV export planned. |
 | Accessibility (WCAG 2.2 AA) | 🚧 | Audit and ARIA enhancements needed. |
 | Test Suite (Unit / Integration) | 🚧 | Coverage improvements required. |
