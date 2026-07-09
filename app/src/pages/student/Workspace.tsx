@@ -142,8 +142,9 @@ export default function StudentWorkspace() {
     e.preventDefault();
     if (!selectedTask) return;
 
-    if (!githubUrl.trim().startsWith('https://github.com/')) {
-      toast.error('Please enter a valid GitHub repository URL (starting with https://github.com/)');
+    const githubRegex = /^https?:\/\/(?:www\.)?github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+/;
+    if (!githubRegex.test(githubUrl.trim())) {
+      toast.error('Invalid GitHub URL. Must be in the format: https://github.com/username/repository');
       return;
     }
 
