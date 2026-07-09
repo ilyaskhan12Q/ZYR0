@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Download, CheckCircle2, XCircle, Search, Eye,
   Clock, AlertTriangle, Loader2, Building2, Calendar, MapPin,
-  BadgeCheck, RotateCcw, ExternalLink
+  BadgeCheck, RotateCcw, ExternalLink, Briefcase
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -30,6 +31,7 @@ const TABS = ['All', 'Sent', 'Accepted', 'Rejected', 'Revoked'] as const;
 
 export default function StudentOfferLetters() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [offers, setOffers]         = useState<OfferLetter[]>([]);
   const [loading, setLoading]       = useState(true);
@@ -279,6 +281,16 @@ export default function StudentOfferLetters() {
                     </button>
                   )}
 
+                  {offer.status === 'Accepted' && (
+                    <button
+                      onClick={() => navigate(`/student/workspace/${offer.internship_id}`)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-accent text-white hover:bg-accent/90 font-medium text-sm transition-all duration-200 shadow-sm shadow-accent/20"
+                    >
+                      <Briefcase className="w-4 h-4 animate-pulse" />
+                      Workspace
+                    </button>
+                  )}
+
                   {canAct && (
                     <>
                       <button
@@ -335,6 +347,7 @@ interface ModalProps {
 }
 
 function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, responding }: ModalProps) {
+  const navigate = useNavigate();
   const cfg  = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
   const Icon = cfg.icon;
   const canAct = offer.status === 'Sent';
@@ -459,6 +472,18 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
                 <ExternalLink className="w-4 h-4" />
                 Open
               </a>
+            )}
+            {offer.status === 'Accepted' && (
+              <button
+                onClick={() => {
+                  onClose();
+                  navigate(`/student/workspace/${offer.internship_id}`);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors shadow-sm"
+              >
+                <Briefcase className="w-4 h-4 animate-pulse" />
+                Go to Workspace
+              </button>
             )}
             {canAct && (
               <>
