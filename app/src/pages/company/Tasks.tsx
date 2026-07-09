@@ -94,6 +94,10 @@ export default function CompanyTasks() {
   const [reviewFeedback, setReviewFeedback] = useState('');
   const [reviewGrade, setReviewGrade] = useState('');
   const [reviewing, setReviewing] = useState(false);
+  const [useRubric, setUseRubric] = useState(true);
+  const [rubricCodeQuality, setRubricCodeQuality] = useState(30);
+  const [rubricDesign, setRubricDesign] = useState(30);
+  const [rubricFunctionality, setRubricFunctionality] = useState(40);
 
   const loadData = async () => {
     try {
@@ -174,22 +178,36 @@ export default function CompanyTasks() {
     setReviewing(true);
     try {
       const submission = reviewingTask.submissions[0];
-      const gradeVal = reviewGrade ? parseInt(reviewGrade, 10) : undefined;
+      const calculatedGrade = useRubric 
+        ? (rubricCodeQuality + rubricDesign + rubricFunctionality) 
+        : (reviewGrade ? parseInt(reviewGrade, 10) : 100);
+      
+      let finalFeedback = reviewFeedback.trim();
+      if (useRubric) {
+        const rubricBreakdown = `[Rubric Breakdown - Code Quality: ${rubricCodeQuality}/30, Design: ${rubricDesign}/30, Functionality: ${rubricFunctionality}/40]`;
+        finalFeedback = finalFeedback ? `${rubricBreakdown}\nFeedback: ${finalFeedback}` : rubricBreakdown;
+      }
+
       const { error } = await reviewSubmission(submission.id, {
         status,
-        feedback: reviewFeedback.trim() || undefined,
-        grade: gradeVal,
+        feedback: finalFeedback || undefined,
+        grade: calculatedGrade,
       });
 
       if (!error) {
         // Correctly update the task status using updateTask instead of createTask
         await updateTask(reviewingTask.id, {
           status,
+          feedback: finalFeedback || undefined,
+          grade: calculatedGrade,
         });
 
         setReviewingTask(null);
         setReviewFeedback('');
         setReviewGrade('');
+        setRubricCodeQuality(30);
+        setRubricDesign(30);
+        setRubricFunctionality(40);
         await loadData();
       }
     } catch (err) {
@@ -448,24 +466,105 @@ export default function CompanyTasks() {
                 <p className="text-sm text-foreground">{reviewingTask.submissions[0].notes || 'No submission notes provided.'}</p>
               </div>
 
+              {/* Scoring Mode Toggle */}
+              <div className="flex items-center justify-between border-t border-b border-border py-3">
+                <span className="text-sm font-medium">Use Scoring Rubric</span>
+                <button
+                  type="button"
+                  onClick={() => setUseRubric(!useRubric)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    useRubric ? 'bg-accent' : 'bg-muted-foreground/30'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      useRubric ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {useRubric ? (
+                <div className="space-y-4 bg-muted/30 p-4 rounded-xl border border-border">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Rubric Criteria</h4>
+                  
+                  {/* Code Quality */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs font-medium">
+                      <span>Code Quality & Best Practices</span>
+                      <span className="text-accent">{rubricCodeQuality} / 30</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="30"
+                      value={rubricCodeQuality}
+                      onChange={(e) => setRubricCodeQuality(parseInt(e.target.value, 10))}
+                      className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-accent"
+                    />
+                  </div>
+
+                  {/* UI/UX Design */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs font-medium">
+                      <span>UI/UX Design & Polish</span>
+                      <span className="text-accent">{rubricDesign} / 30</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="30"
+                      value={rubricDesign}
+                      onChange={(e) => setRubricDesign(parseInt(e.target.value, 10))}
+                      className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-accent"
+                    />
+                  </div>
+
+                  {/* Functionality */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs font-medium">
+                      <span>Functionality & Completion</span>
+                      <span className="text-accent">{rubricFunctionality} / 40</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="40"
+                      value={rubricFunctionality}
+                      onChange={(e) => setRubricFunctionality(parseInt(e.target.value, 10))}
+                      className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-accent"
+                    />
+                  </div>
+
+                  {/* Rubric Total */}
+                  <div className="flex justify-between items-center pt-2 border-t border-border text-sm font-semibold">
+                    <span>Total Rubric Grade</span>
+                    <span className="text-emerald-500 text-base">{rubricCodeQuality + rubricDesign + rubricFunctionality}%</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Grade (0-100, Optional)</label>
+                  <input type="number" min="0" max="100" value={reviewGrade} onChange={(e) => setReviewGrade(e.target.value)} placeholder="e.g. 95"
+                    className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20" />
+                </div>
+              )}
+
               <div>
-                <label className="text-sm font-medium mb-1 block">Feedback (Optional)</label>
-                <textarea rows={3} value={reviewFeedback} onChange={(e) => setReviewFeedback(e.target.value)} placeholder="Provide constructive feedback for the student..."
+                <label className="text-sm font-medium mb-1 block">Feedback & Revision Guidance</label>
+                <textarea rows={3} value={reviewFeedback} onChange={(e) => setReviewFeedback(e.target.value)} placeholder="Provide structured feedback or exact instructions for revision..."
                   className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none" />
               </div>
 
-              <div>
-                <label className="text-sm font-medium mb-1 block">Grade (0-100, Optional)</label>
-                <input type="number" min="0" max="100" value={reviewGrade} onChange={(e) => setReviewGrade(e.target.value)} placeholder="e.g. 95"
-                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20" />
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Rejected')} className="px-4 py-2.5 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-border">
+                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Rejected')} className="px-4 py-2 bg-red-500/10 text-red-500 rounded-lg text-xs font-medium hover:bg-red-500/20 transition-colors">
                   Reject
                 </button>
-                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Approved')} className="px-4 py-2.5 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors">
-                  Approve
+                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Rejected')} className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-medium hover:bg-amber-600 transition-colors">
+                  Request Revision
+                </button>
+                <button type="button" disabled={reviewing} onClick={() => handleReviewSubmission('Approved')} className="px-4 py-2 bg-emerald-500 text-white rounded-lg text-xs font-medium hover:bg-emerald-600 transition-colors flex items-center gap-1">
+                  Approve Task
                 </button>
               </div>
             </div>

@@ -15,7 +15,7 @@ This document provides a quick reference for the implementation status of each m
 | **GitHub Submission (first‑class)** | ✅ | Regex URL validation and database-level anti-plagiarism duplicate checking. |
 | **Internship Workspace & Progress Engine** | ✅ | Dynamic database-backed progress timeline with PostgreSQL triggers & real-time updates. |
 | Task Management (Create/Edit) | ✅ | Dual-purpose Create/Edit modal with robust form validation and inline errors. |
-| Mentor Review & Scoring | 🚧 | Scoring rubric and revision workflow pending. |
+| Mentor Review & Scoring | ✅ | Slider-based rubric scoring interface (Code, UX, Func) and interactive revision flows. |
 | Offer Letter Acceptance / Rejection | ✅ | Dedicated UI with Go‑to‑Workspace redirects and automatic application state triggers. |
 | Notification System (email/SMS) | 🚧 | Email notifications integrated for offers and updates. |
 | Certificate Generation & QR Verification | ✅ | Basic generation exists; public verification page pending. |

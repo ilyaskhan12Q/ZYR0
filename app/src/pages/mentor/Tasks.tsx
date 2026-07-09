@@ -16,6 +16,10 @@ export default function MentorTasks() {
   const [feedbacks, setFeedbacks] = useState<Record<string, string>>({});
   const [grades, setGrades] = useState<Record<string, number>>({});
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({});
+  const [useRubrics, setUseRubrics] = useState<Record<string, boolean>>({});
+  const [rubricsCodeQuality, setRubricsCodeQuality] = useState<Record<string, number>>({});
+  const [rubricsDesign, setRubricsDesign] = useState<Record<string, number>>({});
+  const [rubricsFunctionality, setRubricsFunctionality] = useState<Record<string, number>>({});
 
   async function loadTasks() {
     try {
@@ -37,8 +41,20 @@ export default function MentorTasks() {
   }, [profile]);
 
   const handleReview = async (taskId: string, submissionId: string, status: 'Approved' | 'Rejected') => {
-    const feedback = feedbacks[taskId] || '';
-    const grade = grades[taskId] || 100;
+    const rawFeedback = feedbacks[taskId] || '';
+    const isRubric = useRubrics[taskId] ?? true;
+    const codeQuality = rubricsCodeQuality[taskId] ?? 30;
+    const design = rubricsDesign[taskId] ?? 30;
+    const functionality = rubricsFunctionality[taskId] ?? 40;
+    const grade = isRubric 
+      ? (codeQuality + design + functionality)
+      : (grades[taskId] ?? 100);
+
+    let finalFeedback = rawFeedback.trim();
+    if (isRubric) {
+      const rubricBreakdown = `[Rubric Breakdown - Code Quality: ${codeQuality}/30, Design: ${design}/30, Functionality: ${functionality}/40]`;
+      finalFeedback = finalFeedback ? `${rubricBreakdown}\nFeedback: ${finalFeedback}` : rubricBreakdown;
+    }
 
     setSubmitting((prev) => ({ ...prev, [taskId]: true }));
 
@@ -46,14 +62,14 @@ export default function MentorTasks() {
       // 1. Update the submission status, feedback, and grade
       await reviewSubmission(submissionId, {
         status,
-        feedback,
+        feedback: finalFeedback || undefined,
         grade,
       });
 
       // 2. Update the parent task status, feedback, and grade
       await updateTask(taskId, {
-        status: status === 'Approved' ? 'Approved' : 'Rejected',
-        feedback,
+        status,
+        feedback: finalFeedback || undefined,
         grade,
       });
 
@@ -64,6 +80,26 @@ export default function MentorTasks() {
         return next;
       });
       setGrades((prev) => {
+        const next = { ...prev };
+        delete next[taskId];
+        return next;
+      });
+      setUseRubrics((prev) => {
+        const next = { ...prev };
+        delete next[taskId];
+        return next;
+      });
+      setRubricsCodeQuality((prev) => {
+        const next = { ...prev };
+        delete next[taskId];
+        return next;
+      });
+      setRubricsDesign((prev) => {
+        const next = { ...prev };
+        delete next[taskId];
+        return next;
+      });
+      setRubricsFunctionality((prev) => {
         const next = { ...prev };
         delete next[taskId];
         return next;
@@ -149,16 +185,85 @@ export default function MentorTasks() {
                 )}
 
                 {activeTab === 'To Review' ? (
-                  <div className="space-y-4">
-                    <textarea
-                      placeholder="Provide constructive feedback..."
-                      rows={3}
-                      value={feedbacks[task.id] || ''}
-                      onChange={(e) => setFeedbacks((prev) => ({ ...prev, [task.id]: e.target.value }))}
-                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none text-sm"
-                    />
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <div className="flex-1">
+                  <div className="space-y-4 border-t border-border pt-4">
+                    {/* Rubric toggle */}
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Use Scoring Rubric</span>
+                      <button
+                        type="button"
+                        onClick={() => setUseRubrics(prev => ({ ...prev, [task.id]: !(useRubrics[task.id] ?? true) }))}
+                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${
+                          (useRubrics[task.id] ?? true) ? 'bg-accent' : 'bg-muted-foreground/30'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                            (useRubrics[task.id] ?? true) ? 'translate-x-5' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {(useRubrics[task.id] ?? true) ? (
+                      <div className="space-y-3 bg-muted/40 p-4 rounded-xl border border-border">
+                        {/* Code Quality Slider */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs font-medium">
+                            <span>Code Quality & Best Practices</span>
+                            <span className="text-accent">{rubricsCodeQuality[task.id] ?? 30} / 30</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="30"
+                            value={rubricsCodeQuality[task.id] ?? 30}
+                            onChange={(e) => setRubricsCodeQuality(prev => ({ ...prev, [task.id]: parseInt(e.target.value, 10) }))}
+                            className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-accent"
+                          />
+                        </div>
+
+                        {/* UI/UX Design Slider */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs font-medium">
+                            <span>UI/UX Design & Polish</span>
+                            <span className="text-accent">{rubricsDesign[task.id] ?? 30} / 30</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="30"
+                            value={rubricsDesign[task.id] ?? 30}
+                            onChange={(e) => setRubricsDesign(prev => ({ ...prev, [task.id]: parseInt(e.target.value, 10) }))}
+                            className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-accent"
+                          />
+                        </div>
+
+                        {/* Functionality Slider */}
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs font-medium">
+                            <span>Functionality & Completion</span>
+                            <span className="text-accent">{rubricsFunctionality[task.id] ?? 40} / 40</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="40"
+                            value={rubricsFunctionality[task.id] ?? 40}
+                            onChange={(e) => setRubricsFunctionality(prev => ({ ...prev, [task.id]: parseInt(e.target.value, 10) }))}
+                            className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-accent"
+                          />
+                        </div>
+
+                        {/* Total rubric score */}
+                        <div className="flex justify-between items-center pt-2 border-t border-border text-xs font-bold text-foreground">
+                          <span>Computed Grade</span>
+                          <span className="text-emerald-500 text-sm">
+                            {(rubricsCodeQuality[task.id] ?? 30) + (rubricsDesign[task.id] ?? 30) + (rubricsFunctionality[task.id] ?? 40)}%
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
                         <label className="text-xs text-muted-foreground mb-1 block">Grade (0-100)</label>
                         <input
                           type="number"
@@ -170,22 +275,38 @@ export default function MentorTasks() {
                           className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm"
                         />
                       </div>
-                      <div className="flex items-end gap-2">
-                        <button
-                          onClick={() => submission && handleReview(task.id, submission.id, 'Approved')}
-                          disabled={submitting[task.id] || !submission}
-                          className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors disabled:opacity-50"
-                        >
-                          {submitting[task.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <ThumbsUp className="w-4 h-4" />} Approve
-                        </button>
-                        <button
-                          onClick={() => submission && handleReview(task.id, submission.id, 'Rejected')}
-                          disabled={submitting[task.id] || !submission}
-                          className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors disabled:opacity-50"
-                        >
-                          {submitting[task.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <ThumbsDown className="w-4 h-4" />} Reject
-                        </button>
-                      </div>
+                    )}
+
+                    <textarea
+                      placeholder="Provide constructive feedback and revision guidance..."
+                      rows={3}
+                      value={feedbacks[task.id] || ''}
+                      onChange={(e) => setFeedbacks((prev) => ({ ...prev, [task.id]: e.target.value }))}
+                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none text-sm"
+                    />
+
+                    <div className="flex justify-end gap-2 pt-2">
+                      <button
+                        onClick={() => submission && handleReview(task.id, submission.id, 'Rejected')}
+                        disabled={submitting[task.id] || !submission}
+                        className="px-3.5 py-2 bg-red-500/10 text-red-500 rounded-lg text-xs font-semibold hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => submission && handleReview(task.id, submission.id, 'Rejected')}
+                        disabled={submitting[task.id] || !submission}
+                        className="px-3.5 py-2 bg-amber-500 text-white rounded-lg text-xs font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50"
+                      >
+                        Request Revision
+                      </button>
+                      <button
+                        onClick={() => submission && handleReview(task.id, submission.id, 'Approved')}
+                        disabled={submitting[task.id] || !submission}
+                        className="px-3.5 py-2 bg-emerald-500 text-white rounded-lg text-xs font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 flex items-center gap-1"
+                      >
+                        {submitting[task.id] && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Approve Task
+                      </button>
                     </div>
                   </div>
                 ) : (
