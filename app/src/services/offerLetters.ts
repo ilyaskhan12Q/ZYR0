@@ -160,11 +160,11 @@ export async function uploadOfferLetterPdf(
   studentId: string,
   pdfBlob: Blob
 ): Promise<string> {
-  const path = `${studentId}/offer-letter-${offerId}.pdf`;
+  const path = `${studentId}/offer-letter-${offerId}.png`;
 
   const { error } = await supabase.storage
     .from('offer-letters')
-    .upload(path, pdfBlob, { contentType: 'application/pdf', upsert: true });
+    .upload(path, pdfBlob, { contentType: 'image/png', upsert: true });
 
   if (error) throw new Error(`Storage upload failed: ${error.message}`);
 

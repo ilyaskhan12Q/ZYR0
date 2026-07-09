@@ -292,6 +292,18 @@ export interface ActivityLog {
   user?: Profile;
 }
 
+export interface WorkspaceEvent {
+  id: string;
+  internship_id: string;
+  student_id: string;
+  actor_id: string | null;
+  event_type: 'offer_accepted' | 'task_assigned' | 'task_submitted' | 'task_approved' | 'task_rejected' | 'certificate_issued';
+  title: string;
+  description: string | null;
+  metadata: Record<string, any>;
+  created_at: string;
+}
+
 // Supabase Database type (for createClient<Database>)
 export interface Database {
   public: {
@@ -310,6 +322,7 @@ export interface Database {
       notifications: { Row: Notification; Insert: Partial<Notification>; Update: Partial<Notification> };
       evaluations: { Row: Evaluation; Insert: Partial<Evaluation>; Update: Partial<Evaluation> };
       activity_logs: { Row: ActivityLog; Insert: Partial<ActivityLog>; Update: Partial<ActivityLog> };
+      workspace_events: { Row: WorkspaceEvent; Insert: Partial<WorkspaceEvent>; Update: Partial<WorkspaceEvent> };
     };
     Views: {
       [_ in never]: never

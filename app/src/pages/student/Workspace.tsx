@@ -9,6 +9,9 @@ import {
 import { getMyActiveInternships } from '@/services/internships';
 import { getMyTasks, submitTask } from '@/services/tasks';
 import { getMyCertificates } from '@/services/certificates';
+import { getWorkspaceEvents, clearWorkspaceEventsCache } from '@/services/workspaceEvents';
+import { useRealtimeInsert } from '@/hooks/useRealtime';
+import { clearCache } from '@/lib/cache';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +31,7 @@ export default function StudentWorkspace() {
   // Workspace-specific states
   const [tasks, setTasks] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>('overview');
 
   // Task detail and submission states
@@ -38,10 +42,14 @@ export default function StudentWorkspace() {
   const [submitting, setSubmitting] = useState(false);
 
   // Load placement information, tasks and certificates
-  const loadWorkspaceData = useCallback(async () => {
+  const loadWorkspaceData = useCallback(async (forceRefresh = false) => {
     if (!user) return;
     setLoading(true);
     try {
+      if (forceRefresh) {
+        clearCache(`my_tasks_${user.id}`);
+      }
+
       // 1. Fetch all active accepted offer placements
       const { data: activePlacements, error: placementsErr } = await getMyActiveInternships();
       if (placementsErr) throw placementsErr;
@@ -75,7 +83,7 @@ export default function StudentWorkspace() {
       setActivePlacement(selected);
 
       // 3. Fetch tasks and filter in memory by this placement's internship_id
-      const { data: allTasks, error: tasksErr } = await getMyTasks();
+      const { data: allTasks, error: tasksErr } = await getMyTasks(!forceRefresh);
       if (tasksErr) throw tasksErr;
 
       const filteredTasks = (allTasks || []).filter(
@@ -86,6 +94,21 @@ export default function StudentWorkspace() {
       // 4. Fetch certificates to check if this placement's certificate is issued
       const { data: certs } = await getMyCertificates();
       setCertificates(certs || []);
+
+      // 5. Fetch workspace events
+      const internshipIdVal = (selected.internship as any)?.id;
+      if (internshipIdVal) {
+        if (forceRefresh) {
+          clearWorkspaceEventsCache(internshipIdVal, user.id);
+        }
+        const { data: eventsList, error: eventsErr } = await getWorkspaceEvents(
+          internshipIdVal,
+          user.id,
+          !forceRefresh
+        );
+        if (eventsErr) throw eventsErr;
+        setEvents(eventsList || []);
+      }
 
     } catch (err: any) {
       console.error('Error loading workspace data:', err);
@@ -98,6 +121,21 @@ export default function StudentWorkspace() {
   useEffect(() => {
     loadWorkspaceData();
   }, [loadWorkspaceData]);
+
+  // Subscribe to real-time updates for timeline events
+  const activeInternshipId = (activePlacement?.internship as any)?.id;
+  const realtimeFilter = activeInternshipId
+    ? `internship_id=eq.${activeInternshipId}`
+    : 'internship_id=eq.00000000-0000-0000-0000-000000000000';
+
+  useRealtimeInsert<any>(
+    'workspace_events',
+    realtimeFilter,
+    async () => {
+      await loadWorkspaceData(true);
+    },
+    [activeInternshipId, loadWorkspaceData]
+  );
 
   // Handle task submission
   async function handleSubmitTask(e: React.FormEvent) {
@@ -416,56 +454,128 @@ export default function StudentWorkspace() {
                     <h2 className="text-lg font-bold flex items-center gap-2">
                       <Calendar className="w-5 h-5 text-accent" /> Placement Timeline
                     </h2>
-                    <div className="relative pl-6 border-l-2 border-border space-y-6">
-                      {/* Milestone: Offer Accepted */}
-                      <div className="relative">
-                        <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-emerald-500 border-4 border-card"></div>
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground">Internship Initiated</h4>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            Offer Letter accepted on {activePlacement.accepted_at ? new Date(activePlacement.accepted_at).toLocaleDateString() : 'N/A'}
-                          </p>
+                    <div className="relative pl-6 border-l border-border space-y-6">
+                      {events.length === 0 ? (
+                        <div className="relative">
+                          <div className="absolute -left-[33px] top-0.5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-card flex items-center justify-center text-white">
+                            <Briefcase className="w-2.5 h-2.5" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-foreground">Internship Initiated</h4>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Offer Letter accepted on {activePlacement.accepted_at ? new Date(activePlacement.accepted_at).toLocaleDateString() : 'N/A'}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        events.map((event) => {
+                          let iconColor = 'bg-muted-foreground';
+                          let Icon = ClipboardList;
+                          
+                          switch (event.event_type) {
+                            case 'offer_accepted':
+                              iconColor = 'bg-emerald-500';
+                              Icon = Briefcase;
+                              break;
+                            case 'task_assigned':
+                              iconColor = 'bg-blue-500';
+                              Icon = ClipboardList;
+                              break;
+                            case 'task_submitted':
+                              iconColor = 'bg-amber-500';
+                              Icon = Clock;
+                              break;
+                            case 'task_approved':
+                              iconColor = 'bg-emerald-500';
+                              Icon = CheckCircle2;
+                              break;
+                            case 'task_rejected':
+                              iconColor = 'bg-red-500';
+                              Icon = AlertTriangle;
+                              break;
+                            case 'certificate_issued':
+                              iconColor = 'bg-purple-500 animate-pulse';
+                              Icon = Award;
+                              break;
+                          }
 
-                      {/* Milestone: First Task */}
-                      <div className="relative">
-                        <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full border-4 border-card ${
-                          totalTasks > 0 ? 'bg-emerald-500' : 'bg-muted-foreground'
-                        }`}></div>
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground">Task Assignments</h4>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {totalTasks > 0 ? `${totalTasks} tasks assigned by company mentor.` : 'No tasks assigned yet.'}
-                          </p>
-                        </div>
-                      </div>
+                          return (
+                            <div key={event.id} className="relative group">
+                              <div className={`absolute -left-[33px] top-0.5 w-5 h-5 rounded-full border-4 border-card flex items-center justify-center text-white shadow-sm transition-all duration-200 group-hover:scale-110 ${iconColor}`}>
+                                <Icon className="w-2.5 h-2.5" />
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between gap-4">
+                                  <h4 className="text-sm font-bold text-foreground group-hover:text-accent transition-colors duration-150">{event.title}</h4>
+                                  <span className="text-[10px] text-muted-foreground shrink-0">
+                                    {new Date(event.created_at).toLocaleDateString(undefined, {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                </div>
+                                {event.description && (
+                                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+                                    {event.description}
+                                  </p>
+                                )}
+                                
+                                {/* Event-specific metadata details */}
+                                {event.event_type === 'task_assigned' && event.metadata && (
+                                  <div className="flex flex-wrap gap-2 mt-1 text-[10px]">
+                                    {event.metadata.priority && (
+                                      <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-semibold">
+                                        Priority: {event.metadata.priority}
+                                      </span>
+                                    )}
+                                    {event.metadata.due_date && (
+                                      <span className="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-semibold">
+                                        Due: {new Date(event.metadata.due_date).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
 
-                      {/* Milestone: Progress Check */}
-                      <div className="relative">
-                        <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full border-4 border-card ${
-                          completedTasks > 0 ? 'bg-emerald-500' : 'bg-muted-foreground'
-                        }`}></div>
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground">Progress Completion</h4>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {completedTasks} tasks approved for grading.
-                          </p>
-                        </div>
-                      </div>
+                                {event.event_type === 'task_submitted' && event.metadata && (
+                                  <div className="mt-1 space-y-1">
+                                    {event.metadata.github_url && (
+                                      <a
+                                        href={event.metadata.github_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-1.5 text-[10px] text-accent hover:underline bg-accent/5 px-2 py-0.5 rounded-full"
+                                      >
+                                        <Github className="w-3 h-3" /> View Code Submission
+                                      </a>
+                                    )}
+                                  </div>
+                                )}
 
-                      {/* Milestone: Certified */}
-                      <div className="relative">
-                        <div className={`absolute -left-[31px] top-0.5 w-4 h-4 rounded-full border-4 border-card ${
-                          activeCertificate ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'
-                        }`}></div>
-                        <div>
-                          <h4 className="text-sm font-bold text-foreground">Final Certification</h4>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {activeCertificate ? 'Verified Certificate Issued!' : 'Locks until all tasks are completed.'}
-                          </p>
-                        </div>
-                      </div>
+                                {event.event_type === 'task_approved' && event.metadata && (
+                                  <div className="flex flex-wrap gap-2 mt-1 text-[10px]">
+                                    {event.metadata.grade && (
+                                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">
+                                        Grade: {event.metadata.grade}
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+
+                                {event.event_type === 'certificate_issued' && (
+                                  <button
+                                    onClick={() => setActiveTab('certificate')}
+                                    className="inline-flex items-center gap-1 text-[10px] text-accent hover:underline mt-1 bg-accent/5 px-2 py-0.5 rounded-full"
+                                  >
+                                    View Certificate <ArrowRight className="w-3 h-3" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
                 </div>
