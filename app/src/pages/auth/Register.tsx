@@ -57,7 +57,11 @@ export default function Register() {
     });
 
     if (error) {
-      setLocalError(error.message);
+      let msg = error.message;
+      if (error.status === 500 || !msg || msg === '{}') {
+        msg = "Registration failed (500: Error sending confirmation email). The Supabase built-in email provider limit has been reached. Please log in to your Supabase Dashboard, go to Authentication -> Providers -> Email, and toggle OFF 'Confirm email'.";
+      }
+      setLocalError(msg);
       setLoading(false);
     } else {
       setLoading(false);

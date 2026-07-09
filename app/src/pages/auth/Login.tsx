@@ -33,7 +33,11 @@ export default function Login() {
     const { error } = await signIn({ email, password });
     
     if (error) {
-      setLocalError(error.message);
+      let msg = error.message;
+      if (error.status === 500 || !msg || msg === '{}') {
+        msg = "Authentication server responded with an error (500). Please check your Supabase server connection and database status.";
+      }
+      setLocalError(msg);
       setLoading(false);
     } else {
       // The AuthContext will automatically redirect based on role when session updates
