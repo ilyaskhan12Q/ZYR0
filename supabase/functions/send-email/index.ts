@@ -4,7 +4,12 @@
 // Uses SMTP (if configured) or Resend fallback
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import nodemailer from 'npm:nodemailer';
+import nodemailer from 'npm:nodemailer@6.9.13';
+
+interface EmailAttachment {
+  filename: string;
+  content: string;
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,7 +50,7 @@ serve(async (req) => {
         subject,
         text,
         html,
-        attachments: attachments?.map((att: any) => ({
+        attachments: attachments?.map((att: EmailAttachment) => ({
           filename: att.filename,
           content: att.content, // base64 string
           encoding: 'base64',
@@ -72,7 +77,7 @@ serve(async (req) => {
           to: Array.isArray(to) ? to : [to],
           subject,
           html,
-          attachments: attachments?.map((att: any) => ({
+          attachments: attachments?.map((att: EmailAttachment) => ({
             filename: att.filename,
             content: att.content, // base64 string
           })),
