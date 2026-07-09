@@ -137,6 +137,57 @@ serve(async (req) => {
       details: `Credential ID: ${credentialId}`,
     });
 
+    // Notify recipient via email
+    const { data: student } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', recipient_id)
+      .single();
+
+    if (student?.email) {
+      try {
+        const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
+        const emailSubject = `Certificate Issued: ${title} - Zyro`;
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyro-kim.vercel.app';
+        
+        const emailHtml = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <h1 style="color: #4f46e5; margin: 0; font-size: 24px;">Certificate of Completion! 🎉</h1>
+              <p style="color: #6b7280; margin: 4px 0 0 0;">issued via Zyro</p>
+            </div>
+            <p>Dear <strong>${student.full_name}</strong>,</p>
+            <p>Congratulations on successfully completing your internship! We are proud to issue you the certificate for <strong>${title}</strong>.</p>
+            <p style="margin: 16px 0; padding: 12px; background-color: #f9fafb; border-radius: 6px; font-family: monospace;">
+              <strong>Credential ID:</strong> ${credentialId}
+            </p>
+            <p>You can view, verify, or download your digital certificate online on the Zyro Platform.</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${siteUrl}/verify-certificate/${credentialId}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Verified Certificate</a>
+            </div>
+            <p style="color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 24px;">
+              Verify this digital credential securely on the Zyro network.
+            </p>
+          </div>
+        `;
+
+        await fetch(sendEmailUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          },
+          body: JSON.stringify({
+            to: student.email,
+            subject: emailSubject,
+            html: emailHtml,
+          }),
+        });
+      } catch (emailErr) {
+        console.error('Failed to dispatch certificate email notification:', emailErr);
+      }
+    }
+
     return new Response(JSON.stringify({ certificate }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
