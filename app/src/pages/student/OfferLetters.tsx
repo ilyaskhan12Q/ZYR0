@@ -13,6 +13,7 @@ import {
   rejectOfferLetter,
 } from '@/services/offerLetters';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
+import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -73,6 +74,22 @@ export default function StudentOfferLetters() {
     try {
       const { data, error: err } = await acceptOfferLetter(id);
       if (err) throw err;
+      
+      const offer = offers.find((o) => o.id === id);
+      if (offer && offer.company_id) {
+        try {
+          await dispatchNotificationWithSimulation({
+            userId: offer.company_id,
+            title: 'Offer Accepted',
+            message: `${offer.student?.full_name || 'A student'} has accepted your internship offer for "${offer.internship?.title}".`,
+            type: 'application',
+            actionUrl: '/company/offer-letters',
+          });
+        } catch (notifErr) {
+          console.error('Failed to trigger accept notification simulation:', notifErr);
+        }
+      }
+
       setOffers((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'Accepted', accepted_at: data?.accepted_at ?? null } : o)));
       setSelected((prev) => prev?.id === id ? { ...prev, status: 'Accepted' } : prev);
     } catch (e: unknown) {
@@ -89,6 +106,22 @@ export default function StudentOfferLetters() {
     try {
       const { data, error: err } = await rejectOfferLetter(id);
       if (err) throw err;
+
+      const offer = offers.find((o) => o.id === id);
+      if (offer && offer.company_id) {
+        try {
+          await dispatchNotificationWithSimulation({
+            userId: offer.company_id,
+            title: 'Offer Declined',
+            message: `${offer.student?.full_name || 'A student'} has declined your internship offer for "${offer.internship?.title}".`,
+            type: 'application',
+            actionUrl: '/company/offer-letters',
+          });
+        } catch (notifErr) {
+          console.error('Failed to trigger reject notification simulation:', notifErr);
+        }
+      }
+
       setOffers((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'Rejected', rejected_at: data?.rejected_at ?? null } : o)));
       setSelected((prev) => prev?.id === id ? { ...prev, status: 'Rejected' } : prev);
     } catch (e: unknown) {

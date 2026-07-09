@@ -15,6 +15,7 @@ import { clearCache } from '@/lib/cache';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 type WorkspaceTab = 'overview' | 'tasks' | 'submissions' | 'certificate';
 
@@ -163,6 +164,22 @@ export default function StudentWorkspace() {
       setGithubUrl('');
       setDemoUrl('');
       setNotes('');
+
+      // Trigger simulation notification to mentor/company supervisor
+      const recipientId = selectedTask.mentor_id || selectedTask.company_id;
+      if (recipientId) {
+        try {
+          await dispatchNotificationWithSimulation({
+            userId: recipientId,
+            title: 'New Task Submission',
+            message: `${user?.user_metadata?.full_name || 'An intern'} has submitted a task: "${selectedTask.title}".`,
+            type: 'task',
+            actionUrl: `/mentor/tasks`,
+          });
+        } catch (notifErr) {
+          console.error('Failed to trigger submission notification simulation:', notifErr);
+        }
+      }
 
       // Reload to reflect new submission status
       await loadWorkspaceData();

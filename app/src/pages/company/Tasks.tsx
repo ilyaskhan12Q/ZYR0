@@ -5,6 +5,7 @@ import { getTasksAssignedByMe, createTask, updateTask, reviewSubmission } from '
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
 import { getInternships } from '@/services/internships';
+import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 const tabs = ['All', 'Pending', 'Submitted', 'Approved', 'Rejected'];
 
@@ -201,6 +202,20 @@ export default function CompanyTasks() {
           feedback: finalFeedback || undefined,
           grade: calculatedGrade,
         });
+
+        // Trigger simulation notification
+        try {
+          await dispatchNotificationWithSimulation({
+            userId: reviewingTask.student_id,
+            title: `Task ${status === 'Approved' ? 'Approved' : 'Revision Requested'}`,
+            message: `Your submission for "${reviewingTask.title}" has been reviewed. Grade: ${calculatedGrade}%.`,
+            type: 'task',
+            actionUrl: '/student/workspace',
+            studentEmail: reviewingTask.assignee?.email,
+          });
+        } catch (notifErr) {
+          console.error('Failed to trigger task review notification simulation:', notifErr);
+        }
 
         setReviewingTask(null);
         setReviewFeedback('');

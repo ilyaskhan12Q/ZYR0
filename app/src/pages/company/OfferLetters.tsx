@@ -18,6 +18,7 @@ import {
 } from '@/services/offerLetters';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
+import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 // ── Status config (mirrors student page) ─────────────────────────────────────
 
@@ -137,6 +138,20 @@ export default function CompanyOfferLetters() {
 
       // 5. Update record with PDF URL
       await attachOfferLetterPdf(newOffer!.id, pdfUrl);
+
+      // Trigger simulation notification
+      try {
+        await dispatchNotificationWithSimulation({
+          userId: student.id,
+          title: 'Offer Letter Received',
+          message: `Congratulations! ${company.name} has extended an internship offer: "${internship.title}".`,
+          type: 'application',
+          actionUrl: '/student/offer-letters',
+          studentEmail: student.email,
+        });
+      } catch (notifErr) {
+        console.error('Failed to trigger offer letter notification simulation:', notifErr);
+      }
 
       setSuccessMsg(`Offer letter generated and sent to ${student.full_name}!`);
       await load();

@@ -55,22 +55,34 @@ function Toggle({
 export default function StudentSettings() {
   const [showPass, setShowPass] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [settings, setSettings] = useState({
-    emailApps: true,
-    emailTasks: true,
-    emailMessages: true,
-    emailDeadlines: true,
-    pushApps: false,
-    pushTasks: true,
-    pushMessages: true,
-    pushDeadlines: true,
-    theme: 'system' as 'light' | 'dark' | 'system',
-    language: 'en',
-    twoFactor: false,
-    publicProfile: true,
+  const [settings, setSettings] = useState(() => {
+    const savedData = localStorage.getItem('zyro_student_settings');
+    if (savedData) {
+      try {
+        return JSON.parse(savedData);
+      } catch (e) {
+        // ignore and fallback
+      }
+    }
+    return {
+      emailApps: true,
+      emailTasks: true,
+      emailMessages: true,
+      emailDeadlines: true,
+      smsApps: true,
+      smsTasks: true,
+      smsMessages: false,
+      smsDeadlines: true,
+      phoneNumber: '+1 (555) 019-2834',
+      theme: 'system' as 'light' | 'dark' | 'system',
+      language: 'en',
+      twoFactor: false,
+      publicProfile: true,
+    };
   });
 
   const handleSave = () => {
+    localStorage.setItem('zyro_student_settings', JSON.stringify(settings));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -92,14 +104,34 @@ export default function StudentSettings() {
 
       {/* Notifications */}
       <Section title="Notifications">
-        <div className="space-y-1">
-          <Toggle label="Application Updates" desc="Get notified when your application status changes" checked={settings.emailApps} onChange={(v) => setSettings({ ...settings, emailApps: v })} />
-          <div className="border-t border-border" />
-          <Toggle label="Task Assignments" desc="Get notified when new tasks are assigned" checked={settings.emailTasks} onChange={(v) => setSettings({ ...settings, emailTasks: v })} />
-          <div className="border-t border-border" />
-          <Toggle label="New Messages" desc="Get notified when you receive a message" checked={settings.emailMessages} onChange={(v) => setSettings({ ...settings, emailMessages: v })} />
-          <div className="border-t border-border" />
-          <Toggle label="Deadline Reminders" desc="Get reminded before task deadlines" checked={settings.emailDeadlines} onChange={(v) => setSettings({ ...settings, emailDeadlines: v })} />
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-foreground">Email Notifications</h4>
+              <Toggle label="Application Updates" desc="Get notified when your application status changes" checked={settings.emailApps} onChange={(v) => setSettings({ ...settings, emailApps: v })} />
+              <Toggle label="Task Assignments" desc="Get notified when new tasks are assigned" checked={settings.emailTasks} onChange={(v) => setSettings({ ...settings, emailTasks: v })} />
+              <Toggle label="New Messages" desc="Get notified when you receive a message" checked={settings.emailMessages} onChange={(v) => setSettings({ ...settings, emailMessages: v })} />
+              <Toggle label="Deadline Reminders" desc="Get reminded before task deadlines" checked={settings.emailDeadlines} onChange={(v) => setSettings({ ...settings, emailDeadlines: v })} />
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-foreground">SMS & Phone Alerts</h4>
+              <Toggle label="Application SMS Alerts" desc="Receive SMS alerts for status changes" checked={settings.smsApps} onChange={(v) => setSettings({ ...settings, smsApps: v })} />
+              <Toggle label="Task Assignment SMS" desc="Receive SMS updates on task reviews and deadlines" checked={settings.smsTasks} onChange={(v) => setSettings({ ...settings, smsTasks: v })} />
+              <Toggle label="New Messages SMS" desc="Receive text alerts for direct messages" checked={settings.smsMessages} onChange={(v) => setSettings({ ...settings, smsMessages: v })} />
+              
+              <div className="pt-2">
+                <label className="text-xs text-muted-foreground mb-1 block">Primary Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  value={settings.phoneNumber}
+                  onChange={(e) => setSettings({ ...settings, phoneNumber: e.target.value })}
+                  className="w-full px-3 py-2 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </Section>
 

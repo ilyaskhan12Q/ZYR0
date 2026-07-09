@@ -17,7 +17,7 @@ This document provides a quick reference for the implementation status of each m
 | Task Management (Create/Edit) | ✅ | Dual-purpose Create/Edit modal with robust form validation and inline errors. |
 | Mentor Review & Scoring | ✅ | Slider-based rubric scoring interface (Code, UX, Func) and interactive revision flows. |
 | Offer Letter Acceptance / Rejection | ✅ | Dedicated UI with Go‑to‑Workspace redirects and automatic application state triggers. |
-| Notification System (email/SMS) | 🚧 | Email notifications integrated for offers and updates. |
+| Notification System (email/SMS) | ✅ | Dual email/SMS settings and live Toast dispatcher simulating background alerts on lifecycle updates. |
 | Certificate Generation & QR Verification | ✅ | Basic generation exists; public verification page pending. |
 | Analytics & Reporting | 🚧 | Advanced filters and CSV export planned. |
 | Accessibility (WCAG 2.2 AA) | 🚧 | Audit and ARIA enhancements needed. |

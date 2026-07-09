@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTasksAssignedByMe, reviewSubmission, updateTask } from '@/services/tasks';
+import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 const tabs = ['To Review', 'Reviewed'];
 
@@ -72,6 +73,23 @@ export default function MentorTasks() {
         feedback: finalFeedback || undefined,
         grade,
       });
+
+      // Trigger simulation notification
+      const targetTask = tasks.find((t) => t.id === taskId);
+      if (targetTask) {
+        try {
+          await dispatchNotificationWithSimulation({
+            userId: targetTask.student_id,
+            title: `Task ${status === 'Approved' ? 'Approved' : 'Revision Requested'}`,
+            message: `Your submission for "${targetTask.title}" has been reviewed. Grade: ${grade}%.`,
+            type: 'task',
+            actionUrl: '/student/workspace',
+            studentEmail: targetTask.assignee?.email,
+          });
+        } catch (notifErr) {
+          console.error('Failed to trigger mentor review notification simulation:', notifErr);
+        }
+      }
 
       // Clear states
       setFeedbacks((prev) => {
