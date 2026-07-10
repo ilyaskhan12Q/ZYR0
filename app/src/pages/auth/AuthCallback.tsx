@@ -25,6 +25,13 @@ export default function AuthCallback() {
 
       if (session?.user) {
         const user = session.user;
+        const typeParam = searchParams.get('type');
+
+        if (typeParam === 'recovery') {
+          navigate('/reset-password', { replace: true });
+          return;
+        }
+
         const roleParam = searchParams.get('role') as UserRole | null;
 
         // Fetch user profile

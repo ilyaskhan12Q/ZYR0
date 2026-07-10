@@ -28,6 +28,7 @@ const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
 const Login = lazy(() => import('@/pages/auth/Login'));
 const Register = lazy(() => import('@/pages/auth/Register'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 
 // Role-Based Portals (Each is its own dynamically-loaded bundle containing statically-loaded pages)
 const StudentPortal = lazy(() => import('@/pages/student/StudentPortal'));
@@ -61,6 +62,7 @@ function App() {
         <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
         <Route path="/register/:role" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
         <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Student Routes */}
         <Route path="/student/*" element={<ProtectedRoute role="student"><DashboardLayout role="student" /></ProtectedRoute>}>
