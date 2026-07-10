@@ -324,3 +324,8 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Accessible focus visible utility ring */
+.focus-visible-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-shadow duration-150;
+}

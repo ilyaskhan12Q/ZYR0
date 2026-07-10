@@ -857,53 +857,56 @@ export default function StudentWorkspace() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-muted-foreground block">
+                                <label htmlFor="submission-github-url" className="text-xs font-semibold text-muted-foreground block">
                                   GitHub Repository URL <span className="text-red-500">*</span>
                                 </label>
                                 <input
+                                  id="submission-github-url"
                                   type="url"
                                   required
                                   value={githubUrl}
                                   onChange={(e) => setGithubUrl(e.target.value)}
                                   placeholder="https://github.com/username/project"
-                                  className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus"
+                                  className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
                                 />
                               </div>
                               <div className="space-y-1.5">
-                                <label className="text-xs font-semibold text-muted-foreground block">
+                                <label htmlFor="submission-demo-url" className="text-xs font-semibold text-muted-foreground block">
                                   Live Demo URL <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
                                 </label>
                                 <input
+                                  id="submission-demo-url"
                                   type="url"
                                   value={demoUrl}
                                   onChange={(e) => setDemoUrl(e.target.value)}
                                   placeholder="https://project.vercel.app"
-                                  className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus"
+                                  className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
                                 />
                               </div>
                             </div>
 
                             <div className="space-y-1.5">
-                              <label className="text-xs font-semibold text-muted-foreground block">
+                              <label htmlFor="submission-notes" className="text-xs font-semibold text-muted-foreground block">
                                 Submission Notes <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
                               </label>
                               <textarea
+                                id="submission-notes"
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 rows={3}
                                 placeholder="Explain implementation details, challenges, or assumptions..."
-                                className="w-full text-sm p-3 bg-background border border-border rounded-lg input-focus resize-none"
+                                className="w-full text-sm p-3 bg-background border border-border rounded-lg input-focus resize-none focus-visible-ring"
                               />
                             </div>
 
                             <button
                               type="submit"
                               disabled={submitting}
-                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
                             >
                               {submitting ? (
                                 <>
-                                  <Loader2 className="w-4 h-4 animate-spin" /> Submitting...
+                                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Submitting...
                                 </>
                               ) : (
                                 'Submit Solution'

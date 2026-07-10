@@ -55,20 +55,39 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium mb-1.5 block">Name</label>
-                    <input type="text" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent" placeholder="Your name" />
+                    <label htmlFor="contact-name" className="text-sm font-medium mb-1.5 block">Name</label>
+                    <input
+                      id="contact-name"
+                      type="text"
+                      required
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
+                      placeholder="Your name"
+                    />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-1.5 block">Email</label>
-                    <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent" placeholder="you@example.com" />
+                    <label htmlFor="contact-email" className="text-sm font-medium mb-1.5 block">Email</label>
+                    <input
+                      id="contact-email"
+                      type="email"
+                      required
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
+                      placeholder="you@example.com"
+                    />
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Subject</label>
-                  <select required value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent">
+                  <label htmlFor="contact-subject" className="text-sm font-medium mb-1.5 block">Subject</label>
+                  <select
+                    id="contact-subject"
+                    required
+                    value={form.subject}
+                    onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
+                  >
                     <option value="">Select a subject</option>
                     <option value="general">General Inquiry</option>
                     <option value="support">Technical Support</option>
@@ -77,12 +96,22 @@ export default function Contact() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1.5 block">Message</label>
-                  <textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none" placeholder="Tell us how we can help..." />
+                  <label htmlFor="contact-message" className="text-sm font-medium mb-1.5 block">Message</label>
+                  <textarea
+                    id="contact-message"
+                    required
+                    rows={5}
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none focus-visible-ring"
+                    placeholder="Tell us how we can help..."
+                  />
                 </div>
-                <button type="submit" className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors">
-                  <Send className="w-4 h-4" /> Send Message
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring"
+                >
+                  <Send className="w-4 h-4" aria-hidden="true" /> Send Message
                 </button>
               </form>
             )}

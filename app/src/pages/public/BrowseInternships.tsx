@@ -65,25 +65,33 @@ export default function BrowseInternships() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
+              <label htmlFor="search-internships" className="sr-only">Search internships</label>
               <input
+                id="search-internships"
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by title or company..."
-                className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+                className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
               />
               {search && (
-                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <X className="w-4 h-4 text-muted-foreground" />
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 focus-visible-ring rounded"
+                  aria-label="Clear search query"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                 </button>
               )}
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-lg hover:bg-muted transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-lg hover:bg-muted transition-colors focus-visible-ring"
+              aria-expanded={showFilters}
+              aria-controls="filter-panel"
             >
-              <Filter className="w-4 h-4" />
+              <Filter className="w-4 h-4" aria-hidden="true" />
               Filters
               {(selectedDomain !== 'All' || selectedLocation !== 'All' || selectedType !== 'All') && (
                 <span className="w-2 h-2 bg-accent rounded-full" />
@@ -92,22 +100,42 @@ export default function BrowseInternships() {
           </div>
 
           {showFilters && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <motion.div
+              id="filter-panel"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+            >
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Domain</label>
-                <select value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
+                <label htmlFor="filter-domain" className="text-xs font-medium text-muted-foreground mb-1 block">Domain</label>
+                <select
+                  id="filter-domain"
+                  value={selectedDomain}
+                  onChange={(e) => setSelectedDomain(e.target.value)}
+                  className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus-visible-ring"
+                >
                   {domains.map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Location</label>
-                <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
+                <label htmlFor="filter-location" className="text-xs font-medium text-muted-foreground mb-1 block">Location</label>
+                <select
+                  id="filter-location"
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus-visible-ring"
+                >
                   {locations.map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1 block">Type</label>
-                <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
+                <label htmlFor="filter-type" className="text-xs font-medium text-muted-foreground mb-1 block">Type</label>
+                <select
+                  id="filter-type"
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full px-3 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 focus-visible-ring"
+                >
                   {types.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
@@ -164,14 +192,21 @@ export default function BrowseInternships() {
                       {/* Header */}
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3">
-                          <img src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                          <img
+                            src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`}
+                            alt={`${company?.name || 'Company'} logo`}
+                            className="w-10 h-10 rounded-lg object-cover"
+                          />
                           <div>
                             <p className="text-sm font-medium">{company?.name || 'Unknown Company'}</p>
                             <p className="text-xs text-muted-foreground">{new Date(internship.posted_date || internship.created_at).toLocaleDateString()}</p>
                           </div>
                         </div>
-                        <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-                          <Bookmark className="w-4 h-4 text-muted-foreground" />
+                        <button
+                          className="p-1.5 rounded-lg hover:bg-muted transition-colors focus-visible-ring"
+                          aria-label={`Bookmark ${internship.title} at ${company?.name || 'Company'}`}
+                        >
+                          <Bookmark className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
                         </button>
                       </div>
 
@@ -208,10 +243,10 @@ export default function BrowseInternships() {
                         </span>
                         <Link
                           to={`/internships/${internship.id}`}
-                          className="inline-flex items-center gap-1.5 bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors"
+                          className="inline-flex items-center gap-1.5 bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors focus-visible-ring"
                         >
                           View Details
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
                         </Link>
                       </div>
                     </div>
