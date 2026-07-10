@@ -20,7 +20,7 @@ This document provides a quick reference for the implementation status of each m
 | Notification System (email/SMS) | ✅ | Dual email/SMS settings and live Toast dispatcher simulating background alerts on lifecycle updates. |
 | Certificate Generation & QR Verification | ✅ | Full digital certificates, print-friendly template, secure QR verification, and fallback mock support. |
 | Analytics & Reporting | ✅ | Interactive filters (domain/timeframe), CSV dataset export, and browser-native print reports. |
-| Accessibility (WCAG 2.2 AA) | 🚧 | Audit and ARIA enhancements needed. |
+| Accessibility (WCAG 2.2 AA) | ✅ | Implemented global focus ring, form control labels, dynamic status live regions, and keyboard role selections. |
 | Test Suite (Unit / Integration) | 🚧 | Coverage improvements required. |
 
 _Keep this document up‑to‑date as features move through the development pipeline._
