@@ -205,10 +205,10 @@ export default function StudentDashboard() {
               ) : recentApps.map((app) => (
                 <div key={app.id} className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
                   <div className="flex items-center gap-3">
-                    <img src={app.internships?.companies?.logo_url || 'https://via.placeholder.com/40'} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    <img src={app.internship?.company?.logo_url || 'https://via.placeholder.com/40'} alt="" className="w-10 h-10 rounded-lg object-cover" />
                     <div>
-                      <p className="text-sm font-medium">{app.internships?.title}</p>
-                      <p className="text-xs text-muted-foreground">{app.internships?.companies?.name}</p>
+                      <p className="text-sm font-medium">{app.internship?.title}</p>
+                      <p className="text-xs text-muted-foreground">{app.internship?.company?.name}</p>
                     </div>
                   </div>
                   <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
@@ -242,7 +242,7 @@ export default function StudentDashboard() {
                        <Circle className="w-5 h-5 text-muted-foreground mt-0.5 flex-shrink-0" />}
                       <div>
                         <p className="text-sm font-medium">{task.title}</p>
-                        <p className="text-xs text-muted-foreground">{task.internships?.title}</p>
+                        <p className="text-xs text-muted-foreground">{task.internship?.title}</p>
                       </div>
                     </div>
                     {task.priority && (
@@ -309,7 +309,7 @@ export default function StudentDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{task.title}</p>
-                      <p className="text-xs text-muted-foreground">{task.internships?.title}</p>
+                      <p className="text-xs text-muted-foreground">{task.internship?.title}</p>
                     </div>
                     <span className={`text-xs font-medium whitespace-nowrap ${daysLeft <= 3 ? 'text-red-600' : 'text-amber-600'}`}>
                       {daysLeft > 0 ? `${daysLeft}d left` : 'Overdue'}
@@ -328,7 +328,7 @@ export default function StudentDashboard() {
               {conversations.length === 0 ? (
                 <div className="text-sm text-muted-foreground">No recent messages.</div>
               ) : conversations.slice(0, 2).map((conv) => {
-                const otherParticipant = conv.participants.find((p: any) => p.profile_id !== user?.id)?.profiles;
+                const otherParticipant = conv.participants.find((p: any) => p.user?.id !== user?.id)?.user;
                 return (
                   <Link key={conv.id} to={`/student/messages/${conv.id}`} className="flex items-center gap-3 hover:bg-muted/50 p-2 -mx-2 rounded-lg transition-colors">
                     <div className="relative">

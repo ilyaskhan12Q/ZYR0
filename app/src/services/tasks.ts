@@ -46,7 +46,7 @@ export async function getTasksAssignedByMe(useCache = true) {
     .select(`
       *,
       internship:internships!internship_id (id, title),
-      assignee:profiles!assigned_to (id, full_name, avatar_url),
+      assignee:profiles!assigned_to (id, full_name, avatar_url, email),
       submissions:task_submissions (*)
     `)
     .eq('assigned_by', user.id)
@@ -71,7 +71,7 @@ export async function getTaskById(id: string, useCache = true) {
     .select(`
       *,
       internship:internships!internship_id (id, title),
-      assignee:profiles!assigned_to (id, full_name, avatar_url, university),
+      assignee:profiles!assigned_to (id, full_name, avatar_url, university, email),
       assigner:profiles!assigned_by (id, full_name, avatar_url, role),
       submissions:task_submissions (*, student:profiles!student_id (*))
     `)

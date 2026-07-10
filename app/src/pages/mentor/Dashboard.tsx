@@ -27,11 +27,14 @@ export default function MentorDashboard() {
             .from('applications')
             .select(`
               id, status,
-              student:profiles!student_id (id, full_name, avatar_url, university)
+              student:profiles!student_id (id, full_name, avatar_url, university),
+              internship:internships!internship_id (id, company_id)
             `)
             .eq('status', 'Accepted');
-          // Since client-side filters or inner join can be tricky, filter manually
-          internsData = data || [];
+          // Filter manually by company_id
+          internsData = (data || []).filter(
+            (app: any) => app.internship?.company_id === profile.company_id
+          );
         }
 
         // Get evaluations created by this mentor

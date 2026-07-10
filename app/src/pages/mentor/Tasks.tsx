@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +9,7 @@ import { dispatchNotificationWithSimulation } from '@/services/notificationsSim'
 const tabs = ['To Review', 'Reviewed'];
 
 export default function MentorTasks() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState('To Review');
   const [tasks, setTasks] = useState<any[]>([]);
@@ -79,7 +81,7 @@ export default function MentorTasks() {
       if (targetTask) {
         try {
           await dispatchNotificationWithSimulation({
-            userId: targetTask.student_id,
+            userId: targetTask.assigned_to,
             title: `Task ${status === 'Approved' ? 'Approved' : 'Revision Requested'}`,
             message: `Your submission for "${targetTask.title}" has been reviewed. Grade: ${grade}%.`,
             type: 'task',
@@ -141,9 +143,15 @@ export default function MentorTasks() {
     );
   }
 
+  const studentIdParam = searchParams.get('studentId') || searchParams.get('student_id');
   const toReview = tasks.filter(t => t.status === 'Submitted' || t.status === 'Under Review');
   const reviewed = tasks.filter(t => t.status === 'Approved' || t.status === 'Rejected');
-  const filtered = activeTab === 'To Review' ? toReview : reviewed;
+  const filtered = (activeTab === 'To Review' ? toReview : reviewed)
+    .filter(t => !studentIdParam || t.assigned_to === studentIdParam);
+
+  const filteredStudentName = studentIdParam 
+    ? tasks.find(t => t.assigned_to === studentIdParam)?.assignee?.full_name || 'Selected Intern'
+    : '';
 
   return (
     <div className="space-y-6">
@@ -160,6 +168,27 @@ export default function MentorTasks() {
           </button>
         ))}
       </div>
+
+      {studentIdParam && (
+        <div className="flex items-center justify-between p-3.5 bg-accent/10 border border-accent/20 rounded-xl text-sm">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+            <span className="text-muted-foreground">Showing tasks for:</span>
+            <strong className="text-foreground">{filteredStudentName}</strong>
+          </div>
+          <button 
+            onClick={() => {
+              const nextParams = new URLSearchParams(searchParams);
+              nextParams.delete('studentId');
+              nextParams.delete('student_id');
+              setSearchParams(nextParams);
+            }} 
+            className="text-xs text-accent hover:underline font-semibold"
+          >
+            Clear Filter
+          </button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {filtered.length === 0 ? (

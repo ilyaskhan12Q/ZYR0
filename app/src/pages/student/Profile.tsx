@@ -1,28 +1,124 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, MapPin, GraduationCap, Calendar, Save, Plus, X, Upload } from 'lucide-react';
+import { User, Mail, MapPin, GraduationCap, Calendar, Save, Plus, X, Upload, FileText, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { updateMyProfile, uploadAvatar, uploadResume } from '@/services/users';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 export default function StudentProfile() {
+  const { profile, user, refreshProfile } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
   const [saved, setSaved] = useState(false);
+
   const [form, setForm] = useState({
-    name: 'Alex Johnson',
-    email: 'alex@student.edu',
-    phone: '+1 (555) 123-4567',
-    bio: 'Passionate computer science student with hands-on experience in full-stack development.',
-    university: 'Stanford University',
-    degree: 'B.S. Computer Science',
-    graduation: '2025',
-    location: 'San Francisco, CA',
-    linkedin: 'linkedin.com/in/alexjohnson',
-    github: 'github.com/alexjohnson',
-    website: 'alexjohnson.dev',
+    name: '',
+    email: '',
+    phone: '',
+    bio: '',
+    university: '',
+    degree: '',
+    graduation: '',
+    location: '',
+    linkedin: '',
+    github: '',
+    website: '',
   });
-  const [skills, setSkills] = useState(['JavaScript', 'React', 'Node.js', 'TypeScript', 'Python', 'SQL']);
+
+  const [skills, setSkills] = useState<string[]>([]);
   const [newSkill, setNewSkill] = useState('');
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  // Load profile data when available
+  useEffect(() => {
+    if (profile && user) {
+      const meta = user.user_metadata || {};
+      setForm({
+        name: profile.full_name || '',
+        email: user.email || '',
+        phone: meta.phone || '',
+        bio: profile.bio || '',
+        university: profile.university || '',
+        degree: meta.degree || '',
+        graduation: profile.graduation_year ? profile.graduation_year.toString() : '',
+        location: meta.location || '',
+        linkedin: meta.linkedin || '',
+        github: meta.github || '',
+        website: profile.portfolio_url || '',
+      });
+      setSkills(profile.skills || []);
+    }
+  }, [profile, user]);
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+      // 1. Update Profile in DB
+      await updateMyProfile({
+        full_name: form.name,
+        university: form.university,
+        graduation_year: form.graduation ? parseInt(form.graduation, 10) : null,
+        bio: form.bio,
+        skills: skills,
+        portfolio_url: form.website,
+      });
+
+      // 2. Update metadata in Auth
+      const { error: authErr } = await supabase.auth.updateUser({
+        data: {
+          phone: form.phone,
+          degree: form.degree,
+          location: form.location,
+          linkedin: form.linkedin,
+          github: form.github,
+        }
+      });
+
+      if (authErr) throw authErr;
+
+      await refreshProfile();
+      setSaved(true);
+      toast.success('Profile updated successfully!');
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err: any) {
+      console.error('Error saving profile:', err);
+      toast.error(err.message || 'Failed to save profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingAvatar(true);
+      await uploadAvatar(file);
+      await refreshProfile();
+      toast.success('Avatar uploaded successfully!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Failed to upload avatar');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleResumeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setUploadingResume(true);
+      await uploadResume(file);
+      await refreshProfile();
+      toast.success('Resume uploaded successfully!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Failed to upload resume');
+    } finally {
+      setUploadingResume(false);
+    }
   };
 
   const addSkill = () => {
@@ -34,12 +130,29 @@ export default function StudentProfile() {
 
   const removeSkill = (s: string) => setSkills(skills.filter(sk => sk !== s));
 
+  if (!profile || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Edit Profile</h1>
-        <button onClick={handleSave} className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
-          <Save className="w-4 h-4" /> {saved ? 'Saved!' : 'Save Changes'}
+        <button 
+          onClick={handleSave} 
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4" />
+          )}
+          {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
 
@@ -48,10 +161,19 @@ export default function StudentProfile() {
         className="bg-card rounded-xl border border-border shadow-sm p-6">
         <div className="flex items-center gap-6">
           <div className="relative">
-            <img src="https://i.pravatar.cc/150?u=alex" alt="" className="w-20 h-20 rounded-2xl" />
-            <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center shadow-md hover:bg-accent/90">
-              <Upload className="w-4 h-4" />
-            </button>
+            <img 
+              src={profile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(form.name || 'User')}`} 
+              alt="Avatar" 
+              className="w-20 h-20 rounded-2xl object-cover border border-border" 
+            />
+            <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center shadow-md hover:bg-accent/90 cursor-pointer">
+              {uploadingAvatar ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Upload className="w-4 h-4" />
+              )}
+              <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" disabled={uploadingAvatar} />
+            </label>
           </div>
           <div>
             <h3 className="font-semibold">Profile Photo</h3>
@@ -71,9 +193,9 @@ export default function StudentProfile() {
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1.5 block">Email</label>
-            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
+            <label className="text-sm font-medium mb-1.5 block">Email (Read Only)</label>
+            <input type="email" value={form.email} readOnly
+              className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-muted-foreground cursor-not-allowed" />
           </div>
           <div>
             <label className="text-sm font-medium mb-1.5 block">Phone</label>
@@ -109,10 +231,40 @@ export default function StudentProfile() {
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1.5 block">Expected Graduation</label>
-            <input type="text" value={form.graduation} onChange={(e) => setForm({ ...form, graduation: e.target.value })}
+            <label className="text-sm font-medium mb-1.5 block">Expected Graduation Year</label>
+            <input type="number" placeholder="2025" value={form.graduation} onChange={(e) => setForm({ ...form, graduation: e.target.value })}
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
+        </div>
+      </motion.div>
+
+      {/* Resume Upload */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+        className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
+        <h3 className="font-semibold">Resume</h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <FileText className="w-8 h-8 text-muted-foreground flex-shrink-0" />
+            <div>
+              {profile.resume_url ? (
+                <a href={profile.resume_url} target="_blank" rel="noopener noreferrer" className="text-sm text-accent hover:underline font-medium block">
+                  View Uploaded Resume
+                </a>
+              ) : (
+                <p className="text-sm text-muted-foreground">No resume uploaded yet.</p>
+              )}
+              <p className="text-xs text-muted-foreground">PDF or Word documents. Max 5MB.</p>
+            </div>
+          </div>
+          <label className="flex items-center justify-center gap-2 px-4 py-2.5 border border-border rounded-lg text-sm font-medium hover:bg-muted cursor-pointer transition-colors">
+            {uploadingResume ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+            Upload New Resume
+            <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeChange} className="hidden" disabled={uploadingResume} />
+          </label>
         </div>
       </motion.div>
 
@@ -123,7 +275,7 @@ export default function StudentProfile() {
         <div className="flex flex-wrap gap-2 mb-4">
           {skills.map((s) => (
             <span key={s} className="inline-flex items-center gap-1 px-3 py-1.5 bg-accent/10 text-accent text-sm rounded-full">
-              {s} <button onClick={() => removeSkill(s)}><X className="w-3 h-3" /></button>
+              {s} <button onClick={() => removeSkill(s)} className="hover:text-accent-foreground"><X className="w-3 h-3" /></button>
             </span>
           ))}
         </div>
@@ -144,18 +296,21 @@ export default function StudentProfile() {
         <h3 className="font-semibold">Social Links</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="text-sm font-medium mb-1.5 block">LinkedIn</label>
+            <label className="text-sm font-medium mb-1.5 block">LinkedIn URL</label>
             <input type="text" value={form.linkedin} onChange={(e) => setForm({ ...form, linkedin: e.target.value })}
+              placeholder="linkedin.com/in/username"
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1.5 block">GitHub</label>
+            <label className="text-sm font-medium mb-1.5 block">GitHub URL</label>
             <input type="text" value={form.github} onChange={(e) => setForm({ ...form, github: e.target.value })}
+              placeholder="github.com/username"
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1.5 block">Portfolio</label>
+            <label className="text-sm font-medium mb-1.5 block">Portfolio / Website</label>
             <input type="text" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })}
+              placeholder="https://mywebsite.com"
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
         </div>

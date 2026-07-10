@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Send, Paperclip, ChevronLeft, CheckCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 
 export default function StudentMessages() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const { profile } = useAuth();
   const [selectedConv, setSelectedConv] = useState<string>(id || '');
   const [conversations, setConversations] = useState<any[]>([]);
@@ -43,6 +44,20 @@ export default function StudentMessages() {
   useEffect(() => {
     loadConversations();
   }, [profile]);
+
+  // Select conversation matching query parameter user ID
+  useEffect(() => {
+    const queryUserId = searchParams.get('userId') || searchParams.get('student_id') || searchParams.get('user_id');
+    if (queryUserId && conversations.length > 0 && profile) {
+      const match = conversations.find((c: any) => {
+        const otherParticipant = c.participants?.find((p: any) => p.user?.id !== profile.id);
+        return otherParticipant?.user?.id === queryUserId;
+      });
+      if (match) {
+        setSelectedConv(match.id);
+      }
+    }
+  }, [searchParams, conversations, profile]);
 
   // Load messages when selected conversation changes
   useEffect(() => {

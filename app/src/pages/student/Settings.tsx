@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save } from 'lucide-react';
+import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save, Loader2 } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 // ─── Extracted sub-components (must live OUTSIDE the parent component) ────────
 // Defining components inside a render function causes React to remount them
@@ -37,11 +40,15 @@ function Toggle({
         {desc && <p className="text-xs text-muted-foreground">{desc}</p>}
       </div>
       <button
-        onClick={() => onChange(!checked)}
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          onChange(!checked);
+        }}
         className={`w-11 h-6 rounded-full transition-colors relative ${checked ? 'bg-accent' : 'bg-muted'}`}
       >
         <span
-          className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+          className={`absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow transition-transform ${
             checked ? 'translate-x-6' : 'translate-x-1'
           }`}
         />
@@ -53,8 +60,11 @@ function Toggle({
 // ─── Main Settings Component ──────────────────────────────────────────────────
 
 export default function StudentSettings() {
+  const { setTheme } = useTheme();
   const [showPass, setShowPass] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [password, setPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
   const [settings, setSettings] = useState(() => {
     const savedData = localStorage.getItem('zyro_student_settings');
     if (savedData) {
@@ -73,7 +83,7 @@ export default function StudentSettings() {
       smsTasks: true,
       smsMessages: false,
       smsDeadlines: true,
-      phoneNumber: '+1 (555) 019-2834',
+      phoneNumber: '',
       theme: 'system' as 'light' | 'dark' | 'system',
       language: 'en',
       twoFactor: false,
@@ -81,10 +91,37 @@ export default function StudentSettings() {
     };
   });
 
-  const handleSave = () => {
-    localStorage.setItem('zyro_student_settings', JSON.stringify(settings));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  useEffect(() => {
+    if (settings.theme) {
+      setTheme(settings.theme);
+    }
+  }, [settings.theme, setTheme]);
+
+  const handleSave = async () => {
+    try {
+      localStorage.setItem('zyro_student_settings', JSON.stringify(settings));
+      
+      if (password) {
+        if (password.length < 6) {
+          toast.error('Password must be at least 6 characters long');
+          return;
+        }
+        setUpdatingPassword(true);
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+        setPassword('');
+        toast.success('Password updated successfully!');
+      }
+
+      setSaved(true);
+      toast.success('Settings saved successfully!');
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Failed to save settings');
+    } finally {
+      setUpdatingPassword(false);
+    }
   };
 
   return (
@@ -145,6 +182,7 @@ export default function StudentSettings() {
           ].map((t) => (
             <button
               key={t.value}
+              type="button"
               onClick={() => setSettings({ ...settings, theme: t.value })}
               className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
                 settings.theme === t.value ? 'border-accent bg-accent/5' : 'border-border hover:border-accent/50'
@@ -168,9 +206,18 @@ export default function StudentSettings() {
               <input
                 type={showPass ? 'text' : 'password'}
                 placeholder="New password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
-              <button onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2">
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowPass(!showPass);
+                }} 
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
                 {showPass
                   ? <EyeOff className="w-4 h-4 text-muted-foreground" />
                   : <Eye className="w-4 h-4 text-muted-foreground" />}
