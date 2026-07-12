@@ -103,7 +103,7 @@ export default function Companies() {
               return (
                 <motion.div key={company.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                   className="bg-card rounded-xl border border-border shadow-md overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                  <div className="h-24 bg-gradient-to-r from-primary to-accent relative">
+                  <div className="h-24 bg-gradient-to-r from-primary to-accent dark:from-slate-900 dark:to-accent/50 relative">
                     <div className="absolute -bottom-8 left-5">
                       <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name || 'Company'}`} alt="" className="w-16 h-16 rounded-xl border-4 border-card shadow-sm object-cover" />
                     </div>

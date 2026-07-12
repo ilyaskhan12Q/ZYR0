@@ -302,7 +302,7 @@ export default function AdminOfferLetters() {
             onClick={(e) => e.stopPropagation()}
             className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-xl overflow-y-auto max-h-[85vh]"
           >
-            <div className="bg-gradient-to-r from-primary to-accent p-5 rounded-t-2xl text-white flex items-center justify-between">
+            <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-5 rounded-t-2xl text-white flex items-center justify-between">
               <div>
                 <p className="font-bold">{selected.student?.full_name ?? 'Student'}</p>
                 <p className="text-white/70 text-sm">{selected.internship?.title ?? '—'}</p>

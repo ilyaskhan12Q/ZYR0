@@ -272,7 +272,7 @@ export default function Landing() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="relative"
             >
-              <div className="bg-gradient-to-br from-primary to-accent rounded-2xl p-8 shadow-2xl">
+              <div className="bg-gradient-to-br from-primary to-accent dark:from-slate-900 dark:to-accent/50 rounded-2xl p-8 shadow-2xl">
                 <div className="bg-card rounded-xl p-6 shadow-lg space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
@@ -355,7 +355,7 @@ export default function Landing() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 px-4 bg-primary">
+      <section className="py-16 px-4 bg-primary dark:bg-slate-950 border-y border-border/10">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, i) => (

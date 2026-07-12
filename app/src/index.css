@@ -187,7 +187,7 @@
 
 /* Glassmorphism */
 .glass {
-  background: rgba(255, 255, 255, 0.8);
+  background: hsl(var(--card) / 80%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

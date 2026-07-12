@@ -215,16 +215,15 @@ export default function Verify() {
               <CertificateDocument certificate={verifiedCert} />
             </motion.div>
           )}
-
           {result === 'invalid' && (
             <motion.div key="invalid" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="mt-8 bg-card rounded-xl border-2 border-red-200 shadow-lg overflow-hidden max-w-2xl mx-auto" role="alert">
-              <div className="bg-red-50 p-6 text-center">
+              className="mt-8 bg-card rounded-xl border-2 border-red-200 dark:border-red-900/30 shadow-lg overflow-hidden max-w-2xl mx-auto" role="alert">
+              <div className="bg-red-50 dark:bg-red-950/20 p-6 text-center">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
                   <XCircle className="w-16 h-16 text-red-500 mx-auto" aria-hidden="true" />
                 </motion.div>
-                <h2 className="mt-4 text-2xl font-bold text-red-700">Certificate Not Found</h2>
-                <p className="text-sm text-red-600 mt-1">The certificate ID you entered could not be verified.</p>
+                <h2 className="mt-4 text-2xl font-bold text-red-700 dark:text-red-400">Certificate Not Found</h2>
+                <p className="text-sm text-red-600 dark:text-red-300 mt-1">The certificate ID you entered could not be verified.</p>
               </div>
               <div className="p-6 text-center">
                 <p className="text-muted-foreground text-sm mb-4">Please check the ID and try again. If you believe this is an error, please contact support.</p>

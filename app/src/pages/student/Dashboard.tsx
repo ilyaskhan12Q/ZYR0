@@ -173,8 +173,8 @@ export default function StudentDashboard() {
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
               className="stat-card">
               <div className="flex items-center justify-between">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-blue-100' : i === 1 ? 'bg-amber-100' : i === 2 ? 'bg-emerald-100' : 'bg-purple-100'}`}>
-                  <Icon className={`w-5 h-5 ${i === 0 ? 'text-blue-600' : i === 1 ? 'text-amber-600' : i === 2 ? 'text-emerald-600' : 'text-purple-600'}`} />
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-blue-100 dark:bg-blue-950/30' : i === 1 ? 'bg-amber-100 dark:bg-amber-950/30' : i === 2 ? 'bg-emerald-100 dark:bg-emerald-950/30' : 'bg-purple-100 dark:bg-purple-950/30'}`}>
+                  <Icon className={`w-5 h-5 ${i === 0 ? 'text-blue-600 dark:text-blue-400' : i === 1 ? 'text-amber-600 dark:text-amber-400' : i === 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-purple-600 dark:text-purple-400'}`} />
                 </div>
                 {stat.change !== 0 && (
                   <span className={`text-xs font-medium ${stat.changeType === 'increase' ? 'text-emerald-600' : 'text-red-600'}`}>
@@ -212,11 +212,11 @@ export default function StudentDashboard() {
                     </div>
                   </div>
                   <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
-                    app.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' :
-                    app.status === 'Under Review' ? 'bg-amber-100 text-amber-700' :
-                    app.status === 'Shortlisted' ? 'bg-blue-100 text-blue-700' :
-                    app.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                    'bg-slate-100 text-slate-700'
+                    app.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' :
+                    app.status === 'Under Review' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' :
+                    app.status === 'Shortlisted' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400' :
+                    app.status === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' :
+                    'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-400'
                   }`}>{app.status || 'Applied'}</span>
                 </div>
               ))}
@@ -247,9 +247,9 @@ export default function StudentDashboard() {
                     </div>
                     {task.priority && (
                       <span className={`px-2 py-0.5 text-xs rounded-full ${
-                        task.priority === 'High' ? 'bg-red-100 text-red-700' :
-                        task.priority === 'Medium' ? 'bg-amber-100 text-amber-700' :
-                        'bg-blue-100 text-blue-700'
+                        task.priority === 'High' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' :
+                        task.priority === 'Medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' :
+                        'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'
                       }`}>{task.priority}</span>
                     )}
                   </div>
@@ -304,8 +304,8 @@ export default function StudentDashboard() {
                 const daysLeft = Math.ceil((new Date(task.due_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
                 return (
                   <div key={task.id} className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <AlertCircle className="w-5 h-5 text-red-600" />
+                    <div className="w-10 h-10 bg-red-100 dark:bg-red-950/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{task.title}</p>

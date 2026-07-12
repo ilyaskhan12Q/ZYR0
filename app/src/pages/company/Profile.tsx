@@ -115,7 +115,7 @@ export default function CompanyProfile() {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium">
+        <div className="p-4 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30 rounded-lg text-sm font-medium">
           {error}
         </div>
       )}
@@ -124,7 +124,7 @@ export default function CompanyProfile() {
       {company && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-primary to-accent relative" />
+          <div className="h-32 bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 relative" />
           <div className="px-6 pb-6">
             <div className="flex items-end -mt-10 mb-4 gap-4">
               <div className="relative">

@@ -126,7 +126,7 @@ export default function CompanyCertificates() {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium">
+        <div className="p-4 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30 rounded-lg text-sm font-medium">
           {error}
         </div>
       )}
@@ -188,15 +188,15 @@ export default function CompanyCertificates() {
                       </td>
                       <td className="px-4 py-3">
                         {intern.hasCert ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 text-xs rounded-full font-medium">
                             <CheckCircle2 className="w-3 h-3" /> Issued
                           </span>
                         ) : intern.eligible ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs rounded-full font-medium">
                             <CheckCircle2 className="w-3 h-3" /> Ready
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-amber-100 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 text-xs rounded-full font-medium">
                             <XCircle className="w-3 h-3" /> In Progress
                           </span>
                         )}

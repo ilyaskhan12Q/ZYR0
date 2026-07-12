@@ -6,12 +6,12 @@ import { getMyApplications } from '@/services/applications';
 const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
 
 const statusConfig: Record<string, { color: string; icon: React.ElementType }> = {
-  Applied: { color: 'bg-blue-100 text-blue-700', icon: FileCheck },
-  'Under Review': { color: 'bg-amber-100 text-amber-700', icon: Clock },
-  Shortlisted: { color: 'bg-purple-100 text-purple-700', icon: Star },
-  Accepted: { color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle2 },
-  Rejected: { color: 'bg-red-100 text-red-700', icon: XCircle },
-  Withdrawn: { color: 'bg-slate-100 text-slate-700', icon: XCircle },
+  Applied: { color: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400', icon: FileCheck },
+  'Under Review': { color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400', icon: Clock },
+  Shortlisted: { color: 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400', icon: Star },
+  Accepted: { color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400', icon: CheckCircle2 },
+  Rejected: { color: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400', icon: XCircle },
+  Withdrawn: { color: 'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-400', icon: XCircle },
 };
 
 export default function StudentApplications() {
@@ -106,15 +106,15 @@ export default function StudentApplications() {
                         <div key={step} className="flex items-center flex-1 last:flex-none">
                           <div className="flex flex-col items-center">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              isCompleted ? 'bg-emerald-100' : isCurrent ? 'bg-accent/10' : 'bg-muted'
+                              isCompleted ? 'bg-emerald-100 dark:bg-emerald-950/30' : isCurrent ? 'bg-accent/10' : 'bg-muted'
                             }`}>
-                              {isCompleted ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> :
+                              {isCompleted ? <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> :
                                isCurrent ? <AlertCircle className="w-4 h-4 text-accent" /> :
                                <div className="w-2 h-2 bg-muted-foreground/30 rounded-full" />}
                             </div>
                             <span className={`text-[10px] mt-1.5 ${isCompleted || isCurrent ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>{step}</span>
                           </div>
-                          {idx < 3 && <div className={`flex-1 h-0.5 mx-2 ${isCompleted ? 'bg-emerald-200' : 'bg-border'}`} />}
+                          {idx < 3 && <div className={`flex-1 h-0.5 mx-2 ${isCompleted ? 'bg-emerald-200 dark:bg-emerald-900/30' : 'bg-border'}`} />}
                         </div>
                       );
                     })}

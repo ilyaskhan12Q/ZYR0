@@ -96,7 +96,7 @@ export default function CompanyDetail() {
         {/* Company Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-          <div className="h-32 bg-gradient-to-r from-primary to-accent" />
+          <div className="h-32 bg-gradient-to-r from-primary to-accent dark:from-slate-900 dark:to-accent/50" />
           <div className="px-6 pb-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-end -mt-12 mb-4 gap-4">
               <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name || 'Company'}`} alt="" className="w-24 h-24 rounded-2xl border-4 border-card shadow-lg object-cover bg-background" />
@@ -105,7 +105,7 @@ export default function CompanyDetail() {
                 <p className="text-sm text-muted-foreground">{company.industry} &middot; {company.size}</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 px-3 py-1.5 bg-yellow-50 rounded-lg">
+                <div className="flex items-center gap-1 px-3 py-1.5 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                   <span className="text-sm font-medium">{company.rating || '5.0'}</span>
                 </div>
@@ -173,7 +173,7 @@ export default function CompanyDetail() {
                     <h3 className="font-semibold">{internship.title}</h3>
                     <div className="mt-2 flex flex-wrap gap-2">
                       <span className="px-2 py-0.5 bg-accent/10 text-accent text-xs rounded-full">{internship.domain}</span>
-                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full">{internship.stipend_type}</span>
+                      <span className="px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs rounded-full">{internship.stipend_type}</span>
                       <span className="px-2 py-0.5 bg-muted text-muted-foreground text-xs rounded-full">{internship.location_type}</span>
                     </div>
                     <div className="mt-2 flex gap-4 text-xs text-muted-foreground">

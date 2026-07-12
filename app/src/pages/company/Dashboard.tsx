@@ -39,11 +39,19 @@ export default function CompanyDashboard() {
     );
   }
 
+  const appStatusColors: Record<string, string> = {
+    Applied: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+    'Under Review': 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+    Shortlisted: 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
+    Accepted: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    Rejected: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+  };
+
   const stats = [
-    { label: 'Active Internships', value: internships.filter(i => i.status === 'Active').length, icon: FolderOpen, color: 'bg-blue-100', iconColor: 'text-blue-600' },
-    { label: 'Total Applicants', value: applications.length, icon: Users, color: 'bg-emerald-100', iconColor: 'text-emerald-600' },
-    { label: 'Shortlisted', value: applications.filter(a => a.status === 'Shortlisted').length, icon: GraduationCap, color: 'bg-purple-100', iconColor: 'text-purple-600' },
-    { label: 'Accepted', value: applications.filter(a => a.status === 'Accepted').length, icon: Award, color: 'bg-amber-100', iconColor: 'text-amber-600' },
+    { label: 'Active Internships', value: internships.filter(i => i.status === 'Active').length, icon: FolderOpen, color: 'bg-blue-100 dark:bg-blue-950/30', iconColor: 'text-blue-600 dark:text-blue-400' },
+    { label: 'Total Applicants', value: applications.length, icon: Users, color: 'bg-emerald-100 dark:bg-emerald-950/30', iconColor: 'text-emerald-600 dark:text-emerald-400' },
+    { label: 'Shortlisted', value: applications.filter(a => a.status === 'Shortlisted').length, icon: GraduationCap, color: 'bg-purple-100 dark:bg-purple-950/30', iconColor: 'text-purple-600 dark:text-purple-400' },
+    { label: 'Accepted', value: applications.filter(a => a.status === 'Accepted').length, icon: Award, color: 'bg-amber-100 dark:bg-amber-950/30', iconColor: 'text-amber-600 dark:text-amber-400' },
   ];
 
   const recentApps = applications.slice(0, 5);
@@ -111,7 +119,7 @@ export default function CompanyDashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">{app.status}</span>
+                        <span className={`px-2.5 py-0.5 text-xs rounded-full ${appStatusColors[app.status] || 'bg-muted text-muted-foreground'}`}>{app.status}</span>
                         <span className="text-xs text-muted-foreground">{new Date(app.applied_at).toLocaleDateString()}</span>
                       </div>
                     </div>
@@ -146,7 +154,7 @@ export default function CompanyDashboard() {
                           <span>{internship.domain}</span>
                         </div>
                       </div>
-                      <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">{internship.status}</span>
+                      <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${internship.status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'}`}>{internship.status}</span>
                     </div>
                   );
                 })
@@ -205,7 +213,7 @@ export default function CompanyDashboard() {
                 {company.location && <p>📍 {company.location}</p>}
                 {company.website && <p>🌐 {company.website}</p>}
                 <p className="mt-2">
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${company.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${company.status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'}`}>
                     {company.status}
                   </span>
                 </p>

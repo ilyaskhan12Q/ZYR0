@@ -125,7 +125,7 @@ export default function InternshipDetail() {
             <h3 className="text-lg font-semibold mb-3">Benefits</h3>
             <div className="flex flex-wrap gap-2">
               {internship.benefits.map((b: string, i: number) => (
-                <span key={i} className="px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm rounded-lg">{b}</span>
+                <span key={i} className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 text-sm rounded-lg">{b}</span>
               ))}
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function InternshipDetail() {
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="px-2.5 py-1 bg-accent/10 text-accent text-xs rounded-full font-medium">{internship.type}</span>
-                <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full font-medium">{internship.stipend_type}</span>
+                <span className="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs rounded-full font-medium">{internship.stipend_type}</span>
                 <span className="px-2.5 py-1 bg-muted text-muted-foreground text-xs rounded-full">{internship.location_type}</span>
                 <span className="px-2.5 py-1 bg-muted text-muted-foreground text-xs rounded-full">{internship.domain}</span>
               </div>
@@ -302,7 +302,7 @@ export default function InternshipDetail() {
               {applicationStatus ? (
                 <button
                   disabled
-                  className="w-full flex items-center justify-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 py-3 rounded-lg font-medium transition-colors cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/30 py-3 rounded-lg font-medium transition-colors cursor-not-allowed"
                 >
                   <CheckCircle2 className="w-5 h-5" /> Applied ({applicationStatus.status})
                 </button>

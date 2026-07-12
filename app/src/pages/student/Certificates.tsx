@@ -82,7 +82,7 @@ export default function StudentCertificates() {
               className="bg-card rounded-xl border border-border shadow-md overflow-hidden hover:shadow-lg transition-all flex flex-col justify-between">
               <div>
                 {/* Certificate Preview Card Header */}
-                <div className="bg-gradient-to-br from-primary via-primary to-accent p-6 text-white text-center relative overflow-hidden">
+                <div className="bg-gradient-to-br from-primary via-primary to-accent dark:from-slate-900 dark:via-slate-950 dark:to-accent/50 p-6 text-white text-center relative overflow-hidden">
                   <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 left-0 w-40 h-40 bg-white rounded-full -translate-x-1/2 -translate-y-1/2" />
                     <div className="absolute bottom-0 right-0 w-32 h-32 bg-white rounded-full translate-x-1/3 translate-y-1/3" />

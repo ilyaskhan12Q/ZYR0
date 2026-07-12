@@ -116,7 +116,7 @@ export default function PublicLayout() {
                             </button>
                           </div>
                           <div className="border-t border-border pt-1">
-                            <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                            <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
                               <LogOut className="w-4 h-4" /> Sign Out
                             </button>
                           </div>
@@ -191,7 +191,7 @@ export default function PublicLayout() {
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
-        <footer className="bg-primary text-white">
+        <footer className="bg-primary dark:bg-slate-950 text-white dark:text-slate-200 border-t border-border/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
               {/* Brand */}

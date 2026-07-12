@@ -1,0 +1,44 @@
+;;
+;; Domain:     zyroo.dpdns.org.
+;; Exported:   2026-07-10 11:40:49
+;;
+;; This file is intended for use for informational and archival
+;; purposes ONLY and MUST be edited before use on a production
+;; DNS server.  In particular, you must:
+;;   -- update the SOA record with the correct authoritative name server
+;;   -- update the SOA record with the contact e-mail address information
+;;   -- update the NS record(s) with the authoritative name servers for this domain.
+;;
+;; For further information, please consult the BIND documentation
+;; located on the following website:
+;;
+;; http://www.isc.org/
+;;
+;; And RFC 1035:
+;;
+;; http://www.ietf.org/rfc/rfc1035.txt
+;;
+;; Please note that we do NOT offer technical support for any use
+;; of this zone data, the BIND name server, or any other third-party
+;; DNS software.
+;;
+;; Use at your own risk.
+;; SOA Record
+zyroo.dpdns.org	3600	IN	SOA	dara.ns.cloudflare.com. dns.cloudflare.com. 2053535024 10000 2400 604800 3600
+
+;; NS Records
+zyroo.dpdns.org.	86400	IN	NS	dara.ns.cloudflare.com.
+zyroo.dpdns.org.	86400	IN	NS	edward.ns.cloudflare.com.
+
+;; A Records
+www.zyroo.dpdns.org.	1	IN	A	8.8.8.8 ; cf_tags=cf-proxied:true
+zyroo.dpdns.org.	1	IN	A	216.198.79.1 ; cf_tags=cf-proxied:true
+
+;; MX Records
+send.zyroo.zyroo.dpdns.org.	1	IN	MX	10 feedback-smtp.ap-northeast-1.amazonses.com.
+
+;; TXT Records
+_dmarc.zyroo.dpdns.org.	1	IN	TXT	"v=DMARC1; p=none;"
+resend._domainkey.zyroo.zyroo.dpdns.org.	1	IN	TXT	"p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCZo1FjGqpvNXNluckW9HuNWLXXHNQ0ZdO04n2dtw3W/+yq0jxjUqC1ZWNYzhIIVbDKpYlD8mlrOgdGWff1WtgUyAvI8GVQ536giiDZ1Rxk7OBmZ2mcyqw/f0qPoQ68w53tVwqAliOojzB2KEecnpv+ucQCbnxte3CBsaKQha0AywIDAQAB"
+send.zyroo.zyroo.dpdns.org.	1	IN	TXT	"v=spf1 include:amazonses.com ~all"
+_vercel.zyroo.dpdns.org.	1	IN	TXT	"vc-domain-verify=zyroo.dpdns.org,ed4820ee83329ba71ce0"

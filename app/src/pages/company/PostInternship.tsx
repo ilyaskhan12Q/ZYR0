@@ -136,7 +136,7 @@ export default function PostInternship() {
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium">
+        <div className="p-4 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900/30 rounded-lg text-sm font-medium">
           {error}
         </div>
       )}
@@ -290,7 +290,7 @@ export default function PostInternship() {
               <label className="text-sm font-medium mb-1.5 block">Benefits</label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {benefits.map(b => (
-                  <span key={b} className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-700 text-sm rounded-full">
+                  <span key={b} className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-sm rounded-full">
                     {b} <button type="button" onClick={() => removeBenefit(b)}><X className="w-3 h-3" /></button>
                   </span>
                 ))}

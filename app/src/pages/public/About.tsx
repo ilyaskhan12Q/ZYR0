@@ -19,7 +19,7 @@ export default function About() {
   return (
     <div className="pt-20 pb-16">
       {/* Hero */}
-      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 text-white">
+      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl sm:text-5xl font-bold">About Zyro</h1>

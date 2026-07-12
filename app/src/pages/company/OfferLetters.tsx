@@ -535,7 +535,7 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
         className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent p-6 rounded-t-2xl text-white">
+        <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-6 rounded-t-2xl text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-bold text-lg">{offer.student?.full_name ?? '—'}</p>

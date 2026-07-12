@@ -151,9 +151,9 @@ export default function StudentProgress() {
             <div className="space-y-3">
               {skillsList.map((skill, i) => {
                 const categoryColors: Record<string, string> = {
-                  Technical: 'bg-blue-100 text-blue-700',
-                  'Soft Skills': 'bg-purple-100 text-purple-700',
-                  Tools: 'bg-amber-100 text-amber-700',
+                  Technical: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+                  'Soft Skills': 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
+                  Tools: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
                 };
                 return (
                   <div key={i}>
@@ -161,7 +161,7 @@ export default function StudentProgress() {
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">{skill.name}</span>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${categoryColors[skill.category] || 'bg-slate-100 text-slate-700'}`}>{skill.category}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${categoryColors[skill.category] || 'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-400'}`}>{skill.category}</span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                       <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${skill.level}%` }} transition={{ duration: 0.6, delay: i * 0.05 }} />

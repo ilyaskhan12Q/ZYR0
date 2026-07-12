@@ -8,12 +8,12 @@ import { getAllCompanyApplications, updateApplicationStatus } from '@/services/a
 const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
 
 const statusColors: Record<string, string> = {
-  Applied: 'bg-blue-100 text-blue-700',
-  'Under Review': 'bg-amber-100 text-amber-700',
-  Shortlisted: 'bg-purple-100 text-purple-700',
-  Accepted: 'bg-emerald-100 text-emerald-700',
-  Rejected: 'bg-red-100 text-red-700',
-  Withdrawn: 'bg-slate-100 text-slate-700',
+  Applied: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
+  'Under Review': 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+  Shortlisted: 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
+  Accepted: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+  Rejected: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+  Withdrawn: 'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-400',
 };
 
 export default function CompanyApplicants() {
@@ -167,26 +167,26 @@ export default function CompanyApplicants() {
                               <button
                                 onClick={() => handleStatusChange(app.id, 'Shortlisted')}
                                 disabled={app.status === 'Shortlisted'}
-                                className="p-1.5 hover:bg-purple-50 rounded-lg disabled:opacity-40"
+                                className="p-1.5 hover:bg-purple-50 dark:hover:bg-purple-950/30 rounded-lg disabled:opacity-40 text-purple-600 dark:text-purple-400"
                                 title="Shortlist"
                               >
-                                <Star className="w-4 h-4 text-purple-600" />
+                                <Star className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleStatusChange(app.id, 'Accepted')}
                                 disabled={app.status === 'Accepted'}
-                                className="p-1.5 hover:bg-emerald-50 rounded-lg disabled:opacity-40"
+                                className="p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg disabled:opacity-40 text-emerald-600 dark:text-emerald-400"
                                 title="Accept"
                               >
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                <CheckCircle2 className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleStatusChange(app.id, 'Rejected')}
                                 disabled={app.status === 'Rejected'}
-                                className="p-1.5 hover:bg-red-50 rounded-lg disabled:opacity-40"
+                                className="p-1.5 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg disabled:opacity-40 text-red-600 dark:text-red-400"
                                 title="Reject"
                               >
-                                <XCircle className="w-4 h-4 text-red-600" />
+                                <XCircle className="w-4 h-4" />
                               </button>
                             </>
                           )}

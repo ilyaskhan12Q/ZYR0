@@ -110,8 +110,8 @@ export default function CompanyInternships() {
                     <div className="flex items-center gap-3">
                       <h3 className="font-semibold">{internship.title}</h3>
                       <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                        internship.status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
-                        internship.status === 'Closed' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                        internship.status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' :
+                        internship.status === 'Closed' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
                       }`}>{internship.status}</span>
                     </div>
                     <div className="flex flex-wrap gap-4 mt-2 text-sm text-muted-foreground">

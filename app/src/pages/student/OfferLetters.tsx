@@ -239,7 +239,7 @@ export default function StudentOfferLetters() {
               className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all overflow-hidden"
             >
               {/* Card top gradient */}
-              <div className="h-2 bg-gradient-to-r from-primary to-accent" />
+              <div className="h-2 bg-gradient-to-r from-primary to-accent dark:from-slate-900 dark:to-accent/50" />
 
               <div className="p-5 space-y-4">
                 {/* Company + Status */}
@@ -401,7 +401,7 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
         className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent p-6 rounded-t-2xl text-white">
+        <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-6 rounded-t-2xl text-white">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               {offer.company?.logo_url ? (
