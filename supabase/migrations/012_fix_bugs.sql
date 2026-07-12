@@ -86,7 +86,7 @@ BEGIN
   -- Mark as incomplete if role wasn't explicitly provided (OAuth flow)
   is_complete := (NEW.raw_user_meta_data->>'role') IS NOT NULL;
 
-  INSERT INTO public.profiles (id, role, full_name, avatar_url, profile_complete)
+  INSERT INTO public.profiles (id, role, full_name, avatar_url, email, profile_complete)
   VALUES (
     NEW.id,
     user_role,
@@ -96,6 +96,7 @@ BEGIN
       split_part(NEW.email, '@', 1)
     ),
     NEW.raw_user_meta_data->>'avatar_url',
+    NEW.email,
     is_complete
   )
   ON CONFLICT (id) DO UPDATE SET
@@ -106,6 +107,10 @@ BEGIN
     avatar_url = COALESCE(
       EXCLUDED.avatar_url,
       profiles.avatar_url
+    ),
+    email = COALESCE(
+      EXCLUDED.email,
+      profiles.email
     );
 
   RETURN NEW;

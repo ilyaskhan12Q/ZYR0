@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   role            text NOT NULL CHECK (role IN ('student', 'company', 'mentor', 'admin')),
   full_name       text,
   avatar_url      text,
+  email           text,
   status          text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
 
   -- Student-specific
