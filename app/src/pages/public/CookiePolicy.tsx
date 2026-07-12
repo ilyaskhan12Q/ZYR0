@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Cookie, Settings, BarChart2, Shield, ToggleRight, Mail } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const cookieTypes = [
   {
@@ -31,6 +32,12 @@ const cookieTypes = [
 export default function CookiePolicy() {
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="Cookie Policy — How Zyro Uses Cookies"
+        description="Learn how Zyro uses cookies to keep you logged in, remember your preferences, and improve your experience. Find out which cookies are strictly necessary and which are optional."
+        path="/cookies"
+        keywords="Zyro cookie policy, cookies, website cookies, analytics cookies, strictly necessary cookies"
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">

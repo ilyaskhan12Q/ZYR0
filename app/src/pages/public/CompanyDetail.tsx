@@ -6,6 +6,7 @@ import { getCompanyById } from '@/services/companies';
 import { getInternships } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
 import { supabase } from '@/lib/supabase';
+import { SEO } from '@/components/SEO';
 
 export default function CompanyDetail() {
   const { id } = useParams();
@@ -86,8 +87,35 @@ export default function CompanyDetail() {
     );
   }
 
+  const companyStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: company.name,
+      description: company.description || `Learn about careers and internship opportunities at ${company.name} on Zyro.`,
+      logo: company.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=random`,
+      url: company.website || `https://zyro.kim/companies/${id}`,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
+        { '@type': 'ListItem', position: 2, name: 'Companies', item: 'https://zyro.kim/companies' },
+        { '@type': 'ListItem', position: 3, name: company.name, item: `https://zyro.kim/companies/${id}` },
+      ],
+    },
+  ];
+
   return (
     <div className="pt-20 pb-16 px-4">
+      <SEO
+        title={`${company.name} — Careers, Internships & Company Profile`}
+        description={company.description || `Learn more about ${company.name}, view their available internship programs, project categories, and contact information on Zyro.`}
+        path={`/companies/${id}`}
+        keywords={`${company.name}, ${company.name} internships, ${company.name} jobs, Zyro companies`}
+        structuredData={companyStructuredData}
+      />
       <div className="max-w-5xl mx-auto">
         <Link to="/companies" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Companies

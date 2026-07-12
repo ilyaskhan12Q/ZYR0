@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FileText, Users, AlertCircle, ShieldCheck, Scale, Mail } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const sections = [
   {
@@ -72,6 +73,12 @@ const sections = [
 export default function TermsOfService() {
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="Terms of Service — Zyro Platform Usage Agreement"
+        description="Review Zyro's Terms of Service. These terms govern your access and use of the Zyro internship management platform, including rights, responsibilities, and limitations for students, companies, and mentors."
+        path="/terms"
+        keywords="Zyro terms of service, platform terms, usage agreement, internship platform terms, user agreement"
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">

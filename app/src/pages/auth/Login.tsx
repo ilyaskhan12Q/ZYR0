@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Users } from 'lucide-react';
 import { signIn, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
+import { SEO } from '@/components/SEO';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -55,6 +56,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex">
+      <SEO
+        title="Sign In — Access Your Dashboard"
+        description="Log in to your Zyro portal to manage your internships, mentor assignments, certificates, and student applications."
+        path="/login"
+        noIndex={true}
+      />
       {/* Left Side - Branding */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
         className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center relative overflow-hidden">

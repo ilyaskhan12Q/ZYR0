@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 interface FAQItem {
   q: string;
@@ -126,8 +127,37 @@ function FAQItem({ item, index }: { item: FAQItem; index: number }) {
 export default function FAQ() {
   const [activeCategory, setActiveCategory] = useState(faqData[0].label);
 
+  const faqStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqData.flatMap(cat =>
+        cat.items.map(item => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        }))
+      ),
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
+        { '@type': 'ListItem', position: 2, name: 'FAQ', item: 'https://zyro.kim/faq' },
+      ],
+    },
+  ];
+
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="FAQ — Frequently Asked Questions About Zyro"
+        description="Find answers to the most common questions about the Zyro internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, and account management."
+        path="/faq"
+        keywords="Zyro FAQ, internship platform questions, certificate verification help, student internship FAQ, company FAQ"
+        structuredData={faqStructuredData}
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
@@ -145,10 +175,12 @@ export default function FAQ() {
       <section className="px-4 py-16">
         <div className="max-w-3xl mx-auto">
           {/* Category Tabs */}
-          <div className="flex gap-2 bg-muted rounded-lg p-1 border border-border mb-10 overflow-x-auto">
+          <div role="tablist" aria-label="FAQ categories" className="flex gap-2 bg-muted rounded-lg p-1 border border-border mb-10 overflow-x-auto">
             {faqData.map((cat) => (
               <button
                 key={cat.label}
+                role="tab"
+                aria-selected={activeCategory === cat.label}
                 onClick={() => setActiveCategory(cat.label)}
                 className={`flex-1 px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
                   activeCategory === cat.label ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import { resetPassword } from '@/lib/auth';
+import { SEO } from '@/components/SEO';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -26,6 +27,12 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <SEO
+        title="Forgot Password"
+        description="Reset your Zyro account password securely."
+        path="/forgot-password"
+        noIndex={true}
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">

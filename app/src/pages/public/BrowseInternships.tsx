@@ -6,6 +6,7 @@ import {
   X, Clock, ArrowRight, Loader2
 } from 'lucide-react';
 import { getInternships, getInternshipDomains } from '@/services/internships';
+import { SEO } from '@/components/SEO';
 
 const locations = ['All', 'Remote', 'On-site', 'Hybrid'];
 const types = ['All', 'Full-time', 'Part-time'];
@@ -54,6 +55,12 @@ export default function BrowseInternships() {
 
   return (
     <div className="pt-20 pb-16 px-4">
+      <SEO
+        title="Browse Internships — Find Your Perfect Opportunity"
+        description="Explore hundreds of verified internship opportunities across technology, design, data science, and more. Filter by domain, location, and type to find the internship that fits your career goals."
+        path="/internships"
+        keywords="browse internships, internship opportunities, student jobs, career internship, remote internship, technology internship"
+      />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">

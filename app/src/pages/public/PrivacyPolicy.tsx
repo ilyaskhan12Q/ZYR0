@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Shield, Lock, Eye, Database, Bell, Mail } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const sections = [
   {
@@ -74,6 +75,12 @@ const sections = [
 export default function PrivacyPolicy() {
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="Privacy Policy — How Zyro Handles Your Data"
+        description="Read Zyro's Privacy Policy to understand how we collect, use, and protect your personal information. We are committed to transparency and data security for all platform users."
+        path="/privacy"
+        keywords="Zyro privacy policy, data privacy, GDPR, personal data, user privacy, internship platform privacy"
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">

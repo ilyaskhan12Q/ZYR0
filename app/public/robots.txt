@@ -1,0 +1,37 @@
+User-agent: *
+Allow: /
+
+# Public pages — index
+Allow: /internships
+Allow: /internships/
+Allow: /companies
+Allow: /companies/
+Allow: /about
+Allow: /contact
+Allow: /verify
+Allow: /verify/
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+Allow: /faq
+Allow: /help
+Allow: /careers
+
+# Auth pages — no index (handled via noindex meta on the pages themselves)
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /auth/
+
+# Authenticated dashboard routes — not for public crawlers
+Disallow: /student/
+Disallow: /company/
+Disallow: /mentor/
+Disallow: /admin/
+
+# Build artifacts
+Disallow: /src/
+Disallow: /.vite/
+
+Sitemap: https://zyro.kim/sitemap.xml

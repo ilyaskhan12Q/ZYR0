@@ -1,6 +1,25 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Globe } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+
+const contactStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
+      { '@type': 'ListItem', position: 2, name: 'Contact', item: 'https://zyro.kim/contact' },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contact Zyro Support',
+    url: 'https://zyro.kim/contact',
+    description: 'Get in touch with the Zyro support team for platform questions, partnership inquiries, and technical assistance.',
+  },
+];
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -13,6 +32,13 @@ export default function Contact() {
 
   return (
     <div className="pt-20 pb-16 px-4">
+      <SEO
+        title="Contact Zyro — Get in Touch with Our Team"
+        description="Have questions about Zyro? Reach out to our support team for help with your account, internship listings, certificate verification, or partnership opportunities. We respond within 24 hours."
+        path="/contact"
+        keywords="contact Zyro, Zyro support, internship platform help, partnership inquiry"
+        structuredData={contactStructuredData}
+      />
       <div className="max-w-5xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold">Contact Us</h1>

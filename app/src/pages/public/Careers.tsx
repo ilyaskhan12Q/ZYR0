@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Briefcase, MapPin, Clock, ChevronRight, Rocket } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const openRoles: { title: string; team: string; location: string; type: string }[] = [];
 
@@ -14,6 +15,12 @@ const futureAreas = [
 export default function Careers() {
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="Careers at Zyro — Join Our Team"
+        description="Zyro is growing and will be hiring across engineering, product, design, and operations. Express your interest early and help us build the platform connecting students to real career opportunities."
+        path="/careers"
+        keywords="Zyro careers, work at Zyro, internship platform jobs, tech startup jobs, EdTech careers"
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">

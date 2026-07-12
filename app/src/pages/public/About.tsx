@@ -1,5 +1,17 @@
 import { motion } from 'framer-motion';
 import { Target, Eye, Shield, Zap, Users, Award, Globe, Heart } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+
+const aboutStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
+      { '@type': 'ListItem', position: 2, name: 'About', item: 'https://zyro.kim/about' },
+    ],
+  },
+];
 
 const values = [
   { icon: Shield, title: 'Trust', desc: 'We verify every certificate and validate every experience to maintain platform integrity.' },
@@ -18,6 +30,13 @@ const milestones = [
 export default function About() {
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="About Zyro — Our Mission, Vision & Values"
+        description="Learn about Zyro's mission to bridge the gap between education and industry. Discover how we connect students, companies, and mentors through structured internship management and verified digital certificates."
+        path="/about"
+        keywords="about Zyro, internship platform mission, career ecosystem, digital certificates, student mentorship"
+        structuredData={aboutStructuredData}
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">

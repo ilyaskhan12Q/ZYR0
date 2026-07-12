@@ -6,6 +6,7 @@ import { verifyCertificate } from '@/services/certificates';
 import { supabase } from '@/lib/supabase';
 import { certificates as mockCertificates } from '@/data/mockData';
 import CertificateDocument from '@/components/CertificateDocument';
+import { SEO } from '@/components/SEO';
 
 export default function Verify() {
   const { code } = useParams();
@@ -121,6 +122,12 @@ export default function Verify() {
 
   return (
     <div className="pt-20 pb-16 px-4 min-h-screen">
+      <SEO
+        title="Verify Certificate — Authenticate Zyro Credentials"
+        description="Instantly verify the authenticity of any Zyro-issued internship certificate using its unique credential ID. Blockchain-backed verification for students, employers, and institutions."
+        path="/verify"
+        keywords="verify certificate, internship certificate verification, blockchain certificate, credential verification, Zyro certificate"
+      />
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
           <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">

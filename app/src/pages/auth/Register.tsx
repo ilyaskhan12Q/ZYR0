@@ -6,6 +6,7 @@ import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, Chec
 import { signUp, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
 import type { UserRole } from '../../lib/database.types';
 import { supabase } from '../../lib/supabase';
+import { SEO } from '@/components/SEO';
 
 type Role = UserRole | null;
 type Step = 'role' | 'form' | 'otp' | 'success';
@@ -111,6 +112,12 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <SEO
+        title="Sign Up — Join Zyro"
+        description="Register a student, company, or mentor account on the Zyro internship management platform."
+        path="/register"
+        noIndex={true}
+      />
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
         {/* Logo */}
         <div className="text-center mb-8">

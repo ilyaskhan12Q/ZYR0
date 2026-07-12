@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Bookmark, Share2, Check
 import { getInternshipById } from '@/services/internships';
 import { applyToInternship, hasApplied } from '@/services/applications';
 import { useAuth } from '@/contexts/AuthContext';
+import { SEO } from '@/components/SEO';
 
 export default function InternshipDetail() {
   const { id } = useParams();
@@ -213,8 +214,59 @@ export default function InternshipDetail() {
 
   const currentTab = tabs.find((t) => t.label === activeTabLabel) || tabs[0];
 
+  const jobStructuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'JobPosting',
+      title: internship.title,
+      description: internship.description,
+      datePosted: internship.posted_date || internship.created_at,
+      validThrough: internship.deadline || undefined,
+      employmentType: 'INTERN',
+      hiringOrganization: {
+        '@type': 'Organization',
+        name: company?.name || 'Zyro Partner',
+        sameAs: company?.website || undefined,
+        logo: company?.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(company?.name || 'Company')}`,
+      },
+      jobLocation: {
+        '@type': 'Place',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: internship.location || 'Remote',
+          addressCountry: 'US',
+        },
+      },
+      baseSalary: internship.stipend ? {
+        '@type': 'MonetaryAmount',
+        currency: 'USD',
+        value: {
+          '@type': 'QuantitativeValue',
+          value: internship.stipend,
+          unitText: 'MONTH',
+        },
+      } : undefined,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
+        { '@type': 'ListItem', position: 2, name: 'Internships', item: 'https://zyro.kim/internships' },
+        { '@type': 'ListItem', position: 3, name: internship.title, item: `https://zyro.kim/internships/${id}` },
+      ],
+    },
+  ];
+
   return (
     <div className="pt-20 pb-16 px-4">
+      <SEO
+        title={`${internship.title} Internship at ${company?.name || 'Zyro Partner'}`}
+        description={`${internship.title} internship opportunity. Domain: ${internship.domain}. Duration: ${internship.duration}. Location: ${internship.location_type}. Learn more and apply on Zyro.`}
+        path={`/internships/${id}`}
+        keywords={`${internship.title}, ${company?.name || 'Zyro Partner'} internship, ${internship.domain} internship, Zyro jobs`}
+        structuredData={jobStructuredData}
+      />
       <div className="max-w-6xl mx-auto">
         {/* Back Link */}
         <Link to="/internships" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors mb-6">

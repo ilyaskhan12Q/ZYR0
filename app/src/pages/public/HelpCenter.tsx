@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const guides = [
   {
@@ -64,6 +65,12 @@ const topics = [
 export default function HelpCenter() {
   return (
     <div className="pt-20 pb-16">
+      <SEO
+        title="Help Center — Getting Started Guides for Zyro"
+        description="Step-by-step guides for students, companies, and mentors. Learn how to browse internships, review applicants, submit project work, issue certificates, and verify credentials on Zyro."
+        path="/help"
+        keywords="Zyro help center, getting started guide, internship platform help, student guide, company guide, mentor guide"
+      />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">

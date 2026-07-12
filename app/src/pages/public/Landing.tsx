@@ -5,6 +5,15 @@ import {
   UserPlus, Send, BookOpen, CheckCircle2, Building2, GraduationCap,
   ArrowRight, Star, Quote, TrendingUp, Globe, Zap, Target
 } from 'lucide-react';
+import { SEO } from '@/components/SEO';
+
+const homepageStructuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' }],
+  },
+];
 
 const features = [
   { icon: Search, title: 'Discover Opportunities', desc: 'Browse curated internships from top companies and startups. Filter by domain, location, duration, and skills.', color: 'bg-blue-100 text-blue-600' },
@@ -46,8 +55,16 @@ const checkFeatures = [
 export default function Landing() {
   return (
     <div>
+      <SEO
+        title="Zyro — Internship Management Platform for Students & Companies"
+        description="Zyro connects students with real internship opportunities, experienced mentors, and blockchain-verified digital certificates. Discover, apply, complete, and get certified — all in one platform."
+        path="/"
+        keywords="internship platform, student internship, digital certificate, mentor, career portal, verified internship, internship management"
+        structuredData={homepageStructuredData}
+      />
+
       {/* Hero Section */}
-      <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden hero-gradient">
+      <section aria-label="Platform introduction" className="relative min-h-[92vh] flex items-center justify-center overflow-hidden hero-gradient">
         {/* Animated Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {Array.from({ length: 20 }).map((_, i) => (

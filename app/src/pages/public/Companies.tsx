@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Search, MapPin, Globe, Star, FolderOpen, Users, X, Loader2 } from 'lucide-react';
 import { getCompanies } from '@/services/companies';
 import { supabase } from '@/lib/supabase';
+import { SEO } from '@/components/SEO';
 
 const industries = ['All', 'Technology', 'Design', 'Data Science', 'Cloud Computing', 'Sustainability', 'FinTech', 'Engineering'];
 const sizes = ['All', '1-10 employees', '11-50 employees', '51-200 employees', '201-500 employees', '500+ employees'];
@@ -67,6 +68,12 @@ export default function Companies() {
 
   return (
     <div className="pt-20 pb-16 px-4">
+      <SEO
+        title="Partner Companies — Internship Opportunities from Top Organizations"
+        description="Discover internship opportunities from verified companies across technology, design, data science, fintech, and more. Explore company profiles, active listings, and team culture."
+        path="/companies"
+        keywords="internship companies, hiring companies, top internship providers, company profiles, tech companies hiring interns"
+      />
       <div className="max-w-7xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold">Browse Companies</h1>
