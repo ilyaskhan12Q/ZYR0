@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { OfferLetterStatus } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
-import { createWorkspaceEvent } from '@/services/workspaceEvents';
+
 
 // ── Common select fragment ────────────────────────────────────────────────────
 const OFFER_LETTER_SELECT = `
@@ -184,14 +184,6 @@ export async function acceptOfferLetter(id: string) {
     clearCache(createRequestKey('my_offer_letters', res.data.student_id));
     clearCache(createRequestKey('offer_letter', id));
     clearCache(createRequestKey('my_active_internships', res.data.student_id));
-
-    await createWorkspaceEvent({
-      internship_id: res.data.internship_id,
-      student_id: res.data.student_id,
-      event_type: 'offer_accepted',
-      title: 'Offer Accepted',
-      description: 'You have accepted the offer letter for this internship.',
-    });
 
     await supabase.from('profiles').update({ company_id: res.data.company_id }).eq('id', res.data.student_id);
   }
