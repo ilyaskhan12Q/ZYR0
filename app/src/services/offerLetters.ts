@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import type { OfferLetterStatus } from '@/lib/database.types';
-import { getCachedData, setCachedData } from '@/lib/cache';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
+import { createWorkspaceEvent } from '@/services/workspaceEvents';
 
 // ── Common select fragment ────────────────────────────────────────────────────
 const OFFER_LETTER_SELECT = `
@@ -113,7 +114,7 @@ export async function generateOfferLetter(data: {
   expires_at?: string;
   notes?: string;
 }) {
-  return supabase
+  const res = await supabase
     .from('offer_letters')
     .insert({
       ...data,
@@ -122,6 +123,14 @@ export async function generateOfferLetter(data: {
     })
     .select(OFFER_LETTER_SELECT)
     .single();
+
+  if (!res.error) {
+    clearCache(createRequestKey('my_offer_letters', data.student_id));
+    clearCache(createRequestKey('company_offer_letters', data.company_id));
+    clearCache(createRequestKey('all_offer_letters'));
+  }
+
+  return res;
 }
 
 // ── Company: update ───────────────────────────────────────────────────────────
@@ -164,22 +173,47 @@ export async function revokeOfferLetter(id: string, reason?: string) {
 
 /** Student accepts an offer letter. */
 export async function acceptOfferLetter(id: string) {
-  return supabase
+  const res = await supabase
     .from('offer_letters')
     .update({ status: 'Accepted', accepted_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();
+
+  if (!res.error && res.data) {
+    clearCache(createRequestKey('my_offer_letters', res.data.student_id));
+    clearCache(createRequestKey('offer_letter', id));
+    clearCache(createRequestKey('my_active_internships', res.data.student_id));
+
+    await createWorkspaceEvent({
+      internship_id: res.data.internship_id,
+      student_id: res.data.student_id,
+      event_type: 'offer_accepted',
+      title: 'Offer Accepted',
+      description: 'You have accepted the offer letter for this internship.',
+    });
+
+    await supabase.from('profiles').update({ company_id: res.data.company_id }).eq('id', res.data.student_id);
+  }
+
+  return res;
 }
 
 /** Student rejects an offer letter. */
 export async function rejectOfferLetter(id: string) {
-  return supabase
+  const res = await supabase
     .from('offer_letters')
     .update({ status: 'Rejected', rejected_at: new Date().toISOString() })
     .eq('id', id)
     .select()
     .single();
+
+  if (!res.error && res.data) {
+    clearCache(createRequestKey('my_offer_letters', res.data.student_id));
+    clearCache(createRequestKey('offer_letter', id));
+  }
+
+  return res;
 }
 
 // ── Admin: read all ───────────────────────────────────────────────────────────

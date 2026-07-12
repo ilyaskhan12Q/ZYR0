@@ -80,6 +80,8 @@ export async function applyToInternship(data: {
   if (!res.error) {
     clearCache(`my_applications_${user.id}`);
     clearCache(`has_applied_${user.id}_${data.internship_id}`);
+    clearCache(`applications_for_internship_${data.internship_id}`);
+    supabase.rpc('increment_applicant_count', { internship_id: data.internship_id }).then(() => {});
   }
   return res;
 }
@@ -131,10 +133,12 @@ export async function hasApplied(internship_id: string, useCache = true) {
 }
 
 /** Get all applications for a company's internship (company portal) */
-export async function getApplicationsForInternship(internship_id: string) {
+export async function getApplicationsForInternship(internship_id: string, useCache = true) {
   const cacheKey = `applications_for_internship_${internship_id}`;
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('applications')
@@ -203,7 +207,14 @@ export async function updateApplicationStatus(
       clearCache(`my_applications_${studentId}`);
       if (internshipId) {
         clearCache(`has_applied_${studentId}_${internshipId}`);
+        clearCache(`applications_for_internship_${internshipId}`);
       }
+    }
+    const { data: internship } = internshipId
+      ? await supabase.from('internships').select('company_id').eq('id', internshipId).single()
+      : { data: null };
+    if (internship?.company_id) {
+      clearCache(`all_company_applications_${internship.company_id}`);
     }
   }
   return res;

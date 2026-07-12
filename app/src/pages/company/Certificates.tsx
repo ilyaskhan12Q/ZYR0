@@ -6,6 +6,8 @@ import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
 import { getTasksAssignedByMe } from '@/services/tasks';
 import { getCompanyCertificates, issueCertificate } from '@/services/certificates';
+import { createWorkspaceEvent } from '@/services/workspaceEvents';
+import { clearCache } from '@/lib/cache';
 
 export default function CompanyCertificates() {
   const { user } = useAuth();
@@ -69,6 +71,16 @@ export default function CompanyCertificates() {
       });
 
       if (err) throw err;
+
+      await createWorkspaceEvent({
+        internship_id: internship.id,
+        student_id: student.id,
+        event_type: 'certificate_issued',
+        title: 'Certificate Issued',
+        description: `Certificate for ${internship.title} has been issued.`,
+      });
+
+      clearCache(`my_certificates_${student.id}`);
 
       // Refresh certificates
       const { data: updatedCerts } = await getCompanyCertificates(company.id);

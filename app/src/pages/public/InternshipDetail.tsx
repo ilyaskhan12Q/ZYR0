@@ -404,7 +404,7 @@ export default function InternshipDetail() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Applicants</span>
-                    <span className="font-medium">{internship.applicants_count || 0}</span>
+                    <span className="font-medium">{internship.applicant_count || 0}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Posted</span>

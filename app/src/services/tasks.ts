@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { Task, TaskSubmission } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+import { createWorkspaceEvent } from '@/services/workspaceEvents';
 
 /** Get tasks assigned to current user */
 export async function getMyTasks(useCache = true) {
@@ -107,6 +108,17 @@ export async function createTask(data: Partial<Task>) {
     if (data.assigned_to) {
       clearCache(`my_tasks_${data.assigned_to}`);
     }
+    if (data.assigned_to && data.internship_id) {
+      await createWorkspaceEvent({
+        internship_id: data.internship_id,
+        student_id: data.assigned_to,
+        actor_id: user.id,
+        event_type: 'task_assigned',
+        title: `New Task: ${data.title || 'Untitled'}`,
+        description: data.description ?? undefined,
+        metadata: { task_id: res.data?.id },
+      }).catch(() => {});
+    }
   }
   return res;
 }
@@ -147,8 +159,21 @@ export async function submitTask(data: {
   if (!res.error) {
     clearCache(`my_tasks_${user.id}`);
     clearCache(`task_${data.task_id}`);
-    // Also clear assignee's supervisor caches if we knew the supervisor ID,
-    // but clearing task details is sufficient as details fetch includes the submission.
+    const { data: task } = await supabase
+      .from('tasks')
+      .select('internship_id, title')
+      .eq('id', data.task_id)
+      .single();
+    if (task?.internship_id) {
+      await createWorkspaceEvent({
+        internship_id: task.internship_id,
+        student_id: user.id,
+        actor_id: user.id,
+        event_type: 'task_submitted',
+        title: `Task Submitted: ${task.title || 'Untitled'}`,
+        metadata: { task_id: data.task_id, submission_id: res.data?.id },
+      }).catch(() => {});
+    }
   }
   return res;
 }
@@ -181,6 +206,24 @@ export async function reviewSubmission(
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       clearCache(`assigned_by_tasks_${user.id}`);
+    }
+    if (taskId && studentId) {
+      const { data: task } = await supabase
+        .from('tasks')
+        .select('internship_id, title')
+        .eq('id', taskId)
+        .single();
+      if (task?.internship_id) {
+        const eventType = data.status === 'Approved' ? 'task_approved' : 'task_rejected';
+        await createWorkspaceEvent({
+          internship_id: task.internship_id,
+          student_id: studentId,
+          event_type: eventType,
+          title: data.status === 'Approved' ? 'Task Approved' : 'Task Rejected',
+          description: data.feedback ?? undefined,
+          metadata: { task_id: taskId, submission_id, grade: data.grade, feedback: data.feedback },
+        }).catch(() => {});
+      }
     }
   }
   return res;
