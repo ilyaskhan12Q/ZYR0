@@ -106,7 +106,7 @@ export default function StudentTasks() {
                       task.priority === 'High' ? 'bg-red-100 text-red-700' :
                       task.priority === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
                     }`}>{task.priority}</span>
-                    <Link to={`/student/tasks/${task.id}`} className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+                    <Link to={task.internship_id ? `/student/workspace/${task.internship_id}` : '#'} className="p-1.5 hover:bg-muted rounded-lg transition-colors">
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </Link>
                   </div>
