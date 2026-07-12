@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getCacheEntry, setCachedData, getCachePolicy } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
 import { registerRefreshCallback } from '@/lib/cache/swr';
+import { hasActiveOptimistic } from '@/lib/cache/optimistic';
 
 interface CachedQueryState<T> {
   data: T | undefined;
@@ -100,12 +101,16 @@ export function useCachedQuery<T>(
     const e = getCacheEntry<T>(cacheKey);
     if (e) setData(e.data as T);
 
-    const needsRefresh = !e || isPastStale(e.updatedAt, staleAfter ?? getPolicyStale(cacheKey));
-    if (needsRefresh) refresh();
+    const hasOptimistic = hasActiveOptimistic(cacheKey);
+    if (!hasOptimistic) {
+      const needsRefresh = !e || isPastStale(e.updatedAt, staleAfter ?? getPolicyStale(cacheKey));
+      if (needsRefresh) refresh();
+    }
   }, [cacheKey, enabled, refresh, staleAfter]);
 
   useEffect(
     () => registerRefreshCallback(cacheKey, () => {
+      if (hasActiveOptimistic(cacheKey)) return;
       const e = getCacheEntry<T>(cacheKey);
       if (e) setData(e.data as T);
     }),

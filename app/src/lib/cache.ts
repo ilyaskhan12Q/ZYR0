@@ -1,4 +1,4 @@
-interface CacheEntry<T = unknown> {
+export interface CacheEntry<T = unknown> {
   data: T;
   createdAt: number;
   updatedAt: number;
@@ -132,6 +132,14 @@ export function setCachedDataWithPolicy(
   source?: 'cache' | 'network'
 ): void {
   cache.set(key, createEntry(data, policy, source ?? 'network'));
+}
+
+export function restoreCacheEntry<T>(key: string, entry: CacheEntry<T>): void {
+  cache.set(key, entry as CacheEntry);
+}
+
+export function deleteCacheEntry(key: string): void {
+  cache.delete(key);
 }
 
 export function clearCache(keyPrefix?: string): void {
