@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { BASE_URL } from '@/config/seo';
 
 interface FAQItem {
   q: string;
@@ -143,8 +144,8 @@ export default function FAQ() {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
-        { '@type': 'ListItem', position: 2, name: 'FAQ', item: 'https://zyro.kim/faq' },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+        { '@type': 'ListItem', position: 2, name: 'FAQ', item: `${BASE_URL}/faq` },
       ],
     },
   ];

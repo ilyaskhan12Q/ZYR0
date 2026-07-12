@@ -2,21 +2,22 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Globe } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { BASE_URL } from '@/config/seo';
 
 const contactStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
-      { '@type': 'ListItem', position: 2, name: 'Contact', item: 'https://zyro.kim/contact' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'Contact', item: `${BASE_URL}/contact` },
     ],
   },
   {
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
     name: 'Contact Zyro Support',
-    url: 'https://zyro.kim/contact',
+    url: `${BASE_URL}/contact`,
     description: 'Get in touch with the Zyro support team for platform questions, partnership inquiries, and technical assistance.',
   },
 ];

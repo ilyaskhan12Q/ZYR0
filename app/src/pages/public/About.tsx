@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion';
 import { Target, Eye, Shield, Zap, Users, Award, Globe, Heart } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { BASE_URL } from '@/config/seo';
 
 const aboutStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
-      { '@type': 'ListItem', position: 2, name: 'About', item: 'https://zyro.kim/about' },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'About', item: `${BASE_URL}/about` },
     ],
   },
 ];

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Bookmark, Share2, CheckCircle2, Building2, ExternalLink, Loader2 } from 'lucide-react';
@@ -6,6 +6,7 @@ import { getInternshipById } from '@/services/internships';
 import { applyToInternship, hasApplied } from '@/services/applications';
 import { useAuth } from '@/contexts/AuthContext';
 import { SEO } from '@/components/SEO';
+import { BASE_URL } from '@/config/seo';
 
 export default function InternshipDetail() {
   const { id } = useParams();
@@ -18,7 +19,14 @@ export default function InternshipDetail() {
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTabLabel, setActiveTabLabel] = useState('Overview');
+  const [now, setNow] = useState(0);
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setNow(Date.now());
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -251,9 +259,9 @@ export default function InternshipDetail() {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
-        { '@type': 'ListItem', position: 2, name: 'Internships', item: 'https://zyro.kim/internships' },
-        { '@type': 'ListItem', position: 3, name: internship.title, item: `https://zyro.kim/internships/${id}` },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+        { '@type': 'ListItem', position: 2, name: 'Internships', item: `${BASE_URL}/internships` },
+        { '@type': 'ListItem', position: 3, name: internship.title, item: `${BASE_URL}/internships/${id}` },
       ],
     },
   ];
@@ -346,7 +354,7 @@ export default function InternshipDetail() {
                 <p className="text-lg font-semibold">{internship.deadline ? new Date(internship.deadline).toLocaleDateString() : 'Rolling'}</p>
                 {internship.deadline && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {Math.max(0, Math.ceil((new Date(internship.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days remaining
+                    {Math.max(0, Math.ceil((new Date(internship.deadline).getTime() - now) / (1000 * 60 * 60 * 24)))} days remaining
                   </p>
                 )}
               </div>
@@ -361,12 +369,12 @@ export default function InternshipDetail() {
               ) : (
                 <button
                   onClick={handleApply}
-                  disabled={applying || (internship.deadline && new Date(internship.deadline).getTime() < Date.now())}
+                  disabled={applying || (internship.deadline && new Date(internship.deadline).getTime() < now)}
                   className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {applying ? (
                     <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</>
-                  ) : internship.deadline && new Date(internship.deadline).getTime() < Date.now() ? (
+                  ) : internship.deadline && new Date(internship.deadline).getTime() < now ? (
                     'Deadline Passed'
                   ) : (
                     'Apply Now'

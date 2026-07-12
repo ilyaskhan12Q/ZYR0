@@ -34,4 +34,4 @@ Disallow: /admin/
 Disallow: /src/
 Disallow: /.vite/
 
-Sitemap: https://zyro.kim/sitemap.xml
+Sitemap: https://zyroo.dpdns.org/sitemap.xml

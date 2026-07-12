@@ -1,9 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-
-const SITE_NAME = 'Zyro';
-const BASE_URL = 'https://zyro.kim';
-const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
-const TWITTER_HANDLE = '@zyroplatform';
+import { SITE_NAME, BASE_URL, DEFAULT_IMAGE, TWITTER_HANDLE } from '@/config/seo';
 
 interface SEOProps {
   /** Page title — will be appended with " | Zyro" unless it already contains "Zyro" */

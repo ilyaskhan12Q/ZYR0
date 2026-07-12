@@ -7,6 +7,7 @@ import { getInternships } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
 import { supabase } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
+import { BASE_URL } from '@/config/seo';
 
 export default function CompanyDetail() {
   const { id } = useParams();
@@ -94,15 +95,15 @@ export default function CompanyDetail() {
       name: company.name,
       description: company.description || `Learn about careers and internship opportunities at ${company.name} on Zyro.`,
       logo: company.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=random`,
-      url: company.website || `https://zyro.kim/companies/${id}`,
+      url: company.website || `${BASE_URL}/companies/${id}`,
     },
     {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://zyro.kim/' },
-        { '@type': 'ListItem', position: 2, name: 'Companies', item: 'https://zyro.kim/companies' },
-        { '@type': 'ListItem', position: 3, name: company.name, item: `https://zyro.kim/companies/${id}` },
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+        { '@type': 'ListItem', position: 2, name: 'Companies', item: `${BASE_URL}/companies` },
+        { '@type': 'ListItem', position: 3, name: company.name, item: `${BASE_URL}/companies/${id}` },
       ],
     },
   ];
