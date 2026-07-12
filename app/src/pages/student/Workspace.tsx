@@ -67,7 +67,7 @@ export default function StudentWorkspace() {
       // 2. Select the placement (from URL param or default to the first active placement)
       let selected = placementList[0];
       if (internshipId) {
-        const found = placementList.find(p => (p.internship as any)?.id === internshipId);
+        const found = placementList.find((p: any) => (p.internship as any)?.id === internshipId);
         if (found) {
           selected = found;
         } else {

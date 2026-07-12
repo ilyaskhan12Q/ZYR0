@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
+import { dedupRequest } from '@/lib/cache/requestRegistry';
 
 /** Get all conversations for current user */
 export async function getMyConversations(useCache = true) {
@@ -12,26 +13,29 @@ export async function getMyConversations(useCache = true) {
     if (cached) return cached;
   }
 
-  // Get conversation IDs this user is part of
-  const { data: participations } = await supabase
-    .from('conversation_participants')
-    .select('conversation_id')
-    .eq('user_id', user.id);
+  const fetchFn = async () => {
+    const { data: participations } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id')
+      .eq('user_id', user.id);
 
-  if (!participations?.length) return { data: [], error: null };
+    if (!participations?.length) return { data: [], error: null };
 
-  const conversationIds = participations.map((p) => p.conversation_id);
+    const conversationIds = participations.map((p) => p.conversation_id);
 
-  const res = await supabase
-    .from('conversations')
-    .select(`
-      *,
-      participants:conversation_participants (
-        user:profiles!user_id (id, full_name, avatar_url, role)
-      )
-    `)
-    .in('id', conversationIds)
-    .order('last_message_at', { ascending: false });
+    return supabase
+      .from('conversations')
+      .select(`
+        *,
+        participants:conversation_participants (
+          user:profiles!user_id (id, full_name, avatar_url, role)
+        )
+      `)
+      .in('id', conversationIds)
+      .order('last_message_at', { ascending: false });
+  };
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -41,7 +45,11 @@ export async function getMyConversations(useCache = true) {
 
 /** Get messages in a conversation */
 export async function getMessages(conversation_id: string) {
-  return supabase
+  const cacheKey = `messages_${conversation_id}`;
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('messages')
     .select(`
       *,
@@ -49,6 +57,11 @@ export async function getMessages(conversation_id: string) {
     `)
     .eq('conversation_id', conversation_id)
     .order('created_at', { ascending: true });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Send a message */
@@ -150,27 +163,27 @@ export async function getUnreadCount(useCache = true) {
     if (cached !== null) return cached;
   }
 
-  const { data: participations } = await supabase
-    .from('conversation_participants')
-    .select('conversation_id')
-    .eq('user_id', user.id);
+  const fetchFn = async () => {
+    const { data: participations } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id')
+      .eq('user_id', user.id);
 
-  if (!participations?.length) {
-    setCachedData(cacheKey, 0);
-    return 0;
-  }
+    if (!participations?.length) return 0;
 
-  const convIds = participations.map((p) => p.conversation_id);
+    const convIds = participations.map((p) => p.conversation_id);
 
-  // Messages not read by this user (not in read_by array)
-  const { count } = await supabase
-    .from('messages')
-    .select('*', { count: 'exact', head: true })
-    .in('conversation_id', convIds)
-    .not('sender_id', 'eq', user.id)
-    .not('read_by', 'cs', `{${user.id}}`);
+    const { count } = await supabase
+      .from('messages')
+      .select('*', { count: 'exact', head: true })
+      .in('conversation_id', convIds)
+      .not('sender_id', 'eq', user.id)
+      .not('read_by', 'cs', `{${user.id}}`);
 
-  const unreadCount = count ?? 0;
-  setCachedData(cacheKey, unreadCount);
-  return unreadCount;
+    return count ?? 0;
+  };
+
+  const result = await dedupRequest(cacheKey, fetchFn);
+  setCachedData(cacheKey, result);
+  return result;
 }

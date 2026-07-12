@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
+import { dedupRequest } from '@/lib/cache/requestRegistry';
 
 /** Get current user's notifications */
 export async function getNotifications(limit = 50, useCache = true) {
@@ -12,12 +13,14 @@ export async function getNotifications(limit = 50, useCache = true) {
     if (cached) return cached;
   }
 
-  const res = await supabase
+  const fetchFn = () => supabase
     .from('notifications')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(limit);
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -36,15 +39,18 @@ export async function getUnreadNotificationCount(useCache = true) {
     if (cached !== null) return cached;
   }
 
-  const { count } = await supabase
-    .from('notifications')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('read', false);
+  const fetchFn = async () => {
+    const { count } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+    return count ?? 0;
+  };
 
-  const unreadCount = count ?? 0;
-  setCachedData(cacheKey, unreadCount);
-  return unreadCount;
+  const result = await dedupRequest(cacheKey, fetchFn);
+  setCachedData(cacheKey, result);
+  return result;
 }
 
 /** Mark a notification as read */

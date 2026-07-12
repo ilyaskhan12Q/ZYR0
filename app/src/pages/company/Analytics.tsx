@@ -31,7 +31,7 @@ export default function CompanyAnalytics() {
 
         const myInternships = internshipsRes.data || [];
         const myApps = appsRes.data || [];
-        const internshipIds = myInternships.map((i) => i.id);
+        const internshipIds = myInternships.map((i: any) => i.id);
 
         // Fetch tasks
         let myTasks: any[] = [];
@@ -45,7 +45,7 @@ export default function CompanyAnalytics() {
 
         // 1. Calculate Stats
         const totalApps = myApps.length;
-        const acceptedApps = myApps.filter((a) => a.status === 'Accepted').length;
+        const acceptedApps = myApps.filter((a: any) => a.status === 'Accepted').length;
         const acceptanceRate = totalApps ? Math.round((acceptedApps / totalApps) * 100) : 0;
         const completedTasks = myTasks.filter((t) => t.status === 'Approved').length;
         const avgCompletion = myTasks.length ? Math.round((completedTasks / myTasks.length) * 100) : 0;
@@ -71,7 +71,7 @@ export default function CompanyAnalytics() {
           monthlyCounts[monthName] = { applications: 0, accepted: 0 };
         }
 
-        myApps.forEach((app) => {
+        myApps.forEach((app: any) => {
           const appDate = new Date(app.applied_at);
           const monthName = months[appDate.getMonth()];
           if (monthlyCounts[monthName] !== undefined) {
@@ -100,9 +100,9 @@ export default function CompanyAnalytics() {
 
         // 3. Applications by Domain
         const domains: Record<string, number> = {};
-        myApps.forEach((app) => {
+        myApps.forEach((app: any) => {
           const internshipId = app.internship_id;
-          const internship = myInternships.find((i) => i.id === internshipId);
+          const internship = myInternships.find((i: any) => i.id === internshipId);
           const domain = internship?.domain || 'General';
           domains[domain] = (domains[domain] || 0) + 1;
         });

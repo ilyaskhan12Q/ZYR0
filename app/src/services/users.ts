@@ -1,12 +1,22 @@
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/lib/database.types';
+import { getCachedData, setCachedData } from '@/lib/cache';
+import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 /** Get the current user's profile */
 export async function getMyProfile() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
 
-  return supabase.from('profiles').select('*').eq('id', user.id).single();
+  const cacheKey = createRequestKey('profile', user.id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase.from('profiles').select('*').eq('id', user.id).single();
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Update the current user's profile */
@@ -69,7 +79,15 @@ export async function uploadResume(file: File) {
 
 /** Get a user's public profile */
 export async function getUserProfile(userId: string) {
-  return supabase.from('profiles').select('*').eq('id', userId).single();
+  const cacheKey = createRequestKey('public_profile', userId);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase.from('profiles').select('*').eq('id', userId).single();
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Admin: get all users with pagination */

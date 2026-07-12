@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Application } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
+import { dedupRequest } from '@/lib/cache/requestRegistry';
 
 /** Get applications for the current student */
 export async function getMyApplications(useCache = true) {
@@ -13,7 +14,7 @@ export async function getMyApplications(useCache = true) {
     if (cached) return cached;
   }
 
-  const res = await supabase
+  const fetchFn = () => supabase
     .from('applications')
     .select(`
       *,
@@ -23,6 +24,8 @@ export async function getMyApplications(useCache = true) {
       )
     `)
     .order('applied_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -38,7 +41,7 @@ export async function getApplicationById(id: string, useCache = true) {
     if (cached) return cached;
   }
 
-  const res = await supabase
+  const fetchFn = () => supabase
     .from('applications')
     .select(`
       *,
@@ -49,6 +52,8 @@ export async function getApplicationById(id: string, useCache = true) {
     `)
     .eq('id', id)
     .single();
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -110,20 +115,28 @@ export async function hasApplied(internship_id: string, useCache = true) {
     if (cached !== null) return cached;
   }
 
-  const { data } = await supabase
-    .from('applications')
-    .select('id, status')
-    .eq('internship_id', internship_id)
-    .eq('student_id', user.id)
-    .single();
+  const fetchFn = async () => {
+    const { data } = await supabase
+      .from('applications')
+      .select('id, status')
+      .eq('internship_id', internship_id)
+      .eq('student_id', user.id)
+      .single();
+    return data ?? null;
+  };
 
-  setCachedData(cacheKey, data ?? null);
-  return data ?? null;
+  const result = await dedupRequest(cacheKey, fetchFn);
+  setCachedData(cacheKey, result);
+  return result;
 }
 
 /** Get all applications for a company's internship (company portal) */
 export async function getApplicationsForInternship(internship_id: string) {
-  return supabase
+  const cacheKey = `applications_for_internship_${internship_id}`;
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('applications')
     .select(`
       *,
@@ -131,29 +144,43 @@ export async function getApplicationsForInternship(internship_id: string) {
     `)
     .eq('internship_id', internship_id)
     .order('applied_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Get all applications across company's internships (company dashboard) */
 export async function getAllCompanyApplications(company_id: string) {
-  // Step 1: get all internship IDs for this company
-  const { data: internships } = await supabase
-    .from('internships')
-    .select('id')
-    .eq('company_id', company_id);
+  const cacheKey = `all_company_applications_${company_id}`;
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
 
-  if (!internships?.length) return { data: [], error: null };
-  const internshipIds = internships.map((i) => i.id);
+  const fetchFn = async () => {
+    const { data: internships } = await supabase
+      .from('internships')
+      .select('id')
+      .eq('company_id', company_id);
 
-  // Step 2: get applications filtered by those IDs
-  return supabase
-    .from('applications')
-    .select(`
-      *,
-      internship:internships!internship_id (id, title, company_id),
-      student:profiles!student_id (id, full_name, avatar_url, university)
-    `)
-    .in('internship_id', internshipIds)
-    .order('applied_at', { ascending: false });
+    if (!internships?.length) return { data: [], error: null };
+    const internshipIds = internships.map((i) => i.id);
+
+    return supabase
+      .from('applications')
+      .select(`
+        *,
+        internship:internships!internship_id (id, title, company_id),
+        student:profiles!student_id (id, full_name, avatar_url, university)
+      `)
+      .in('internship_id', internshipIds)
+      .order('applied_at', { ascending: false });
+  };
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Update application status (company: shortlist, accept, reject) */

@@ -1,5 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { OfferLetterStatus } from '@/lib/database.types';
+import { getCachedData, setCachedData } from '@/lib/cache';
+import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 // ── Common select fragment ────────────────────────────────────────────────────
 const OFFER_LETTER_SELECT = `
@@ -20,40 +22,76 @@ export async function getMyOfferLetters() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], error: null };
 
-  return supabase
+  const cacheKey = createRequestKey('my_offer_letters', user.id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('offer_letters')
     .select(OFFER_LETTER_SELECT)
     .eq('student_id', user.id)
     .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Get a single offer letter by id (student, company, or admin). */
 export async function getOfferLetterById(id: string) {
-  return supabase
+  const cacheKey = createRequestKey('offer_letter', id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('offer_letters')
     .select(OFFER_LETTER_SELECT)
     .eq('id', id)
     .single();
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Check whether an offer letter already exists for a given application. */
 export async function getOfferLetterByApplication(application_id: string) {
-  return supabase
+  const cacheKey = createRequestKey('offer_letter_by_application', application_id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('offer_letters')
     .select(OFFER_LETTER_SELECT)
     .eq('application_id', application_id)
     .maybeSingle();
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 // ── Company: read ─────────────────────────────────────────────────────────────
 
 /** Get all offer letters issued by the logged-in company. */
 export async function getCompanyOfferLetters(company_id: string) {
-  return supabase
+  const cacheKey = createRequestKey('company_offer_letters', company_id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('offer_letters')
     .select(OFFER_LETTER_SELECT)
     .eq('company_id', company_id)
     .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 // ── Company: create ───────────────────────────────────────────────────────────
@@ -140,16 +178,27 @@ export async function rejectOfferLetter(id: string) {
 
 /** Admin: fetch every offer letter (no filter). */
 export async function getAllOfferLetters(status?: OfferLetterStatus) {
-  let query = supabase
-    .from('offer_letters')
-    .select(OFFER_LETTER_SELECT)
-    .order('created_at', { ascending: false });
+  const cacheKey = createRequestKey('all_offer_letters', status ?? 'all');
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
 
-  if (status) {
-    query = query.eq('status', status);
-  }
+  const fetchFn = () => {
+    let query = supabase
+      .from('offer_letters')
+      .select(OFFER_LETTER_SELECT)
+      .order('created_at', { ascending: false });
 
-  return query;
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    return query;
+  };
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Task, TaskSubmission } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
+import { dedupRequest } from '@/lib/cache/requestRegistry';
 
 /** Get tasks assigned to current user */
 export async function getMyTasks(useCache = true) {
@@ -13,7 +14,7 @@ export async function getMyTasks(useCache = true) {
     if (cached) return cached;
   }
 
-  const res = await supabase
+  const fetchFn = () => supabase
     .from('tasks')
     .select(`
       *,
@@ -23,6 +24,8 @@ export async function getMyTasks(useCache = true) {
     `)
     .eq('assigned_to', user.id)
     .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -41,7 +44,7 @@ export async function getTasksAssignedByMe(useCache = true) {
     if (cached) return cached;
   }
 
-  const res = await supabase
+  const fetchFn = () => supabase
     .from('tasks')
     .select(`
       *,
@@ -51,6 +54,8 @@ export async function getTasksAssignedByMe(useCache = true) {
     `)
     .eq('assigned_by', user.id)
     .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -66,7 +71,7 @@ export async function getTaskById(id: string, useCache = true) {
     if (cached) return cached;
   }
 
-  const res = await supabase
+  const fetchFn = () => supabase
     .from('tasks')
     .select(`
       *,
@@ -77,6 +82,8 @@ export async function getTaskById(id: string, useCache = true) {
     `)
     .eq('id', id)
     .single();
+
+  const res = await dedupRequest(cacheKey, fetchFn);
 
   if (!res.error) {
     setCachedData(cacheKey, res);

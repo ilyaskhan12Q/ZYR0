@@ -1,11 +1,17 @@
 import { supabase } from '@/lib/supabase';
+import { getCachedData, setCachedData } from '@/lib/cache';
+import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 /** Get all active certificates for current user */
 export async function getMyCertificates() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], error: null };
 
-  return supabase
+  const cacheKey = createRequestKey('my_certificates', user.id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('certificates')
     .select(`
       *,
@@ -14,11 +20,20 @@ export async function getMyCertificates() {
     `)
     .eq('recipient_id', user.id)
     .order('issue_date', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Verify a certificate by credential ID (public — no auth needed) */
 export async function verifyCertificate(credentialId: string) {
-  return supabase
+  const cacheKey = createRequestKey('verify_certificate', credentialId);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('certificates')
     .select(`
       *,
@@ -28,12 +43,21 @@ export async function verifyCertificate(credentialId: string) {
     `)
     .eq('credential_id', credentialId)
     .single();
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 
 /** Get certificates for a company's interns */
 export async function getCompanyCertificates(company_id: string) {
-  return supabase
+  const cacheKey = createRequestKey('company_certificates', company_id);
+  const cached = getCachedData<any>(cacheKey);
+  if (cached) return cached;
+
+  const fetchFn = () => supabase
     .from('certificates')
     .select(`
       *,
@@ -42,6 +66,11 @@ export async function getCompanyCertificates(company_id: string) {
     `)
     .eq('company_id', company_id)
     .order('issue_date', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }
 
 /** Issue a certificate (via Edge Function) */
