@@ -5,7 +5,7 @@
 CREATE TABLE IF NOT EXISTS public.applications (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   internship_id uuid NOT NULL REFERENCES public.internships(id) ON DELETE CASCADE,
-  student_id    uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  student_id    uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   status        text NOT NULL DEFAULT 'Applied'
                 CHECK (status IN ('Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected', 'Withdrawn')),
   cover_letter  text,

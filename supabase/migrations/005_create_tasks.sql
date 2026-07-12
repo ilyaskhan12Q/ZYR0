@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS public.tasks (
   internship_id uuid REFERENCES public.internships(id) ON DELETE SET NULL,
   title         text NOT NULL,
   description   text,
-  assigned_to   uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  assigned_by   uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  assigned_to   uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  assigned_by   uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   due_date      date,
   status        text NOT NULL DEFAULT 'Pending'
                 CHECK (status IN ('Pending', 'Submitted', 'Under Review', 'Approved', 'Rejected')),
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS public.tasks (
 CREATE TABLE IF NOT EXISTS public.task_submissions (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   task_id     uuid NOT NULL REFERENCES public.tasks(id) ON DELETE CASCADE,
-  student_id  uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  student_id  uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   notes       text,
   attachments jsonb NOT NULL DEFAULT '[]',
   status      text NOT NULL DEFAULT 'Submitted'

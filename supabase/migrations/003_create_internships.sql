@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.internships (
   applicant_count  int NOT NULL DEFAULT 0,
   view_count       int NOT NULL DEFAULT 0,
   posted_date      timestamptz NOT NULL DEFAULT now(),
-  created_by       uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_by       uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now()
 );

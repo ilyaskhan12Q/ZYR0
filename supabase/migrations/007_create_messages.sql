@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.conversations (
 
 CREATE TABLE IF NOT EXISTS public.conversation_participants (
   conversation_id uuid NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
-  user_id         uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id         uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   joined_at       timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (conversation_id, user_id)
 );
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.conversation_participants (
 CREATE TABLE IF NOT EXISTS public.messages (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   conversation_id uuid NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
-  sender_id       uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sender_id       uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   content         text NOT NULL,
   attachments     jsonb NOT NULL DEFAULT '[]',
   read_by         uuid[] NOT NULL DEFAULT '{}',

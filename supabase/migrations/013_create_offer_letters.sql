@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.offer_letters (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   internship_id   uuid NOT NULL REFERENCES public.internships(id) ON DELETE CASCADE,
   application_id  uuid NOT NULL REFERENCES public.applications(id) ON DELETE CASCADE,
-  student_id      uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  student_id      uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   company_id      uuid NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
   status          text NOT NULL DEFAULT 'Pending'
                   CHECK (status IN ('Pending', 'Sent', 'Accepted', 'Rejected', 'Revoked', 'Expired')),

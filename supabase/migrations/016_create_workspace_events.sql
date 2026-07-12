@@ -7,8 +7,8 @@
 CREATE TABLE IF NOT EXISTS public.workspace_events (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   internship_id  uuid NOT NULL REFERENCES public.internships(id) ON DELETE CASCADE,
-  student_id     uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  actor_id       uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  student_id     uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  actor_id       uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   event_type     text NOT NULL CHECK (event_type IN ('offer_accepted', 'task_assigned', 'task_submitted', 'task_approved', 'task_rejected', 'certificate_issued')),
   title          text NOT NULL,
   description    text,

@@ -4,8 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS public.evaluations (
   id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  intern_id             uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  mentor_id             uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  intern_id             uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  mentor_id             uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   internship_id         uuid REFERENCES public.internships(id) ON DELETE SET NULL,
   period                text,
   skills_assessment     jsonb NOT NULL DEFAULT '[]',

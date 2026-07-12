@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.companies (
   status          text NOT NULL DEFAULT 'Pending' CHECK (status IN ('Active', 'Pending', 'Suspended')),
   rating          numeric(3,2) NOT NULL DEFAULT 0,
   review_count    int NOT NULL DEFAULT 0,
-  owner_id        uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  owner_id        uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at      timestamptz NOT NULL DEFAULT now(),
   updated_at      timestamptz NOT NULL DEFAULT now()
 );
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.companies (
 CREATE TABLE IF NOT EXISTS public.company_team_members (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id  uuid NOT NULL REFERENCES public.companies(id) ON DELETE CASCADE,
-  user_id     uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id     uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   name        text NOT NULL,
   role        text NOT NULL,
   avatar_url  text,

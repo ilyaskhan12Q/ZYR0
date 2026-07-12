@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS public.activity_logs (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id     uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id     uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
   action      text NOT NULL,
   target      text,
   target_type text,
