@@ -1,0 +1,5 @@
+Contact: mailto:support@zyro.com
+Expires: 2027-07-12T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://zyroo.dpdns.org/security.txt
+Policy: https://github.com/ilyaskhan12Q/ZYR0/security/policy

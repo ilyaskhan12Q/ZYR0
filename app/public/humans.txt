@@ -1,0 +1,14 @@
+/* TEAM */
+Developer: Ilyas Khan
+Site: Zyro — Internship Management Platform
+Location: Global
+
+/* SITE */
+Standards: HTML5, CSS3, TypeScript, React 19
+Components: shadcn/ui, Tailwind CSS, Framer Motion
+Backend: Supabase, PostgreSQL
+Deployment: Vercel
+
+/* THANKS */
+Powered by open-source software.
+Built with care for students, mentors, and organizations worldwide.

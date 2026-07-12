@@ -148,7 +148,7 @@ serve(async (req) => {
       try {
         const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
         const emailSubject = `Certificate Issued: ${title} - Zyro`;
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyro-kim.vercel.app';
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.dpdns.org';
         
         const emailHtml = `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff;">

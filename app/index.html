@@ -15,15 +15,15 @@
     <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)" />
 
     <!-- Canonical -->
-    <link rel="canonical" href="https://zyroo.dpdns.org/" />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Zyro" />
-    <meta property="og:url" content="https://zyroo.dpdns.org/" />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
     <meta property="og:title" content="Zyro — Internship Management Platform" />
     <meta property="og:description" content="Connect with real internship opportunities, experienced mentors, and earn blockchain-verified certificates. Your complete career launchpad." />
-    <meta property="og:image" content="https://zyroo.dpdns.org/og-image.png" />
+    <meta property="og:image" content="%VITE_SITE_URL%/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Zyro — Internship Management Platform" />
@@ -35,7 +35,7 @@
     <meta name="twitter:creator" content="@zyroplatform" />
     <meta name="twitter:title" content="Zyro — Internship Management Platform" />
     <meta name="twitter:description" content="Connect with real internship opportunities, experienced mentors, and earn blockchain-verified certificates." />
-    <meta name="twitter:image" content="https://zyroo.dpdns.org/og-image.png" />
+    <meta name="twitter:image" content="%VITE_SITE_URL%/og-image.png" />
     <meta name="twitter:image:alt" content="Zyro platform preview" />
 
     <!-- Favicon & App Icons -->
@@ -56,8 +56,8 @@
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Zyro",
-      "url": "https://zyroo.dpdns.org",
-      "logo": "https://zyroo.dpdns.org/zyro-logo.png",
+      "url": "%VITE_SITE_URL%",
+      "logo": "%VITE_SITE_URL%/zyro-logo.png",
       "description": "Zyro is a modern internship management platform connecting students, companies, and mentors for structured, verifiable internship experiences.",
       "sameAs": [
         "https://github.com/ilyaskhan12Q/ZYR0",
@@ -78,13 +78,13 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Zyro",
-      "url": "https://zyroo.dpdns.org",
+      "url": "%VITE_SITE_URL%",
       "description": "Internship management platform for students, companies, and mentors.",
       "potentialAction": {
         "@type": "SearchAction",
         "target": {
           "@type": "EntryPoint",
-          "urlTemplate": "https://zyroo.dpdns.org/internships?search={search_term_string}"
+          "urlTemplate": "%VITE_SITE_URL%/internships?search={search_term_string}"
         },
         "query-input": "required name=search_term_string"
       }
