@@ -23,6 +23,12 @@ const CompanyDetail = lazy(() => import('@/pages/public/CompanyDetail'));
 const Verify = lazy(() => import('@/pages/public/Verify'));
 const About = lazy(() => import('@/pages/public/About'));
 const Contact = lazy(() => import('@/pages/public/Contact'));
+const PrivacyPolicy = lazy(() => import('@/pages/public/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('@/pages/public/TermsOfService'));
+const CookiePolicy = lazy(() => import('@/pages/public/CookiePolicy'));
+const FAQ = lazy(() => import('@/pages/public/FAQ'));
+const HelpCenter = lazy(() => import('@/pages/public/HelpCenter'));
+const Careers = lazy(() => import('@/pages/public/Careers'));
 
 // Auth Pages
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
@@ -55,6 +61,12 @@ function App() {
           <Route path="/verify/:code" element={<Verify />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/cookies" element={<CookiePolicy />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/careers" element={<Careers />} />
         </Route>
 
         {/* Auth Routes — redirect to dashboard if already logged in */}

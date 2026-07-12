@@ -3,8 +3,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, Bell, ChevronDown, LogOut, User, LayoutDashboard,
-  Briefcase, Settings,
-  Twitter, Linkedin, Github
+  Briefcase, Settings, Mail,
+  Linkedin, Github
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 const navLinks = [
@@ -206,11 +206,15 @@ export default function PublicLayout() {
                   The complete internship management platform connecting students, companies, and mentors.
                 </p>
                 <div className="flex gap-4 mt-6">
-                  {[Twitter, Linkedin, Github].map((Icon, i) => (
-                    <a key={i} href="#" className="text-white/40 hover:text-white transition-colors">
-                      <Icon className="w-5 h-5" />
-                    </a>
-                  ))}
+                  <a href="https://github.com/ilyaskhan12Q/ZYR0" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-white/40 hover:text-white transition-colors">
+                    <Github className="w-5 h-5" />
+                  </a>
+                  <a href="https://linkedin.com/company/zyro-platform" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white/40 hover:text-white transition-colors">
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a href="mailto:support@zyro.com" aria-label="Email support" className="text-white/40 hover:text-white transition-colors">
+                    <Mail className="w-5 h-5" />
+                  </a>
                 </div>
               </div>
 
@@ -218,11 +222,11 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">For Students</h4>
                 <ul className="space-y-2.5">
-                  {['Browse Internships', 'My Applications', 'Tasks', 'Certificates', 'Portfolio'].map((item) => (
-                    <li key={item}>
-                      <Link to="#" className="text-white/60 text-sm hover:text-white transition-colors">{item}</Link>
-                    </li>
-                  ))}
+                  <li><Link to="/internships" className="text-white/60 text-sm hover:text-white transition-colors">Browse Internships</Link></li>
+                  <li><Link to="/student/applications" className="text-white/60 text-sm hover:text-white transition-colors">My Applications</Link></li>
+                  <li><Link to="/student/workspace" className="text-white/60 text-sm hover:text-white transition-colors">Workspace</Link></li>
+                  <li><Link to="/student/certificates" className="text-white/60 text-sm hover:text-white transition-colors">Certificates</Link></li>
+                  <li><Link to="/verify" className="text-white/60 text-sm hover:text-white transition-colors">Verify Certificate</Link></li>
                 </ul>
               </div>
 
@@ -230,11 +234,10 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">For Companies</h4>
                 <ul className="space-y-2.5">
-                  {['Post Internship', 'Dashboard', 'Analytics', 'Team Management'].map((item) => (
-                    <li key={item}>
-                      <Link to="#" className="text-white/60 text-sm hover:text-white transition-colors">{item}</Link>
-                    </li>
-                  ))}
+                  <li><Link to="/company/post-internship" className="text-white/60 text-sm hover:text-white transition-colors">Post Internship</Link></li>
+                  <li><Link to="/company/dashboard" className="text-white/60 text-sm hover:text-white transition-colors">Dashboard</Link></li>
+                  <li><Link to="/companies" className="text-white/60 text-sm hover:text-white transition-colors">Browse Companies</Link></li>
+                  <li><Link to="/careers" className="text-white/60 text-sm hover:text-white transition-colors">Careers</Link></li>
                 </ul>
               </div>
 
@@ -242,17 +245,18 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">Support</h4>
                 <ul className="space-y-2.5">
-                  {['Help Center', 'Contact Us', 'Privacy Policy', 'Terms of Service'].map((item) => (
-                    <li key={item}>
-                      <Link to="#" className="text-white/60 text-sm hover:text-white transition-colors">{item}</Link>
-                    </li>
-                  ))}
+                  <li><Link to="/help" className="text-white/60 text-sm hover:text-white transition-colors">Help Center</Link></li>
+                  <li><Link to="/faq" className="text-white/60 text-sm hover:text-white transition-colors">FAQ</Link></li>
+                  <li><Link to="/contact" className="text-white/60 text-sm hover:text-white transition-colors">Contact Us</Link></li>
+                  <li><Link to="/privacy" className="text-white/60 text-sm hover:text-white transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/terms" className="text-white/60 text-sm hover:text-white transition-colors">Terms of Service</Link></li>
+                  <li><Link to="/cookies" className="text-white/60 text-sm hover:text-white transition-colors">Cookie Policy</Link></li>
                 </ul>
               </div>
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-white/40 text-sm">2025 Zyro. All rights reserved.</p>
+              <p className="text-white/40 text-sm">&copy; 2025 Zyro. All rights reserved.</p>
               <p className="text-white/40 text-sm">Made with care for the next generation of professionals.</p>
             </div>
           </div>
