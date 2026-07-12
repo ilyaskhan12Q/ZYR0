@@ -4,13 +4,15 @@ import { getCachedData, setCachedData } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 /** Get the current user's profile */
-export async function getMyProfile() {
+export async function getMyProfile(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
 
   const cacheKey = createRequestKey('profile', user.id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase.from('profiles').select('*').eq('id', user.id).single();
   const res = await dedupRequest(cacheKey, fetchFn);
@@ -78,10 +80,12 @@ export async function uploadResume(file: File) {
 }
 
 /** Get a user's public profile */
-export async function getUserProfile(userId: string) {
+export async function getUserProfile(userId: string, useCache = true) {
   const cacheKey = createRequestKey('public_profile', userId);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase.from('profiles').select('*').eq('id', userId).single();
   const res = await dedupRequest(cacheKey, fetchFn);

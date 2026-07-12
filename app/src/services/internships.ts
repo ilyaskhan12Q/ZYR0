@@ -16,11 +16,13 @@ export interface InternshipFilters {
 }
 
 /** Fetch active internships with optional filters (public) */
-export async function getInternships(filters: InternshipFilters = {}) {
+export async function getInternships(filters: InternshipFilters = {}, useCache = true) {
   const filterKey = JSON.stringify(filters);
   const cacheKey = createRequestKey('internships', filterKey);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => {
     let query = supabase
@@ -57,10 +59,12 @@ export async function getInternships(filters: InternshipFilters = {}) {
 }
 
 /** Fetch a single internship by ID (increments view count) */
-export async function getInternshipById(id: string) {
+export async function getInternshipById(id: string, useCache = true) {
   const cacheKey = createRequestKey('internship', id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => {
     supabase.rpc('increment_internship_view', { internship_id: id }).then(() => {});
@@ -100,10 +104,12 @@ export async function closeInternship(id: string) {
 }
 
 /** Get unique domains for filter UI */
-export async function getInternshipDomains() {
+export async function getInternshipDomains(useCache = true) {
   const cacheKey = 'internship_domains';
-  const cached = getCachedData<string[]>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<string[]>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = async () => {
     const { data } = await supabase
@@ -120,13 +126,15 @@ export async function getInternshipDomains() {
 }
 
 /** Get active internships for the current logged-in student (where offer letter is Accepted) */
-export async function getMyActiveInternships() {
+export async function getMyActiveInternships(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], error: new Error('Not authenticated') };
 
   const cacheKey = createRequestKey('my_active_internships', user.id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('offer_letters')

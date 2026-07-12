@@ -44,10 +44,12 @@ export async function getMyConversations(useCache = true) {
 }
 
 /** Get messages in a conversation */
-export async function getMessages(conversation_id: string) {
+export async function getMessages(conversation_id: string, useCache = true) {
   const cacheKey = `messages_${conversation_id}`;
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('messages')

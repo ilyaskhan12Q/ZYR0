@@ -18,13 +18,15 @@ const OFFER_LETTER_SELECT = `
 // ── Student: read ─────────────────────────────────────────────────────────────
 
 /** Get all offer letters for the currently logged-in student. */
-export async function getMyOfferLetters() {
+export async function getMyOfferLetters(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], error: null };
 
   const cacheKey = createRequestKey('my_offer_letters', user.id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('offer_letters')
@@ -39,10 +41,12 @@ export async function getMyOfferLetters() {
 }
 
 /** Get a single offer letter by id (student, company, or admin). */
-export async function getOfferLetterById(id: string) {
+export async function getOfferLetterById(id: string, useCache = true) {
   const cacheKey = createRequestKey('offer_letter', id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('offer_letters')
@@ -57,10 +61,12 @@ export async function getOfferLetterById(id: string) {
 }
 
 /** Check whether an offer letter already exists for a given application. */
-export async function getOfferLetterByApplication(application_id: string) {
+export async function getOfferLetterByApplication(application_id: string, useCache = true) {
   const cacheKey = createRequestKey('offer_letter_by_application', application_id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('offer_letters')
@@ -77,10 +83,12 @@ export async function getOfferLetterByApplication(application_id: string) {
 // ── Company: read ─────────────────────────────────────────────────────────────
 
 /** Get all offer letters issued by the logged-in company. */
-export async function getCompanyOfferLetters(company_id: string) {
+export async function getCompanyOfferLetters(company_id: string, useCache = true) {
   const cacheKey = createRequestKey('company_offer_letters', company_id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('offer_letters')
@@ -177,10 +185,12 @@ export async function rejectOfferLetter(id: string) {
 // ── Admin: read all ───────────────────────────────────────────────────────────
 
 /** Admin: fetch every offer letter (no filter). */
-export async function getAllOfferLetters(status?: OfferLetterStatus) {
+export async function getAllOfferLetters(status?: OfferLetterStatus, useCache = true) {
   const cacheKey = createRequestKey('all_offer_letters', status ?? 'all');
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => {
     let query = supabase

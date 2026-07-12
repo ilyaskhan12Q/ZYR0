@@ -3,13 +3,15 @@ import { getCachedData, setCachedData } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 /** Get all active certificates for current user */
-export async function getMyCertificates() {
+export async function getMyCertificates(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: [], error: null };
 
   const cacheKey = createRequestKey('my_certificates', user.id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('certificates')
@@ -28,10 +30,12 @@ export async function getMyCertificates() {
 }
 
 /** Verify a certificate by credential ID (public — no auth needed) */
-export async function verifyCertificate(credentialId: string) {
+export async function verifyCertificate(credentialId: string, useCache = true) {
   const cacheKey = createRequestKey('verify_certificate', credentialId);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('certificates')
@@ -52,10 +56,12 @@ export async function verifyCertificate(credentialId: string) {
 
 
 /** Get certificates for a company's interns */
-export async function getCompanyCertificates(company_id: string) {
+export async function getCompanyCertificates(company_id: string, useCache = true) {
   const cacheKey = createRequestKey('company_certificates', company_id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('certificates')

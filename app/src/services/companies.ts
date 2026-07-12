@@ -9,11 +9,13 @@ export async function getCompanies(opts: {
   industry?: string;
   limit?: number;
   offset?: number;
-} = {}) {
+} = {}, useCache = true) {
   const filterKey = JSON.stringify(opts);
   const cacheKey = createRequestKey('companies', filterKey);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => {
     let query = supabase
@@ -41,10 +43,12 @@ export async function getCompanies(opts: {
 }
 
 /** Get company by ID */
-export async function getCompanyById(id: string) {
+export async function getCompanyById(id: string, useCache = true) {
   const cacheKey = createRequestKey('company', id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('companies')
@@ -62,13 +66,15 @@ export async function getCompanyById(id: string) {
 }
 
 /** Get company owned by current user */
-export async function getMyCompany() {
+export async function getMyCompany(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
 
   const cacheKey = createRequestKey('my_company', user.id);
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => supabase
     .from('companies')
@@ -124,10 +130,12 @@ export async function updateCompanyStatus(id: string, status: Company['status'])
 }
 
 /** Admin: get all companies */
-export async function getAllCompanies(opts: { status?: string } = {}) {
+export async function getAllCompanies(opts: { status?: string } = {}, useCache = true) {
   const cacheKey = createRequestKey('all_companies', opts.status ?? 'all');
-  const cached = getCachedData<any>(cacheKey);
-  if (cached) return cached;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
 
   const fetchFn = () => {
     let query = supabase
