@@ -73,7 +73,7 @@ serve(async (req) => {
           'Authorization': `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: from || 'Zyro <noreply@zyro.app>',
+          from: from || 'Zyro <noreply@zyroo.dpdns.org>',
           to: Array.isArray(to) ? to : [to],
           subject,
           html,
