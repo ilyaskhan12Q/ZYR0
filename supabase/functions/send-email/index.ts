@@ -29,78 +29,83 @@ serve(async (req) => {
     const SMTP_USER = Deno.env.get('SMTP_USER');
     const SMTP_PASS = Deno.env.get('SMTP_PASS');
     const SMTP_FROM = Deno.env.get('SMTP_FROM') || from;
+    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
-    let result;
+    let lastError;
 
+    // Try SMTP first
     if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
-      // Use SMTP (e.g. Gmail or custom)
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: parseInt(SMTP_PORT || '587'),
-        secure: SMTP_PORT === '465', // true for 465, false for 587
-        auth: {
-          user: SMTP_USER,
-          pass: SMTP_PASS,
-        },
-      });
+      try {
+        const transporter = nodemailer.createTransport({
+          host: SMTP_HOST,
+          port: parseInt(SMTP_PORT || '587'),
+          secure: SMTP_PORT === '465',
+          auth: { user: SMTP_USER, pass: SMTP_PASS },
+        });
 
-      const mailOptions = {
-        from: SMTP_FROM || `Zyro <${SMTP_USER}>`,
-        to: Array.isArray(to) ? to.join(', ') : to,
-        subject,
-        text,
-        html,
-        attachments: attachments?.map((att: EmailAttachment) => ({
-          filename: att.filename,
-          content: att.content, // base64 string
-          encoding: 'base64',
-        })),
-      };
-
-      const info = await transporter.sendMail(mailOptions);
-      result = { success: true, messageId: info.messageId };
-    } else {
-      // Fallback to Resend API
-      const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-      if (!RESEND_API_KEY) {
-        throw new Error('SMTP credentials are not configured, and RESEND_API_KEY is missing.');
-      }
-
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: from || 'Zyro <noreply@zyroo.dpdns.org>',
-          to: Array.isArray(to) ? to : [to],
+        const info = await transporter.sendMail({
+          from: SMTP_FROM || `Zyro <${SMTP_USER}>`,
+          to: Array.isArray(to) ? to.join(', ') : to,
           subject,
+          text,
           html,
           attachments: attachments?.map((att: EmailAttachment) => ({
             filename: att.filename,
-            content: att.content, // base64 string
+            content: att.content,
+            encoding: 'base64',
           })),
-        }),
-      });
+        });
 
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(`Resend error: ${err}`);
+        return new Response(JSON.stringify({ success: true, messageId: info.messageId }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (smtpErr) {
+        console.error('SMTP failed, trying Resend:', smtpErr);
+        lastError = smtpErr;
       }
-
-      const data = await res.json();
-      result = { success: true, id: data.id };
     }
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    // Fallback to Resend API
+    if (RESEND_API_KEY) {
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+          },
+          body: JSON.stringify({
+            from: from || 'Zyro <noreply@zyroo.dpdns.org>',
+            to: Array.isArray(to) ? to : [to],
+            subject,
+            html,
+            attachments: attachments?.map((att: EmailAttachment) => ({
+              filename: att.filename,
+              content: att.content,
+            })),
+          }),
+        });
 
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(`Resend error: ${err}`);
+        }
+
+        const data = await res.json();
+        return new Response(JSON.stringify({ success: true, id: data.id }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (resendErr) {
+        console.error('Resend also failed:', resendErr);
+        lastError = resendErr;
+      }
+    }
+
+    const message = lastError
+      ? `Email sending failed: ${lastError.message}`
+      : 'SMTP credentials are not configured, and RESEND_API_KEY is missing.';
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  }
 });
