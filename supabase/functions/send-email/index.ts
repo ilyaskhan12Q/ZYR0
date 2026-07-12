@@ -21,9 +21,7 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  try {
     const { to, subject, html, from, text, attachments } = await req.json();
-
     const SMTP_HOST = Deno.env.get('SMTP_HOST');
     const SMTP_PORT = Deno.env.get('SMTP_PORT');
     const SMTP_USER = Deno.env.get('SMTP_USER');
@@ -108,5 +106,4 @@ serve(async (req) => {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-  }
 });
