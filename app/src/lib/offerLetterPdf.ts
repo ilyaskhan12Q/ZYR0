@@ -362,13 +362,11 @@ async function drawQRCode(
   x: number, y: number,
   size: number
 ) {
-  // Use Google Charts QR API (only network call — produces a small PNG)
-  const src = `https://chart.googleapis.com/chart?cht=qr&chs=${size * 2}x${size * 2}&chl=${encodeURIComponent(text)}&choe=UTF-8`;
+  const src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
   try {
     const img = await loadImage(src);
     ctx.drawImage(img, x, y, size, size);
   } catch {
-    // Fallback: draw a placeholder box
     ctx.strokeStyle = '#888';
     ctx.lineWidth = 1;
     ctx.strokeRect(x, y, size, size);
