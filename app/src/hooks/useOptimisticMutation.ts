@@ -13,15 +13,15 @@ interface OptimisticMutationOptions<TData, TArgs extends unknown[]> {
   onError?: (error: Error, ...args: TArgs) => void;
 }
 
-interface OptimisticMutationState<TData> {
-  mutate: (...args: any[]) => Promise<TData | undefined>;
+interface OptimisticMutationState<TData, TArgs extends unknown[]> {
+  mutate: (...args: TArgs) => Promise<TData | undefined>;
   isLoading: boolean;
   error: Error | null;
 }
 
 export function useOptimisticMutation<TData, TArgs extends unknown[] = unknown[]>(
   options: OptimisticMutationOptions<TData, TArgs>
-): OptimisticMutationState<TData> {
+): OptimisticMutationState<TData, TArgs> {
   const { mutationFn, cacheKeys, optimisticUpdate, onSuccess, onError } = options;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

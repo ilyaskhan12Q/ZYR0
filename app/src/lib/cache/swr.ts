@@ -1,8 +1,8 @@
 type RefreshCallback = () => void;
 
 const refreshTriggers = new Map<string, Set<RefreshCallback>>();
-let focusListener: (() => void) | null = null;
-let onlineListener: (() => void) | null = null;
+const focusListener: (() => void) | null = null;
+const onlineListener: (() => void) | null = null;
 let registeredCount = 0;
 
 export function registerRefreshCallback(key: string, cb: RefreshCallback): () => void {
