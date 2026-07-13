@@ -1,21 +1,29 @@
-# Zyro — Internship Management Platform
-> Zyro connects students with real internship opportunities, experienced mentors, and blockchain-verified digital certificates.
+# Zyro - Internship Management Platform
 
-## Docs
-- Docs: https://github.com/ilyaskhan12Q/ZYR0
+Zyro is a modern, production-grade Internship & Workforce Readiness Platform.
+It bridges the gap between academic learning and industry experience by enabling organizations to manage project-based internships, assigning real-world tasks, reviewing code submissions on GitHub, and issuing blockchain-verified digital certificates.
 
-## Overview
-Zyro is a modern Internship & Workforce Readiness Platform that bridges the gap between academic education and professional industry experience. Students complete real-world projects, submit work through public GitHub repositories, receive mentor feedback, and earn trusted digital credentials.
+## Core Audience
+- **Students**: Apply for internships, work on real-world tasks, submit GitHub repositories, and earn digital certificates.
+- **Companies**: Create internships, review applications, assign tasks, review code submissions, and issue certificates.
+- **Mentors**: Provide guidance, review submissions, and evaluate intern performance.
 
-## Features
-- Internship Listings & Applications
-- Offer Letter Management
-- Internship Workspace & Task Management
-- GitHub Repository Submission
-- Mentor Review & Feedback
-- Progress Tracking
-- Digital Certificates with Blockchain Verification
-- Analytics & Reporting
+## Technology Stack
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Radix UI, Framer Motion
+- **Backend / Database**: Supabase (PostgreSQL), Edge Functions (Deno)
+- **Deployment**: https://zyroo.dpdns.org
 
-## Tech Stack
-- TypeScript, React 19, Vite, Tailwind CSS, Supabase
+## Key Architectural Principles
+- **GitHub First**: Student code is never hosted on Zyro; students submit GitHub repository URLs to simulate real software engineering workflows.
+- **No LMS Features**: Zyro focuses on real-world internships. It is not an online course platform.
+- **Role-Based Access**: Specialized dashboards and views for Students, Mentors, Companies, and Admins.
+- **Verified Credentials**: Certificates are generated securely on the backend with a unique SHA-256 blockchain-style hash to ensure authenticity.
+
+## URLs
+- **Production URL**: https://zyroo.dpdns.org
+- **Search**: https://zyroo.dpdns.org/internships?search={query}
+- **Verify Certificates**: https://zyroo.dpdns.org/verify
+
+## Contact & Support
+- Email: support@zyro.com
+- Twitter: @zyroplatform

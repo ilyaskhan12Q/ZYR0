@@ -56,9 +56,10 @@ serve(async (req) => {
       .eq('id', user.id)
       .single();
 
-    // PostgREST returns related rows as an array — access index [0]
-    const companiesData = internship?.companies as Array<{ owner_id: string }> | null;
-    const isOwner = companiesData?.[0]?.owner_id === user.id;
+    // PostgREST returns related rows as an object or array
+    const companiesData = internship?.companies as any;
+    const ownerId = Array.isArray(companiesData) ? companiesData[0]?.owner_id : companiesData?.owner_id;
+    const isOwner = ownerId === user.id;
     const isAdmin = callerProfile?.role === 'admin';
 
     if (!isOwner && !isAdmin) {
