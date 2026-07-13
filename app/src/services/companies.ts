@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase';
 import type { Company } from '@/lib/database.types';
-import { getCachedData, setCachedData } from '@/lib/cache';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
+import { createNotification } from './notifications';
 
 /** Get all active companies (public) */
 export async function getCompanies(opts: {
@@ -21,7 +22,7 @@ export async function getCompanies(opts: {
     let query = supabase
       .from('companies')
       .select('*, team:company_team_members(*)', { count: 'exact' })
-      .eq('status', 'Active')
+      .eq('status', 'approved')
       .order('created_at', { ascending: false });
 
     if (opts.search) {
@@ -95,7 +96,7 @@ export async function createCompany(data: Partial<Company>) {
 
   return supabase
     .from('companies')
-    .insert({ ...data, owner_id: user.id, status: 'Pending' })
+    .insert({ ...data, owner_id: user.id, status: 'pending' })
     .select()
     .single();
 }
@@ -124,9 +125,51 @@ export async function uploadCompanyLogo(companyId: string, file: File) {
   return publicUrl;
 }
 
-/** Admin: approve/suspend company */
-export async function updateCompanyStatus(id: string, status: Company['status']) {
-  return supabase.from('companies').update({ status }).eq('id', id);
+/** Admin: approve/suspend/reject/pending company */
+export async function updateCompanyStatus(
+  id: string,
+  status: Company['status'],
+  verificationNotes?: string
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  const updateData = {
+    status,
+    verified_at: new Date().toISOString(),
+    verified_by: user?.id || null,
+    verification_notes: verificationNotes || null,
+  };
+  
+  const res = await supabase
+    .from('companies')
+    .update(updateData)
+    .eq('id', id)
+    .select('owner_id, name')
+    .single();
+  
+  if (!res.error && res.data) {
+    const ownerId = res.data.owner_id;
+    const companyName = res.data.name;
+    
+    // Clear cache so the owner gets updated status immediately
+    if (ownerId) {
+      clearCache(createRequestKey('my_company', ownerId));
+      
+      let message = `Your company "${companyName}" registration has been updated to ${status}.`;
+      if (verificationNotes) {
+        message += ` Notes: ${verificationNotes}`;
+      }
+      
+      await createNotification({
+        user_id: ownerId,
+        type: 'company_status',
+        title: `Verification Update: ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+        message,
+        action_url: '/company/dashboard',
+      });
+    }
+  }
+  
+  return res;
 }
 
 /** Admin: get all companies */

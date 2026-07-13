@@ -6,7 +6,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 export type UserRole = 'student' | 'company' | 'mentor' | 'admin';
 export type UserStatus = 'active' | 'inactive' | 'pending';
-export type CompanyStatus = 'Active' | 'Pending' | 'Suspended';
+export type CompanyStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type InternshipStatus = 'Active' | 'Closed' | 'Draft';
 export type ApplicationStatus = 'Applied' | 'Under Review' | 'Shortlisted' | 'Accepted' | 'Rejected' | 'Withdrawn';
 export type TaskStatus = 'Pending' | 'Submitted' | 'Under Review' | 'Approved' | 'Rejected';
@@ -62,6 +62,9 @@ export interface Company {
   rating: number;
   review_count: number;
   owner_id: string | null;
+  verified_at: string | null;
+  verified_by: string | null;
+  verification_notes: string | null;
   created_at: string;
   updated_at: string;
 }
