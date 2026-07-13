@@ -175,7 +175,7 @@ export default function CompanyOfferLetters() {
           </div>
         `;
 
-        await supabase.functions.invoke('send-email', {
+        const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
           body: {
             to: student.email,
             subject: emailSubject,
@@ -188,6 +188,10 @@ export default function CompanyOfferLetters() {
             ]
           }
         });
+        if (invokeErr) {
+          throw invokeErr;
+        }
+        console.log('Offer letter email sent successfully:', resData);
       } catch (emailErr) {
         console.error('Failed to send actual offer letter email:', emailErr);
       }
@@ -246,9 +250,83 @@ export default function CompanyOfferLetters() {
     document.body.removeChild(a);
   }
 
-  // ── Resend email (stub — integrate with Supabase Edge Function / Resend) ──────
+  // ── Resend email ─────────────────────────────────────────────────────────────
   async function handleResend(offer: OfferLetter) {
-    alert(`Email resend for ${offer.student?.full_name ?? 'student'} would be triggered here via a Supabase Edge Function / Resend integration.`);
+    setError(null);
+    setSuccessMsg(null);
+    try {
+      const student = offer.student;
+      const internship = offer.internship;
+      const company = offer.company || { name: 'Zyro' }; // Fallback
+
+      if (!student || !internship) {
+        throw new Error('Missing student or internship data for resending');
+      }
+
+      // 1. Regenerate PDF locally
+      const verificationUrl = `${window.location.origin}/verify-offer/${offer.id}`;
+      const pdfBlob = await generateOfferLetterPdf({
+        offer,
+        verificationUrl,
+      });
+
+      // 2. Convert PDF to base64
+      const blobToBase64 = (blob: Blob): Promise<string> => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64data = reader.result as string;
+            const base64 = base64data.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      };
+
+      const base64Pdf = await blobToBase64(pdfBlob);
+      const emailSubject = `Internship Offer Letter - ${company.name}`;
+      const emailHtml = `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h1 style="color: #4f46e5; margin: 0; font-size: 24px;">Internship Offer Extended!</h1>
+            <p style="color: #6b7280; margin: 4px 0 0 0;">from ${company.name}</p>
+          </div>
+          <p>Dear <strong>${student.full_name}</strong>,</p>
+          <p>Congratulations! We are thrilled to extend you an offer for the <strong>${internship.title}</strong> internship position at <strong>${company.name}</strong>.</p>
+          <p>Please find your official offer letter attached to this email. You can also view the details and respond to this offer online on the Zyro Platform.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View & Respond to Offer</a>
+          </div>
+          <p style="color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 24px;">
+            If you have any questions, please contact ${company.name} directly.
+          </p>
+        </div>
+      `;
+
+      const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
+        body: {
+          to: student.email,
+          subject: emailSubject,
+          html: emailHtml,
+          attachments: [
+            {
+              filename: `Offer_Letter_${company.name.replace(/\s+/g, '_')}.png`,
+              content: base64Pdf,
+            }
+          ]
+        }
+      });
+
+      if (invokeErr) {
+        throw invokeErr;
+      }
+
+      setSuccessMsg(`Offer letter email resent to ${student.full_name}!`);
+    } catch (err: any) {
+      console.error('Failed to resend email:', err);
+      setError(err.message || 'Failed to resend email.');
+    }
   }
 
   if (loading) {

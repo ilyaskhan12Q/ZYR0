@@ -172,11 +172,13 @@ serve(async (req) => {
           </div>
         `;
 
-        await fetch(sendEmailUrl, {
+        const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const response = await fetch(sendEmailUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            'apikey': serviceRoleKey,
+            'Authorization': `Bearer ${serviceRoleKey}`,
           },
           body: JSON.stringify({
             to: student.email,
@@ -184,6 +186,13 @@ serve(async (req) => {
             html: emailHtml,
           }),
         });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          console.error(`Failed to send certificate email. Status: ${response.status}, Error: ${errText}`);
+        } else {
+          console.log(`Certificate email successfully dispatched to ${student.email}`);
+        }
       } catch (emailErr) {
         console.error('Failed to dispatch certificate email notification:', emailErr);
       }
