@@ -67,6 +67,7 @@ Do not begin implementation until this analysis is complete.
 
 Implement the feature while following these rules:
 
+* Working branch is isolated (`feature/*` or `bugfix/*`) and created off `develop` (refer to the [Git Workflow](file:///home/ilyaskhan/Projects/zyro-kim/docs/GIT_WORKFLOW.md)). Never commit or push directly to `develop` or `main`.
 * Reuse existing components whenever possible.
 * Never duplicate business logic.
 * Never duplicate routes.
@@ -113,7 +114,7 @@ After implementation, provide:
 * New API endpoints
 * New components
 * Manual testing checklist
-* Suggested Git commit message
+* Suggested Git commit message (following [Git Workflow](file:///home/ilyaskhan/Projects/zyro-kim/docs/GIT_WORKFLOW.md) conventions)
 
 ---
 

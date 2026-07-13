@@ -342,9 +342,11 @@ Avoid premature optimization.
 
 # Feature Development Workflow
 
-Every feature should follow this sequence:
+Every feature development and bug correction must follow the official repository branching strategy defined in the [Git Workflow & Branching Strategy](file:///home/ilyaskhan/Projects/zyro-kim/docs/GIT_WORKFLOW.md).
 
-1. Analyze the existing architecture
+The development sequence is:
+
+1. Create a feature or bugfix branch off `develop` following naming conventions.
 2. Design the solution
 3. Extend existing modules
 4. Reuse existing components

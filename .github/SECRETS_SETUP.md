@@ -45,13 +45,25 @@ These are NOT GitHub secrets — set them in **Vercel Dashboard → Project → 
 
 ## Branch Protection Rules (set in GitHub)
 
-Go to: **Settings → Branches → Add rule** for `main`:
+For complete details on our branching strategy and branch governance, refer to the [Git Workflow & Branching Strategy](file:///home/ilyaskhan/Projects/zyro-kim/docs/GIT_WORKFLOW.md).
 
-- [x] Require a pull request before merging
+Go to: **Settings → Branches → Add rule** for both `main` and `develop`:
+
+### Rule for `main` (Production Branch)
+- [x] Require a pull request before merging (target: `develop` -> `main` releases)
 - [x] Require status checks to pass before merging
   - Required checks: `ESLint`, `TypeScript`, `Vite Build`, `SQL Migrations`
 - [x] Require branches to be up to date before merging
+- [x] Require linear history
 - [x] Do not allow bypassing the above settings
+
+### Rule for `develop` (Integration Branch)
+- [x] Require a pull request before merging (target: `feature/*` or `bugfix/*` -> `develop`)
+- [x] Require status checks to pass before merging
+  - Required checks: `ESLint`, `TypeScript`, `Vite Build`, `SQL Migrations`
+- [x] Require linear history
+- [x] Do not allow bypassing the above settings
+
 
 ---
 
