@@ -323,9 +323,10 @@ export default function CompanyOfferLetters() {
       }
 
       setSuccessMsg(`Offer letter email resent to ${student.full_name}!`);
-    } catch (err: any) {
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : 'Failed to resend email.';
       console.error('Failed to resend email:', err);
-      setError(err.message || 'Failed to resend email.');
+      setError(errMsg);
     }
   }
 
