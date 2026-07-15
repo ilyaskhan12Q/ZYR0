@@ -3,21 +3,18 @@ Allow: /
 
 # Public pages — index
 Allow: /internships
-Allow: /internships/
 Allow: /companies
-Allow: /companies/
 Allow: /about
 Allow: /contact
-Allow: /verify
-Allow: /verify/
 Allow: /privacy
 Allow: /terms
 Allow: /cookies
 Allow: /faq
 Allow: /help
 Allow: /careers
+Allow: /verify
 
-# Auth pages — no index (handled via noindex meta on the pages themselves)
+# Auth pages — no index
 Disallow: /login
 Disallow: /register
 Disallow: /forgot-password

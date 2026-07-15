@@ -9,6 +9,7 @@ import {
   TrendingUp, Star, Flag
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { SEO } from '@/components/SEO';
 import type { UserRole } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
@@ -159,6 +160,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <SEO title="Dashboard" description="Zyro Platform dashboard and user portal." noIndex={true} />
       {/* Mobile Overlay */}
       <AnimatePresence>
         {mobileOpen && (
@@ -405,7 +407,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                 onClick={() => { setProfileOpen(!profileOpen); setNotificationsOpen(false); }}
                 className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
               >
-                <img src={user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />
+                <img src={user?.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="User avatar" className="w-8 h-8 rounded-full object-cover" />
                 <span className="hidden sm:block text-sm font-medium">{user?.user_metadata?.full_name?.split(' ')[0] || 'User'}</span>
                 <ChevronDown className="w-4 h-4 text-muted-foreground" />
               </button>

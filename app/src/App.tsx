@@ -29,6 +29,7 @@ const CookiePolicy = lazy(() => import('@/pages/public/CookiePolicy'));
 const FAQ = lazy(() => import('@/pages/public/FAQ'));
 const HelpCenter = lazy(() => import('@/pages/public/HelpCenter'));
 const Careers = lazy(() => import('@/pages/public/Careers'));
+const NotFound = lazy(() => import('@/pages/public/NotFound'));
 
 // Auth Pages
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
@@ -98,7 +99,7 @@ function App() {
         </Route>
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster />
     </Suspense>
