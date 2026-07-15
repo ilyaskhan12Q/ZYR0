@@ -193,9 +193,9 @@ export default function PublicLayout() {
       {!isAuthPage && (
         <footer className="bg-primary dark:bg-slate-950 text-white dark:text-slate-200 border-t border-border/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {/* Brand */}
-              <div>
+              <div className="col-span-2 md:col-span-1">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 flex items-center justify-center">
                     <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />

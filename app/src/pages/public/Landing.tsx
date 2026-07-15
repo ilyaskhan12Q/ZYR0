@@ -87,8 +87,11 @@ export default function Landing() {
         structuredData={homepageStructuredData}
       />
 
-      {/* Hero Section */}
-      <section aria-label="Platform introduction" className="relative min-h-[92vh] flex items-center justify-center overflow-hidden hero-gradient">
+      {/* Hero Section — fills the true visible viewport on mobile (dvh) and desktop (100vh fallback) */}
+      <section
+        aria-label="Platform introduction"
+        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height"
+      >
         {/* Animated Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {PARTICLE_PRESETS.map((particle, i) => (
@@ -118,12 +121,12 @@ export default function Landing() {
           backgroundSize: '60px 60px',
         }} />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20 pb-10 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm text-white/90 mb-8"
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5 text-xs sm:text-sm text-white/90 mb-6 sm:mb-8"
           >
             <Star className="w-4 h-4 text-yellow-400" />
             Trusted by 500+ Companies &amp; Universities
@@ -133,7 +136,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight"
+            className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight text-balance"
           >
             Launch Your Career
             <br />
@@ -144,7 +147,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-6 text-lg text-white/70 max-w-2xl mx-auto"
+            className="mt-4 sm:mt-6 text-base sm:text-lg text-white/70 max-w-2xl mx-auto text-balance"
           >
             Zyro connects students with real internship opportunities, mentors, and verifiable certificates — all in one powerful platform.
           </motion.p>
@@ -153,18 +156,18 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.8 }}
-            className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
+            className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
           >
             <Link
               to="/register"
-              className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25"
+              className="inline-flex items-center justify-center gap-2 bg-accent text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25"
             >
               Get Started
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/internships"
-              className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-8 py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200"
             >
               Browse Internships
             </Link>
@@ -174,7 +177,7 @@ export default function Landing() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 1.0 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 text-white/50 text-sm"
+            className="mt-10 sm:mt-16 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/50 text-xs sm:text-sm"
           >
             {[
               { icon: Building2, text: '500+ Companies' },
@@ -191,7 +194,7 @@ export default function Landing() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-4">
+      <section className="py-14 lg:py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -200,7 +203,7 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Why Choose Zyro</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">Everything You Need for Career Growth</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Everything You Need for Career Growth</h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
               From discovering opportunities to earning verified certificates, Zyro streamlines your entire internship journey.
             </p>
@@ -228,7 +231,7 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 px-4 bg-muted/50">
+      <section className="py-14 lg:py-20 px-4 bg-muted/50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -237,10 +240,10 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">How It Works</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">Your Internship Journey in 4 Steps</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Your Internship Journey in 4 Steps</h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
             {steps.map((step, i) => (
               <motion.div
                 key={i}
@@ -266,7 +269,7 @@ export default function Landing() {
       </section>
 
       {/* For Companies */}
-      <section className="py-20 px-4">
+      <section className="py-14 lg:py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -276,7 +279,7 @@ export default function Landing() {
               transition={{ duration: 0.6 }}
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Companies</span>
-              <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">Hire Top Talent, Simplified</h2>
+              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Hire Top Talent, Simplified</h2>
               <p className="mt-4 text-muted-foreground">
                 Post internships, manage applicants, assign tasks, and issue verified certificates — all from one dashboard.
               </p>
@@ -358,7 +361,7 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-muted/50">
+      <section className="py-14 lg:py-20 px-4 bg-muted/50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -367,7 +370,7 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Testimonials</span>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-bold text-foreground">What Our Users Say</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">What Our Users Say</h2>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -396,9 +399,9 @@ export default function Landing() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 px-4 bg-primary dark:bg-slate-950 border-y border-border/10">
+      <section className="py-12 lg:py-16 px-4 bg-primary dark:bg-slate-950 border-y border-border/10">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => (
               <motion.div
                 key={i}
@@ -408,7 +411,7 @@ export default function Landing() {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="text-center"
               >
-                <p className="text-3xl md:text-4xl font-bold text-white">{stat.value}</p>
+                <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-white">{stat.value}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <stat.icon className="w-4 h-4 text-white/50" />
                   <p className="text-sm text-white/60">{stat.label}</p>
@@ -420,20 +423,20 @@ export default function Landing() {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-20 px-4">
+      <section className="py-14 lg:py-20 px-4">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="bg-accent rounded-2xl p-10 md:p-16 text-center relative overflow-hidden"
+            className="bg-accent rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
             </div>
             <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold text-white">Ready to Start Your Career Journey?</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-balance">Ready to Start Your Career Journey?</h2>
               <p className="mt-4 text-white/80 max-w-xl mx-auto">
                 Join thousands of students and companies already using Zyro.
               </p>
