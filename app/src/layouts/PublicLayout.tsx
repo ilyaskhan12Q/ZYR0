@@ -206,7 +206,7 @@ export default function PublicLayout() {
                   The complete internship management platform connecting students, companies, and mentors.
                 </p>
                 <div className="flex gap-4 mt-6">
-                  <a href="https://github.com/ilyaskhan12Q/ZYR0" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-white/40 hover:text-white transition-colors">
+                  <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-white/40 hover:text-white transition-colors">
                     <Github className="w-5 h-5" />
                   </a>
                   <a href="https://linkedin.com/company/zyro-platform" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white/40 hover:text-white transition-colors">
