@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Bookmark, Share2, CheckCircle2, Building2, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Share2, CheckCircle2, Building2, ExternalLink, Loader2 } from 'lucide-react';
 import { getInternshipById } from '@/services/internships';
 import { applyToInternship, hasApplied } from '@/services/applications';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
+import { SaveButton } from '@/components/SaveButton';
 
 export default function InternshipDetail() {
   const { id } = useParams();
@@ -389,10 +390,20 @@ export default function InternshipDetail() {
               )}
               
               <div className="mt-3 flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
-                  <Bookmark className="w-4 h-4" /> Save
-                </button>
-                <button className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
+                <div className="flex-1 flex items-center justify-center py-2.5 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
+                  <SaveButton internshipId={internship.id} />
+                </div>
+                <button
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: internship.title, url: window.location.href }).catch(() => {});
+                    } else {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success('Link copied!');
+                    }
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg text-sm hover:bg-muted transition-colors"
+                >
                   <Share2 className="w-4 h-4" /> Share
                 </button>
               </div>

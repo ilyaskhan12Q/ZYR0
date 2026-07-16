@@ -12,6 +12,7 @@ import StudentSettings from './Settings';
 import StudentOfferLetters from './OfferLetters';
 import StudentWorkspace from './Workspace';
 import InternshipDetail from '../public/InternshipDetail';
+import StudentSavedInternships from './SavedInternships';
 
 export default function StudentPortal() {
   return (
@@ -22,6 +23,7 @@ export default function StudentPortal() {
       <Route path="workspace/:internshipId" element={<StudentWorkspace />} />
       <Route path="internships" element={<StudentInternships />} />
       <Route path="internships/:id" element={<InternshipDetail />} />
+      <Route path="saved" element={<StudentSavedInternships />} />
       <Route path="applications" element={<StudentApplications />} />
       <Route path="tasks" element={<StudentTasks />} />
       <Route path="tasks/:id" element={<StudentTasks />} />

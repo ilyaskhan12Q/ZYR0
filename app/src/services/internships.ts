@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { Internship } from '@/lib/database.types';
-import { getCachedData, setCachedData } from '@/lib/cache';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 export interface InternshipFilters {
@@ -155,3 +155,99 @@ export async function getMyActiveInternships(useCache = true) {
   if (!res.error) setCachedData(cacheKey, res);
   return res;
 }
+
+/** Save an internship for the current user */
+export async function saveInternship(internshipId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const res = await supabase
+    .from('saved_internships')
+    .insert({
+      user_id: user.id,
+      internship_id: internshipId
+    })
+    .select()
+    .single();
+
+  if (!res.error) {
+    clearCache(createRequestKey('saved_internships', user.id));
+    clearCache(createRequestKey('is_saved', `${user.id}::${internshipId}`));
+  }
+  return res;
+}
+
+/** Unsave/remove a saved internship for the current user */
+export async function unsaveInternship(internshipId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const res = await supabase
+    .from('saved_internships')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('internship_id', internshipId);
+
+  if (!res.error) {
+    clearCache(createRequestKey('saved_internships', user.id));
+    clearCache(createRequestKey('is_saved', `${user.id}::${internshipId}`));
+  }
+  return res;
+}
+
+/** Check if an internship is saved by the current user */
+export async function isInternshipSaved(internshipId: string, useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const cacheKey = createRequestKey('is_saved', `${user.id}::${internshipId}`);
+  if (useCache) {
+    const cached = getCachedData<boolean>(cacheKey);
+    if (cached !== null) return cached;
+  }
+
+  const fetchFn = async () => {
+    const { data, error } = await supabase
+      .from('saved_internships')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('internship_id', internshipId)
+      .maybeSingle();
+
+    if (error) return false;
+    return !!data;
+  };
+
+  const isSaved = await dedupRequest(cacheKey, fetchFn);
+  setCachedData(cacheKey, isSaved);
+  return isSaved;
+}
+
+/** Get all saved internships for the current user */
+export async function getSavedInternships(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [], error: new Error('Not authenticated') };
+
+  const cacheKey = createRequestKey('saved_internships', user.id);
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const fetchFn = () => supabase
+    .from('saved_internships')
+    .select(`
+      id,
+      created_at,
+      internship:internships!internship_id (
+        *,
+        company:companies!company_id (id, name, logo_url, location, rating)
+      )
+    `)
+    .eq('user_id', user.id);
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
+}
+

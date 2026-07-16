@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Globe, Users, Star, FolderOpen, Mail, Phone, Calendar, Award, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Globe, Users, FolderOpen, Mail, Phone, Calendar, Award, ExternalLink, Loader2 } from 'lucide-react';
 import { getCompanyById } from '@/services/companies';
 import { getInternships } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
 import { supabase } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
+import { CompanyRatingWidget } from '@/components/CompanyRatingWidget';
 
 export default function CompanyDetail() {
   const { id } = useParams();
@@ -133,11 +134,12 @@ export default function CompanyDetail() {
                 <h1 className="text-2xl font-bold">{company.name}</h1>
                 <p className="text-sm text-muted-foreground">{company.industry} &middot; {company.size}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 px-3 py-1.5 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <span className="text-sm font-medium">{company.rating || '5.0'}</span>
-                </div>
+              <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                <CompanyRatingWidget
+                  companyId={company.id}
+                  currentAvgRating={Number(company.rating) || 0}
+                  currentReviewCount={company.review_count || 0}
+                />
               </div>
             </div>
 

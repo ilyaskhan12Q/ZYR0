@@ -200,3 +200,77 @@ export async function getAllCompanies(opts: { status?: string } = {}, useCache =
   if (!res.error) setCachedData(cacheKey, res);
   return res;
 }
+
+/** Rate a company (or update existing rating) */
+export async function rateCompany(companyId: string, rating: number) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const res = await supabase
+    .from('company_ratings')
+    .upsert({
+      user_id: user.id,
+      company_id: companyId,
+      rating,
+      updated_at: new Date().toISOString()
+    }, {
+      onConflict: 'user_id,company_id'
+    })
+    .select()
+    .single();
+
+  if (!res.error) {
+    clearCache(createRequestKey('company', companyId));
+    clearCache(createRequestKey('companies', ''));
+    clearCache(createRequestKey('user_rating', `${user.id}::${companyId}`));
+  }
+  return res;
+}
+
+/** Get the current user's rating for a specific company */
+export async function getUserRatingForCompany(companyId: string, useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const cacheKey = createRequestKey('user_rating', `${user.id}::${companyId}`);
+  if (useCache) {
+    const cached = getCachedData<number | null>(cacheKey);
+    if (cached !== undefined) return cached;
+  }
+
+  const fetchFn = async () => {
+    const { data, error } = await supabase
+      .from('company_ratings')
+      .select('rating')
+      .eq('user_id', user.id)
+      .eq('company_id', companyId)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return data.rating;
+  };
+
+  const ratingVal = await dedupRequest(cacheKey, fetchFn);
+  setCachedData(cacheKey, ratingVal);
+  return ratingVal;
+}
+
+/** Delete the current user's rating for a specific company */
+export async function deleteUserRatingForCompany(companyId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const res = await supabase
+    .from('company_ratings')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('company_id', companyId);
+
+  if (!res.error) {
+    clearCache(createRequestKey('company', companyId));
+    clearCache(createRequestKey('companies', ''));
+    clearCache(createRequestKey('user_rating', `${user.id}::${companyId}`));
+  }
+  return res;
+}
+

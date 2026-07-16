@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Search, MapPin, Calendar, DollarSign, Bookmark, Filter,
+  Search, MapPin, Calendar, DollarSign, Filter,
   X, Clock, ArrowRight, Loader2
 } from 'lucide-react';
 import { getInternships, getInternshipDomains } from '@/services/internships';
 import { SEO } from '@/components/SEO';
+import { SaveButton } from '@/components/SaveButton';
 
 const locations = ['All', 'Remote', 'On-site', 'Hybrid'];
 const types = ['All', 'Full-time', 'Part-time'];
@@ -209,12 +210,11 @@ export default function BrowseInternships() {
                             <p className="text-xs text-muted-foreground">{new Date(internship.posted_date || internship.created_at).toLocaleDateString()}</p>
                           </div>
                         </div>
-                        <button
+                        <SaveButton
+                          internshipId={internship.id}
+                          compact
                           className="p-1.5 rounded-lg hover:bg-muted transition-colors focus-visible-ring"
-                          aria-label={`Bookmark ${internship.title} at ${company?.name || 'Company'}`}
-                        >
-                          <Bookmark className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
-                        </button>
+                        />
                       </div>
 
                       {/* Title */}

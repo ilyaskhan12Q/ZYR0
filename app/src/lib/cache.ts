@@ -27,6 +27,8 @@ const POLICIES: Record<string, CachePolicy> = {
   workspace: { ttlMs: 30_000, staleAfter: 30_000 },
   certificates: { ttlMs: 1_800_000, staleAfter: 1_800_000 },
   offer_letters: { ttlMs: 1_800_000, staleAfter: 1_800_000 },
+  saved_internships: { ttlMs: 60_000, staleAfter: 60_000 },
+  company_ratings: { ttlMs: 60_000, staleAfter: 60_000 },
 };
 
 const POLICY_ALIASES: Record<string, string> = {
@@ -54,6 +56,10 @@ const POLICY_ALIASES: Record<string, string> = {
   unread_notifications_count: 'notifications',
   conversations: 'messages',
   unread_count: 'messages',
+  saved_internships: 'saved_internships',
+  is_saved: 'saved_internships',
+  user_rating: 'company_ratings',
+  company_ratings: 'company_ratings',
 };
 
 const DEFAULT_POLICY: CachePolicy = { ttlMs: 5_000, staleAfter: 5_000 };
