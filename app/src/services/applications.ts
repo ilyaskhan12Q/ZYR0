@@ -20,7 +20,7 @@ export async function getMyApplications(useCache = true) {
       *,
       internship:internships!internship_id (
         id, title, domain, location, location_type, type, stipend, stipend_type,
-        company:companies!company_id (id, name, logo_url)
+        company:companies!company_id (id, name, logo_url, owner_id)
       )
     `)
     .order('applied_at', { ascending: false });

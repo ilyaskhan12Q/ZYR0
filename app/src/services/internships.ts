@@ -144,7 +144,7 @@ export async function getMyActiveInternships(useCache = true) {
       accepted_at,
       internship:internships!internship_id (
         *,
-        company:companies!company_id (id, name, logo_url, rating)
+        company:companies!company_id (id, name, logo_url, rating, owner_id)
       )
     `)
     .eq('student_id', user.id)

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, Loader2, MessageSquare } from 'lucide-react';
 import { getMyApplications } from '@/services/applications';
 
 const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
@@ -89,9 +90,19 @@ export default function StudentApplications() {
                       </div>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
-                    <StatusIcon className="w-3.5 h-3.5" /> {app.status}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                      <StatusIcon className="w-3.5 h-3.5" /> {app.status}
+                    </span>
+                    {company?.owner_id && (
+                      <Link 
+                        to={`/student/messages?internshipId=${app.internship_id}&userId=${company.owner_id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 text-accent hover:bg-accent/20 rounded-md text-xs font-medium transition-colors"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" /> Message Company
+                      </Link>
+                    )}
+                  </div>
                 </div>
 
                 {/* Timeline */}

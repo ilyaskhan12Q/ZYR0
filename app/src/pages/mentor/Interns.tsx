@@ -82,6 +82,7 @@ export default function MentorInterns() {
 
             return {
               id: studentId,
+              internship_id: app.internship?.id,
               name: app.student?.full_name || 'Anonymous Student',
               avatar: app.student?.avatar_url,
               role: app.internship?.title || 'Intern',
@@ -219,7 +220,7 @@ export default function MentorInterns() {
                   <CheckSquare className="w-4 h-4" /> Evaluate
                 </button>
                 <button 
-                  onClick={() => navigate(`/mentor/messages?student_id=${intern.id}`)}
+                  onClick={() => navigate(`/mentor/messages?internshipId=${intern.internship_id}&userId=${intern.id}`)}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors"
                 >
                   <MessageSquare className="w-4 h-4" /> Message

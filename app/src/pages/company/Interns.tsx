@@ -126,7 +126,7 @@ export default function CompanyInterns() {
                   <button onClick={() => navigate(`/company/certificates`)} className="flex-1 flex items-center justify-center gap-1.5 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
                     <Star className="w-3.5 h-3.5" /> Certificate
                   </button>
-                  <button onClick={() => navigate(`/company/messages?userId=${student.id}`)} className="flex-1 flex items-center justify-center gap-1.5 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
+                  <button onClick={() => navigate(`/company/messages?internshipId=${intern.internship_id}&userId=${student.id}`)} className="flex-1 flex items-center justify-center gap-1.5 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">
                     <MessageSquare className="w-3.5 h-3.5" /> Message
                   </button>
                 </div>

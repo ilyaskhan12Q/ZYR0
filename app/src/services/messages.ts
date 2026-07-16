@@ -27,6 +27,7 @@ export async function getMyConversations(useCache = true) {
       .from('conversations')
       .select(`
         *,
+        internship:internships(id, title, company:companies(id, name, logo_url)),
         participants:conversation_participants (
           user:profiles!user_id (id, full_name, avatar_url, role)
         )
@@ -96,47 +97,24 @@ export async function sendMessage(data: {
 }
 
 /** Start or get a conversation with another user */
-export async function getOrCreateConversation(otherUserId: string) {
+export async function getOrCreateConversation(internshipId: string, otherUserId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  // Find existing conversation between these two users
-  const { data: myConvs } = await supabase
-    .from('conversation_participants')
-    .select('conversation_id')
-    .eq('user_id', user.id);
+  const { data, error } = await supabase.rpc('get_or_create_conversation', {
+    p_internship_id: internshipId,
+    p_other_user_id: otherUserId,
+  });
 
-  if (myConvs?.length) {
-    const { data: shared } = await supabase
-      .from('conversation_participants')
-      .select('conversation_id')
-      .eq('user_id', otherUserId)
-      .in('conversation_id', myConvs.map((c) => c.conversation_id));
-
-    if (shared?.length) {
-      return { data: { id: shared[0].conversation_id }, error: null };
-    }
+  if (error) {
+    console.error('Error in getOrCreateConversation:', error);
+    return { data: null, error };
   }
-
-  // Create a new conversation
-  const { data: conv, error } = await supabase
-    .from('conversations')
-    .insert({})
-    .select()
-    .single();
-
-  if (error) return { data: null, error };
-
-  // Add both participants
-  await supabase.from('conversation_participants').insert([
-    { conversation_id: conv.id, user_id: user.id },
-    { conversation_id: conv.id, user_id: otherUserId },
-  ]);
 
   clearCache(`conversations_${user.id}`);
   clearCache(`conversations_${otherUserId}`);
 
-  return { data: conv, error: null };
+  return { data: { id: data }, error: null };
 }
 
 /** Mark messages in a conversation as read */

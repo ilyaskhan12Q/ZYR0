@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, XCircle, Star, Eye, Loader2, CheckCircle2, ChevronDown } from 'lucide-react';
+import { Search, XCircle, Star, Eye, Loader2, CheckCircle2, ChevronDown, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications, updateApplicationStatus } from '@/services/applications';
@@ -188,6 +188,13 @@ export default function CompanyApplicants() {
                               >
                                 <XCircle className="w-4 h-4" />
                               </button>
+                              <a
+                                href={`/company/messages?internshipId=${app.internship_id}&userId=${student.id}`}
+                                className="p-1.5 hover:bg-accent/10 rounded-lg text-accent"
+                                title="Message Applicant"
+                              >
+                                <MessageSquare className="w-4 h-4" />
+                              </a>
                             </>
                           )}
                         </div>

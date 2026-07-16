@@ -45,19 +45,35 @@ export default function StudentMessages() {
     loadConversations();
   }, [profile]);
 
-  // Select conversation matching query parameter user ID
+  // Select conversation matching query parameter user ID & internship ID
   useEffect(() => {
-    const queryUserId = searchParams.get('userId') || searchParams.get('student_id') || searchParams.get('user_id');
-    if (queryUserId && conversations.length > 0 && profile) {
+    const queryUserId = searchParams.get('userId') || searchParams.get('user_id');
+    const queryInternshipId = searchParams.get('internshipId') || searchParams.get('internship_id');
+    
+    if (queryUserId && queryInternshipId && profile) {
+      // First check if we already have it in state
       const match = conversations.find((c: any) => {
         const otherParticipant = c.participants?.find((p: any) => p.user?.id !== profile.id);
-        return otherParticipant?.user?.id === queryUserId;
+        return otherParticipant?.user?.id === queryUserId && c.internship_id === queryInternshipId;
       });
+      
       if (match) {
         setSelectedConv(match.id);
+      } else {
+        // If not in state, try to get or create it on the server
+        import('@/services/messages').then(m => {
+          m.getOrCreateConversation(queryInternshipId, queryUserId).then(res => {
+            if (res.data?.id) {
+              // Reload conversations to include the new one
+              loadConversations().then(() => {
+                setSelectedConv(res.data.id);
+              });
+            }
+          });
+        });
       }
     }
-  }, [searchParams, conversations, profile]);
+  }, [searchParams, conversations.length, profile]);
 
   // Load messages when selected conversation changes
   useEffect(() => {
@@ -206,6 +222,7 @@ export default function StudentMessages() {
                           </span>
                         )}
                       </div>
+                      <p className="text-[10px] text-accent truncate mt-0.5 font-medium">{conv.internship?.title || 'General'}</p>
                       <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Start chatting...'}</p>
                     </div>
                   </button>
@@ -229,8 +246,9 @@ export default function StudentMessages() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">{getOtherParticipant(activeConversation).full_name}</p>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {getOtherParticipant(activeConversation).role}
+                  <p className="text-xs text-muted-foreground">
+                    <span className="capitalize">{getOtherParticipant(activeConversation).role}</span>
+                    {activeConversation.internship?.title && ` • ${activeConversation.internship.title}`}
                   </p>
                 </div>
               </div>

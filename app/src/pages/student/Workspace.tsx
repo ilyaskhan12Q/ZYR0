@@ -627,7 +627,7 @@ export default function StudentWorkspace() {
                     </p>
                     <div className="flex gap-3">
                       <Link
-                        to="/student/messages"
+                        to={`/student/messages?internshipId=${activePlacement?.internship?.id}&userId=${activePlacement?.internship?.company?.owner_id}`}
                         className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-xl text-sm font-medium transition-colors"
                       >
                         <MessageSquare className="w-4 h-4" /> Message Coordinator
@@ -807,9 +807,19 @@ export default function StudentWorkspace() {
                               <Clock className="w-5 h-5" />
                               <h4 className="font-bold text-sm">Awaiting Mentor Review</h4>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                              Your solution has been submitted. The program coordinator will review your GitHub repository and grade your work.
-                            </p>
+                            <div className="flex flex-col gap-2">
+                              <p className="text-xs text-muted-foreground">
+                                Your solution has been submitted. The program coordinator will review your GitHub repository and grade your work.
+                              </p>
+                              {(selectedTask.mentor_id || selectedTask.company_id) && (
+                                <Link 
+                                  to={`/student/messages?internshipId=${selectedTask.internship_id}&userId=${selectedTask.mentor_id || selectedTask.company_id}`}
+                                  className="inline-flex w-fit items-center gap-1.5 text-xs text-accent hover:underline font-medium"
+                                >
+                                  <MessageSquare className="w-3.5 h-3.5" /> Message Reviewer
+                                </Link>
+                              )}
+                            </div>
 
                             {selectedTask.submissions?.[0] && (
                               <div className="pt-2 text-xs space-y-1.5">
