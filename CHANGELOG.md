@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-07-16
+
+### Added
+- Centered premium glassmorphism profile completion modal shown to Students, Companies, and Mentors on first login after registration.
+- Persistent warning banner at the top of all dashboard views displaying the completion progress bar and current percentage.
+- Role-specific profile completion checklist visual indicators.
+- Route protection guard in the global dashboard layout to redirect uncompleted users to dashboards and show error toasts.
+- Application submission lock in `InternshipDetail.tsx` preventing incomplete student profiles from applying to internships.
+
 ## [0.3.0] - 2026-07-16
 
 ### Added

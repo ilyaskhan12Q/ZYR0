@@ -38,6 +38,7 @@ export interface Profile {
   department: string | null;
   created_at: string;
   updated_at: string;
+  company?: Company | null;
 }
 
 export interface Company {

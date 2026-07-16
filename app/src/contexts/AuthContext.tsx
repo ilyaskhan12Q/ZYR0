@@ -9,6 +9,7 @@ import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { signOut as authSignOut } from '@/lib/auth';
 import type { Profile } from '@/lib/database.types';
+import { checkProfileCompletion } from '@/services/users';
 
 interface AuthContextValue {
   session: Session | null;
@@ -17,6 +18,9 @@ interface AuthContextValue {
   loading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  profileCompleted: boolean;
+  profileCompletionPercentage: number;
+  profileCompletionRequirements: string[];
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -30,10 +34,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function fetchProfile(userId: string) {
     const { data } = await supabase
       .from('profiles')
-      .select('*')
+      .select('*, company:companies(*)')
       .eq('id', userId)
       .single();
-    setProfile(data);
+
+    if (data) {
+      if (data.role === 'company' && !data.company) {
+        const { data: ownerCompany } = await supabase
+          .from('companies')
+          .select('*')
+          .eq('owner_id', userId)
+          .single();
+        if (ownerCompany) {
+          data.company = ownerCompany;
+        }
+      }
+      setProfile(data);
+    } else {
+      setProfile(null);
+    }
   }
 
   async function refreshProfile() {
@@ -76,8 +95,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   }
 
+  const completion = checkProfileCompletion(profile);
+  const profileCompleted = completion.completed;
+  const profileCompletionPercentage = completion.percentage;
+  const profileCompletionRequirements = completion.requirements;
+
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, signOut, refreshProfile }}>
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        profile,
+        loading,
+        signOut,
+        refreshProfile,
+        profileCompleted,
+        profileCompletionPercentage,
+        profileCompletionRequirements,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

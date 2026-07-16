@@ -5,13 +5,14 @@ import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Bookmark, Share2, Check
 import { getInternshipById } from '@/services/internships';
 import { applyToInternship, hasApplied } from '@/services/applications';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 
 export default function InternshipDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
+  const { user, profile, profileCompleted } = useAuth();
 
   const [internship, setInternship] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -58,6 +59,11 @@ export default function InternshipDetail() {
     // Must be a student to apply
     if (profile?.role !== 'student') {
       alert("Only student accounts can apply for internships.");
+      return;
+    }
+
+    if (!profileCompleted) {
+      toast.error("Please complete your profile before using this feature.");
       return;
     }
 
