@@ -121,6 +121,7 @@ CREATE POLICY "avatars: authenticated upload"
   WITH CHECK (
     bucket_id = 'avatars'
     AND auth.role() = 'authenticated'
+    AND name LIKE 'avatars/' || auth.uid()::text || '.%'
   );
 
 DROP POLICY IF EXISTS "avatars: authenticated update" ON storage.objects;
@@ -129,6 +130,7 @@ CREATE POLICY "avatars: authenticated update"
   USING (
     bucket_id = 'avatars'
     AND auth.role() = 'authenticated'
+    AND name LIKE 'avatars/' || auth.uid()::text || '.%'
   );
 
 DROP POLICY IF EXISTS "avatars: authenticated delete" ON storage.objects;
@@ -137,6 +139,7 @@ CREATE POLICY "avatars: authenticated delete"
   USING (
     bucket_id = 'avatars'
     AND auth.role() = 'authenticated'
+    AND name LIKE 'avatars/' || auth.uid()::text || '.%'
   );
 
 DROP POLICY IF EXISTS "resumes: public read" ON storage.objects;
@@ -150,6 +153,7 @@ CREATE POLICY "resumes: authenticated upload"
   WITH CHECK (
     bucket_id = 'resumes'
     AND auth.role() = 'authenticated'
+    AND name LIKE 'resumes/' || auth.uid()::text || '/%'
   );
 
 DROP POLICY IF EXISTS "resumes: authenticated update" ON storage.objects;
@@ -158,6 +162,7 @@ CREATE POLICY "resumes: authenticated update"
   USING (
     bucket_id = 'resumes'
     AND auth.role() = 'authenticated'
+    AND name LIKE 'resumes/' || auth.uid()::text || '/%'
   );
 
 DROP POLICY IF EXISTS "resumes: authenticated delete" ON storage.objects;
@@ -166,4 +171,5 @@ CREATE POLICY "resumes: authenticated delete"
   USING (
     bucket_id = 'resumes'
     AND auth.role() = 'authenticated'
+    AND name LIKE 'resumes/' || auth.uid()::text || '/%'
   );
