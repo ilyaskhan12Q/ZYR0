@@ -13,6 +13,9 @@ const distDir = path.join(projectRoot, 'dist');
 
 // Read env files to get VITE_SITE_URL
 function getSiteUrl() {
+  if (process.env.VITE_SITE_URL) {
+    return process.env.VITE_SITE_URL.trim().replace(/\/+$/, '');
+  }
   const envFiles = ['.env.production', '.env.local', '.env'];
   for (const file of envFiles) {
     const filePath = path.join(projectRoot, file);
@@ -31,10 +34,7 @@ function getSiteUrl() {
             url = url.substring(1, url.length - 1);
           }
           // Clean trailing slash
-          if (url.endsWith('/')) {
-            url = url.substring(0, url.length - 1);
-          }
-          return url;
+          return url.replace(/\/+$/, '');
         }
       }
     }
