@@ -24,7 +24,10 @@ const TABS = ['All', 'Pending', 'Sent', 'Accepted', 'Rejected', 'Revoked', 'Expi
 const OFFER_LETTER_SELECT = `
   *,
   student:profiles!student_id (id, full_name, avatar_url, university),
-  company:companies!company_id (id, name, logo_url),
+  company:companies!company_id (
+    id, name, logo_url, owner_id,
+    owner:profiles!owner_id (id, full_name, title, department)
+  ),
   internship:internships!internship_id (id, title, type, location_type)
 `;
 

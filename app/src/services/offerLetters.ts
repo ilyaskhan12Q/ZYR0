@@ -8,7 +8,10 @@ import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 const OFFER_LETTER_SELECT = `
   *,
   student:profiles!student_id (id, full_name, avatar_url, university, email),
-  company:companies!company_id (id, name, logo_url, location, email),
+  company:companies!company_id (
+    id, name, logo_url, location, email, owner_id,
+    owner:profiles!owner_id (id, full_name, title, department)
+  ),
   internship:internships!internship_id (
     id, title, domain, location, location_type, type,
     duration, start_date, stipend, stipend_type, responsibilities

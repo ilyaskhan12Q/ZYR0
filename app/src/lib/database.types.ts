@@ -67,6 +67,7 @@ export interface Company {
   verification_notes: string | null;
   created_at: string;
   updated_at: string;
+  owner?: Profile;
 }
 
 export interface CompanyTeamMember {
@@ -194,6 +195,7 @@ export interface Certificate {
   recipient?: Profile;
   company?: Company;
   internship?: Internship;
+  issuer?: Profile;
 }
 
 export interface OfferLetter {

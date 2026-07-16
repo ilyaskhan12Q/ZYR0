@@ -197,10 +197,18 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.lineTo(MARGIN + 180, y);
   ctx.stroke();
   y += 14;
+  
+  const signatoryName = company?.owner?.full_name || 'Authorized Signatory';
+  const signatoryTitle = company?.owner?.title || 'Company Representative';
+
   ctx.fillStyle = TEXT_DARK;
   ctx.font = 'bold 13px sans-serif';
-  ctx.fillText('Authorized Signatory', MARGIN, y);
-  y += 18;
+  ctx.fillText(signatoryName, MARGIN, y);
+  y += 16;
+  ctx.fillStyle = TEXT_MUTED;
+  ctx.font = '12px sans-serif';
+  ctx.fillText(signatoryTitle, MARGIN, y);
+  y += 16;
   ctx.fillStyle = TEXT_MUTED;
   ctx.font = '12px sans-serif';
   ctx.fillText(company?.name ?? '', MARGIN, y);

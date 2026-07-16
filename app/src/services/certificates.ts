@@ -18,7 +18,9 @@ export async function getMyCertificates(useCache = true) {
     .select(`
       *,
       company:companies!company_id (id, name, logo_url),
-      internship:internships!internship_id (id, title, domain)
+      internship:internships!internship_id (id, title, domain),
+      recipient:profiles!recipient_id (id, full_name, avatar_url),
+      issuer:profiles!issued_by (id, full_name, role, title, department)
     `)
     .eq('recipient_id', user.id)
     .order('issue_date', { ascending: false });
@@ -43,7 +45,8 @@ export async function verifyCertificate(credentialId: string, useCache = true) {
       *,
       recipient:profiles!recipient_id (id, full_name, avatar_url),
       company:companies!company_id (id, name, logo_url),
-      internship:internships!internship_id (id, title)
+      internship:internships!internship_id (id, title),
+      issuer:profiles!issued_by (id, full_name, role, title, department)
     `)
     .eq('credential_id', credentialId)
     .single();
@@ -68,7 +71,9 @@ export async function getCompanyCertificates(company_id: string, useCache = true
     .select(`
       *,
       recipient:profiles!recipient_id (id, full_name, avatar_url, university),
-      internship:internships!internship_id (id, title)
+      internship:internships!internship_id (id, title),
+      issuer:profiles!issued_by (id, full_name, role, title, department),
+      company:companies!company_id (id, name, logo_url)
     `)
     .eq('company_id', company_id)
     .order('issue_date', { ascending: false });

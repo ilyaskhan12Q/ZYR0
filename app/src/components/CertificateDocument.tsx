@@ -19,6 +19,12 @@ interface CertificateDocumentProps {
     internship?: {
       title: string;
     } | any;
+    issuer?: {
+      full_name: string;
+      title?: string;
+      role?: string;
+      department?: string;
+    } | any;
   };
 }
 
@@ -31,6 +37,9 @@ export default function CertificateDocument({ certificate }: CertificateDocument
     month: 'long',
     day: 'numeric'
   });
+
+  const supervisorName = certificate.issuer?.full_name || 'Program Supervisor';
+  const supervisorTitle = certificate.issuer?.title || 'Program Coordinator';
 
   const verifyUrl = `${window.location.origin}/verify/${certificate.credential_id}`;
   const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verifyUrl)}`;
@@ -241,7 +250,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               <div class="cert-corner-b-r"></div>
               
               <div class="header">
-                <div class="logo">ZYR<span>O</span></div>
+                ${certificate.company?.logo_url ? `<img src="${certificate.company.logo_url}" style="height: 48px; max-width: 180px; object-fit: contain; margin-bottom: 10px;" />` : `<div class="logo">ZYR<span>O</span></div>`}
               </div>
               
               <div class="title">Certificate of Completion</div>
@@ -259,12 +268,12 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               
               <div class="footer-sections">
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 20px; color: #334155; height: 30px;">
-                    ${companyName.slice(0, 3).toUpperCase()}_Supervisor
+                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
+                    ${supervisorName}
                   </div>
                   <div class="sig-line">
-                    <div class="sig-name">Program Supervisor</div>
-                    <div class="sig-title">${companyName}</div>
+                    <div class="sig-name">${supervisorName}</div>
+                    <div class="sig-title">${supervisorTitle}, ${companyName}</div>
                   </div>
                 </div>
                 
@@ -279,8 +288,8 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                 </div>
                 
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 20px; color: #334155; height: 30px;">
-                    Zyro_Director
+                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
+                    Zyro Director
                   </div>
                   <div class="sig-line">
                     <div class="sig-name">Academic Director</div>
@@ -317,8 +326,18 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
       <div className="bg-white dark:bg-slate-950 border-4 double border-amber-500/40 p-6 sm:p-8 rounded-xl shadow-lg flex flex-col items-center text-center relative z-10 max-w-4xl mx-auto">
         {/* Certificate Seal/Badge header */}
-        <div className="w-16 h-16 bg-amber-500/10 text-amber-600 rounded-full flex items-center justify-center mb-6">
-          <Award className="w-9 h-9" />
+        <div className="flex items-center gap-4 mb-6">
+          {certificate.company?.logo_url ? (
+            <img 
+              src={certificate.company.logo_url} 
+              alt={companyName} 
+              className="h-16 max-w-[160px] object-contain bg-white p-1 rounded border border-slate-200 dark:border-slate-800" 
+            />
+          ) : (
+            <div className="w-16 h-16 bg-amber-500/10 text-amber-600 rounded-full flex items-center justify-center">
+              <Award className="w-9 h-9" />
+            </div>
+          )}
         </div>
 
         <h2 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 dark:text-slate-100 tracking-wider">
@@ -344,9 +363,9 @@ export default function CertificateDocument({ certificate }: CertificateDocument
         {/* Certificate metadata grid */}
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 items-end mt-12 pt-8 border-t border-slate-100 dark:border-slate-900">
           <div className="flex flex-col items-center">
-            <span className="font-serif text-sm italic text-slate-700 dark:text-slate-300">{companyName.slice(0, 3).toUpperCase()}_Supervisor</span>
+            <span className="font-serif text-sm italic text-slate-700 dark:text-slate-300">{supervisorName}</span>
             <div className="w-32 border-t border-slate-300 dark:border-slate-700 mt-2 pt-1">
-              <p className="text-[10px] font-semibold uppercase text-slate-400 dark:text-slate-500">Program Supervisor</p>
+              <p className="text-[10px] font-semibold uppercase text-slate-400 dark:text-slate-500">{supervisorTitle}</p>
               <p className="text-[9px] text-slate-500 dark:text-slate-400 truncate max-w-[120px]">{companyName}</p>
             </div>
           </div>
@@ -361,7 +380,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
           </div>
 
           <div className="flex flex-col items-center">
-            <span className="font-serif text-sm italic text-slate-700 dark:text-slate-300">Zyro_Director</span>
+            <span className="font-serif text-sm italic text-slate-700 dark:text-slate-300">Zyro Director</span>
             <div className="w-32 border-t border-slate-300 dark:border-slate-700 mt-2 pt-1">
               <p className="text-[10px] font-semibold uppercase text-slate-400 dark:text-slate-500">Academic Director</p>
               <p className="text-[9px] text-slate-500 dark:text-slate-400">Zyro Platforms</p>

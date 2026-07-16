@@ -55,7 +55,8 @@ export async function getCompanyById(id: string, useCache = true) {
     .from('companies')
     .select(`
       *,
-      team:company_team_members (*)
+      team:company_team_members (*),
+      owner:profiles!owner_id (id, full_name, title, department)
     `)
     .eq('id', id)
     .single();
@@ -79,7 +80,11 @@ export async function getMyCompany(useCache = true) {
 
   const fetchFn = () => supabase
     .from('companies')
-    .select(`*, team:company_team_members(*)`)
+    .select(`
+      *, 
+      team:company_team_members(*),
+      owner:profiles!owner_id (id, full_name, title, department)
+    `)
     .eq('owner_id', user.id)
     .single();
 
