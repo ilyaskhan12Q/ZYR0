@@ -194,7 +194,7 @@ export default function Register() {
                 </div>
 
                 {localError && (
-                  <div role="alert" className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 border border-red-100 text-sm flex items-start gap-2">
+                  <div role="alert" className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 text-sm flex items-start gap-2">
                     <span className="mt-0.5" aria-hidden="true">⚠️</span>
                     <span>{localError}</span>
                   </div>
@@ -352,7 +352,7 @@ export default function Register() {
                   </div>
 
                   {localError && (
-                    <div role="alert" className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-start gap-2">
+                    <div role="alert" className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 text-sm flex items-start gap-2">
                       <span className="shrink-0 mt-0.5" aria-hidden="true">⚠️</span>
                       <span>{localError}</span>
                     </div>

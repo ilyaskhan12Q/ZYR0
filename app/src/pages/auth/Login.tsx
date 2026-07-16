@@ -63,27 +63,44 @@ export default function Login() {
         noIndex={true}
       />
       {/* Left Side - Branding */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-        className="hidden lg:flex lg:w-1/2 bg-primary items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(59,130,246,0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(59,130,246,0.2) 0%, transparent 50%)' }} />
+      <motion.div 
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ duration: 0.5 }}
+        className="hidden lg:flex lg:w-1/2 bg-primary dark:bg-slate-950 items-center justify-center relative overflow-hidden border-r border-border/10"
+      >
+        {/* Subtle decorative grid/mesh background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 dark:from-accent/5 dark:to-transparent" />
+          <div 
+            className="absolute inset-0 opacity-20 dark:opacity-10" 
+            style={{ 
+              backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(59,130,246,0.2) 0%, transparent 60%), radial-gradient(circle at 75% 75%, rgba(147,51,234,0.15) 0%, transparent 60%)' 
+            }} 
+          />
         </div>
+
         <div className="relative z-10 max-w-md px-8 text-center">
           <div className="w-16 h-16 flex items-center justify-center mx-auto mb-6">
-            <img src="/zyro-logo.png" alt="Zyro Logo" className="w-16 h-16 object-contain rounded-2xl" />
+            <img src="/zyro-logo.png" alt="Zyro Logo" className="w-16 h-16 object-contain rounded-2xl shadow-xl" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">Welcome Back to Zyro</h2>
-          <p className="text-white/70 mb-8">Your gateway to professional growth and meaningful internship experiences.</p>
+          <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Welcome Back to Zyro</h2>
+          <p className="text-white/80 dark:text-slate-300 mb-8 max-w-sm mx-auto">Your gateway to professional growth and meaningful internship experiences.</p>
           <div className="grid grid-cols-3 gap-4">
             {[
               { icon: GraduationCap, label: 'Students', count: '10K+' },
               { icon: Building2, label: 'Companies', count: '500+' },
               { icon: Users, label: 'Mentors', count: '200+' },
             ].map((item, i) => (
-              <div key={i} className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <item.icon className="w-6 h-6 text-accent mx-auto mb-2" />
-                <p className="text-xl font-bold text-white">{item.count}</p>
-                <p className="text-xs text-white/60">{item.label}</p>
+              <div 
+                key={i} 
+                className="bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/5 backdrop-blur-md rounded-2xl p-5 hover:border-accent/30 hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-300 group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/10 dark:bg-white/5 flex items-center justify-center mx-auto mb-3 border border-white/5 group-hover:scale-110 transition-transform duration-300">
+                  <item.icon className="w-5 h-5 text-accent" />
+                </div>
+                <p className="text-2xl font-bold text-white tracking-tight">{item.count}</p>
+                <p className="text-xs text-white/60 dark:text-slate-400 font-medium mt-1">{item.label}</p>
               </div>
             ))}
           </div>
@@ -109,7 +126,7 @@ export default function Login() {
             </div>
 
             {displayError && (
-              <div role="alert" className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 border border-red-100 text-sm flex items-start gap-2">
+              <div role="alert" className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 text-sm flex items-start gap-2">
                 <span className="mt-0.5" aria-hidden="true">⚠️</span>
                 <span>{displayError}</span>
               </div>
