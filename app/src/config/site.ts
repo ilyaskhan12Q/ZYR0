@@ -4,9 +4,9 @@ const runtimeUrl = import.meta.env.VITE_SITE_URL ||
 const cleanUrl = runtimeUrl.replace(/\/+$/, '');
 
 export const SITE_CONFIG = {
-  name: 'Zyro',
+  name: 'ZYR0',
   url: cleanUrl,
   defaultImage: `${cleanUrl}/og-image.png`,
-  twitterHandle: '@zyroplatform',
-  supportEmail: 'support@zyro.com'
+  twitterHandle: '@zyr0platform',
+  supportEmail: 'support@zyr0.com'
 };

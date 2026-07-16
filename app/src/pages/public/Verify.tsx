@@ -123,10 +123,10 @@ export default function Verify() {
   return (
     <div className="pt-20 pb-16 px-4 min-h-screen">
       <SEO
-        title="Verify Certificate — Authenticate Zyro Credentials"
-        description="Instantly verify the authenticity of any Zyro-issued internship certificate using its unique credential ID. Blockchain-backed verification for students, employers, and institutions."
+        title="Verify Certificate — Authenticate ZYR0 Credentials"
+        description="Instantly verify the authenticity of any ZYR0-issued internship certificate using its unique credential ID. Blockchain-backed verification for students, employers, and institutions."
         path="/verify"
-        keywords="verify certificate, internship certificate verification, blockchain certificate, credential verification, Zyro certificate"
+        keywords="verify certificate, internship certificate verification, blockchain certificate, credential verification, ZYR0 certificate"
       />
       <div className="max-w-4xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
@@ -147,7 +147,7 @@ export default function Verify() {
                 type="text"
                 value={certId}
                 onChange={(e) => { setCertId(e.target.value); setResult('idle'); }}
-                placeholder="Enter Certificate ID (e.g., ZYRO-SE-2024-001234)"
+                placeholder="Enter Certificate ID (e.g., ZYR0-SE-2024-001234)"
                 className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
                 onKeyDown={(e) => e.key === 'Enter' && handleVerify()}
               />

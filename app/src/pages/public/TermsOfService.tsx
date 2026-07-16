@@ -7,10 +7,10 @@ const sections = [
     icon: FileText,
     title: 'Acceptance of Terms',
     content: [
-      'By accessing or using the Zyro platform ("Service"), you agree to be bound by these Terms of Service ("Terms").',
+      'By accessing or using the ZYR0 platform ("Service"), you agree to be bound by these Terms of Service ("Terms").',
       'If you do not agree with any part of these Terms, you may not access or use the Service.',
       'These Terms apply to all users of the Service including students, companies, mentors, and administrators.',
-      'Zyro reserves the right to update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the revised Terms.',
+      'ZYR0 reserves the right to update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the revised Terms.',
     ],
   },
   {
@@ -33,17 +33,17 @@ const sections = [
       'Students agree to submit genuine work through GitHub repositories. Plagiarism or misrepresentation of work is grounds for account termination.',
       'All users agree to communicate respectfully. Harassment, discrimination, or abusive behavior will result in immediate suspension.',
       'You may not reverse engineer, scrape, or attempt to extract data from the platform through automated means.',
-      'Certificates issued by Zyro represent completed internship programs. Fraudulent use of certificates is prohibited.',
+      'Certificates issued by ZYR0 represent completed internship programs. Fraudulent use of certificates is prohibited.',
     ],
   },
   {
     icon: AlertCircle,
     title: 'Intellectual Property',
     content: [
-      'Zyro retains ownership of all platform software, design, branding, and documentation.',
+      'ZYR0 retains ownership of all platform software, design, branding, and documentation.',
       'Student project work submitted via GitHub remains the intellectual property of the student, unless otherwise agreed with the sponsoring company.',
-      'Certificates issued by Zyro remain verifiable indefinitely. The verification system and certificate design are the intellectual property of Zyro.',
-      'Content you upload to the platform (profile photos, documents) is licensed to Zyro for the purpose of providing the Service.',
+      'Certificates issued by ZYR0 remain verifiable indefinitely. The verification system and certificate design are the intellectual property of ZYR0.',
+      'Content you upload to the platform (profile photos, documents) is licensed to ZYR0 for the purpose of providing the Service.',
     ],
   },
   {
@@ -51,9 +51,9 @@ const sections = [
     title: 'Liability & Warranties',
     content: [
       'The Service is provided "as is" without warranties of any kind, express or implied.',
-      'Zyro acts as a platform facilitating connections between students and companies. We are not responsible for the outcomes of internship relationships.',
+      'ZYR0 acts as a platform facilitating connections between students and companies. We are not responsible for the outcomes of internship relationships.',
       'We do not guarantee that internship listings are accurate, that applications will result in offers, or that all internships will be completed.',
-      'To the maximum extent permitted by law, Zyro is not liable for indirect, incidental, or consequential damages arising from use of the Service.',
+      'To the maximum extent permitted by law, ZYR0 is not liable for indirect, incidental, or consequential damages arising from use of the Service.',
       'Our total liability for any claim arising from these Terms or use of the Service shall not exceed the amount you paid us in the 12 months preceding the claim.',
     ],
   },
@@ -61,11 +61,11 @@ const sections = [
     icon: Mail,
     title: 'Termination & Contact',
     content: [
-      'You may terminate your account at any time by contacting us at support@zyro.com.',
-      'Zyro may suspend or terminate accounts that violate these Terms, with or without notice.',
+      'You may terminate your account at any time by contacting us at support@zyroo.dpdns.org.',
+      'ZYR0 may suspend or terminate accounts that violate these Terms, with or without notice.',
       'Upon termination, your access to the Service will cease. Issued certificates remain verifiable through the public verification system.',
       'These Terms are governed by applicable law. Any disputes shall be resolved through binding arbitration.',
-      'For questions about these Terms, contact us at legal@zyro.com.',
+      'For questions about these Terms, contact us at legal@zyroo.dpdns.org.',
     ],
   },
 ];
@@ -74,10 +74,10 @@ export default function TermsOfService() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="Terms of Service — Zyro Platform Usage Agreement"
-        description="Review Zyro's Terms of Service. These terms govern your access and use of the Zyro internship management platform, including rights, responsibilities, and limitations for students, companies, and mentors."
+        title="Terms of Service — ZYR0 Platform Usage Agreement"
+        description="Review ZYR0's Terms of Service. These terms govern your access and use of the ZYR0 internship management platform, including rights, responsibilities, and limitations for students, companies, and mentors."
         path="/terms"
-        keywords="Zyro terms of service, platform terms, usage agreement, internship platform terms, user agreement"
+        keywords="ZYR0 terms of service, platform terms, usage agreement, internship platform terms, user agreement"
       />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
@@ -86,7 +86,7 @@ export default function TermsOfService() {
             <FileText className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Terms of Service</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Please read these terms carefully before using the Zyro platform. They govern your access and use of our Service.
+              Please read these terms carefully before using the ZYR0 platform. They govern your access and use of our Service.
             </p>
             <p className="mt-3 text-sm text-white/50">Last updated: July 2025</p>
           </motion.div>

@@ -282,7 +282,7 @@ export const users: User[] = [
   { id: '5', name: 'James Park', email: 'james@student.edu', avatar: 'https://i.pravatar.cc/150?u=james', role: 'student', status: 'active', joinDate: '2024-09-01', lastActive: '2025-01-19T20:00:00Z' },
   { id: '6', name: 'Lisa Wang', email: 'lisa@designco.com', avatar: 'https://i.pravatar.cc/150?u=lisa', role: 'company', status: 'active', joinDate: '2024-06-15', lastActive: '2025-01-20T11:00:00Z' },
   { id: '7', name: 'Prof. David Kim', email: 'david@university.edu', avatar: 'https://i.pravatar.cc/150?u=david', role: 'mentor', status: 'active', joinDate: '2024-05-20', lastActive: '2025-01-18T14:00:00Z' },
-  { id: '8', name: 'Admin User', email: 'admin@zyro.com', avatar: 'https://i.pravatar.cc/150?u=admin', role: 'admin', status: 'active', joinDate: '2024-01-01', lastActive: '2025-01-20T12:00:00Z' },
+  { id: '8', name: 'Admin User', email: 'admin@zyr0.com', avatar: 'https://i.pravatar.cc/150?u=admin', role: 'admin', status: 'active', joinDate: '2024-01-01', lastActive: '2025-01-20T12:00:00Z' },
 ];
 
 export const companies: Company[] = [

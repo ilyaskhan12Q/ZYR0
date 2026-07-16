@@ -43,9 +43,9 @@ const guides = [
   {
     icon: ShieldCheck,
     title: 'Certificate Verification',
-    desc: 'Verify the authenticity of any Zyro-issued certificate using its credential ID.',
+    desc: 'Verify the authenticity of any ZYR0-issued certificate using its credential ID.',
     steps: [
-      'Navigate to zyro.com/verify.',
+      'Navigate to zyroo.dpdns.org/verify.',
       'Enter the credential ID printed on the certificate.',
       'The system will display the certificate holder\'s name, the internship completed, the issuing company, and the date of issuance.',
       'A green verification badge confirms the certificate is authentic and has not been revoked.',
@@ -66,10 +66,10 @@ export default function HelpCenter() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="Help Center — Getting Started Guides for Zyro"
-        description="Step-by-step guides for students, companies, and mentors. Learn how to browse internships, review applicants, submit project work, issue certificates, and verify credentials on Zyro."
+        title="Help Center — Getting Started Guides for ZYR0"
+        description="Step-by-step guides for students, companies, and mentors. Learn how to browse internships, review applicants, submit project work, issue certificates, and verify credentials on ZYR0."
         path="/help"
-        keywords="Zyro help center, getting started guide, internship platform help, student guide, company guide, mentor guide"
+        keywords="ZYR0 help center, getting started guide, internship platform help, student guide, company guide, mentor guide"
       />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
@@ -78,7 +78,7 @@ export default function HelpCenter() {
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Help Center</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Step-by-step guides and resources to help you get the most out of the Zyro platform.
+              Step-by-step guides and resources to help you get the most out of the ZYR0 platform.
             </p>
           </motion.div>
         </div>
@@ -107,7 +107,7 @@ export default function HelpCenter() {
         <div className="max-w-5xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
             <h2 className="text-3xl font-bold">Getting Started Guides</h2>
-            <p className="mt-2 text-muted-foreground">Everything you need to start using Zyro in your role.</p>
+            <p className="mt-2 text-muted-foreground">Everything you need to start using ZYR0 in your role.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

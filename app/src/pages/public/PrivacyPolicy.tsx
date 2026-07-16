@@ -54,10 +54,10 @@ const sections = [
     title: 'Your Rights',
     content: [
       'You may access and update your profile information at any time from your account settings.',
-      'You may request deletion of your account by contacting us at privacy@zyro.com. We will process requests within 30 days.',
+      'You may request deletion of your account by contacting us at privacy@zyroo.dpdns.org. We will process requests within 30 days.',
       'You may opt out of non-essential email communications by following the unsubscribe link in any marketing email.',
       'If you are located in the European Economic Area, you have rights under the GDPR including the right to access, rectify, erase, restrict processing, and data portability.',
-      'To exercise any of these rights, contact us at privacy@zyro.com.',
+      'To exercise any of these rights, contact us at privacy@zyroo.dpdns.org.',
     ],
   },
   {
@@ -66,8 +66,8 @@ const sections = [
     content: [
       'This Privacy Policy was last updated in July 2025.',
       'We may update this policy periodically to reflect changes in our practices or applicable law. We will notify you of significant changes via email or a prominent notice on the platform.',
-      'For privacy-related questions or concerns, contact our Privacy team at privacy@zyro.com.',
-      'For general inquiries, visit our Contact page or email support@zyro.com.',
+      'For privacy-related questions or concerns, contact our Privacy team at privacy@zyroo.dpdns.org.',
+      'For general inquiries, visit our Contact page or email support@zyroo.dpdns.org.',
     ],
   },
 ];
@@ -76,10 +76,10 @@ export default function PrivacyPolicy() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="Privacy Policy — How Zyro Handles Your Data"
-        description="Read Zyro's Privacy Policy to understand how we collect, use, and protect your personal information. We are committed to transparency and data security for all platform users."
+        title="Privacy Policy — How ZYR0 Handles Your Data"
+        description="Read ZYR0's Privacy Policy to understand how we collect, use, and protect your personal information. We are committed to transparency and data security for all platform users."
         path="/privacy"
-        keywords="Zyro privacy policy, data privacy, GDPR, personal data, user privacy, internship platform privacy"
+        keywords="ZYR0 privacy policy, data privacy, GDPR, personal data, user privacy, internship platform privacy"
       />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">

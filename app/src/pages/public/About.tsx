@@ -22,7 +22,7 @@ const values = [
 ];
 
 const milestones = [
-  { year: '2023', title: 'Founded', desc: 'Zyro was founded with a mission to transform internship experiences.' },
+  { year: '2023', title: 'Founded', desc: 'ZYR0 was founded with a mission to transform internship experiences.' },
   { year: '2024', title: 'Platform Launch', desc: 'Launched the first version with student, company, and mentor portals.' },
   { year: '2024', title: '10,000 Users', desc: 'Reached 10,000 active users across 50+ universities.' },
   { year: '2025', title: 'Certificate System', desc: 'Introduced blockchain-verified digital certificates.' },
@@ -32,19 +32,19 @@ export default function About() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="About Zyro — Our Mission, Vision & Values"
-        description="Learn about Zyro's mission to bridge the gap between education and industry. Discover how we connect students, companies, and mentors through structured internship management and verified digital certificates."
+        title="About ZYR0 — Our Mission, Vision & Values"
+        description="Learn about ZYR0's mission to bridge the gap between education and industry. Discover how we connect students, companies, and mentors through structured internship management and verified digital certificates."
         path="/about"
-        keywords="about Zyro, internship platform mission, career ecosystem, digital certificates, student mentorship"
+        keywords="about ZYR0, internship platform mission, career ecosystem, digital certificates, student mentorship"
         structuredData={aboutStructuredData}
       />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl sm:text-5xl font-bold">About Zyro</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold">About ZYR0</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Zyro is a modern internship management platform that connects students, companies, mentors, and educational institutions in a single ecosystem. We believe every student deserves a meaningful internship experience.
+              ZYR0 is a modern internship management platform that connects students, companies, mentors, and educational institutions in a single ecosystem. We believe every student deserves a meaningful internship experience.
             </p>
           </motion.div>
         </div>
@@ -132,7 +132,7 @@ export default function About() {
         <div className="max-w-3xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <Heart className="w-10 h-10 text-accent mx-auto mb-4" />
-            <h2 className="text-3xl font-bold">Join the Zyro Community</h2>
+            <h2 className="text-3xl font-bold">Join the ZYR0 Community</h2>
             <p className="mt-4 text-muted-foreground">Whether you are a student, company, mentor, or university — there is a place for you in our ecosystem.</p>
           </motion.div>
         </div>

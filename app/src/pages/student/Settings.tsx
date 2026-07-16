@@ -66,7 +66,7 @@ export default function StudentSettings() {
   const [password, setPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [settings, setSettings] = useState(() => {
-    const savedData = localStorage.getItem('zyro_student_settings');
+    const savedData = localStorage.getItem('zyr0_student_settings');
     if (savedData) {
       try {
         return JSON.parse(savedData);
@@ -99,7 +99,7 @@ export default function StudentSettings() {
 
   const handleSave = async () => {
     try {
-      localStorage.setItem('zyro_student_settings', JSON.stringify(settings));
+      localStorage.setItem('zyr0_student_settings', JSON.stringify(settings));
       
       if (password) {
         if (password.length < 6) {

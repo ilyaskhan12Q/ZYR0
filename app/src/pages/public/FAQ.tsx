@@ -19,7 +19,7 @@ const faqData: FAQCategory[] = [
     label: 'For Students',
     items: [
       {
-        q: 'How do I apply for an internship on Zyro?',
+        q: 'How do I apply for an internship on ZYR0?',
         a: 'Browse available internships from the Internships page. Click on any listing to view full details including requirements, duration, and company information. When you are ready, click "Apply Now" and submit your application. You can track the status of all your applications from your Student Dashboard under My Applications.',
       },
       {
@@ -32,7 +32,7 @@ const faqData: FAQCategory[] = [
       },
       {
         q: 'How are certificates issued and verified?',
-        a: 'Upon successful completion of all assigned tasks and your mentor\'s final approval, Zyro automatically generates a digital certificate with a unique credential ID. You can download it from your Certificates dashboard. Anyone can verify the authenticity of your certificate at zyro.com/verify by entering the credential ID.',
+        a: 'Upon successful completion of all assigned tasks and your mentor\'s final approval, ZYR0 automatically generates a digital certificate with a unique credential ID. You can download it from your Certificates dashboard. Anyone can verify the authenticity of your certificate at zyroo.dpdns.org/verify by entering the credential ID.',
       },
       {
         q: 'Can I apply to multiple internships at once?',
@@ -44,7 +44,7 @@ const faqData: FAQCategory[] = [
     label: 'For Companies',
     items: [
       {
-        q: 'How do I post an internship on Zyro?',
+        q: 'How do I post an internship on ZYR0?',
         a: 'From your Company Dashboard, navigate to Internships and click "Post Internship". Fill in the details including title, domain, duration, location type, requirements, and a description of the project students will work on. Once published, your internship will appear in the public listings immediately.',
       },
       {
@@ -65,16 +65,16 @@ const faqData: FAQCategory[] = [
     label: 'Platform & Account',
     items: [
       {
-        q: 'Is Zyro free to use?',
-        a: 'Zyro is currently in its growth phase. The core platform — including internship listings, applications, task management, and certificate verification — is available without charge. Enterprise plans with advanced analytics, priority support, and bulk internship management are planned for the future.',
+        q: 'Is ZYR0 free to use?',
+        a: 'ZYR0 is currently in its growth phase. The core platform — including internship listings, applications, task management, and certificate verification — is available without charge. Enterprise plans with advanced analytics, priority support, and bulk internship management are planned for the future.',
       },
       {
-        q: 'What roles are available on Zyro?',
-        a: 'Zyro supports four roles: Student, Company, Mentor, and Admin. Each role has its own dedicated dashboard and permissions. You select your role during registration and it determines what features you have access to.',
+        q: 'What roles are available on ZYR0?',
+        a: 'ZYR0 supports four roles: Student, Company, Mentor, and Admin. Each role has its own dedicated dashboard and permissions. You select your role during registration and it determines what features you have access to.',
       },
       {
         q: 'Can I change my role after registering?',
-        a: 'Role changes are not currently supported through self-service. If you registered with the wrong role, please contact our support team at support@zyro.com and we will assist you.',
+        a: 'Role changes are not currently supported through self-service. If you registered with the wrong role, please contact our support team at support@zyr0.com and we will assist you.',
       },
       {
         q: 'How do I reset my password?',
@@ -82,7 +82,7 @@ const faqData: FAQCategory[] = [
       },
       {
         q: 'How do I delete my account?',
-        a: 'To request account deletion, contact us at support@zyro.com with the subject line "Account Deletion Request". We will process your request within 30 days. Note that issued certificates will remain verifiable through the public verification system even after account deletion.',
+        a: 'To request account deletion, contact us at support@zyr0.com with the subject line "Account Deletion Request". We will process your request within 30 days. Note that issued certificates will remain verifiable through the public verification system even after account deletion.',
       },
     ],
   },
@@ -153,10 +153,10 @@ export default function FAQ() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="FAQ — Frequently Asked Questions About Zyro"
-        description="Find answers to the most common questions about the Zyro internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, and account management."
+        title="FAQ — Frequently Asked Questions About ZYR0"
+        description="Find answers to the most common questions about the ZYR0 internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, and account management."
         path="/faq"
-        keywords="Zyro FAQ, internship platform questions, certificate verification help, student internship FAQ, company FAQ"
+        keywords="ZYR0 FAQ, internship platform questions, certificate verification help, student internship FAQ, company FAQ"
         structuredData={faqStructuredData}
       />
       {/* Hero */}
@@ -166,7 +166,7 @@ export default function FAQ() {
             <HelpCircle className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Frequently Asked Questions</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Find answers to the most common questions about the Zyro platform.
+              Find answers to the most common questions about the ZYR0 platform.
             </p>
           </motion.div>
         </div>

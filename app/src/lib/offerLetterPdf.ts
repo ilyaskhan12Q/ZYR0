@@ -185,7 +185,7 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   // ── Closing ──────────────────────────────────────────────────────────────
   ctx.fillStyle = TEXT_MUTED;
   ctx.font = '13px sans-serif';
-  const closing = 'We look forward to welcoming you to our team. Please accept or reject this offer via your Zyro dashboard.';
+  const closing = 'We look forward to welcoming you to our team. Please accept or reject this offer via your ZYR0 dashboard.';
   wrapText(ctx, closing, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 20, TEXT_MUTED, '13px');
   y += 55;
 
@@ -238,7 +238,7 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   );
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.fillText(
-    `© ${new Date().getFullYear()} Zyro Internship Platform · ${company?.name ?? ''} · Confidential`,
+    `© ${new Date().getFullYear()} ZYR0 Internship Platform · ${company?.name ?? ''} · Confidential`,
     PAGE_WIDTH / 2,
     PAGE_HEIGHT - 16
   );

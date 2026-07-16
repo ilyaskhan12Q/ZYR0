@@ -19,7 +19,7 @@ export default function NotFound() {
   return (
     <div className="pt-28 pb-16 px-4 min-h-[80vh] flex items-center justify-center">
       <SEO
-        title="Page Not Found | Zyro"
+        title="Page Not Found | ZYR0"
         description="The page you are looking for does not exist or has been moved. Use our search or links to find internships and company profiles."
         noIndex={true}
       />

@@ -14,6 +14,41 @@ const homepageStructuredData = [
     '@type': 'BreadcrumbList',
     itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` }],
   },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': 'ZYR0',
+    'alternateName': 'Zyro',
+    'url': `${BASE_URL}/`,
+    'description': 'Internship management platform for students, companies, and mentors.',
+    'potentialAction': {
+      '@type': 'SearchAction',
+      'target': {
+        '@type': 'EntryPoint',
+        'urlTemplate': `${BASE_URL}/internships?search={search_term_string}`
+      },
+      'query-input': 'required name=search_term_string'
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    'name': 'ZYR0',
+    'alternateName': 'Zyro',
+    'url': `${BASE_URL}/`,
+    'logo': `${BASE_URL}/zyro-logo.png`,
+    'description': 'ZYR0 is a modern internship management platform connecting students, companies, and mentors for structured, verifiable internship experiences.',
+    'sameAs': [
+      'https://github.com/ilyaskhan12Q/ZYR0',
+      'https://linkedin.com/company/zyr0-platform'
+    ],
+    'contactPoint': {
+      '@type': 'ContactPoint',
+      'email': 'support@zyr0.com',
+      'contactType': 'customer support',
+      'availableLanguage': 'English'
+    }
+  }
 ];
 
 const features = [
@@ -33,9 +68,9 @@ const steps = [
 ];
 
 const testimonials = [
-  { name: 'Sarah Chen', role: 'Computer Science Student, Stanford', quote: 'Zyro helped me land my dream internship at a tech startup. The task tracking and mentor feedback were game-changers.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
-  { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor, TechFlow', quote: 'As a mentor, Zyro makes it easy to manage multiple interns and provide structured feedback. Highly recommended.', avatar: 'https://i.pravatar.cc/150?u=michael' },
-  { name: 'TechFlow Inc.', role: 'Hiring Partner', quote: 'We\'ve hired 15 interns through Zyro. The quality of candidates and the streamlined process saved us countless hours.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
+  { name: 'Sarah Chen', role: 'Computer Science Student, Stanford', quote: 'ZYR0 helped me land my dream internship at a tech startup. The task tracking and mentor feedback were game-changers.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
+  { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor, TechFlow', quote: 'As a mentor, ZYR0 makes it easy to manage multiple interns and provide structured feedback. Highly recommended.', avatar: 'https://i.pravatar.cc/150?u=michael' },
+  { name: 'TechFlow Inc.', role: 'Hiring Partner', quote: 'We\'ve hired 15 interns through ZYR0. The quality of candidates and the streamlined process saved us countless hours.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
 ];
 
 const stats = [
@@ -80,8 +115,8 @@ export default function Landing() {
   return (
     <div>
       <SEO
-        title="Zyro — Internship Management Platform for Students & Companies"
-        description="Zyro connects students with real internship opportunities, experienced mentors, and blockchain-verified digital certificates. Discover, apply, complete, and get certified — all in one platform."
+        title="ZYR0 — Internship Management Platform for Students & Companies"
+        description="ZYR0 connects students with real internship opportunities, experienced mentors, and blockchain-verified digital certificates. Discover, apply, complete, and get certified — all in one platform."
         path="/"
         keywords="internship platform, student internship, digital certificate, mentor, career portal, verified internship, internship management"
         structuredData={homepageStructuredData}
@@ -149,7 +184,7 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="mt-4 sm:mt-6 text-base sm:text-lg text-white/70 max-w-2xl mx-auto text-balance"
           >
-            Zyro connects students with real internship opportunities, mentors, and verifiable certificates — all in one powerful platform.
+            ZYR0 connects students with real internship opportunities, mentors, and verifiable certificates — all in one powerful platform.
           </motion.p>
 
           <motion.div
@@ -202,10 +237,10 @@ export default function Landing() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Why Choose Zyro</span>
+            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Why Choose ZYR0</span>
             <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Everything You Need for Career Growth</h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              From discovering opportunities to earning verified certificates, Zyro streamlines your entire internship journey.
+              From discovering opportunities to earning verified certificates, ZYR0 streamlines your entire internship journey.
             </p>
           </motion.div>
 
@@ -438,7 +473,7 @@ export default function Landing() {
             <div className="relative z-10">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-balance">Ready to Start Your Career Journey?</h2>
               <p className="mt-4 text-white/80 max-w-xl mx-auto">
-                Join thousands of students and companies already using Zyro.
+                Join thousands of students and companies already using ZYR0.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

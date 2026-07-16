@@ -50,10 +50,10 @@ export default function PublicLayout() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <div className="w-8 h-8 flex items-center justify-center">
-                <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />
+                <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-8 h-8 object-contain rounded-md" />
               </div>
               <span className={`text-xl font-bold transition-colors ${scrolled ? 'text-foreground' : 'text-white'}`}>
-                Zyro
+                ZYR0
               </span>
             </Link>
 
@@ -198,9 +198,9 @@ export default function PublicLayout() {
               <div className="col-span-2 md:col-span-1">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 flex items-center justify-center">
-                    <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />
+                    <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-8 h-8 object-contain rounded-md" />
                   </div>
-                  <span className="text-xl font-bold">Zyro</span>
+                  <span className="text-xl font-bold">ZYR0</span>
                 </div>
                 <p className="text-white/60 text-sm leading-relaxed">
                   The complete internship management platform connecting students, companies, and mentors.
@@ -209,10 +209,10 @@ export default function PublicLayout() {
                   <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-white/40 hover:text-white transition-colors">
                     <Github className="w-5 h-5" />
                   </a>
-                  <a href="https://linkedin.com/company/zyro-platform" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white/40 hover:text-white transition-colors">
+                  <a href="https://linkedin.com/company/zyr0-platform" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white/40 hover:text-white transition-colors">
                     <Linkedin className="w-5 h-5" />
                   </a>
-                  <a href="mailto:support@zyro.com" aria-label="Email support" className="text-white/40 hover:text-white transition-colors">
+                  <a href="mailto:support@zyr0.com" aria-label="Email support" className="text-white/40 hover:text-white transition-colors">
                     <Mail className="w-5 h-5" />
                   </a>
                 </div>
@@ -256,7 +256,7 @@ export default function PublicLayout() {
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-white/40 text-sm">&copy; 2025 Zyro. All rights reserved.</p>
+              <p className="text-white/40 text-sm">&copy; 2025 ZYR0. All rights reserved.</p>
               <p className="text-white/40 text-sm">Made with care for the next generation of professionals.</p>
             </div>
           </div>

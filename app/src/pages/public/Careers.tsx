@@ -16,17 +16,17 @@ export default function Careers() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="Careers at Zyro — Join Our Team"
-        description="Zyro is growing and will be hiring across engineering, product, design, and operations. Express your interest early and help us build the platform connecting students to real career opportunities."
+        title="Careers at ZYR0 — Join Our Team"
+        description="ZYR0 is growing and will be hiring across engineering, product, design, and operations. Express your interest early and help us build the platform connecting students to real career opportunities."
         path="/careers"
-        keywords="Zyro careers, work at Zyro, internship platform jobs, tech startup jobs, EdTech careers"
+        keywords="ZYR0 careers, work at ZYR0, internship platform jobs, tech startup jobs, EdTech careers"
       />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Briefcase className="w-12 h-12 mx-auto mb-4 text-white/70" />
-            <h1 className="text-4xl sm:text-5xl font-bold">Careers at Zyro</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold">Careers at ZYR0</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Help us build the platform that gives every student a fair shot at meaningful industry experience.
             </p>
@@ -51,7 +51,7 @@ export default function Careers() {
             </span>
             <h2 className="text-2xl font-bold mt-3 mb-3">We&apos;re growing — stay tuned</h2>
             <p className="text-muted-foreground leading-relaxed max-w-xl mx-auto">
-              Zyro is in active development and we are building towards our next phase. We don&apos;t have open positions to post yet, but we will be hiring across engineering, product, and operations as the platform scales.
+              ZYR0 is in active development and we are building towards our next phase. We don&apos;t have open positions to post yet, but we will be hiring across engineering, product, and operations as the platform scales.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3 max-w-xl mx-auto">
               If you are passionate about bridging the gap between education and industry, we&apos;d love to hear from you early.

@@ -94,7 +94,7 @@ export default function CompanyDetail() {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: company.name,
-      description: company.description || `Learn about careers and internship opportunities at ${company.name} on Zyro.`,
+      description: company.description || `Learn about careers and internship opportunities at ${company.name} on ZYR0.`,
       logo: company.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(company.name)}&background=random`,
       url: company.website || `${BASE_URL}/companies/${id}`,
     },
@@ -113,9 +113,9 @@ export default function CompanyDetail() {
     <div className="pt-20 pb-16 px-4">
       <SEO
         title={`${company.name} — Careers, Internships & Company Profile`}
-        description={company.description || `Learn more about ${company.name}, view their available internship programs, project categories, and contact information on Zyro.`}
+        description={company.description || `Learn more about ${company.name}, view their available internship programs, project categories, and contact information on ZYR0.`}
         path={`/companies/${id}`}
-        keywords={`${company.name}, ${company.name} internships, ${company.name} jobs, Zyro companies`}
+        keywords={`${company.name}, ${company.name} internships, ${company.name} jobs, ZYR0 companies`}
         structuredData={companyStructuredData}
       />
       <div className="max-w-5xl mx-auto">

@@ -196,7 +196,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
           setNotifications([
             {
               id: 'mock-1',
-              title: 'Welcome to Zyro!',
+              title: 'Welcome to ZYR0!',
               message: 'Your career accelerator is now ready. Start by exploring internships in the Portal.',
               read: false,
               created_at: new Date().toISOString(),
@@ -255,7 +255,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
   return (
     <div className="min-h-screen bg-background flex">
-      <SEO title="Dashboard" description="Zyro Platform dashboard and user portal." noIndex={true} />
+      <SEO title="Dashboard" description="ZYR0 Platform dashboard and user portal." noIndex={true} />
       {/* Mobile Overlay */}
       <AnimatePresence>
         {mobileOpen && (
@@ -279,7 +279,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         <div className="flex items-center justify-between h-16 px-4 border-b border-border flex-shrink-0">
           <Link to={`/${role}/dashboard`} className="flex items-center gap-2.5 overflow-hidden">
             <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-8 h-8 object-contain rounded-md" />
+              <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-8 h-8 object-contain rounded-md" />
             </div>
             {!collapsed && (
               <motion.span
@@ -287,7 +287,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                 animate={{ opacity: 1 }}
                 className="text-lg font-bold whitespace-nowrap"
               >
-                Zyro
+                ZYR0
               </motion.span>
             )}
           </Link>

@@ -1,7 +1,7 @@
 /* TEAM */
-  Developer: Zyro Team
-  Contact: support [at] zyro.com
-  Twitter: @zyroplatform
+  Developer: ZYR0 Team
+  Contact: support [at] zyroo.dpdns.org
+  Twitter: @zyr0platform
   From: Earth
 
 /* SITE */

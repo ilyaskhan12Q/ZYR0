@@ -20,7 +20,7 @@ export async function dispatchNotificationWithSimulation({
   message,
   type,
   actionUrl,
-  studentEmail = 'intern@zyro.com',
+  studentEmail = 'intern@zyr0.com',
   studentPhone,
 }: NotificationPayload) {
   // 1. Always create the DB in-app notification
@@ -41,7 +41,7 @@ export async function dispatchNotificationWithSimulation({
   let smsEnabled = true;
   let configuredPhone = studentPhone || '+1 (555) 019-2834';
 
-  const savedSettings = localStorage.getItem('zyro_student_settings');
+  const savedSettings = localStorage.getItem('zyr0_student_settings');
   if (savedSettings) {
     try {
       const parsed = JSON.parse(savedSettings);
@@ -75,7 +75,7 @@ export async function dispatchNotificationWithSimulation({
 
   if (smsEnabled && configuredPhone) {
     toast(`📱 SMS Alert Dispatched`, {
-      description: `Sent to ${configuredPhone}: "Zyro: ${title} - ${message.substring(0, 45)}..."`,
+      description: `Sent to ${configuredPhone}: "ZYR0: ${title} - ${message.substring(0, 45)}..."`,
       duration: 5000,
     });
   }

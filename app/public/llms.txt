@@ -1,6 +1,6 @@
-# Zyro - Internship Management Platform
+# ZYR0 - Internship Management Platform
 
-Zyro is a modern, production-grade Internship & Workforce Readiness Platform.
+ZYR0 is a modern, production-grade Internship & Workforce Readiness Platform.
 It bridges the gap between academic learning and industry experience by enabling organizations to manage project-based internships, assigning real-world tasks, reviewing code submissions on GitHub, and issuing blockchain-verified digital certificates.
 
 ## Core Audience
@@ -14,8 +14,8 @@ It bridges the gap between academic learning and industry experience by enabling
 - **Deployment**: https://zyroo.dpdns.org
 
 ## Key Architectural Principles
-- **GitHub First**: Student code is never hosted on Zyro; students submit GitHub repository URLs to simulate real software engineering workflows.
-- **No LMS Features**: Zyro focuses on real-world internships. It is not an online course platform.
+- **GitHub First**: Student code is never hosted on ZYR0; students submit GitHub repository URLs to simulate real software engineering workflows.
+- **No LMS Features**: ZYR0 focuses on real-world internships. It is not an online course platform.
 - **Role-Based Access**: Specialized dashboards and views for Students, Mentors, Companies, and Admins.
 - **Verified Credentials**: Certificates are generated securely on the backend with a unique SHA-256 blockchain-style hash to ensure authenticity.
 
@@ -25,5 +25,5 @@ It bridges the gap between academic learning and industry experience by enabling
 - **Verify Certificates**: https://zyroo.dpdns.org/verify
 
 ## Contact & Support
-- Email: support@zyro.com
-- Twitter: @zyroplatform
+- Email: support@zyroo.dpdns.org
+- Twitter: @zyr0platform

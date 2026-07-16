@@ -33,10 +33,10 @@ export default function CookiePolicy() {
   return (
     <div className="pt-20 pb-16">
       <SEO
-        title="Cookie Policy — How Zyro Uses Cookies"
-        description="Learn how Zyro uses cookies to keep you logged in, remember your preferences, and improve your experience. Find out which cookies are strictly necessary and which are optional."
+        title="Cookie Policy — How ZYR0 Uses Cookies"
+        description="Learn how ZYR0 uses cookies to keep you logged in, remember your preferences, and improve your experience. Find out which cookies are strictly necessary and which are optional."
         path="/cookies"
-        keywords="Zyro cookie policy, cookies, website cookies, analytics cookies, strictly necessary cookies"
+        keywords="ZYR0 cookie policy, cookies, website cookies, analytics cookies, strictly necessary cookies"
       />
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
@@ -45,7 +45,7 @@ export default function CookiePolicy() {
             <Cookie className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Cookie Policy</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              This policy explains how Zyro uses cookies and similar technologies to provide, improve, and protect our platform.
+              This policy explains how ZYR0 uses cookies and similar technologies to provide, improve, and protect our platform.
             </p>
             <p className="mt-3 text-sm text-white/50">Last updated: July 2025</p>
           </motion.div>
@@ -68,7 +68,7 @@ export default function CookiePolicy() {
               <h2 className="text-xl font-bold">What Are Cookies?</h2>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, to remember your preferences, and to provide information to site operators. Zyro uses cookies to keep you logged in, remember your settings, and understand how the platform is used.
+              Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, to remember your preferences, and to provide information to site operators. ZYR0 uses cookies to keep you logged in, remember your settings, and understand how the platform is used.
             </p>
           </motion.div>
 
@@ -132,7 +132,7 @@ export default function CookiePolicy() {
             <div className="flex items-start gap-3 mt-4 p-4 bg-muted/50 rounded-lg">
               <Mail className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
               <p className="text-sm text-muted-foreground">
-                For questions about our cookie usage, contact us at <span className="text-accent">privacy@zyro.com</span>.
+                For questions about our cookie usage, contact us at <span className="text-accent">privacy@zyroo.dpdns.org</span>.
               </p>
             </div>
           </motion.div>

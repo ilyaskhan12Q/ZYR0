@@ -282,7 +282,7 @@ export default function AdminAnalytics() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `zyro_platform_analytics_${timeframe}_${selectedDomain}.csv`);
+    link.setAttribute('download', `zyr0_platform_analytics_${timeframe}_${selectedDomain}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

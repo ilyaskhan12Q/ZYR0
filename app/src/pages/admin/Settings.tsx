@@ -23,12 +23,12 @@ function Toggle({ label, desc, checked, onChange }: { label: string; desc?: stri
 export default function AdminSettings() {
   const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState(() => {
-    const savedData = localStorage.getItem('zyro_admin_settings');
+    const savedData = localStorage.getItem('zyr0_admin_settings');
     if (savedData) {
       try {
         return {
           smtpHost: 'smtp.example.com',
-          senderEmail: 'noreply@zyro.com',
+          senderEmail: 'noreply@zyr0.com',
           ...JSON.parse(savedData)
         };
       } catch (e) {
@@ -45,12 +45,12 @@ export default function AdminSettings() {
       autoBackup: true,
       analyticsEnabled: true,
       smtpHost: 'smtp.example.com',
-      senderEmail: 'noreply@zyro.com',
+      senderEmail: 'noreply@zyr0.com',
     };
   });
 
   const handleSave = () => { 
-    localStorage.setItem('zyro_admin_settings', JSON.stringify(settings));
+    localStorage.setItem('zyr0_admin_settings', JSON.stringify(settings));
     setSaved(true); 
     setTimeout(() => setSaved(false), 2000); 
   };
@@ -92,7 +92,7 @@ export default function AdminSettings() {
           </div>
           <div>
             <label className="text-sm font-medium mb-1.5 block">Sender Email</label>
-            <input type="email" placeholder="noreply@zyro.com" value={settings.senderEmail} onChange={(e) => setSettings({ ...settings, senderEmail: e.target.value })}
+            <input type="email" placeholder="noreply@zyr0.com" value={settings.senderEmail} onChange={(e) => setSettings({ ...settings, senderEmail: e.target.value })}
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
         </div>

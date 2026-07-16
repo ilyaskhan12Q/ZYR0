@@ -127,7 +127,7 @@ export default function AdminReports() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `zyro_report_${reportId}_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `zyr0_report_${reportId}_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -174,7 +174,7 @@ export default function AdminReports() {
               <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Platform Analytics & Telemetry Log</div>
             </div>
             <div class="meta">
-              <div class="logo">ZYRO</div>
+              <div class="logo">ZYR0</div>
               <div>Generated: ${new Date().toLocaleDateString()}</div>
               <div>Status: Verified Official</div>
             </div>
@@ -196,7 +196,7 @@ export default function AdminReports() {
           </table>
 
           <div class="footer">
-            © ${new Date().getFullYear()} Zyro Platform Admin System. All rights reserved. This document contains secure operational log data.
+            © ${new Date().getFullYear()} ZYR0 Platform Admin System. All rights reserved. This document contains secure operational log data.
           </div>
 
           <script>
@@ -263,8 +263,8 @@ export default function AdminReports() {
     } else if (reportId === 'certificate_issuance') {
       headers = ['Certificate Record ID', 'Secure Credential ID', 'Issue Date', 'Authenticity Status'];
       const source = data.length > 0 ? data : [
-        { id: 'cert-88a', credential_id: 'ZYRO-SE-2024-001234', created_at: '2026-01-05' },
-        { id: 'cert-99b', credential_id: 'ZYRO-DS-2024-005678', created_at: '2026-01-08' }
+        { id: 'cert-88a', credential_id: 'ZYR0-SE-2024-001234', created_at: '2026-01-05' },
+        { id: 'cert-99b', credential_id: 'ZYR0-DS-2024-005678', created_at: '2026-01-08' }
       ];
       rows = source.map(item => [
         item.id,

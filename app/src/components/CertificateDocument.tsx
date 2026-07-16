@@ -250,7 +250,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               <div class="cert-corner-b-r"></div>
               
               <div class="header">
-                ${certificate.company?.logo_url ? `<img src="${certificate.company.logo_url}" style="height: 48px; max-width: 180px; object-fit: contain; margin-bottom: 10px;" />` : `<div class="logo">ZYR<span>O</span></div>`}
+                ${certificate.company?.logo_url ? `<img src="${certificate.company.logo_url}" style="height: 48px; max-width: 180px; object-fit: contain; margin-bottom: 10px;" />` : `<div class="logo">ZYR<span>0</span></div>`}
               </div>
               
               <div class="title">Certificate of Completion</div>
@@ -261,7 +261,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               
               <div class="description">
                 for successfully completing the <span class="highlight">${internshipTitle}</span> program
-                collaborating with <span class="highlight">${companyName}</span> from Zyro Internship Portal. 
+                collaborating with <span class="highlight">${companyName}</span> from ZYR0 Internship Portal. 
                 The candidate has successfully finalized all assigned tasks and industry-level milestones, 
                 demonstrating profound commitment, outstanding skills, and exceptional professionalism.
               </div>
@@ -289,11 +289,11 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                 
                 <div class="sig-block">
                   <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
-                    Zyro Director
+                    ZYR0 Director
                   </div>
                   <div class="sig-line">
                     <div class="sig-name">Academic Director</div>
-                    <div class="sig-title">Zyro Platforms</div>
+                    <div class="sig-title">ZYR0 Platforms</div>
                   </div>
                 </div>
               </div>
@@ -356,7 +356,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
         <p className="text-slate-600 dark:text-slate-300 text-sm max-w-2xl leading-relaxed mt-4">
           for successfully completing the <span className="font-semibold text-slate-900 dark:text-white">{internshipTitle}</span> program
-          in collaboration with <span className="font-semibold text-slate-900 dark:text-white">{companyName}</span> through the Zyro Platform.
+          in collaboration with <span className="font-semibold text-slate-900 dark:text-white">{companyName}</span> through the ZYR0 Platform.
           The candidate has demonstrated exceptional proficiency, dedication, and technical skill in executing all professional responsibilities.
         </p>
 
@@ -380,10 +380,10 @@ export default function CertificateDocument({ certificate }: CertificateDocument
           </div>
 
           <div className="flex flex-col items-center">
-            <span className="font-serif text-sm italic text-slate-700 dark:text-slate-300">Zyro Director</span>
+            <span className="font-serif text-sm italic text-slate-700 dark:text-slate-300">ZYR0 Director</span>
             <div className="w-32 border-t border-slate-300 dark:border-slate-700 mt-2 pt-1">
               <p className="text-[10px] font-semibold uppercase text-slate-400 dark:text-slate-500">Academic Director</p>
-              <p className="text-[9px] text-slate-500 dark:text-slate-400">Zyro Platforms</p>
+              <p className="text-[9px] text-slate-500 dark:text-slate-400">ZYR0 Platforms</p>
             </div>
           </div>
         </div>

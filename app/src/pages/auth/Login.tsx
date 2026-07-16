@@ -58,7 +58,7 @@ export default function Login() {
     <div className="min-h-screen flex">
       <SEO
         title="Sign In — Access Your Dashboard"
-        description="Log in to your Zyro portal to manage your internships, mentor assignments, certificates, and student applications."
+        description="Log in to your ZYR0 portal to manage your internships, mentor assignments, certificates, and student applications."
         path="/login"
         noIndex={true}
       />
@@ -82,9 +82,9 @@ export default function Login() {
 
         <div className="relative z-10 max-w-md px-8 text-center">
           <div className="w-16 h-16 flex items-center justify-center mx-auto mb-6">
-            <img src="/zyro-logo.png" alt="Zyro Logo" className="w-16 h-16 object-contain rounded-2xl shadow-xl" />
+            <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-16 h-16 object-contain rounded-2xl shadow-xl" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Welcome Back to Zyro</h2>
+          <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Welcome Back to ZYR0</h2>
           <p className="text-white/80 dark:text-slate-300 mb-8 max-w-sm mx-auto">Your gateway to professional growth and meaningful internship experiences.</p>
           <div className="grid grid-cols-3 gap-4">
             {[
@@ -114,15 +114,15 @@ export default function Login() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="w-12 h-12 flex items-center justify-center mx-auto mb-3">
-              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-12 h-12 object-contain rounded-xl" />
+              <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-12 h-12 object-contain rounded-xl" />
             </div>
-            <h1 className="text-2xl font-bold">Zyro</h1>
+            <h1 className="text-2xl font-bold">ZYR0</h1>
           </div>
 
           <div className="bg-card rounded-xl border border-border shadow-lg p-8">
             <div className="mb-6">
               <h2 className="text-2xl font-bold">Welcome Back</h2>
-              <p className="text-sm text-muted-foreground mt-1">Sign in to your Zyro account</p>
+              <p className="text-sm text-muted-foreground mt-1">Sign in to your ZYR0 account</p>
             </div>
 
             {displayError && (

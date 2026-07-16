@@ -165,7 +165,7 @@ export default function CompanyOfferLetters() {
             </div>
             <p>Dear <strong>${student.full_name}</strong>,</p>
             <p>Congratulations! We are thrilled to extend you an offer for the <strong>${internship.title}</strong> internship position at <strong>${company.name}</strong>.</p>
-            <p>Please find your official offer letter attached to this email. You can also view the details and respond to this offer online on the Zyro Platform.</p>
+            <p>Please find your official offer letter attached to this email. You can also view the details and respond to this offer online on the ZYR0 Platform.</p>
             <div style="text-align: center; margin: 30px 0;">
               <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View & Respond to Offer</a>
             </div>
@@ -257,7 +257,7 @@ export default function CompanyOfferLetters() {
     try {
       const student = offer.student;
       const internship = offer.internship;
-      const company = offer.company || { name: 'Zyro' }; // Fallback
+      const company = offer.company || { name: 'ZYR0' }; // Fallback
 
       if (!student || !internship) {
         throw new Error('Missing student or internship data for resending');
@@ -294,7 +294,7 @@ export default function CompanyOfferLetters() {
           </div>
           <p>Dear <strong>${student.full_name}</strong>,</p>
           <p>Congratulations! We are thrilled to extend you an offer for the <strong>${internship.title}</strong> internship position at <strong>${company.name}</strong>.</p>
-          <p>Please find your official offer letter attached to this email. You can also view the details and respond to this offer online on the Zyro Platform.</p>
+          <p>Please find your official offer letter attached to this email. You can also view the details and respond to this offer online on the ZYR0 Platform.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View & Respond to Offer</a>
           </div>

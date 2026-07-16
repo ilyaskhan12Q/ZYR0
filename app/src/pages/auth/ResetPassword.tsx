@@ -41,7 +41,7 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <SEO
         title="Reset Password"
-        description="Choose a new password for your Zyro account."
+        description="Choose a new password for your ZYR0 account."
         path="/reset-password"
         noIndex={true}
       />
@@ -49,9 +49,9 @@ export default function ResetPassword() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
             <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-10 h-10 object-contain rounded-xl" />
+              <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-10 h-10 object-contain rounded-xl" />
             </div>
-            <span className="text-xl font-bold">Zyro</span>
+            <span className="text-xl font-bold">ZYR0</span>
           </Link>
         </div>
 

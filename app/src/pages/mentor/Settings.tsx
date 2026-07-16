@@ -60,7 +60,7 @@ export default function MentorSettings() {
   const [password, setPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [settings, setSettings] = useState(() => {
-    const savedData = localStorage.getItem('zyro_mentor_settings');
+    const savedData = localStorage.getItem('zyr0_mentor_settings');
     if (savedData) {
       try {
         return JSON.parse(savedData);
@@ -92,7 +92,7 @@ export default function MentorSettings() {
 
   const handleSave = async () => {
     try {
-      localStorage.setItem('zyro_mentor_settings', JSON.stringify(settings));
+      localStorage.setItem('zyr0_mentor_settings', JSON.stringify(settings));
       
       if (password) {
         if (password.length < 6) {

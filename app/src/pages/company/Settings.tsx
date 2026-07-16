@@ -47,7 +47,7 @@ export default function CompanySettings() {
   const [password, setPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
   const [settings, setSettings] = useState(() => {
-    const savedData = localStorage.getItem('zyro_company_settings');
+    const savedData = localStorage.getItem('zyr0_company_settings');
     if (savedData) {
       try {
         return JSON.parse(savedData);
@@ -76,7 +76,7 @@ export default function CompanySettings() {
 
   const handleSave = async () => {
     try {
-      localStorage.setItem('zyro_company_settings', JSON.stringify(settings));
+      localStorage.setItem('zyr0_company_settings', JSON.stringify(settings));
       
       if (password) {
         if (password.length < 6) {

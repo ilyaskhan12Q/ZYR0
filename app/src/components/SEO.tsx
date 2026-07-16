@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { SITE_NAME, BASE_URL, DEFAULT_IMAGE, TWITTER_HANDLE } from '@/config/seo';
 
 interface SEOProps {
-  /** Page title — will be appended with " | Zyro" unless it already contains "Zyro" */
+  /** Page title — will be appended with " | ZYR0" unless it already contains "ZYR0" */
   title: string;
   /** Meta description (recommended 150–160 chars) */
   description: string;
@@ -35,7 +35,19 @@ export function SEO({
   structuredData,
   keywords,
 }: SEOProps) {
-  const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
+  // Normalize branding to ensure consistency
+  const normalizeBranding = (text: string): string => {
+    if (!text) return text;
+    // Replace standalone "Zyro" or "zyro" (case-insensitive) with "ZYR0"
+    // Does not match URLs (e.g. zyroo.dpdns.org) or email addresses/handles (@zyroplatform)
+    return text.replace(/\b[Zz]yro\b/g, 'ZYR0');
+  };
+
+  const cleanTitle = normalizeBranding(title);
+  const cleanDescription = normalizeBranding(description);
+  const cleanKeywords = keywords ? normalizeBranding(keywords) : undefined;
+
+  const fullTitle = cleanTitle.includes(SITE_NAME) ? cleanTitle : `${cleanTitle} | ${SITE_NAME}`;
   const canonicalUrl = `${BASE_URL}${path}`;
   const robotsContent = noIndex ? 'noindex, nofollow' : 'index, follow';
 
@@ -43,8 +55,8 @@ export function SEO({
     <Helmet>
       {/* Primary */}
       <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      {keywords && <meta name="keywords" content={keywords} />}
+      <meta name="description" content={cleanDescription} />
+      {cleanKeywords && <meta name="keywords" content={cleanKeywords} />}
       <meta name="robots" content={robotsContent} />
       <link rel="canonical" href={canonicalUrl} />
 
@@ -53,7 +65,7 @@ export function SEO({
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
+      <meta property="og:description" content={cleanDescription} />
       <meta property="og:image" content={image} />
       <meta property="og:image:alt" content={fullTitle} />
       <meta property="og:locale" content="en_US" />
@@ -63,7 +75,7 @@ export function SEO({
       <meta name="twitter:site" content={TWITTER_HANDLE} />
       <meta name="twitter:creator" content={TWITTER_HANDLE} />
       <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
+      <meta name="twitter:description" content={cleanDescription} />
       <meta name="twitter:image" content={image} />
       <meta name="twitter:image:alt" content={fullTitle} />
 

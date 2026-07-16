@@ -240,7 +240,7 @@ export default function InternshipDetail() {
       employmentType: 'INTERN',
       hiringOrganization: {
         '@type': 'Organization',
-        name: company?.name || 'Zyro Partner',
+        name: company?.name || 'ZYR0 Partner',
         sameAs: company?.website || undefined,
         logo: company?.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(company?.name || 'Company')}`,
       },
@@ -276,10 +276,10 @@ export default function InternshipDetail() {
   return (
     <div className="pt-20 pb-16 px-4">
       <SEO
-        title={`${internship.title} Internship at ${company?.name || 'Zyro Partner'}`}
-        description={`${internship.title} internship opportunity. Domain: ${internship.domain}. Duration: ${internship.duration}. Location: ${internship.location_type}. Learn more and apply on Zyro.`}
+        title={`${internship.title} Internship at ${company?.name || 'ZYR0 Partner'}`}
+        description={`${internship.title} internship opportunity. Domain: ${internship.domain}. Duration: ${internship.duration}. Location: ${internship.location_type}. Learn more and apply on ZYR0.`}
         path={`/internships/${id}`}
-        keywords={`${internship.title}, ${company?.name || 'Zyro Partner'} internship, ${internship.domain} internship, Zyro jobs`}
+        keywords={`${internship.title}, ${company?.name || 'ZYR0 Partner'} internship, ${internship.domain} internship, ZYR0 jobs`}
         structuredData={jobStructuredData}
       />
       <div className="max-w-6xl mx-auto">

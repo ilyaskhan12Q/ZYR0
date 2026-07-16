@@ -16,9 +16,9 @@ const contactStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'ContactPage',
-    name: 'Contact Zyro Support',
+    name: 'Contact ZYR0 Support',
     url: `${BASE_URL}/contact`,
-    description: 'Get in touch with the Zyro support team for platform questions, partnership inquiries, and technical assistance.',
+    description: 'Get in touch with the ZYR0 support team for platform questions, partnership inquiries, and technical assistance.',
   },
 ];
 
@@ -34,10 +34,10 @@ export default function Contact() {
   return (
     <div className="pt-20 pb-16 px-4">
       <SEO
-        title="Contact Zyro — Get in Touch with Our Team"
-        description="Have questions about Zyro? Reach out to our support team for help with your account, internship listings, certificate verification, or partnership opportunities. We respond within 24 hours."
+        title="Contact ZYR0 — Get in Touch with Our Team"
+        description="Have questions about ZYR0? Reach out to our support team for help with your account, internship listings, certificate verification, or partnership opportunities. We respond within 24 hours."
         path="/contact"
-        keywords="contact Zyro, Zyro support, internship platform help, partnership inquiry"
+        keywords="contact ZYR0, ZYR0 support, internship platform help, partnership inquiry"
         structuredData={contactStructuredData}
       />
       <div className="max-w-5xl mx-auto">
@@ -50,10 +50,10 @@ export default function Contact() {
           {/* Contact Info */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="space-y-4">
             {[
-              { icon: Mail, title: 'Email', value: 'support@zyro.com', desc: 'We reply within 24 hours' },
+              { icon: Mail, title: 'Email', value: 'support@zyroo.dpdns.org', desc: 'We reply within 24 hours' },
               { icon: Phone, title: 'Phone', value: '+1 (555) 123-4567', desc: 'Mon-Fri 9am-6pm EST' },
               { icon: MapPin, title: 'Office', value: 'San Francisco, CA', desc: '123 Market Street, Suite 400' },
-              { icon: Globe, title: 'Social', value: '@zyroplatform', desc: 'Follow us for updates' },
+              { icon: Globe, title: 'Social', value: '@zyr0platform', desc: 'Follow us for updates' },
             ].map((item, i) => (
               <div key={i} className="bg-card rounded-xl border border-border p-5 shadow-sm flex items-start gap-4">
                 <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">

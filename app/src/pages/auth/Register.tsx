@@ -113,8 +113,8 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <SEO
-        title="Sign Up — Join Zyro"
-        description="Register a student, company, or mentor account on the Zyro internship management platform."
+        title="Sign Up — Join ZYR0"
+        description="Register a student, company, or mentor account on the ZYR0 internship management platform."
         path="/register"
         noIndex={true}
       />
@@ -123,9 +123,9 @@ export default function Register() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
             <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/zyro-logo.png" alt="Zyro Logo" className="w-10 h-10 object-contain rounded-xl" />
+              <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-10 h-10 object-contain rounded-xl" />
             </div>
-            <span className="text-xl font-bold">Zyro</span>
+            <span className="text-xl font-bold">ZYR0</span>
           </Link>
         </div>
 
@@ -134,7 +134,7 @@ export default function Register() {
           {step === 'role' && (
             <motion.div key="role" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold">Join Zyro</h1>
+                <h1 className="text-3xl font-bold">Join ZYR0</h1>
                 <p className="text-muted-foreground mt-2">Select your role to get started</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4" role="radiogroup" aria-label="Select register role">
