@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 import { Spinner } from '@/components/ui/spinner';
@@ -50,61 +51,63 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 
 function App() {
   return (
-    <Suspense fallback={<RouteLoading />}>
-      <Routes>
-        {/* Public Routes */}
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Landing />} />
-          <Route path="/internships" element={<BrowseInternships />} />
-          <Route path="/internships/:id" element={<InternshipDetail />} />
-          <Route path="/companies" element={<Companies />} />
-          <Route path="/companies/:id" element={<CompanyDetail />} />
-          <Route path="/verify" element={<Verify />} />
-          <Route path="/verify/:code" element={<Verify />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/cookies" element={<CookiePolicy />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/help" element={<HelpCenter />} />
-          <Route path="/careers" element={<Careers />} />
-        </Route>
+    <LazyMotion features={domAnimation}>
+      <Suspense fallback={<RouteLoading />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/internships" element={<BrowseInternships />} />
+            <Route path="/internships/:id" element={<InternshipDetail />} />
+            <Route path="/companies" element={<Companies />} />
+            <Route path="/companies/:id" element={<CompanyDetail />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/verify/:code" element={<Verify />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/cookies" element={<CookiePolicy />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/careers" element={<Careers />} />
+          </Route>
 
-        {/* Auth Routes — redirect to dashboard if already logged in */}
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-        <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
-        <Route path="/register/:role" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
-        <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
+          {/* Auth Routes — redirect to dashboard if already logged in */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+          <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+          <Route path="/register/:role" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+          <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
 
-        {/* Student Routes */}
-        <Route path="/student/*" element={<ProtectedRoute role="student"><DashboardLayout role="student" /></ProtectedRoute>}>
-          <Route path="*" element={<StudentPortal />} />
-        </Route>
+          {/* Student Routes */}
+          <Route path="/student/*" element={<ProtectedRoute role="student"><DashboardLayout role="student" /></ProtectedRoute>}>
+            <Route path="*" element={<StudentPortal />} />
+          </Route>
 
-        {/* Company Routes */}
-        <Route path="/company/*" element={<ProtectedRoute role="company"><DashboardLayout role="company" /></ProtectedRoute>}>
-          <Route path="*" element={<CompanyPortal />} />
-        </Route>
+          {/* Company Routes */}
+          <Route path="/company/*" element={<ProtectedRoute role="company"><DashboardLayout role="company" /></ProtectedRoute>}>
+            <Route path="*" element={<CompanyPortal />} />
+          </Route>
 
-        {/* Mentor Routes */}
-        <Route path="/mentor/*" element={<ProtectedRoute role="mentor"><DashboardLayout role="mentor" /></ProtectedRoute>}>
-          <Route path="*" element={<MentorPortal />} />
-        </Route>
+          {/* Mentor Routes */}
+          <Route path="/mentor/*" element={<ProtectedRoute role="mentor"><DashboardLayout role="mentor" /></ProtectedRoute>}>
+            <Route path="*" element={<MentorPortal />} />
+          </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin/*" element={<ProtectedRoute role="admin"><DashboardLayout role="admin" /></ProtectedRoute>}>
-          <Route path="*" element={<AdminPortal />} />
-        </Route>
+          {/* Admin Routes */}
+          <Route path="/admin/*" element={<ProtectedRoute role="admin"><DashboardLayout role="admin" /></ProtectedRoute>}>
+            <Route path="*" element={<AdminPortal />} />
+          </Route>
 
-        {/* Fallback */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-    </Suspense>
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </Suspense>
+    </LazyMotion>
   );
 }
 

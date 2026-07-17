@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-07-17
+
+### Added
+- Realtime updates and synchronization for profiles and companies on the Admin Dashboard.
+- Clean text fallback support to the `send-email` Edge Function to prevent spam filter rejections.
+- Configured a DMARC DNS record and sender authentication requirements for email deliverability.
+
+### Changed
+- Upgraded CSS hover states in `index.css` with media query guards (`@media (hover: hover)`) to resolve sticky hovers and scroll lag on mobile browsers.
+- Replaced desktop-heavy animations on the landing page with conditional static layouts on mobile breakpoints.
+- Implemented lazy-routed modules and code-split `framer-motion` features to accelerate mobile main-thread execution.
+- Rethemed and unified platform-wide branding under the ZYR0 name, including a redesigned landing page hero section.
+
+### Fixed
+- Fixed email deliverability issues by routing through authenticated sender domain.
+- Enhanced certificate email triggers to include structural text content and secure links.
+
+## [0.4.4] - 2026-07-16
+
+### Added
+- Completed end-to-end saved internships system, including DB schemas, RLS policies, query/mutation services, and cache invalidation.
+- Implemented company rating features with trigger-calculated aggregate company reviews.
+
 ## [0.4.3] - 2026-07-16
 
 ### Fixed

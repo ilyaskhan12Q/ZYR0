@@ -148,29 +148,52 @@ serve(async (req) => {
     if (student?.email) {
       try {
         const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
-        const emailSubject = `Certificate Issued: ${title} - Zyro`;
+        const emailSubject = `Certificate of Completion: ${title}`;
         const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.dpdns.org';
         
         const emailHtml = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #4f46e5; margin: 0; font-size: 24px;">Certificate of Completion! 🎉</h1>
-              <p style="color: #6b7280; margin: 4px 0 0 0;">issued via Zyro</p>
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
+              <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Certificate of Completion</h2>
+              <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Issued via ZYR0</p>
             </div>
-            <p>Dear <strong>${student.full_name}</strong>,</p>
-            <p>Congratulations on successfully completing your internship! We are proud to issue you the certificate for <strong>${title}</strong>.</p>
-            <p style="margin: 16px 0; padding: 12px; background-color: #f9fafb; border-radius: 6px; font-family: monospace;">
-              <strong>Credential ID:</strong> ${credentialId}
-            </p>
-            <p>You can view, verify, or download your digital certificate online on the Zyro Platform.</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${siteUrl}/verify-certificate/${credentialId}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Verified Certificate</a>
+            
+            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${student.full_name}</strong>,</p>
+            
+            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">Congratulations on successfully completing your internship. We are proud to issue your official digital certificate for <strong>${title}</strong>.</p>
+            
+            <div style="margin: 24px 0; padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center;">
+              <span style="display: block; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Credential ID</span>
+              <strong style="color: #0f172a; font-size: 15px; letter-spacing: 0.05em;">${credentialId}</strong>
             </div>
-            <p style="color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 24px;">
-              Verify this digital credential securely on the Zyro network.
-            </p>
+            
+            <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform.</p>
+            
+            <div style="text-align: center; margin: 32px 0;">
+              <a href="${siteUrl}/verify-certificate/${credentialId}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
+            </div>
+            
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
+              <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">Verify this digital credential securely on the ZYR0 network at any time using your credential ID.</p>
+              <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
+            </div>
+            
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
+              <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
+              <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
+            </div>
           </div>
         `;
+
+        const emailText = `Dear ${student.full_name},\n\n` +
+          `Congratulations on successfully completing your internship! We are proud to issue your official digital certificate for ${title}.\n\n` +
+          `Credential ID: ${credentialId}\n\n` +
+          `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
+          `${siteUrl}/verify-certificate/${credentialId}\n\n` +
+          `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
+          `Best regards,\n` +
+          `The ZYR0 Team\n` +
+          `team@zyroo.dpdns.org`;
 
         const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const response = await fetch(sendEmailUrl, {
@@ -184,6 +207,7 @@ serve(async (req) => {
             to: student.email,
             subject: emailSubject,
             html: emailHtml,
+            text: emailText,
           }),
         });
 

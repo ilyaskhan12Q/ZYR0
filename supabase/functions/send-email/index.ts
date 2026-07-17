@@ -82,10 +82,11 @@ serve(async (req) => {
             'Authorization': `Bearer ${RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: from || 'Zyro <noreply@zyroo.dpdns.org>',
+            from: from || 'ZYR0 Team <team@zyroo.dpdns.org>',
             to: Array.isArray(to) ? to : [to],
             subject,
             html,
+            text: text || undefined,
             attachments: attachments?.map((att: EmailAttachment) => ({
               filename: att.filename,
               content: att.content,

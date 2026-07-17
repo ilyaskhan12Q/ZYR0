@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Search, FileCheck, ClipboardList, Users, Award, Briefcase,
   UserPlus, Send, BookOpen, CheckCircle2, Building2, GraduationCap,
@@ -176,14 +176,103 @@ const PARTICLE_PRESETS = [
   { left: '85%', top: '35%', duration: 3.5, delay: 1.9 },
 ];
 
+// Performance optimized motion components that strip Framer Motion on mobile to save layout and thread budget
+const MotionDiv = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
+  if (isMobile) {
+    return <div {...props}>{children}</div>;
+  }
+  return (
+    <m.div
+      initial={initial}
+      animate={animate}
+      transition={transition}
+      whileInView={whileInView}
+      viewport={viewport}
+      {...props}
+    >
+      {children}
+    </m.div>
+  );
+};
+
+const MotionSpan = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
+  if (isMobile) {
+    return <span {...props}>{children}</span>;
+  }
+  return (
+    <m.span
+      initial={initial}
+      animate={animate}
+      transition={transition}
+      whileInView={whileInView}
+      viewport={viewport}
+      {...props}
+    >
+      {children}
+    </m.span>
+  );
+};
+
+const MotionP = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
+  if (isMobile) {
+    return <p {...props}>{children}</p>;
+  }
+  return (
+    <m.p
+      initial={initial}
+      animate={animate}
+      transition={transition}
+      whileInView={whileInView}
+      viewport={viewport}
+      {...props}
+    >
+      {children}
+    </m.p>
+  );
+};
+
 export default function Landing() {
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
     const { clientX, clientY, currentTarget } = e;
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
     const x = ((clientX - left) / width) * 100;
     const y = ((clientY - top) / height) * 100;
     setMousePos({ x, y });
+  };
+
+  // Helper to dynamically adjust animation props based on screen size
+  const animProps = (initialVal: any, animateVal: any, transitionVal: any) => {
+    return isMobile
+      ? { initial: false }
+      : {
+          initial: initialVal,
+          animate: animateVal,
+          transition: transitionVal,
+        };
+  };
+
+  const viewProps = (initialVal: any, whileInViewVal: any, transitionVal: any = undefined) => {
+    return isMobile
+      ? { initial: false }
+      : {
+          initial: initialVal,
+          whileInView: whileInViewVal,
+          viewport: { once: true },
+          transition: transitionVal,
+        };
   };
 
   return (
@@ -202,40 +291,44 @@ export default function Landing() {
         onMouseMove={handleMouseMove}
         className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-12 lg:py-16"
       >
-        {/* Animated Particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {PARTICLE_PRESETS.map((particle, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/20 rounded-full"
-              style={{
-                left: particle.left,
-                top: particle.top,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.2, 0.7, 0.2],
-              }}
-              transition={{
-                duration: particle.duration,
-                repeat: Infinity,
-                delay: particle.delay,
-              }}
-            />
-          ))}
-        </div>
+        {/* Animated Particles - only rendered on desktop */}
+        {!isMobile && (
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {PARTICLE_PRESETS.map((particle, i) => (
+              <m.div
+                key={i}
+                className="absolute w-1 h-1 bg-white/20 rounded-full"
+                style={{
+                  left: particle.left,
+                  top: particle.top,
+                }}
+                animate={{
+                  y: [0, -30, 0],
+                  opacity: [0.2, 0.7, 0.2],
+                }}
+                transition={{
+                  duration: particle.duration,
+                  repeat: Infinity,
+                  delay: particle.delay,
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Ambient Blur Lights */}
         <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Mouse-reactive lighting effect */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
-          style={{
-            background: `radial-gradient(600px circle at ${mousePos.x}% ${mousePos.y}%, rgba(99,102,241,0.15), transparent 80%)`,
-          }}
-        />
+        {/* Mouse-reactive lighting effect - disabled on mobile */}
+        {!isMobile && (
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
+            style={{
+              background: `radial-gradient(600px circle at ${mousePos.x}% ${mousePos.y}%, rgba(99,102,241,0.15), transparent 80%)`,
+            }}
+          />
+        )}
 
         {/* Subtle Grid Overlay */}
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
@@ -257,72 +350,93 @@ export default function Landing() {
                   'Verified Certificates',
                   'Professional Experience Tracking'
                 ].map((badge, idx) => (
-                  <motion.span
+                  <MotionSpan
+                    isMobile={isMobile}
                     key={idx}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: 0.1 * idx }}
+                    {...animProps(
+                      { opacity: 0, scale: 0.95 },
+                      { opacity: 1, scale: 1 },
+                      { duration: 0.4, delay: 0.1 * idx }
+                    )}
                     className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-white/85 hover:bg-white/10 transition-colors"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
                     {badge}
-                  </motion.span>
+                  </MotionSpan>
                 ))}
               </div>
 
               {/* Title Section with Oversized Typography */}
               <div className="space-y-3">
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 15 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: 0.3 }
+                  )}
                   className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-widest block"
                 >
                   Find Your Next
-                </motion.div>
+                </MotionDiv>
                 <div className="flex flex-col space-y-1">
-                  <motion.span
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
+                  <MotionSpan
+                    isMobile={isMobile}
+                    {...animProps(
+                      { opacity: 0, x: -20 },
+                      { opacity: 1, x: 0 },
+                      { duration: 0.6, delay: 0.4 }
+                    )}
                     className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-white"
                   >
                     Structured
-                  </motion.span>
-                  <motion.span
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.7, delay: 0.5 }}
+                  </MotionSpan>
+                  <MotionSpan
+                    isMobile={isMobile}
+                    {...animProps(
+                      { opacity: 0, x: 20 },
+                      { opacity: 1, x: 0 },
+                      { duration: 0.7, delay: 0.5 }
+                    )}
                     className="text-6xl xs:text-7xl sm:text-8xl md:text-9xl lg:text-[7rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-accent via-blue-400 to-white leading-none block"
                   >
                     Internship.
-                  </motion.span>
+                  </MotionSpan>
                 </div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 }}
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 20 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: 0.6 }
+                  )}
                   className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight"
                 >
                   Build Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-300">Future</span> Career.
-                </motion.div>
+                </MotionDiv>
               </div>
 
               {/* Supporting Explanation */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.7 }}
+              <MotionP
+                isMobile={isMobile}
+                {...animProps(
+                  { opacity: 0, y: 20 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: 0.7 }
+                )}
                 className="text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
               >
                 ZYR0 bridges the gap between academic learning and professional growth. We provide students with structured milestone tasks and verified certificates, while enabling companies to hire and mentor talent with total confidence.
-              </motion.p>
+              </MotionP>
 
               {/* Actions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.8 }}
+              <MotionDiv
+                isMobile={isMobile}
+                {...animProps(
+                  { opacity: 0, y: 20 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.4, delay: 0.8 }
+                )}
                 className="flex flex-col sm:flex-row gap-4"
               >
                 <Link
@@ -338,13 +452,16 @@ export default function Landing() {
                 >
                   For Companies
                 </Link>
-              </motion.div>
+              </MotionDiv>
 
               {/* Trust Indicators */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.4, delay: 1.0 }}
+              <MotionDiv
+                isMobile={isMobile}
+                {...animProps(
+                  { opacity: 0 },
+                  { opacity: 1 },
+                  { duration: 0.4, delay: 1.0 }
+                )}
                 className="flex flex-wrap items-center gap-x-6 gap-y-3 text-white/40 text-xs pt-4 border-t border-white/5"
               >
                 <span className="uppercase tracking-wider font-semibold text-[10px]">Ecosystem Partners:</span>
@@ -359,7 +476,7 @@ export default function Landing() {
                     <span>{partner.label}</span>
                   </div>
                 ))}
-              </motion.div>
+              </MotionDiv>
 
             </div>
 
@@ -371,18 +488,17 @@ export default function Landing() {
 
               <div className="relative w-full max-w-md h-full">
                 {/* Floating Card 1: Workspace Tasks */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: [0, -12, 0], 
-                    scale: 1 
-                  }}
-                  transition={{ 
-                    opacity: { duration: 0.6, delay: 0.8 },
-                    scale: { duration: 0.6, delay: 0.8 },
-                    y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
-                  }}
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 40, scale: 0.95 },
+                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -12, 0], scale: 1 },
+                    isMobile ? { duration: 0.6, delay: 0.8 } : { 
+                      opacity: { duration: 0.6, delay: 0.8 },
+                      scale: { duration: 0.6, delay: 0.8 },
+                      y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
+                    }
+                  )}
                   className="absolute top-8 left-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-5 shadow-2xl z-10"
                 >
                   <div className="flex items-center justify-between border-b border-white/10 pb-3">
@@ -414,21 +530,20 @@ export default function Landing() {
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </MotionDiv>
 
                 {/* Floating Card 2: Mentor Feedback */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: [0, 10, 0], 
-                    scale: 1 
-                  }}
-                  transition={{ 
-                    opacity: { duration: 0.6, delay: 1.0 },
-                    scale: { duration: 0.6, delay: 1.0 },
-                    y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
-                  }}
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 40, scale: 0.95 },
+                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, 10, 0], scale: 1 },
+                    isMobile ? { duration: 0.6, delay: 1.0 } : { 
+                      opacity: { duration: 0.6, delay: 1.0 },
+                      scale: { duration: 0.6, delay: 1.0 },
+                      y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+                    }
+                  )}
                   className="absolute bottom-12 right-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-2xl z-20"
                 >
                   <div className="flex items-center gap-3">
@@ -443,21 +558,20 @@ export default function Landing() {
                   <p className="mt-3 text-[11px] text-white/80 italic bg-white/5 p-2 rounded-lg border border-white/5">
                     "Excellent database schema. Milestone 4 approved. Let's proceed with security rules validation."
                   </p>
-                </motion.div>
+                </MotionDiv>
 
                 {/* Floating Card 3: Certificate Preview */}
-                <motion.div
-                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                  animate={{ 
-                    opacity: 1, 
-                    y: [0, -8, 0], 
-                    scale: 1 
-                  }}
-                  transition={{ 
-                    opacity: { duration: 0.6, delay: 1.2 },
-                    scale: { duration: 0.6, delay: 1.2 },
-                    y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
-                  }}
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 40, scale: 0.95 },
+                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -8, 0], scale: 1 },
+                    isMobile ? { duration: 0.6, delay: 1.2 } : { 
+                      opacity: { duration: 0.6, delay: 1.2 },
+                      scale: { duration: 0.6, delay: 1.2 },
+                      y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
+                    }
+                  )}
                   className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 to-slate-900 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
                 >
                   <div className="flex items-center justify-between">
@@ -476,7 +590,7 @@ export default function Landing() {
                       Secure
                     </span>
                   </div>
-                </motion.div>
+                </MotionDiv>
               </div>
             </div>
 
@@ -487,9 +601,13 @@ export default function Landing() {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden sm:flex">
           <span className="text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
           <div className="w-5 h-8 border border-white/20 rounded-full flex justify-center p-1">
-            <motion.div 
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            <MotionDiv 
+              isMobile={isMobile}
+              {...animProps(
+                null,
+                isMobile ? {} : { y: [0, 10, 0] },
+                isMobile ? {} : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
+              )}
               className="w-1.5 h-1.5 bg-accent rounded-full"
             />
           </div>
@@ -497,15 +615,17 @@ export default function Landing() {
       </section>
 
       {/* Section 1 — Every Career Starts Somewhere */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-b border-border">
+      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-b border-border content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left: Heading and Paragraph */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, x: -30 },
+                { opacity: 1, x: 0 },
+                { duration: 0.6 }
+              )}
               className="lg:col-span-5 space-y-6"
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
@@ -518,17 +638,19 @@ export default function Landing() {
               <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
                 We connect students looking for professional experience with companies hiring interns to build their future teams. By bringing structure, mentorship, and clear milestones to the process, we help universities bridge academic learning with industry demands. We make internship opportunities measurable, transparent, and structured for career development.
               </p>
-            </motion.div>
+            </MotionDiv>
 
             {/* Right: Four Elegant Cards */}
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
               {roles.map((role, i) => (
-                <motion.div
+                <MotionDiv
+                  isMobile={isMobile}
                   key={i}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  {...viewProps(
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: i * 0.1 }
+                  )}
                   className="bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
                 >
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
@@ -536,7 +658,7 @@ export default function Landing() {
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-foreground">{role.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{role.desc}</p>
-                </motion.div>
+                </MotionDiv>
               ))}
             </div>
           </div>
@@ -544,12 +666,14 @@ export default function Landing() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-14 lg:py-20 px-4">
+      <section className="py-14 lg:py-20 px-4 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <MotionDiv
+            isMobile={isMobile}
+            {...viewProps(
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0 }
+            )}
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
@@ -557,16 +681,18 @@ export default function Landing() {
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
               Every tool you need to track progress, align goals, and verify experience.
             </p>
-          </motion.div>
+          </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, i) => (
-              <motion.div
+              <MotionDiv
+                isMobile={isMobile}
                 key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                {...viewProps(
+                  { opacity: 0, y: 40 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.1 }
+                )}
                 className="feature-card"
               >
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
@@ -574,33 +700,37 @@ export default function Landing() {
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">{feature.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/50">
+      <section className="py-14 lg:py-20 px-4 bg-muted/50 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <MotionDiv
+            isMobile={isMobile}
+            {...viewProps(
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0 }
+            )}
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Path</span>
             <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">How it works</h2>
-          </motion.div>
+          </MotionDiv>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
             {steps.map((step, i) => (
-              <motion.div
+              <MotionDiv
+                isMobile={isMobile}
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
+                {...viewProps(
+                  { opacity: 0, y: 30 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.15 }
+                )}
                 className="text-center relative"
               >
                 <span className="text-5xl font-bold text-accent/15">{step.num}</span>
@@ -612,21 +742,23 @@ export default function Landing() {
                 {i < 3 && (
                   <div className="hidden md:block absolute top-16 right-0 w-1/2 border-t-2 border-dashed border-border" />
                 )}
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
       </section>
 
       {/* For Companies */}
-      <section className="py-14 lg:py-20 px-4">
+      <section className="py-14 lg:py-20 px-4 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, x: -30 },
+                { opacity: 1, x: 0 },
+                { duration: 0.6 }
+              )}
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
               <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Run your internship programs with confidence</h2>
@@ -635,19 +767,21 @@ export default function Landing() {
               </p>
               <div className="mt-8 space-y-4">
                 {checkFeatures.map((feature, i) => (
-                  <motion.div
+                  <MotionDiv
+                    isMobile={isMobile}
                     key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
+                    {...viewProps(
+                      { opacity: 0, x: -20 },
+                      { opacity: 1, x: 0 },
+                      { delay: i * 0.1 }
+                    )}
                     className="flex items-center gap-3"
                   >
                     <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     </div>
                     <span className="text-sm text-foreground">{feature}</span>
-                  </motion.div>
+                  </MotionDiv>
                 ))}
               </div>
               <Link
@@ -657,13 +791,15 @@ export default function Landing() {
                 Post an Internship
                 <ArrowRight className="w-4 h-4" />
               </Link>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, x: 30 },
+                { opacity: 1, x: 0 },
+                { duration: 0.6, delay: 0.2 }
+              )}
               className="relative"
             >
               <div className="bg-gradient-to-br from-primary to-accent dark:from-slate-900 dark:to-accent/50 rounded-2xl p-8 shadow-2xl">
@@ -705,18 +841,20 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </MotionDiv>
           </div>
         </div>
       </section>
 
       {/* Section 2 — Built on Transparency. Designed for Confidence. */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-t border-b border-border/50">
+      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-t border-b border-border/50 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <MotionDiv
+            isMobile={isMobile}
+            {...viewProps(
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0 }
+            )}
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">System Credibility</span>
@@ -726,16 +864,18 @@ export default function Landing() {
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
               A reliable internship management platform requires clear guardrails. We align student internships and internship workflow processes to ensure credibility at every step of career development.
             </p>
-          </motion.div>
+          </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {confidenceCards.map((card, i) => (
-              <motion.div
+              <MotionDiv
+                isMobile={isMobile}
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                {...viewProps(
+                  { opacity: 0, y: 30 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.1 }
+                )}
                 className="bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
               >
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
@@ -743,33 +883,37 @@ export default function Landing() {
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-foreground">{card.title}</h3>
                 <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/50">
+      <section className="py-14 lg:py-20 px-4 bg-muted/50 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <MotionDiv
+            isMobile={isMobile}
+            {...viewProps(
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0 }
+            )}
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Reviews</span>
             <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Verified experiences from our community</h2>
-          </motion.div>
+          </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
-              <motion.div
+              <MotionDiv
+                isMobile={isMobile}
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                {...viewProps(
+                  { opacity: 0, y: 30 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.1 }
+                )}
                 className="bg-card rounded-xl border border-border p-6 shadow-md"
               >
                 <Quote className="w-8 h-8 text-accent/20" />
@@ -781,23 +925,25 @@ export default function Landing() {
                     <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="py-12 lg:py-16 px-4 bg-primary dark:bg-slate-950 border-y border-border/10">
+      <section className="py-12 lg:py-16 px-4 bg-primary dark:bg-slate-950 border-y border-border/10 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => (
-              <motion.div
+              <MotionDiv
+                isMobile={isMobile}
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                {...viewProps(
+                  { opacity: 0, y: 20 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.1 }
+                )}
                 className="text-center"
               >
                 <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-white">{stat.value}</p>
@@ -805,19 +951,21 @@ export default function Landing() {
                   <stat.icon className="w-4 h-4 text-white/50" />
                   <p className="text-sm text-white/60">{stat.label}</p>
                 </div>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Banner */}
-      <section className="py-14 lg:py-20 px-4">
+      <section className="py-14 lg:py-20 px-4 content-visibility-auto">
         <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <MotionDiv
+            isMobile={isMobile}
+            {...viewProps(
+              { opacity: 0, y: 20 },
+              { opacity: 1, y: 0 }
+            )}
             className="bg-accent rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 opacity-10">
@@ -844,7 +992,7 @@ export default function Landing() {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </MotionDiv>
         </div>
       </section>
     </div>

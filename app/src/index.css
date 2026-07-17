@@ -198,10 +198,6 @@
   @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground transition-all duration-200;
 }
 
-.sidebar-link:hover {
-  @apply bg-accent/10 text-accent;
-}
-
 .sidebar-link.active {
   @apply bg-accent/10 text-accent border-r-2 border-accent;
 }
@@ -211,17 +207,9 @@
   @apply bg-card rounded-xl border border-border p-5 shadow-sm transition-all duration-200;
 }
 
-.stat-card:hover {
-  @apply shadow-md -translate-y-0.5;
-}
-
 /* Feature card */
 .feature-card {
   @apply bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300;
-}
-
-.feature-card:hover {
-  @apply shadow-lg -translate-y-1 border-primary/20;
 }
 
 /* Internship card */
@@ -229,17 +217,28 @@
   @apply bg-card rounded-xl border border-border shadow-md overflow-hidden transition-all duration-300;
 }
 
-.internship-card:hover {
-  @apply shadow-lg -translate-y-1;
-}
-
 /* Table row hover */
 .table-row-hover {
   @apply transition-colors duration-150;
 }
 
-.table-row-hover:hover {
-  @apply bg-muted/50;
+/* Wrapped in media query to prevent sticky hover state on mobile */
+@media (hover: hover) {
+  .sidebar-link:hover {
+    @apply bg-accent/10 text-accent;
+  }
+  .stat-card:hover {
+    @apply shadow-md -translate-y-0.5;
+  }
+  .feature-card:hover {
+    @apply shadow-lg -translate-y-1 border-primary/20;
+  }
+  .internship-card:hover {
+    @apply shadow-lg -translate-y-1;
+  }
+  .table-row-hover:hover {
+    @apply bg-muted/50;
+  }
 }
 
 /* Badge variants */
@@ -325,8 +324,10 @@
   @apply transition-all duration-300;
 }
 
-.card-lift:hover {
-  @apply -translate-y-1 shadow-lg;
+@media (hover: hover) {
+  .card-lift:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
 }
 
 /* Button press */
@@ -371,3 +372,10 @@
 .focus-visible-ring {
   @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-shadow duration-150;
 }
+
+/* Scroll performance optimization class to skip off-screen rendering */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
+}
+
