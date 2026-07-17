@@ -1,18 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, FolderOpen, FileCheck, Award, Shield, Zap, TrendingUp, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { supabase } from '@/lib/supabase';
-
-const userGrowthData = [
-  { month: 'Aug', students: 120, companies: 8, mentors: 5 },
-  { month: 'Sep', students: 180, companies: 12, mentors: 8 },
-  { month: 'Oct', students: 240, companies: 18, mentors: 12 },
-  { month: 'Nov', students: 310, companies: 22, mentors: 15 },
-  { month: 'Dec', students: 450, companies: 30, mentors: 22 },
-  { month: 'Jan', students: 580, companies: 42, mentors: 35 },
-];
 
 const systemHealth = [
   { name: 'Database', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
@@ -22,35 +13,99 @@ const systemHealth = [
 ];
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [internshipsCount, setInternshipsCount] = useState(0);
+  const [certsCount, setCertsCount] = useState(0);
+  const [appsCount, setAppsCount] = useState(0);
   const [activities, setActivities] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Buffers for batch updates
+  const profileQueueRef = useRef<{ eventType: string; record: any }[]>([]);
+  const companyQueueRef = useRef<{ eventType: string; record: any }[]>([]);
+  const updateTimeoutRef = useRef<any>(null);
+
+  const processQueues = () => {
+    // Process profile updates in one batch
+    if (profileQueueRef.current.length > 0) {
+      const queue = [...profileQueueRef.current];
+      profileQueueRef.current = [];
+
+      setProfiles(prev => {
+        let updated = [...prev];
+        queue.forEach(({ eventType, record }) => {
+          if (eventType === 'INSERT') {
+            if (!updated.some(p => p.id === record.id)) {
+              updated.push(record);
+            }
+          } else if (eventType === 'UPDATE') {
+            updated = updated.map(p => p.id === record.id ? record : p);
+          } else if (eventType === 'DELETE') {
+            updated = updated.filter(p => p.id !== record.id);
+          }
+        });
+        return updated;
+      });
+    }
+
+    // Process company updates in one batch
+    if (companyQueueRef.current.length > 0) {
+      const queue = [...companyQueueRef.current];
+      companyQueueRef.current = [];
+
+      setCompanies(prev => {
+        let updated = [...prev];
+        queue.forEach(({ eventType, record }) => {
+          if (eventType === 'INSERT') {
+            if (!updated.some(c => c.id === record.id)) {
+              updated.push(record);
+            }
+          } else if (eventType === 'UPDATE') {
+            updated = updated.map(c => c.id === record.id ? record : c);
+          } else if (eventType === 'DELETE') {
+            updated = updated.filter(c => c.id !== record.id);
+          }
+        });
+        return updated;
+      });
+    }
+  };
+
+  const queueProfileUpdate = (eventType: string, record: any) => {
+    profileQueueRef.current.push({ eventType, record });
+    if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+    updateTimeoutRef.current = setTimeout(processQueues, 50);
+  };
+
+  const queueCompanyUpdate = (eventType: string, record: any) => {
+    companyQueueRef.current.push({ eventType, record });
+    if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+    updateTimeoutRef.current = setTimeout(processQueues, 50);
+  };
+
   useEffect(() => {
+    let profileChannel: any;
+    let companyChannel: any;
+
     async function loadAdminStats() {
       try {
         const [profilesRes, companiesRes, internshipsRes, certsRes, appsRes] = await Promise.all([
-          supabase.from('profiles').select('id, role'),
-          supabase.from('companies').select('id', { count: 'exact' }),
+          supabase.from('profiles').select('id, role, created_at'),
+          supabase.from('companies').select('id, created_at'),
           supabase.from('internships').select('id', { count: 'exact' }),
           supabase.from('certificates').select('id', { count: 'exact' }),
           supabase.from('applications').select('id', { count: 'exact' }),
         ]);
 
-        const profiles = profilesRes.data || [];
-        const studentsCount = profiles.filter((p) => p.role === 'student').length;
-        const mentorsCount = profiles.filter((p) => p.role === 'mentor').length;
-        const companyRepsCount = profiles.filter((p) => p.role === 'company').length;
+        const fetchedProfiles = profilesRes.data || [];
+        const fetchedCompanies = companiesRes.data || [];
 
-        const adminStats = [
-          { label: 'Students', value: studentsCount.toString(), icon: Users },
-          { label: 'Mentors', value: mentorsCount.toString(), icon: Shield },
-          { label: 'Companies', value: (companiesRes.count || 0).toString(), icon: FolderOpen },
-          { label: 'Internships', value: (internshipsRes.count || 0).toString(), icon: Zap },
-          { label: 'Applications', value: (appsRes.count || 0).toString(), icon: FileCheck },
-          { label: 'Certificates', value: (certsRes.count || 0).toString(), icon: Award },
-        ];
-        setStats(adminStats);
+        setProfiles(fetchedProfiles);
+        setCompanies(fetchedCompanies);
+        setInternshipsCount(internshipsRes.count || 0);
+        setCertsCount(certsRes.count || 0);
+        setAppsCount(appsRes.count || 0);
 
         // Fetch recent activity logs
         const { data: logs } = await supabase
@@ -63,6 +118,44 @@ export default function AdminDashboard() {
           .limit(5);
 
         if (logs) setActivities(logs);
+
+        // Set up realtime subscriptions after initial fetch
+        profileChannel = supabase
+          .channel('realtime-profiles')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'profiles' },
+            (payload) => {
+              const { eventType, new: newRecord, old: oldRecord } = payload;
+              if (eventType === 'INSERT') {
+                queueProfileUpdate('INSERT', newRecord);
+              } else if (eventType === 'UPDATE') {
+                queueProfileUpdate('UPDATE', newRecord);
+              } else if (eventType === 'DELETE') {
+                queueProfileUpdate('DELETE', oldRecord);
+              }
+            }
+          )
+          .subscribe();
+
+        companyChannel = supabase
+          .channel('realtime-companies')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'companies' },
+            (payload) => {
+              const { eventType, new: newRecord, old: oldRecord } = payload;
+              if (eventType === 'INSERT') {
+                queueCompanyUpdate('INSERT', newRecord);
+              } else if (eventType === 'UPDATE') {
+                queueCompanyUpdate('UPDATE', newRecord);
+              } else if (eventType === 'DELETE') {
+                queueCompanyUpdate('DELETE', oldRecord);
+              }
+            }
+          )
+          .subscribe();
+
       } catch (err) {
         console.error('Error loading admin dashboard stats:', err);
       } finally {
@@ -70,7 +163,62 @@ export default function AdminDashboard() {
       }
     }
     loadAdminStats();
+
+    return () => {
+      if (profileChannel) supabase.removeChannel(profileChannel);
+      if (companyChannel) supabase.removeChannel(companyChannel);
+      if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+    };
   }, []);
+
+  const stats = useMemo(() => {
+    const studentsCount = profiles.filter((p) => p.role === 'student').length;
+    const mentorsCount = profiles.filter((p) => p.role === 'mentor').length;
+
+    return [
+      { label: 'Students', value: studentsCount.toString(), icon: Users },
+      { label: 'Mentors', value: mentorsCount.toString(), icon: Shield },
+      { label: 'Companies', value: companies.length.toString(), icon: FolderOpen },
+      { label: 'Internships', value: internshipsCount.toString(), icon: Zap },
+      { label: 'Applications', value: appsCount.toString(), icon: FileCheck },
+      { label: 'Certificates', value: certsCount.toString(), icon: Award },
+    ];
+  }, [profiles, companies, internshipsCount, appsCount, certsCount]);
+
+  const userGrowthData = useMemo(() => {
+    const result = [];
+    const now = new Date();
+
+    // Create the last 6 months list
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = d.toLocaleString('default', { month: 'short' });
+      const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59, 999);
+      result.push({
+        month: monthName,
+        endDateTime: lastDay.getTime(),
+        students: 0,
+        companies: 0,
+        mentors: 0
+      });
+    }
+
+    // Populate each month with cumulative counts
+    result.forEach(item => {
+      item.students = profiles.filter(
+        p => p.role === 'student' && new Date(p.created_at).getTime() <= item.endDateTime
+      ).length;
+      item.mentors = profiles.filter(
+        p => p.role === 'mentor' && new Date(p.created_at).getTime() <= item.endDateTime
+      ).length;
+      item.companies = companies.filter(
+        c => new Date(c.created_at).getTime() <= item.endDateTime
+      ).length;
+    });
+
+    return result;
+  }, [profiles, companies]);
+
 
   if (loading) {
     return (
