@@ -173,9 +173,9 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight text-balance"
           >
-            Run Structured Internships
+            One Platform.
             <br />
-            <span className="text-accent">from End to End</span>
+            <span className="text-accent">Every Internship.</span>
           </motion.h1>
 
           <motion.p
@@ -184,7 +184,7 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="mt-4 sm:mt-6 text-base sm:text-lg text-white/70 max-w-2xl mx-auto text-balance"
           >
-            A unified platform designed for the modern internship lifecycle. ZYR0 integrates student applications, structured task workflows, mentor feedback, and blockchain-verified credentials into a single source of truth.
+            From application to certification, ZYR0 gives students, companies, and mentors a structured way to manage internships from start to finish.
           </motion.p>
 
           <motion.div
@@ -197,14 +197,14 @@ export default function Landing() {
               to="/register"
               className="inline-flex items-center justify-center gap-2 bg-accent text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25"
             >
-              Create Free Account
+              Start Your Internship
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              to="/internships"
+              to="/register"
               className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200"
             >
-              Explore Opportunities
+              For Companies
             </Link>
           </motion.div>
 
