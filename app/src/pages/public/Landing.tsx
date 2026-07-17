@@ -86,6 +86,72 @@ const checkFeatures = [
   'Access cohort performance statistics',
 ];
 
+const roles = [
+  {
+    icon: GraduationCap,
+    title: 'Students',
+    desc: 'Build experience that employers recognize.',
+    color: 'text-blue-500 bg-blue-500/10'
+  },
+  {
+    icon: Building2,
+    title: 'Companies',
+    desc: 'Develop future professionals through structured internships.',
+    color: 'text-emerald-500 bg-emerald-500/10'
+  },
+  {
+    icon: Users,
+    title: 'Mentors',
+    desc: 'Guide the next generation with measurable impact.',
+    color: 'text-orange-500 bg-orange-500/10'
+  },
+  {
+    icon: Globe,
+    title: 'Universities',
+    desc: 'Bridge education with industry experience.',
+    color: 'text-purple-500 bg-purple-500/10'
+  }
+];
+
+const confidenceCards = [
+  {
+    icon: Award,
+    title: 'Verified Certificates',
+    desc: 'Every certificate issued is tamper-proof and instantly verifiable online by any prospective employer.',
+    color: 'text-yellow-500 bg-yellow-500/10'
+  },
+  {
+    icon: ClipboardList,
+    title: 'Structured Internship Lifecycle',
+    desc: 'From initial application to daily tasks, feedback, and final sign-off, every stage follows a consistent process.',
+    color: 'text-blue-500 bg-blue-500/10'
+  },
+  {
+    icon: Users,
+    title: 'Role-Based Access',
+    desc: 'Granular access controls ensure students, mentors, employers, and administrators only access permitted data.',
+    color: 'text-emerald-500 bg-emerald-500/10'
+  },
+  {
+    icon: FileCheck,
+    title: 'Privacy First',
+    desc: 'All personal profiles, evaluations, feedback logs, and workspace documents remain secure and under user control.',
+    color: 'text-purple-500 bg-purple-500/10'
+  },
+  {
+    icon: TrendingUp,
+    title: 'Transparent Progress',
+    desc: 'Every assigned task, supervisor review, and milestone update is transparently documented in a single timeline.',
+    color: 'text-orange-500 bg-orange-500/10'
+  },
+  {
+    icon: Globe,
+    title: 'Built to Grow',
+    desc: 'Flexible architecture that serves single student placements as efficiently as university-wide internship cohorts.',
+    color: 'text-teal-500 bg-teal-500/10'
+  }
+];
+
 const PARTICLE_PRESETS = [
   { left: '12%', top: '45%', duration: 4.2, delay: 0.5 },
   { left: '25%', top: '15%', duration: 3.8, delay: 1.2 },
@@ -223,6 +289,53 @@ export default function Landing() {
               </div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* Section 1 — Every Career Starts Somewhere */}
+      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-b border-border">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left: Heading and Paragraph */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-5 space-y-6"
+            >
+              <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
+                Every career starts somewhere.
+              </h2>
+              <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-normal">
+                Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
+              </p>
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                We connect students looking for professional experience with companies hiring interns to build their future teams. By bringing structure, mentorship, and clear milestones to the process, we help universities bridge academic learning with industry demands. We make internship opportunities measurable, transparent, and structured for career development.
+              </p>
+            </motion.div>
+
+            {/* Right: Four Elegant Cards */}
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {roles.map((role, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.1 }}
+                  className="bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
+                >
+                  <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
+                    <role.icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-foreground">{role.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{role.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -389,6 +502,45 @@ export default function Landing() {
                 </div>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 2 — Built on Transparency. Designed for Confidence. */}
+      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-t border-b border-border/50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <span className="text-accent text-sm font-semibold uppercase tracking-wider">System Credibility</span>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
+              Built on transparency. Designed for confidence.
+            </h2>
+            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+              A reliable internship management platform requires clear guardrails. We align student internships and internship workflow processes to ensure credibility at every step of career development.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {confidenceCards.map((card, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
+              >
+                <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
+                  <card.icon className="w-5 h-5" />
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-foreground">{card.title}</h3>
+                <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
