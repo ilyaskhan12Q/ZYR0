@@ -203,7 +203,7 @@ export default function PublicLayout() {
                   <span className="text-xl font-bold">ZYR0</span>
                 </div>
                 <p className="text-white/60 text-sm leading-relaxed">
-                  The complete internship management platform connecting students, companies, and mentors.
+                  A professional internship platform connecting students, companies, and mentors through a structured internship lifecycle.
                 </p>
                 <div className="flex gap-4 mt-6">
                   <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-white/40 hover:text-white transition-colors">
@@ -257,7 +257,7 @@ export default function PublicLayout() {
 
             <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-white/40 text-sm">&copy; 2025 ZYR0. All rights reserved.</p>
-              <p className="text-white/40 text-sm">Made with care for the next generation of professionals.</p>
+              <p className="text-white/40 text-sm">Designed for the modern workforce.</p>
             </div>
           </div>
         </footer>
