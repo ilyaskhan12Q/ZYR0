@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -176,6 +177,15 @@ const PARTICLE_PRESETS = [
 ];
 
 export default function Landing() {
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const { clientX, clientY, currentTarget } = e;
+    const { left, top, width, height } = currentTarget.getBoundingClientRect();
+    const x = ((clientX - left) / width) * 100;
+    const y = ((clientY - top) / height) * 100;
+    setMousePos({ x, y });
+  };
+
   return (
     <div>
       <SEO
@@ -186,10 +196,11 @@ export default function Landing() {
         structuredData={homepageStructuredData}
       />
 
-      {/* Hero Section — fills the true visible viewport on mobile (dvh) and desktop (100vh fallback) */}
+      {/* Hero Section — redesigned with oversized typography, glowing grids, and a floating workspace preview */}
       <section
         aria-label="Platform introduction"
-        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height"
+        onMouseMove={handleMouseMove}
+        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-12 lg:py-16"
       >
         {/* Animated Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -202,8 +213,8 @@ export default function Landing() {
                 top: particle.top,
               }}
               animate={{
-                y: [0, -20, 0],
-                opacity: [0.2, 0.6, 0.2],
+                y: [0, -30, 0],
+                opacity: [0.2, 0.7, 0.2],
               }}
               transition={{
                 duration: particle.duration,
@@ -214,81 +225,274 @@ export default function Landing() {
           ))}
         </div>
 
+        {/* Ambient Blur Lights */}
+        <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+        {/* Mouse-reactive lighting effect */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
+          style={{
+            background: `radial-gradient(600px circle at ${mousePos.x}% ${mousePos.y}%, rgba(99,102,241,0.15), transparent 80%)`,
+          }}
+        />
+
         {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 opacity-5" style={{
+        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
           backgroundSize: '60px 60px',
         }} />
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20 pb-10 sm:pt-24 sm:pb-16 lg:pt-28 lg:pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5 text-xs sm:text-sm text-white/90 mb-6 sm:mb-8"
-          >
-            <Star className="w-4 h-4 text-yellow-400" />
-            Structured internships for students and employers
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight text-balance"
-          >
-            One Platform.
-            <br />
-            <span className="text-accent">Every Internship.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-4 sm:mt-6 text-base sm:text-lg text-white/70 max-w-2xl mx-auto text-balance"
-          >
-            From application to certification, ZYR0 gives students, companies, and mentors a structured way to manage internships from start to finish.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.8 }}
-            className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center"
-          >
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center gap-2 bg-accent text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25"
-            >
-              Start Your Internship
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200"
-            >
-              For Companies
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 1.0 }}
-            className="mt-10 sm:mt-16 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/50 text-xs sm:text-sm"
-          >
-            {[
-              { icon: Building2, text: '500+ Partner Companies' },
-              { icon: Users, text: '10,000+ Active Students' },
-              { icon: GraduationCap, text: '50+ Universities' },
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <item.icon className="w-4 h-4" />
-                {item.text}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-8 lg:mt-0">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            {/* Left Column: Typography, Actions, Trust */}
+            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
+              
+              {/* Trust Badges / Social Proof */}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  'Structured Internship Workflow',
+                  'Mentor Guided Learning',
+                  'Verified Certificates',
+                  'Professional Experience Tracking'
+                ].map((badge, idx) => (
+                  <motion.span
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.1 * idx }}
+                    className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-white/85 hover:bg-white/10 transition-colors"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                    {badge}
+                  </motion.span>
+                ))}
               </div>
-            ))}
-          </motion.div>
+
+              {/* Title Section with Oversized Typography */}
+              <div className="space-y-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-widest block"
+                >
+                  Find Your Next
+                </motion.div>
+                <div className="flex flex-col space-y-1">
+                  <motion.span
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-white"
+                  >
+                    Structured
+                  </motion.span>
+                  <motion.span
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.7, delay: 0.5 }}
+                    className="text-6xl xs:text-7xl sm:text-8xl md:text-9xl lg:text-[7rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-accent via-blue-400 to-white leading-none block"
+                  >
+                    Internship.
+                  </motion.span>
+                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight"
+                >
+                  Build Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-300">Future</span> Career.
+                </motion.div>
+              </div>
+
+              {/* Supporting Explanation */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
+              >
+                ZYR0 bridges the gap between academic learning and professional growth. We provide students with structured milestone tasks and verified certificates, while enabling companies to hire and mentor talent with total confidence.
+              </motion.p>
+
+              {/* Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.8 }}
+                className="flex flex-col sm:flex-row gap-4"
+              >
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 active:scale-95"
+                >
+                  Start Your Internship
+                  <ArrowRight className="w-4.5 h-4.5" />
+                </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-8 py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200 active:scale-95"
+                >
+                  For Companies
+                </Link>
+              </motion.div>
+
+              {/* Trust Indicators */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4, delay: 1.0 }}
+                className="flex flex-wrap items-center gap-x-6 gap-y-3 text-white/40 text-xs pt-4 border-t border-white/5"
+              >
+                <span className="uppercase tracking-wider font-semibold text-[10px]">Ecosystem Partners:</span>
+                {[
+                  { icon: GraduationCap, label: 'Students' },
+                  { icon: Building2, label: 'Companies' },
+                  { icon: Users, label: 'Mentors' },
+                  { icon: Globe, label: 'Universities' }
+                ].map((partner, idx) => (
+                  <div key={idx} className="flex items-center gap-1.5 hover:text-white/60 transition-colors">
+                    <partner.icon className="w-3.5 h-3.5" />
+                    <span>{partner.label}</span>
+                  </div>
+                ))}
+              </motion.div>
+
+            </div>
+
+            {/* Right Column: Engaging Visual Element */}
+            <div className="lg:col-span-5 relative w-full h-[400px] sm:h-[450px] lg:h-[500px] flex items-center justify-center">
+              {/* Glowing gradients */}
+              <div className="absolute w-72 h-72 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute w-48 h-48 bg-blue-500/10 rounded-full blur-2xl -top-10 -right-10 pointer-events-none" />
+
+              <div className="relative w-full max-w-md h-full">
+                {/* Floating Card 1: Workspace Tasks */}
+                <motion.div
+                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: [0, -12, 0], 
+                    scale: 1 
+                  }}
+                  transition={{ 
+                    opacity: { duration: 0.6, delay: 0.8 },
+                    scale: { duration: 0.6, delay: 0.8 },
+                    y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
+                  }}
+                  className="absolute top-8 left-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-5 shadow-2xl z-10"
+                >
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <span className="text-[10px] font-semibold text-accent uppercase tracking-wider">Workspace Tracker</span>
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between text-xs text-white/95">
+                      <span className="font-medium">Completed Milestones</span>
+                      <span className="text-accent font-semibold">4 / 5</span>
+                    </div>
+                    <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                      <div className="w-4/5 bg-accent h-full rounded-full" />
+                    </div>
+                    <div className="space-y-2 pt-1 text-[11px]">
+                      <div className="flex items-center gap-2 text-white/60">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>Milestone 3: API Integration</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/60">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <span>Milestone 4: Database Design</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-white/90">
+                        <div className="w-3.5 h-3.5 rounded-full border border-accent flex items-center justify-center">
+                          <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                        </div>
+                        <span className="font-medium text-white/90">Milestone 5: Production Deployment</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Card 2: Mentor Feedback */}
+                <motion.div
+                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: [0, 10, 0], 
+                    scale: 1 
+                  }}
+                  transition={{ 
+                    opacity: { duration: 0.6, delay: 1.0 },
+                    scale: { duration: 0.6, delay: 1.0 },
+                    y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
+                  }}
+                  className="absolute bottom-12 right-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-2xl z-20"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-xs border border-accent/30">
+                      SR
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-semibold text-white">Sarah Jenkins</h4>
+                      <p className="text-[9px] text-white/50">Senior Engineer & Mentor</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-[11px] text-white/80 italic bg-white/5 p-2 rounded-lg border border-white/5">
+                    "Excellent database schema. Milestone 4 approved. Let's proceed with security rules validation."
+                  </p>
+                </motion.div>
+
+                {/* Floating Card 3: Certificate Preview */}
+                <motion.div
+                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: [0, -8, 0], 
+                    scale: 1 
+                  }}
+                  transition={{ 
+                    opacity: { duration: 0.6, delay: 1.2 },
+                    scale: { duration: 0.6, delay: 1.2 },
+                    y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
+                  }}
+                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 to-slate-900 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[8px] uppercase tracking-wider text-accent font-bold">Secure ID</span>
+                    <span className="text-[8px] text-white/40">ZYR0-9182-X</span>
+                  </div>
+                  <div className="mt-4 text-center">
+                    <Award className="w-8 h-8 mx-auto text-accent mb-1.5" />
+                    <h5 className="text-[10px] font-semibold">Certificate of Excellence</h5>
+                    <p className="text-[8px] text-white/50 mt-0.5">Verified Internship Graduate</p>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[8px] text-white/40">
+                    <span>Instantly Verifiable</span>
+                    <span className="text-emerald-400 font-medium flex items-center gap-0.5">
+                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                      Secure
+                    </span>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden sm:flex">
+          <span className="text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
+          <div className="w-5 h-8 border border-white/20 rounded-full flex justify-center p-1">
+            <motion.div 
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              className="w-1.5 h-1.5 bg-accent rounded-full"
+            />
+          </div>
         </div>
       </section>
 
