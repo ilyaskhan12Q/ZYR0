@@ -52,40 +52,40 @@ const homepageStructuredData = [
 ];
 
 const features = [
-  { icon: Search, title: 'Discover Opportunities', desc: 'Browse curated internships from top companies and startups. Filter by domain, location, duration, and skills.', color: 'bg-blue-100 text-blue-600' },
-  { icon: FileCheck, title: 'Smart Applications', desc: 'Apply with your enriched profile. Track application status in real-time from submission to acceptance.', color: 'bg-emerald-100 text-emerald-600' },
-  { icon: ClipboardList, title: 'Task Management', desc: 'Receive, complete, and submit tasks with clear deadlines. Stay organized with progress tracking.', color: 'bg-purple-100 text-purple-600' },
-  { icon: Users, title: 'Mentor Guidance', desc: 'Get paired with experienced mentors who review your work and provide actionable feedback.', color: 'bg-orange-100 text-orange-600' },
-  { icon: Award, title: 'Verified Certificates', desc: 'Earn blockchain-verified digital certificates. Share on LinkedIn or verify with a QR code scan.', color: 'bg-yellow-100 text-yellow-600' },
-  { icon: Briefcase, title: 'Professional Portfolio', desc: 'Build a career portfolio with verified experience, skills, and certificates that employers trust.', color: 'bg-teal-100 text-teal-600' },
+  { icon: Search, title: 'Targeted Sourcing', desc: 'Search curated student internships matching your domain, skill set, and targeted career path.', color: 'bg-blue-100 text-blue-600' },
+  { icon: FileCheck, title: 'Status Transparency', desc: 'Apply with an enriched profile and monitor your application journey at every stage of the pipeline.', color: 'bg-emerald-100 text-emerald-600' },
+  { icon: ClipboardList, title: 'Milestone Tracking', desc: 'Manage and submit structured project tasks with clear deliverables and progress tracking.', color: 'bg-purple-100 text-purple-600' },
+  { icon: Users, title: 'Continuous Mentorship', desc: 'Connect with industry mentors for milestone reviews, career guidance, and actionable feedback.', color: 'bg-orange-100 text-orange-600' },
+  { icon: Award, title: 'Cryptographic Proof', desc: 'Earn blockchain-verified internship certificates that can be instantly validated by employers.', color: 'bg-yellow-100 text-yellow-600' },
+  { icon: Briefcase, title: 'Verifiable Portfolios', desc: 'Compile a permanent record of your completed tasks, feedback, and verified skills.', color: 'bg-teal-100 text-teal-600' },
 ];
 
 const steps = [
-  { num: '01', icon: UserPlus, title: 'Create Your Profile', desc: 'Sign up, add your skills, education, and career interests.' },
-  { num: '02', icon: Send, title: 'Apply to Internships', desc: 'Browse and apply to opportunities that match your goals.' },
-  { num: '03', icon: BookOpen, title: 'Learn & Grow', desc: 'Complete tasks, get mentor feedback, and track your progress.' },
-  { num: '04', icon: Award, title: 'Get Certified', desc: 'Receive a verified digital certificate upon successful completion.' },
+  { num: '01', icon: UserPlus, title: 'Align Profile', desc: 'Define your workspace, target roles, technical skills, and educational background.' },
+  { num: '02', icon: Send, title: 'Apply & Match', desc: 'Submit your profile directly to structured internship programs that align with your goals.' },
+  { num: '03', icon: BookOpen, title: 'Execute & Review', desc: 'Complete real-world tasks, collaborate with mentors, and receive milestone grades.' },
+  { num: '04', icon: Award, title: 'Verify & Share', desc: 'Claim your cryptographic credential and showcase your verified portfolio to hiring networks.' },
 ];
 
 const testimonials = [
-  { name: 'Sarah Chen', role: 'Computer Science Student, Stanford', quote: 'ZYR0 helped me land my dream internship at a tech startup. The task tracking and mentor feedback were game-changers.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
-  { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor, TechFlow', quote: 'As a mentor, ZYR0 makes it easy to manage multiple interns and provide structured feedback. Highly recommended.', avatar: 'https://i.pravatar.cc/150?u=michael' },
-  { name: 'TechFlow Inc.', role: 'Hiring Partner', quote: 'We\'ve hired 15 interns through ZYR0. The quality of candidates and the streamlined process saved us countless hours.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
+  { name: 'Sarah Chen', role: 'Computer Science Student, Stanford', quote: 'The structured tasks and continuous mentor feedback loops on ZYR0 changed how I learn. I didn\'t just work—I had a clear roadmap of growth.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
+  { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor, TechFlow', quote: 'ZYR0 provides the structure that traditional internships lack. Reviewing submissions, grading milestones, and tracking progress is completely frictionless.', avatar: 'https://i.pravatar.cc/150?u=michael' },
+  { name: 'TechFlow Inc.', role: 'Hiring Partner', quote: 'Managing a cohort of 15 interns used to require multiple tools and spreadsheets. ZYR0 consolidated our hiring, tracking, and credentialing into one dashboard.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
 ];
 
 const stats = [
-  { value: '10,000+', label: 'Active Students', icon: GraduationCap },
-  { value: '500+', label: 'Partner Companies', icon: Building2 },
-  { value: '50+', label: 'Universities', icon: Globe },
-  { value: '25,000+', label: 'Certificates Issued', icon: Award },
+  { value: '10,000+', label: 'Verified Student Portfolios', icon: GraduationCap },
+  { value: '500+', label: 'Hiring Partners', icon: Building2 },
+  { value: '50+', label: 'Academic Institutions', icon: Globe },
+  { value: '25,000+', label: 'Milestones Completed', icon: Award },
 ];
 
 const checkFeatures = [
-  'Post unlimited internships with rich details',
-  'Review and shortlist applicants efficiently',
-  'Assign tasks and track intern progress',
-  'Issue blockchain-verified certificates',
-  'Access analytics and performance insights',
+  'Deploy structured, detail-rich internship listings',
+  'Streamline screening with centralized applicant pipelines',
+  'Define task milestones and monitor student progress',
+  'Authorize cryptographic proof-of-completion credentials',
+  'Evaluate cohort performance with comprehensive analytics',
 ];
 
 const PARTICLE_PRESETS = [
@@ -115,10 +115,10 @@ export default function Landing() {
   return (
     <div>
       <SEO
-        title="ZYR0 — Internship Management Platform for Students & Companies"
-        description="ZYR0 connects students with real internship opportunities, experienced mentors, and blockchain-verified digital certificates. Discover, apply, complete, and get certified — all in one platform."
+        title="ZYR0 — The Internship Operating System"
+        description="The unified platform for managing the entire internship lifecycle. ZYR0 connects students, companies, and mentors through structured workflows, task tracking, and blockchain-verified credentials."
         path="/"
-        keywords="internship platform, student internship, digital certificate, mentor, career portal, verified internship, internship management"
+        keywords="internship platform, student internships, internship management, digital certificates, mentor-driven internships, career portal, verifiable credentials, internship tracking"
         structuredData={homepageStructuredData}
       />
 
@@ -164,7 +164,7 @@ export default function Landing() {
             className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1.5 text-xs sm:text-sm text-white/90 mb-6 sm:mb-8"
           >
             <Star className="w-4 h-4 text-yellow-400" />
-            Trusted by 500+ Companies &amp; Universities
+            Introducing ZYR0 — The Internship Operating System
           </motion.div>
 
           <motion.h1
@@ -173,9 +173,9 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight text-balance"
           >
-            Launch Your Career
+            Run Structured Internships
             <br />
-            <span className="text-accent">with Confidence</span>
+            <span className="text-accent">from End to End</span>
           </motion.h1>
 
           <motion.p
@@ -184,7 +184,7 @@ export default function Landing() {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="mt-4 sm:mt-6 text-base sm:text-lg text-white/70 max-w-2xl mx-auto text-balance"
           >
-            ZYR0 connects students with real internship opportunities, mentors, and verifiable certificates — all in one powerful platform.
+            A unified platform designed for the modern internship lifecycle. ZYR0 integrates student applications, structured task workflows, mentor feedback, and blockchain-verified credentials into a single source of truth.
           </motion.p>
 
           <motion.div
@@ -197,14 +197,14 @@ export default function Landing() {
               to="/register"
               className="inline-flex items-center justify-center gap-2 bg-accent text-white px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25"
             >
-              Get Started
+              Create Free Account
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/internships"
               className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-6 sm:px-8 py-3 sm:py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200"
             >
-              Browse Internships
+              Explore Opportunities
             </Link>
           </motion.div>
 
@@ -215,9 +215,9 @@ export default function Landing() {
             className="mt-10 sm:mt-16 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-white/50 text-xs sm:text-sm"
           >
             {[
-              { icon: Building2, text: '500+ Companies' },
-              { icon: Users, text: '10,000+ Students' },
-              { icon: GraduationCap, text: '50+ Universities' },
+              { icon: Building2, text: '500+ Hiring Partners' },
+              { icon: Users, text: '10,000+ Verified Students' },
+              { icon: GraduationCap, text: '50+ Academic Institutions' },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-2">
                 <item.icon className="w-4 h-4" />
@@ -237,10 +237,10 @@ export default function Landing() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Why Choose ZYR0</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Everything You Need for Career Growth</h2>
+            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Engineered for structured growth</h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              From discovering opportunities to earning verified certificates, ZYR0 streamlines your entire internship journey.
+              A complete toolkit for managing student performance, verification, and mentorship in one place.
             </p>
           </motion.div>
 
@@ -274,8 +274,8 @@ export default function Landing() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">How It Works</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Your Internship Journey in 4 Steps</h2>
+            <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Workflow</span>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">From onboarding to verification</h2>
           </motion.div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
@@ -313,10 +313,10 @@ export default function Landing() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Companies</span>
-              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Hire Top Talent, Simplified</h2>
+              <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
+              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Scale your internship programs with rigor</h2>
               <p className="mt-4 text-muted-foreground">
-                Post internships, manage applicants, assign tasks, and issue verified certificates — all from one dashboard.
+                Sponsor, coordinate, and review student talent within a single operational dashboard. Drive program quality through structured milestones and standardized evaluation workflows.
               </p>
               <div className="mt-8 space-y-4">
                 {checkFeatures.map((feature, i) => (
@@ -339,7 +339,7 @@ export default function Landing() {
                 to="/register"
                 className="inline-flex items-center gap-2 mt-8 bg-accent text-white px-6 py-3 rounded-lg font-medium hover:bg-accent/90 transition-all"
               >
-                Start Hiring Today
+                Deploy Your Program
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
@@ -355,7 +355,7 @@ export default function Landing() {
                 <div className="bg-card rounded-xl p-6 shadow-lg space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Active Interns</p>
+                      <p className="text-sm text-muted-foreground">Cohort Size</p>
                       <p className="text-2xl font-bold">24</p>
                     </div>
                     <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
@@ -376,7 +376,7 @@ export default function Landing() {
                     </div>
                     <div className="text-center">
                       <p className="text-lg font-bold">4.8</p>
-                      <p className="text-xs text-muted-foreground">Rating</p>
+                      <p className="text-xs text-muted-foreground">Feedback</p>
                     </div>
                   </div>
                 </div>
@@ -385,7 +385,7 @@ export default function Landing() {
                     <TrendingUp className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Applications up 32%</p>
+                    <p className="text-sm font-medium">Cohort activity up 32%</p>
                     <p className="text-xs text-muted-foreground">Compared to last month</p>
                   </div>
                 </div>
@@ -404,8 +404,8 @@ export default function Landing() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Testimonials</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">What Our Users Say</h2>
+            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Endorsements</span>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Trusted by the community</h2>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -471,22 +471,22 @@ export default function Landing() {
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/2" />
             </div>
             <div className="relative z-10">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-balance">Ready to Start Your Career Journey?</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-balance">Modernize your internship workflow</h2>
               <p className="mt-4 text-white/80 max-w-xl mx-auto">
-                Join thousands of students and companies already using ZYR0.
+                Join students, mentors, and employers running structured programs on ZYR0.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/register"
                   className="inline-flex items-center justify-center gap-2 bg-white text-accent px-8 py-3.5 rounded-lg font-medium hover:bg-white/90 transition-all shadow-lg"
                 >
-                  Get Started Free
+                  Create Free Account
                 </Link>
                 <Link
                   to="/about"
                   className="inline-flex items-center justify-center gap-2 bg-transparent text-white border border-white/30 px-8 py-3.5 rounded-lg font-medium hover:bg-white/10 transition-all"
                 >
-                  Learn More
+                  Platform Overview
                 </Link>
               </div>
             </div>
