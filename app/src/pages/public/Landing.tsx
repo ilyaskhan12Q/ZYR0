@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
+import { CanvasParticles } from '@/components/CanvasParticles';
 
 const homepageStructuredData = [
   {
@@ -176,9 +177,9 @@ const PARTICLE_PRESETS = [
   { left: '85%', top: '35%', duration: 3.5, delay: 1.9 },
 ];
 
-// Performance optimized motion components that strip Framer Motion on mobile to save layout and thread budget
 const MotionDiv = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
-  if (isMobile) {
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
     return <div {...props}>{children}</div>;
   }
   return (
@@ -196,7 +197,8 @@ const MotionDiv = ({ isMobile, children, initial, animate, transition, whileInVi
 };
 
 const MotionSpan = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
-  if (isMobile) {
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
     return <span {...props}>{children}</span>;
   }
   return (
@@ -214,7 +216,8 @@ const MotionSpan = ({ isMobile, children, initial, animate, transition, whileInV
 };
 
 const MotionP = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
-  if (isMobile) {
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) {
     return <p {...props}>{children}</p>;
   }
   return (
@@ -232,30 +235,39 @@ const MotionP = ({ isMobile, children, initial, animate, transition, whileInView
 };
 
 export default function Landing() {
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(media.matches);
+    const listener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    media.addEventListener('change', listener);
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile, { passive: true });
-    return () => window.removeEventListener('resize', checkMobile);
+
+    return () => {
+      media.removeEventListener('change', listener);
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return;
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const { clientX, clientY, currentTarget } = e;
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
     const x = ((clientX - left) / width) * 100;
     const y = ((clientY - top) / height) * 100;
-    setMousePos({ x, y });
+    currentTarget.style.setProperty('--mouse-x', `${x}%`);
+    currentTarget.style.setProperty('--mouse-y', `${y}%`);
   };
 
-  // Helper to dynamically adjust animation props based on screen size
+  // Helper to dynamically adjust animation props based on screen size/prefers-reduced-motion
   const animProps = (initialVal: any, animateVal: any, transitionVal: any) => {
-    return isMobile
+    return prefersReducedMotion
       ? { initial: false }
       : {
           initial: initialVal,
@@ -265,12 +277,12 @@ export default function Landing() {
   };
 
   const viewProps = (initialVal: any, whileInViewVal: any, transitionVal: any = undefined) => {
-    return isMobile
+    return prefersReducedMotion
       ? { initial: false }
       : {
           initial: initialVal,
           whileInView: whileInViewVal,
-          viewport: { once: true },
+          viewport: { once: true, margin: "-30px" },
           transition: transitionVal,
         };
   };
@@ -288,47 +300,27 @@ export default function Landing() {
       {/* Hero Section — redesigned with oversized typography, glowing grids, and a floating workspace preview */}
       <section
         aria-label="Platform introduction"
-        onMouseMove={handleMouseMove}
+        onPointerMove={handlePointerMove}
         className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-12 lg:py-16"
+        style={{
+          '--mouse-x': '50%',
+          '--mouse-y': '50%'
+        } as React.CSSProperties}
       >
-        {/* Animated Particles - only rendered on desktop */}
-        {!isMobile && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {PARTICLE_PRESETS.map((particle, i) => (
-              <m.div
-                key={i}
-                className="absolute w-1 h-1 bg-white/20 rounded-full"
-                style={{
-                  left: particle.left,
-                  top: particle.top,
-                }}
-                animate={{
-                  y: [0, -30, 0],
-                  opacity: [0.2, 0.7, 0.2],
-                }}
-                transition={{
-                  duration: particle.duration,
-                  repeat: Infinity,
-                  delay: particle.delay,
-                }}
-              />
-            ))}
-          </div>
-        )}
+        {/* Animated Particles - high performance Canvas based rendering */}
+        <CanvasParticles />
 
         {/* Ambient Blur Lights */}
         <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Mouse-reactive lighting effect - disabled on mobile */}
-        {!isMobile && (
-          <div 
-            className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
-            style={{
-              background: `radial-gradient(600px circle at ${mousePos.x}% ${mousePos.y}%, rgba(99,102,241,0.15), transparent 80%)`,
-            }}
-          />
-        )}
+        {/* Mouse-reactive lighting effect */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
+          style={{
+            background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99,102,241,0.15), transparent 80%)`,
+          }}
+        />
 
         {/* Subtle Grid Overlay */}
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{

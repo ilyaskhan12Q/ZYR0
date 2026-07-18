@@ -379,3 +379,35 @@
   contain-intrinsic-size: 1px 500px;
 }
 
+/* GPU-accelerated floating animations */
+@keyframes floatUp {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -12px, 0); }
+}
+
+@keyframes floatDown {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, 10px, 0); }
+}
+
+@keyframes floatSlight {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -8px, 0); }
+}
+
+.animate-float-up {
+  animation: floatUp 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-down {
+  animation: floatDown 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-float-slight {
+  animation: floatSlight 5.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+
