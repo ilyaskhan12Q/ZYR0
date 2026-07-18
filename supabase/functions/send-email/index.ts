@@ -21,96 +21,116 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  try {
-    const body = await req.json();
-    const { to, subject, html, from, text, attachments } = body;
-    console.log(`[send-email] Incoming email request. To: ${JSON.stringify(to)}, Subject: "${subject}", From: "${from || 'default'}"`);
+    try {
+      const body = await req.json();
+      const { to, subject, html, from, text, replyTo, reply_to, attachments } = body;
+      console.log(`[send-email] Incoming email request. To: ${JSON.stringify(to)}, Subject: "${subject}", From: "${from || 'default'}"`);
 
-    const SMTP_HOST = Deno.env.get('SMTP_HOST');
-    const SMTP_PORT = Deno.env.get('SMTP_PORT');
-    const SMTP_USER = Deno.env.get('SMTP_USER');
-    const SMTP_PASS = Deno.env.get('SMTP_PASS');
-    const SMTP_FROM = Deno.env.get('SMTP_FROM') || from;
-    const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+      const SMTP_HOST = Deno.env.get('SMTP_HOST');
+      const SMTP_PORT = Deno.env.get('SMTP_PORT');
+      const SMTP_USER = Deno.env.get('SMTP_USER');
+      const SMTP_PASS = Deno.env.get('SMTP_PASS');
+      const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
-    let lastError;
-
-    // Try SMTP first
-    if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
-      console.log(`[send-email] Attempting SMTP delivery via ${SMTP_HOST}:${SMTP_PORT || '587'}`);
-      try {
-        const transporter = nodemailer.createTransport({
-          host: SMTP_HOST,
-          port: parseInt(SMTP_PORT || '587'),
-          secure: SMTP_PORT === '465',
-          auth: { user: SMTP_USER, pass: SMTP_PASS },
-        });
-
-        const info = await transporter.sendMail({
-          from: SMTP_FROM || `Zyro <${SMTP_USER}>`,
-          to: Array.isArray(to) ? to.join(', ') : to,
-          subject,
-          text,
-          html,
-          attachments: attachments?.map((att: EmailAttachment) => ({
-            filename: att.filename,
-            content: att.content,
-            encoding: 'base64',
-          })),
-        });
-
-        console.log(`[send-email] SMTP delivery successful. MessageId: ${info.messageId}`);
-        return new Response(JSON.stringify({ success: true, messageId: info.messageId }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      } catch (smtpErr) {
-        console.error('[send-email] SMTP delivery failed:', smtpErr);
-        lastError = smtpErr;
+      let sanitizedFrom = from;
+      if (!sanitizedFrom || 
+          sanitizedFrom.includes('onboarding@resend.dev') || 
+          sanitizedFrom.includes('noreply@') || 
+          sanitizedFrom.includes('example.com') ||
+          sanitizedFrom.includes('zyr0.com')) {
+        sanitizedFrom = 'ZYR0 Team <team@zyroo.dpdns.org>';
       }
-    } else {
-      console.log('[send-email] SMTP is not configured or incomplete (host, user, or pass missing).');
-    }
 
-    // Fallback to Resend API
-    if (RESEND_API_KEY) {
-      console.log('[send-email] Attempting Resend API delivery');
-      try {
-        const res = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${RESEND_API_KEY}`,
-          },
-          body: JSON.stringify({
-            from: from || 'ZYR0 Team <team@zyroo.dpdns.org>',
-            to: Array.isArray(to) ? to : [to],
+      let sanitizedReplyTo = replyTo || reply_to;
+      if (!sanitizedReplyTo || 
+          sanitizedReplyTo.includes('onboarding@resend.dev') ||
+          sanitizedReplyTo.includes('example.com') ||
+          sanitizedReplyTo.includes('zyr0.com')) {
+        sanitizedReplyTo = 'team@zyroo.dpdns.org';
+      }
+
+      const SMTP_FROM = Deno.env.get('SMTP_FROM') || sanitizedFrom;
+
+      let lastError;
+
+      // Try SMTP first
+      if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
+        console.log(`[send-email] Attempting SMTP delivery via ${SMTP_HOST}:${SMTP_PORT || '587'}`);
+        try {
+          const transporter = nodemailer.createTransport({
+            host: SMTP_HOST,
+            port: parseInt(SMTP_PORT || '587'),
+            secure: SMTP_PORT === '465',
+            auth: { user: SMTP_USER, pass: SMTP_PASS },
+          });
+
+          const info = await transporter.sendMail({
+            from: SMTP_FROM || `ZYR0 Team <${SMTP_USER}>`,
+            to: Array.isArray(to) ? to.join(', ') : to,
+            replyTo: sanitizedReplyTo,
             subject,
+            text,
             html,
-            text: text || undefined,
             attachments: attachments?.map((att: EmailAttachment) => ({
               filename: att.filename,
               content: att.content,
+              encoding: 'base64',
             })),
-          }),
-        });
+          });
 
-        if (!res.ok) {
-          const err = await res.text();
-          throw new Error(`Resend error: ${err}`);
+          console.log(`[send-email] SMTP delivery successful. MessageId: ${info.messageId}`);
+          return new Response(JSON.stringify({ success: true, messageId: info.messageId }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        } catch (smtpErr) {
+          console.error('[send-email] SMTP delivery failed:', smtpErr);
+          lastError = smtpErr;
         }
-
-        const data = await res.json();
-        console.log(`[send-email] Resend API delivery successful. Id: ${data.id}`);
-        return new Response(JSON.stringify({ success: true, id: data.id }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      } catch (resendErr) {
-        console.error('[send-email] Resend API delivery failed:', resendErr);
-        lastError = resendErr;
+      } else {
+        console.log('[send-email] SMTP is not configured or incomplete (host, user, or pass missing).');
       }
-    } else {
-      console.log('[send-email] RESEND_API_KEY is not configured.');
-    }
+
+      // Fallback to Resend API
+      if (RESEND_API_KEY) {
+        console.log('[send-email] Attempting Resend API delivery');
+        try {
+          const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: sanitizedFrom,
+              to: Array.isArray(to) ? to : [to],
+              reply_to: sanitizedReplyTo,
+              subject,
+              html,
+              text: text || undefined,
+              attachments: attachments?.map((att: EmailAttachment) => ({
+                filename: att.filename,
+                content: att.content,
+              })),
+            }),
+          });
+
+          if (!res.ok) {
+            const err = await res.text();
+            throw new Error(`Resend error: ${err}`);
+          }
+
+          const data = await res.json();
+          console.log(`[send-email] Resend API delivery successful. Id: ${data.id}`);
+          return new Response(JSON.stringify({ success: true, id: data.id }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        } catch (resendErr) {
+          console.error('[send-email] Resend API delivery failed:', resendErr);
+          lastError = resendErr;
+        }
+      } else {
+        console.log('[send-email] RESEND_API_KEY is not configured.');
+      }
 
     const message = lastError
       ? `Email sending failed. SMTP/Resend errors: ${lastError.message || lastError}`
