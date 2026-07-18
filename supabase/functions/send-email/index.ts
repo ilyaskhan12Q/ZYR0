@@ -22,6 +22,68 @@ serve(async (req) => {
   }
 
     try {
+      if (req.method === 'GET') {
+        const url = new URL(req.url);
+        const action = url.searchParams.get('action');
+        const emailId = url.searchParams.get('id');
+        
+        const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+        if (!RESEND_API_KEY) {
+          return new Response(JSON.stringify({ error: 'RESEND_API_KEY not configured' }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (action === 'domains') {
+          const res = await fetch('https://api.resend.com/domains', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${RESEND_API_KEY}` },
+          });
+          const data = await res.json();
+          return new Response(JSON.stringify(data), {
+            status: res.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (action === 'domain_details') {
+          const domainId = url.searchParams.get('domain_id');
+          if (!domainId) {
+            return new Response(JSON.stringify({ error: 'Missing domain_id parameter' }), {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+          const res = await fetch(`https://api.resend.com/domains/${domainId}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${RESEND_API_KEY}` },
+          });
+          const data = await res.json();
+          return new Response(JSON.stringify(data), {
+            status: res.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (emailId) {
+          const res = await fetch(`https://api.resend.com/emails/${emailId}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${RESEND_API_KEY}` },
+          });
+          const data = await res.json();
+          return new Response(JSON.stringify(data), {
+            status: res.status,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        return new Response(JSON.stringify({ error: 'Invalid parameters' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const body = await req.json();
       const { to, subject, html, from, text, replyTo, reply_to, attachments } = body;
       console.log(`[send-email] Incoming email request. To: ${JSON.stringify(to)}, Subject: "${subject}", From: "${from || 'default'}"`);
