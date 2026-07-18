@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check } from 'lucide-react';
+import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check, HelpCircle, BookOpen } from 'lucide-react';
 import { verifyCertificate } from '@/services/certificates';
 import { supabase } from '@/lib/supabase';
 import { certificates as mockCertificates } from '@/data/mockData';
@@ -244,6 +244,27 @@ export default function Verify() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Help links */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12 text-center"
+        >
+          <p className="text-sm text-muted-foreground mb-3">Having trouble with verification?</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link to="/help" className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              <BookOpen className="w-4 h-4 text-accent" /> Certificate Verification Guide
+            </Link>
+            <Link to="/faq" className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              <HelpCircle className="w-4 h-4 text-accent" /> Visit FAQ
+            </Link>
+            <Link to="/contact" className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              Contact Support
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

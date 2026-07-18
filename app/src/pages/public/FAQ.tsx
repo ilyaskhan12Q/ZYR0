@@ -27,6 +27,14 @@ const faqData: FAQCategory[] = [
         a: 'Your application enters the company\'s review queue. The company will either accept, reject, or place your application on a shortlist. You will receive notifications for each status change. If accepted, a formal offer letter will be generated for you to review and sign digitally within the platform.',
       },
       {
+        q: 'What should I include in my profile to improve my chances?',
+        a: 'Complete your profile with a professional photo, a clear bio highlighting your skills and interests, your educational background, and relevant links such as a GitHub portfolio or LinkedIn profile. A well-prepared profile helps companies evaluate your fit for their internship programs more effectively.',
+      },
+      {
+        q: 'Can I withdraw an application after submitting it?',
+        a: 'Yes. From your Student Dashboard, navigate to My Applications and locate the application you wish to withdraw. If the company has not yet responded, you can cancel your application freely. If an offer has been extended, please contact the company directly through the platform before withdrawing.',
+      },
+      {
         q: 'How do I submit my project work?',
         a: 'All project submissions must be done via a public GitHub repository URL. From your Internship Workspace, navigate to the relevant task and click "Submit Work". Enter your GitHub repository link and an optional live demo URL. Your mentor will review your submission and may request revisions or approve it.',
       },
@@ -48,16 +56,53 @@ const faqData: FAQCategory[] = [
         a: 'From your Company Dashboard, navigate to Internships and click "Post Internship". Fill in the details including title, domain, duration, location type, requirements, and a description of the project students will work on. Once published, your internship will appear in the public listings immediately.',
       },
       {
+        q: 'What information should I include in an internship listing?',
+        a: 'A strong listing includes a clear title, the domain or field of work, expected duration, location type (remote, on-site, or hybrid), stipend information, detailed project description, required skills or qualifications, and any deadlines. The more detail you provide, the better matched your applicants will be.',
+      },
+      {
         q: 'How does the application review process work?',
         a: 'All applications to your internships appear in the Applicants section of your dashboard. You can review each applicant\'s profile, accept or reject their application, or shortlist them for further review. Accepted applicants receive an automatically generated offer letter to review and sign.',
       },
       {
         q: 'Can I assign tasks after an intern joins?',
-        a: 'Yes. From the Tasks section of your dashboard, you can create detailed project tasks including a title, description, acceptance criteria, difficulty level, and due date. Tasks are assigned to specific interns and become visible in their Workspace.',
+        a: 'Yes. From the Tasks section of your dashboard, you can create detailed project tasks including a title, description, acceptance criteria, difficulty level, and due date. Tasks are assigned to specific interns and become visible in their Workspace. You can track completion status across all active interns.',
+      },
+      {
+        q: 'How do I assign a mentor to an intern?',
+        a: 'From your Company Dashboard, navigate to the intern\'s profile or the cohort management section. You can assign an existing mentor from your organization or invite a new mentor to join the platform. The mentor will then receive access to review the intern\'s task submissions and provide feedback.',
+      },
+      {
+        q: 'Can I edit or close an active internship listing?',
+        a: 'Yes. From the Internships section of your dashboard, you can edit the details of any active listing or close it entirely. Closing a listing removes it from public view but does not affect applications or offers already in progress.',
       },
       {
         q: 'How do I issue a certificate to a completed intern?',
-        a: 'Once a mentor has reviewed and approved all task submissions and your team completes the final evaluation, you can initiate certificate generation from the Certificates section of your dashboard. The certificate is then automatically delivered to the intern\'s account.',
+        a: 'Once a mentor has reviewed and approved all task submissions and your team completes the final evaluation, you can initiate certificate generation from the Certificates section of your dashboard. The certificate is then automatically delivered to the intern\'s account with a unique credential ID.',
+      },
+    ],
+  },
+  {
+    label: 'For Mentors',
+    items: [
+      {
+        q: 'How do I register as a mentor on ZYR0?',
+        a: 'During registration, select the Mentor role and complete your professional profile including your industry experience, areas of expertise, and current position. Once registered, companies can assign you to their internship cohorts to review and guide their interns.',
+      },
+      {
+        q: 'How am I assigned to interns?',
+        a: 'Partner companies assign mentors to specific interns or cohorts from their Company Dashboard. Once assigned, you will see the intern\'s tasks and submissions appear in your Mentor Dashboard. You can accept or decline mentorship assignments as your schedule allows.',
+      },
+      {
+        q: 'How do I review and provide feedback on submissions?',
+        a: 'From your Mentor Dashboard, navigate to the relevant intern\'s workspace. Each submitted task displays the GitHub repository link and any additional notes from the intern. You can provide structured feedback, request revisions with specific guidance, or approve the submission as complete.',
+      },
+      {
+        q: 'What happens after I approve a milestone?',
+        a: 'When you approve a task submission, the intern is notified and can proceed to the next milestone. After all tasks in the internship are approved and the company completes the final evaluation, the certificate generation process is triggered automatically.',
+      },
+      {
+        q: 'Can I mentor interns from multiple companies?',
+        a: 'Yes. You can mentor interns from any number of partner companies on ZYR0. Each mentorship assignment is scoped to a specific intern and company, and your dashboard will show all active assignments across organizations in a single view.',
       },
     ],
   },
@@ -81,6 +126,14 @@ const faqData: FAQCategory[] = [
         a: 'Click "Forgot Password" on the login page and enter your registered email address. We will send a secure password reset link. The link is valid for 60 minutes. If you do not receive the email, check your spam folder or contact support.',
       },
       {
+        q: 'Is my data secure on the platform?',
+        a: 'Yes. All data transmitted to and from ZYR0 is encrypted using HTTPS with TLS. Authentication is handled by Supabase Auth, and database access is restricted using Row Level Security (RLS) policies that ensure users only access the data they are authorized to view. We conduct regular security reviews to maintain platform integrity.',
+      },
+      {
+        q: 'What browsers and devices are supported?',
+        a: 'ZYR0 supports the latest versions of Chrome, Firefox, Safari, and Edge. The platform is designed with a responsive layout that works on desktops, tablets, and mobile devices. For the best experience, we recommend using a desktop or laptop computer for dashboard features and task management.',
+      },
+      {
         q: 'How do I delete my account?',
         a: 'To request account deletion, contact us at support@zyr0.com with the subject line "Account Deletion Request". We will process your request within 30 days. Note that issued certificates will remain verifiable through the public verification system even after account deletion.',
       },
@@ -97,6 +150,7 @@ function FAQItem({ item, index }: { item: FAQItem; index: number }) {
       viewport={{ once: true }}
       transition={{ delay: index * 0.04 }}
       className="border border-border rounded-xl overflow-hidden"
+      role="article"
     >
       <button
         onClick={() => setOpen(!open)}
@@ -154,9 +208,9 @@ export default function FAQ() {
     <div className="pt-20 pb-16">
       <SEO
         title="FAQ — Frequently Asked Questions About ZYR0"
-        description="Find answers to the most common questions about the ZYR0 internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, and account management."
+        description="Find answers to the most common questions about the ZYR0 internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, account management, and data security."
         path="/faq"
-        keywords="ZYR0 FAQ, internship platform questions, certificate verification help, student internship FAQ, company FAQ"
+        keywords="ZYR0 FAQ, internship platform questions, certificate verification help, student internship FAQ, company FAQ, mentor FAQ, internship platform help"
         structuredData={faqStructuredData}
       />
       {/* Hero */}
