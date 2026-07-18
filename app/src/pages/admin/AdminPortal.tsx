@@ -1,22 +1,18 @@
-import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { RouteLoading } from '@/components/RouteLoading';
-
-const AdminDashboard = lazy(() => import('./Dashboard'));
-const AdminUsers = lazy(() => import('./Users'));
-const AdminCompanies = lazy(() => import('./Companies'));
-const AdminInternships = lazy(() => import('./Internships'));
-const AdminCertificates = lazy(() => import('./Certificates'));
-const AdminApplications = lazy(() => import('./Applications'));
-const AdminAnalytics = lazy(() => import('./Analytics'));
-const AdminReports = lazy(() => import('./Reports'));
-const AdminSettings = lazy(() => import('./Settings'));
-const AdminLogs = lazy(() => import('./Logs'));
-const AdminOfferLetters = lazy(() => import('./OfferLetters'));
+import AdminDashboard from './Dashboard';
+import AdminUsers from './Users';
+import AdminCompanies from './Companies';
+import AdminInternships from './Internships';
+import AdminCertificates from './Certificates';
+import AdminApplications from './Applications';
+import AdminAnalytics from './Analytics';
+import AdminReports from './Reports';
+import AdminSettings from './Settings';
+import AdminLogs from './Logs';
+import AdminOfferLetters from './OfferLetters';
 
 export default function AdminPortal() {
   return (
-    <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<AdminDashboard />} />
@@ -35,6 +31,5 @@ export default function AdminPortal() {
       <Route path="settings" element={<AdminSettings />} />
       <Route path="logs" element={<AdminLogs />} />
     </Routes>
-    </Suspense>
   );
 }

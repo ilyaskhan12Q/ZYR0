@@ -3,8 +3,17 @@ import { lazy, Suspense } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
+import { Spinner } from '@/components/ui/spinner';
 import { Toaster } from '@/components/ui/sonner';
-import { RouteLoading } from '@/components/RouteLoading';
+
+// Loading fallback component
+function RouteLoading() {
+  return (
+    <div className="flex min-h-[400px] w-full items-center justify-center">
+      <Spinner className="size-8 text-primary animate-spin" />
+    </div>
+  );
+}
 
 // Public Pages
 const Landing = lazy(() => import('@/pages/public/Landing'));
@@ -37,7 +46,8 @@ const CompanyPortal = lazy(() => import('@/pages/company/CompanyPortal'));
 const MentorPortal = lazy(() => import('@/pages/mentor/MentorPortal'));
 const AdminPortal = lazy(() => import('@/pages/admin/AdminPortal'));
 
-const LazyDashboardLayout = lazy(() => import('@/layouts/DashboardLayout'));
+// Layouts (Loaded statically for layout state preservation)
+import DashboardLayout from '@/layouts/DashboardLayout';
 
 function App() {
   return (
@@ -73,23 +83,23 @@ function App() {
           <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
 
           {/* Student Routes */}
-          <Route path="/student/*" element={<ProtectedRoute role="student"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="student" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><StudentPortal /></Suspense>} />
+          <Route path="/student/*" element={<ProtectedRoute role="student"><DashboardLayout role="student" /></ProtectedRoute>}>
+            <Route path="*" element={<StudentPortal />} />
           </Route>
 
           {/* Company Routes */}
-          <Route path="/company/*" element={<ProtectedRoute role="company"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="company" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><CompanyPortal /></Suspense>} />
+          <Route path="/company/*" element={<ProtectedRoute role="company"><DashboardLayout role="company" /></ProtectedRoute>}>
+            <Route path="*" element={<CompanyPortal />} />
           </Route>
 
           {/* Mentor Routes */}
-          <Route path="/mentor/*" element={<ProtectedRoute role="mentor"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="mentor" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><MentorPortal /></Suspense>} />
+          <Route path="/mentor/*" element={<ProtectedRoute role="mentor"><DashboardLayout role="mentor" /></ProtectedRoute>}>
+            <Route path="*" element={<MentorPortal />} />
           </Route>
 
           {/* Admin Routes */}
-          <Route path="/admin/*" element={<ProtectedRoute role="admin"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="admin" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><AdminPortal /></Suspense>} />
+          <Route path="/admin/*" element={<ProtectedRoute role="admin"><DashboardLayout role="admin" /></ProtectedRoute>}>
+            <Route path="*" element={<AdminPortal />} />
           </Route>
 
           {/* Fallback */}

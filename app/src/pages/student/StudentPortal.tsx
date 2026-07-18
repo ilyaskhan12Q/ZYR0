@@ -1,25 +1,21 @@
-import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { RouteLoading } from '@/components/RouteLoading';
-
-const StudentDashboard = lazy(() => import('./Dashboard'));
-const StudentInternships = lazy(() => import('./Internships'));
-const StudentApplications = lazy(() => import('./Applications'));
-const StudentTasks = lazy(() => import('./Tasks'));
-const StudentProgress = lazy(() => import('./Progress'));
-const StudentMessages = lazy(() => import('./Messages'));
-const StudentCertificates = lazy(() => import('./Certificates'));
-const StudentPortfolio = lazy(() => import('./Portfolio'));
-const StudentProfile = lazy(() => import('./Profile'));
-const StudentSettings = lazy(() => import('./Settings'));
-const StudentOfferLetters = lazy(() => import('./OfferLetters'));
-const StudentWorkspace = lazy(() => import('./Workspace'));
-const InternshipDetail = lazy(() => import('../public/InternshipDetail'));
-const StudentSavedInternships = lazy(() => import('./SavedInternships'));
+import StudentDashboard from './Dashboard';
+import StudentInternships from './Internships';
+import StudentApplications from './Applications';
+import StudentTasks from './Tasks';
+import StudentProgress from './Progress';
+import StudentMessages from './Messages';
+import StudentCertificates from './Certificates';
+import StudentPortfolio from './Portfolio';
+import StudentProfile from './Profile';
+import StudentSettings from './Settings';
+import StudentOfferLetters from './OfferLetters';
+import StudentWorkspace from './Workspace';
+import InternshipDetail from '../public/InternshipDetail';
+import StudentSavedInternships from './SavedInternships';
 
 export default function StudentPortal() {
   return (
-    <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<StudentDashboard />} />
@@ -40,6 +36,5 @@ export default function StudentPortal() {
       <Route path="profile" element={<StudentProfile />} />
       <Route path="settings" element={<StudentSettings />} />
     </Routes>
-    </Suspense>
   );
 }
