@@ -52,19 +52,19 @@ const homepageStructuredData = [
 ];
 
 const features = [
-  { icon: Search, title: 'Curated Sourcing', desc: 'Find internships in Pakistan matching your background and career goals.', color: 'bg-blue-100 text-blue-600' },
-  { icon: FileCheck, title: 'Application Transparency', desc: 'Track the status of your applications from submission to final acceptance in real time.', color: 'bg-emerald-100 text-emerald-600' },
-  { icon: ClipboardList, title: 'Milestone Coordination', desc: 'Manage internship tasks with clear deliverables, timeline tracking, and milestone reviews.', color: 'bg-purple-100 text-purple-600' },
-  { icon: Users, title: 'Professional Mentorship', desc: 'Get matched with industry mentors who review your work and provide structured guidance.', color: 'bg-orange-100 text-orange-600' },
-  { icon: Award, title: 'Verified Achievements', desc: 'Earn secure completion certificates that employers can instantly authenticate.', color: 'bg-yellow-100 text-yellow-600' },
-  { icon: Briefcase, title: 'Professional Portfolios', desc: 'Accumulate a permanent, structured history of your completed milestones, feedback, and skills.', color: 'bg-teal-100 text-teal-600' },
+  { icon: Search, title: 'Curated Sourcing', desc: 'Find internships in Pakistan matching your background and career goals. Filter by domain, duration, location type, and stipend to discover opportunities that fit your needs.', color: 'bg-blue-100 text-blue-600' },
+  { icon: FileCheck, title: 'Application Transparency', desc: 'Track your applications from submission through review to final acceptance in real time. Know exactly where you stand with every opportunity.', color: 'bg-emerald-100 text-emerald-600' },
+  { icon: ClipboardList, title: 'Milestone Coordination', desc: 'Manage internship tasks with clear deliverables, timeline tracking, and milestone reviews. Every task has defined acceptance criteria and feedback loops.', color: 'bg-purple-100 text-purple-600' },
+  { icon: Users, title: 'Professional Mentorship', desc: 'Get matched with industry mentors who review your work, provide structured guidance, and help you grow through actionable feedback on each submission.', color: 'bg-orange-100 text-orange-600' },
+  { icon: Award, title: 'Verified Achievements', desc: 'Earn secure completion certificates with unique credential IDs that employers can instantly authenticate through the public verification portal.', color: 'bg-yellow-100 text-yellow-600' },
+  { icon: Briefcase, title: 'Professional Portfolios', desc: 'Accumulate a permanent, structured history of completed milestones, mentor feedback, and demonstrated skills that you can share with future employers.', color: 'bg-teal-100 text-teal-600' },
 ];
 
 const steps = [
-  { num: '01', icon: UserPlus, title: 'Set up your profile', desc: 'Highlight your skills, background, and career focus.' },
-  { num: '02', icon: Send, title: 'Apply to listings', desc: 'Submit your profile directly to structured internship positions.' },
-  { num: '03', icon: BookOpen, title: 'Collaborate and complete', desc: 'Receive guidance, complete milestone tasks, and log your progress.' },
-  { num: '04', icon: Award, title: 'Claim certification', desc: 'Verify your completion and share your accomplishments with hiring networks.' },
+  { num: '01', icon: UserPlus, title: 'Set up your profile', desc: 'Create your student or company account and build a profile that showcases your skills, background, and career focus.' },
+  { num: '02', icon: Send, title: 'Apply to listings', desc: 'Browse opportunities filtered by domain, duration, and location. Submit your profile directly to structured internship positions that match your goals.' },
+  { num: '03', icon: BookOpen, title: 'Collaborate and complete', desc: 'Receive mentor guidance, complete milestone tasks with defined criteria, and log your progress through the interactive workspace.' },
+  { num: '04', icon: Award, title: 'Claim certification', desc: 'Upon completion, receive a verified certificate with a unique credential ID. Share your accomplishment with employers and your professional network.' },
 ];
 
 const testimonials = [
@@ -119,37 +119,37 @@ const confidenceCards = [
   {
     icon: Award,
     title: 'Verified Certificates',
-    desc: 'Every certificate issued is tamper-proof and instantly verifiable online by any prospective employer.',
+    desc: 'Every certificate issued is tamper-proof and linked to a unique credential ID that any prospective employer can instantly verify through the public verification portal.',
     color: 'text-yellow-500 bg-yellow-500/10'
   },
   {
     icon: ClipboardList,
     title: 'Structured Internship Lifecycle',
-    desc: 'From initial application to daily tasks, feedback, and final sign-off, every stage follows a consistent process.',
+    desc: 'From initial application through task management, mentor feedback, and final certification — every stage follows a consistent, documented process that both interns and companies can rely on.',
     color: 'text-blue-500 bg-blue-500/10'
   },
   {
     icon: Users,
     title: 'Role-Based Access',
-    desc: 'Granular access controls ensure students, mentors, employers, and administrators only access permitted data.',
+    desc: 'Granular access controls ensure students, mentors, employers, and administrators only interact with the data and features relevant to their role on the platform.',
     color: 'text-emerald-500 bg-emerald-500/10'
   },
   {
     icon: FileCheck,
     title: 'Privacy First',
-    desc: 'All personal profiles, evaluations, feedback logs, and workspace documents remain secure and under user control.',
+    desc: 'Personal profiles, evaluations, feedback logs, and workspace documents remain secure behind authentication and Row Level Security policies tailored to each user role.',
     color: 'text-purple-500 bg-purple-500/10'
   },
   {
     icon: TrendingUp,
     title: 'Transparent Progress',
-    desc: 'Every assigned task, supervisor review, and milestone update is transparently documented in a single timeline.',
+    desc: 'Every assigned task, supervisor review, and milestone update is documented in a single timeline visible to all stakeholders — no more lost emails or status confusion.',
     color: 'text-orange-500 bg-orange-500/10'
   },
   {
     icon: Globe,
     title: 'Built to Grow',
-    desc: 'Flexible architecture that serves single student placements as efficiently as university-wide internship cohorts.',
+    desc: 'Architected to serve single student placements as efficiently as university-wide internship cohorts, with flexible configuration that adapts to programs of any size.',
     color: 'text-teal-500 bg-teal-500/10'
   }
 ];
@@ -369,7 +369,7 @@ export default function Landing() {
                   )}
                   className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-widest block"
                 >
-                  Find Your Next
+                  Pakistan's Platform for
                 </MotionDiv>
                 <div className="flex flex-col space-y-1">
                   <MotionSpan
@@ -418,7 +418,7 @@ export default function Landing() {
                 )}
                 className="text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
               >
-                ZYR0 bridges the gap between academic learning and professional growth. We provide students with structured milestone tasks and verified certificates, while enabling companies to hire and mentor talent with total confidence.
+                ZYR0 bridges the gap between academic learning and professional growth. We provide students with structured milestone tasks, direct mentor feedback, and verified certificates that employers trust. Companies gain a streamlined pipeline to hire, mentor, and evaluate interns with complete visibility into each candidate's progress and performance.
               </MotionP>
 
               {/* Actions */}
@@ -628,7 +628,10 @@ export default function Landing() {
                 Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
               </p>
               <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                We connect students looking for professional experience with companies hiring interns to build their future teams. By bringing structure, mentorship, and clear milestones to the process, we help universities bridge academic learning with industry demands. We make internship opportunities measurable, transparent, and structured for career development.
+                Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
+              </p>
+              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
               </p>
             </MotionDiv>
 
@@ -638,6 +641,7 @@ export default function Landing() {
                 <MotionDiv
                   isMobile={isMobile}
                   key={i}
+                  role="article"
                   {...viewProps(
                     { opacity: 0, y: 30 },
                     { opacity: 1, y: 0 },
@@ -671,7 +675,7 @@ export default function Landing() {
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
             <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Built for accountability and clear outcomes</h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-              Every tool you need to track progress, align goals, and verify experience.
+              Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
             </p>
           </MotionDiv>
 
@@ -686,6 +690,7 @@ export default function Landing() {
                   { duration: 0.5, delay: i * 0.1 }
                 )}
                 className="feature-card"
+                role="article"
               >
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
                   <feature.icon className="w-6 h-6" />
@@ -714,17 +719,18 @@ export default function Landing() {
           </MotionDiv>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
-            {steps.map((step, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                {...viewProps(
-                  { opacity: 0, y: 30 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: i * 0.15 }
-                )}
-                className="text-center relative"
-              >
+              {steps.map((step, i) => (
+                <MotionDiv
+                  isMobile={isMobile}
+                  key={i}
+                  role="article"
+                  {...viewProps(
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: i * 0.15 }
+                  )}
+                  className="text-center relative"
+                >
                 <span className="text-5xl font-bold text-accent/15">{step.num}</span>
                 <div className="mt-4 w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto">
                   <step.icon className="w-7 h-7 text-accent" />
@@ -755,7 +761,10 @@ export default function Landing() {
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
               <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Run your internship programs with confidence</h2>
               <p className="mt-4 text-muted-foreground">
-                Manage cohorts of any size from one structured dashboard. Review candidate profiles, structure milestone tasks, assign industry mentors, and issue verified completion certificates.
+                Manage cohorts of any size from one structured dashboard. Review candidate profiles, structure milestone tasks with clear acceptance criteria, assign industry mentors, track intern progress in real time, and issue verified completion certificates when each intern finishes their program.
+              </p>
+              <p className="mt-3 text-muted-foreground text-sm">
+                ZYR0 replaces spreadsheets and email chains with a unified view of your entire internship pipeline — from posting listings and reviewing applicants to monitoring task completion and generating credentials. Companies retain full control over every stage while providing interns with the structured guidance they need to succeed.
               </p>
               <div className="mt-8 space-y-4">
                 {checkFeatures.map((feature, i) => (
@@ -854,7 +863,7 @@ export default function Landing() {
               Built on transparency. Designed for confidence.
             </h2>
             <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
-              A reliable internship management platform requires clear guardrails. We align student internships and internship workflow processes to ensure credibility at every step of career development.
+              A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
             </p>
           </MotionDiv>
 
@@ -863,6 +872,7 @@ export default function Landing() {
               <MotionDiv
                 isMobile={isMobile}
                 key={i}
+                role="article"
                 {...viewProps(
                   { opacity: 0, y: 30 },
                   { opacity: 1, y: 0 },
@@ -897,26 +907,27 @@ export default function Landing() {
           </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                {...viewProps(
-                  { opacity: 0, y: 30 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: i * 0.1 }
-                )}
-                className="bg-card rounded-xl border border-border p-6 shadow-md"
-              >
-                <Quote className="w-8 h-8 text-accent/20" />
+              {testimonials.map((t, i) => (
+                <MotionDiv
+                  isMobile={isMobile}
+                  key={i}
+                  role="article"
+                  {...viewProps(
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: i * 0.1 }
+                  )}
+                  className="bg-card rounded-xl border border-border p-6 shadow-md"
+                >
+                  <Quote className="w-8 h-8 text-accent/20" />
                 <p className="mt-3 text-foreground italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-6 flex items-center gap-3">
-                  <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
-                  <div>
-                    <p className="text-sm font-semibold">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </div>
-                </div>
+                  <figure className="mt-6 flex items-center gap-3">
+                    <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
+                    <figcaption>
+                      <p className="text-sm font-semibold">{t.name}</p>
+                      <p className="text-xs text-muted-foreground">{t.role}</p>
+                    </figcaption>
+                  </figure>
               </MotionDiv>
             ))}
           </div>
@@ -967,7 +978,7 @@ export default function Landing() {
             <div className="relative z-10">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-balance">Ready to start your next internship?</h2>
               <p className="mt-4 text-white/80 max-w-xl mx-auto">
-                Join the students, mentors, and companies building verified professional experience on ZYR0.
+                Join thousands of students, mentors, and companies building verified professional experience on ZYR0. Your first opportunity is waiting — take the step that shapes your career.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link

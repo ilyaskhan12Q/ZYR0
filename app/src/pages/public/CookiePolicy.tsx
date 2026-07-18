@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Cookie, Settings, BarChart2, Shield, ToggleRight, Mail } from 'lucide-react';
+import { Cookie, Settings, BarChart2, Shield, ToggleRight, Mail, FileText } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 
 const cookieTypes = [
@@ -136,6 +137,26 @@ export default function CookiePolicy() {
               </p>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Related Policies */}
+      <section className="px-4 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-card rounded-xl border border-border p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">Review our other policies:</p>
+            <div className="flex gap-3">
+              <Link to="/privacy" className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+                <Shield className="w-4 h-4 text-accent" /> Privacy Policy
+              </Link>
+              <Link to="/terms" className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+                <FileText className="w-4 h-4 text-accent" /> Terms of Service
+              </Link>
+              <Link to="/contact" className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
+                Contact Us
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </div>
