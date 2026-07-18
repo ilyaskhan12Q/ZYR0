@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Globe, HelpCircle, BookOpen } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 
@@ -48,7 +49,7 @@ export default function Contact() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Info */}
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="space-y-4">
+          <address className="space-y-4 not-italic">
             {[
               { icon: Mail, title: 'Email', value: 'support@zyroo.dpdns.org', desc: 'We reply within 24 hours' },
               { icon: Phone, title: 'Phone', value: '+92 (300) 123-4567', desc: 'Mon-Fri 9am-6pm PKT' },
@@ -66,7 +67,7 @@ export default function Contact() {
                 </div>
               </div>
             ))}
-          </motion.div>
+          </address>
 
           {/* Contact Form */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2">
@@ -144,6 +145,27 @@ export default function Contact() {
             )}
           </motion.div>
         </div>
+
+        {/* Additional resources */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12 max-w-2xl mx-auto text-center"
+        >
+          <p className="text-sm text-muted-foreground mb-4">Before reaching out, you may find your answer faster in these resources:</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link to="/faq" className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              <HelpCircle className="w-4 h-4 text-accent" /> Browse FAQ
+            </Link>
+            <Link to="/help" className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              <BookOpen className="w-4 h-4 text-accent" /> Getting Started Guides
+            </Link>
+            <Link to="/privacy" className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
+              Privacy Policy
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

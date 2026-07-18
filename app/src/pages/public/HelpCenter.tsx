@@ -118,6 +118,7 @@ export default function HelpCenter() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
+                role="article"
                 className="bg-card rounded-xl border border-border p-6 shadow-sm"
               >
                 <div className="flex items-center gap-3 mb-4">

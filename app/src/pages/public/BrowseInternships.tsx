@@ -191,6 +191,7 @@ export default function BrowseInternships() {
                 return (
                   <motion.div
                     key={internship.id}
+                    role="article"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: i * 0.08 }}
@@ -210,7 +211,7 @@ export default function BrowseInternships() {
                           />
                           <div>
                             <p className="text-sm font-medium">{company?.name || 'Unknown Company'}</p>
-                            <p className="text-xs text-muted-foreground">{new Date(internship.posted_date || internship.created_at).toLocaleDateString()}</p>
+                            <time dateTime={new Date(internship.posted_date || internship.created_at).toISOString().split('T')[0]} className="text-xs text-muted-foreground">{new Date(internship.posted_date || internship.created_at).toLocaleDateString()}</time>
                           </div>
                         </div>
                         <SaveButton
