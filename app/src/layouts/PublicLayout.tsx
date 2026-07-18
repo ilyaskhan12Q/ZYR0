@@ -50,7 +50,7 @@ export default function PublicLayout() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <div className="w-8 h-8 flex items-center justify-center">
-                <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-8 h-8 object-contain rounded-md" />
+                <img src="/zyro-logo.webp" alt="ZYR0 Logo" width="32" height="32" className="w-8 h-8 object-contain rounded-md" />
               </div>
               <span className={`text-xl font-bold transition-colors ${scrolled ? 'text-foreground' : 'text-white'}`}>
                 ZYR0
@@ -198,7 +198,7 @@ export default function PublicLayout() {
               <div className="col-span-2 md:col-span-1">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-8 h-8 flex items-center justify-center">
-                    <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-8 h-8 object-contain rounded-md" />
+                    <img src="/zyro-logo.webp" alt="ZYR0 Logo" width="32" height="32" className="w-8 h-8 object-contain rounded-md" />
                   </div>
                   <span className="text-xl font-bold">ZYR0</span>
                 </div>
@@ -256,7 +256,7 @@ export default function PublicLayout() {
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-white/40 text-sm">&copy; 2025 ZYR0. All rights reserved.</p>
+              <p className="text-white/40 text-sm">&copy; 2026 ZYR0. All rights reserved.</p>
               <p className="text-white/40 text-sm">Designed for the modern workforce.</p>
             </div>
           </div>

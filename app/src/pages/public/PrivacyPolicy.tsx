@@ -64,7 +64,7 @@ const sections = [
     icon: Mail,
     title: 'Contact & Updates',
     content: [
-      'This Privacy Policy was last updated in July 2025.',
+      'This Privacy Policy was last updated in July 2026.',
       'We may update this policy periodically to reflect changes in our practices or applicable law. We will notify you of significant changes via email or a prominent notice on the platform.',
       'For privacy-related questions or concerns, contact our Privacy team at privacy@zyroo.dpdns.org.',
       'For general inquiries, visit our Contact page or email support@zyroo.dpdns.org.',
@@ -90,7 +90,7 @@ export default function PrivacyPolicy() {
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Your privacy matters to us. This policy explains what information we collect, how we use it, and the choices you have.
             </p>
-            <p className="mt-3 text-sm text-white/50">Last updated: July 2025</p>
+            <p className="mt-3 text-sm text-white/50">Last updated: July 2026</p>
           </motion.div>
         </div>
       </section>

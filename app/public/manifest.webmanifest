@@ -12,7 +12,7 @@
   "categories": ["education", "business", "productivity"],
   "icons": [
     {
-      "src": "/zyro-logo.png",
+      "src": "/zyro-logo-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"

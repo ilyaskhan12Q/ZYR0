@@ -192,7 +192,7 @@ export default function InternshipDetail() {
     { label: 'About Company', content: company ? (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name}`} alt={`${company.name} logo`} className="w-16 h-16 rounded-xl object-cover" />
+          <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name}`} alt={`${company.name} logo`} width="64" height="64" loading="lazy" className="w-16 h-16 rounded-xl object-cover" />
           <div>
             <h3 className="text-lg font-semibold">{company.name}</h3>
             <p className="text-sm text-muted-foreground">{company.industry}</p>
@@ -295,7 +295,7 @@ export default function InternshipDetail() {
             <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                  <img src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`} alt={`${company?.name || 'Company'} logo`} className="w-14 h-14 rounded-xl object-cover" />
+                  <img src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`} alt={`${company?.name || 'Company'} logo`} width="56" height="56" className="w-14 h-14 rounded-xl object-cover" />
                   <div>
                     {company && (
                       <Link to={`/companies/${company.id}`} className="text-sm text-accent hover:underline flex items-center gap-1">
@@ -436,7 +436,7 @@ export default function InternshipDetail() {
               <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
                 <h4 className="text-sm font-semibold mb-3">Company</h4>
                 <div className="flex items-center gap-3 mb-4">
-                  <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name}`} alt={`${company.name} logo`} className="w-10 h-10 rounded-lg object-cover" />
+                  <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name}`} alt={`${company.name} logo`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-lg object-cover" />
                   <div>
                     <p className="text-sm font-medium">{company.name}</p>
                     <p className="text-xs text-muted-foreground">{company.industry}</p>

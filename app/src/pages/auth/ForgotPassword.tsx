@@ -37,7 +37,7 @@ export default function ForgotPassword() {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
             <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/zyro-logo.png" alt="ZYR0 Logo" className="w-10 h-10 object-contain rounded-xl" />
+              <img src="/zyro-logo.webp" alt="ZYR0 Logo" width="40" height="40" className="w-10 h-10 object-contain rounded-xl" />
             </div>
             <span className="text-xl font-bold">ZYR0</span>
           </Link>

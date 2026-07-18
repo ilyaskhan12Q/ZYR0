@@ -51,8 +51,8 @@ export default function Contact() {
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="space-y-4">
             {[
               { icon: Mail, title: 'Email', value: 'support@zyroo.dpdns.org', desc: 'We reply within 24 hours' },
-              { icon: Phone, title: 'Phone', value: '+1 (555) 123-4567', desc: 'Mon-Fri 9am-6pm EST' },
-              { icon: MapPin, title: 'Office', value: 'San Francisco, CA', desc: '123 Market Street, Suite 400' },
+              { icon: Phone, title: 'Phone', value: '+92 (300) 123-4567', desc: 'Mon-Fri 9am-6pm PKT' },
+              { icon: MapPin, title: 'Office', value: 'Lahore, Pakistan', desc: 'Arfa Software Technology Park, Ferozepur Road' },
               { icon: Globe, title: 'Social', value: '@zyr0platform', desc: 'Follow us for updates' },
             ].map((item, i) => (
               <div key={i} className="bg-card rounded-xl border border-border p-5 shadow-sm flex items-start gap-4">

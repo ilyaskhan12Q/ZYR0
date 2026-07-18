@@ -203,6 +203,9 @@ export default function BrowseInternships() {
                           <img
                             src={company?.logo_url || `https://ui-avatars.com/api/?name=${company?.name || 'Company'}`}
                             alt={`${company?.name || 'Company'} logo`}
+                            width="40"
+                            height="40"
+                            loading="lazy"
                             className="w-10 h-10 rounded-lg object-cover"
                           />
                           <div>

@@ -129,7 +129,7 @@ export default function CompanyDetail() {
           <div className="h-32 bg-gradient-to-r from-primary to-accent dark:from-slate-900 dark:to-accent/50" />
           <div className="px-6 pb-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-end -mt-12 mb-4 gap-4">
-              <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name || 'Company'}`} alt={`${company.name} logo`} className="w-24 h-24 rounded-2xl border-4 border-card shadow-lg object-cover bg-background" />
+              <img src={company.logo_url || `https://ui-avatars.com/api/?name=${company.name || 'Company'}`} alt={`${company.name} logo`} width="96" height="96" className="w-24 h-24 rounded-2xl border-4 border-card shadow-lg object-cover bg-background" />
               <div className="flex-1">
                 <h1 className="text-2xl font-bold">{company.name}</h1>
                 <p className="text-sm text-muted-foreground">{company.industry} &middot; {company.size}</p>
@@ -228,7 +228,7 @@ export default function CompanyDetail() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {company.team.map((member: any) => (
                 <div key={member.id} className="flex items-center gap-4 bg-card rounded-xl border border-border p-4">
-                  <img src={member.avatar_url || `https://ui-avatars.com/api/?name=${member.name || 'Member'}`} alt={`${member.name} avatar`} className="w-12 h-12 rounded-full object-cover bg-background" />
+                  <img src={member.avatar_url || `https://ui-avatars.com/api/?name=${member.name || 'Member'}`} alt={`${member.name} avatar`} width="48" height="48" loading="lazy" className="w-12 h-12 rounded-full object-cover bg-background" />
                   <div>
                     <p className="font-medium">{member.name}</p>
                     <p className="text-sm text-muted-foreground">{member.role}</p>

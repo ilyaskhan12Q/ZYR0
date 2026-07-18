@@ -88,7 +88,7 @@ export default function TermsOfService() {
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Please read these terms carefully before using the ZYR0 platform. They govern your access and use of our Service.
             </p>
-            <p className="mt-3 text-sm text-white/50">Last updated: July 2025</p>
+            <p className="mt-3 text-sm text-white/50">Last updated: July 2026</p>
           </motion.div>
         </div>
       </section>
