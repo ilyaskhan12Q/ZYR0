@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2026-07-18
+
+### Added
+- Expanded homepage content from ~450 to ~1,071 words across all sections with Pakistan-specific context.
+- Rewrote About page with new sections: Pakistan internship gap challenges, platform philosophy, and team placeholder.
+- Expanded FAQ from 14 to 26 questions across 4 categories (added Mentor category).
+- Added contextual internal cross-linking between Contact, FAQ, Help Center, Verify, Privacy, Terms, and Cookie pages.
+- Added semantic HTML (`role="article"`, `<address>`, `<figure>`, `<time>`) across 10 public pages.
+- Added FAQPage and ContactPage structured data schemas.
+
+### Changed
+- Expanded Mission/Vision on About page with Pakistan-focused second paragraphs.
+- Increased About page values from 4 to 6 (added Transparency, Accessibility).
+- Extended About timeline from 4 to 5 milestones.
+
 ## [0.5.1] - 2026-07-18
 
 ### Changed
