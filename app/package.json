@@ -1,7 +1,8 @@
 {
   "name": "my-app",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.6.0",
+>>>>>>> 7a92aa9 (feat: implement phase 2 performance engineering — code splitting, bundle optimization, CSS cleanup)
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-07-18
+
+### Added
+- Per-page code splitting: lazy-loaded all portal sub-pages (company ~12, student ~14, admin ~10, mentor ~7) so each page loads only its own chunk.
+- Lazy-loaded DashboardLayout (26 kB) so anonymous visitors don't download protected-route code.
+- Separate `vendor-recharts` chunk (421 kB) — recharts only loads when visiting Analytics pages.
+- Shared `RouteLoading` spinner component for consistent lazy-load UX.
+
+### Changed
+- Moved Google Fonts from CSS `@import` to `<link>` in index.html with preconnect hints for earlier font discovery.
+- Removed dead code: deleted unused `Home.tsx` (Vite starter template) and `App.css` (42 lines of dead styles).
+- Extracted `SEO` component, `notifications`, `messages`, and other shared modules into separate async chunks.
+
+### Performance Improvements
+- **portal-company initial load: 581 kB → ~11 kB** (98% reduction) — only the visited page loads, not all 12 company pages.
+- **portal-student initial load: 301 kB → ~12 kB** (96% reduction) — only the visited page loads.
+- **portal-admin initial load: 112 kB → ~5-20 kB per page** (82%+ reduction).
+- **portal-mentor initial load: 70 kB → ~3-15 kB per page** (79%+ reduction).
+- **Anonymous landing page: DashboardLayout (26 kB) and all its transitive deps no longer loaded** — saves ~80+ kB on first visit.
+- **Font loading: CSS @import → HTML link with display=swap** — earlier font discovery, no render blocking.
+
+## [0.5.2] - 2026-07-18
+
+### Added
+- Expanded homepage content from ~450 to ~1,071 words across all sections with Pakistan-specific context.
+- Rewrote About page with new sections: Pakistan internship gap challenges, platform philosophy, and team placeholder.
+- Expanded FAQ from 14 to 26 questions across 4 categories (added Mentor category).
+- Added contextual internal cross-linking between Contact, FAQ, Help Center, Verify, Privacy, Terms, and Cookie pages.
+- Added semantic HTML (`role="article"`, `<address>`, `<figure>`, `<time>`) across 10 public pages.
+- Added FAQPage and ContactPage structured data schemas.
+
+### Changed
+- Expanded Mission/Vision on About page with Pakistan-focused second paragraphs.
+- Increased About page values from 4 to 6 (added Transparency, Accessibility).
+- Extended About timeline from 4 to 5 milestones.
+
+>>>>>>> 7a92aa9 (feat: implement phase 2 performance engineering — code splitting, bundle optimization, CSS cleanup)
 ## [0.5.1] - 2026-07-18
 
 ### Changed

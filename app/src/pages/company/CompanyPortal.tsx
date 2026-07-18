@@ -1,21 +1,25 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import CompanyDashboard from './Dashboard';
-import CompanyProfile from './Profile';
-import CompanyInternships from './Internships';
-import PostInternship from './PostInternship';
-import CompanyApplicants from './Applicants';
-import CompanyInterns from './Interns';
-import CompanyTasks from './Tasks';
-import CompanyAnalytics from './Analytics';
-import CompanyCertificates from './Certificates';
-import CompanyOfferLetters from './OfferLetters';
-import CompanyTeam from './Team';
-import CompanySettings from './Settings';
-import MentorMessages from '../mentor/Messages';
 import CompanyVerificationGate from '@/components/CompanyVerificationGate';
+import { RouteLoading } from '@/components/RouteLoading';
+
+const CompanyDashboard = lazy(() => import('./Dashboard'));
+const CompanyProfile = lazy(() => import('./Profile'));
+const CompanyInternships = lazy(() => import('./Internships'));
+const PostInternship = lazy(() => import('./PostInternship'));
+const CompanyApplicants = lazy(() => import('./Applicants'));
+const CompanyInterns = lazy(() => import('./Interns'));
+const CompanyTasks = lazy(() => import('./Tasks'));
+const CompanyAnalytics = lazy(() => import('./Analytics'));
+const CompanyCertificates = lazy(() => import('./Certificates'));
+const CompanyOfferLetters = lazy(() => import('./OfferLetters'));
+const CompanyTeam = lazy(() => import('./Team'));
+const CompanySettings = lazy(() => import('./Settings'));
+const MentorMessages = lazy(() => import('../mentor/Messages'));
 
 export default function CompanyPortal() {
   return (
+    <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route index element={<Navigate to="dashboard" replace />} />
       
@@ -123,5 +127,6 @@ export default function CompanyPortal() {
         } 
       />
     </Routes>
+    </Suspense>
   );
 }
