@@ -142,7 +142,7 @@ export async function generateOfferLetter(data: {
 export async function attachOfferLetterPdf(id: string, pdf_url: string) {
   return supabase
     .from('offer_letters')
-    .update({ pdf_url, status: 'Sent', email_sent: true, email_sent_at: new Date().toISOString() })
+    .update({ pdf_url })
     .eq('id', id)
     .select()
     .single();
