@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Globe, HelpCircle, BookOpen } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2, MessageSquare, Clock, Globe, HelpCircle, BookOpen, Facebook, Linkedin } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 
@@ -52,17 +53,27 @@ export default function Contact() {
           <address className="space-y-4 not-italic">
             {[
               { icon: Mail, title: 'Email', value: 'support@zyroo.dpdns.org', desc: 'We reply within 24 hours' },
-              { icon: Phone, title: 'Phone', value: '+92 (300) 123-4567', desc: 'Mon-Fri 9am-6pm PKT' },
+              { icon: Phone, title: 'Phone', value: '+923279883150', desc: 'Mon-Fri 9am-6pm PKT' },
               { icon: MapPin, title: 'Office', value: 'Lahore, Pakistan', desc: 'Arfa Software Technology Park, Ferozepur Road' },
-              { icon: Globe, title: 'Social', value: '@zyr0platform', desc: 'Follow us for updates' },
+              { icon: Facebook, title: 'Facebook', value: 'https://web.facebook.com/profile.php?id=61591995425665', desc: 'Follow us on Facebook' },
+              { icon: Linkedin, title: 'LinkedIn', value: 'https://linkedin.com/company/zyr0', desc: 'Connect on LinkedIn' },
+              { icon: FaWhatsapp, title: 'WhatsApp', value: 'https://wa.me/923279883150', desc: 'Chat with us on WhatsApp' },
             ].map((item, i) => (
               <div key={i} className="bg-card rounded-xl border border-border p-5 shadow-sm flex items-start gap-4">
                 <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-accent" />
+                  {['Facebook','LinkedIn','WhatsApp'].includes(item.title) ? (
+                    <a href={item.value} target="_blank" rel="noopener noreferrer" className="w-5 h-5">
+                      <item.icon className="w-5 h-5 text-accent" />
+                    </a>
+                  ) : (
+                    <item.icon className="w-5 h-5 text-accent" />
+                  )}
                 </div>
                 <div>
                   <p className="text-sm font-medium">{item.title}</p>
-                  <p className="text-sm text-foreground">{item.value}</p>
+                  {['Facebook','LinkedIn','WhatsApp'].includes(item.title) ? null : (
+                    <p className="text-sm text-foreground break-all">{item.value}</p>
+                  )}
                   <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
                 </div>
               </div>
