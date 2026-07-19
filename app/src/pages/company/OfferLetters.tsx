@@ -15,6 +15,7 @@ import {
   getOfferLetterByApplication,
   uploadOfferLetterPdf,
   attachOfferLetterPdf,
+  markOfferSent,
 } from '@/services/offerLetters';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
@@ -228,9 +229,19 @@ export default function CompanyOfferLetters() {
         if (invokeErr) {
           throw invokeErr;
         }
+        if (resData?.error) {
+          throw new Error(resData.error);
+        }
         console.log('Offer letter email sent successfully:', resData);
+
+        // Update database status and email flags only after email provider confirmation
+        const { error: markErr } = await markOfferSent(newOffer!.id);
+        if (markErr) {
+          throw markErr;
+        }
       } catch (emailErr) {
         console.error('Failed to send actual offer letter email:', emailErr);
+        throw new Error(`Offer letter generated, but email delivery failed: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`);
       }
 
       // Trigger simulation notification
@@ -395,8 +406,19 @@ export default function CompanyOfferLetters() {
       if (invokeErr) {
         throw invokeErr;
       }
+      if (resData?.error) {
+        throw new Error(resData.error);
+      }
+      console.log('Offer letter email resent successfully:', resData);
+
+      // Update database status and email flags only after email provider confirmation
+      const { error: markErr } = await markOfferSent(offer.id);
+      if (markErr) {
+        throw markErr;
+      }
 
       setSuccessMsg(`Offer letter email resent to ${student.full_name}!`);
+      await load();
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Failed to resend email.';
       console.error('Failed to resend email:', err);

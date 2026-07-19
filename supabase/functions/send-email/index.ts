@@ -87,12 +87,21 @@ serve(async (req) => {
       const body = await req.json();
       const { to, subject, html, from, text, replyTo, reply_to, attachments } = body;
       console.log(`[send-email] Incoming email request. To: ${JSON.stringify(to)}, Subject: "${subject}", From: "${from || 'default'}"`);
+      console.log(`[send-email] Attachment count: ${attachments?.length || 0}`);
+      if (attachments && attachments.length > 0) {
+        attachments.forEach((att: EmailAttachment, idx: number) => {
+          console.log(`[send-email] Attachment #${idx + 1}: filename="${att.filename}", base64 content length=${att.content?.length || 0}`);
+        });
+      }
 
       const SMTP_HOST = Deno.env.get('SMTP_HOST');
       const SMTP_PORT = Deno.env.get('SMTP_PORT');
       const SMTP_USER = Deno.env.get('SMTP_USER');
       const SMTP_PASS = Deno.env.get('SMTP_PASS');
       const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+
+      console.log(`[send-email] SMTP configuration status: HOST=${SMTP_HOST ? 'Configured' : 'Not configured'}, USER=${SMTP_USER ? 'Configured' : 'Not configured'}`);
+      console.log(`[send-email] Resend API key status: ${RESEND_API_KEY ? 'Configured' : 'Not configured'}`);
 
       let sanitizedFrom = from;
       if (!sanitizedFrom || 
@@ -110,6 +119,8 @@ serve(async (req) => {
           sanitizedReplyTo.includes('zyr0.com')) {
         sanitizedReplyTo = 'team@zyroo.dpdns.org';
       }
+
+      console.log(`[send-email] Sanitized sender info: from="${sanitizedFrom}", replyTo="${sanitizedReplyTo}"`);
 
       const SMTP_FROM = Deno.env.get('SMTP_FROM') || sanitizedFrom;
 
@@ -149,12 +160,12 @@ serve(async (req) => {
           lastError = smtpErr;
         }
       } else {
-        console.log('[send-email] SMTP is not configured or incomplete (host, user, or pass missing).');
+        console.log('[send-email] Skipping SMTP delivery: SMTP configuration is incomplete or missing.');
       }
 
       // Fallback to Resend API
       if (RESEND_API_KEY) {
-        console.log('[send-email] Attempting Resend API delivery');
+        console.log(`[send-email] Attempting Resend API delivery to ${JSON.stringify(to)}...`);
         try {
           const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -178,11 +189,12 @@ serve(async (req) => {
 
           if (!res.ok) {
             const err = await res.text();
+            console.error(`[send-email] Resend API response status: ${res.status}. Error body: ${err}`);
             throw new Error(`Resend error: ${err}`);
           }
 
           const data = await res.json();
-          console.log(`[send-email] Resend API delivery successful. Id: ${data.id}`);
+          console.log(`[send-email] Resend API delivery successful. Email Id: ${data.id}`);
           return new Response(JSON.stringify({ success: true, id: data.id }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
@@ -191,7 +203,7 @@ serve(async (req) => {
           lastError = resendErr;
         }
       } else {
-        console.log('[send-email] RESEND_API_KEY is not configured.');
+        console.log('[send-email] Skipping Resend API delivery: RESEND_API_KEY is not configured.');
       }
 
     const message = lastError
