@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-07-19
+
+### Added
+- Added official ZYR0 Facebook Business Page branding assets under `branding/facebook/`:
+  - `profile-logo.png` (1024x1024 px): High-resolution icon centered and padded, optimized for circular cropping.
+  - `cover-banner.png` (820x360 px): cover designed with a central safe zone to accommodate both mobile and desktop safe zones.
+  - `post-template.png` (1024x1024 px): square layout with professional typography, signature line, and verified internship certificate design style to build authority.
+
 ## [0.5.4] - 2026-07-19
 
 ### Fixed
