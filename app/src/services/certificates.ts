@@ -86,16 +86,29 @@ export async function getCompanyCertificates(company_id: string, useCache = true
 
 /** Issue a certificate (via Edge Function) */
 export async function issueCertificate(data: {
-  internship_id: string;
-  recipient_id: string;
-  title: string;
+  internship_id?: string;
+  recipient_id?: string;
+  title?: string;
   skills?: string[];
   description?: string;
+  certificate_id?: string;
 }) {
   const { data: { session } } = await supabase.auth.getSession();
 
   return supabase.functions.invoke('issue-certificate', {
     body: data,
+    headers: {
+      Authorization: `Bearer ${session?.access_token}`,
+    },
+  });
+}
+
+/** Resend a certificate notification email */
+export async function resendCertificateEmail(certificate_id: string) {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  return supabase.functions.invoke('issue-certificate', {
+    body: { certificate_id },
     headers: {
       Authorization: `Bearer ${session?.access_token}`,
     },
