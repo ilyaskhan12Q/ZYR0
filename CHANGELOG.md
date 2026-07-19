@@ -13,6 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `cover-banner.png` (820x360 px): cover designed with a central safe zone to accommodate both mobile and desktop safe zones.
   - `post-template.png` (1024x1024 px): square layout with professional typography, signature line, and verified internship certificate design style to build authority.
 
+## [0.6.0] - 2026-07-18
+
+### Added
+- Per-page code splitting: lazy-loaded all portal sub-pages (company ~12, student ~14, admin ~10, mentor ~7) so each page loads only its own chunk.
+- Lazy-loaded DashboardLayout (26 kB) so anonymous visitors don't download protected-route code.
+- Separate `vendor-recharts` chunk (421 kB) — recharts only loads when visiting Analytics pages.
+- Shared `RouteLoading` spinner component for consistent lazy-load UX.
+
+### Changed
+- Moved Google Fonts from CSS `@import` to `<link>` in index.html with preconnect hints for earlier font discovery.
+- Removed dead code: deleted unused `Home.tsx` (Vite starter template) and `App.css` (42 lines of dead styles).
+- Extracted `SEO` component, `notifications`, `messages`, and other shared modules into separate async chunks.
+
+### Performance Improvements
+- **portal-company initial load: 581 kB → ~11 kB** (98% reduction) — only the visited page loads, not all 12 company pages.
+- **portal-student initial load: 301 kB → ~12 kB** (96% reduction) — only the visited page loads.
+- **portal-admin initial load: 112 kB → ~5-20 kB per page** (82%+ reduction).
+- **portal-mentor initial load: 70 kB → ~3-15 kB per page** (79%+ reduction).
+- **Anonymous landing page: DashboardLayout (26 kB) and all its transitive deps no longer loaded** — saves ~80+ kB on first visit.
+- **Font loading: CSS @import → HTML link with display=swap** — earlier font discovery, no render blocking.
+
 ## [0.5.4] - 2026-07-19
 
 ### Fixed

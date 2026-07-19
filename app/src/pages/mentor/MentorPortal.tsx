@@ -1,14 +1,18 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import MentorDashboard from './Dashboard';
-import MentorInterns from './Interns';
-import MentorTasks from './Tasks';
-import MentorEvaluations from './Evaluations';
-import MentorMessages from './Messages';
-import MentorProfile from './Profile';
-import MentorSettings from './Settings';
+import { RouteLoading } from '@/components/RouteLoading';
+
+const MentorDashboard = lazy(() => import('./Dashboard'));
+const MentorInterns = lazy(() => import('./Interns'));
+const MentorTasks = lazy(() => import('./Tasks'));
+const MentorEvaluations = lazy(() => import('./Evaluations'));
+const MentorMessages = lazy(() => import('./Messages'));
+const MentorProfile = lazy(() => import('./Profile'));
+const MentorSettings = lazy(() => import('./Settings'));
 
 export default function MentorPortal() {
   return (
+    <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route index element={<Navigate to="dashboard" replace />} />
       <Route path="dashboard" element={<MentorDashboard />} />
@@ -21,5 +25,6 @@ export default function MentorPortal() {
       <Route path="profile" element={<MentorProfile />} />
       <Route path="settings" element={<MentorSettings />} />
     </Routes>
+    </Suspense>
   );
 }
