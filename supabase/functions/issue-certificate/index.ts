@@ -1,6 +1,6 @@
 // Edge Function: issue-certificate
 // POST /functions/v1/issue-certificate
-// Body: { internship_id, recipient_id, title, skills, description }
+// Body: { internship_id, recipient_id, title, skills, description, certificate_id }
 // Auth: company owner or admin JWT required
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -34,9 +34,170 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { internship_id, recipient_id, title, skills, description } = body;
+    const { internship_id, recipient_id, title, skills, description, certificate_id } = body;
 
-    // Validate required fields
+    // Resend flow
+    if (certificate_id) {
+      console.log(`[issue-certificate] Resend email requested for certificate: ${certificate_id}`);
+      
+      const { data: certificate, error: fetchErr } = await supabaseAdmin
+        .from('certificates')
+        .select('*')
+        .eq('id', certificate_id)
+        .single();
+      
+      if (fetchErr || !certificate) {
+        return new Response(JSON.stringify({ error: 'Certificate not found' }), {
+          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Verify caller is owner of the company that issued the certificate, or admin
+      const { data: callerProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      
+      const { data: companyData } = await supabaseAdmin
+        .from('companies')
+        .select('owner_id')
+        .eq('id', certificate.company_id)
+        .single();
+      
+      const isOwner = companyData?.owner_id === user.id;
+      const isAdmin = callerProfile?.role === 'admin';
+
+      if (!isOwner && !isAdmin) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Fetch the student profile
+      const { data: student } = await supabaseAdmin
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', certificate.recipient_id)
+        .single();
+
+      if (!student || !student.email) {
+        return new Response(JSON.stringify({ error: 'Recipient profile or email not found' }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      let email_error = null;
+      try {
+        const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
+        const emailSubject = `Certificate of Completion: ${certificate.title}`;
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.dpdns.org';
+        
+        const emailHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Certificate of Completion</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
+            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Certificate of Completion</h2>
+            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Issued via ZYR0</p>
+          </div>
+          
+          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${student.full_name}</strong>,</p>
+          
+          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">Congratulations on successfully completing your internship. We are proud to issue your official digital certificate for <strong>${certificate.title}</strong>.</p>
+          
+          <div style="margin: 24px 0; padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center;">
+            <span style="display: block; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Credential ID</span>
+            <strong style="color: #0f172a; font-size: 15px; letter-spacing: 0.05em;">${certificate.credential_id}</strong>
+          </div>
+          
+          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform.</p>
+          
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${siteUrl}/verify-certificate/${certificate.credential_id}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
+          </div>
+          
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">Verify this digital credential securely on the ZYR0 network at any time using your credential ID.</p>
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
+          </div>
+          
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
+            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
+            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+        const emailText = `Dear ${student.full_name},\n\n` +
+          `Congratulations on successfully completing your internship! We are proud to issue your official digital certificate for ${certificate.title}.\n\n` +
+          `Credential ID: ${certificate.credential_id}\n\n` +
+          `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
+          `${siteUrl}/verify-certificate/${certificate.credential_id}\n\n` +
+          `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
+          `Best regards,\n` +
+          `The ZYR0 Team\n` +
+          `team@zyroo.dpdns.org`;
+
+        const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        console.log(`[issue-certificate] Invoking send-email endpoint for resend: to=${student.email}`);
+        const response = await fetch(sendEmailUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': serviceRoleKey,
+            'Authorization': `Bearer ${serviceRoleKey}`,
+          },
+          body: JSON.stringify({
+            to: student.email,
+            from: 'ZYR0 Team <team@zyroo.dpdns.org>',
+            replyTo: 'team@zyroo.dpdns.org',
+            subject: emailSubject,
+            html: emailHtml,
+            text: emailText,
+          }),
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          email_error = `Failed to send certificate email. Status: ${response.status}, Error: ${errText}`;
+          console.error(`[issue-certificate] ${email_error}`);
+        } else {
+          console.log(`[issue-certificate] Certificate email successfully dispatched to ${student.email}`);
+          const { error: updateErr } = await supabaseAdmin
+            .from('certificates')
+            .update({ email_sent: true })
+            .eq('id', certificate.id);
+          if (updateErr) {
+            console.error(`[issue-certificate] Failed to update certificate email_sent status in DB:`, updateErr);
+          } else {
+            console.log(`[issue-certificate] Successfully updated certificate ${certificate.id} email_sent = true in DB`);
+            certificate.email_sent = true;
+          }
+        }
+      } catch (emailErr) {
+        email_error = `Failed to dispatch certificate email notification: ${emailErr.message}`;
+        console.error(`[issue-certificate] ${email_error}`);
+      }
+
+      return new Response(JSON.stringify({ certificate, email_error }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Validate required fields for main flow
     if (!internship_id || !recipient_id || !title) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -99,6 +260,7 @@ serve(async (req) => {
           blockchain_hash: blockchainHash,
           issued_by: user.id,
           status: 'Active',
+          email_sent: false,
         })
         .select()
         .single();
@@ -120,7 +282,7 @@ serve(async (req) => {
     if (insertError) throw insertError;
     if (!certificate) throw new Error('Failed to generate certificate after 3 attempts');
 
-    // Notify recipient
+    // Notify recipient via platform notification
     await supabaseAdmin.from('notifications').insert({
       user_id: recipient_id,
       type: 'certificate',
@@ -145,6 +307,7 @@ serve(async (req) => {
       .eq('id', recipient_id)
       .single();
 
+    let email_error = null;
     if (student?.email) {
       try {
         const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
@@ -210,6 +373,7 @@ serve(async (req) => {
           `team@zyroo.dpdns.org`;
 
         const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        console.log(`[issue-certificate] Invoking send-email endpoint: to=${student.email}`);
         const response = await fetch(sendEmailUrl, {
           method: 'POST',
           headers: {
@@ -229,16 +393,28 @@ serve(async (req) => {
 
         if (!response.ok) {
           const errText = await response.text();
-          console.error(`Failed to send certificate email. Status: ${response.status}, Error: ${errText}`);
+          email_error = `Failed to send certificate email. Status: ${response.status}, Error: ${errText}`;
+          console.error(`[issue-certificate] ${email_error}`);
         } else {
-          console.log(`Certificate email successfully dispatched to ${student.email}`);
+          console.log(`[issue-certificate] Certificate email successfully dispatched to ${student.email}`);
+          const { error: updateErr } = await supabaseAdmin
+            .from('certificates')
+            .update({ email_sent: true })
+            .eq('id', certificate.id);
+          if (updateErr) {
+            console.error(`[issue-certificate] Failed to update certificate email_sent status in DB:`, updateErr);
+          } else {
+            console.log(`[issue-certificate] Successfully updated certificate ${certificate.id} email_sent = true in DB`);
+            certificate.email_sent = true;
+          }
         }
       } catch (emailErr) {
-        console.error('Failed to dispatch certificate email notification:', emailErr);
+        email_error = `Failed to dispatch certificate email notification: ${emailErr.message}`;
+        console.error(`[issue-certificate] ${email_error}`);
       }
     }
 
-    return new Response(JSON.stringify({ certificate }), {
+    return new Response(JSON.stringify({ certificate, email_error }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

@@ -191,6 +191,7 @@ export interface Certificate {
   blockchain_hash: string | null;
   status: CertificateStatus;
   issued_by: string | null;
+  email_sent: boolean;
   created_at: string;
   // Joined
   recipient?: Profile;

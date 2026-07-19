@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-07-19
+
+### Added
+- Added official ZYR0 Facebook Business Page branding assets under `branding/facebook/`:
+  - `profile-logo.png` (1024x1024 px): High-resolution icon centered and padded, optimized for circular cropping.
+  - `cover-banner.png` (820x360 px): cover designed with a central safe zone to accommodate both mobile and desktop safe zones.
+  - `post-template.png` (1024x1024 px): square layout with professional typography, signature line, and verified internship certificate design style to build authority.
+
 ## [0.6.0] - 2026-07-18
 
 ### Added
@@ -26,6 +34,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Anonymous landing page: DashboardLayout (26 kB) and all its transitive deps no longer loaded** — saves ~80+ kB on first visit.
 - **Font loading: CSS @import → HTML link with display=swap** — earlier font discovery, no render blocking.
 
+## [0.5.4] - 2026-07-19
+
+### Fixed
+- Fixed Certificate email delivery pipeline: certificates are only marked as "Email Sent" (`email_sent = true`) after the email delivery service confirms successful acceptance.
+- Prevented duplicate triggers and silent failures in the company Certificates page: added full sending loading states (`sendingCertId`) to disable interaction while certificate generation and emailing are active.
+- Added comprehensive TypeScript type definitions for `email_sent` flag across frontend components and services.
+
+## [0.5.3] - 2026-07-19
+
+### Fixed
+- Fixed Offer Letter email delivery database update sequence: database records are only updated to "Sent" and email sent flags (`email_sent`, `email_sent_at`) are set only after the email delivery service confirms successful acceptance.
+- Added detailed step-by-step logging to the `send-email` Edge Function to track SMTP configuration status, Resend API key status, sanitization, attachment metadata, and API response details.
+- Prevented silent email delivery failures in the company Offer Letters page: errors returned by the Edge Function or the email client are now thrown, preventing false success messages and keeping the offer letter in its initial status.
+
 ## [0.5.2] - 2026-07-18
 
 ### Added
@@ -41,7 +63,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Increased About page values from 4 to 6 (added Transparency, Accessibility).
 - Extended About timeline from 4 to 5 milestones.
 
->>>>>>> 7a92aa9 (feat: implement phase 2 performance engineering — code splitting, bundle optimization, CSS cleanup)
 ## [0.5.1] - 2026-07-18
 
 ### Changed
