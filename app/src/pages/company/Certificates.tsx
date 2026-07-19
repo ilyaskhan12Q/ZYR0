@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
 import { getTasksAssignedByMe } from '@/services/tasks';
-import { getCompanyCertificates, issueCertificate } from '@/services/certificates';
+import { getCompanyCertificates, issueCertificate, resendCertificateEmail } from '@/services/certificates';
 import { createWorkspaceEvent } from '@/services/workspaceEvents';
 import { clearCache } from '@/lib/cache';
 
@@ -19,6 +19,7 @@ export default function CompanyCertificates() {
   const [search, setSearch] = useState('');
   const [showEligibleOnly, setShowEligibleOnly] = useState(false);
   const [issuingId, setIssuingId] = useState<string | null>(null);
+  const [resendingId, setResendingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function loadData() {
@@ -72,6 +73,10 @@ export default function CompanyCertificates() {
 
       if (err) throw err;
 
+      if (data?.email_error) {
+        setError(`Certificate generated, but email notification failed to send: ${data.email_error}. You can retry sending using the "Resend Email" button.`);
+      }
+
       await createWorkspaceEvent({
         internship_id: internship.id,
         student_id: student.id,
@@ -93,6 +98,29 @@ export default function CompanyCertificates() {
     }
   };
 
+  const handleResend = async (certId: string) => {
+    setResendingId(certId);
+    setError(null);
+
+    try {
+      const { data, error: err } = await resendCertificateEmail(certId);
+      if (err) throw err;
+
+      if (data?.email_error) {
+        throw new Error(data.email_error);
+      }
+
+      // Refresh certificates
+      const { data: updatedCerts } = await getCompanyCertificates(company.id);
+      if (updatedCerts) setCertificates(updatedCerts);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'Failed to resend email. Please check Edge Function logs.');
+    } finally {
+      setResendingId(null);
+    }
+  };
+
   const internsWithStatus = interns.map(intern => {
     const student = intern.student;
     const internship = intern.internship;
@@ -105,13 +133,18 @@ export default function CompanyCertificates() {
     const eligible = progress >= 80 || (totalTasks > 0 && tasksCompleted >= 1);
 
     // Check if certificate already exists
-    const hasCert = certificates.some(c => c.recipient_id === student.id && c.internship_id === internship.id);
+    const cert = certificates.find(c => c.recipient_id === student.id && c.internship_id === internship.id);
+    const hasCert = !!cert;
+    const emailSent = cert?.email_sent ?? false;
+    const certId = cert?.id;
 
     return {
       ...intern,
       progress,
       eligible,
-      hasCert
+      hasCert,
+      emailSent,
+      certId
     };
   });
 
@@ -200,9 +233,16 @@ export default function CompanyCertificates() {
                       </td>
                       <td className="px-4 py-3">
                         {intern.hasCert ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 text-xs rounded-full font-medium">
-                            <CheckCircle2 className="w-3 h-3" /> Issued
-                          </span>
+                          <div className="flex flex-col gap-1 items-start">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-100 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 text-xs rounded-full font-medium">
+                              <CheckCircle2 className="w-3 h-3" /> Issued
+                            </span>
+                            {!intern.emailSent && (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-rose-100 dark:bg-rose-950/30 text-rose-700 dark:text-rose-400 text-xs rounded-full font-medium">
+                                <XCircle className="w-3 h-3" /> Email Failed
+                              </span>
+                            )}
+                          </div>
                         ) : intern.eligible ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-xs rounded-full font-medium">
                             <CheckCircle2 className="w-3 h-3" /> Ready
@@ -215,7 +255,24 @@ export default function CompanyCertificates() {
                       </td>
                       <td className="px-4 py-3">
                         {intern.hasCert ? (
-                          <span className="text-xs text-muted-foreground font-medium">Completed</span>
+                          <div className="flex items-center gap-2">
+                            {!intern.emailSent ? (
+                              <button
+                                onClick={() => handleResend(intern.certId)}
+                                disabled={resendingId === intern.certId}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                {resendingId === intern.certId ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  <Send className="w-3 h-3" />
+                                )}
+                                Resend Email
+                              </button>
+                            ) : (
+                              <span className="text-xs text-muted-foreground font-medium">Completed</span>
+                            )}
+                          </div>
                         ) : (
                           <button
                             onClick={() => handleIssue(intern)}
