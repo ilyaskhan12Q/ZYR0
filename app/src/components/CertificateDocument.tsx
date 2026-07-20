@@ -348,6 +348,25 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                 margin: 0;
                 padding: 40px;
               }
+              .cert-border {
+                /* overflow:visible prevents the print engine from clipping
+                   content that slightly overflows the border box.
+                   Some print renderers default to overflow:hidden in a
+                   paginated context, silently hiding signatures and footer
+                   elements that fall near the bottom of the certificate. */
+                overflow: visible;
+                /* Reserve space for the absolute-positioned .qr-block and
+                   .meta-block (bottom:30px, ~80px tall). Without this
+                   reservation the normal-flow .footer-sections renders
+                   directly on top of those elements and the signatures are
+                   visually obscured by the overlapping QR/meta content. */
+                padding-bottom: 110px;
+              }
+              .footer-sections {
+                /* Never split a signature block across a page boundary. */
+                page-break-inside: avoid;
+                break-inside: avoid;
+              }
               .no-print {
                 display: none !important;
               }
@@ -381,7 +400,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               
               <div class="footer-sections">
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
+                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; min-height: 30px;">
                     ${supervisorName}
                   </div>
                   <div class="sig-line">
@@ -401,7 +420,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                 </div>
                 
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
+                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; min-height: 30px;">
                     ZYR0 Director
                   </div>
                   <div class="sig-line">
