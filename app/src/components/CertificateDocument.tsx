@@ -208,14 +208,19 @@ export default function CertificateDocument({ certificate }: CertificateDocument
     const qrSrc   = qrDataUrlRef.current  ?? qrCodeUrl;
     const logoSrc  = logoDataUrlRef.current ?? (certificate.company?.logo_url ?? '');
 
-    const fontStyleCss = fontCssRef.current
-      ? fontCssRef.current
-      : `@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap');`;
+    const fontStyleCss = fontCssRef.current ? fontCssRef.current : '';
 
     printWindow.document.write(`
       <html>
         <head>
           <title>Certificate - ${recipientName}</title>
+          <!--
+            Use <link rel="stylesheet"> as fallback if base64 font prefetch in parent window is still in flight.
+            When fontCssRef.current is ready, inline @font-face data URIs in <style> take precedence for instant rendering.
+          -->
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap" />
           <style>
             ${fontStyleCss}
             body {
@@ -417,6 +422,25 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                 margin: 0;
                 padding: 40px;
               }
+              .cert-border {
+                /* overflow:visible prevents the print engine from clipping
+                   content that slightly overflows the border box.
+                   Some print renderers default to overflow:hidden in a
+                   paginated context, silently hiding signatures and footer
+                   elements that fall near the bottom of the certificate. */
+                overflow: visible;
+                /* Reserve space for the absolute-positioned .qr-block and
+                   .meta-block (bottom:30px, ~80px tall). Without this
+                   reservation the normal-flow .footer-sections renders
+                   directly on top of those elements and the signatures are
+                   visually obscured by the overlapping QR/meta content. */
+                padding-bottom: 110px;
+              }
+              .footer-sections {
+                /* Never split a signature block across a page boundary. */
+                page-break-inside: avoid;
+                break-inside: avoid;
+              }
               .no-print {
                 display: none !important;
               }
@@ -450,7 +474,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               
               <div class="footer-sections">
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
+                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; min-height: 30px;">
                     ${supervisorName}
                   </div>
                   <div class="sig-line">
@@ -470,7 +494,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                 </div>
                 
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; height: 30px;">
+                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; min-height: 30px;">
                     ZYR0 Director
                   </div>
                   <div class="sig-line">
@@ -487,7 +511,14 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               </div>
               
               <div class="qr-block">
-                <img class="qr-image" src="${qrSrc}" alt="Verification QR" /><br/>
+                <img
+                  class="qr-image"
+                  src="${qrSrc}"
+                  alt="Verification QR"
+                  width="70"
+                  height="70"
+                  onerror="this.onerror=null;this.src='${qrCodeUrl}';"
+                /><br/>
                 <span class="qr-label">Scan to Verify</span>
               </div>
             </div>
@@ -516,7 +547,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-inner relative overflow-hidden">
+    <div className="certificate-print-root bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-inner relative overflow-hidden">
       {/* Decorative corners */}
       <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-amber-600/30 dark:border-amber-500/20 rounded-tl-lg pointer-events-none" />
       <div className="absolute top-8 right-8 w-12 h-12 border-t-2 border-r-2 border-amber-600/30 dark:border-amber-500/20 rounded-tr-lg pointer-events-none" />
