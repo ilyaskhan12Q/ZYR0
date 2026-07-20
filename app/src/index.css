@@ -408,4 +408,56 @@
   will-change: transform;
 }
 
+/* ==========================================================================
+   Certificate print isolation
+   ==========================================================================
+   When the user presses Ctrl+P on any page containing <CertificateDocument>,
+   only the certificate renders — not navigation, sidebars, modals, or chrome.
 
+   Technique: visibility:hidden/visible isolation (not display:none).
+   display:none removes elements from layout; visibility:hidden preserves the
+   layout box while making it transparent, so .certificate-print-root stays
+   correctly positioned when we reveal it with visibility:visible.
+
+   @page: defaults to A4 landscape with zero margins so the certificate fills
+   the page. This is a default — the user can change it in the print dialog.
+   ========================================================================== */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  /* Hide all body content. */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Reveal only the certificate and all its children. */
+  .certificate-print-root,
+  .certificate-print-root * {
+    visibility: visible !important;
+  }
+
+  /* Pin the certificate to the top-left of the print canvas. */
+  .certificate-print-root {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+
+  /* Hide the Print button — it has no place on the printed page. */
+  .certificate-print-root .no-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}

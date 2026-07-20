@@ -473,7 +473,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-inner relative overflow-hidden">
+    <div className="certificate-print-root bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 sm:p-10 shadow-inner relative overflow-hidden">
       {/* Decorative corners */}
       <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-amber-600/30 dark:border-amber-500/20 rounded-tl-lg pointer-events-none" />
       <div className="absolute top-8 right-8 w-12 h-12 border-t-2 border-r-2 border-amber-600/30 dark:border-amber-500/20 rounded-tr-lg pointer-events-none" />
