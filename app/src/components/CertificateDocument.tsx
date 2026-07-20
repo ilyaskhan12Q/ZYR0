@@ -96,11 +96,11 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
   // Prefetched asset refs — populated at mount, injected inline into the
   // print window so it has zero external network requests.
-  const qrDataUrlRef   = useRef<string | null>(null);
+  const qrDataUrlRef = useRef<string | null>(null);
   const logoDataUrlRef = useRef<string | null>(null);
   // Inline @font-face CSS block built from base64-encoded woff2 files.
   // Eliminates the 7 font network requests that were blocking fonts.ready.
-  const fontCssRef     = useRef<string | null>(null);
+  const fontCssRef = useRef<string | null>(null);
 
   useEffect(() => {
     // ── Helper: fetch a URL and return a base64 data URI ──────────────────
@@ -112,7 +112,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       const blob = await r.blob();
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload  = () => resolve(reader.result as string);
+        reader.onload = () => resolve(reader.result as string);
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(blob);
       });
@@ -195,8 +195,8 @@ export default function CertificateDocument({ certificate }: CertificateDocument
           console.warn('[cert-save-perf] Logo prefetch failed, falling back to remote URL:', e);
         });
     }
-  // Only re-run if the certificate identity changes (not on every render).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only re-run if the certificate identity changes (not on every render).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [certificate.credential_id, certificate.company?.logo_url]);
 
   const handlePrint = () => {
@@ -205,8 +205,8 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
     // Use prefetched data URLs so the print window has zero external image
     // fetches. Falls back to the remote URL if prefetch is still in flight.
-    const qrSrc   = qrDataUrlRef.current  ?? qrCodeUrl;
-    const logoSrc  = logoDataUrlRef.current ?? (certificate.company?.logo_url ?? '');
+    const qrSrc = qrDataUrlRef.current ?? qrCodeUrl;
+    const logoSrc = logoDataUrlRef.current ?? (certificate.company?.logo_url ?? '');
 
     const fontStyleCss = fontCssRef.current ? fontCssRef.current : '';
 
@@ -558,10 +558,10 @@ export default function CertificateDocument({ certificate }: CertificateDocument
         {/* Certificate Seal/Badge header */}
         <div className="flex items-center gap-4 mb-6">
           {certificate.company?.logo_url ? (
-            <img 
-              src={certificate.company.logo_url} 
-              alt={companyName} 
-              className="h-16 max-w-[160px] object-contain bg-white p-1 rounded border border-slate-200 dark:border-slate-800" 
+            <img
+              src={certificate.company.logo_url}
+              alt={companyName}
+              className="h-16 max-w-[160px] object-contain bg-white p-1 rounded border border-slate-200 dark:border-slate-800"
             />
           ) : (
             <div className="w-16 h-16 bg-amber-500/10 text-amber-600 rounded-full flex items-center justify-center">
