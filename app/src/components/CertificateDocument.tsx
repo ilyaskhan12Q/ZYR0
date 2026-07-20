@@ -418,7 +418,14 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               </div>
               
               <div class="qr-block">
-                <img class="qr-image" src="${qrSrc}" alt="Verification QR" /><br/>
+                <img
+                  class="qr-image"
+                  src="${qrSrc}"
+                  alt="Verification QR"
+                  width="70"
+                  height="70"
+                  onerror="this.onerror=null;this.src='${qrCodeUrl}';"
+                /><br/>
                 <span class="qr-label">Scan to Verify</span>
               </div>
             </div>
