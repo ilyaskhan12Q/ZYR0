@@ -48,6 +48,11 @@ export default function CertificateDocument({ certificate }: CertificateDocument
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
+    // Write the document first so the parser can start fetching fonts,
+    // then wait for document.fonts.ready before calling window.print().
+    // Without this guard the browser may print before Playfair Display
+    // has loaded, causing a fallback font with different character metrics
+    // that changes text width and breaks the centred-name layout.
     printWindow.document.write(`
       <html>
         <head>
@@ -124,6 +129,14 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               margin-bottom: 10px;
             }
             .recipient {
+              /* Use display:block + width:100% so text-align:center correctly
+                 centres the element itself within its parent in both the
+                 screen renderer and the browser print layout engine.
+                 display:inline-block only centres text *within* the box,
+                 not the box within its parent, causing the name to shift
+                 to the left when printed / exported as PDF. */
+              display: block;
+              width: 100%;
               text-align: center;
               font-family: 'Playfair Display', serif;
               font-size: 44px;
@@ -131,9 +144,8 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               font-style: italic;
               margin: 10px 0 20px 0;
               border-bottom: 1px solid #e2e8f0;
-              display: inline-block;
               padding-bottom: 5px;
-              min-width: 400px;
+              box-sizing: border-box;
             }
             .description {
               text-align: center;
@@ -229,11 +241,22 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               letter-spacing: 0.5px;
             }
             @media print {
-              body, .cert-container {
+              /* Match the A4 landscape page box exactly.
+                 Keep the same padding as the screen rule (40px) so the
+                 interior .cert-border geometry — and therefore the visual
+                 centre — is identical between preview and exported PDF.
+                 Previously padding:0 was shifting the centre-point. */
+              body {
+                margin: 0;
+                padding: 0;
+                width: 297mm;
+                height: 210mm;
+              }
+              .cert-container {
                 width: 297mm;
                 height: 210mm;
                 margin: 0;
-                padding: 0;
+                padding: 40px;
               }
               .no-print {
                 display: none !important;
@@ -314,6 +337,32 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       </html>
     `);
     printWindow.document.close();
+
+    // Wait for all fonts declared via @import to fully load before
+    // triggering the print dialog. Falls back to a 600 ms delay for
+    // browsers that do not support document.fonts (IE / old Edge).
+    const triggerPrint = () => {
+      if (printWindow.document.fonts && printWindow.document.fonts.ready) {
+        printWindow.document.fonts.ready.then(() => {
+          printWindow.focus();
+          printWindow.print();
+        });
+      } else {
+        // Legacy fallback: give the browser 600 ms to fetch fonts
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+        }, 600);
+      }
+    };
+
+    // document.close() is synchronous but the load event fires after
+    // all sub-resources (images, fonts) have been fetched.
+    if (printWindow.document.readyState === 'complete') {
+      triggerPrint();
+    } else {
+      printWindow.addEventListener('load', triggerPrint);
+    }
   };
 
   return (
