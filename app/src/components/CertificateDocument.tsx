@@ -138,8 +138,17 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       <html>
         <head>
           <title>Certificate - ${recipientName}</title>
+          <!--
+            Use <link rel="stylesheet"> instead of @import.
+            CSS @import blocks the parser until the remote stylesheet resolves,
+            adding 100–400 ms before any style is applied. <link> elements
+            load in parallel with HTML parsing, cutting time-to-first-style.
+            preconnect hints warm the DNS/TLS connections immediately.
+          -->
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap" />
           <style>
-            @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap');
             body {
               margin: 0;
               padding: 0;
