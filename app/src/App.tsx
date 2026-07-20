@@ -53,6 +53,8 @@ function App() {
             <Route path="/companies/:id" element={<CompanyDetail />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/verify/:code" element={<Verify />} />
+            <Route path="/verify-certificate" element={<Verify />} />
+            <Route path="/verify-certificate/:code" element={<Verify />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />

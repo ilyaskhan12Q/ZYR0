@@ -122,7 +122,7 @@ serve(async (req) => {
           <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform.</p>
           
           <div style="text-align: center; margin: 32px 0;">
-            <a href="${siteUrl}/verify-certificate/${certificate.credential_id}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
+            <a href="${siteUrl}/verify/${certificate.credential_id}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
           </div>
           
           <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
@@ -145,7 +145,7 @@ serve(async (req) => {
           `Congratulations on successfully completing your internship! We are proud to issue your official digital certificate for ${certificate.title}.\n\n` +
           `Credential ID: ${certificate.credential_id}\n\n` +
           `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
-          `${siteUrl}/verify-certificate/${certificate.credential_id}\n\n` +
+          `${siteUrl}/verify/${certificate.credential_id}\n\n` +
           `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
           `Best regards,\n` +
           `The ZYR0 Team\n` +
@@ -343,7 +343,7 @@ serve(async (req) => {
           <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform.</p>
           
           <div style="text-align: center; margin: 32px 0;">
-            <a href="${siteUrl}/verify-certificate/${credentialId}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
+            <a href="${siteUrl}/verify/${credentialId}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
           </div>
           
           <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
@@ -366,7 +366,7 @@ serve(async (req) => {
           `Congratulations on successfully completing your internship! We are proud to issue your official digital certificate for ${title}.\n\n` +
           `Credential ID: ${credentialId}\n\n` +
           `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
-          `${siteUrl}/verify-certificate/${credentialId}\n\n` +
+          `${siteUrl}/verify/${credentialId}\n\n` +
           `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
           `Best regards,\n` +
           `The ZYR0 Team\n` +
