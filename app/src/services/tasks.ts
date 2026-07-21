@@ -151,6 +151,55 @@ export async function submitTask(data: {
   return res;
 }
 
+/** Bulk-create tasks for multiple interns (company).
+ *  Inserts one independent task row per intern in a single request.
+ *  Returns the list of created tasks and a count, or an error.
+ *  Duplicates (same title + internship + assignee) are silently skipped. */
+export async function bulkCreateTasks(
+  baseData: Omit<Partial<Task>, 'assigned_to' | 'assigned_by'>,
+  internIds: string[],
+  existingTasks: any[] = [],
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  if (!internIds.length) return { data: [], created: 0, skipped: 0, error: null };
+
+  // Deduplicate against existing tasks with the same title + internship + assignee
+  const existingSet = new Set(
+    existingTasks
+      .filter(t => t.title === baseData.title && t.internship_id === baseData.internship_id)
+      .map(t => t.assigned_to),
+  );
+
+  const newInternIds = internIds.filter(id => !existingSet.has(id));
+  const skipped = internIds.length - newInternIds.length;
+
+  if (!newInternIds.length) {
+    return { data: [], created: 0, skipped, error: null };
+  }
+
+  const rows = newInternIds.map(internId => ({
+    ...baseData,
+    assigned_to: internId,
+    assigned_by: user.id,
+  }));
+
+  const res = await supabase.from('tasks').insert(rows).select();
+
+  if (!res.error) {
+    // Clear caches for assigner and every affected intern
+    clearCache(`assigned_by_tasks_${user.id}`);
+    newInternIds.forEach(id => clearCache(`my_tasks_${id}`));
+  }
+
+  return {
+    data: res.data,
+    created: res.data?.length ?? 0,
+    skipped,
+    error: res.error,
+  };
+}
+
 /** Review a submission (mentor/company) */
 export async function reviewSubmission(
   submission_id: string,
