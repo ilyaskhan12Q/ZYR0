@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, ClipboardList, CheckCircle2, Clock, Circle, Calendar, Paperclip, ChevronRight, User, Loader2, X, AlertCircle, Pencil } from 'lucide-react';
-import { getTasksAssignedByMe, createTask, updateTask, reviewSubmission } from '@/services/tasks';
+import { Plus, ClipboardList, CheckCircle2, Clock, Circle, Calendar, Paperclip, ChevronRight, User, Users, Loader2, X, AlertCircle, Pencil, Info } from 'lucide-react';
+import { getTasksAssignedByMe, createTask, updateTask, reviewSubmission, bulkCreateTasks } from '@/services/tasks';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
 import { getInternships } from '@/services/internships';
@@ -29,6 +29,12 @@ export default function CompanyTasks() {
   const [newAssignedTo, setNewAssignedTo] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Bulk assignment state
+  const [assignmentScope, setAssignmentScope] = useState<'individual' | 'bulk'>('individual');
+  const [bulkInternshipId, setBulkInternshipId] = useState('');
+  const [bulkEligibleInterns, setBulkEligibleInterns] = useState<any[]>([]);
+  const [bulkResult, setBulkResult] = useState<{ created: number; skipped: number } | null>(null);
+
   // Edit task state
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -41,6 +47,10 @@ export default function CompanyTasks() {
     setNewDueDate('');
     setNewInternshipId('');
     setNewAssignedTo('');
+    setAssignmentScope('individual');
+    setBulkInternshipId('');
+    setBulkEligibleInterns([]);
+    setBulkResult(null);
     setValidationErrors({});
     setShowCreateModal(true);
   };
@@ -57,6 +67,21 @@ export default function CompanyTasks() {
     setShowCreateModal(true);
   };
 
+  // When bulk internship selection changes, fetch eligible interns for that internship
+  const handleBulkInternshipChange = (internshipId: string) => {
+    setBulkInternshipId(internshipId);
+    if (validationErrors.bulkInternship) {
+      setValidationErrors(prev => ({ ...prev, bulkInternship: '' }));
+    }
+    if (!internshipId) {
+      setBulkEligibleInterns([]);
+      return;
+    }
+    // Filter interns who have accepted applications for this specific internship
+    const eligible = interns.filter((app: any) => app.internship_id === internshipId);
+    setBulkEligibleInterns(eligible);
+  };
+
   const validateForm = () => {
     const errors: Record<string, string> = {};
     if (!newTitle.trim()) {
@@ -71,12 +96,19 @@ export default function CompanyTasks() {
       errors.description = 'Description must be at least 10 characters';
     }
 
-    if (!newInternshipId) {
-      errors.internship = 'Please select an internship project';
-    }
-
-    if (!newAssignedTo) {
-      errors.intern = 'Please select an intern';
+    if (assignmentScope === 'individual') {
+      if (!newInternshipId) {
+        errors.internship = 'Please select an internship project';
+      }
+      if (!newAssignedTo) {
+        errors.intern = 'Please select an intern';
+      }
+    } else {
+      if (!bulkInternshipId) {
+        errors.bulkInternship = 'Please select an internship';
+      } else if (bulkEligibleInterns.length === 0) {
+        errors.bulkInternship = 'No eligible interns found for this internship';
+      }
     }
 
     if (newDueDate) {
@@ -140,8 +172,10 @@ export default function CompanyTasks() {
     e.preventDefault();
     if (!validateForm()) return;
     setSubmitting(true);
+    setBulkResult(null);
     try {
       if (editingTaskId) {
+        // Edit mode — always individual
         const { error } = await updateTask(editingTaskId, {
           title: newTitle.trim(),
           description: newDescription.trim(),
@@ -154,7 +188,48 @@ export default function CompanyTasks() {
           setShowCreateModal(false);
           await loadData();
         }
+      } else if (assignmentScope === 'bulk') {
+        // Bulk assignment — create one task per eligible intern
+        const internIds = bulkEligibleInterns.map((app: any) => app.student?.id || app.student_id);
+        const { created, skipped, error } = await bulkCreateTasks(
+          {
+            title: newTitle.trim(),
+            description: newDescription.trim(),
+            priority: newPriority,
+            due_date: newDueDate || null,
+            internship_id: bulkInternshipId,
+            status: 'Pending',
+          },
+          internIds,
+          tasks,
+        );
+        if (!error) {
+          setBulkResult({ created, skipped });
+          // Send notifications to each newly assigned intern
+          for (const app of bulkEligibleInterns) {
+            const internId = app.student?.id || app.student_id;
+            try {
+              await dispatchNotificationWithSimulation({
+                userId: internId,
+                title: 'New Task Assigned',
+                message: `You have been assigned a new task: "${newTitle.trim()}"`,
+                type: 'task',
+                actionUrl: '/student/workspace',
+                studentEmail: app.student?.email,
+              });
+            } catch (notifErr) {
+              console.error('Bulk notification failed for', internId, notifErr);
+            }
+          }
+          // Show result briefly then close
+          setTimeout(() => {
+            setShowCreateModal(false);
+            setBulkResult(null);
+            loadData();
+          }, 2500);
+        }
       } else {
+        // Individual assignment (existing behavior)
         const { error } = await createTask({
           title: newTitle.trim(),
           description: newDescription.trim(),
@@ -410,46 +485,117 @@ export default function CompanyTasks() {
                   </p>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              {/* Assignment Scope — only shown in create mode */}
+              {!editingTaskId && (
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Internship Project</label>
-                  <select value={newInternshipId} onChange={(e) => {
-                    setNewInternshipId(e.target.value);
-                    if (validationErrors.internship) {
-                      setValidationErrors(prev => ({ ...prev, internship: '' }));
-                    }
-                  }}
-                    className={`w-full px-3.5 py-2.5 bg-background border ${validationErrors.internship ? 'border-red-500 focus:ring-red-500/20' : 'border-border focus:ring-accent/20'} rounded-lg text-sm focus:outline-none focus:ring-2`}>
-                    <option value="">Select Internship</option>
-                    {internships.map(i => <option key={i.id} value={i.id}>{i.title}</option>)}
-                  </select>
-                  {validationErrors.internship && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {validationErrors.internship}
-                    </p>
+                  <label className="text-sm font-medium mb-2 block">Assignment Scope</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button type="button" onClick={() => setAssignmentScope('individual')}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all ${assignmentScope === 'individual' ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-foreground hover:bg-muted'}`}>
+                      <User className="w-4 h-4" /> Selected Intern(s)
+                    </button>
+                    <button type="button" onClick={() => setAssignmentScope('bulk')}
+                      className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all ${assignmentScope === 'bulk' ? 'border-accent bg-accent/10 text-accent' : 'border-border text-muted-foreground hover:bg-muted'}`}>
+                      <Users className="w-4 h-4" /> All Enrolled Interns
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Individual assignment (existing behavior) */}
+              {(assignmentScope === 'individual' || editingTaskId) && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Internship Project</label>
+                    <select value={newInternshipId} onChange={(e) => {
+                      setNewInternshipId(e.target.value);
+                      if (validationErrors.internship) {
+                        setValidationErrors(prev => ({ ...prev, internship: '' }));
+                      }
+                    }}
+                      className={`w-full px-3.5 py-2.5 bg-background border ${validationErrors.internship ? 'border-red-500 focus:ring-red-500/20' : 'border-border focus:ring-accent/20'} rounded-lg text-sm focus:outline-none focus:ring-2`}>
+                      <option value="">Select Internship</option>
+                      {internships.map(i => <option key={i.id} value={i.id}>{i.title}</option>)}
+                    </select>
+                    {validationErrors.internship && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {validationErrors.internship}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Assign To (Intern)</label>
+                    <select value={newAssignedTo} onChange={(e) => {
+                      setNewAssignedTo(e.target.value);
+                      if (validationErrors.intern) {
+                        setValidationErrors(prev => ({ ...prev, intern: '' }));
+                      }
+                    }}
+                      className={`w-full px-3.5 py-2.5 bg-background border ${validationErrors.intern ? 'border-red-500 focus:ring-red-500/20' : 'border-border focus:ring-accent/20'} rounded-lg text-sm focus:outline-none focus:ring-2`}>
+                      <option value="">Select Intern</option>
+                      {interns.map(i => <option key={i.student.id} value={i.student.id}>{i.student.full_name}</option>)}
+                    </select>
+                    {validationErrors.intern && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {validationErrors.intern}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Bulk assignment */}
+              {assignmentScope === 'bulk' && !editingTaskId && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Select Internship</label>
+                    <select value={bulkInternshipId} onChange={(e) => handleBulkInternshipChange(e.target.value)}
+                      className={`w-full px-3.5 py-2.5 bg-background border ${validationErrors.bulkInternship ? 'border-red-500 focus:ring-red-500/20' : 'border-border focus:ring-accent/20'} rounded-lg text-sm focus:outline-none focus:ring-2`}>
+                      <option value="">Select Internship</option>
+                      {internships.map(i => <option key={i.id} value={i.id}>{i.title}</option>)}
+                    </select>
+                    {validationErrors.bulkInternship && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {validationErrors.bulkInternship}
+                      </p>
+                    )}
+                  </div>
+
+                  {bulkInternshipId && (
+                    <div className={`flex items-start gap-2.5 p-3 rounded-lg border text-sm ${bulkEligibleInterns.length > 0 ? 'bg-accent/5 border-accent/20 text-accent' : 'bg-amber-500/5 border-amber-500/20 text-amber-600'}`}>
+                      {bulkEligibleInterns.length > 0 ? (
+                        <>
+                          <Users className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="font-medium">
+                              {bulkEligibleInterns.length} intern{bulkEligibleInterns.length !== 1 ? 's' : ''} will receive this task
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {bulkEligibleInterns.map((a: any) => a.student?.full_name).filter(Boolean).join(', ')}
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                          <p>No accepted/enrolled interns found for this internship. Bulk assignment is disabled.</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {bulkResult && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm font-medium">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Task successfully assigned to {bulkResult.created} intern{bulkResult.created !== 1 ? 's' : ''}.
+                      {bulkResult.skipped > 0 && ` (${bulkResult.skipped} skipped — already assigned)`}
+                    </div>
                   )}
                 </div>
-                <div>
-                  <label className="text-sm font-medium mb-1 block">Assign To (Intern)</label>
-                  <select value={newAssignedTo} onChange={(e) => {
-                    setNewAssignedTo(e.target.value);
-                    if (validationErrors.intern) {
-                      setValidationErrors(prev => ({ ...prev, intern: '' }));
-                    }
-                  }}
-                    className={`w-full px-3.5 py-2.5 bg-background border ${validationErrors.intern ? 'border-red-500 focus:ring-red-500/20' : 'border-border focus:ring-accent/20'} rounded-lg text-sm focus:outline-none focus:ring-2`}>
-                    <option value="">Select Intern</option>
-                    {interns.map(i => <option key={i.student.id} value={i.student.id}>{i.student.full_name}</option>)}
-                  </select>
-                  {validationErrors.intern && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {validationErrors.intern}
-                    </p>
-                  )}
-                </div>
-              </div>
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-1 block">Priority</label>
@@ -479,8 +625,16 @@ export default function CompanyTasks() {
               </div>
               <div className="flex justify-end gap-3 pt-4 border-t border-border">
                 <button type="button" onClick={() => setShowCreateModal(false)} className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">Cancel</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-1.5">
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (editingTaskId ? 'Save Changes' : 'Create Task')}
+                <button
+                  type="submit"
+                  disabled={submitting || (assignmentScope === 'bulk' && !editingTaskId && bulkEligibleInterns.length === 0) || !!bulkResult}
+                  className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                    editingTaskId ? 'Save Changes' :
+                    assignmentScope === 'bulk' ? `Assign to ${bulkEligibleInterns.length} Intern${bulkEligibleInterns.length !== 1 ? 's' : ''}` :
+                    'Create Task'
+                  )}
                 </button>
               </div>
             </form>

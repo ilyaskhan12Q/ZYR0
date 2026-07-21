@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-07-21
+
+### Added
+- **Company Bulk Task Assignment (`feature/company-bulk-task-assignment`)**:
+  - Implemented `bulkCreateTasks` service function in `@/services/tasks` for atomic multi-row task generation with duplicate prevention and cache invalidation.
+  - Extended Company Task modal with an **Assignment Scope** toggle (`Selected Intern(s)` vs `All Enrolled Interns`).
+  - Added dynamic filtering for accepted/enrolled interns within the chosen internship, displaying real-time intern counts and preview lists.
+  - Dispatched simulated email/in-app notifications for each intern upon bulk creation.
+  - Maintained complete task independence, individual submissions, and per-intern progress tracking.
+
 ## [0.5.7] - 2026-07-20
 
 ### Fixed
