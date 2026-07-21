@@ -223,6 +223,22 @@ export default function CertificateDocument({ certificate }: CertificateDocument
           <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@1,600&display=swap" />
           <style>
             ${fontStyleCss}
+
+            /* ── Suppress browser-generated headers/footers ─────────────
+               Setting margin:0 on the @page at-rule removes the browser's
+               default header (document title, URL) and footer (page number,
+               date) from the printed / "Save as PDF" output.  The
+               size:landscape directive ensures the PDF is generated in
+               landscape orientation matching the certificate aspect ratio. */
+            @page {
+              size: A4 landscape;
+              margin: 0;
+            }
+
+            *, *::before, *::after {
+              box-sizing: border-box;
+            }
+
             body {
               margin: 0;
               padding: 0;
@@ -247,14 +263,16 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               border: 12px double #b89c56;
               box-sizing: border-box;
               position: relative;
-              padding: 40px;
+              padding: 40px 40px 20px 40px;
+              display: flex;
+              flex-direction: column;
               background: radial-gradient(circle, rgba(255,255,255,1) 60%, rgba(250,248,242,1) 100%);
             }
             .cert-corner-t-l { position: absolute; top: 15px; left: 15px; width: 40px; height: 40px; border-top: 4px solid #b89c56; border-left: 4px solid #b89c56; }
             .cert-corner-t-r { position: absolute; top: 15px; right: 15px; width: 40px; height: 40px; border-top: 4px solid #b89c56; border-right: 4px solid #b89c56; }
             .cert-corner-b-l { position: absolute; bottom: 15px; left: 15px; width: 40px; height: 40px; border-bottom: 4px solid #b89c56; border-left: 4px solid #b89c56; }
             .cert-corner-b-r { position: absolute; bottom: 15px; right: 15px; width: 40px; height: 40px; border-bottom: 4px solid #b89c56; border-right: 4px solid #b89c56; }
-            
+
             .header {
               text-align: center;
               margin-bottom: 20px;
@@ -293,12 +311,6 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               margin-bottom: 10px;
             }
             .recipient {
-              /* Use display:block + width:100% so text-align:center correctly
-                 centres the element itself within its parent in both the
-                 screen renderer and the browser print layout engine.
-                 display:inline-block only centres text *within* the box,
-                 not the box within its parent, causing the name to shift
-                 to the left when printed / exported as PDF. */
               display: block;
               width: 100%;
               text-align: center;
@@ -309,7 +321,6 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               margin: 10px 0 20px 0;
               border-bottom: 1px solid #e2e8f0;
               padding-bottom: 5px;
-              box-sizing: border-box;
             }
             .description {
               text-align: center;
@@ -317,32 +328,58 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               line-height: 1.8;
               color: #334155;
               max-width: 750px;
-              margin: 0 auto 40px auto;
+              margin: 0 auto 30px auto;
             }
             .highlight {
               font-weight: 600;
               color: #0f172a;
             }
+
+            /* ── Signature + Seal footer row ─────────────────────────────
+               Three equal-width columns: left sig | centre seal | right sig.
+               Each column is 200px wide.  The outer flex container uses
+               justify-content:center with a fixed gap so the three blocks
+               are always perfectly centred and symmetrical regardless of
+               content length. */
             .footer-sections {
               display: flex;
-              justify-content: space-between;
+              justify-content: center;
               align-items: flex-end;
-              margin-top: 60px;
-              padding: 0 40px;
+              gap: 60px;
+              margin-top: auto;
+              padding: 0 20px;
             }
+
+            /* Signature blocks: flex column for clean vertical stacking */
             .sig-block {
-              text-align: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
               width: 200px;
+              min-width: 200px;
+            }
+            .sig-script {
+              font-family: 'Playfair Display', serif;
+              font-style: italic;
+              font-size: 16px;
+              color: #334155;
+              min-height: 30px;
+              display: flex;
+              align-items: flex-end;
+              justify-content: center;
             }
             .sig-line {
+              width: 100%;
               border-top: 1px solid #94a3b8;
-              margin-top: 50px;
+              margin-top: 8px;
               padding-top: 8px;
+              text-align: center;
             }
             .sig-name {
               font-size: 12px;
               font-weight: 600;
               color: #1e293b;
+              margin: 0;
             }
             .sig-title {
               font-size: 10px;
@@ -350,11 +387,15 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               text-transform: uppercase;
               margin-top: 2px;
             }
+
+            /* Seal: same width as sig-blocks for perfect symmetry */
             .seal-container {
               display: flex;
               flex-direction: column;
               align-items: center;
-              justify-content: center;
+              justify-content: flex-end;
+              width: 200px;
+              min-width: 200px;
             }
             .seal-gold {
               width: 80px;
@@ -376,18 +417,26 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               color: #b89c56;
               letter-spacing: 1px;
             }
+
+            /* ── Bottom metadata bar ──────────────────────────────────────
+               Replaces the previous absolute-positioned .meta-block and
+               .qr-block with a normal-flow flex row that sits at the bottom
+               of .cert-border.  This ensures equal left/right margins and
+               consistent spacing regardless of print scaling. */
+            .bottom-bar {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              padding: 16px 20px 0 20px;
+              margin-top: 16px;
+            }
             .meta-block {
-              position: absolute;
-              bottom: 30px;
-              left: 55px;
               font-size: 10px;
               color: #94a3b8;
               font-family: monospace;
+              line-height: 1.6;
             }
             .qr-block {
-              position: absolute;
-              bottom: 30px;
-              right: 55px;
               text-align: center;
             }
             .qr-image {
@@ -404,12 +453,8 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
+
             @media print {
-              /* Match the A4 landscape page box exactly.
-                 Keep the same padding as the screen rule (40px) so the
-                 interior .cert-border geometry — and therefore the visual
-                 centre — is identical between preview and exported PDF.
-                 Previously padding:0 was shifting the centre-point. */
               body {
                 margin: 0;
                 padding: 0;
@@ -419,25 +464,14 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               .cert-container {
                 width: 297mm;
                 height: 210mm;
+                max-width: none;
                 margin: 0;
                 padding: 40px;
               }
               .cert-border {
-                /* overflow:visible prevents the print engine from clipping
-                   content that slightly overflows the border box.
-                   Some print renderers default to overflow:hidden in a
-                   paginated context, silently hiding signatures and footer
-                   elements that fall near the bottom of the certificate. */
                 overflow: visible;
-                /* Reserve space for the absolute-positioned .qr-block and
-                   .meta-block (bottom:30px, ~80px tall). Without this
-                   reservation the normal-flow .footer-sections renders
-                   directly on top of those elements and the signatures are
-                   visually obscured by the overlapping QR/meta content. */
-                padding-bottom: 110px;
               }
               .footer-sections {
-                /* Never split a signature block across a page boundary. */
                 page-break-inside: avoid;
                 break-inside: avoid;
               }
@@ -474,15 +508,13 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               
               <div class="footer-sections">
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; min-height: 30px;">
-                    ${supervisorName}
-                  </div>
+                  <div class="sig-script">${supervisorName}</div>
                   <div class="sig-line">
                     <div class="sig-name">${supervisorName}</div>
                     <div class="sig-title">${supervisorTitle}, ${companyName}</div>
                   </div>
                 </div>
-                
+
                 <div class="seal-container">
                   <div class="seal-gold">
                     <svg style="width:40px; height:40px; fill:none; stroke:currentColor; stroke-width:2" viewBox="0 0 24 24">
@@ -492,34 +524,33 @@ export default function CertificateDocument({ certificate }: CertificateDocument
                   </div>
                   <div class="badge-text">VERIFIED SECURE</div>
                 </div>
-                
+
                 <div class="sig-block">
-                  <div style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: #334155; min-height: 30px;">
-                    ZYR0 Director
-                  </div>
+                  <div class="sig-script">ZYR0 Director</div>
                   <div class="sig-line">
                     <div class="sig-name">Academic Director</div>
                     <div class="sig-title">ZYR0 Platforms</div>
                   </div>
                 </div>
               </div>
-              
-              <div class="meta-block">
-                ID: ${certificate.credential_id}<br/>
-                Issued: ${issueDateStr}<br/>
-                Hash: ${certificate.blockchain_hash ? certificate.blockchain_hash.slice(0, 24) + '...' : 'N/A'}
-              </div>
-              
-              <div class="qr-block">
-                <img
-                  class="qr-image"
-                  src="${qrSrc}"
-                  alt="Verification QR"
-                  width="70"
-                  height="70"
-                  onerror="this.onerror=null;this.src='${qrCodeUrl}';"
-                /><br/>
-                <span class="qr-label">Scan to Verify</span>
+
+              <div class="bottom-bar">
+                <div class="meta-block">
+                  ID: ${certificate.credential_id}<br/>
+                  Issued: ${issueDateStr}<br/>
+                  Hash: ${certificate.blockchain_hash ? certificate.blockchain_hash.slice(0, 24) + '...' : 'N/A'}
+                </div>
+                <div class="qr-block">
+                  <img
+                    class="qr-image"
+                    src="${qrSrc}"
+                    alt="Verification QR"
+                    width="70"
+                    height="70"
+                    onerror="this.onerror=null;this.src='${qrCodeUrl}';"
+                  /><br/>
+                  <span class="qr-label">Scan to Verify</span>
+                </div>
               </div>
             </div>
           </div>
