@@ -40,20 +40,32 @@ function blobToBase64(blob: Blob): Promise<string> {
 
 /** Build and send the offer letter email via the send-email Edge Function. */
 async function sendOfferLetterEmail(opts: {
-  student: { email?: string | null; full_name?: string | null };
+  student: { id?: string; email?: string | null; full_name?: string | null };
   company: { name?: string | null };
   internship: { title?: string | null };
   pdfBlob: Blob;
   offerId: string;
 }): Promise<void> {
   const { student, company, internship, pdfBlob, offerId } = opts;
-  const studentEmail = student.email;
+  let studentEmail = student.email;
+
+  if (!studentEmail && student.id) {
+    const { data: prof } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', student.id)
+      .single();
+    if (prof?.email) {
+      studentEmail = prof.email;
+    }
+  }
+
   const studentName = student.full_name ?? 'Candidate';
   const companyName = company.name ?? 'Company';
   const internshipTitle = internship.title ?? 'Internship';
 
   if (!studentEmail) {
-    throw new Error('Student email is missing');
+    throw new Error('Student email is missing for this application.');
   }
 
   const base64Pdf = await blobToBase64(pdfBlob);
