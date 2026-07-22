@@ -6,6 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getInternships, closeInternship } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
+import EditInternshipModal from './EditInternshipModal';
+import type { Internship } from '@/lib/database.types';
 
 const tabs = ['All', 'Active', 'Closed', 'Draft'];
 
@@ -18,6 +20,9 @@ export default function CompanyInternships() {
   const [activeTab, setActiveTab] = useState('All');
   const [search, setSearch] = useState('');
   const [updating, setUpdating] = useState<string | null>(null);
+
+  // Edit modal state
+  const [editingInternship, setEditingInternship] = useState<Internship | null>(null);
 
   async function loadData() {
     const { data: co } = await getMyCompany();
@@ -48,7 +53,7 @@ export default function CompanyInternships() {
   async function handleCloseInternship(id: string) {
     if (!window.confirm('Are you sure you want to close this internship?')) return;
     setUpdating(id);
-    const { error } = await closeInternship(id);
+    const { error } = await closeInternship(id, company?.id);
     if (!error) {
       setInternships(prev => prev.map(i => i.id === id ? { ...i, status: 'Closed' } : i));
     }
@@ -68,9 +73,9 @@ export default function CompanyInternships() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Internships</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage your internship postings</p>
+          <p className="text-sm text-muted-foreground mt-1">Manage and edit your internship postings</p>
         </div>
-        <Link to="/company/internships/new" className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90">
+        <Link to="/company/internships/new" className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 shadow-sm transition-all hover:shadow">
           <Plus className="w-4 h-4" /> Post New
         </Link>
       </div>
@@ -81,7 +86,7 @@ export default function CompanyInternships() {
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search internships..."
             className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
         </div>
-        <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto">
+        <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto border border-border">
           {tabs.map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
@@ -109,7 +114,7 @@ export default function CompanyInternships() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3">
                       <h3 className="font-semibold">{internship.title}</h3>
-                      <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
+                      <span className={`px-2.5 py-0.5 text-xs rounded-full font-medium ${
                         internship.status === 'Active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' :
                         internship.status === 'Closed' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400'
                       }`}>{internship.status}</span>
@@ -129,12 +134,19 @@ export default function CompanyInternships() {
                       <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                     ) : (
                       <>
-                        <Link to={`/internships/${internship.id}`} className="p-2 hover:bg-muted rounded-lg transition-colors" title="View">
-                          <Eye className="w-4 h-4 text-muted-foreground" />
+                        <button
+                          onClick={() => setEditingInternship(internship)}
+                          className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-accent"
+                          title="Edit Internship"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <Link to={`/internships/${internship.id}`} className="p-2 hover:bg-muted rounded-lg transition-colors" title="View Public Page">
+                          <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                         </Link>
                         {internship.status !== 'Closed' && (
                           <button onClick={() => handleCloseInternship(internship.id)} className="p-2 hover:bg-muted rounded-lg transition-colors" title="Close">
-                            <XCircle className="w-4 h-4 text-red-500" />
+                            <XCircle className="w-4 h-4 text-red-500 hover:text-red-600" />
                           </button>
                         )}
                       </>
@@ -146,6 +158,18 @@ export default function CompanyInternships() {
           })
         )}
       </div>
+
+      {/* Edit Internship Modal */}
+      {editingInternship && (
+        <EditInternshipModal
+          internship={editingInternship}
+          isOpen={!!editingInternship}
+          onClose={() => setEditingInternship(null)}
+          onSuccess={(updated) => {
+            setInternships(prev => prev.map(i => i.id === updated.id ? { ...i, ...updated } : i));
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.0] - 2026-07-22
+
+### Added
+- **Company Internship Management Enhancement (`feature/company-internship-management`)**:
+  - Implemented dedicated `EditInternshipModal` component allowing companies to update published and draft internships.
+  - Added business rule validations: protected immutable system fields (`id`, `company_id`, `created_by`, `posted_date`, `created_at`, `applicant_count`, `view_count`), enforced location requirements based on work mode, and prevented reducing openings below the count of already accepted interns.
+  - Added dirty-form detection and unsaved changes confirmation dialog to prevent accidental data loss.
+  - Integrated cache invalidation in `@/services/internships` (`updateInternship`, `closeInternship`, `createInternship`) so updates reflect instantly across company dashboards, public internship detail pages, and filter options.
+
 ## [0.10.1] - 2026-07-22
 
 ### Fixed
