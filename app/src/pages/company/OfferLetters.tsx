@@ -38,6 +38,108 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+/** Build and send the offer letter email via the send-email Edge Function. */
+async function sendOfferLetterEmail(opts: {
+  student: { email?: string | null; full_name?: string | null };
+  company: { name?: string | null };
+  internship: { title?: string | null };
+  pdfBlob: Blob;
+  offerId: string;
+}): Promise<void> {
+  const { student, company, internship, pdfBlob, offerId } = opts;
+  const studentEmail = student.email;
+  const studentName = student.full_name ?? 'Candidate';
+  const companyName = company.name ?? 'Company';
+  const internshipTitle = internship.title ?? 'Internship';
+
+  if (!studentEmail) {
+    throw new Error('Student email is missing');
+  }
+
+  const base64Pdf = await blobToBase64(pdfBlob);
+  const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
+  const emailHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internship Offer</title>
+</head>
+<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
+            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Internship Offer Extended</h2>
+            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 16px; font-weight: 600;">${companyName}</p>
+          </div>
+          
+          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${studentName}</strong>,</p>
+          
+          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">We are pleased to inform you that <strong>${companyName}</strong> has extended an official internship offer for the <strong>${internshipTitle}</strong> position.</p>
+          
+          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">The official offer letter is attached to this email. You can view the details, terms, and submit your response directly through the ZYR0 platform.</p>
+          
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">Review & Respond to Offer</a>
+          </div>
+          
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">If you have any questions regarding the terms or the role, please contact ${companyName} directly.</p>
+            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
+          </div>
+          
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
+            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent on behalf of ${companyName} via ZYR0.</p>
+            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const emailText = `Dear ${studentName},\n\n` +
+    `We are pleased to inform you that ${companyName} has extended an official internship offer for the ${internshipTitle} position.\n\n` +
+    `The official offer letter is attached to this email as a PDF. You can view the details, terms, and submit your response directly through the ZYR0 platform:\n` +
+    `${window.location.origin}/student/offer-letters\n\n` +
+    `If you have any questions regarding the terms or the role, please contact ${companyName} directly.\n\n` +
+    `Best regards,\n` +
+    `The ZYR0 Team\n` +
+    `team@zyroo.dpdns.org`;
+
+  const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
+    body: {
+      to: studentEmail,
+      from: 'ZYR0 Team <team@zyroo.dpdns.org>',
+      replyTo: 'team@zyroo.dpdns.org',
+      subject: emailSubject,
+      html: emailHtml,
+      text: emailText,
+      attachments: [
+        {
+          filename: `Offer_Letter_${companyName.replace(/\s+/g, '_')}.png`,
+          content: base64Pdf,
+        }
+      ]
+    }
+  });
+  if (invokeErr) {
+    throw invokeErr;
+  }
+  if (resData?.error) {
+    throw new Error(resData.error);
+  }
+
+  // Update database status and email flags only after email provider confirmation
+  const { error: markErr } = await markOfferSent(offerId);
+  if (markErr) {
+    throw markErr;
+  }
+}
+
 // ── Status config (mirrors student page) ─────────────────────────────────────
 
 const STATUS_CONFIG: Record<OfferLetterStatus, { label: string; color: string; icon: React.ElementType }> = {
@@ -159,91 +261,14 @@ export default function CompanyOfferLetters() {
 
       // Send actual offer letter email via custom SMTP (send-email Edge Function)
       try {
-
-
-        const base64Pdf = await blobToBase64(pdfBlob);
-        const emailSubject = `Internship Offer: ${internship.title} - ${company.name}`;
-        const emailHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internship Offer</title>
-</head>
-<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
-    <tr>
-      <td align="center">
-        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
-            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Internship Offer Extended</h2>
-            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 16px; font-weight: 600;">${company.name}</p>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${student.full_name}</strong>,</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">We are pleased to inform you that <strong>${company.name}</strong> has extended an official internship offer for the <strong>${internship.title}</strong> position.</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">The official offer letter is attached to this email. You can view the details, terms, and submit your response directly through the ZYR0 platform.</p>
-          
-          <div style="text-align: center; margin: 32px 0;">
-            <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">Review & Respond to Offer</a>
-          </div>
-          
-          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">If you have any questions regarding the terms or the role, please contact ${company.name} directly.</p>
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
-          </div>
-          
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
-            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent on behalf of ${company.name} via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-
-        const emailText = `Dear ${student.full_name},\n\n` +
-          `We are pleased to inform you that ${company.name} has extended an official internship offer for the ${internship.title} position.\n\n` +
-          `The official offer letter is attached to this email as a PDF. You can view the details, terms, and submit your response directly through the ZYR0 platform:\n` +
-          `${window.location.origin}/student/offer-letters\n\n` +
-          `If you have any questions regarding the terms or the role, please contact ${company.name} directly.\n\n` +
-          `Best regards,\n` +
-          `The ZYR0 Team\n` +
-          `team@zyroo.dpdns.org`;
-
-        const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
-          body: {
-            to: student.email,
-            from: 'ZYR0 Team <team@zyroo.dpdns.org>',
-            replyTo: 'team@zyroo.dpdns.org',
-            subject: emailSubject,
-            html: emailHtml,
-            text: emailText,
-            attachments: [
-              {
-                filename: `Offer_Letter_${company.name.replace(/\s+/g, '_')}.png`,
-                content: base64Pdf,
-              }
-            ]
-          }
+        await sendOfferLetterEmail({
+          student,
+          company,
+          internship,
+          pdfBlob,
+          offerId: newOffer!.id,
         });
-        if (invokeErr) {
-          throw invokeErr;
-        }
-        if (resData?.error) {
-          throw new Error(resData.error);
-        }
-        console.log('Offer letter email sent successfully:', resData);
-
-        // Update database status and email flags only after email provider confirmation
-        const { error: markErr } = await markOfferSent(newOffer!.id);
-        if (markErr) {
-          throw markErr;
-        }
+        console.log('Offer letter email sent successfully');
       } catch (emailErr) {
         console.error('Failed to send actual offer letter email:', emailErr);
         throw new Error(`Offer letter generated, but email delivery failed: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`);
@@ -323,93 +348,15 @@ export default function CompanyOfferLetters() {
         verificationUrl,
       });
 
-      // 2. Convert PDF to base64
-
-
-      const base64Pdf = await blobToBase64(pdfBlob);
-      const emailSubject = `Internship Offer: ${internship.title} - ${company.name}`;
-      const emailHtml = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internship Offer</title>
-</head>
-<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
-    <tr>
-      <td align="center">
-        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
-            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Internship Offer Extended</h2>
-            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 16px; font-weight: 600;">${company.name}</p>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${student.full_name}</strong>,</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">We are pleased to inform you that <strong>${company.name}</strong> has extended an official internship offer for the <strong>${internship.title}</strong> position.</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">The official offer letter is attached to this email. You can view the details, terms, and submit your response directly through the ZYR0 platform.</p>
-          
-          <div style="text-align: center; margin: 32px 0;">
-            <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">Review & Respond to Offer</a>
-          </div>
-          
-          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">If you have any questions regarding the terms or the role, please contact ${company.name} directly.</p>
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
-          </div>
-          
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
-            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent on behalf of ${company.name} via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
-          </div>
-        </div>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`;
-
-      const emailText = `Dear ${student.full_name},\n\n` +
-        `We are pleased to inform you that ${company.name} has extended an official internship offer for the ${internship.title} position.\n\n` +
-        `The official offer letter is attached to this email as a PDF. You can view the details, terms, and submit your response directly through the ZYR0 platform:\n` +
-        `${window.location.origin}/student/offer-letters\n\n` +
-        `If you have any questions regarding the terms or the role, please contact ${company.name} directly.\n\n` +
-        `Best regards,\n` +
-        `The ZYR0 Team\n` +
-        `team@zyroo.dpdns.org`;
-
-      const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
-        body: {
-          to: student.email,
-          from: 'ZYR0 Team <team@zyroo.dpdns.org>',
-          replyTo: 'team@zyroo.dpdns.org',
-          subject: emailSubject,
-          html: emailHtml,
-          text: emailText,
-          attachments: [
-            {
-              filename: `Offer_Letter_${company.name.replace(/\s+/g, '_')}.png`,
-              content: base64Pdf,
-            }
-          ]
-        }
+      // 2. Send email via shared function
+      await sendOfferLetterEmail({
+        student,
+        company,
+        internship,
+        pdfBlob,
+        offerId: offer.id,
       });
-
-      if (invokeErr) {
-        throw invokeErr;
-      }
-      if (resData?.error) {
-        throw new Error(resData.error);
-      }
-      console.log('Offer letter email resent successfully:', resData);
-
-      // Update database status and email flags only after email provider confirmation
-      const { error: markErr } = await markOfferSent(offer.id);
-      if (markErr) {
-        throw markErr;
-      }
+      console.log('Offer letter email resent successfully');
 
       setSuccessMsg(`Offer letter email resent to ${student.full_name}!`);
       await load();
