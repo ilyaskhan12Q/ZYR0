@@ -88,19 +88,82 @@ export async function getInternshipById(id: string, useCache = true) {
   return res;
 }
 
-/** Create an internship (company portal) */
-export async function createInternship(data: Partial<Internship>) {
-  return supabase.from('internships').insert(data).select().single();
+/** Get count of accepted interns (accepted offer letters) for an internship */
+export async function getAcceptedCountForInternship(internshipId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('offer_letters')
+    .select('id', { count: 'exact', head: true })
+    .eq('internship_id', internshipId)
+    .eq('status', 'Accepted');
+
+  if (error) {
+    console.error('Error fetching accepted intern count:', error);
+    return 0;
+  }
+  return count || 0;
 }
 
-/** Update an internship (company portal) */
-export async function updateInternship(id: string, data: Partial<Internship>) {
-  return supabase.from('internships').update(data).eq('id', id).select().single();
+/** Create an internship (company portal) */
+export async function createInternship(data: Partial<Internship>) {
+  const res = await supabase.from('internships').insert(data).select().single();
+  if (!res.error && data.company_id) {
+    clearCache(createRequestKey('company_internships', data.company_id));
+    clearCache('internship_domains');
+  }
+  return res;
+}
+
+/** Update an internship (company portal) with business validation and cache clearing */
+export async function updateInternship(id: string, data: Partial<Internship>, companyId?: string) {
+  // If openings is being updated, validate against accepted count
+  if (data.openings !== undefined && data.openings !== null) {
+    const acceptedCount = await getAcceptedCountForInternship(id);
+    if (data.openings < acceptedCount) {
+      throw new Error(`Cannot reduce openings to ${data.openings}. ${acceptedCount} intern(s) have already accepted offers for this position.`);
+    }
+  }
+
+  // Prevent mutating immutable system fields
+  const safeData: Partial<Internship> = { ...data };
+  delete safeData.id;
+  delete safeData.company_id;
+  delete safeData.created_by;
+  delete safeData.posted_date;
+  delete safeData.created_at;
+  delete safeData.applicant_count;
+  delete safeData.view_count;
+  safeData.updated_at = new Date().toISOString();
+
+  const res = await supabase
+    .from('internships')
+    .update(safeData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (!res.error && res.data) {
+    clearCache(createRequestKey('internship', id));
+    const targetCompanyId = companyId || res.data.company_id;
+    if (targetCompanyId) {
+      clearCache(createRequestKey('company_internships', targetCompanyId));
+    }
+    clearCache('internship_domains');
+  }
+
+  return res;
 }
 
 /** Delete / close an internship */
-export async function closeInternship(id: string) {
-  return supabase.from('internships').update({ status: 'Closed' }).eq('id', id);
+export async function closeInternship(id: string, companyId?: string) {
+  const res = await supabase.from('internships').update({ status: 'Closed', updated_at: new Date().toISOString() }).eq('id', id);
+  if (!res.error) {
+    clearCache(createRequestKey('internship', id));
+    if (companyId) {
+      clearCache(createRequestKey('company_internships', companyId));
+    }
+    clearCache('internship_domains');
+  }
+  return res;
 }
 
 /** Get unique domains for filter UI */
