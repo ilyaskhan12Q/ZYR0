@@ -5,15 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.9.2] - 2026-07-22
+## [0.10.1] - 2026-07-22
 
 ### Fixed
 - Consolidated duplicated HTML/text email template generation and Edge Function invocation into a shared `sendOfferLetterEmail()` utility function in the Company Offer Letters page (`OfferLetters.tsx`). Both `handleGenerate()` and `handleResend()` now use this single source of truth, preventing template drift and ensuring consistent email styling, attachments, and database status update handling.
+- Extracted duplicated `blobToBase64` helper from inline declarations inside `handleGenerate()` and `handleResend()` in the Company Offer Letters page to a single module-scoped utility function, eliminating code duplication and reducing maintenance risk.
 
-## [0.9.1] - 2026-07-22
+## [0.10.0] - 2026-07-21
+
+### Added
+- **Company Bulk Task Assignment (`feature/company-bulk-task-assignment`)**:
+  - Implemented `bulkCreateTasks` service function in `@/services/tasks` for atomic multi-row task generation with duplicate prevention and cache invalidation.
+  - Extended Company Task modal with an **Assignment Scope** toggle (`Selected Intern(s)` vs `All Enrolled Interns`).
+  - Added dynamic filtering for accepted/enrolled interns within the chosen internship, displaying real-time intern counts and preview lists.
+  - Dispatched simulated email/in-app notifications for each intern upon bulk creation.
+  - Maintained complete task independence, individual submissions, and per-intern progress tracking.
+
+## [0.5.7] - 2026-07-20
 
 ### Fixed
-- Extracted duplicated `blobToBase64` helper from inline declarations inside `handleGenerate()` and `handleResend()` in the Company Offer Letters page to a single module-scoped utility function, eliminating code duplication and reducing maintenance risk.
+- **Certificate PDF: recipient name shifts out of position after printing / PDF export** (`fix/certificate-pdf-layout`)
+  - **Root cause 1 — Wrong CSS display model for `.recipient`**: The print CSS used `display: inline-block`, which only centres text *within* the element's own box, not the box itself within its parent. The browser's print layout engine left-aligned the `inline-block` element, causing the name to drift sideways in the exported PDF while the in-app preview (screen renderer) appeared correct. Fixed by switching to `display: block; width: 100%` so `text-align: center` operates at the block level and is honoured identically in both renderers.
+  - **Root cause 2 — `@media print` erased container padding**: The print media query applied `padding: 0` to `.cert-container`, overriding the `padding: 40px` defined by the screen rule. This shifted the visual centre-point of the interior certificate layout between preview and print. Fixed by preserving `padding: 40px` on `.cert-container` inside the print media query.
+  - **Root cause 3 — Font-load race condition**: `printWindow.document.close()` triggered browser layout before the Google Fonts async `@import` for *Playfair Display Italic* had resolved. The browser fell back to a different serif with narrower character metrics, reflowing the name and breaking the centred position. Fixed by waiting on `document.fonts.ready` (with a 600 ms `setTimeout` fallback for older browsers) before calling `window.print()`.
+  - No margins hardcoded; no positions manually offset; no visual redesign. Both preview and exported PDF now render identically for short, medium, and long student names.
 
 ## [0.9.0] - 2026-07-19
 
