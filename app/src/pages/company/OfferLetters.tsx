@@ -22,6 +22,22 @@ import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Convert a Blob to a base64 string (data-URI content portion). */
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64data = reader.result as string;
+      const base64 = base64data.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 // ── Status config (mirrors student page) ─────────────────────────────────────
 
 const STATUS_CONFIG: Record<OfferLetterStatus, { label: string; color: string; icon: React.ElementType }> = {
@@ -143,18 +159,7 @@ export default function CompanyOfferLetters() {
 
       // Send actual offer letter email via custom SMTP (send-email Edge Function)
       try {
-        const blobToBase64 = (blob: Blob): Promise<string> => {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64data = reader.result as string;
-              const base64 = base64data.split(',')[1];
-              resolve(base64);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-        };
+
 
         const base64Pdf = await blobToBase64(pdfBlob);
         const emailSubject = `Internship Offer: ${internship.title} - ${company.name}`;
@@ -319,18 +324,7 @@ export default function CompanyOfferLetters() {
       });
 
       // 2. Convert PDF to base64
-      const blobToBase64 = (blob: Blob): Promise<string> => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64data = reader.result as string;
-            const base64 = base64data.split(',')[1];
-            resolve(base64);
-          };
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      };
+
 
       const base64Pdf = await blobToBase64(pdfBlob);
       const emailSubject = `Internship Offer: ${internship.title} - ${company.name}`;
