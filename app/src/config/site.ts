@@ -8,5 +8,9 @@ export const SITE_CONFIG = {
   url: cleanUrl,
   defaultImage: `${cleanUrl}/og-image.png`,
   twitterHandle: '@zyr0platform',
-  supportEmail: 'support@zyr0.com'
+  supportEmail: 'support@zyr0.com',
+  social: {
+    whatsappChannel: import.meta.env.VITE_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/0029VaZYR0Official',
+    linkedinCompany: import.meta.env.VITE_LINKEDIN_COMPANY_URL || null,
+  }
 };

@@ -5,9 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-07-25
+
+### Added
+- **Header Navigation Enhancement Phases 3, 4 & 5 (`feature/header-social-cta`)**:
+  - Implemented `CommunitySocialNav` component (`app/src/components/navigation/CommunitySocialNav.tsx`) with WhatsApp Channel CTA and LinkedIn "Coming Soon" placeholder.
+  - Added social media configuration parameters in `app/src/config/site.ts`.
+  - Connected `CommunitySocialNav` to desktop `#header-community-cta-slot` and mobile drawer `#mobile-community-cta-slot` in `PublicLayout.tsx`.
+  - Conducted full responsive, accessibility, visual animation, and production build verification.
+
+## [0.12.1] - 2026-07-25
+
+### Changed
+- **Header Navigation Enhancement Phase 2 (`feature/header-social-cta`)**:
+  - Refactored `PublicLayout.tsx` header container layout to establish dedicated, flexible Community CTA slots (`#header-community-cta-slot` for desktop and `#mobile-community-cta-slot` for mobile drawer).
+  - Maintained exact spacing, typography, alignment, and navigation behavior across all viewports.
+
 ## [0.12.0] - 2026-07-25
 
 ### Added
+- **Header Navigation Enhancement Phase 1 (`feature/header-social-cta`)**:
+  - Completed architectural audit of `PublicLayout.tsx` and `DashboardLayout.tsx` navigation structures.
+  - Designed responsive layout strategy and component hierarchy for social CTA integration (WhatsApp Channel & LinkedIn placeholder).
 - **Offer Letter System Modernization (`feature/offer-letter-modernization`)**:
   - Implemented high-fidelity `OfferLetterDocument` component with professional letterhead styling, official security seal, verification badge, and direct browser-native printing support (`window.print()`).
   - Added deterministic, offline canvas QR code generator (`renderSafeCanvasQr` in `@/lib/offerLetterPdf`) removing reliance on external QR APIs or network-restricted endpoints.

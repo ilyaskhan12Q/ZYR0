@@ -7,6 +7,7 @@ import {
   Linkedin, Github
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
 const navLinks = [
   { label: 'Internships', href: '/internships' },
   { label: 'Companies', href: '/companies' },
@@ -46,9 +47,9 @@ export default function PublicLayout() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 group">
+            <Link to="/" className="flex items-center gap-2 group shrink-0">
               <div className="w-8 h-8 flex items-center justify-center">
                 <img src="/zyro-logo.webp" alt="ZYR0 Logo" width="32" height="32" className="w-8 h-8 object-contain rounded-md" />
               </div>
@@ -57,8 +58,8 @@ export default function PublicLayout() {
               </span>
             </Link>
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-8">
+            {/* Desktop Center Navigation & Community Slot */}
+            <div className="hidden md:flex items-center gap-6 lg:gap-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -71,10 +72,15 @@ export default function PublicLayout() {
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-200 group-hover:w-full" />
                 </Link>
               ))}
+
+              {/* Reserved Community/Social CTA Container Slot */}
+              <div id="header-community-cta-slot" className="hidden lg:flex items-center gap-2 pl-4 border-l border-border/20">
+                <CommunitySocialNav scrolled={scrolled} />
+              </div>
             </div>
 
-            {/* Right Side */}
-            <div className="hidden md:flex items-center gap-4">
+            {/* Right Side Controls / Auth */}
+            <div className="hidden md:flex items-center gap-3 lg:gap-4 shrink-0">
               {user ? (
                 <>
                   <button className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-white/10 text-white'}`}>
@@ -172,6 +178,12 @@ export default function PublicLayout() {
                     {link.label}
                   </Link>
                 ))}
+
+                {/* Mobile Community CTA Slot */}
+                <div id="mobile-community-cta-slot" className="pt-2 border-t border-border">
+                  <CommunitySocialNav mobile />
+                </div>
+
                 <div className="pt-3 border-t border-border flex gap-3">
                   <Link to="/login" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors">
                     Log in

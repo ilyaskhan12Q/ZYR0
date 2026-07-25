@@ -18,44 +18,42 @@ export default function EditInternshipModal({
   onClose,
   onSuccess,
 }: EditInternshipModalProps) {
-  if (!isOpen || !internship) return null;
-
   // Accepted interns count
   const [acceptedCount, setAcceptedCount] = useState<number>(0);
   const [loadingAccepted, setLoadingAccepted] = useState(true);
 
   // Form State
-  const [title, setTitle] = useState(internship.title || '');
-  const [description, setDescription] = useState(internship.description || '');
-  const [domain, setDomain] = useState(internship.domain || 'Engineering');
-  const [type, setType] = useState<InternshipType>(internship.type || 'Full-time');
-  const [locationType, setLocationType] = useState<LocationType>(internship.location_type || 'Remote');
-  const [location, setLocation] = useState(internship.location || '');
-  const [duration, setDuration] = useState(internship.duration || '3-6 months');
+  const [title, setTitle] = useState(internship?.title || '');
+  const [description, setDescription] = useState(internship?.description || '');
+  const [domain, setDomain] = useState(internship?.domain || 'Engineering');
+  const [type, setType] = useState<InternshipType>(internship?.type || 'Full-time');
+  const [locationType, setLocationType] = useState<LocationType>(internship?.location_type || 'Remote');
+  const [location, setLocation] = useState(internship?.location || '');
+  const [duration, setDuration] = useState(internship?.duration || '3-6 months');
   const [deadline, setDeadline] = useState(
-    internship.deadline ? new Date(internship.deadline).toISOString().split('T')[0] : ''
+    internship?.deadline ? new Date(internship.deadline).toISOString().split('T')[0] : ''
   );
   const [startDate, setStartDate] = useState(
-    internship.start_date ? new Date(internship.start_date).toISOString().split('T')[0] : ''
+    internship?.start_date ? new Date(internship.start_date).toISOString().split('T')[0] : ''
   );
-  const [stipendType, setStipendType] = useState<StipendType>(internship.stipend_type || 'Paid');
-  const [stipend, setStipend] = useState(internship.stipend || '');
-  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(internship.experience_level || 'Beginner');
-  const [educationLevel, setEducationLevel] = useState(internship.education_level || '');
-  const [openings, setOpenings] = useState<number>(internship.openings || 1);
-  const [status, setStatus] = useState<InternshipStatus>(internship.status || 'Active');
+  const [stipendType, setStipendType] = useState<StipendType>(internship?.stipend_type || 'Paid');
+  const [stipend, setStipend] = useState(internship?.stipend || '');
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(internship?.experience_level || 'Beginner');
+  const [educationLevel, setEducationLevel] = useState(internship?.education_level || '');
+  const [openings, setOpenings] = useState<number>(internship?.openings || 1);
+  const [status, setStatus] = useState<InternshipStatus>(internship?.status || 'Active');
 
   // Arrays
-  const [skills, setSkills] = useState<string[]>(internship.skills || []);
+  const [skills, setSkills] = useState<string[]>(internship?.skills || []);
   const [newSkill, setNewSkill] = useState('');
 
-  const [benefits, setBenefits] = useState<string[]>(internship.benefits || []);
+  const [benefits, setBenefits] = useState<string[]>(internship?.benefits || []);
   const [newBenefit, setNewBenefit] = useState('');
 
-  const [responsibilities, setResponsibilities] = useState<string[]>(internship.responsibilities || []);
+  const [responsibilities, setResponsibilities] = useState<string[]>(internship?.responsibilities || []);
   const [newResp, setNewResp] = useState('');
 
-  const [requirements, setRequirements] = useState<string[]>(internship.requirements || []);
+  const [requirements, setRequirements] = useState<string[]>(internship?.requirements || []);
   const [newReq, setNewReq] = useState('');
 
   // UI State
@@ -65,6 +63,7 @@ export default function EditInternshipModal({
 
   // Load accepted intern count for minimum openings constraint
   useEffect(() => {
+    if (!internship?.id) return;
     let isMounted = true;
     async function loadAccepted() {
       setLoadingAccepted(true);
@@ -79,29 +78,31 @@ export default function EditInternshipModal({
     }
     loadAccepted();
     return () => { isMounted = false; };
-  }, [internship.id]);
+  }, [internship?.id]);
 
   // Dirty check helper
   const isDirty =
-    title !== (internship.title || '') ||
-    description !== (internship.description || '') ||
-    domain !== (internship.domain || 'Engineering') ||
-    type !== (internship.type || 'Full-time') ||
-    locationType !== (internship.location_type || 'Remote') ||
-    location !== (internship.location || '') ||
-    duration !== (internship.duration || '3-6 months') ||
-    deadline !== (internship.deadline ? new Date(internship.deadline).toISOString().split('T')[0] : '') ||
-    startDate !== (internship.start_date ? new Date(internship.start_date).toISOString().split('T')[0] : '') ||
-    stipendType !== (internship.stipend_type || 'Paid') ||
-    stipend !== (internship.stipend || '') ||
-    experienceLevel !== (internship.experience_level || 'Beginner') ||
-    educationLevel !== (internship.education_level || '') ||
-    openings !== (internship.openings || 1) ||
-    status !== (internship.status || 'Active') ||
-    JSON.stringify(skills) !== JSON.stringify(internship.skills || []) ||
-    JSON.stringify(benefits) !== JSON.stringify(internship.benefits || []) ||
-    JSON.stringify(responsibilities) !== JSON.stringify(internship.responsibilities || []) ||
-    JSON.stringify(requirements) !== JSON.stringify(internship.requirements || []);
+    Boolean(internship) && (
+      title !== (internship?.title || '') ||
+      description !== (internship?.description || '') ||
+      domain !== (internship?.domain || 'Engineering') ||
+      type !== (internship?.type || 'Full-time') ||
+      locationType !== (internship?.location_type || 'Remote') ||
+      location !== (internship?.location || '') ||
+      duration !== (internship?.duration || '3-6 months') ||
+      deadline !== (internship?.deadline ? new Date(internship.deadline).toISOString().split('T')[0] : '') ||
+      startDate !== (internship?.start_date ? new Date(internship.start_date).toISOString().split('T')[0] : '') ||
+      stipendType !== (internship?.stipend_type || 'Paid') ||
+      stipend !== (internship?.stipend || '') ||
+      experienceLevel !== (internship?.experience_level || 'Beginner') ||
+      educationLevel !== (internship?.education_level || '') ||
+      openings !== (internship?.openings || 1) ||
+      status !== (internship?.status || 'Active') ||
+      JSON.stringify(skills) !== JSON.stringify(internship?.skills || []) ||
+      JSON.stringify(benefits) !== JSON.stringify(internship?.benefits || []) ||
+      JSON.stringify(responsibilities) !== JSON.stringify(internship?.responsibilities || []) ||
+      JSON.stringify(requirements) !== JSON.stringify(internship?.requirements || [])
+    );
 
   const handleAttemptClose = () => {
     if (isDirty) {
@@ -149,8 +150,9 @@ export default function EditInternshipModal({
   const removeReq = (item: string) => setRequirements(requirements.filter(r => r !== item));
 
   // Form submission
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!internship) return;
     setError(null);
 
     if (!title.trim()) {
@@ -212,6 +214,8 @@ export default function EditInternshipModal({
       setSubmitting(false);
     }
   }
+
+  if (!isOpen || !internship) return null;
 
   return (
     <AnimatePresence>

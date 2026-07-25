@@ -5,7 +5,7 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 export default [{
   files: ['**/*.ts', '**/*.tsx'],
   languageOptions: { parser: tsParser },
-  plugins: { 
+  plugins: {
     '@typescript-eslint': tsPlugin,
     'react-hooks': reactHooksPlugin,
   },
@@ -14,6 +14,10 @@ export default [{
     ...reactHooksPlugin.configs.recommended.rules,
     'react-hooks/set-state-in-effect': 'off',
     'react-hooks/purity': 'off',
-    'react-hooks/rules-of-hooks': 'warn',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
   },
 }];
+
+
+
