@@ -18,6 +18,7 @@ import {
   markOfferSent,
 } from '@/services/offerLetters';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
+import OfferLetterDocument from '@/components/OfferLetterDocument';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
@@ -646,6 +647,7 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
   const cfg     = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
   const Icon    = cfg.icon;
   const canRevoke = ['Pending', 'Sent'].includes(offer.status);
+  const [viewTab, setViewTab] = useState<'document' | 'details'>('document');
 
   return (
     <motion.div
@@ -653,106 +655,127 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6"
     >
       <motion.div
         initial={{ scale: 0.95, y: 16 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 16 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-6 rounded-t-2xl text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-bold text-lg">{offer.student?.full_name ?? '—'}</p>
-              <p className="text-white/70 text-sm">{offer.internship?.title ?? '—'}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20">
-                <Icon className="w-3.5 h-3.5" />
-                {cfg.label}
-              </span>
-              <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-                <XCircle className="w-5 h-5" />
+        <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-5 px-6 flex items-center justify-between text-white shrink-0">
+          <div>
+            <p className="font-bold text-lg">{offer.student?.full_name ?? '—'}</p>
+            <p className="text-white/70 text-sm">{offer.internship?.title ?? '—'}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="flex bg-black/20 p-1 rounded-lg text-xs font-medium border border-white/10">
+              <button
+                onClick={() => setViewTab('document')}
+                className={`px-3 py-1 rounded-md transition-colors ${viewTab === 'document' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-white/80 hover:text-white'}`}
+              >
+                Document View
+              </button>
+              <button
+                onClick={() => setViewTab('details')}
+                className={`px-3 py-1 rounded-md transition-colors ${viewTab === 'details' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-white/80 hover:text-white'}`}
+              >
+                Details & Audit
               </button>
             </div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20">
+              <Icon className="w-3.5 h-3.5" />
+              {cfg.label}
+            </span>
+            <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+              <XCircle className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              ['Student',      offer.student?.full_name    ?? '—'],
-              ['University',   offer.student?.university   ?? '—'],
-              ['Position',     offer.internship?.title     ?? '—'],
-              ['Duration',     offer.internship?.duration  ?? '—'],
-              ['Start Date',   offer.internship?.start_date ? new Date(offer.internship.start_date).toLocaleDateString() : '—'],
-              ['Compensation', offer.internship?.stipend   ?? '—'],
-              ['Work Mode',    offer.internship?.location_type ?? '—'],
-              ['Issued',       offer.issued_at ? new Date(offer.issued_at).toLocaleDateString() : '—'],
-              ['Expires',      offer.expires_at ? new Date(offer.expires_at).toLocaleDateString() : '—'],
-              ['Email Sent',   offer.email_sent ? (offer.email_sent_at ? new Date(offer.email_sent_at).toLocaleDateString() : 'Yes') : 'No'],
-            ].map(([k, v]) => (
-              <div key={k}>
-                <p className="text-xs text-muted-foreground">{k}</p>
-                <p className="text-sm font-medium mt-0.5">{v}</p>
+        <div className="p-6 overflow-y-auto flex-1 bg-muted/20">
+          {viewTab === 'document' ? (
+            <OfferLetterDocument offer={offer} showActions={true} />
+          ) : (
+            <div className="space-y-6 max-w-2xl mx-auto bg-card p-6 rounded-2xl border border-border shadow-sm">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  ['Student',      offer.student?.full_name    ?? '—'],
+                  ['University',   offer.student?.university   ?? '—'],
+                  ['Position',     offer.internship?.title     ?? '—'],
+                  ['Duration',     offer.internship?.duration  ?? '—'],
+                  ['Start Date',   offer.internship?.start_date ? new Date(offer.internship.start_date).toLocaleDateString() : '—'],
+                  ['Compensation', offer.internship?.stipend   ?? '—'],
+                  ['Work Mode',    offer.internship?.location_type ?? '—'],
+                  ['Issued',       offer.issued_at ? new Date(offer.issued_at).toLocaleDateString() : '—'],
+                  ['Expires',      offer.expires_at ? new Date(offer.expires_at).toLocaleDateString() : '—'],
+                  ['Email Sent',   offer.email_sent ? (offer.email_sent_at ? new Date(offer.email_sent_at).toLocaleDateString() : 'Yes') : 'No'],
+                ].map(([k, v]) => (
+                  <div key={k}>
+                    <p className="text-xs text-muted-foreground">{k}</p>
+                    <p className="text-sm font-medium mt-0.5">{v}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          {offer.revoke_reason && (
-            <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-sm">
-              <strong>Revoke reason:</strong> {offer.revoke_reason}
+              {offer.revoke_reason && (
+                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-sm">
+                  <strong>Revoke reason:</strong> {offer.revoke_reason}
+                </div>
+              )}
+
+              <div className="text-xs text-muted-foreground font-mono bg-muted px-3 py-2 rounded-lg break-all">
+                Offer ID: {offer.id}
+              </div>
             </div>
           )}
+        </div>
 
-          <div className="text-xs text-muted-foreground font-mono bg-muted/50 px-3 py-2 rounded-lg break-all">
-            Offer ID: {offer.id}
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-2 pt-1">
+        {/* Footer Actions */}
+        <div className="p-4 px-6 border-t border-border bg-card flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2">
             {offer.pdf_url && (
               <>
                 <button
                   onClick={() => onDownload(offer)}
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm hover:bg-muted transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
                 >
                   <Download className="w-4 h-4" />
-                  Download
+                  Download PNG
                 </button>
                 <a
                   href={offer.pdf_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm hover:bg-muted transition-colors"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
                 >
                   <ExternalLink className="w-4 h-4" />
-                  Open
+                  Open Link
                 </a>
               </>
             )}
             <button
               onClick={() => onResend(offer)}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-border text-sm hover:bg-muted transition-colors"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
             >
               <RefreshCw className="w-4 h-4" />
               Resend Email
             </button>
-            {canRevoke && (
-              <button
-                onClick={() => onRevoke(offer.id)}
-                disabled={revoking === offer.id}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
-              >
-                {revoking === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
-                Revoke
-              </button>
-            )}
           </div>
+
+          {canRevoke && (
+            <button
+              onClick={() => onRevoke(offer.id)}
+              disabled={revoking === offer.id}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50 font-medium"
+            >
+              {revoking === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+              Revoke Offer
+            </button>
+          )}
         </div>
       </motion.div>
     </motion.div>

@@ -11,6 +11,9 @@ export default [{
   },
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
+    ...reactHooksPlugin.configs.recommended.rules,
+    'react-hooks/set-state-in-effect': 'off',
+    'react-hooks/purity': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
   },

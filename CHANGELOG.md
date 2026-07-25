@@ -27,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Header Navigation Enhancement Phase 1 (`feature/header-social-cta`)**:
   - Completed architectural audit of `PublicLayout.tsx` and `DashboardLayout.tsx` navigation structures.
   - Designed responsive layout strategy and component hierarchy for social CTA integration (WhatsApp Channel & LinkedIn placeholder).
+- **Offer Letter System Modernization (`feature/offer-letter-modernization`)**:
+  - Implemented high-fidelity `OfferLetterDocument` component with professional letterhead styling, official security seal, verification badge, and direct browser-native printing support (`window.print()`).
+  - Added deterministic, offline canvas QR code generator (`renderSafeCanvasQr` in `@/lib/offerLetterPdf`) removing reliance on external QR APIs or network-restricted endpoints.
+  - Integrated full document preview and summary tabs into both Company and Student offer letter modals (`OfferLetters.tsx`).
+  - Upgraded ESLint configuration (`eslint.config.js`) to support React 19 and ES modules.
 
 ## [0.11.1] - 2026-07-22
 
