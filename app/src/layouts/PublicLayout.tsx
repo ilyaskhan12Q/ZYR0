@@ -7,6 +7,7 @@ import {
   Linkedin, Github
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
 const navLinks = [
   { label: 'Internships', href: '/internships' },
   { label: 'Companies', href: '/companies' },
@@ -73,8 +74,8 @@ export default function PublicLayout() {
               ))}
 
               {/* Reserved Community/Social CTA Container Slot */}
-              <div id="header-community-cta-slot" className="hidden xl:flex items-center gap-2 pl-4 border-l border-border/20">
-                {/* Social CTA component will render here in Phase 3 */}
+              <div id="header-community-cta-slot" className="hidden lg:flex items-center gap-2 pl-4 border-l border-border/20">
+                <CommunitySocialNav scrolled={scrolled} />
               </div>
             </div>
 
@@ -180,7 +181,7 @@ export default function PublicLayout() {
 
                 {/* Mobile Community CTA Slot */}
                 <div id="mobile-community-cta-slot" className="pt-2 border-t border-border">
-                  {/* Mobile Social CTA component will render here in Phase 3 */}
+                  <CommunitySocialNav mobile />
                 </div>
 
                 <div className="pt-3 border-t border-border flex gap-3">

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2026-07-25
+
+### Added
+- **Header Navigation Enhancement Phases 3, 4 & 5 (`feature/header-social-cta`)**:
+  - Implemented `CommunitySocialNav` component (`app/src/components/navigation/CommunitySocialNav.tsx`) with WhatsApp Channel CTA and LinkedIn "Coming Soon" placeholder.
+  - Added social media configuration parameters in `app/src/config/site.ts`.
+  - Connected `CommunitySocialNav` to desktop `#header-community-cta-slot` and mobile drawer `#mobile-community-cta-slot` in `PublicLayout.tsx`.
+  - Conducted full responsive, accessibility, visual animation, and production build verification.
+
 ## [0.12.1] - 2026-07-25
 
 ### Changed
