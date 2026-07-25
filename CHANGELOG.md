@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2026-07-25
+
+### Added
+- **Offer Letter System Modernization (`feature/offer-letter-modernization`)**:
+  - Implemented high-fidelity `OfferLetterDocument` component with professional letterhead styling, official security seal, verification badge, and direct browser-native printing support (`window.print()`).
+  - Added deterministic, offline canvas QR code generator (`renderSafeCanvasQr` in `@/lib/offerLetterPdf`) removing reliance on external QR APIs or network-restricted endpoints.
+  - Integrated full document preview and summary tabs into both Company and Student offer letter modals (`OfferLetters.tsx`).
+  - Upgraded ESLint configuration (`eslint.config.js`) to support React 19 and ES modules.
+
 ## [0.11.1] - 2026-07-22
 
 ### Fixed
