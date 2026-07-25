@@ -12,6 +12,7 @@ import {
   acceptOfferLetter,
   rejectOfferLetter,
 } from '@/services/offerLetters';
+import OfferLetterDocument from '@/components/OfferLetterDocument';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
@@ -384,6 +385,7 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
   const cfg  = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
   const Icon = cfg.icon;
   const canAct = offer.status === 'Sent';
+  const [viewTab, setViewTab] = useState<'document' | 'details'>('document');
 
   return (
     <motion.div
@@ -391,128 +393,149 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6"
     >
       <motion.div
         initial={{ scale: 0.95, y: 16 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 16 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-2xl border border-border shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-6 rounded-t-2xl text-white">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              {offer.company?.logo_url ? (
-                <img src={offer.company.logo_url} alt="" className="w-12 h-12 rounded-xl object-cover bg-white/10" />
-              ) : (
-                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                  <Building2 className="w-6 h-6" />
-                </div>
-              )}
-              <div>
-                <p className="font-bold text-lg">{offer.company?.name ?? 'Company'}</p>
-                <p className="text-white/70 text-sm">Official Offer Letter</p>
+        <div className="bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 p-5 px-6 flex items-center justify-between text-white shrink-0">
+          <div className="flex items-center gap-3">
+            {offer.company?.logo_url ? (
+              <img src={offer.company.logo_url} alt="" className="w-10 h-10 rounded-xl object-cover bg-white/10" />
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                <Building2 className="w-5 h-5" />
               </div>
+            )}
+            <div>
+              <p className="font-bold text-base">{offer.company?.name ?? 'Company'}</p>
+              <p className="text-white/70 text-xs">Official Offer Letter</p>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex bg-black/20 p-1 rounded-lg text-xs font-medium border border-white/10">
+              <button
+                onClick={() => setViewTab('document')}
+                className={`px-3 py-1 rounded-md transition-colors ${viewTab === 'document' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-white/80 hover:text-white'}`}
+              >
+                Document View
+              </button>
+              <button
+                onClick={() => setViewTab('details')}
+                className={`px-3 py-1 rounded-md transition-colors ${viewTab === 'details' ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'text-white/80 hover:text-white'}`}
+              >
+                Summary
+              </button>
+            </div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20">
+              <Icon className="w-3.5 h-3.5" />
+              {cfg.label}
+            </span>
             <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
               <XCircle className="w-5 h-5" />
             </button>
           </div>
-
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/20`}>
-            <Icon className="w-3.5 h-3.5" />
-            {cfg.label}
-          </div>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-5">
-
-          {/* Internship Details */}
-          <div className="bg-muted/40 rounded-xl p-5 space-y-3">
-            <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Position Details</h3>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                ['Position',    offer.internship?.title    ?? '—'],
-                ['Type',        offer.internship?.type     ?? '—'],
-                ['Duration',    offer.internship?.duration ?? '—'],
-                ['Start Date',  offer.internship?.start_date ? new Date(offer.internship.start_date).toLocaleDateString() : '—'],
-                ['Compensation', offer.internship?.stipend ? `${offer.internship.stipend} (${offer.internship.stipend_type})` : '—'],
-                ['Work Mode',   offer.internship?.location_type ?? '—'],
-                ['Location',    offer.internship?.location  ?? offer.company?.location ?? '—'],
-              ].map(([k, v]) => (
-                <div key={k}>
-                  <p className="text-xs text-muted-foreground">{k}</p>
-                  <p className="text-sm font-medium mt-0.5">{v}</p>
+        <div className="p-6 overflow-y-auto flex-1 bg-muted/20">
+          {viewTab === 'document' ? (
+            <OfferLetterDocument offer={offer} showActions={true} />
+          ) : (
+            <div className="space-y-5 max-w-2xl mx-auto bg-card p-6 rounded-2xl border border-border shadow-sm">
+              <div className="bg-muted/40 rounded-xl p-5 space-y-3">
+                <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Position Details</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    ['Position',    offer.internship?.title    ?? '—'],
+                    ['Type',        offer.internship?.type     ?? '—'],
+                    ['Duration',    offer.internship?.duration ?? '—'],
+                    ['Start Date',  offer.internship?.start_date ? new Date(offer.internship.start_date).toLocaleDateString() : '—'],
+                    ['Compensation', offer.internship?.stipend ? `${offer.internship.stipend} (${offer.internship.stipend_type})` : '—'],
+                    ['Work Mode',   offer.internship?.location_type ?? '—'],
+                    ['Location',    offer.internship?.location  ?? offer.company?.location ?? '—'],
+                  ].map(([k, v]) => (
+                    <div key={k}>
+                      <p className="text-xs text-muted-foreground">{k}</p>
+                      <p className="text-sm font-medium mt-0.5">{v}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                {offer.issued_at && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Calendar className="w-4 h-4 text-accent" />
+                    Issued {new Date(offer.issued_at).toLocaleDateString()}
+                  </div>
+                )}
+                {offer.expires_at && (
+                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="w-4 h-4" />
+                    Expires {new Date(offer.expires_at).toLocaleDateString()}
+                  </div>
+                )}
+                {offer.accepted_at && (
+                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Accepted {new Date(offer.accepted_at).toLocaleDateString()}
+                  </div>
+                )}
+                {offer.rejected_at && (
+                  <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                    <XCircle className="w-4 h-4" />
+                    Rejected {new Date(offer.rejected_at).toLocaleDateString()}
+                  </div>
+                )}
+              </div>
+
+              <div className="text-xs text-muted-foreground font-mono bg-muted/50 px-3 py-2 rounded-lg break-all">
+                Offer ID: {offer.id}
+              </div>
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Offer meta */}
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            {offer.issued_at && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Calendar className="w-4 h-4 text-accent" />
-                Issued {new Date(offer.issued_at).toLocaleDateString()}
-              </div>
-            )}
-            {offer.expires_at && (
-              <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
-                <AlertTriangle className="w-4 h-4" />
-                Expires {new Date(offer.expires_at).toLocaleDateString()}
-              </div>
-            )}
-            {offer.accepted_at && (
-              <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="w-4 h-4" />
-                Accepted {new Date(offer.accepted_at).toLocaleDateString()}
-              </div>
-            )}
-            {offer.rejected_at && (
-              <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                <XCircle className="w-4 h-4" />
-                Rejected {new Date(offer.rejected_at).toLocaleDateString()}
-              </div>
-            )}
-          </div>
-
-          {/* Offer ID */}
-          <div className="text-xs text-muted-foreground font-mono bg-muted/50 px-3 py-2 rounded-lg break-all">
-            Offer ID: {offer.id}
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-3 pt-1">
+        {/* Footer Actions */}
+        <div className="p-4 px-6 border-t border-border bg-card flex flex-wrap items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2">
             {offer.pdf_url && (
-              <button
-                onClick={() => onDownload(offer)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm hover:bg-muted transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Download
-              </button>
+              <>
+                <button
+                  onClick={() => onDownload(offer)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PNG
+                </button>
+                <a
+                  href={offer.pdf_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Open Link
+                </a>
+              </>
             )}
-            {offer.pdf_url && (
-              <a
-                href={offer.pdf_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border text-sm hover:bg-muted transition-colors"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Open
-              </a>
-            )}
+          </div>
+
+          <div className="flex items-center gap-2">
             {offer.status === 'Accepted' && (
               <button
                 onClick={() => {
                   onClose();
                   navigate(`/student/workspace/${offer.internship_id}`);
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors shadow-sm"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent/90 transition-colors shadow-sm"
               >
                 <Briefcase className="w-4 h-4 animate-pulse" />
                 Go to Workspace
@@ -523,7 +546,7 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
                 <button
                   onClick={() => onAccept(offer.id)}
                   disabled={responding === offer.id}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
                 >
                   {responding === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                   Accept Offer
@@ -531,7 +554,7 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
                 <button
                   onClick={() => onReject(offer.id)}
                   disabled={responding === offer.id}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors disabled:opacity-50"
                 >
                   <XCircle className="w-4 h-4" />
                   Reject Offer
