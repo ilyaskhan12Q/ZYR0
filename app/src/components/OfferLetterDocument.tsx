@@ -79,7 +79,7 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
       {/* Main Printable Document Sheet */}
       <div 
         id={`offer-letter-sheet-${offer.id}`}
-        className="bg-white text-slate-900 border border-slate-200 rounded-2xl p-8 sm:p-12 shadow-xl relative overflow-hidden print:border-none print:shadow-none print:p-0 print:m-0"
+        className="offer-letter-print-root bg-white text-slate-900 border border-slate-200 rounded-2xl p-8 sm:p-12 shadow-xl relative overflow-hidden print:border-none print:shadow-none print:p-0 print:m-0"
       >
         {/* Status Watermark Stamp */}
         {['Accepted', 'Rejected', 'Revoked'].includes(offer.status) && (
