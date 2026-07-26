@@ -9,6 +9,9 @@ import {
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 import { CanvasParticles } from '@/components/CanvasParticles';
+import { toast } from 'sonner';
+import { SITE_CONFIG } from '@/config/site';
+import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 
 const homepageStructuredData = [
   {
@@ -255,6 +258,17 @@ export default function Landing() {
       window.removeEventListener('resize', checkMobile);
     };
   }, []);
+
+  const handleLinkedInClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (SITE_CONFIG.social.linkedinCompany) {
+      window.open(SITE_CONFIG.social.linkedinCompany, '_blank', 'noopener,noreferrer');
+    } else {
+      toast.info('LinkedIn Community channel is coming soon!', {
+        description: 'Join our WhatsApp Channel for instant internship alerts and official updates.',
+      });
+    }
+  };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const { clientX, clientY, currentTarget } = e;
@@ -602,6 +616,111 @@ export default function Landing() {
               )}
               className="w-1.5 h-1.5 bg-accent rounded-full"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Community / Stay Updated Section */}
+      <section className="py-14 lg:py-20 px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden border-y border-white/10">
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              Official Community Channels
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              Never Miss an Opportunity. <br className="hidden sm:inline" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
+                Stay Connected in Real-Time.
+              </span>
+            </h2>
+            <p className="mt-4 text-white/70 text-base sm:text-lg leading-relaxed">
+              Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Live WhatsApp Channel Card */}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0 },
+                { duration: 0.5, delay: 0.1 }
+              )}
+              className="bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <WhatsAppIcon className="w-6 h-6 fill-current" />
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Live Alerts
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                  WhatsApp Channel
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed mb-6">
+                  Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
+                </p>
+              </div>
+              <a
+                href={SITE_CONFIG.social.whatsappChannel}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Join ZYR0 WhatsApp Channel for instant updates"
+                className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 group/btn"
+              >
+                <WhatsAppIcon className="w-4.5 h-4.5 fill-current" />
+                Join WhatsApp Channel
+                <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+              </a>
+            </MotionDiv>
+
+            {/* LinkedIn Placeholder Card */}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0 },
+                { duration: 0.5, delay: 0.2 }
+              )}
+              className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10 group-hover:scale-110 transition-transform duration-300">
+                    <LinkedInIcon className="w-6 h-6 fill-current" />
+                  </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/15">
+                    Coming Soon
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
+                  LinkedIn Network
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed mb-6">
+                  Our official LinkedIn channel for professional networking, employer spotlights, student success stories, and corporate announcements is launching soon.
+                </p>
+              </div>
+              <button
+                onClick={handleLinkedInClick}
+                aria-label="LinkedIn Community Channel (Coming Soon)"
+                className="w-full inline-flex items-center justify-center gap-2 bg-white/10 text-white/80 border border-white/20 py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-white/20 hover:text-white transition-all duration-200 active:scale-95"
+              >
+                <LinkedInIcon className="w-4.5 h-4.5 fill-current text-blue-400" />
+                LinkedIn Page (Coming Soon)
+              </button>
+            </MotionDiv>
           </div>
         </div>
       </section>

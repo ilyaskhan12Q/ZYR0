@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
+import { SITE_CONFIG } from '@/config/site';
+import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 const navLinks = [
   { label: 'Internships', href: '/internships' },
   { label: 'Companies', href: '/companies' },
@@ -217,12 +219,29 @@ export default function PublicLayout() {
                 <p className="text-white/60 text-sm leading-relaxed">
                   A professional internship platform connecting students, companies, and mentors through a structured internship lifecycle.
                 </p>
-                <div className="flex gap-4 mt-6">
+                <div className="flex items-center gap-4 mt-6">
+                  <a
+                    href={SITE_CONFIG.social.whatsappChannel}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="ZYR0 WhatsApp Channel"
+                    title="Join ZYR0 WhatsApp Channel for instant announcements"
+                    className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all duration-200"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 fill-current" />
+                  </a>
+                  <a
+                    href={SITE_CONFIG.social.linkedinCompany || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="LinkedIn"
+                    title="LinkedIn Page"
+                    className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-200"
+                  >
+                    <LinkedInIcon className="w-4 h-4 fill-current" />
+                  </a>
                   <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-white/40 hover:text-white transition-colors">
                     <Github className="w-5 h-5" />
-                  </a>
-                  <a href="https://linkedin.com/company/zyr0-platform" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white/40 hover:text-white transition-colors">
-                    <Linkedin className="w-5 h-5" />
                   </a>
                   <a href="mailto:support@zyr0.com" aria-label="Email support" className="text-white/40 hover:text-white transition-colors">
                     <Mail className="w-5 h-5" />
@@ -253,10 +272,21 @@ export default function PublicLayout() {
                 </ul>
               </div>
 
-              {/* Support */}
+              {/* Community & Support */}
               <div>
-                <h4 className="font-semibold mb-4">Support</h4>
+                <h4 className="font-semibold mb-4">Community & Support</h4>
                 <ul className="space-y-2.5">
+                  <li>
+                    <a
+                      href={SITE_CONFIG.social.whatsappChannel}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 font-medium text-sm hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      WhatsApp Channel
+                    </a>
+                  </li>
                   <li><Link to="/help" className="text-white/60 text-sm hover:text-white transition-colors">Help Center</Link></li>
                   <li><Link to="/faq" className="text-white/60 text-sm hover:text-white transition-colors">FAQ</Link></li>
                   <li><Link to="/contact" className="text-white/60 text-sm hover:text-white transition-colors">Contact Us</Link></li>

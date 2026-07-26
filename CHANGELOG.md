@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.5] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 5 (`feature/social-cta-polish`)**:
+  - Unified footer social links and support channels across PublicLayout with official brand icons and WhatsApp Channel link.
+  - Audited Contact page social cards with standardized brand SVG icons and direct channel links.
+
+## [0.13.4] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 4 (`feature/social-cta-polish`)**:
+  - Designed and integrated a dedicated "Community / Stay Updated" section on the main landing page immediately following the hero section.
+  - Featured live WhatsApp Channel card with instant alert pulse badge and coming-soon LinkedIn network card with toast fallback.
+
+## [0.13.3] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 3 (`feature/social-cta-polish`)**:
+  - Improved header navigation spacing, responsiveness, and container alignment for community social CTAs.
+  - Added subtle hover shadow effects, live status pill badges, active click scale micro-interactions, and accessibility titles.
+
+## [0.13.2] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 2 (`feature/social-cta-polish`)**:
+  - Created brand icon system component `BrandIcons.tsx` with official high-resolution SVG assets for WhatsApp and LinkedIn.
+  - Upgraded `CommunitySocialNav` with official brand icons, pixel-perfect sizing, and responsive styling.
+
+## [0.13.1] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 1 (`feature/social-cta-polish`)**:
+  - Audited existing social CTA placements across header, mobile drawer, footer, and contact pages.
+  - Updated `SITE_CONFIG` default fallback URL to official ZYR0 WhatsApp Channel: `https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F`.
+
 ## [0.13.0] - 2026-07-25
 
 ### Added
