@@ -4,7 +4,7 @@ import { m } from 'framer-motion';
 import {
   Search, FileCheck, ClipboardList, Users, Award, Briefcase,
   UserPlus, Send, BookOpen, CheckCircle2, Building2, GraduationCap,
-  ArrowRight, Star, Quote, TrendingUp, Globe, Zap, Target
+  ArrowRight, Star, Quote, TrendingUp, Globe, Zap, Target, Sparkles
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
@@ -12,6 +12,7 @@ import { CanvasParticles } from '@/components/CanvasParticles';
 import { toast } from 'sonner';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
+import { TextRotate } from '@/components/fancy/text/TextRotate';
 
 const homepageStructuredData = [
   {
@@ -344,146 +345,137 @@ export default function Landing() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-8 lg:mt-0">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            
-            {/* Left Column: Typography, Actions, Trust */}
-            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
+                 {/* Left Column: Typography, Actions, Trust */}
+            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-7 text-left">
               
-              {/* Trust Badges / Social Proof */}
-              <div className="flex flex-wrap gap-2">
-                {[
-                  'Structured Internship Workflow',
-                  'Mentor Guided Learning',
-                  'Verified Certificates',
-                  'Professional Experience Tracking'
-                ].map((badge, idx) => (
-                  <MotionSpan
-                    isMobile={isMobile}
-                    key={idx}
-                    {...animProps(
-                      { opacity: 0, scale: 0.95 },
-                      { opacity: 1, scale: 1 },
-                      { duration: 0.4, delay: 0.1 * idx }
-                    )}
-                    className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-white/85 hover:bg-white/10 transition-colors"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
-                    {badge}
-                  </MotionSpan>
-                ))}
-              </div>
+              {/* Top Announcement Badge */}
+              <MotionDiv
+                isMobile={isMobile}
+                {...animProps(
+                  { opacity: 0, y: -10 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.4, delay: 0.1 }
+                )}
+                className="inline-flex items-center gap-2 self-start bg-white/10 border border-white/15 backdrop-blur-md rounded-full px-3.5 py-1.5 text-xs text-white/90 shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-accent animate-pulse" />
+                <span className="font-semibold uppercase tracking-wider text-[11px]">Pakistan's Premier Internship Engine</span>
+              </MotionDiv>
 
-              {/* Title Section with Oversized Typography */}
-              <div className="space-y-3">
+              {/* Title Section with Oversized Premium Typography & TextRotate */}
+              <div className="space-y-2 sm:space-y-3">
                 <MotionDiv
                   isMobile={isMobile}
                   {...animProps(
                     { opacity: 0, y: 15 },
                     { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: 0.3 }
+                    { duration: 0.5, delay: 0.2 }
                   )}
-                  className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-widest block"
+                  className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight"
                 >
-                  Pakistan's Platform for
+                  Launch Your Career With
                 </MotionDiv>
-                <div className="flex flex-col space-y-1">
-                  <MotionSpan
-                    isMobile={isMobile}
-                    {...animProps(
-                      { opacity: 0, x: -20 },
-                      { opacity: 1, x: 0 },
-                      { duration: 0.6, delay: 0.4 }
-                    )}
-                    className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-white"
-                  >
-                    Structured
-                  </MotionSpan>
-                  <MotionSpan
-                    isMobile={isMobile}
-                    {...animProps(
-                      { opacity: 0, x: 20 },
-                      { opacity: 1, x: 0 },
-                      { duration: 0.7, delay: 0.5 }
-                    )}
-                    className="text-6xl xs:text-7xl sm:text-8xl md:text-9xl lg:text-[7rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-accent via-blue-400 to-white leading-none block"
-                  >
-                    Internship.
-                  </MotionSpan>
+                
+                <div className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight min-h-[1.3em] flex items-center">
+                  <TextRotate
+                    texts={[
+                      'Internships.',
+                      'Real Experience.',
+                      'Verified Certificates.',
+                      'Industry Projects.',
+                      'Dream Companies.',
+                      'Career Growth.',
+                    ]}
+                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-accent via-indigo-300 to-blue-400 font-black tracking-tight"
+                    staggerFrom="last"
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '-120%', opacity: 0 }}
+                    staggerDuration={0.02}
+                    splitLevelClassName="overflow-hidden py-1"
+                    transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+                    rotationInterval={3400}
+                    ariaLabel="Career Opportunities on ZYR0"
+                  />
                 </div>
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 20 },
-                    { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: 0.6 }
-                  )}
-                  className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight"
-                >
-                  Build Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-300">Future</span> Career.
-                </MotionDiv>
               </div>
 
-              {/* Supporting Explanation */}
+              {/* Supporting Value Proposition */}
               <MotionP
                 isMobile={isMobile}
                 {...animProps(
                   { opacity: 0, y: 20 },
                   { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: 0.7 }
+                  { duration: 0.5, delay: 0.4 }
                 )}
-                className="text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
+                className="text-base sm:text-lg text-white/75 max-w-xl leading-relaxed font-normal"
               >
-                ZYR0 bridges the gap between academic learning and professional growth. We provide students with structured milestone tasks, direct mentor feedback, and verified certificates that employers trust. Companies gain a streamlined pipeline to hire, mentor, and evaluate interns with complete visibility into each candidate's progress and performance.
+                ZYR0 bridges academic learning with real-world industry demands. Complete structured milestone tasks, receive direct 1-on-1 mentor guidance, and earn employer-verified certificates that accelerate your hiring pipeline.
               </MotionP>
 
-              {/* Actions */}
+              {/* Action CTAs */}
               <MotionDiv
                 isMobile={isMobile}
                 {...animProps(
                   { opacity: 0, y: 20 },
                   { opacity: 1, y: 0 },
-                  { duration: 0.4, delay: 0.8 }
+                  { duration: 0.4, delay: 0.5 }
                 )}
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-1"
               >
                 <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 active:scale-95"
+                  to="/internships"
+                  className="inline-flex items-center justify-center gap-2 bg-accent text-white px-7 py-3.5 rounded-xl font-semibold hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 active:scale-95 text-sm sm:text-base"
                 >
-                  Start Your Internship
+                  Explore Internships
                   <ArrowRight className="w-4.5 h-4.5" />
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-8 py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-6 py-3.5 rounded-xl font-semibold hover:bg-white/20 transition-all duration-200 active:scale-95 text-sm sm:text-base backdrop-blur-sm"
                 >
                   For Companies
                 </Link>
+                <a
+                  href={SITE_CONFIG.social.whatsappChannel}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-emerald-500/25 transition-all duration-200 text-sm active:scale-95"
+                  title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-400" />
+                  <span>WhatsApp Channel</span>
+                </a>
               </MotionDiv>
 
-              {/* Trust Indicators */}
+              {/* Trust Indicators & Proof Grid */}
               <MotionDiv
                 isMobile={isMobile}
                 {...animProps(
                   { opacity: 0 },
                   { opacity: 1 },
-                  { duration: 0.4, delay: 1.0 }
+                  { duration: 0.4, delay: 0.6 }
                 )}
-                className="flex flex-wrap items-center gap-x-6 gap-y-3 text-white/40 text-xs pt-4 border-t border-white/5"
+                className="pt-4 border-t border-white/10"
               >
-                <span className="uppercase tracking-wider font-semibold text-[10px]">Ecosystem Partners:</span>
-                {[
-                  { icon: GraduationCap, label: 'Students' },
-                  { icon: Building2, label: 'Companies' },
-                  { icon: Users, label: 'Mentors' },
-                  { icon: Globe, label: 'Universities' }
-                ].map((partner, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 hover:text-white/60 transition-colors">
-                    <partner.icon className="w-3.5 h-3.5" />
-                    <span>{partner.label}</span>
-                  </div>
-                ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { number: '500+', label: 'Verified Students' },
+                    { number: '50+', label: 'Partner Companies' },
+                    { number: '100%', label: 'Certificate Validity' },
+                    { number: '4.9★', label: 'Mentor Rating' },
+                  ].map((stat, idx) => (
+                    <div key={idx} className="bg-white/5 border border-white/10 rounded-lg p-2.5 text-left backdrop-blur-xs">
+                      <div className="text-base sm:text-lg font-bold text-white tracking-tight">{stat.number}</div>
+                      <div className="text-[11px] text-white/60 font-medium">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
               </MotionDiv>
-
             </div>
 
             {/* Right Column: Engaging Visual Element */}

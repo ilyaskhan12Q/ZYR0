@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.1] - 2026-07-26
+
+### Added
+- **Hero Section Redesign Phases 2-4 (`feature/hero-redesign`)**:
+  - Implemented oversized enterprise headline incorporating customized `TextRotate` component with career-focused rotating phrases.
+  - Enhanced value proposition answering core platform identity, target audience, trust model, and next actions.
+  - Added multi-tier CTA layout featuring primary "Explore Internships", secondary "For Companies", and live "WhatsApp Channel" action pills.
+  - Integrated 4-column trust indicator grid highlighting student enrolment, employer ecosystem, certificate validity, and mentor rating metrics.
+
+## [0.14.0] - 2026-07-26
+
+### Added
+- **Hero Section Redesign Phase 1 (`feature/hero-redesign`)**:
+  - Audited current landing page hero architecture and reusable components.
+  - Created customizable `TextRotate.tsx` component with spring physics, stagger delays, accessibility support, and prefers-reduced-motion fallbacks.
+
 ## [0.13.5] - 2026-07-26
 
 ### Added
