@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.1] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 1 (`feature/social-cta-polish`)**:
+  - Audited existing social CTA placements across header, mobile drawer, footer, and contact pages.
+  - Updated `SITE_CONFIG` default fallback URL to official ZYR0 WhatsApp Channel: `https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F`.
+
 ## [0.13.0] - 2026-07-25
 
 ### Added
