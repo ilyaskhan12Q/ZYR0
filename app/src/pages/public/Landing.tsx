@@ -312,11 +312,11 @@ export default function Landing() {
         structuredData={homepageStructuredData}
       />
 
-      {/* Hero Section — redesigned with oversized typography, glowing grids, and a floating workspace preview */}
+      {/* Hero Section — redesigned with Sora font pairing, SaaS color system, layered radial glows, and floating workspace preview */}
       <section
         aria-label="Platform introduction"
         onPointerMove={handlePointerMove}
-        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-12 lg:py-16"
+        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-14 lg:py-20"
         style={{
           '--mouse-x': '50%',
           '--mouse-y': '50%'
@@ -325,28 +325,32 @@ export default function Landing() {
         {/* Animated Particles - high performance Canvas based rendering */}
         <CanvasParticles />
 
-        {/* Ambient Blur Lights */}
-        <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+        {/* Layered Radial Glows & SaaS Ambient Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.14),rgba(79,70,229,0.16),transparent_80%)] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
+        <div className="absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
         {/* Mouse-reactive lighting effect */}
         <div 
-          className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
+          className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
           style={{
-            background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99,102,241,0.15), transparent 80%)`,
+            background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
           }}
         />
 
-        {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+        {/* Subtle Masked Grid Overlay */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+          maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
         }} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-8 lg:mt-0">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-6 lg:mt-0">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-                 {/* Left Column: Typography, Actions, Trust */}
-            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-7 text-left">
+            {/* Left Column: Typography, Actions, Trust */}
+            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
               
               {/* Top Announcement Badge */}
               <MotionDiv
@@ -356,13 +360,13 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.4, delay: 0.1 }
                 )}
-                className="inline-flex items-center gap-2 self-start bg-white/10 border border-white/15 backdrop-blur-md rounded-full px-3.5 py-1.5 text-xs text-white/90 shadow-sm"
+                className="inline-flex items-center gap-2.5 self-start bg-white/[0.04] border border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-white/90 shadow-sm hover:border-white/20 transition-all duration-200"
               >
-                <Sparkles className="w-3.5 h-3.5 text-accent animate-pulse" />
-                <span className="font-semibold uppercase tracking-wider text-[11px]">Pakistan's Premier Internship Engine</span>
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                <span className="font-display font-semibold uppercase tracking-wider text-[11px] text-emerald-300/90">Pakistan's Premier Internship Engine</span>
               </MotionDiv>
 
-              {/* Title Section with Oversized Premium Typography & TextRotate */}
+              {/* Title Section with Oversized Sora Typography & TextRotate */}
               <div className="space-y-2 sm:space-y-3">
                 <MotionDiv
                   isMobile={isMobile}
@@ -371,12 +375,12 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: 0.2 }
                   )}
-                  className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight"
+                  className="font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.75rem] font-extrabold -tracking-[0.03em] text-white leading-[1.08]"
                 >
                   Launch Your Career With
                 </MotionDiv>
                 
-                <div className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight min-h-[1.3em] flex items-center">
+                <div className="font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.75rem] font-black -tracking-[0.03em] leading-[1.08] min-h-[1.3em] flex items-center">
                   <TextRotate
                     texts={[
                       'Internships.',
@@ -386,7 +390,7 @@ export default function Landing() {
                       'Dream Companies.',
                       'Career Growth.',
                     ]}
-                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-accent via-indigo-300 to-blue-400 font-black tracking-tight"
+                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-indigo-400 font-display font-black -tracking-[0.03em]"
                     staggerFrom="last"
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -408,7 +412,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: 0.4 }
                 )}
-                className="text-base sm:text-lg text-white/75 max-w-xl leading-relaxed font-normal"
+                className="text-base sm:text-lg text-slate-300/80 max-w-xl leading-relaxed font-normal"
               >
                 ZYR0 bridges academic learning with real-world industry demands. Complete structured milestone tasks, receive direct 1-on-1 mentor guidance, and earn employer-verified certificates that accelerate your hiring pipeline.
               </MotionP>
@@ -421,18 +425,18 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.4, delay: 0.5 }
                 )}
-                className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-1"
+                className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-1"
               >
                 <Link
                   to="/internships"
-                  className="inline-flex items-center justify-center gap-2 bg-accent text-white px-7 py-3.5 rounded-xl font-semibold hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 active:scale-95 text-sm sm:text-base"
+                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-emerald-400/30"
                 >
                   Explore Internships
                   <ArrowRight className="w-4.5 h-4.5" />
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-6 py-3.5 rounded-xl font-semibold hover:bg-white/20 transition-all duration-200 active:scale-95 text-sm sm:text-base backdrop-blur-sm"
+                  className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/15 backdrop-blur-md px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base"
                 >
                   For Companies
                 </Link>
@@ -440,7 +444,7 @@ export default function Landing() {
                   href={SITE_CONFIG.social.whatsappChannel}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-emerald-500/25 transition-all duration-200 text-sm active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 bg-emerald-500/[0.08] border border-emerald-500/25 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-emerald-500/[0.16] hover:border-emerald-500/40 transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98]"
                   title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
                 >
                   <span className="relative flex h-2 w-2">
@@ -460,7 +464,7 @@ export default function Landing() {
                   { opacity: 1 },
                   { duration: 0.4, delay: 0.6 }
                 )}
-                className="pt-4 border-t border-white/10"
+                className="pt-5 border-t border-white/10"
               >
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
@@ -469,9 +473,9 @@ export default function Landing() {
                     { number: '100%', label: 'Certificate Validity' },
                     { number: '4.9★', label: 'Mentor Rating' },
                   ].map((stat, idx) => (
-                    <div key={idx} className="bg-white/5 border border-white/10 rounded-lg p-2.5 text-left backdrop-blur-xs">
-                      <div className="text-base sm:text-lg font-bold text-white tracking-tight">{stat.number}</div>
-                      <div className="text-[11px] text-white/60 font-medium">{stat.label}</div>
+                    <div key={idx} className="bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-md rounded-xl p-3 sm:p-3.5 transition-all duration-300 hover:bg-white/[0.06] text-left">
+                      <div className="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-300 text-lg sm:text-xl tracking-tight">{stat.number}</div>
+                      <div className="text-[11px] text-slate-400 font-medium">{stat.label}</div>
                     </div>
                   ))}
                 </div>
@@ -481,8 +485,8 @@ export default function Landing() {
             {/* Right Column: Engaging Visual Element */}
             <div className="lg:col-span-5 relative w-full h-[400px] sm:h-[450px] lg:h-[500px] flex items-center justify-center">
               {/* Glowing gradients */}
-              <div className="absolute w-72 h-72 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute w-48 h-48 bg-blue-500/10 rounded-full blur-2xl -top-10 -right-10 pointer-events-none" />
+              <div className="absolute w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
 
               <div className="relative w-full max-w-md h-full">
                 {/* Floating Card 1: Workspace Tasks */}
@@ -497,32 +501,32 @@ export default function Landing() {
                       y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
                     }
                   )}
-                  className="absolute top-8 left-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-5 shadow-2xl z-10"
+                  className="absolute top-8 left-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-5 shadow-2xl z-10"
                 >
                   <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="text-[10px] font-semibold text-accent uppercase tracking-wider">Workspace Tracker</span>
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-display font-semibold text-emerald-400 uppercase tracking-wider">Workspace Tracker</span>
+                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                   </div>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between text-xs text-white/95">
                       <span className="font-medium">Completed Milestones</span>
-                      <span className="text-accent font-semibold">4 / 5</span>
+                      <span className="text-emerald-400 font-semibold">4 / 5</span>
                     </div>
                     <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div className="w-4/5 bg-accent h-full rounded-full" />
+                      <div className="w-4/5 bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full" />
                     </div>
                     <div className="space-y-2 pt-1 text-[11px]">
                       <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Milestone 3: API Integration</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Milestone 4: Database Design</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/90">
-                        <div className="w-3.5 h-3.5 rounded-full border border-accent flex items-center justify-center">
-                          <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                        <div className="w-3.5 h-3.5 rounded-full border border-emerald-400 flex items-center justify-center">
+                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
                         </div>
                         <span className="font-medium text-white/90">Milestone 5: Production Deployment</span>
                       </div>
@@ -542,14 +546,14 @@ export default function Landing() {
                       y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
                     }
                   )}
-                  className="absolute bottom-12 right-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-2xl z-20"
+                  className="absolute bottom-12 right-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-4 shadow-2xl z-20"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-xs border border-accent/30">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-display font-semibold text-xs border border-emerald-500/30">
                       SR
                     </div>
                     <div>
-                      <h4 className="text-xs font-semibold text-white">Sarah Jenkins</h4>
+                      <h4 className="text-xs font-display font-semibold text-white">Sarah Jenkins</h4>
                       <p className="text-[9px] text-white/50">Senior Engineer & Mentor</p>
                     </div>
                   </div>
@@ -570,14 +574,14 @@ export default function Landing() {
                       y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
                     }
                   )}
-                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 to-slate-900 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
+                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-950 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-wider text-accent font-bold">Secure ID</span>
+                    <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-display font-bold">Secure ID</span>
                     <span className="text-[8px] text-white/40">ZYR0-9182-X</span>
                   </div>
                   <div className="mt-4 text-center">
-                    <Award className="w-8 h-8 mx-auto text-accent mb-1.5" />
+                    <Award className="w-8 h-8 mx-auto text-emerald-400 mb-1.5" />
                     <h5 className="text-[10px] font-semibold">Certificate of Excellence</h5>
                     <p className="text-[8px] text-white/50 mt-0.5">Verified Internship Graduate</p>
                   </div>
