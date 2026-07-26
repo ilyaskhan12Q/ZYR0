@@ -78,6 +78,11 @@
     overflow-x: hidden;
   }
 
+  h1, h2, h3, h4, .font-heading {
+    font-family: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
   html {
     scroll-behavior: smooth;
   }

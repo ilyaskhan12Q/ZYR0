@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Hero Section Premium Visual Language (`feature/hero-redesign`)**:
   - Integrated Google Font **Sora** into `index.html` and `tailwind.config.js` (`font-display`) for an authoritative enterprise font pairing (Sora + Inter).
+  - Enforced global Sora display font mapping for all `h1`, `h2`, `h3`, `h4` tags and `.font-heading` utility classes in `src/index.css` with `-0.02em` tracking.
   - Applied linear-gradient text fill to `TextRotate` component using an **Emerald → Cyan → Indigo** palette (`from-emerald-400 via-cyan-300 to-indigo-400`).
   - Added layered radial ambient glows, soft blurred background nodes, and a subtle masked grid overlay for depth.
   - Refined floating preview cards with high-contrast glassmorphism, accent progress bars, and glowing status indicators.
