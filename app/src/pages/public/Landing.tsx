@@ -375,12 +375,12 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: 0.2 }
                   )}
-                  className="font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.75rem] font-extrabold -tracking-[0.03em] text-white leading-[1.08]"
+                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-300/90 leading-[1.06] drop-shadow-sm"
                 >
                   Launch Your Career With
                 </MotionDiv>
                 
-                <div className="font-display text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.75rem] font-black -tracking-[0.03em] leading-[1.08] min-h-[1.3em] flex items-center">
+                <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
                   <TextRotate
                     texts={[
                       'Internships.',
@@ -390,7 +390,7 @@ export default function Landing() {
                       'Dream Companies.',
                       'Career Growth.',
                     ]}
-                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-300 to-indigo-400 font-display font-black -tracking-[0.03em]"
+                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-300 font-display font-[900] tracking-[-0.035em] drop-shadow-[0_0_35px_rgba(16,185,129,0.3)]"
                     staggerFrom="last"
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
