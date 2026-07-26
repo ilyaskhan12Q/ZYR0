@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.3] - 2026-07-26
+
+### Added
+- **Hero Section Premium Visual Language (`feature/hero-redesign`)**:
+  - Integrated Google Font **Sora** into `index.html` and `tailwind.config.js` (`font-display`) for an authoritative enterprise font pairing (Sora + Inter).
+  - Enforced global Sora display font mapping for all `h1`, `h2`, `h3`, `h4` tags and `.font-heading` utility classes in `src/index.css` with `-0.02em` tracking.
+  - Applied linear-gradient text fill to `TextRotate` component using an **Emerald → Cyan → Indigo** palette (`from-emerald-400 via-cyan-300 to-indigo-400`).
+  - Added layered radial ambient glows, soft blurred background nodes, and a subtle masked grid overlay for depth.
+  - Refined floating preview cards with high-contrast glassmorphism, accent progress bars, and glowing status indicators.
+
 ## [0.14.1] - 2026-07-26
 
 ### Added
