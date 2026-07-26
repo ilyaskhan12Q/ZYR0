@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.3] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 3 (`feature/social-cta-polish`)**:
+  - Improved header navigation spacing, responsiveness, and container alignment for community social CTAs.
+  - Added subtle hover shadow effects, live status pill badges, active click scale micro-interactions, and accessibility titles.
+
 ## [0.13.2] - 2026-07-26
 
 ### Added
