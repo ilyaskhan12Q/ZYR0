@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.13.2] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 2 (`feature/social-cta-polish`)**:
+  - Created brand icon system component `BrandIcons.tsx` with official high-resolution SVG assets for WhatsApp and LinkedIn.
+  - Upgraded `CommunitySocialNav` with official brand icons, pixel-perfect sizing, and responsive styling.
+
 ## [0.13.1] - 2026-07-26
 
 ### Added
