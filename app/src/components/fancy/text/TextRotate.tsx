@@ -70,7 +70,8 @@ export const TextRotate: React.FC<TextRotateProps> = ({
     );
   }
 
-  const characters = currentText.split('');
+  const words = currentText.split(' ');
+  const totalCharacters = currentText.length;
 
   const getStaggerDelay = (index: number, total: number) => {
     switch (staggerFrom) {
@@ -88,33 +89,46 @@ export const TextRotate: React.FC<TextRotateProps> = ({
     }
   };
 
+  let globalCharIndex = 0;
+
   return (
     <span
-      className={`inline-flex items-center relative overflow-hidden ${mainClassName}`}
+      className={`inline-flex items-center relative overflow-hidden py-1 ${mainClassName}`}
       aria-label={ariaLabel || currentText}
       aria-live="polite"
     >
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
           key={`${keyId}-${currentTextIndex}`}
-          className={`inline-flex flex-wrap ${splitLevelClassName}`}
+          className={`inline-flex flex-wrap items-center ${splitLevelClassName}`}
           aria-hidden="true"
         >
-          {characters.map((char, i) => (
-            <motion.span
-              key={`${i}-${char}`}
-              initial={initial}
-              animate={animate}
-              exit={exit}
-              transition={{
-                ...transition,
-                delay: getStaggerDelay(i, characters.length),
-              }}
-              className="inline-block whitespace-pre"
-            >
-              {char}
-            </motion.span>
-          ))}
+          {words.map((word, wordIdx) => {
+            const chars = word.split('');
+
+            return (
+              <span key={`word-${wordIdx}-${word}`} className="inline-flex whitespace-nowrap mr-[0.25em] last:mr-0">
+                {chars.map((char, charIdx) => {
+                  const currentIndex = globalCharIndex++;
+                  return (
+                    <motion.span
+                      key={`${charIdx}-${char}-${currentIndex}`}
+                      initial={initial}
+                      animate={animate}
+                      exit={exit}
+                      transition={{
+                        ...transition,
+                        delay: getStaggerDelay(currentIndex, totalCharacters),
+                      }}
+                      className="inline-block whitespace-pre"
+                    >
+                      {char}
+                    </motion.span>
+                  );
+                })}
+              </span>
+            );
+          })}
         </motion.span>
       </AnimatePresence>
     </span>

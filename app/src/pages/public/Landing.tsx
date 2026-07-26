@@ -363,7 +363,7 @@ export default function Landing() {
               </MotionDiv>
 
               {/* Title Section with Oversized Premium Typography & TextRotate */}
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <MotionDiv
                   isMobile={isMobile}
                   {...animProps(
@@ -371,12 +371,12 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: 0.2 }
                   )}
-                  className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-tight"
+                  className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight"
                 >
                   Launch Your Career With
                 </MotionDiv>
                 
-                <div className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-none min-h-[1.25em] flex items-center">
+                <div className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight min-h-[1.3em] flex items-center">
                   <TextRotate
                     texts={[
                       'Internships.',
@@ -391,8 +391,8 @@ export default function Landing() {
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: '-120%', opacity: 0 }}
-                    staggerDuration={0.025}
-                    splitLevelClassName="overflow-hidden pb-1"
+                    staggerDuration={0.02}
+                    splitLevelClassName="overflow-hidden py-1"
                     transition={{ type: 'spring', damping: 28, stiffness: 350 }}
                     rotationInterval={3400}
                     ariaLabel="Career Opportunities on ZYR0"
