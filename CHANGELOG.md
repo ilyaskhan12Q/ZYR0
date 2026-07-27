@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2026-07-27
+
+### Added
+- **Company Task Management UX Redesign (`fix/Company-task-management-redesign`)**:
+  - Modularized legacy 775-line `Tasks.tsx` monolith into modular, high-performance workspace components.
+  - Created `TaskStatsHeader.tsx` for real-time KPI metrics with status tab quick-filtering.
+  - Created `TaskFilterBar.tsx` supporting multi-criterion filtering, search, status tabs, priority, sorting, and view mode switching.
+  - Created `TaskCardGrid.tsx` and `TaskTable.tsx` for responsive dual-view presentation.
+  - Created `TaskCreateEditModal.tsx` supporting single and bulk task delegation to active interns with inline validation.
+  - Implemented `TaskReviewDrawer.tsx` PR-style split-pane drawer for evaluating student task submissions using rubric-based scoring.
+
 ## [0.15.5] - 2026-07-27
 
 ### Added
