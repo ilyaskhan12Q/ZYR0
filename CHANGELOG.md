@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.4] - 2026-07-27
+
+### Fixed
+- **Admin Dashboard & Analytics Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Audited `pages/admin/Dashboard.tsx` and `pages/admin/Analytics.tsx`.
+  - Removed static `userGrowthDataRaw` and `appDataRaw` fallback arrays from `AdminAnalytics.tsx`.
+  - Purged hardcoded trend percentage indicators (`+3%`, `+8%`, `+12%`, etc.) from Admin KPI stat cards.
+  - Implemented dynamic, database-backed monthly telemetry for user registrations and monthly application volumes over the last 6 months.
+  - Removed `Math.sin(i.title.length)` pseudo-random star rating math and replaced hardcoded domain fallback percentages with clean empty states.
+  - Updated `Email Service` status indicator in Admin Dashboard system health to Operational.
+
 ## [0.15.3] - 2026-07-27
 
 ### Fixed
