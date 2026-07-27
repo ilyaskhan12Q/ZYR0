@@ -30,23 +30,25 @@ export function CanvasParticles() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
     if (!ctx) return;
 
     let animationFrameId: number;
     let isVisible = true;
     let width = 0;
     let height = 0;
+    let frameCount = 0;
 
-    // Detect if we are on a smaller viewport to adapt particle count
+    // Detect if we are on a smaller viewport to adapt particle count and DPR
     const isMobile = window.innerWidth < 1024;
     const activeParticles = isMobile
-      ? PARTICLE_PRESETS.filter((_, i) => i % 2 === 0)
+      ? PARTICLE_PRESETS.filter((_, i) => i % 3 === 0)
       : PARTICLE_PRESETS;
 
     const resizeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      // Cap DPR to 1 on mobile to prevent massive 3x DPR pixel render surfaces
+      const dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       width = rect.width;
       height = rect.height;
       
@@ -98,6 +100,14 @@ export function CanvasParticles() {
         return;
       }
 
+      frameCount++;
+
+      // Throttle particle redraws to 30 FPS on mobile to conserve GPU/CPU during scrolling
+      if (isMobile && frameCount % 2 !== 0) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       const elapsedSeconds = (time - startTime) / 1000;
@@ -105,26 +115,16 @@ export function CanvasParticles() {
       for (let i = 0; i < activeParticles.length; i++) {
         const p = activeParticles[i];
         
-        // Calculate oscillation
         const delay = p.delay;
         const duration = p.duration;
         
-        // Use Math.sin for smooth up/down oscillation
-        // To match y: [0, -30, 0] over duration:
-        // We want a wave that peaks at -30px and returns to 0
         const phase = ((elapsedSeconds - delay) * (Math.PI * 2)) / duration;
-        
-        // Offset range: 0 to -30
         const yOffset = (Math.sin(phase) - 1) * 15;
-        
-        // Opacity range: 0.2 to 0.7
         const opacity = 0.45 + Math.sin(phase) * 0.25;
 
-        // Calculate absolute position
         const px = (p.left / 100) * width;
         const py = (p.top / 100) * height + yOffset;
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(px, py, 1.5, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0.1, Math.min(0.9, opacity))})`;

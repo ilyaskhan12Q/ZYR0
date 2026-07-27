@@ -272,6 +272,7 @@ export default function Landing() {
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isMobile) return;
     const { clientX, clientY, currentTarget } = e;
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
     const x = ((clientX - left) / width) * 100;
@@ -282,24 +283,37 @@ export default function Landing() {
 
   // Helper to dynamically adjust animation props based on screen size/prefers-reduced-motion
   const animProps = (initialVal: any, animateVal: any, transitionVal: any) => {
-    return prefersReducedMotion
-      ? { initial: false }
-      : {
-          initial: initialVal,
-          animate: animateVal,
-          transition: transitionVal,
-        };
+    if (prefersReducedMotion) return { initial: false };
+    if (isMobile) {
+      return {
+        initial: initialVal,
+        animate: animateVal,
+        transition: { duration: 0.25, ease: 'easeOut' },
+      };
+    }
+    return {
+      initial: initialVal,
+      animate: animateVal,
+      transition: transitionVal,
+    };
   };
 
   const viewProps = (initialVal: any, whileInViewVal: any, transitionVal: any = undefined) => {
-    return prefersReducedMotion
-      ? { initial: false }
-      : {
-          initial: initialVal,
-          whileInView: whileInViewVal,
-          viewport: { once: true, margin: "-30px" },
-          transition: transitionVal,
-        };
+    if (prefersReducedMotion) return { initial: false };
+    if (isMobile) {
+      return {
+        initial: initialVal,
+        whileInView: whileInViewVal,
+        viewport: { once: true, margin: '-20px' },
+        transition: { duration: 0.3, ease: 'easeOut' },
+      };
+    }
+    return {
+      initial: initialVal,
+      whileInView: whileInViewVal,
+      viewport: { once: true, margin: '-30px' },
+      transition: transitionVal,
+    };
   };
 
   return (
@@ -327,17 +341,20 @@ export default function Landing() {
 
         {/* Layered Radial Glows & SaaS Ambient Background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.14),rgba(79,70,229,0.16),transparent_80%)] pointer-events-none" />
-        <div className="absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
-        <div className="absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="hidden lg:block absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="hidden lg:block absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
+        <div className="hidden lg:block absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Mouse-reactive lighting effect */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
-          style={{
-            background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
-          }}
-        />
+        {/* Mouse-reactive lighting effect - Only rendered/active on desktop */}
+        {!isMobile && (
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
+            style={{
+              background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
+            }}
+          />
+        )}
+
 
         {/* Subtle Masked Grid Overlay */}
         <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{

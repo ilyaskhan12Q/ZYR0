@@ -36,6 +36,7 @@ export const TextRotate: React.FC<TextRotateProps> = ({
 }) => {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const keyId = useId();
 
   useEffect(() => {
@@ -43,7 +44,17 @@ export const TextRotate: React.FC<TextRotateProps> = ({
     setPrefersReducedMotion(media.matches);
     const listener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
     media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
+
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile, { passive: true });
+
+    return () => {
+      media.removeEventListener('change', listener);
+      window.removeEventListener('resize', checkMobile);
+    };
   }, []);
 
   const nextText = useCallback(() => {
@@ -66,6 +77,31 @@ export const TextRotate: React.FC<TextRotateProps> = ({
     return (
       <span className={`inline-block ${mainClassName}`} aria-label={ariaLabel || currentText}>
         {currentText}
+      </span>
+    );
+  }
+
+  // On mobile viewports, animate full word/phrase as a single lightweight node to prevent CPU spring overhead
+  if (isMobile) {
+    return (
+      <span
+        className={`inline-flex items-center relative overflow-hidden py-1 ${mainClassName}`}
+        aria-label={ariaLabel || currentText}
+        aria-live="polite"
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={`${keyId}-${currentTextIndex}`}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
+            className={`inline-block whitespace-nowrap ${splitLevelClassName}`}
+            aria-hidden="true"
+          >
+            {currentText}
+          </motion.span>
+        </AnimatePresence>
       </span>
     );
   }
