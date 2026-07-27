@@ -46,3 +46,4 @@ supabase/.temp/
 
 # Reference directories
 offer-letter&certificate/
+.gstack/
