@@ -4,7 +4,6 @@ import {
   Users, 
   FileCheck, 
   Award, 
-  ArrowUpRight, 
   Calendar, 
   FolderOpen, 
   Star, 
@@ -29,25 +28,6 @@ import {
 } from 'recharts';
 import { supabase } from '@/lib/supabase';
 
-// Trend fallbacks for demo
-const userGrowthDataRaw = [
-  { month: 'Aug', students: 120, companies: 8, mentors: 5 },
-  { month: 'Sep', students: 180, companies: 12, mentors: 8 },
-  { month: 'Oct', students: 240, companies: 18, mentors: 12 },
-  { month: 'Nov', students: 310, companies: 22, mentors: 15 },
-  { month: 'Dec', students: 450, companies: 30, mentors: 22 },
-  { month: 'Jan', students: 580, companies: 42, mentors: 35 },
-];
-
-const appDataRaw = [
-  { month: 'Aug', applications: 25 },
-  { month: 'Sep', applications: 40 },
-  { month: 'Oct', applications: 35 },
-  { month: 'Nov', applications: 55 },
-  { month: 'Dec', applications: 80 },
-  { month: 'Jan', applications: 110 },
-];
-
 const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
 
 export default function AdminAnalytics() {
@@ -68,8 +48,8 @@ export default function AdminAnalytics() {
   const [stats, setStats] = useState<any[]>([]);
   const [domainData, setDomainData] = useState<any[]>([]);
   const [topInternships, setTopInternships] = useState<any[]>([]);
-  const [userGrowthData, setUserGrowthData] = useState<any[]>(userGrowthDataRaw);
-  const [appData, setAppData] = useState<any[]>(appDataRaw);
+  const [userGrowthData, setUserGrowthData] = useState<any[]>([]);
+  const [appData, setAppData] = useState<any[]>([]);
 
   const loadAnalytics = async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -136,22 +116,20 @@ export default function AdminAnalytics() {
 
     // Stats Calculations
     const totalUsers = filteredProfiles.length;
-    const studentCount = filteredProfiles.filter(p => p.role === 'Student').length;
-    const companyCount = filteredProfiles.filter(p => p.role === 'Company').length;
-    const mentorCount = filteredProfiles.filter(p => p.role === 'Mentor').length;
+    const studentCount = filteredProfiles.filter(p => p.role === 'Student' || p.role === 'student').length;
+    const companyCount = filteredProfiles.filter(p => p.role === 'Company' || p.role === 'company').length;
+    const mentorCount = filteredProfiles.filter(p => p.role === 'Mentor' || p.role === 'mentor').length;
 
     const activeInternshipsCount = filteredInternships.filter(i => i.status === 'Active').length;
     const draftInternshipsCount = filteredInternships.filter(i => i.status === 'Draft').length;
 
     const pendingApps = filteredApplications.filter(a => a.status === 'Pending').length;
     const acceptedApps = filteredApplications.filter(a => a.status === 'Accepted').length;
-    const rejectedApps = filteredApplications.filter(a => a.status === 'Rejected').length;
 
     setStats([
       {
         label: 'Total Users',
         value: totalUsers.toString(),
-        change: timeframe === '7d' ? '+3%' : timeframe === '30d' ? '+8%' : '+12%',
         icon: Users,
         subtext: `${studentCount} Interns • ${mentorCount} Mentors • ${companyCount} Org`,
         color: 'border-blue-500/20'
@@ -159,7 +137,6 @@ export default function AdminAnalytics() {
       {
         label: 'Active Internships',
         value: activeInternshipsCount.toString(),
-        change: timeframe === '7d' ? '+1%' : timeframe === '30d' ? '+4%' : '+8%',
         icon: FolderOpen,
         subtext: `${draftInternshipsCount} Drafts / Templates`,
         color: 'border-purple-500/20'
@@ -167,7 +144,6 @@ export default function AdminAnalytics() {
       {
         label: 'Applications',
         value: filteredApplications.length.toString(),
-        change: timeframe === '7d' ? '+5%' : timeframe === '30d' ? '+10%' : '+15%',
         icon: FileCheck,
         subtext: `${pendingApps} Pending • ${acceptedApps} Accepted`,
         color: 'border-emerald-500/20'
@@ -175,7 +151,6 @@ export default function AdminAnalytics() {
       {
         label: 'Certificates Issued',
         value: filteredCertificates.length.toString(),
-        change: timeframe === '7d' ? '+8%' : timeframe === '30d' ? '+15%' : '+22%',
         icon: Award,
         subtext: '100% Secure & Verified',
         color: 'border-amber-500/20'
@@ -199,9 +174,7 @@ export default function AdminAnalytics() {
     }));
 
     setDomainData(chartDomains.length > 0 ? chartDomains : [
-      { name: 'Engineering', value: 60, color: '#3B82F6' },
-      { name: 'Design', value: 25, color: '#8B5CF6' },
-      { name: 'Data', value: 15, color: '#10B981' }
+      { name: 'No Data Available', value: 100, color: 'hsl(var(--muted-foreground))' }
     ]);
 
     // Top performing internships (by application count)
@@ -219,7 +192,7 @@ export default function AdminAnalytics() {
           title: i.title,
           companyName: companyObj?.name || 'Partner Company',
           applicantsCount: appCounts[i.id] || 0,
-          rating: 4.5 + (Math.sin(i.title.length) * 0.4 + 0.4), // stable pseudo-random rating
+          domain: i.domain || 'General',
         };
       })
       .sort((a, b) => b.applicantsCount - a.applicantsCount)
@@ -227,23 +200,45 @@ export default function AdminAnalytics() {
 
     setTopInternships(sortedInternships);
 
-    // Apply scale multiplier for growth trends according to filters
-    let multiplier = 1;
-    if (timeframe === '7d') multiplier = 0.15;
-    else if (timeframe === '30d') multiplier = 0.4;
-    else if (timeframe === '90d') multiplier = 0.75;
+    // Compute dynamic registration timeline and application volume for last 6 months
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const now = new Date();
+    const computedUserGrowth = [];
+    const computedAppData = [];
 
-    setUserGrowthData(userGrowthDataRaw.map(d => ({
-      ...d,
-      students: Math.round(d.students * multiplier),
-      companies: Math.round(d.companies * multiplier),
-      mentors: Math.round(d.mentors * multiplier)
-    })));
+    for (let i = 5; i >= 0; i--) {
+      const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = monthNames[monthDate.getMonth()];
+      const startMs = monthDate.getTime();
+      const endMs = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0, 23, 59, 59, 999).getTime();
 
-    setAppData(appDataRaw.map(d => ({
-      ...d,
-      applications: Math.round(d.applications * multiplier)
-    })));
+      const students = rawProfiles.filter(p => 
+        (p.role === 'Student' || p.role === 'student') && 
+        new Date(p.created_at).getTime() <= endMs
+      ).length;
+
+      const companies = rawProfiles.filter(p => 
+        (p.role === 'Company' || p.role === 'company') && 
+        new Date(p.created_at).getTime() <= endMs
+      ).length;
+
+      const mentors = rawProfiles.filter(p => 
+        (p.role === 'Mentor' || p.role === 'mentor') && 
+        new Date(p.created_at).getTime() <= endMs
+      ).length;
+
+      computedUserGrowth.push({ month: label, students, companies, mentors });
+
+      const monthlyApplications = rawApplications.filter(a => {
+        const t = new Date(a.created_at).getTime();
+        return t >= startMs && t <= endMs;
+      }).length;
+
+      computedAppData.push({ month: label, applications: monthlyApplications });
+    }
+
+    setUserGrowthData(computedUserGrowth);
+    setAppData(computedAppData);
 
   }, [timeframe, selectedDomain, rawProfiles, rawInternships, rawApplications, rawCertificates, loading]);
 
@@ -379,9 +374,6 @@ export default function AdminAnalytics() {
               <div className="w-10 h-10 rounded-lg bg-accent/5 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
                 <stat.icon className="w-5 h-5 text-accent" />
               </div>
-              <span className="text-xs font-semibold flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                <ArrowUpRight className="w-3 h-3" /> {stat.change}
-              </span>
             </div>
             
             <div className="mt-4">
@@ -521,9 +513,8 @@ export default function AdminAnalytics() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold text-accent">{item.applicantsCount} apps</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end mt-0.5">
-                      <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                      {item.rating.toFixed(1)}
+                    <p className="text-xs text-muted-foreground font-medium justify-end mt-0.5">
+                      {item.domain}
                     </p>
                   </div>
                 </div>

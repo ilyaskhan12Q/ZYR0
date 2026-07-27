@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getMyApplications } from '@/services/applications';
 import { getMyTasks } from '@/services/tasks';
 import { getUnreadCount, getMyConversations } from '@/services/messages';
+import { getMyCertificates } from '@/services/certificates';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, Award, Briefcase };
@@ -18,21 +19,24 @@ export default function StudentDashboard() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [certificates, setCertificates] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [apps, myTasks, unread, convos] = await Promise.all([
+        const [apps, myTasks, unread, convos, certs] = await Promise.all([
           getMyApplications(),
           getMyTasks(),
           getUnreadCount(),
-          getMyConversations()
+          getMyConversations(),
+          getMyCertificates()
         ]);
         
         setApplications(apps?.data || []);
         setTasks(myTasks?.data || []);
         setUnreadMessages(unread || 0);
         setConversations(convos?.data || []);
+        setCertificates(certs?.data || []);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
@@ -151,10 +155,10 @@ export default function StudentDashboard() {
   const progressPercent = tasks.length > 0 ? Math.round((approvedTasksCount / tasks.length) * 100) : 0;
 
   const studentStats = [
-    { label: 'Total Applications', value: applications.length, icon: 'FileCheck', change: 0, changeType: 'increase' },
-    { label: 'Active Tasks', value: pendingTasks.length, icon: 'ClipboardList', change: 0, changeType: 'increase' },
-    { label: 'Completed Tasks', value: approvedTasksCount, icon: 'Award', change: 0, changeType: 'increase' },
-    { label: 'Profile Views', value: 0, icon: 'Briefcase', change: 0, changeType: 'increase' }
+    { label: 'Total Applications', value: applications.length, icon: 'FileCheck' },
+    { label: 'Active Tasks', value: pendingTasks.length, icon: 'ClipboardList' },
+    { label: 'Completed Tasks', value: approvedTasksCount, icon: 'Award' },
+    { label: 'Certificates Earned', value: certificates.length, icon: 'Briefcase' }
   ];
 
   return (
@@ -176,11 +180,6 @@ export default function StudentDashboard() {
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-blue-100 dark:bg-blue-950/30' : i === 1 ? 'bg-amber-100 dark:bg-amber-950/30' : i === 2 ? 'bg-emerald-100 dark:bg-emerald-950/30' : 'bg-purple-100 dark:bg-purple-950/30'}`}>
                   <Icon className={`w-5 h-5 ${i === 0 ? 'text-blue-600 dark:text-blue-400' : i === 1 ? 'text-amber-600 dark:text-amber-400' : i === 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-purple-600 dark:text-purple-400'}`} />
                 </div>
-                {stat.change !== 0 && (
-                  <span className={`text-xs font-medium ${stat.changeType === 'increase' ? 'text-emerald-600' : 'text-red-600'}`}>
-                    {stat.changeType === 'increase' ? '+' : ''}{stat.change}
-                  </span>
-                )}
               </div>
               <p className="text-2xl font-bold mt-3">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
