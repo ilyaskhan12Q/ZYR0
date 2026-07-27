@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.1] - 2026-07-27
+
+### Fixed
+- **Student Dashboard Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Removed hardcoded "Profile Views: 0" statistic card and replaced it with real dynamic "Certificates Earned" counter fetched from `getMyCertificates()`.
+  - Stripped unused `change` / `changeType` demo properties from `studentStats` summary cards.
+  - Eliminated arbitrary skill level percentage formula (`70 + (index * 7) % 25`) in `Progress.tsx` and updated UI to render verified skill badges with categories.
+  - Replaced generic placeholder company logo fallback URLs with dynamic `ui-avatars` generator.
+
 ## [0.14.4] - 2026-07-26
 
 ### Added

@@ -59,13 +59,11 @@ export default function StudentProgress() {
   // Active internships
   const activeInternships = applications.filter((app) => app.status === 'Accepted');
 
-  // Hardcode skills category/level mappings based on profile.skills array for visual presentation
+  // Categorize skills from profile.skills array for visual presentation
   const skillsList = (profile.skills || []).map((skill, index) => {
-    // Generate deterministic ratings & categories for user skills
     const categories = ['Technical', 'Tools', 'Soft Skills'];
     const category = categories[index % categories.length];
-    const level = 70 + (index * 7) % 25; // 70% to 95%
-    return { name: skill, category, level };
+    return { name: skill, category };
   });
 
   return (
@@ -148,24 +146,19 @@ export default function StudentProgress() {
           {skillsList.length === 0 ? (
             <p className="text-sm text-muted-foreground">No skills recorded in profile yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="flex flex-wrap gap-2.5">
               {skillsList.map((skill, i) => {
                 const categoryColors: Record<string, string> = {
-                  Technical: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
-                  'Soft Skills': 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
-                  Tools: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+                  Technical: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/40',
+                  'Soft Skills': 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/40',
+                  Tools: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/40',
                 };
                 return (
-                  <div key={i}>
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{skill.name}</span>
-                      </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${categoryColors[skill.category] || 'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-400'}`}>{skill.category}</span>
-                    </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${skill.level}%` }} transition={{ duration: 0.6, delay: i * 0.05 }} />
-                    </div>
+                  <div key={i} className="flex items-center gap-2 px-3 py-1.5 bg-card border border-border rounded-lg shadow-xs">
+                    <span className="text-sm font-medium">{skill.name}</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${categoryColors[skill.category] || 'bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-400 border-slate-200'}`}>
+                      {skill.category}
+                    </span>
                   </div>
                 );
               })}
