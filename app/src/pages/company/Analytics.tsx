@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, FileCheck, Award, Calendar, ArrowUpRight, ArrowDownRight, Loader2 } from 'lucide-react';
+import { TrendingUp, Users, FileCheck, Award, Calendar, Loader2 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -52,10 +52,10 @@ export default function CompanyAnalytics() {
         const activeInterns = acceptedApps;
 
         const calculatedStats = [
-          { label: 'Total Applications', value: totalApps.toString(), change: '+12%', up: true, icon: FileCheck },
-          { label: 'Acceptance Rate', value: `${acceptanceRate}%`, change: '+3%', up: true, icon: TrendingUp },
-          { label: 'Avg. Completion', value: `${avgCompletion}%`, change: '+5%', up: true, icon: Award },
-          { label: 'Active Interns', value: activeInterns.toString(), change: '+2', up: true, icon: Users },
+          { label: 'Total Applications', value: totalApps.toString(), icon: FileCheck },
+          { label: 'Acceptance Rate', value: `${acceptanceRate}%`, icon: TrendingUp },
+          { label: 'Avg. Completion', value: `${avgCompletion}%`, icon: Award },
+          { label: 'Active Interns', value: activeInterns.toString(), icon: Users },
         ];
         setStats(calculatedStats);
 
@@ -156,10 +156,6 @@ export default function CompanyAnalytics() {
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card">
               <div className="flex items-center justify-between">
                 <Icon className="w-5 h-5 text-accent" />
-                <span className={`text-xs font-medium flex items-center gap-0.5 ${stat.up ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {stat.up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                  {stat.change}
-                </span>
               </div>
               <p className="text-2xl font-bold mt-3">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>

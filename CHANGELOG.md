@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.2] - 2026-07-27
+
+### Fixed
+- **Company Dashboard Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Audited `CompanyDashboard.tsx`, `CompanyAnalytics.tsx`, and `CompanyInterns.tsx`.
+  - Removed artificial trend change strings (`+12%`, `+3%`, `+5%`, `+2`) and `up` comparison flags from `CompanyAnalytics.tsx`.
+  - Cleaned up unused icon imports and ensured all company analytics display real database numbers.
+
 ## [0.15.1] - 2026-07-27
 
 ### Fixed
