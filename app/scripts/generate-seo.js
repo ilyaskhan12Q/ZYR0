@@ -180,7 +180,7 @@ const staticPagesMeta = {
         'description': 'ZYR0 is a professional internship platform connecting students, companies, and mentors for structured, verifiable internship experiences.',
         'sameAs': [
           'https://github.com/ilyaskhan12Q/ZYR0',
-          'https://linkedin.com/company/zyr0-platform'
+          'https://linkedin.com/company/zyr0-co'
         ],
         'contactPoint': {
           '@type': 'ContactPoint',

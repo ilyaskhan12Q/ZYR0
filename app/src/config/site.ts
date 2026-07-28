@@ -11,6 +11,6 @@ export const SITE_CONFIG = {
   supportEmail: 'support@zyr0.com',
   social: {
     whatsappChannel: import.meta.env.VITE_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F',
-    linkedinCompany: import.meta.env.VITE_LINKEDIN_COMPANY_URL || null,
+    linkedinCompany: import.meta.env.VITE_LINKEDIN_COMPANY_URL || 'https://linkedin.com/company/zyr0-co',
   }
 };
