@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.2] - 2026-07-28
+
+### Added
+- **Official LinkedIn URL & CTA Integration (`feature/social-cta-polish`)**:
+  - Updated single source of truth `SITE_CONFIG` in `src/config/site.ts` with new official LinkedIn company profile: `https://linkedin.com/company/zyr0-co`.
+  - Added `VITE_LINKEDIN_COMPANY_URL` to `.env` and `.env.example`.
+  - Updated JSON-LD Organization schema in `generate-seo.js` and `Landing.tsx` for consistent search engine indexing.
+  - Converted legacy "Coming Soon" LinkedIn placeholders into live interactive "Follow on LinkedIn" CTA cards across `Landing.tsx`, `CommunitySocialNav.tsx`, `PublicLayout.tsx` footer, and `Contact.tsx`.
+  - Cleaned up legacy click-handler toasts to enforce clean semantic anchor navigation.
+
 ## [0.16.1] - 2026-07-28
 
 ### Fixed

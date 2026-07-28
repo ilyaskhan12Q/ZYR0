@@ -231,7 +231,7 @@ export default function PublicLayout() {
                     <WhatsAppIcon className="w-4 h-4 fill-current" />
                   </a>
                   <a
-                    href={SITE_CONFIG.social.linkedinCompany || '#'}
+                    href={SITE_CONFIG.social.linkedinCompany}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn"
@@ -285,6 +285,17 @@ export default function PublicLayout() {
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       WhatsApp Channel
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={SITE_CONFIG.social.linkedinCompany}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 font-medium text-sm hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                      LinkedIn Page
                     </a>
                   </li>
                   <li><Link to="/help" className="text-white/60 text-sm hover:text-white transition-colors">Help Center</Link></li>

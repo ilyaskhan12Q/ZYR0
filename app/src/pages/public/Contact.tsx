@@ -57,7 +57,7 @@ export default function Contact() {
               { icon: Phone, title: 'Phone', value: '+923279883150', desc: 'Mon-Fri 9am-6pm PKT' },
               { icon: MapPin, title: 'Office', value: 'Lahore, Pakistan', desc: 'Arfa Software Technology Park, Ferozepur Road' },
               { icon: WhatsAppIcon, title: 'WhatsApp Channel', value: SITE_CONFIG.social.whatsappChannel, desc: 'Join for instant internship & hiring alerts', isBrand: true, color: 'text-emerald-500' },
-              { icon: LinkedInIcon, title: 'LinkedIn Page', value: SITE_CONFIG.social.linkedinCompany || '#', desc: 'Follow our official company page', isBrand: true, color: 'text-blue-500' },
+              { icon: LinkedInIcon, title: 'LinkedIn Page', value: SITE_CONFIG.social.linkedinCompany, desc: 'Follow our official company page', isBrand: true, color: 'text-blue-500' },
               { icon: Facebook, title: 'Facebook', value: 'https://web.facebook.com/profile.php?id=61591995425665', desc: 'Follow us on Facebook', isBrand: false, color: 'text-accent' },
             ].map((item, i) => (
               <div key={i} className="bg-card rounded-xl border border-border p-5 shadow-sm flex items-start gap-4 hover:border-accent/30 transition-colors">
@@ -72,7 +72,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-medium">{item.title}</p>
-                  {['Facebook','LinkedIn','WhatsApp'].includes(item.title) ? null : (
+                  {item.value.startsWith('http') ? null : (
                     <p className="text-sm text-foreground break-all">{item.value}</p>
                   )}
                   <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>

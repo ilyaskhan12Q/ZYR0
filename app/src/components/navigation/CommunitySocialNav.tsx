@@ -1,5 +1,4 @@
 import React from 'react';
-import { toast } from 'sonner';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 
@@ -16,17 +15,6 @@ export const CommunitySocialNav: React.FC<CommunitySocialNavProps> = ({
 }) => {
   const whatsappUrl = SITE_CONFIG.social.whatsappChannel;
   const linkedinUrl = SITE_CONFIG.social.linkedinCompany;
-
-  const handleLinkedInClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (linkedinUrl) {
-      window.open(linkedinUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      toast.info('LinkedIn Community channel is coming soon!', {
-        description: 'Follow our official WhatsApp Channel for instant internship alerts and platform updates.',
-      });
-    }
-  };
 
   if (mobile) {
     return (
@@ -62,25 +50,27 @@ export const CommunitySocialNav: React.FC<CommunitySocialNavProps> = ({
           </span>
         </a>
 
-        {/* LinkedIn Placeholder (Mobile) */}
-        <button
-          onClick={handleLinkedInClick}
-          aria-label="LinkedIn Community Channel (Coming Soon)"
-          className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 border border-border/60 active:scale-[0.99]"
+        {/* LinkedIn Page (Mobile) */}
+        <a
+          href={linkedinUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Follow ZYR0 LinkedIn Page"
+          className="flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-foreground hover:bg-muted/50 transition-all duration-200 border border-border/60 active:scale-[0.99] group"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-600/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-blue-600/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
               <LinkedInIcon className="w-4.5 h-4.5 fill-current" />
             </div>
             <div className="flex flex-col text-left">
-              <span className="font-semibold text-foreground/80 text-sm">LinkedIn Page</span>
-              <span className="text-[11px] text-muted-foreground/70">Company updates & announcements</span>
+              <span className="font-semibold text-foreground text-sm">LinkedIn Page</span>
+              <span className="text-[11px] text-muted-foreground">Official company updates</span>
             </div>
           </div>
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border/50">
-            Coming Soon
+          <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-600 text-white uppercase tracking-wider shadow-xs group-hover:bg-blue-700 transition-colors">
+            Follow
           </span>
-        </button>
+        </a>
       </div>
     );
   }
@@ -108,21 +98,22 @@ export const CommunitySocialNav: React.FC<CommunitySocialNavProps> = ({
         <span className="hidden sm:inline tracking-tight">WhatsApp Channel</span>
       </a>
 
-      {/* LinkedIn Placeholder Button (Desktop) */}
-      <button
-        onClick={handleLinkedInClick}
-        title="LinkedIn Community Page (Coming Soon)"
-        aria-label="LinkedIn Community Channel (Coming Soon)"
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 border opacity-80 hover:opacity-100 active:scale-95 ${
+      {/* LinkedIn Button (Desktop) */}
+      <a
+        href={linkedinUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Follow ZYR0 on LinkedIn"
+        aria-label="Follow ZYR0 on LinkedIn"
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border shadow-xs group active:scale-95 ${
           scrolled
-            ? 'bg-muted/60 text-muted-foreground border-border/50 hover:bg-muted hover:border-border/80'
-            : 'bg-white/10 text-white/80 border-white/20 hover:bg-white/20 hover:border-white/30'
+            ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50'
+            : 'bg-blue-500/20 text-blue-200 border-blue-400/40 hover:bg-blue-500/30 hover:border-blue-400/60'
         }`}
       >
-        <LinkedInIcon className="w-3.5 h-3.5 fill-current shrink-0 text-blue-600 dark:text-blue-400" />
-        <span className="hidden xl:inline text-[11px]">LinkedIn</span>
-        <span className="text-[10px] text-muted-foreground/80 font-normal ml-0.5">(Soon)</span>
-      </button>
+        <LinkedInIcon className="w-3.5 h-3.5 fill-current shrink-0 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-200" />
+        <span className="hidden xl:inline tracking-tight">LinkedIn</span>
+      </a>
     </div>
   );
 };

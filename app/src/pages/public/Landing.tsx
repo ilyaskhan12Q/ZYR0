@@ -44,7 +44,7 @@ const homepageStructuredData = [
     'description': 'ZYR0 is a professional internship platform connecting students, companies, and mentors for structured, verifiable internship experiences.',
     'sameAs': [
       'https://github.com/ilyaskhan12Q/ZYR0',
-      'https://linkedin.com/company/zyr0-platform'
+      'https://linkedin.com/company/zyr0-co'
     ],
     'contactPoint': {
       '@type': 'ContactPoint',
@@ -260,16 +260,6 @@ export default function Landing() {
     };
   }, []);
 
-  const handleLinkedInClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (SITE_CONFIG.social.linkedinCompany) {
-      window.open(SITE_CONFIG.social.linkedinCompany, '_blank', 'noopener,noreferrer');
-    } else {
-      toast.info('LinkedIn Community channel is coming soon!', {
-        description: 'Join our WhatsApp Channel for instant internship alerts and official updates.',
-      });
-    }
-  };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (isMobile) return;
@@ -699,7 +689,7 @@ export default function Landing() {
               </a>
             </MotionDiv>
 
-            {/* LinkedIn Placeholder Card */}
+            {/* Live LinkedIn Network Card */}
             <MotionDiv
               isMobile={isMobile}
               {...viewProps(
@@ -707,32 +697,36 @@ export default function Landing() {
                 { opacity: 1, y: 0 },
                 { duration: 0.5, delay: 0.2 }
               )}
-              className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+              className="bg-slate-900/80 backdrop-blur-xl border border-blue-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10 group-hover:scale-110 transition-transform duration-300">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
                     <LinkedInIcon className="w-6 h-6 fill-current" />
                   </div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/15">
-                    Coming Soon
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                    Official Page
                   </span>
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
                   LinkedIn Network
                 </h3>
                 <p className="text-white/70 text-sm leading-relaxed mb-6">
-                  Our official LinkedIn channel for professional networking, employer spotlights, student success stories, and corporate announcements is launching soon.
+                  Follow our official LinkedIn page for professional networking, employer spotlights, student success stories, and corporate announcements.
                 </p>
               </div>
-              <button
-                onClick={handleLinkedInClick}
-                aria-label="LinkedIn Community Channel (Coming Soon)"
-                className="w-full inline-flex items-center justify-center gap-2 bg-white/10 text-white/80 border border-white/20 py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-white/20 hover:text-white transition-all duration-200 active:scale-95"
+              <a
+                href={SITE_CONFIG.social.linkedinCompany}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow ZYR0 on LinkedIn"
+                className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-600/25 active:scale-95 group/btn"
               >
-                <LinkedInIcon className="w-4.5 h-4.5 fill-current text-blue-400" />
-                LinkedIn Page (Coming Soon)
-              </button>
+                <LinkedInIcon className="w-4.5 h-4.5 fill-current" />
+                Follow on LinkedIn
+                <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+              </a>
             </MotionDiv>
           </div>
         </div>
