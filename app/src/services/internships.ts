@@ -107,6 +107,7 @@ export async function getAcceptedCountForInternship(internshipId: string): Promi
 export async function createInternship(data: Partial<Internship>) {
   const res = await supabase.from('internships').insert(data).select().single();
   if (!res.error && data.company_id) {
+    clearCache('internships');
     clearCache(createRequestKey('company_internships', data.company_id));
     clearCache('internship_domains');
   }
@@ -143,6 +144,7 @@ export async function updateInternship(id: string, data: Partial<Internship>, co
 
   if (!res.error && res.data) {
     clearCache(createRequestKey('internship', id));
+    clearCache('internships');
     const targetCompanyId = companyId || res.data.company_id;
     if (targetCompanyId) {
       clearCache(createRequestKey('company_internships', targetCompanyId));
@@ -158,6 +160,7 @@ export async function closeInternship(id: string, companyId?: string) {
   const res = await supabase.from('internships').update({ status: 'Closed', updated_at: new Date().toISOString() }).eq('id', id);
   if (!res.error) {
     clearCache(createRequestKey('internship', id));
+    clearCache('internships');
     if (companyId) {
       clearCache(createRequestKey('company_internships', companyId));
     }
