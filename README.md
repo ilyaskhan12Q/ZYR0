@@ -57,10 +57,13 @@ zyro-kim/
 │   │   └── types/        # TypeScript interfaces and type definitions
 │   ├── public/           # Static web assets and pre-rendered SEO files
 │   └── package.json
+├── branding/             # Brand logos, visual identity assets, and media
 ├── docs/                 # System architecture, workflows, and engineering specs
 ├── supabase/             # Database migrations, RLS policies, and seed data
 ├── CHANGELOG.md          # Release history and version updates
-└── CONTRIBUTING.md       # Contribution guidelines and workflow rules
+├── CONTRIBUTING.md       # Contribution guidelines and workflow rules
+├── LICENSE               # Open-source MIT License terms
+└── SECURITY.md           # Vulnerability reporting and security policies
 ```
 
 ## Quick Start
@@ -133,6 +136,7 @@ Comprehensive engineering documentation is maintained in the [`/docs`](./docs) d
 - **[Architecture Guide](./docs/ARCHITECTURE.md)**: System design, feature isolation principles, and data flow patterns.
 - **[Engineering Principles](./docs/ENGINEERING_PRINCIPLES.md)**: Coding conventions, performance benchmarks, and quality gates.
 - **[Git Workflow](./docs/GIT_WORKFLOW.md)**: Branching policy, commit message formatting, and PR requirements.
+- **[Security Policy](./SECURITY.md)**: Vulnerability reporting guidelines and defense-in-depth security measures.
 - **[Changelog](./CHANGELOG.md)**: Versioned history of features, optimizations, and fixes.
 
 ## Contributing
@@ -141,9 +145,13 @@ Contributions from the developer community are welcome. Whether you are addressi
 
 Please read **[CONTRIBUTING.md](./CONTRIBUTING.md)** before opening a pull request to understand our branching standards, code formatting expectations, and submission process.
 
+## Security
+
+We take security seriously. If you discover a vulnerability, please review our **[SECURITY.md](./SECURITY.md)** for private reporting channels and disclosure policies.
+
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License. See the **[LICENSE](./LICENSE)** file for full terms and conditions.
 
 ## Acknowledgements
 
