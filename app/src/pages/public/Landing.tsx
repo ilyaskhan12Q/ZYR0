@@ -4,11 +4,15 @@ import { m } from 'framer-motion';
 import {
   Search, FileCheck, ClipboardList, Users, Award, Briefcase,
   UserPlus, Send, BookOpen, CheckCircle2, Building2, GraduationCap,
-  ArrowRight, Star, Quote, TrendingUp, Globe, Zap, Target
+  ArrowRight, Star, Quote, TrendingUp, Globe, Zap, Target, Sparkles
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 import { CanvasParticles } from '@/components/CanvasParticles';
+import { toast } from 'sonner';
+import { SITE_CONFIG } from '@/config/site';
+import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
+import { TextRotate } from '@/components/fancy/text/TextRotate';
 
 const homepageStructuredData = [
   {
@@ -256,7 +260,19 @@ export default function Landing() {
     };
   }, []);
 
+  const handleLinkedInClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (SITE_CONFIG.social.linkedinCompany) {
+      window.open(SITE_CONFIG.social.linkedinCompany, '_blank', 'noopener,noreferrer');
+    } else {
+      toast.info('LinkedIn Community channel is coming soon!', {
+        description: 'Join our WhatsApp Channel for instant internship alerts and official updates.',
+      });
+    }
+  };
+
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (isMobile) return;
     const { clientX, clientY, currentTarget } = e;
     const { left, top, width, height } = currentTarget.getBoundingClientRect();
     const x = ((clientX - left) / width) * 100;
@@ -267,24 +283,37 @@ export default function Landing() {
 
   // Helper to dynamically adjust animation props based on screen size/prefers-reduced-motion
   const animProps = (initialVal: any, animateVal: any, transitionVal: any) => {
-    return prefersReducedMotion
-      ? { initial: false }
-      : {
-          initial: initialVal,
-          animate: animateVal,
-          transition: transitionVal,
-        };
+    if (prefersReducedMotion) return { initial: false };
+    if (isMobile) {
+      return {
+        initial: initialVal,
+        animate: animateVal,
+        transition: { duration: 0.25, ease: 'easeOut' },
+      };
+    }
+    return {
+      initial: initialVal,
+      animate: animateVal,
+      transition: transitionVal,
+    };
   };
 
   const viewProps = (initialVal: any, whileInViewVal: any, transitionVal: any = undefined) => {
-    return prefersReducedMotion
-      ? { initial: false }
-      : {
-          initial: initialVal,
-          whileInView: whileInViewVal,
-          viewport: { once: true, margin: "-30px" },
-          transition: transitionVal,
-        };
+    if (prefersReducedMotion) return { initial: false };
+    if (isMobile) {
+      return {
+        initial: initialVal,
+        whileInView: whileInViewVal,
+        viewport: { once: true, margin: '-20px' },
+        transition: { duration: 0.3, ease: 'easeOut' },
+      };
+    }
+    return {
+      initial: initialVal,
+      whileInView: whileInViewVal,
+      viewport: { once: true, margin: '-30px' },
+      transition: transitionVal,
+    };
   };
 
   return (
@@ -297,11 +326,11 @@ export default function Landing() {
         structuredData={homepageStructuredData}
       />
 
-      {/* Hero Section — redesigned with oversized typography, glowing grids, and a floating workspace preview */}
+      {/* Hero Section — redesigned with Sora font pairing, SaaS color system, layered radial glows, and floating workspace preview */}
       <section
         aria-label="Platform introduction"
         onPointerMove={handlePointerMove}
-        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-12 lg:py-16"
+        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-14 lg:py-20"
         style={{
           '--mouse-x': '50%',
           '--mouse-y': '50%'
@@ -310,173 +339,171 @@ export default function Landing() {
         {/* Animated Particles - high performance Canvas based rendering */}
         <CanvasParticles />
 
-        {/* Ambient Blur Lights */}
-        <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[35vw] h-[35vw] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+        {/* Layered Radial Glows & SaaS Ambient Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.14),rgba(79,70,229,0.16),transparent_80%)] pointer-events-none" />
+        <div className="hidden lg:block absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+        <div className="hidden lg:block absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
+        <div className="hidden lg:block absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Mouse-reactive lighting effect */}
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-40 mix-blend-screen transition-all duration-300"
-          style={{
-            background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99,102,241,0.15), transparent 80%)`,
-          }}
-        />
+        {/* Mouse-reactive lighting effect - Only rendered/active on desktop */}
+        {!isMobile && (
+          <div 
+            className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
+            style={{
+              background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
+            }}
+          />
+        )}
 
-        {/* Subtle Grid Overlay */}
-        <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
+
+        {/* Subtle Masked Grid Overlay */}
+        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+          maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
         }} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-8 lg:mt-0">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-6 lg:mt-0">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            
             {/* Left Column: Typography, Actions, Trust */}
             <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
               
-              {/* Trust Badges / Social Proof */}
-              <div className="flex flex-wrap gap-2">
-                {[
-                  'Structured Internship Workflow',
-                  'Mentor Guided Learning',
-                  'Verified Certificates',
-                  'Professional Experience Tracking'
-                ].map((badge, idx) => (
-                  <MotionSpan
-                    isMobile={isMobile}
-                    key={idx}
-                    {...animProps(
-                      { opacity: 0, scale: 0.95 },
-                      { opacity: 1, scale: 1 },
-                      { duration: 0.4, delay: 0.1 * idx }
-                    )}
-                    className="inline-flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-white/85 hover:bg-white/10 transition-colors"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
-                    {badge}
-                  </MotionSpan>
-                ))}
-              </div>
+              {/* Top Announcement Badge */}
+              <MotionDiv
+                isMobile={isMobile}
+                {...animProps(
+                  { opacity: 0, y: -10 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.4, delay: 0.1 }
+                )}
+                className="inline-flex items-center gap-2.5 self-start bg-white/[0.04] border border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-white/90 shadow-sm hover:border-white/20 transition-all duration-200"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                <span className="font-display font-semibold uppercase tracking-wider text-[11px] text-emerald-300/90">Pakistan's Premier Internship Engine</span>
+              </MotionDiv>
 
-              {/* Title Section with Oversized Typography */}
-              <div className="space-y-3">
+              {/* Title Section with Oversized Sora Typography & TextRotate */}
+              <div className="space-y-2 sm:space-y-3">
                 <MotionDiv
                   isMobile={isMobile}
                   {...animProps(
                     { opacity: 0, y: 15 },
                     { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: 0.3 }
+                    { duration: 0.5, delay: 0.2 }
                   )}
-                  className="text-white/60 text-xs sm:text-sm font-semibold uppercase tracking-widest block"
+                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-300/90 leading-[1.06] drop-shadow-sm"
                 >
-                  Pakistan's Platform for
+                  Launch Your Career With
                 </MotionDiv>
-                <div className="flex flex-col space-y-1">
-                  <MotionSpan
-                    isMobile={isMobile}
-                    {...animProps(
-                      { opacity: 0, x: -20 },
-                      { opacity: 1, x: 0 },
-                      { duration: 0.6, delay: 0.4 }
-                    )}
-                    className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tighter text-white"
-                  >
-                    Structured
-                  </MotionSpan>
-                  <MotionSpan
-                    isMobile={isMobile}
-                    {...animProps(
-                      { opacity: 0, x: 20 },
-                      { opacity: 1, x: 0 },
-                      { duration: 0.7, delay: 0.5 }
-                    )}
-                    className="text-6xl xs:text-7xl sm:text-8xl md:text-9xl lg:text-[7rem] font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-accent via-blue-400 to-white leading-none block"
-                  >
-                    Internship.
-                  </MotionSpan>
+                
+                <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
+                  <TextRotate
+                    texts={[
+                      'Internships.',
+                      'Real Experience.',
+                      'Verified Certificates.',
+                      'Industry Projects.',
+                      'Dream Companies.',
+                      'Career Growth.',
+                    ]}
+                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-300 font-display font-[900] tracking-[-0.035em] drop-shadow-[0_0_35px_rgba(16,185,129,0.3)]"
+                    staggerFrom="last"
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '-120%', opacity: 0 }}
+                    staggerDuration={0.02}
+                    splitLevelClassName="overflow-hidden py-1"
+                    transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+                    rotationInterval={3400}
+                    ariaLabel="Career Opportunities on ZYR0"
+                  />
                 </div>
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 20 },
-                    { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: 0.6 }
-                  )}
-                  className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight"
-                >
-                  Build Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-300">Future</span> Career.
-                </MotionDiv>
               </div>
 
-              {/* Supporting Explanation */}
+              {/* Supporting Value Proposition */}
               <MotionP
                 isMobile={isMobile}
                 {...animProps(
                   { opacity: 0, y: 20 },
                   { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: 0.7 }
+                  { duration: 0.5, delay: 0.4 }
                 )}
-                className="text-base sm:text-lg text-white/70 max-w-xl leading-relaxed"
+                className="text-base sm:text-lg text-slate-300/80 max-w-xl leading-relaxed font-normal"
               >
-                ZYR0 bridges the gap between academic learning and professional growth. We provide students with structured milestone tasks, direct mentor feedback, and verified certificates that employers trust. Companies gain a streamlined pipeline to hire, mentor, and evaluate interns with complete visibility into each candidate's progress and performance.
+                ZYR0 bridges academic learning with real-world industry demands. Complete structured milestone tasks, receive direct 1-on-1 mentor guidance, and earn employer-verified certificates that accelerate your hiring pipeline.
               </MotionP>
 
-              {/* Actions */}
+              {/* Action CTAs */}
               <MotionDiv
                 isMobile={isMobile}
                 {...animProps(
                   { opacity: 0, y: 20 },
                   { opacity: 1, y: 0 },
-                  { duration: 0.4, delay: 0.8 }
+                  { duration: 0.4, delay: 0.5 }
                 )}
-                className="flex flex-col sm:flex-row gap-4"
+                className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-1"
               >
                 <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-accent text-white px-8 py-3.5 rounded-lg font-medium hover:bg-accent/90 transition-all duration-200 shadow-lg shadow-accent/25 active:scale-95"
+                  to="/internships"
+                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-emerald-400/30"
                 >
-                  Start Your Internship
+                  Explore Internships
                   <ArrowRight className="w-4.5 h-4.5" />
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/20 px-8 py-3.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-200 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/15 backdrop-blur-md px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base"
                 >
                   For Companies
                 </Link>
+                <a
+                  href={SITE_CONFIG.social.whatsappChannel}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-emerald-500/[0.08] border border-emerald-500/25 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-emerald-500/[0.16] hover:border-emerald-500/40 transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98]"
+                  title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
+                >
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-400" />
+                  <span>WhatsApp Channel</span>
+                </a>
               </MotionDiv>
 
-              {/* Trust Indicators */}
+              {/* Trust Indicators & Proof Grid */}
               <MotionDiv
                 isMobile={isMobile}
                 {...animProps(
                   { opacity: 0 },
                   { opacity: 1 },
-                  { duration: 0.4, delay: 1.0 }
+                  { duration: 0.4, delay: 0.6 }
                 )}
-                className="flex flex-wrap items-center gap-x-6 gap-y-3 text-white/40 text-xs pt-4 border-t border-white/5"
+                className="pt-5 border-t border-white/10"
               >
-                <span className="uppercase tracking-wider font-semibold text-[10px]">Ecosystem Partners:</span>
-                {[
-                  { icon: GraduationCap, label: 'Students' },
-                  { icon: Building2, label: 'Companies' },
-                  { icon: Users, label: 'Mentors' },
-                  { icon: Globe, label: 'Universities' }
-                ].map((partner, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 hover:text-white/60 transition-colors">
-                    <partner.icon className="w-3.5 h-3.5" />
-                    <span>{partner.label}</span>
-                  </div>
-                ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { number: '500+', label: 'Verified Students' },
+                    { number: '50+', label: 'Partner Companies' },
+                    { number: '100%', label: 'Certificate Validity' },
+                    { number: '4.9★', label: 'Mentor Rating' },
+                  ].map((stat, idx) => (
+                    <div key={idx} className="bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-md rounded-xl p-3 sm:p-3.5 transition-all duration-300 hover:bg-white/[0.06] text-left">
+                      <div className="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-300 text-lg sm:text-xl tracking-tight">{stat.number}</div>
+                      <div className="text-[11px] text-slate-400 font-medium">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
               </MotionDiv>
-
             </div>
 
             {/* Right Column: Engaging Visual Element */}
             <div className="lg:col-span-5 relative w-full h-[400px] sm:h-[450px] lg:h-[500px] flex items-center justify-center">
               {/* Glowing gradients */}
-              <div className="absolute w-72 h-72 bg-accent/20 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute w-48 h-48 bg-blue-500/10 rounded-full blur-2xl -top-10 -right-10 pointer-events-none" />
+              <div className="absolute w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
 
               <div className="relative w-full max-w-md h-full">
                 {/* Floating Card 1: Workspace Tasks */}
@@ -491,32 +518,32 @@ export default function Landing() {
                       y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
                     }
                   )}
-                  className="absolute top-8 left-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-5 shadow-2xl z-10"
+                  className="absolute top-8 left-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-5 shadow-2xl z-10"
                 >
                   <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="text-[10px] font-semibold text-accent uppercase tracking-wider">Workspace Tracker</span>
-                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-display font-semibold text-emerald-400 uppercase tracking-wider">Workspace Tracker</span>
+                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
                   </div>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between text-xs text-white/95">
                       <span className="font-medium">Completed Milestones</span>
-                      <span className="text-accent font-semibold">4 / 5</span>
+                      <span className="text-emerald-400 font-semibold">4 / 5</span>
                     </div>
                     <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div className="w-4/5 bg-accent h-full rounded-full" />
+                      <div className="w-4/5 bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full" />
                     </div>
                     <div className="space-y-2 pt-1 text-[11px]">
                       <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Milestone 3: API Integration</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                         <span>Milestone 4: Database Design</span>
                       </div>
                       <div className="flex items-center gap-2 text-white/90">
-                        <div className="w-3.5 h-3.5 rounded-full border border-accent flex items-center justify-center">
-                          <span className="w-1.5 h-1.5 bg-accent rounded-full" />
+                        <div className="w-3.5 h-3.5 rounded-full border border-emerald-400 flex items-center justify-center">
+                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
                         </div>
                         <span className="font-medium text-white/90">Milestone 5: Production Deployment</span>
                       </div>
@@ -536,14 +563,14 @@ export default function Landing() {
                       y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
                     }
                   )}
-                  className="absolute bottom-12 right-4 w-72 bg-slate-900/80 backdrop-blur-md border border-white/10 rounded-xl p-4 shadow-2xl z-20"
+                  className="absolute bottom-12 right-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-4 shadow-2xl z-20"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-semibold text-xs border border-accent/30">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-display font-semibold text-xs border border-emerald-500/30">
                       SR
                     </div>
                     <div>
-                      <h4 className="text-xs font-semibold text-white">Sarah Jenkins</h4>
+                      <h4 className="text-xs font-display font-semibold text-white">Sarah Jenkins</h4>
                       <p className="text-[9px] text-white/50">Senior Engineer & Mentor</p>
                     </div>
                   </div>
@@ -564,14 +591,14 @@ export default function Landing() {
                       y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
                     }
                   )}
-                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 to-slate-900 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
+                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-950 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-wider text-accent font-bold">Secure ID</span>
+                    <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-display font-bold">Secure ID</span>
                     <span className="text-[8px] text-white/40">ZYR0-9182-X</span>
                   </div>
                   <div className="mt-4 text-center">
-                    <Award className="w-8 h-8 mx-auto text-accent mb-1.5" />
+                    <Award className="w-8 h-8 mx-auto text-emerald-400 mb-1.5" />
                     <h5 className="text-[10px] font-semibold">Certificate of Excellence</h5>
                     <p className="text-[8px] text-white/50 mt-0.5">Verified Internship Graduate</p>
                   </div>
@@ -602,6 +629,111 @@ export default function Landing() {
               )}
               className="w-1.5 h-1.5 bg-accent rounded-full"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Community / Stay Updated Section */}
+      <section className="py-14 lg:py-20 px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden border-y border-white/10">
+        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              Official Community Channels
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              Never Miss an Opportunity. <br className="hidden sm:inline" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
+                Stay Connected in Real-Time.
+              </span>
+            </h2>
+            <p className="mt-4 text-white/70 text-base sm:text-lg leading-relaxed">
+              Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Live WhatsApp Channel Card */}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0 },
+                { duration: 0.5, delay: 0.1 }
+              )}
+              className="bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <WhatsAppIcon className="w-6 h-6 fill-current" />
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Live Alerts
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                  WhatsApp Channel
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed mb-6">
+                  Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
+                </p>
+              </div>
+              <a
+                href={SITE_CONFIG.social.whatsappChannel}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Join ZYR0 WhatsApp Channel for instant updates"
+                className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 group/btn"
+              >
+                <WhatsAppIcon className="w-4.5 h-4.5 fill-current" />
+                Join WhatsApp Channel
+                <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+              </a>
+            </MotionDiv>
+
+            {/* LinkedIn Placeholder Card */}
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0 },
+                { duration: 0.5, delay: 0.2 }
+              )}
+              className="bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10 group-hover:scale-110 transition-transform duration-300">
+                    <LinkedInIcon className="w-6 h-6 fill-current" />
+                  </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-white/70 border border-white/15">
+                    Coming Soon
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
+                  LinkedIn Network
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed mb-6">
+                  Our official LinkedIn channel for professional networking, employer spotlights, student success stories, and corporate announcements is launching soon.
+                </p>
+              </div>
+              <button
+                onClick={handleLinkedInClick}
+                aria-label="LinkedIn Community Channel (Coming Soon)"
+                className="w-full inline-flex items-center justify-center gap-2 bg-white/10 text-white/80 border border-white/20 py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-white/20 hover:text-white transition-all duration-200 active:scale-95"
+              >
+                <LinkedInIcon className="w-4.5 h-4.5 fill-current text-blue-400" />
+                LinkedIn Page (Coming Soon)
+              </button>
+            </MotionDiv>
           </div>
         </div>
       </section>

@@ -43,3 +43,7 @@ coverage/
 # Supabase local dev (not for CI)
 supabase/.branches/
 supabase/.temp/
+
+# Reference directories
+offer-letter&certificate/
+.gstack/

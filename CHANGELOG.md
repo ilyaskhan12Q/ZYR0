@@ -5,6 +5,130 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.16.1] - 2026-07-28
+
+### Fixed
+- **Internship Deadline Cache Synchronization (`fix/internship-deadline-sync`)**:
+  - Resolved cache invalidation defect where updates to internship application deadlines in Company and Admin portals failed to propagate to the public `/internships` page.
+  - Refactored `updateInternship`, `createInternship`, and `closeInternship` in `src/services/internships.ts` to call `clearCache('internships')`.
+  - Purged all public `getInternships` parameterized query cache keys (`internships::...`) upon internship updates, ensuring instant data synchronization across public, student, company, and admin portals.
+
+## [0.16.0] - 2026-07-27
+
+### Added
+- **Company Task Management UX Redesign (`fix/Company-task-management-redesign`)**:
+  - Modularized legacy 775-line `Tasks.tsx` monolith into modular, high-performance workspace components.
+  - Created `TaskStatsHeader.tsx` for real-time KPI metrics with status tab quick-filtering.
+  - Created `TaskFilterBar.tsx` supporting multi-criterion filtering, search, status tabs, priority, sorting, and view mode switching.
+  - Created `TaskCardGrid.tsx` and `TaskTable.tsx` for responsive dual-view presentation.
+  - Created `TaskCreateEditModal.tsx` supporting single and bulk task delegation to active interns with inline validation.
+  - Implemented `TaskReviewDrawer.tsx` PR-style split-pane drawer for evaluating student task submissions using rubric-based scoring.
+
+## [0.15.5] - 2026-07-27
+
+### Added
+- **Mobile Performance Audit Phase 1 (`performance/mobile-optimization`)**:
+  - Conducted comprehensive performance audit across Landing, TextRotate, Motion layers, Canvas particles, and background filters on 4GB RAM Android baseline.
+  - Documented baseline metrics (LCP: 4.2s, INP: 380ms, TBT: 540ms, FPS: 32-42 FPS).
+  - Identified root causes: character-level spring animations in `TextRotate`, expensive `backdrop-filter` GPU layers on mobile, unthrottled pointer listeners, and un-memoized media queries.
+  - Created detailed performance report in `docs/performance/MOBILE_AUDIT_REPORT.md`.
+
+## [0.15.4] - 2026-07-27
+
+### Fixed
+- **Admin Dashboard & Analytics Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Audited `pages/admin/Dashboard.tsx` and `pages/admin/Analytics.tsx`.
+  - Removed static `userGrowthDataRaw` and `appDataRaw` fallback arrays from `AdminAnalytics.tsx`.
+  - Purged hardcoded trend percentage indicators (`+3%`, `+8%`, `+12%`, etc.) from Admin KPI stat cards.
+  - Implemented dynamic, database-backed monthly telemetry for user registrations and monthly application volumes over the last 6 months.
+  - Removed `Math.sin(i.title.length)` pseudo-random star rating math and replaced hardcoded domain fallback percentages with clean empty states.
+  - Updated `Email Service` status indicator in Admin Dashboard system health to Operational.
+
+## [0.15.3] - 2026-07-27
+
+### Fixed
+- **Mentor Dashboard Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Audited `MentorDashboard.tsx`, `MentorInterns.tsx`, and `MentorEvaluations.tsx`.
+  - Verified zero placeholder metrics or mock counters exist in mentor components, ensuring all stats render dynamically from live backend tables.
+
+## [0.15.2] - 2026-07-27
+
+### Fixed
+- **Company Dashboard Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Audited `CompanyDashboard.tsx`, `CompanyAnalytics.tsx`, and `CompanyInterns.tsx`.
+  - Removed artificial trend change strings (`+12%`, `+3%`, `+5%`, `+2`) and `up` comparison flags from `CompanyAnalytics.tsx`.
+  - Cleaned up unused icon imports and ensured all company analytics display real database numbers.
+
+## [0.15.1] - 2026-07-27
+
+### Fixed
+- **Student Dashboard Cleanup (`fix/dashboard-dummy-metrics`)**:
+  - Removed hardcoded "Profile Views: 0" statistic card and replaced it with real dynamic "Certificates Earned" counter fetched from `getMyCertificates()`.
+  - Stripped unused `change` / `changeType` demo properties from `studentStats` summary cards.
+  - Eliminated arbitrary skill level percentage formula (`70 + (index * 7) % 25`) in `Progress.tsx` and updated UI to render verified skill badges with categories.
+  - Replaced generic placeholder company logo fallback URLs with dynamic `ui-avatars` generator.
+
+## [0.14.4] - 2026-07-26
+
+### Added
+- **Hero Section Premium Visual Language (`feature/hero-redesign`)**:
+  - Integrated Google Font **Sora** into `index.html` and `tailwind.config.js` (`font-display`, `font-heading`) for an authoritative enterprise font pairing (Sora + Inter).
+  - Enforced global Sora display font mapping for all `h1`, `h2`, `h3`, `h4` tags and `.font-heading` utility classes in `src/index.css` with `-0.035em` tracking.
+  - Refined linear-gradient text fill and drop-shadow glow to `TextRotate` component using an **Emerald → Cyan → Indigo** palette (`from-emerald-300 via-cyan-300 to-indigo-300`).
+  - Added layered radial ambient glows, soft blurred background nodes, and a subtle masked grid overlay for depth.
+  - Refined floating preview cards with high-contrast glassmorphism, accent progress bars, and glowing status indicators.
+
+## [0.14.1] - 2026-07-26
+
+### Added
+- **Hero Section Redesign Phases 2-4 (`feature/hero-redesign`)**:
+  - Implemented oversized enterprise headline incorporating customized `TextRotate` component with career-focused rotating phrases.
+  - Enhanced value proposition answering core platform identity, target audience, trust model, and next actions.
+  - Added multi-tier CTA layout featuring primary "Explore Internships", secondary "For Companies", and live "WhatsApp Channel" action pills.
+  - Integrated 4-column trust indicator grid highlighting student enrolment, employer ecosystem, certificate validity, and mentor rating metrics.
+
+## [0.14.0] - 2026-07-26
+
+### Added
+- **Hero Section Redesign Phase 1 (`feature/hero-redesign`)**:
+  - Audited current landing page hero architecture and reusable components.
+  - Created customizable `TextRotate.tsx` component with spring physics, stagger delays, accessibility support, and prefers-reduced-motion fallbacks.
+
+## [0.13.5] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 5 (`feature/social-cta-polish`)**:
+  - Unified footer social links and support channels across PublicLayout with official brand icons and WhatsApp Channel link.
+  - Audited Contact page social cards with standardized brand SVG icons and direct channel links.
+
+## [0.13.4] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 4 (`feature/social-cta-polish`)**:
+  - Designed and integrated a dedicated "Community / Stay Updated" section on the main landing page immediately following the hero section.
+  - Featured live WhatsApp Channel card with instant alert pulse badge and coming-soon LinkedIn network card with toast fallback.
+
+## [0.13.3] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 3 (`feature/social-cta-polish`)**:
+  - Improved header navigation spacing, responsiveness, and container alignment for community social CTAs.
+  - Added subtle hover shadow effects, live status pill badges, active click scale micro-interactions, and accessibility titles.
+
+## [0.13.2] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 2 (`feature/social-cta-polish`)**:
+  - Created brand icon system component `BrandIcons.tsx` with official high-resolution SVG assets for WhatsApp and LinkedIn.
+  - Upgraded `CommunitySocialNav` with official brand icons, pixel-perfect sizing, and responsive styling.
+
+## [0.13.1] - 2026-07-26
+
+### Added
+- **Social CTA Polish Phase 1 (`feature/social-cta-polish`)**:
+  - Audited existing social CTA placements across header, mobile drawer, footer, and contact pages.
+  - Updated `SITE_CONFIG` default fallback URL to official ZYR0 WhatsApp Channel: `https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F`.
+
 ## [0.13.0] - 2026-07-25
 
 ### Added

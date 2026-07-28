@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sora:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -76,6 +78,14 @@
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-display, .font-heading {
+    font-family: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    letter-spacing: -0.028em;
+    -webkit-font-smoothing: antialiased;
   }
 
   html {
@@ -497,4 +507,21 @@
     visibility: hidden !important;
   }
 }
+
+/* Mobile GPU & Performance Optimizations */
+@media (max-width: 1023px) {
+  .backdrop-blur-md,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-3xl {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .gpu-layer {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+}
+
 

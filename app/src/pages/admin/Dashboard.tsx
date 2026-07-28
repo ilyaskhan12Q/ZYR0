@@ -9,7 +9,7 @@ const systemHealth = [
   { name: 'Database', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
   { name: 'Authentication', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
   { name: 'Storage', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
-  { name: 'Email Service', status: 'Degraded', icon: AlertCircle, color: 'text-amber-500' },
+  { name: 'Email Service', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
 ];
 
 export default function AdminDashboard() {
