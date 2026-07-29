@@ -2,163 +2,242 @@
 
 > A modern, transparent, and project-driven internship and workforce readiness platform.
 
+[![Version](https://img.shields.io/badge/version-0.16.2-blue.svg)](CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-19-61dafb.svg?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-7-646cff.svg?logo=vite)](https://vitejs.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e.svg?logo=supabase)](https://supabase.com/)
+
+---
+
 ## Overview
 
-ZYR0 bridges the gap between academic education and practical industry experience. Millions of students complete their education each year with strong theoretical knowledge but limited opportunity to demonstrate real-world engineering capability. Concurrently, organizations face administrative overhead when hosting and managing remote or project-based internship programs.
+**ZYR0** bridges the gap between academic education and practical industry experience. Millions of students graduate annually with strong theoretical foundations but limited opportunity to demonstrate real-world engineering capability. Concurrently, organizations face administrative overhead when managing remote, project-based internship programs and candidate evaluations.
 
-ZYR0 addresses this challenge by providing a centralized ecosystem where companies host structured internship opportunities, delegate practical tasks, track candidate progress, and evaluate submissions. Students work on real projects hosted on public GitHub repositories, receive structured feedback from mentors, and earn cryptographically verifiable digital certificates upon completion.
+ZYR0 solves this challenge by delivering a centralized ecosystem where companies host structured internships, delegate practical tasks, track candidate progress, and evaluate submissions. Students work on real projects hosted on public GitHub repositories, receive structured rubric-based feedback from mentors, and earn cryptographically verifiable digital certificates upon program completion.
 
-The platform serves four primary audiences:
-- **Students**: Build proof-of-work portfolios through practical projects and verified achievements.
-- **Organizations**: Streamline internship administration from candidate review to final performance evaluation.
-- **Mentors**: Guide interns through code reviews, rubric-based task scoring, and structured feedback loops.
-- **Educational Institutions**: Track student internship outcomes and practical skills acquisition with full transparency.
+### Target Audiences
+
+- **Students**: Build proof-of-work engineering portfolios through real projects, earn verified credentials, and accelerate career entry.
+- **Organizations**: Streamline internship management from application review to automated offer letter distribution and task evaluation.
+- **Mentors**: Guide interns through structured code reviews, rubric-based task scoring, and direct feedback loops.
+- **Educational Institutions**: Monitor student internship outcomes, practical skills acquisition, and completion statistics with total transparency.
+
+---
 
 ## Core Features
 
-- **Role-Based Portals**: Tailored interfaces for Students, Companies, Mentors, and Administrators.
-- **GitHub-First Submission Model**: Direct integration with public GitHub repositories for code review and submission tracking.
-- **Structured Task Workspaces**: Responsive grid and tabular interfaces for delegating, tracking, and reviewing intern assignments.
-- **Automated Offer Letter Workflows**: Digital offer letter generation, delivery tracking, and candidate acceptance flows.
-- **PR-Style Review Drawer**: Split-pane code evaluation drawer for mentors with custom rubric scoring and structured feedback.
-- **Verifiable Digital Credentials**: Cryptographically signed certificates with public verification endpoints.
-- **Live Telemetry & Analytics**: Dynamic metrics tracking application volumes, active internships, and program completion rates.
+### 🌟 Premium Visual Identity & Dynamic Hero System
+- **Enterprise Display Typography**: Powered by **Sora** display font paired with **Inter** body typography for an authoritative brand identity.
+- **Spring-Animated Text Rotating Engine**: Dynamic phrase rotator built with spring physics and accessibility fallbacks.
+- **High-Performance Canvas Particle System**: Light-weight, 60 FPS HTML5 2D Canvas particles (`CanvasParticles`) respecting device constraints and reduced motion settings.
+- **Glassmorphism UI & Accent Glows**: Custom HSL color tokens featuring Emerald → Cyan → Indigo gradients and layered ambient glows.
+
+### 🏢 Modular Task Management & Review Workspace
+- **KPI Metrics Header**: Real-time task statistics tracking active, completed, and pending submissions with tab-based filtering.
+- **Advanced Multi-Criterion Filtering**: Filter by search terms, task status, priority levels, and sort orders with instant grid/table view toggles.
+- **Single & Bulk Task Delegation**: Delegate assignments to individual interns or bulk-assign to all active interns with automated notifications.
+- **PR-Style Split-Pane Review Drawer**: Dedicated evaluation interface for mentors featuring rubric-based scoring, inline code review, and structured feedback templates.
+
+### 📄 Offer Letter Management & High-Fidelity Printing
+- **High-Fidelity Document Rendering**: Automated generation of official offer letters complete with company branding, security seals, and owner signatures.
+- **Offline Canvas QR Code Generation**: Instant, network-independent canvas-rendered QR verification badges embedded into every document.
+- **Print Layout Isolation**: Purpose-built `@media print` rules ensuring pixel-perfect browser-native printing (`window.print()`) and PDF export without UI clutter.
+
+### 📜 Verifiable Digital Credentials
+- **Cryptographically Signed Certificates**: Publicly verifiable digital certificates issued to interns upon successful program completion.
+- **Dynamic Signature & Logo Integration**: Real-time embedding of mentor/supervisor signatures and official company logos.
+- **Public Verification Endpoint**: Direct verification link allowing employers and institutions to validate certificate authenticity.
+
+### 📊 Database-Backed Dynamic Telemetry & Analytics
+- **Live Platform Metrics**: 100% database-backed telemetry tracking application volumes, active internships, user growth, and completion rates.
+- **Zero-Placeholder Architecture**: Stripped-down mock metrics ensuring all dashboard analytics reflect real PostgreSQL data.
+
+### 🌐 Official Community & Social Connectivity
+- **Official Brand Connectivity**: Integrated CTAs for the official **[ZYR0 LinkedIn Profile](https://linkedin.com/company/zyr0-co)** and **[WhatsApp Channel](https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F)** across navigation headers, footers, and contact sections.
+
+### ⚡ Mobile Performance & SEO Engine
+- **Per-Page Route Code Splitting**: Sub-15 kB initial page loads across portal routes with lazy-loaded vendor chunks (e.g., Recharts).
+- **Pre-Rendered Static SEO**: Automated script (`generate-seo.js`) generating static HTML files with JSON-LD Organization, FAQPage, and ContactPage schemas.
+
+---
 
 ## Tech Stack
 
-### Frontend
-- **Framework**: React 19 with Vite
-- **Routing**: React Router v7
-- **Language**: TypeScript (Strict Mode)
-- **Styling**: Tailwind CSS & Vanilla CSS Design Tokens
-- **UI Primitives**: Radix UI & Lucide Icons
+### Frontend Architecture
+- **Framework**: [React 19](https://react.dev/) + [Vite 7](https://vitejs.dev/)
+- **Routing**: [React Router v7](https://reactrouter.com/)
+- **Language**: [TypeScript 5.9](https://www.typescriptlang.org/) (Strict Mode)
+- **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/) + Custom CSS Design Tokens
+- **UI & Motion**: [Radix UI](https://www.radix-ui.com/), [Lucide Icons](https://lucide.dev/), and [Framer Motion](https://www.framer.com/motion/)
 
-### Backend & Infrastructure
-- **Database & Auth**: Supabase (PostgreSQL with Row-Level Security)
+### Backend & Database
+- **Platform**: [Supabase](https://supabase.com/) (PostgreSQL with Row-Level Security)
 - **Authentication**: Supabase Auth (JWT & Role-Based Access Control)
-- **Storage**: Supabase Storage for platform assets and generated documents
-- **Deployment**: Vercel
+- **Storage**: Supabase Storage buckets for resumes, avatars, and platform assets
+- **Hosting & Edge**: [Vercel](https://vercel.com/) + Supabase Edge Functions
 
-### Tooling & Quality
-- **Build System**: Vite & TypeScript compiler (`tsc`)
-- **Linting & Formatting**: ESLint & PostCSS
-- **SEO Engine**: Custom pre-rendering script for static page generation and dynamic metadata
+### Quality & Tooling
+- **Build System**: Vite & TypeScript Compiler (`tsc`)
+- **Linting & Code Standards**: ESLint 9 + PostCSS + Tailwind Animate
+- **SEO Engine**: Pre-rendering script generating static pages and dynamic meta tags
+
+---
 
 ## Project Structure
 
 ```text
 zyro-kim/
-├── app/                  # Main web application frontend
+├── app/                        # Main web application frontend
+│   ├── public/                 # Static web assets & pre-rendered SEO pages
+│   ├── scripts/                # Automated SEO & sitemap pre-rendering scripts
+│   │   └── generate-seo.js
 │   ├── src/
-│   │   ├── components/   # Modular UI, layout, and feature components
-│   │   ├── pages/        # Student, company, mentor, admin, and public views
-│   │   ├── services/     # Supabase API services and query caching layer
-│   │   ├── lib/          # Helper utilities and request deduplication registry
-│   │   └── types/        # TypeScript interfaces and type definitions
-│   ├── public/           # Static web assets and pre-rendered SEO files
-│   └── package.json
-├── branding/             # Brand logos, visual identity assets, and media
-├── docs/                 # System architecture, workflows, and engineering specs
-├── supabase/             # Database migrations, RLS policies, and seed data
-├── CHANGELOG.md          # Release history and version updates
-├── CONTRIBUTING.md       # Contribution guidelines and workflow rules
-├── LICENSE               # Open-source MIT License terms
-└── SECURITY.md           # Vulnerability reporting and security policies
+│   │   ├── components/         # Reusable UI & feature components
+│   │   │   ├── certificates/   # Digital certificate components & print layouts
+│   │   │   ├── common/         # Buttons, modals, spinners, and badges
+│   │   │   ├── navigation/     # Public/Dashboard headers, footers, & social CTAs
+│   │   │   ├── offer-letters/  # Offer letter documents & management modals
+│   │   │   ├── tasks/          # Modular task management workspace & review drawer
+│   │   │   └── ui/             # Radix UI primitives & text animation engines
+│   │   ├── config/             # Site configuration (`site.ts`) & social links
+│   │   ├── lib/                # Utility helpers & request deduplication registry
+│   │   ├── pages/              # Portal views (Student, Company, Mentor, Admin, Public)
+│   │   ├── services/           # Supabase service layer with SWR caching
+│   │   └── types/              # TypeScript interfaces & database schemas
+│   ├── package.json            # Node.js dependencies & npm scripts
+│   └── vite.config.ts          # Vite build, chunking, & alias configuration
+├── branding/                   # Official logo assets, social graphics, & identity
+├── docs/                       # Architecture, engineering specs, & performance reports
+│   ├── ARCHITECTURE.md
+│   ├── ENGINEERING_PRINCIPLES.md
+│   ├── GIT_WORKFLOW.md
+│   ├── OPTIMISTIC_UPDATES.md
+│   ├── PRODUCT_VISION.md
+│   ├── REQUEST_DEDUPLICATION.md
+│   ├── STALE_WHILE_REVALIDATE.md
+│   └── performance/            # Mobile audit reports & benchmarking data
+├── supabase/                   # Database migrations, RLS policies, & Edge Functions
+├── CHANGELOG.md                # Detailed release history and version tracking
+├── CONTRIBUTING.md             # Guidelines for community contributions
+├── LICENSE                     # Open-source MIT License terms
+├── README.md                   # Project overview & documentation
+└── SECURITY.md                 # Vulnerability disclosure & security policies
 ```
+
+---
 
 ## Quick Start
 
 ### Prerequisites
 
-Ensure the following dependencies are installed on your environment:
-- **Node.js**: v18.0.0 or higher
-- **npm**: v9.0.0 or higher
-- **Git**: v2.30.0 or higher
+Ensure your environment meets the following requirements:
+- **Node.js**: `v18.0.0` or higher (v20+ recommended)
+- **npm**: `v9.0.0` or higher
+- **Git**: `v2.30.0` or higher
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/ilyaskhan12Q/ZYR0.git
    cd ZYR0
    ```
 
-2. Navigate into the application directory and install packages:
+2. **Install project dependencies**:
    ```bash
    cd app
    npm install
    ```
 
-### Environment Setup
+### Environment Configuration
 
-Create a `.env` file inside the `app/` directory by copying the provided template:
+Create a `.env` file in the `app/` directory by copying the example environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-Configure your Supabase credentials in `app/.env`:
+Configure your Supabase URL, Anonymous Key, and optional social links in `app/.env`:
 
 ```env
 VITE_SUPABASE_URL=https://your-supabase-instance.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_LINKEDIN_COMPANY_URL=https://linkedin.com/company/zyr0-co
+VITE_WHATSAPP_CHANNEL_URL=https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F
 ```
 
-### Running Locally
+### Development Server
 
-Start the Vite development server with Hot Module Replacement (HMR):
+Start the local Vite development server with Hot Module Replacement (HMR):
 
 ```bash
 npm run dev
 ```
 
-The application will be available locally at `http://localhost:5173`.
+The application will be accessible at `http://localhost:5173`.
 
-### Production Build
+### Production Build & Pre-Rendering
 
-To compile TypeScript code, generate the production asset bundle, and run the static SEO generation script:
+To compile TypeScript code, generate optimized production assets, and execute the static SEO pre-rendering pipeline:
 
 ```bash
 npm run build
 ```
 
-To preview the built production site locally:
+To preview the production build locally:
 
 ```bash
 npm run preview
 ```
 
+---
+
 ## Documentation
 
-Comprehensive engineering documentation is maintained in the [`/docs`](./docs) directory:
+For technical details, architectural blueprints, and engineering standards, explore the [`/docs`](./docs) directory:
 
-- **[Product Vision](./docs/PRODUCT_VISION.md)**: Product mission, core philosophy, and feature scope.
-- **[Architecture Guide](./docs/ARCHITECTURE.md)**: System design, feature isolation principles, and data flow patterns.
-- **[Engineering Principles](./docs/ENGINEERING_PRINCIPLES.md)**: Coding conventions, performance benchmarks, and quality gates.
-- **[Git Workflow](./docs/GIT_WORKFLOW.md)**: Branching policy, commit message formatting, and PR requirements.
-- **[Security Policy](./SECURITY.md)**: Vulnerability reporting guidelines and defense-in-depth security measures.
-- **[Changelog](./CHANGELOG.md)**: Versioned history of features, optimizations, and fixes.
+- 📖 **[Product Vision](./docs/PRODUCT_VISION.md)** — Core mission, target audience, and platform roadmap.
+- 🏗️ **[Architecture Guide](./docs/ARCHITECTURE.md)** — System architecture, database patterns, and service boundaries.
+- ⚡ **[Engineering Principles](./docs/ENGINEERING_PRINCIPLES.md)** — Code quality benchmarks, type safety rules, and performance standards.
+- 🔄 **[Optimistic Updates](./docs/OPTIMISTIC_UPDATES.md)** — Frontend state synchronization and caching strategy.
+- 🛡️ **[Request Deduplication](./docs/REQUEST_DEDUPLICATION.md)** — API request deduplication registry and performance optimization.
+- 🌿 **[Git Workflow](./docs/GIT_WORKFLOW.md)** — Branching model, commit conventions, and pull request policies.
+- 🔐 **[Security Policy](./SECURITY.md)** — Vulnerability reporting channels and row-level security implementation.
+- 📜 **[Changelog](./CHANGELOG.md)** — Release history and detailed feature changes.
+
+---
 
 ## Contributing
 
-Contributions from the developer community are welcome. Whether you are addressing a bug, optimizing performance, or proposing a workflow improvement, your help is appreciated.
+We welcome contributions from the developer community! Whether fixing a bug, enhancing UI accessibility, or proposing a new feature, your help is appreciated.
 
-Please read **[CONTRIBUTING.md](./CONTRIBUTING.md)** before opening a pull request to understand our branching standards, code formatting expectations, and submission process.
+Please review **[CONTRIBUTING.md](./CONTRIBUTING.md)** before opening a pull request to ensure adherence to our branching conventions, commit standards, and code formatting rules.
+
+---
 
 ## Security
 
-We take security seriously. If you discover a vulnerability, please review our **[SECURITY.md](./SECURITY.md)** for private reporting channels and disclosure policies.
+Security is fundamental to ZYR0. If you discover a security vulnerability or security defect, please report it privately according to our **[SECURITY.md](./SECURITY.md)** guidelines rather than opening a public issue.
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See the **[LICENSE](./LICENSE)** file for full terms and conditions.
+This project is open-source software licensed under the **[MIT License](./LICENSE)**.
+
+---
 
 ## Acknowledgements
 
-ZYR0 is built using tools and libraries created by the open-source community, including React, Vite, Supabase, Tailwind CSS, Radix UI, Lucide, and TypeScript. We appreciate the hard work of all maintainers whose tools make this platform possible.
+ZYR0 is made possible through open-source software built by amazing communities, including React, Vite, Supabase, Tailwind CSS, Radix UI, Lucide, and TypeScript. We extend our sincere gratitude to all open-source maintainers.
 
-## From the Developers
+---
 
-ZYR0 was founded on a straightforward belief: practical skills should be demonstrated through real work, not just academic credentials. We view software engineering as a discipline rooted in craft, clarity, and continuous iteration.
+## From the Core Team
 
-We are truly grateful to everyone who tests, uses, or contributes to ZYR0. Building high-quality software is a collaborative journey, and every feedback submission, bug fix, and feature contribution helps move the platform forward. We are excited about what lies ahead and look forward to shaping the future of workforce readiness together.
+> ZYR0 was founded on a straightforward belief: **practical engineering capability should be demonstrated through real proof of work, not just academic credentials.** We view software development as a craft rooted in clarity, accountability, and continuous improvement.
+
+We are deeply grateful to everyone who tests, uses, or contributes to ZYR0. Every bug report, code submission, and feedback note brings us closer to shaping the future of workforce readiness.
+
