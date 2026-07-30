@@ -1,13 +1,23 @@
-# ZYR0
+<p align="center">
+  <a href="https://github.com/ilyaskhan12Q/ZYR0">
+    <img src="app/public/zyro-logo.png" alt="ZYR0 Logo" width="160" />
+  </a>
+</p>
 
-> A modern, transparent, and project-driven internship and workforce readiness platform.
+<h1 align="center">ZYR0</h1>
 
-[![Version](https://img.shields.io/badge/version-0.16.2-blue.svg)](CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![React](https://img.shields.io/badge/React-19-61dafb.svg?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6.svg?logo=typescript)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-7-646cff.svg?logo=vite)](https://vitejs.dev/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e.svg?logo=supabase)](https://supabase.com/)
+<p align="center">
+  <strong>A modern, transparent, and project-driven internship and workforce readiness platform.</strong>
+</p>
+
+<p align="center">
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.16.2-blue.svg" alt="Version" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react" alt="React" /></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178c6.svg?logo=typescript" alt="TypeScript" /></a>
+  <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-7-646cff.svg?logo=vite" alt="Vite" /></a>
+  <a href="https://supabase.com/"><img src="https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e.svg?logo=supabase" alt="Supabase" /></a>
+</p>
 
 ---
 
@@ -28,36 +38,36 @@ ZYR0 solves this challenge by delivering a centralized ecosystem where companies
 
 ## Core Features
 
-### 🌟 Premium Visual Identity & Dynamic Hero System
+### Premium Visual Identity & Dynamic Hero System
 - **Enterprise Display Typography**: Powered by **Sora** display font paired with **Inter** body typography for an authoritative brand identity.
 - **Spring-Animated Text Rotating Engine**: Dynamic phrase rotator built with spring physics and accessibility fallbacks.
 - **High-Performance Canvas Particle System**: Light-weight, 60 FPS HTML5 2D Canvas particles (`CanvasParticles`) respecting device constraints and reduced motion settings.
 - **Glassmorphism UI & Accent Glows**: Custom HSL color tokens featuring Emerald → Cyan → Indigo gradients and layered ambient glows.
 
-### 🏢 Modular Task Management & Review Workspace
+### Modular Task Management & Review Workspace
 - **KPI Metrics Header**: Real-time task statistics tracking active, completed, and pending submissions with tab-based filtering.
 - **Advanced Multi-Criterion Filtering**: Filter by search terms, task status, priority levels, and sort orders with instant grid/table view toggles.
 - **Single & Bulk Task Delegation**: Delegate assignments to individual interns or bulk-assign to all active interns with automated notifications.
 - **PR-Style Split-Pane Review Drawer**: Dedicated evaluation interface for mentors featuring rubric-based scoring, inline code review, and structured feedback templates.
 
-### 📄 Offer Letter Management & High-Fidelity Printing
+### Offer Letter Management & High-Fidelity Printing
 - **High-Fidelity Document Rendering**: Automated generation of official offer letters complete with company branding, security seals, and owner signatures.
 - **Offline Canvas QR Code Generation**: Instant, network-independent canvas-rendered QR verification badges embedded into every document.
 - **Print Layout Isolation**: Purpose-built `@media print` rules ensuring pixel-perfect browser-native printing (`window.print()`) and PDF export without UI clutter.
 
-### 📜 Verifiable Digital Credentials
+### Verifiable Digital Credentials
 - **Cryptographically Signed Certificates**: Publicly verifiable digital certificates issued to interns upon successful program completion.
 - **Dynamic Signature & Logo Integration**: Real-time embedding of mentor/supervisor signatures and official company logos.
 - **Public Verification Endpoint**: Direct verification link allowing employers and institutions to validate certificate authenticity.
 
-### 📊 Database-Backed Dynamic Telemetry & Analytics
+### Database-Backed Dynamic Telemetry & Analytics
 - **Live Platform Metrics**: 100% database-backed telemetry tracking application volumes, active internships, user growth, and completion rates.
 - **Zero-Placeholder Architecture**: Stripped-down mock metrics ensuring all dashboard analytics reflect real PostgreSQL data.
 
-### 🌐 Official Community & Social Connectivity
+### Official Community & Social Connectivity
 - **Official Brand Connectivity**: Integrated CTAs for the official **[ZYR0 LinkedIn Profile](https://linkedin.com/company/zyr0-co)** and **[WhatsApp Channel](https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F)** across navigation headers, footers, and contact sections.
 
-### ⚡ Mobile Performance & SEO Engine
+### Mobile Performance & SEO Engine
 - **Per-Page Route Code Splitting**: Sub-15 kB initial page loads across portal routes with lazy-loaded vendor chunks (e.g., Recharts).
 - **Pre-Rendered Static SEO**: Automated script (`generate-seo.js`) generating static HTML files with JSON-LD Organization, FAQPage, and ContactPage schemas.
 
@@ -198,14 +208,14 @@ npm run preview
 
 For technical details, architectural blueprints, and engineering standards, explore the [`/docs`](./docs) directory:
 
-- 📖 **[Product Vision](./docs/PRODUCT_VISION.md)** — Core mission, target audience, and platform roadmap.
-- 🏗️ **[Architecture Guide](./docs/ARCHITECTURE.md)** — System architecture, database patterns, and service boundaries.
-- ⚡ **[Engineering Principles](./docs/ENGINEERING_PRINCIPLES.md)** — Code quality benchmarks, type safety rules, and performance standards.
-- 🔄 **[Optimistic Updates](./docs/OPTIMISTIC_UPDATES.md)** — Frontend state synchronization and caching strategy.
-- 🛡️ **[Request Deduplication](./docs/REQUEST_DEDUPLICATION.md)** — API request deduplication registry and performance optimization.
-- 🌿 **[Git Workflow](./docs/GIT_WORKFLOW.md)** — Branching model, commit conventions, and pull request policies.
-- 🔐 **[Security Policy](./SECURITY.md)** — Vulnerability reporting channels and row-level security implementation.
-- 📜 **[Changelog](./CHANGELOG.md)** — Release history and detailed feature changes.
+- **[Product Vision](./docs/PRODUCT_VISION.md)** — Core mission, target audience, and platform roadmap.
+- **[Architecture Guide](./docs/ARCHITECTURE.md)** — System architecture, database patterns, and service boundaries.
+- **[Engineering Principles](./docs/ENGINEERING_PRINCIPLES.md)** — Code quality benchmarks, type safety rules, and performance standards.
+- **[Optimistic Updates](./docs/OPTIMISTIC_UPDATES.md)** — Frontend state synchronization and caching strategy.
+- **[Request Deduplication](./docs/REQUEST_DEDUPLICATION.md)** — API request deduplication registry and performance optimization.
+- **[Git Workflow](./docs/GIT_WORKFLOW.md)** — Branching model, commit conventions, and pull request policies.
+- **[Security Policy](./SECURITY.md)** — Vulnerability reporting channels and row-level security implementation.
+- **[Changelog](./CHANGELOG.md)** — Release history and detailed feature changes.
 
 ---
 
