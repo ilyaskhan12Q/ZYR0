@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.1] - 2026-07-31
+
+### Fixed
+- **Certificate PDF Footer Alignment (`fix/certificate-pdf-footer-alignment`)**:
+  - Standardized the certificate PDF export and browser preview footer layouts using a deterministic, 3-column CSS Grid (`grid-cols-3` / `grid-template-columns: repeat(3, 1fr)`).
+  - Eliminated layout drift, flexbox collapse, and absolute positioning discrepancies between browser preview, print preview, print dialogs, and exported PDF documents.
+  - Symmetrically aligned metadata (Credential ID, Issue Date, Blockchain Hash) in the left column, QR code image and "Scan to Verify" label in the center column, and tamper-proof verification text with platform branding in the right column.
+
 ## [0.17.0] - 2026-07-31
 
 ### Added
