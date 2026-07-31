@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.2] - 2026-07-31
+
+### Changed
+- **Repository-Wide Unified Loading System Migration (`feature/unified-loading-system`)**:
+  - Replaced legacy `lucide-react` `Loader2` spinners across all `mentor/` and `admin/` pages (`Dashboard`, `Companies`, `Certificates`, `Users`, `Logs`, `Analytics`, `Reports`, `Internships`, `Evaluations`, `Profile`, `Settings`, `Tasks`, `Interns`).
+  - Standardized asynchronous UI states using `@/components/common/Loader` (`page`, `inline`, `button` variants) with consistent ZYR0 dot-matrix (`DotmSquare14`) glow styling.
+  - Enhanced `LoaderProps` and `ButtonLoaderProps` interfaces to provide seamless backwards compatibility for `text`, `message`, `loading`, and `loadingText` props.
+  - Verified 100% clean TypeScript build (`tsc --noEmit`) with zero errors across the entire codebase.
+
 ## [0.17.1] - 2026-07-31
 
 ### Fixed
