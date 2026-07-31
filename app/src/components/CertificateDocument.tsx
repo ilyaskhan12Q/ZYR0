@@ -419,39 +419,70 @@ export default function CertificateDocument({ certificate }: CertificateDocument
             }
 
             /* ── Bottom metadata bar ──────────────────────────────────────
-               Replaces the previous absolute-positioned .meta-block and
-               .qr-block with a normal-flow flex row that sits at the bottom
-               of .cert-border.  This ensures equal left/right margins and
-               consistent spacing regardless of print scaling. */
+               Deterministic 3-column grid layout (Left: ID/Date/Hash | Center: QR & Scan to Verify | Right: Verification & Branding)
+               Guarantees pixel-perfect alignment across browser preview, print preview, and PDF output. */
             .bottom-bar {
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-end;
-              padding: 16px 20px 0 20px;
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              align-items: center;
+              gap: 16px;
+              width: 100%;
+              padding-top: 16px;
               margin-top: 16px;
+              border-top: 1px solid #e2e8f0;
+              box-sizing: border-box;
             }
             .meta-block {
-              font-size: 10px;
-              color: #94a3b8;
-              font-family: monospace;
-              line-height: 1.6;
+              text-align: left;
+              font-size: 9px;
+              color: #64748b;
+              font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+              line-height: 1.5;
+            }
+            .meta-block span {
+              color: #1e293b;
+              font-weight: 600;
             }
             .qr-block {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
               text-align: center;
             }
             .qr-image {
-              width: 70px;
-              height: 70px;
+              width: 56px;
+              height: 56px;
               border: 1px solid #e2e8f0;
-              padding: 3px;
-              background: white;
+              padding: 2px;
+              background: #ffffff;
+              border-radius: 4px;
+              object-fit: contain;
             }
             .qr-label {
-              font-size: 8px;
-              color: #64748b;
+              font-size: 9px;
+              font-weight: 700;
+              color: #334155;
               margin-top: 4px;
               text-transform: uppercase;
               letter-spacing: 0.5px;
+            }
+            .verify-right-block {
+              text-align: right;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-end;
+              justify-content: center;
+            }
+            .verify-text {
+              font-size: 10px;
+              font-weight: 700;
+              color: #334155;
+            }
+            .branding-text {
+              font-size: 9px;
+              color: #64748b;
+              margin-top: 2px;
             }
 
             @media print {
@@ -471,7 +502,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
               .cert-border {
                 overflow: visible;
               }
-              .footer-sections {
+              .footer-sections, .bottom-bar {
                 page-break-inside: avoid;
                 break-inside: avoid;
               }
@@ -536,20 +567,24 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
               <div class="bottom-bar">
                 <div class="meta-block">
-                  ID: ${certificate.credential_id}<br/>
-                  Issued: ${issueDateStr}<br/>
-                  Hash: ${certificate.blockchain_hash ? certificate.blockchain_hash.slice(0, 24) + '...' : 'N/A'}
+                  CREDENTIAL ID: <span>${certificate.credential_id}</span><br/>
+                  ISSUE DATE: <span>${issueDateStr}</span><br/>
+                  HASH: <span>${certificate.blockchain_hash ? (certificate.blockchain_hash.length > 24 ? certificate.blockchain_hash.slice(0, 24) + '...' : certificate.blockchain_hash) : 'N/A'}</span>
                 </div>
                 <div class="qr-block">
                   <img
                     class="qr-image"
                     src="${qrSrc}"
                     alt="Verification QR"
-                    width="70"
-                    height="70"
+                    width="56"
+                    height="56"
                     onerror="this.onerror=null;this.src='${qrCodeUrl}';"
-                  /><br/>
+                  />
                   <span class="qr-label">Scan to Verify</span>
+                </div>
+                <div class="verify-right-block">
+                  <div class="verify-text">Tamper-proof Digital Credential</div>
+                  <div class="branding-text">ZYR0 Platform Verified Record</div>
                 </div>
               </div>
             </div>
@@ -666,21 +701,36 @@ export default function CertificateDocument({ certificate }: CertificateDocument
         )}
 
         {/* Footer verification & QR block */}
-        <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-slate-100 dark:border-slate-900 text-left">
+        <div className="w-full grid grid-cols-3 items-center gap-4 mt-8 pt-6 border-t border-slate-100 dark:border-slate-900 text-left">
+          {/* Left: Certificate ID, Issue Date, Hash */}
           <div className="space-y-1 font-mono text-[9px] text-slate-400 dark:text-slate-500">
-            <p>CREDENTIAL ID: <span className="text-slate-600 dark:text-slate-300 font-semibold">{certificate.credential_id}</span></p>
-            <p>ISSUE DATE: <span className="text-slate-600 dark:text-slate-300 font-semibold">{issueDateStr}</span></p>
-            {certificate.blockchain_hash && (
-              <p className="truncate max-w-[280px]">HASH: <span className="text-slate-600 dark:text-slate-300 font-semibold">{certificate.blockchain_hash}</span></p>
-            )}
+            <p className="truncate">CREDENTIAL ID: <span className="text-slate-600 dark:text-slate-300 font-semibold">{certificate.credential_id}</span></p>
+            <p className="truncate">ISSUE DATE: <span className="text-slate-600 dark:text-slate-300 font-semibold">{issueDateStr}</span></p>
+            <p className="truncate max-w-[280px]">
+              HASH: <span className="text-slate-600 dark:text-slate-300 font-semibold">{certificate.blockchain_hash ? (certificate.blockchain_hash.length > 24 ? certificate.blockchain_hash.slice(0, 24) + '...' : certificate.blockchain_hash) : 'N/A'}</span>
+            </p>
           </div>
 
-          <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-900/60 p-2 rounded-lg border border-slate-100 dark:border-slate-900/80">
-            <img src={qrCodeUrl} alt="Verify QR Code" className="w-12 h-12 bg-white p-0.5 rounded" />
-            <div>
-              <p className="text-[10px] font-bold text-slate-700 dark:text-slate-300">Scan to Verify</p>
-              <p className="text-[8px] text-slate-400 dark:text-slate-500">Tamper-proof digital copy</p>
-            </div>
+          {/* Center: QR Code & Scan to Verify */}
+          <div className="flex flex-col items-center justify-center text-center">
+            <img
+              src={qrCodeUrl}
+              alt="Scan to Verify QR Code"
+              className="w-14 h-14 bg-white p-0.5 rounded border border-slate-200 dark:border-slate-800 shadow-sm object-contain"
+            />
+            <span className="text-[9px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mt-1">
+              Scan to Verify
+            </span>
+          </div>
+
+          {/* Right: Verification Text & Platform Branding */}
+          <div className="text-right flex flex-col items-end justify-center space-y-0.5">
+            <p className="text-[10px] font-bold text-slate-700 dark:text-slate-300">
+              Tamper-proof Digital Credential
+            </p>
+            <p className="text-[9px] text-slate-400 dark:text-slate-500">
+              ZYR0 Platform Verified Record
+            </p>
           </div>
         </div>
       </div>
