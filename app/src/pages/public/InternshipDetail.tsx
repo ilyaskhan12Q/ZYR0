@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Share2, CheckCircle2, Building2, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Share2, CheckCircle2, Building2, ExternalLink } from 'lucide-react';
+import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { getInternshipById } from '@/services/internships';
 import { applyToInternship, hasApplied } from '@/services/applications';
 import { useAuth } from '@/contexts/AuthContext';
@@ -83,11 +84,7 @@ export default function InternshipDetail() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen pt-20">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" label="Loading internship details..." />;
   }
 
   if (error || !internship) {
@@ -380,7 +377,7 @@ export default function InternshipDetail() {
                   className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {applying ? (
-                    <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</>
+                    <ButtonLoader loading={true} loadingText="Submitting..." />
                   ) : internship.deadline && new Date(internship.deadline).getTime() < now ? (
                     'Deadline Passed'
                   ) : (

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, Loader2 } from 'lucide-react';
+import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar } from 'lucide-react';
+import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTasksAssignedByMe, reviewSubmission, updateTask } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
@@ -136,11 +137,7 @@ export default function MentorTasks() {
   };
 
   if (loading || !profile) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading assigned tasks..." />;
   }
 
   const studentIdParam = searchParams.get('studentId') || searchParams.get('student_id');
@@ -352,7 +349,11 @@ export default function MentorTasks() {
                         disabled={submitting[task.id] || !submission}
                         className="px-3.5 py-2 bg-emerald-500 text-white rounded-lg text-xs font-semibold hover:bg-emerald-600 transition-colors disabled:opacity-50 flex items-center gap-1"
                       >
-                        {submitting[task.id] && <Loader2 className="w-3.5 h-3.5 animate-spin" />} Approve Task
+                        {submitting[task.id] ? (
+                          <ButtonLoader loading={true} loadingText="Approving..." />
+                        ) : (
+                          'Approve Task'
+                        )}
                       </button>
                     </div>
                   </div>

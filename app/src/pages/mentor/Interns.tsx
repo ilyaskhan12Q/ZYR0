@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ClipboardList, CheckSquare, Star, MessageSquare, Loader2, Users } from 'lucide-react';
+import { ClipboardList, CheckSquare, Star, MessageSquare, Users } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -110,11 +111,7 @@ export default function MentorInterns() {
   }, [profile]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading interns list..." />;
   }
 
   if (!profile?.company_id) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Briefcase, Building, Save, Upload, Loader2, Link as LinkIcon, Info } from 'lucide-react';
+import { User, Mail, Briefcase, Building, Save, Upload, Link as LinkIcon, Info } from 'lucide-react';
+import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { updateMyProfile, uploadAvatar } from '@/services/users';
 import { getCompanyById } from '@/services/companies';
@@ -100,11 +101,7 @@ export default function MentorProfile() {
   };
 
   if (!profile || !user) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading profile..." />;
   }
 
   return (
@@ -120,11 +117,10 @@ export default function MentorProfile() {
           className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
         >
           {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <ButtonLoader loading={true} loadingText="Saving..." />
           ) : (
-            <Save className="w-4 h-4" />
+            <><Save className="w-4 h-4" /> {saved ? 'Saved!' : 'Save Changes'}</>
           )}
-          {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
 
@@ -140,7 +136,7 @@ export default function MentorProfile() {
             />
             <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center shadow-md hover:bg-accent/90 cursor-pointer">
               {uploadingAvatar ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader variant="inline" size={16} />
               ) : (
                 <Upload className="w-4 h-4" />
               )}
@@ -210,7 +206,7 @@ export default function MentorProfile() {
         
         {loadingCompany ? (
           <div className="flex items-center justify-center py-6">
-            <Loader2 className="w-6 h-6 animate-spin text-accent" />
+            <Loader variant="inline" text="Loading company details..." />
           </div>
         ) : company ? (
           <div className="flex items-start gap-4 p-4 bg-muted/30 border border-border rounded-xl">

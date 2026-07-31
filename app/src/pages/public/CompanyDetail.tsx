@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, MapPin, Globe, Users, FolderOpen, Mail, Phone, Calendar, Award, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Globe, Users, FolderOpen, Mail, Phone, Calendar, Award, ExternalLink } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getCompanyById } from '@/services/companies';
 import { getInternships } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
@@ -70,11 +71,7 @@ export default function CompanyDetail() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" label="Loading company profile..." />;
   }
 
   if (!company) {

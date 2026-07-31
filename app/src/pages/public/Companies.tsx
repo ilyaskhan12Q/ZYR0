@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Globe, Star, FolderOpen, Users, X, Loader2 } from 'lucide-react';
+import { Search, MapPin, Globe, Star, FolderOpen, Users, X } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getCompanies } from '@/services/companies';
 import { supabase } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
@@ -98,9 +99,7 @@ export default function Companies() {
         </motion.div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-accent" />
-          </div>
+          <Loader variant="container" label="Loading companies..." />
         ) : companies.length === 0 ? (
           <p className="text-muted-foreground text-center py-20">No companies found.</p>
         ) : (

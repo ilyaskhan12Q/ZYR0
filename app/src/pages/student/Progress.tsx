@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, CheckCircle2, Clock, Target, Award, BookOpen, Code, Users, MessageSquare, Lightbulb, Star, Loader2 } from 'lucide-react';
+import { TrendingUp, CheckCircle2, Clock, Target, Award, BookOpen, Code, Users, MessageSquare, Lightbulb, Star } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCertificates } from '@/services/certificates';
 import { getMyTasks } from '@/services/tasks';
@@ -45,11 +46,7 @@ export default function StudentProgress() {
   }, [profile]);
 
   if (loading || !profile) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading progress statistics..." />;
   }
 
   const completedTasks = tasks.filter(t => t.status === 'Approved').length;

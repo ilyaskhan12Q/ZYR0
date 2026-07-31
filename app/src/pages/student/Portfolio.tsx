@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Briefcase, Award, Code, Star, Share2, MapPin, GraduationCap, Calendar, Quote, Loader2, CheckCircle2 } from 'lucide-react';
+import { Briefcase, Award, Code, Star, Share2, MapPin, GraduationCap, Calendar, Quote, CheckCircle2 } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCertificates } from '@/services/certificates';
 import { getMyTasks } from '@/services/tasks';
@@ -52,11 +53,7 @@ export default function StudentPortfolio() {
   }, [profile]);
 
   if (loading || !profile) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading portfolio..." />;
   }
 
   // Filter accepted applications as real internship experiences

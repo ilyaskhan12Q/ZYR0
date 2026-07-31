@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, ClipboardList, CheckSquare, Star, ArrowRight, Clock, MessageSquare, Loader2 } from 'lucide-react';
+import { Users, ClipboardList, CheckSquare, Star, ArrowRight, Clock, MessageSquare } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { getTasksAssignedByMe } from '@/services/tasks';
 import { supabase } from '@/lib/supabase';
@@ -62,11 +63,7 @@ export default function MentorDashboard() {
   }, [profile]);
 
   if (loading || !profile) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading mentor dashboard..." />;
   }
 
   // Filter tasks that need review (status is "Submitted" or "Under Review")

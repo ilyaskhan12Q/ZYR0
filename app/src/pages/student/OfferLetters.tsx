@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Download, CheckCircle2, XCircle, Search, Eye,
-  Clock, AlertTriangle, Loader2, Building2, Calendar, MapPin,
+  Clock, AlertTriangle, Building2, Calendar, MapPin,
   BadgeCheck, RotateCcw, ExternalLink, Briefcase
 } from 'lucide-react';
+import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getMyOfferLetters,
@@ -146,11 +147,7 @@ export default function StudentOfferLetters() {
 
   // ── Loading ─────────────────────────────────────────────────────────────────
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading offer letters..." />;
   }
 
   return (
@@ -332,8 +329,7 @@ export default function StudentOfferLetters() {
                         disabled={responding === offer.id}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm hover:bg-emerald-700 transition-colors disabled:opacity-50"
                       >
-                        {responding === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                        Accept
+                        {responding === offer.id ? <ButtonLoader loading={true} loadingText="Accepting..." /> : <><CheckCircle2 className="w-4 h-4" /> Accept</>}
                       </button>
                       <button
                         onClick={() => handleReject(offer.id)}
@@ -548,8 +544,7 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
                   disabled={responding === offer.id}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
                 >
-                  {responding === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  Accept Offer
+                  {responding === offer.id ? <ButtonLoader loading={true} loadingText="Accepting..." /> : <><CheckCircle2 className="w-4 h-4" /> Accept Offer</>}
                 </button>
                 <button
                   onClick={() => onReject(offer.id)}

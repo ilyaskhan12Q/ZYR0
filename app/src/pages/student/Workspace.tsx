@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
-  Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, Loader2, ArrowRight
+  Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight
 } from 'lucide-react';
+import { ButtonLoader } from '@/components/common/Loader';
 import { getMyActiveInternships } from '@/services/internships';
 import { getMyTasks, submitTask } from '@/services/tasks';
 import { getMyCertificates } from '@/services/certificates';
@@ -915,9 +916,7 @@ export default function StudentWorkspace() {
                               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
                             >
                               {submitting ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> Submitting...
-                                </>
+                                <ButtonLoader loading={true} loadingText="Submitting..." />
                               ) : (
                                 'Submit Solution'
                               )}

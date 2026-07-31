@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save, Loader2 } from 'lucide-react';
+import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save } from 'lucide-react';
+import { ButtonLoader } from '@/components/common/Loader';
+
+// ... (skipping to component usage)
+
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -130,11 +134,10 @@ export default function MentorSettings() {
           className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
         >
           {updatingPassword ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <ButtonLoader loading={true} loadingText="Saving..." />
           ) : (
-            <Save className="w-4 h-4" />
+            <><Save className="w-4 h-4" /> {saved ? 'Saved!' : 'Save Changes'}</>
           )}
-          {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
 

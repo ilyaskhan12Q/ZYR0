@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageSquare, AlertCircle, CheckCircle2, Circle, Loader2 } from 'lucide-react';
+import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageSquare, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyApplications } from '@/services/applications';
 import { getMyTasks } from '@/services/tasks';

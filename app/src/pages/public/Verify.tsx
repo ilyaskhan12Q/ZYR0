@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { certificates as mockCertificates } from '@/data/mockData';
 import CertificateDocument from '@/components/CertificateDocument';
 import { SEO } from '@/components/SEO';
+import { ButtonLoader } from '@/components/common/Loader';
 
 export default function Verify() {
   const { code } = useParams();
@@ -158,7 +159,7 @@ export default function Verify() {
               className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus-visible-ring"
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true" />
+                <ButtonLoader size={16} dotSize={2.5} />
               ) : (
                 'Verify'
               )}

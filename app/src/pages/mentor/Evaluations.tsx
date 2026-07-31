@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckSquare, Star, Save, Send, ChevronDown, ChevronUp, User, Award, ThumbsUp, ThumbsDown, Loader2, Info } from 'lucide-react';
+import { CheckSquare, Star, Save, Send, ChevronDown, ChevronUp, User, Award, ThumbsUp, ThumbsDown, Info } from 'lucide-react';
+import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -238,11 +239,7 @@ export default function MentorEvaluations() {
   const toggleSection = (section: string) => setExpandedSection(expandedSection === section ? null : section);
 
   if (loadingInterns) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading interns list..." />;
   }
 
   if (interns.length === 0) {
@@ -322,7 +319,7 @@ export default function MentorEvaluations() {
 
       {loadingEvaluation ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+          <Loader variant="inline" text="Loading evaluation data..." />
         </div>
       ) : (
         <>
@@ -490,16 +487,22 @@ export default function MentorEvaluations() {
                 onClick={() => handleSave('Draft')}
                 className="flex-1 flex items-center justify-center gap-2 py-3 border border-border rounded-lg font-medium hover:bg-muted transition-colors disabled:opacity-50"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Save Draft
+                {saving ? (
+                  <ButtonLoader loading={true} loadingText="Saving..." />
+                ) : (
+                  <><Save className="w-4 h-4" /> Save Draft</>
+                )}
               </button>
               <button 
                 disabled={saving}
                 onClick={() => handleSave('Submitted')}
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
               >
-                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                Submit Evaluation
+                {saving ? (
+                  <ButtonLoader loading={true} loadingText="Submitting..." />
+                ) : (
+                  <><Send className="w-4 h-4" /> Submit Evaluation</>
+                )}
               </button>
             </div>
           )}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Shield, GraduationCap, Building2, UserCheck, Eye, ToggleLeft, ToggleRight, Loader2 } from 'lucide-react';
+import { Search, Shield, GraduationCap, Building2, UserCheck, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getAllUsers, updateUserStatus } from '@/services/users';
 
 const tabs = ['All', 'Student', 'Company', 'Mentor', 'Admin'];
@@ -81,9 +82,7 @@ export default function AdminUsers() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[30vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
+        <Loader variant="page" text="Loading users..." />
       ) : (
         <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
