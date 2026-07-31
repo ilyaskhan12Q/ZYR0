@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, Loader2, MessageSquare } from 'lucide-react';
+import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, MessageSquare } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getMyApplications } from '@/services/applications';
 
 const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
@@ -32,11 +33,7 @@ export default function StudentApplications() {
   const filtered = activeTab === 'All' ? applications : applications.filter(a => a.status === activeTab);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="container" className="min-h-[50vh]" />;
   }
 
   return (

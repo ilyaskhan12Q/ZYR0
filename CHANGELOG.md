@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2026-07-31
+
+### Added
+- **Unified Dot Matrix Loading System (`feature/unified-loading-system`)**:
+  - Integrated `@dotmatrix/dotm-square-14` Shadcn/ui component into ZYR0's design system.
+  - Built centralized wrapper component `src/components/common/Loader.tsx` with multi-variant support (`page`, `container`, `inline`, `button`, `overlay`) and `grad-aurora` preset glow branding.
+  - Standardized UI loading indicators across global application routes (`RouteLoading`, `ProtectedRoute`, `AuthCallback`), authentication flows, verification gates, form submissions (`TaskCreateEditModal`, `TaskReviewDrawer`), save buttons (`SaveButton`, `CompanyRatingWidget`), and student portals (`Applications`, `SavedInternships`).
+  - Refactored `ui/spinner.tsx` to delegate to the new `Loader` wrapper for seamless backwards compatibility.
+
 ## [0.16.2] - 2026-07-28
 
 ### Added

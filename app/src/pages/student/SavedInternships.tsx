@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Bookmark, MapPin, Calendar, DollarSign,
-  ArrowRight, Loader2, Search
+  ArrowRight, Search
 } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getSavedInternships } from '@/services/internships';
 import { SaveButton } from '@/components/SaveButton';
 
@@ -42,9 +43,7 @@ export default function StudentSavedInternships() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
+        <Loader variant="container" className="py-20" />
       ) : saves.length === 0 ? (
         <div className="text-center py-20 bg-card rounded-xl border border-border">
           <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />

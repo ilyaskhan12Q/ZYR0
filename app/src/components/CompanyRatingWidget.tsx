@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Star, Loader2 } from 'lucide-react';
+import { Star } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import {
@@ -142,9 +143,7 @@ export function CompanyRatingWidget({
 
       {/* User rating input */}
       {loading ? (
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Loader2 className="w-3 h-3 animate-spin" /> Loading your rating…
-        </div>
+        <Loader variant="inline" label="Loading your rating…" />
       ) : !authed ? (
         <p className="text-xs text-muted-foreground">
           <a href="/login" className="text-accent hover:underline">Sign in</a> to rate this company
@@ -178,7 +177,7 @@ export function CompanyRatingWidget({
                 />
               </button>
             ))}
-            {mutating && <Loader2 className="w-4 h-4 animate-spin ml-2 text-muted-foreground" />}
+            {mutating && <Loader variant="button" className="ml-2" />}
           </div>
         </div>
       )}

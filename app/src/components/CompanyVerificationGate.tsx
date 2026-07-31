@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import type { Company } from '@/lib/database.types';
-import { Loader2, ShieldAlert, ShieldX, Clock, Building2 } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
+import { ShieldAlert, ShieldX, Clock, Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface CompanyVerificationGateProps {
@@ -45,7 +46,7 @@ export default function CompanyVerificationGate({ children, mode = 'block' }: Co
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        <Loader variant="container" label="Verifying company status..." />
       </div>
     );
   }
