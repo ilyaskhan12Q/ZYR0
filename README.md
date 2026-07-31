@@ -55,10 +55,15 @@ ZYR0 solves this challenge by delivering a centralized ecosystem where companies
 - **Offline Canvas QR Code Generation**: Instant, network-independent canvas-rendered QR verification badges embedded into every document.
 - **Print Layout Isolation**: Purpose-built `@media print` rules ensuring pixel-perfect browser-native printing (`window.print()`) and PDF export without UI clutter.
 
-### Verifiable Digital Credentials
+### Verifiable Digital Credentials & Certificate Engine
 - **Cryptographically Signed Certificates**: Publicly verifiable digital certificates issued to interns upon successful program completion.
-- **Dynamic Signature & Logo Integration**: Real-time embedding of mentor/supervisor signatures and official company logos.
-- **Public Verification Endpoint**: Direct verification link allowing employers and institutions to validate certificate authenticity.
+- **High-Fidelity A4 Landscape Layout**: Professional certificate rendering featuring guilloché borders, security seals, and supervisor signature blocks.
+- **Dynamic Signature & Logo Integration**: Real-time embedding of mentor/supervisor signatures and official company logos from database profiles.
+- **Public Verification Endpoint**: Direct verification endpoint (`/verify-certificate/:code`) allowing employers and institutions to validate certificate authenticity.
+
+### Stale-While-Revalidate (SWR) Caching & Instant Sync
+- **Service-Layer SWR Caching**: In-memory caching engine reducing redundant Supabase queries while guaranteeing fresh data delivery.
+- **Targeted Cache Invalidation**: Automatic cache-purging (`clearCache`) across public, student, company, and admin portals upon internship, task, or application state changes.
 
 ### Database-Backed Dynamic Telemetry & Analytics
 - **Live Platform Metrics**: 100% database-backed telemetry tracking application volumes, active internships, user growth, and completion rates.
@@ -105,13 +110,13 @@ zyro-kim/
 │   │   └── generate-seo.js
 │   ├── src/
 │   │   ├── components/         # Reusable UI & feature components
-│   │   │   ├── certificates/   # Digital certificate components & print layouts
 │   │   │   ├── common/         # Buttons, modals, spinners, and badges
+│   │   │   ├── company/        # Verification gate & company widgets
 │   │   │   ├── navigation/     # Public/Dashboard headers, footers, & social CTAs
-│   │   │   ├── offer-letters/  # Offer letter documents & management modals
 │   │   │   ├── tasks/          # Modular task management workspace & review drawer
 │   │   │   └── ui/             # Radix UI primitives & text animation engines
 │   │   ├── config/             # Site configuration (`site.ts`) & social links
+│   │   ├── contexts/           # React context providers (AuthContext)
 │   │   ├── lib/                # Utility helpers & request deduplication registry
 │   │   ├── pages/              # Portal views (Student, Company, Mentor, Admin, Public)
 │   │   ├── services/           # Supabase service layer with SWR caching
@@ -122,11 +127,13 @@ zyro-kim/
 ├── docs/                       # Architecture, engineering specs, & performance reports
 │   ├── ARCHITECTURE.md
 │   ├── ENGINEERING_PRINCIPLES.md
+│   ├── FEATURE_STATUS.md
 │   ├── GIT_WORKFLOW.md
 │   ├── OPTIMISTIC_UPDATES.md
 │   ├── PRODUCT_VISION.md
 │   ├── REQUEST_DEDUPLICATION.md
 │   ├── STALE_WHILE_REVALIDATE.md
+│   ├── SUPABASE_EMAIL_TEMPLATES.md
 │   └── performance/            # Mobile audit reports & benchmarking data
 ├── supabase/                   # Database migrations, RLS policies, & Edge Functions
 ├── CHANGELOG.md                # Detailed release history and version tracking
@@ -213,6 +220,8 @@ For technical details, architectural blueprints, and engineering standards, expl
 - **[Engineering Principles](./docs/ENGINEERING_PRINCIPLES.md)** — Code quality benchmarks, type safety rules, and performance standards.
 - **[Optimistic Updates](./docs/OPTIMISTIC_UPDATES.md)** — Frontend state synchronization and caching strategy.
 - **[Request Deduplication](./docs/REQUEST_DEDUPLICATION.md)** — API request deduplication registry and performance optimization.
+- **[Stale-While-Revalidate Caching](./docs/STALE_WHILE_REVALIDATE.md)** — SWR caching patterns and automatic cache invalidation.
+- **[Feature Status](./docs/FEATURE_STATUS.md)** — Current status and implementation breakdown of core features.
 - **[Git Workflow](./docs/GIT_WORKFLOW.md)** — Branching model, commit conventions, and pull request policies.
 - **[Security Policy](./SECURITY.md)** — Vulnerability reporting channels and row-level security implementation.
 - **[Changelog](./CHANGELOG.md)** — Release history and detailed feature changes.
