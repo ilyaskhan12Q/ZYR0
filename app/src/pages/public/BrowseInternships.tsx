@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Search, MapPin, Calendar, DollarSign, Filter,
-  X, Clock, ArrowRight, Loader2
+  X, Clock, ArrowRight
 } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getInternships, getInternshipDomains } from '@/services/internships';
 import { SEO } from '@/components/SEO';
 import { SaveButton } from '@/components/SaveButton';
@@ -176,9 +177,7 @@ export default function BrowseInternships() {
         </motion.div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-accent" />
-          </div>
+          <Loader variant="page" label="Loading internships..." />
         ) : (
           <>
             {/* Results count */}

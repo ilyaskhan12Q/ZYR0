@@ -8,9 +8,9 @@ import {
   FileCheck, 
   Award, 
   TrendingUp, 
-  Loader2, 
   FileText 
 } from 'lucide-react';
+import { ButtonLoader } from '@/components/common/Loader';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -335,11 +335,10 @@ export default function AdminReports() {
                   className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors disabled:opacity-50"
                 >
                   {activeGen === 'pdf' ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <ButtonLoader loading={true} loadingText="Compiling..." />
                   ) : (
-                    <FileText className="w-3.5 h-3.5" />
+                    <><FileText className="w-3.5 h-3.5" /> Print Report</>
                   )}
-                  Print Report
                 </button>
                 
                 <button 
@@ -348,11 +347,10 @@ export default function AdminReports() {
                   className="flex-1 flex items-center justify-center gap-2 py-2 bg-accent text-accent-foreground font-semibold rounded-lg text-xs hover:opacity-95 transition-all disabled:opacity-50"
                 >
                   {activeGen === 'csv' ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-accent-foreground" />
+                    <ButtonLoader loading={true} loadingText="Exporting..." />
                   ) : (
-                    <Download className="w-3.5 h-3.5 text-accent-foreground" />
+                    <><Download className="w-3.5 h-3.5" /> Export CSV</>
                   )}
-                  Export CSV
                 </button>
               </div>
             </motion.div>

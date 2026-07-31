@@ -4,7 +4,6 @@ import {
   Search,
   CheckCircle2,
   Lock,
-  Loader2,
   Eye,
   Unlock,
   X,
@@ -16,6 +15,7 @@ import {
   ShieldCheck,
   ShieldAlert
 } from 'lucide-react';
+import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { getAllCompanies, updateCompanyStatus } from '@/services/companies';
 import type { Company } from '@/lib/database.types';
 
@@ -162,9 +162,7 @@ export default function AdminCompanies() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[30vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
+        <Loader variant="page" text="Loading company registrations..." />
       ) : (
         <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -427,8 +425,11 @@ export default function AdminCompanies() {
                       className="px-5 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/95 transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={submitting || !decision || (decision === 'rejected' && notes.trim().length < 10)}
                     >
-                      {submitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                      Save Decision
+                      {submitting ? (
+                        <ButtonLoader loading={true} loadingText="Saving..." />
+                      ) : (
+                        'Save Decision'
+                      )}
                     </button>
                   </div>
                 </form>

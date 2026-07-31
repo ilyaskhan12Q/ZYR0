@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Eye, Download, XCircle, Loader2 } from 'lucide-react';
+import { Search, Eye, Download, XCircle } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { supabase } from '@/lib/supabase';
 import { revokeCertificate } from '@/services/certificates';
 
@@ -89,9 +90,7 @@ export default function AdminCertificates() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[30vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
+        <Loader variant="page" text="Loading certificates..." />
       ) : (
         <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">

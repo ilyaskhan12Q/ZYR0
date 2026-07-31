@@ -10,7 +10,6 @@ import {
   ExternalLink,
   Paperclip,
   FileText,
-  Loader2,
   Sparkles,
   Calendar,
   User,

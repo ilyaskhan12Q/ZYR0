@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save, Loader2 } from 'lucide-react';
+import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';

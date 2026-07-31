@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Eye, Lock, Loader2, Unlock } from 'lucide-react';
+import { Search, Eye, Lock, Unlock } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getInternships, updateInternship } from '@/services/internships';
 
 const tabs = ['All', 'Active', 'Closed', 'Draft'];
@@ -73,9 +74,7 @@ export default function AdminInternships() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[30vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-accent" />
-        </div>
+        <Loader variant="page" text="Loading internships..." />
       ) : (
         <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="overflow-x-auto">

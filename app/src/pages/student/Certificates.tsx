@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Award, Download, Share2, ExternalLink, Shield, Calendar, Building2, QrCode, Loader2, X, Eye } from 'lucide-react';
+import { Award, Download, Share2, ExternalLink, Shield, Calendar, Building2, QrCode, X, Eye } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { getMyCertificates } from '@/services/certificates';
 import { useAuth } from '@/contexts/AuthContext';
 import { certificates as mockCertificates } from '@/data/mockData';
@@ -57,11 +58,7 @@ export default function StudentCertificates() {
   }, [user]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading certificates..." />;
   }
 
   return (

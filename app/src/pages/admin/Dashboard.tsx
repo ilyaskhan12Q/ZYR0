@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, FolderOpen, FileCheck, Award, Shield, Zap, TrendingUp, ArrowRight, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { Users, FolderOpen, FileCheck, Award, Shield, Zap, TrendingUp, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { supabase } from '@/lib/supabase';
 
@@ -221,11 +222,7 @@ export default function AdminDashboard() {
 
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[55vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-accent" />
-      </div>
-    );
+    return <Loader variant="page" text="Loading admin dashboard..." />;
   }
 
   return (
