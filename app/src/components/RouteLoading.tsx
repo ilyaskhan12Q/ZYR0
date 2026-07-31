@@ -1,9 +1,5 @@
-import { Spinner } from '@/components/ui/spinner';
+import { Loader } from '@/components/common/Loader';
 
 export function RouteLoading() {
-  return (
-    <div className="flex min-h-[400px] w-full items-center justify-center">
-      <Spinner className="size-8 text-primary animate-spin" />
-    </div>
-  );
+  return <Loader variant="page" label="Loading..." />;
 }

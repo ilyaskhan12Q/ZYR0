@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import type { UserRole } from '@/lib/database.types';
 import { SEO } from '@/components/SEO';
+import { Loader } from '@/components/common/Loader';
 
 /**
  * OAuth Callback Page
@@ -101,10 +102,7 @@ export default function AuthCallback() {
         path="/auth/callback"
         noIndex={true}
       />
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <p className="text-muted-foreground text-sm">Completing sign in...</p>
-      </div>
+      <Loader variant="page" label="Completing sign in..." />
     </div>
   );
 }

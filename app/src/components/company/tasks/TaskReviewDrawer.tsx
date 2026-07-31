@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Loader } from '@/components/common/Loader';
 import {
   X,
   CheckCircle2,
@@ -545,7 +546,7 @@ export function TaskReviewDrawer({ task, onClose, onSuccess }: TaskReviewDrawerP
                   className="w-full sm:w-auto flex-2 py-2.5 px-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {reviewing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader variant="button" />
                   ) : (
                     <>
                       <CheckCircle2 className="w-4 h-4" />

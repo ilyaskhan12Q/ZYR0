@@ -2,6 +2,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import type { UserRole } from '@/lib/database.types';
 
+import { Loader } from '@/components/common/Loader';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   /** If provided, user must have this role */
@@ -18,14 +20,11 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   const { session, profile, loading } = useAuth();
   const location = useLocation();
 
-  // Still loading session — show nothing (or a spinner)
+  // Still loading session — show unified Loader
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </div>
+        <Loader variant="page" label="Verifying session..." />
       </div>
     );
   }

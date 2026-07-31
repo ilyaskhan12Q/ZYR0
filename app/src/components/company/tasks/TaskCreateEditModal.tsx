@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Users, AlertCircle, Loader2, CheckCircle2, Info, Calendar } from 'lucide-react';
+import { X, User, Users, AlertCircle, CheckCircle2, Info, Calendar } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { createTask, updateTask, bulkCreateTasks } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
@@ -540,7 +541,7 @@ export function TaskCreateEditModal({
                 className="px-5 py-2 bg-accent text-white rounded-xl text-sm font-semibold hover:bg-accent/90 transition-all flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {submitting ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader variant="button" />
                 ) : isEditMode ? (
                   'Save Task Changes'
                 ) : assignmentScope === 'bulk' ? (

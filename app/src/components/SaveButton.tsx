@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Bookmark, BookmarkCheck, Loader2 } from 'lucide-react';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { Loader } from '@/components/common/Loader';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import {
@@ -78,7 +79,7 @@ export function SaveButton({ internshipId, compact = false, className = '' }: Sa
         aria-label="Loading save state"
         className={`inline-flex items-center gap-1.5 text-sm text-muted-foreground ${className}`}
       >
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader variant="button" />
         {!compact && <span>Save</span>}
       </button>
     );
@@ -97,7 +98,7 @@ export function SaveButton({ internshipId, compact = false, className = '' }: Sa
       } disabled:opacity-50 ${className}`}
     >
       {mutating ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader variant="button" />
       ) : saved ? (
         <BookmarkCheck className="w-4 h-4 fill-current" />
       ) : (
