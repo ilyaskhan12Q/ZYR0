@@ -848,7 +848,7 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Path</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">How it works</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white text-balance">How it works</h2>
           </MotionDiv>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
@@ -868,8 +868,8 @@ export default function Landing() {
                 <div className="mt-4 w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto">
                   <step.icon className="w-7 h-7 text-accent" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{step.desc}</p>
+                <h3 className="mt-4 text-lg font-semibold dark:text-white">{step.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400">{step.desc}</p>
                 {i < 3 && (
                   <div className="hidden md:block absolute top-16 right-0 w-1/2 border-t-2 border-dashed border-border" />
                 )}
@@ -892,11 +892,11 @@ export default function Landing() {
               )}
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
-              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Run your internship programs with confidence</h2>
-              <p className="mt-4 text-muted-foreground">
+              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white">Run your internship programs with confidence</h2>
+              <p className="mt-4 text-muted-foreground dark:text-slate-300">
                 Manage cohorts of any size from one structured dashboard. Review candidate profiles, structure milestone tasks with clear acceptance criteria, assign industry mentors, track intern progress in real time, and issue verified completion certificates when each intern finishes their program.
               </p>
-              <p className="mt-3 text-muted-foreground text-sm">
+              <p className="mt-3 text-muted-foreground dark:text-slate-400 text-sm">
                 ZYR0 replaces spreadsheets and email chains with a unified view of your entire internship pipeline — from posting listings and reviewing applicants to monitoring task completion and generating credentials. Companies retain full control over every stage while providing interns with the structured guidance they need to succeed.
               </p>
               <div className="mt-8 space-y-4">
@@ -911,10 +911,10 @@ export default function Landing() {
                     )}
                     className="flex items-center gap-3"
                   >
-                    <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     </div>
-                    <span className="text-sm text-foreground">{feature}</span>
+                    <span className="text-sm text-foreground dark:text-white/90">{feature}</span>
                   </MotionDiv>
                 ))}
               </div>
@@ -940,11 +940,11 @@ export default function Landing() {
                 <div className="bg-transparent dark:bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-none dark:shadow-lg space-y-4 border border-transparent dark:border-border/40">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Cohort Size</p>
-                      <p className="text-2xl font-bold">24</p>
+                      <p className="text-sm text-muted-foreground dark:text-slate-400">Cohort Size</p>
+                      <p className="text-2xl font-bold dark:text-white">24</p>
                     </div>
-                    <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-emerald-600" />
+                    <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                     </div>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -952,16 +952,16 @@ export default function Landing() {
                   </div>
                   <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
                     <div className="text-center">
-                      <p className="text-lg font-bold">156</p>
-                      <p className="text-xs text-muted-foreground">Applicants</p>
+                      <p className="text-lg font-bold dark:text-white">156</p>
+                      <p className="text-xs text-muted-foreground dark:text-slate-400">Applicants</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-bold">89%</p>
-                      <p className="text-xs text-muted-foreground">Completion</p>
+                      <p className="text-lg font-bold dark:text-white">89%</p>
+                      <p className="text-xs text-muted-foreground dark:text-slate-400">Completion</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-bold">4.8</p>
-                      <p className="text-xs text-muted-foreground">Feedback</p>
+                      <p className="text-lg font-bold dark:text-white">4.8</p>
+                      <p className="text-xs text-muted-foreground dark:text-slate-400">Feedback</p>
                     </div>
                   </div>
                 </div>
@@ -970,8 +970,8 @@ export default function Landing() {
                     <TrendingUp className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">Cohort activity up 32%</p>
-                    <p className="text-xs text-muted-foreground">Compared to last month</p>
+                    <p className="text-sm font-medium dark:text-white">Cohort activity up 32%</p>
+                    <p className="text-xs text-muted-foreground dark:text-slate-400">Compared to last month</p>
                   </div>
                 </div>
               </div>
