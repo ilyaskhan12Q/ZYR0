@@ -3,9 +3,11 @@ import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface StackingCardsContextValue {
-  scrollYProgress: MotionValue<number>
   totalCards: number
   isReducedMotion: boolean
+  scrollOptions?: {
+    container?: React.RefObject<HTMLElement | null>
+  }
 }
 
 const StackingCardsContext = createContext<StackingCardsContextValue | null>(null)
@@ -46,14 +48,8 @@ export function StackingCards({
     return () => mediaQuery.removeEventListener?.("change", handleChange)
   }, [])
 
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end end"],
-    container: scrollOptions?.container,
-  })
-
   return (
-    <StackingCardsContext.Provider value={{ scrollYProgress, totalCards, isReducedMotion }}>
+    <StackingCardsContext.Provider value={{ totalCards, isReducedMotion, scrollOptions }}>
       <div
         ref={targetRef}
         className={cn("relative w-full", className)}
@@ -82,18 +78,16 @@ export function StackingCardItem({
   const context = useContext(StackingCardsContext)
   const cardRef = useRef<HTMLDivElement>(null)
 
-  const total = context?.totalCards || 6
-  const targetScale = 1 - (total - index) * 0.025
+  const total = context?.totalCards || 1
+  const targetScale = 1 - (total - index) * 0.04
 
-  const { scrollYProgress: cardScroll } = useScroll({
+  const { scrollYProgress } = useScroll({
     target: cardRef,
-    offset: ["start end", "start start"],
+    offset: ["start start", "end start"],
+    container: context?.scrollOptions?.container,
   })
 
-  const scrollProgress = context?.scrollYProgress || cardScroll
-  const rangeStart = index / total
-  const scale = useTransform(scrollProgress, [rangeStart, 1], [1, targetScale])
-
+  const scale = useTransform(scrollYProgress, [0, 1], [1, targetScale])
   const isReducedMotion = context?.isReducedMotion || false
 
   return (
@@ -107,9 +101,9 @@ export function StackingCardItem({
     >
       <motion.div
         style={{
-          scale: isReducedMotion ? 1 : (context ? scale : 1),
+          scale: isReducedMotion ? 1 : scale,
         }}
-        className="w-full flex justify-center transition-all duration-200"
+        className="w-full flex justify-center"
       >
         {children}
       </motion.div>

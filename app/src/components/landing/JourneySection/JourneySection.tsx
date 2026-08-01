@@ -34,11 +34,16 @@ export function JourneySection({ className }: JourneySectionProps) {
         </div>
 
         {/* Stacking Cards Scroll Container */}
-        <div className="relative w-full">
+        <div className="relative w-full pb-24">
           <StackingCards totalCards={JOURNEY_CARDS.length}>
-            <div className="space-y-12 sm:space-y-16 pb-12">
+            <div className="relative w-full">
               {JOURNEY_CARDS.map((card, idx) => (
-                <StackingCardItem key={card.id} index={idx} className="min-h-[580px] sm:min-h-[620px] pb-6">
+                <StackingCardItem
+                  key={card.id}
+                  index={idx}
+                  topOffset="top-20 sm:top-24 lg:top-28"
+                  className="h-[520px] sm:h-[560px] lg:h-[600px] mb-8 sm:mb-12"
+                >
                   <JourneyCard card={card} index={idx} totalCards={JOURNEY_CARDS.length} />
                 </StackingCardItem>
               ))}
