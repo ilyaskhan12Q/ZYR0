@@ -37,11 +37,11 @@ export default function PublicLayout() {
   }, [location.pathname]);
 
   if (isAuthPage) {
-    return <div className="min-h-screen bg-background"><Outlet /></div>;
+    return <div className="min-h-screen bg-transparent"><Outlet /></div>;
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-transparent">
       {/* Navigation */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass shadow-sm' : 'bg-transparent'
@@ -202,7 +202,7 @@ export default function PublicLayout() {
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
-        <footer className="bg-primary dark:bg-slate-950 text-white dark:text-slate-200 border-t border-border/10">
+        <footer className="bg-slate-900/60 dark:bg-slate-950/60 backdrop-blur-md text-white dark:text-slate-200 border-t border-slate-200/20 dark:border-white/10 relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {/* Brand */}

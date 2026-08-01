@@ -558,7 +558,7 @@
 
 /* Hero gradient */
 .hero-gradient {
-  background: linear-gradient(135deg, #1E3A5F 0%, #0F172A 50%, #1E3A5F 100%);
+  background: transparent;
 }
 
 /* Hero full-height: fills the true visible viewport on all devices.
