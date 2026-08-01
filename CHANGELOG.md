@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Phase 1: Audit**: Conducted repository-wide visual audit of light theme contrast, SVG visibility, and surface transparency (`docs/LIGHT_THEME_AUDIT.md`).
   - **Phase 2: Light-Mode Gradient Overlay**: Integrated a `dark:hidden` gradient overlay (`rgba(255,255,255,0.70)`, soft slate `rgba(241,245,249,0.50)`, and subtle emerald `rgba(16,185,129,0.04)`) in `ParabolicPentagonBg.tsx` to elevate contrast in light mode while leaving dark mode completely untouched. Updated light mode SVG blend mode to `mix-blend-multiply` (`dark:mix-blend-screen`).
   - **Phase 3: Light-Mode Glass Surfaces**: Updated feature cards, role cards, credibility panels, testimonial boxes, community channel widgets, stats bar, and CTA banner to use light-theme glass surfaces (`bg-white/60 dark:bg-card/70 backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-md`) without relying on solid white or dark fill blocks.
+  - **Phase 4: Typography & Contrast Optimization**: Standardized navigation links, logo text, mobile menu toggles, section titles, and body copy in `PublicLayout.tsx` and `Landing.tsx` to enforce WCAG AA contrast in both light and dark themes without adding opaque backing containers.
 
 ## [0.17.3] - 2026-08-01
 

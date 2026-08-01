@@ -44,9 +44,8 @@ export default function PublicLayout() {
     <div className="min-h-screen bg-background">
       {/* Navigation */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? 'glass shadow-sm' : 'bg-transparent'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass shadow-sm' : 'bg-transparent'
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
@@ -55,7 +54,7 @@ export default function PublicLayout() {
               <div className="w-8 h-8 flex items-center justify-center">
                 <img src="/zyro-logo.webp" alt="ZYR0 Logo" width="32" height="32" className="w-8 h-8 object-contain rounded-md" />
               </div>
-              <span className={`text-xl font-bold transition-colors ${scrolled ? 'text-foreground' : 'text-white'}`}>
+              <span className="text-xl font-bold text-foreground transition-colors">
                 ZYR0
               </span>
             </Link>
@@ -66,9 +65,7 @@ export default function PublicLayout() {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className={`text-sm font-medium transition-colors hover:text-accent relative group ${
-                    scrolled ? 'text-foreground' : 'text-white/90'
-                  } ${location.pathname === link.href ? 'text-accent' : ''}`}
+                  className={`text-sm font-medium transition-colors hover:text-accent relative group text-foreground/90 dark:text-white/90 ${location.pathname === link.href ? 'text-accent font-semibold' : ''}`}
                 >
                   {link.label}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-200 group-hover:w-full" />
@@ -137,7 +134,7 @@ export default function PublicLayout() {
                 <>
                   <Link
                     to="/login"
-                    className={`text-sm font-medium transition-colors ${scrolled ? 'text-foreground hover:text-accent' : 'text-white hover:text-white/80'}`}
+                    className="text-sm font-medium text-foreground hover:text-accent transition-colors"
                   >
                     Log in
                   </Link>
@@ -154,7 +151,7 @@ export default function PublicLayout() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`md:hidden p-2 rounded-lg ${scrolled ? 'text-foreground' : 'text-white'}`}
+              className="md:hidden p-2 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -205,7 +202,7 @@ export default function PublicLayout() {
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
-        <footer className="bg-slate-950/60 dark:bg-slate-950/60 backdrop-blur-md text-white border-t border-white/10">
+        <footer className="bg-primary dark:bg-slate-950 text-white dark:text-slate-200 border-t border-border/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {/* Brand */}
