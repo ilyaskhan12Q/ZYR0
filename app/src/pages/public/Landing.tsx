@@ -837,21 +837,29 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
+      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden">
+        <div className="max-w-7xl mx-auto relative z-10">
           <MotionDiv
             isMobile={isMobile}
             {...viewProps(
               { opacity: 0, y: 20 },
               { opacity: 1, y: 0 }
             )}
-            className="text-center mb-14"
+            className="text-center max-w-3xl mx-auto mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Path</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-balance">How it works</h2>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              The Path
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              How it works
+            </h2>
+            <p className="mt-4 text-slate-300 text-base sm:text-lg leading-relaxed">
+              Four simple steps to launch your career or scale your internship program with confidence.
+            </p>
           </MotionDiv>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {steps.map((step, i) => (
               <MotionDiv
                 isMobile={isMobile}
@@ -862,17 +870,24 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.15 }
                 )}
-                className="text-center relative"
+                className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-cyan-500/40 hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 group relative"
               >
-                <span className="text-5xl font-bold text-accent/15">{step.num}</span>
-                <div className="mt-4 w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto">
-                  <step.icon className="w-7 h-7 text-accent" />
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-cyan-400 group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300 shadow-md">
+                      <step.icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-2xl font-black font-mono text-cyan-400/60 group-hover:text-cyan-300 transition-colors">
+                      {step.num}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                    {step.title}
+                  </h3>
+                  <p className="text-slate-300 text-sm leading-relaxed">
+                    {step.desc}
+                  </p>
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">{step.title}</h3>
-                <p className="mt-2 text-sm text-slate-400">{step.desc}</p>
-                {i < 3 && (
-                  <div className="hidden md:block absolute top-16 right-0 w-1/2 border-t-2 border-dashed border-border" />
-                )}
               </MotionDiv>
             ))}
           </div>
