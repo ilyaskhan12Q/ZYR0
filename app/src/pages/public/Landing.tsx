@@ -637,20 +637,20 @@ export default function Landing() {
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
               </span>
               Official Community Channels
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground dark:text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
               Never Miss an Opportunity. <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
                 Stay Connected in Real-Time.
               </span>
             </h2>
-            <p className="mt-4 text-slate-600 dark:text-white/80 text-base sm:text-lg leading-relaxed">
+            <p className="mt-4 text-slate-300 text-base sm:text-lg leading-relaxed">
               Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
             </p>
           </div>
@@ -664,22 +664,22 @@ export default function Landing() {
                 { opacity: 1, y: 0 },
                 { duration: 0.5, delay: 0.1 }
               )}
-              className="bg-transparent dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group shadow-none"
+              className="bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
                     <WhatsAppIcon className="w-6 h-6 fill-current" />
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     Live Alerts
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
                   WhatsApp Channel
                 </h3>
-                <p className="text-slate-600 dark:text-white/80 text-sm leading-relaxed mb-6">
+                <p className="text-slate-300 text-sm leading-relaxed mb-6">
                   Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
                 </p>
               </div>
@@ -719,7 +719,7 @@ export default function Landing() {
                 <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
                   LinkedIn Network
                 </h3>
-                <p className="text-white/70 text-sm leading-relaxed mb-6">
+                <p className="text-slate-300 text-sm leading-relaxed mb-6">
                   Follow our official LinkedIn page for professional networking, employer spotlights, student success stories, and corporate announcements.
                 </p>
               </div>
