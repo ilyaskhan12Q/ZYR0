@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 import { TextRotate } from '@/components/fancy/text/TextRotate';
+import { ParabolicPentagonBg } from '@/components/landing/ParabolicPentagonBg';
 
 const homepageStructuredData = [
   {
@@ -307,7 +308,10 @@ export default function Landing() {
   };
 
   return (
-    <div>
+    <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
+      {/* Fixed Parabolic Pentagon Background Layer & Gradient Overlay */}
+      <ParabolicPentagonBg />
+
       <SEO
         title="ZYR0 — Structured Internship Platform for Students & Employers"
         description="ZYR0 is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform."
@@ -326,6 +330,14 @@ export default function Landing() {
           '--mouse-y': '50%'
         } as React.CSSProperties}
       >
+        {/* Vector Background Graphic (final.svg) */}
+        <img
+          src="/svgs/final.svg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-30 mix-blend-screen pointer-events-none z-0"
+        />
+
         {/* Animated Particles - high performance Canvas based rendering */}
         <CanvasParticles />
 
