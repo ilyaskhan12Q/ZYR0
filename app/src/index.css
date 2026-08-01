@@ -407,12 +407,12 @@
 
 /* Feature card */
 .feature-card {
-  @apply bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300;
+  @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-xl border border-slate-200/80 dark:border-white/15 p-6 shadow-sm dark:shadow-lg transition-all duration-300;
 }
 
 /* Internship card */
 .internship-card {
-  @apply bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-md overflow-hidden transition-all duration-300;
+  @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-xl border border-slate-200/80 dark:border-white/15 shadow-sm dark:shadow-lg overflow-hidden transition-all duration-300;
 }
 
 /* Table row hover */
@@ -431,7 +431,7 @@
   }
 
   .feature-card:hover {
-    @apply shadow-md -translate-y-1 border-primary/40 dark:border-primary/30;
+    @apply shadow-md -translate-y-1 border-primary/40 dark:border-emerald-400/40 dark:shadow-emerald-500/10;
   }
 
   .internship-card:hover {
