@@ -754,16 +754,16 @@ export default function Landing() {
               className="lg:col-span-5 space-y-6"
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground dark:text-white tracking-tight leading-tight">
                 Every career starts somewhere.
               </h2>
-              <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-normal">
+              <p className="text-muted-foreground dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
               </p>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+              <p className="text-muted-foreground dark:text-slate-400 text-sm sm:text-base leading-relaxed">
                 Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
               </p>
-              <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+              <p className="text-muted-foreground dark:text-slate-400 text-sm sm:text-base leading-relaxed">
                 Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
               </p>
             </MotionDiv>
@@ -785,8 +785,8 @@ export default function Landing() {
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-foreground">{role.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{role.desc}</p>
+                  <h3 className="mt-4 text-lg font-semibold text-foreground dark:text-white">{role.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">{role.desc}</p>
                 </MotionDiv>
               ))}
             </div>
@@ -806,8 +806,8 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground text-balance">Built for accountability and clear outcomes</h2>
-            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white text-balance">Built for accountability and clear outcomes</h2>
+            <p className="mt-4 text-muted-foreground dark:text-slate-300 max-w-2xl mx-auto">
               Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
             </p>
           </MotionDiv>
@@ -828,8 +828,8 @@ export default function Landing() {
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
                   <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{feature.desc}</p>
+                <h3 className="mt-4 text-lg font-semibold dark:text-white">{feature.title}</h3>
+                <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">{feature.desc}</p>
               </MotionDiv>
             ))}
           </div>
