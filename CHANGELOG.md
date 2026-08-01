@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.5] - 2026-08-01
+
+### Added
+- **Landing Page V2 Ground-Up Reconstruction (`feature/landing-page-v2`)**:
+  - **Phase 0: Audit**: Conducted an architecture audit documenting scroll listener overhead and GPU fill-rate degradation (`docs/LANDING_PAGE_V2_AUDIT.md`).
+  - **Phase 1: Foundation**: Created a performant, pure-CSS `BackgroundLayer` component utilizing fixed viewport positioning (`z-0`) and single `parabolic-pentagon.svg` asset canvas.
+  - **Phase 2: Content Architecture**: Restructured `Landing.tsx` and `PublicLayout.tsx` to ensure all content sections naturally float above the fixed SVG canvas in a `z-10` layer.
+  - **Phase 3: Eliminate Opaque Blocks**: Removed all lingering solid background fills (`.hero-gradient`, layout container fills) to ensure the fixed background canvas remains visible continuously from header to footer.
+  - **Phase 4: Dark Mode Optimization**: Refined dark mode typography contrast, subtle contrast overlays, and sharp glass card borders (`dark:border-white/15`, `dark:bg-slate-900/60`).
+  - **Phase 5: Minimal Polish**: Applied subtle button hover scaling, micro-interactions, and uniform section spacing.
+  - **Phase 6 & 7: Performance Measurement & Build Validation**: Achieved 0ms scroll JS overhead and 0 layout shifts. Validated `npm run build` with full static prerendering pipeline.
+  - **Firefox Cross-Browser Rendering & Contrast Fix**: Resolved light-mode body background bleed in Firefox by adding a pinned `bg-slate-950` backdrop behind the SVG canvas. Standardized all landing section cards and typography to explicit high-contrast glass tokens (`text-white`, `text-slate-300`, `bg-slate-900/60`, `border-white/10`).
+
+## [0.17.4] - 2026-08-01
+
+### Added
+- **Light Theme Background Optimization (`fix/light-theme-background-optimization`)**:
+  - **Phase 1: Audit**: Conducted repository-wide visual audit of light theme contrast, SVG visibility, and surface transparency (`docs/LIGHT_THEME_AUDIT.md`).
+  - **Phase 2: Light-Mode Gradient Overlay**: Integrated a `dark:hidden` gradient overlay (`rgba(255,255,255,0.70)`, soft slate `rgba(241,245,249,0.50)`, and subtle emerald `rgba(16,185,129,0.04)`) in `ParabolicPentagonBg.tsx` to elevate contrast in light mode while leaving dark mode completely untouched. Updated light mode SVG blend mode to `mix-blend-multiply` (`dark:mix-blend-screen`).
+  - **Phase 3: Light-Mode Glass Surfaces**: Updated feature cards, role cards, credibility panels, testimonial boxes, community channel widgets, stats bar, and CTA banner to use light-theme glass surfaces (`bg-white/60 dark:bg-card/70 backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-md`) without relying on solid white or dark fill blocks.
+  - **Phase 4: Typography & Contrast Optimization**: Standardized navigation links, logo text, mobile menu toggles, section titles, and body copy in `PublicLayout.tsx` and `Landing.tsx` to enforce WCAG AA contrast in both light and dark themes without adding opaque backing containers.
+  - **Phase 5: Verification & Build Validation**: Validated production build (`tsc -b && vite build`) and static prerendering pipeline. Verified visual balance, fixed SVG backdrop behavior, and translucency in both light and dark themes.
+
+## [0.17.3] - 2026-08-01
+
+### Added
+- **Premium Landing Page Fixed Background (`feature/premium-landing-background`)**:
+  - Integrated `parabolic-pentagon.svg` as a fixed, viewport-covering background layer behind all landing content (`ParabolicPentagonBg.tsx`).
+  - Added full 50-950 color scale tokens for `text`, `background`, `primary`, `secondary`, and `accent` in `tailwind.config.js` and `src/index.css`.
+  - Implemented a multi-tiered gradient overlay (radial ambient glow, secondary accent aura, and adaptive top/bottom vignettes) to ensure visual depth and 100% WCAG AA text contrast compliance in both light and dark modes.
+  - Added GPU-accelerated scroll parallax translation (`translate3d`), respecting user `prefers-reduced-motion` settings.
+  - Preserved cross-device responsiveness and verified 100% clean TypeScript build with zero errors.
+
 ## [0.17.2] - 2026-07-31
 
 ### Changed
