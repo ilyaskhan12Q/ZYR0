@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Star, Building2, User, FileText, Check, Award, Lock, ExternalLink } from "lucide-react"
+import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, User, Award, ExternalLink, Building2, Rocket } from "lucide-react"
 import { JourneyCardItem } from "./journey-data"
 import { cn } from "@/lib/utils"
 
@@ -10,42 +10,69 @@ interface JourneyCardProps {
   totalCards: number
 }
 
-const BADGE_STYLES: Record<JourneyCardItem["badgeVariant"], { bg: string; text: string; border: string; glow: string }> = {
+const BADGE_STYLES: Record<
+  JourneyCardItem["badgeVariant"],
+  { bg: string; text: string; border: string; hoverBorder: string; glowBg: string; ctaBg: string; ctaHover: string; ctaText: string }
+> = {
   cyan: {
     bg: "bg-cyan-500/10",
     text: "text-cyan-400",
     border: "border-cyan-500/25",
-    glow: "shadow-cyan-500/10",
+    hoverBorder: "hover:border-cyan-500/40",
+    glowBg: "bg-cyan-500",
+    ctaBg: "bg-cyan-500",
+    ctaHover: "hover:bg-cyan-400",
+    ctaText: "text-slate-950",
   },
   emerald: {
     bg: "bg-emerald-500/10",
     text: "text-emerald-400",
     border: "border-emerald-500/25",
-    glow: "shadow-emerald-500/10",
+    hoverBorder: "hover:border-emerald-500/40",
+    glowBg: "bg-emerald-500",
+    ctaBg: "bg-emerald-500",
+    ctaHover: "hover:bg-emerald-400",
+    ctaText: "text-white",
   },
   indigo: {
     bg: "bg-indigo-500/10",
     text: "text-indigo-400",
     border: "border-indigo-500/25",
-    glow: "shadow-indigo-500/10",
+    hoverBorder: "hover:border-indigo-500/40",
+    glowBg: "bg-indigo-500",
+    ctaBg: "bg-indigo-600",
+    ctaHover: "hover:bg-indigo-500",
+    ctaText: "text-white",
   },
   amber: {
     bg: "bg-amber-500/10",
     text: "text-amber-400",
     border: "border-amber-500/25",
-    glow: "shadow-amber-500/10",
+    hoverBorder: "hover:border-amber-500/40",
+    glowBg: "bg-amber-500",
+    ctaBg: "bg-amber-500",
+    ctaHover: "hover:bg-amber-400",
+    ctaText: "text-slate-950",
   },
   purple: {
     bg: "bg-purple-500/10",
     text: "text-purple-400",
     border: "border-purple-500/25",
-    glow: "shadow-purple-500/10",
+    hoverBorder: "hover:border-purple-500/40",
+    glowBg: "bg-purple-500",
+    ctaBg: "bg-purple-600",
+    ctaHover: "hover:bg-purple-500",
+    ctaText: "text-white",
   },
   blue: {
     bg: "bg-blue-500/10",
     text: "text-blue-400",
     border: "border-blue-500/25",
-    glow: "shadow-blue-500/10",
+    hoverBorder: "hover:border-blue-500/40",
+    glowBg: "bg-blue-500",
+    ctaBg: "bg-blue-600",
+    ctaHover: "hover:bg-blue-500",
+    ctaText: "text-white",
   },
 }
 
@@ -58,28 +85,23 @@ export function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
       className={cn(
         "w-full max-w-5xl mx-auto rounded-3xl p-6 sm:p-8 lg:p-10",
         "bg-slate-900/90 backdrop-blur-xl border border-white/10 shadow-2xl",
-        "flex flex-col lg:flex-row gap-8 lg:gap-10 items-center justify-between",
+        "flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch justify-between",
         "relative overflow-hidden group transition-all duration-300",
-        `hover:border-${card.badgeVariant}-500/40`
+        badgeStyle.hoverBorder
       )}
     >
-      {/* Background Subtle Gradient Backdrop Accent */}
-      <div 
+      {/* Subtle Glow Circle Accent */}
+      <div
         className={cn(
           "absolute -right-20 -bottom-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none transition-opacity group-hover:opacity-30",
-          card.badgeVariant === "cyan" && "bg-cyan-500",
-          card.badgeVariant === "emerald" && "bg-emerald-500",
-          card.badgeVariant === "indigo" && "bg-indigo-500",
-          card.badgeVariant === "amber" && "bg-amber-500",
-          card.badgeVariant === "purple" && "bg-purple-500",
-          card.badgeVariant === "blue" && "bg-blue-500"
+          badgeStyle.glowBg
         )}
       />
 
       {/* Left Column: Narrative Content */}
       <div className="w-full lg:w-1/2 flex flex-col justify-between space-y-6 relative z-10">
         <div>
-          {/* Top Header Badge & Step Number */}
+          {/* Header Step Badge & Counter */}
           <div className="flex items-center justify-between mb-4">
             <span
               className={cn(
@@ -105,25 +127,25 @@ export function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
             {card.subtitle}
           </p>
 
-          {/* Detailed Narrative */}
+          {/* Body Narrative */}
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal mb-6">
             {card.description}
           </p>
 
-          {/* Feature Tags */}
+          {/* Feature Badges */}
           <div className="flex flex-wrap gap-2 mb-6">
             {card.tags.map((tag, tIdx) => (
               <span
                 key={tIdx}
                 className="px-3 py-1 rounded-lg text-xs font-medium bg-slate-800/80 border border-white/10 text-slate-300 flex items-center gap-1.5"
               >
-                <span className={cn("w-1.5 h-1.5 rounded-full", card.badgeVariant === "cyan" ? "bg-cyan-400" : "bg-emerald-400")} />
+                <span className={cn("w-1.5 h-1.5 rounded-full", badgeStyle.glowBg)} />
                 {tag}
               </span>
             ))}
           </div>
 
-          {/* Key Metrics / Highlights if present */}
+          {/* Key Metrics / Highlights */}
           {card.stats && card.stats.length > 0 && (
             <div className="grid grid-cols-2 gap-4 py-4 px-4 rounded-xl bg-slate-950/60 border border-white/5 mb-6">
               {card.stats.map((stat, sIdx) => (
@@ -136,19 +158,16 @@ export function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
           )}
         </div>
 
-        {/* Action Trigger */}
+        {/* Action Button */}
         {card.ctaText && card.ctaHref && (
           <div>
             <Link
               to={card.ctaHref}
               className={cn(
                 "inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 shadow-lg active:scale-95 group/btn",
-                card.badgeVariant === "cyan" && "bg-cyan-500 text-slate-950 hover:bg-cyan-400 shadow-cyan-500/20",
-                card.badgeVariant === "emerald" && "bg-emerald-500 text-white hover:bg-emerald-400 shadow-emerald-500/20",
-                card.badgeVariant === "indigo" && "bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/20",
-                card.badgeVariant === "amber" && "bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-amber-500/20",
-                card.badgeVariant === "purple" && "bg-purple-600 text-white hover:bg-purple-500 shadow-purple-500/20",
-                card.badgeVariant === "blue" && "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-500/20"
+                badgeStyle.ctaBg,
+                badgeStyle.ctaHover,
+                badgeStyle.ctaText
               )}
             >
               {card.ctaText}
@@ -160,19 +179,13 @@ export function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
 
       {/* Right Column: Custom Product Visual Mockup */}
       <div className="w-full lg:w-1/2 relative z-10 flex items-center justify-center">
-        <CardVisualPreview type={card.previewType} badgeVariant={card.badgeVariant} />
+        <CardVisualPreview type={card.previewType} />
       </div>
     </div>
   )
 }
 
-function CardVisualPreview({
-  type,
-  badgeVariant,
-}: {
-  type: JourneyCardItem["previewType"]
-  badgeVariant: JourneyCardItem["badgeVariant"]
-}) {
+function CardVisualPreview({ type }: { type: JourneyCardItem["previewType"] }) {
   switch (type) {
     case "filter_drops":
       return (
@@ -252,7 +265,7 @@ function CardVisualPreview({
 
           <div className="space-y-3">
             {[
-              { stage: "Profile Submitted", time: "Just now", status: "COMPLETE", color: "text-slate-400 bg-slate-800" },
+              { stage: "Profile Submitted", time: "Just now", status: "COMPLETE", color: "text-slate-400 bg-slate-800 border-transparent" },
               { stage: "Employer Screening", time: "2 hours ago", status: "VERIFIED", color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/30" },
               { stage: "Shortlisted for Interview", time: "Live Alert", status: "SHORTLISTED", color: "text-emerald-400 bg-emerald-500/20 border-emerald-500/40 animate-pulse" }
             ].map((step, idx) => (
