@@ -35,19 +35,17 @@ export function JourneySection({ className }: JourneySectionProps) {
 
         {/* Stacking Cards Scroll Container */}
         <div className="relative w-full pb-24">
-          <StackingCards totalCards={JOURNEY_CARDS.length}>
-            <div className="relative w-full">
-              {JOURNEY_CARDS.map((card, idx) => (
-                <StackingCardItem
-                  key={card.id}
-                  index={idx}
-                  topOffset="top-20 sm:top-24 lg:top-28"
-                  className="h-[520px] sm:h-[560px] lg:h-[600px] mb-8 sm:mb-12"
-                >
-                  <JourneyCard card={card} index={idx} totalCards={JOURNEY_CARDS.length} />
-                </StackingCardItem>
-              ))}
-            </div>
+          <StackingCards totalCards={JOURNEY_CARDS.length} scaleMultiplier={0.03}>
+            {JOURNEY_CARDS.map((card, idx) => (
+              <StackingCardItem
+                key={card.id}
+                index={idx}
+                topPosition={`${8 + idx * 3}%`}
+                className="h-[560px] sm:h-[620px]"
+              >
+                <JourneyCard card={card} index={idx} totalCards={JOURNEY_CARDS.length} />
+              </StackingCardItem>
+            ))}
           </StackingCards>
         </div>
       </div>
