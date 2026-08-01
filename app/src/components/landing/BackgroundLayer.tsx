@@ -13,7 +13,7 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({ parallaxOffset
     >
       {/* 1. Background SVG Layer (Fixed, covers viewport, non-repeating) */}
       <div
-        className="absolute inset-0 w-full h-full flex items-center justify-center transition-transform duration-75 ease-out will-change-transform"
+        className="absolute -inset-[5%] w-[110%] h-[110%] flex items-center justify-center will-change-transform"
         style={{
           transform: `translate3d(0, ${-parallaxOffsetY}px, 0)`,
         }}
