@@ -1116,13 +1116,13 @@ export default function Landing() {
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-accent px-8 py-3.5 rounded-lg font-medium hover:bg-white/90 transition-all shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-emerald-950 px-8 py-3.5 rounded-xl font-semibold hover:bg-white/95 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg"
                 >
                   Start Your Internship
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-transparent text-white border border-white/30 px-8 py-3.5 rounded-lg font-medium hover:bg-white/10 transition-all"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white border border-white/30 px-8 py-3.5 rounded-xl font-semibold hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 backdrop-blur-sm"
                 >
                   For Companies
                 </Link>
