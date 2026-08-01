@@ -992,10 +992,10 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">System Credibility</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white tracking-tight">
               Built on transparency. Designed for confidence.
             </h2>
-            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
+            <p className="mt-4 text-muted-foreground dark:text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
               A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
             </p>
           </MotionDiv>
@@ -1016,8 +1016,8 @@ export default function Landing() {
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-foreground">{card.title}</h3>
-                <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
+                <h3 className="mt-4 text-base font-semibold text-foreground dark:text-white">{card.title}</h3>
+                <p className="mt-2 text-xs sm:text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">{card.desc}</p>
               </MotionDiv>
             ))}
           </div>
@@ -1036,7 +1036,7 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Reviews</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">Verified experiences from our community</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white">Verified experiences from our community</h2>
           </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1053,12 +1053,12 @@ export default function Landing() {
                 className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-accent/40 dark:hover:border-accent/30"
               >
                 <Quote className="w-8 h-8 text-accent/20" />
-                <p className="mt-3 text-foreground italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <p className="mt-3 text-foreground dark:text-white/90 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <figure className="mt-6 flex items-center gap-3">
                   <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
                   <figcaption>
-                    <p className="text-sm font-semibold">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                    <p className="text-sm font-semibold dark:text-white">{t.name}</p>
+                    <p className="text-xs text-muted-foreground dark:text-slate-400">{t.role}</p>
                   </figcaption>
                 </figure>
               </MotionDiv>
@@ -1085,7 +1085,7 @@ export default function Landing() {
                 <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <stat.icon className="w-4 h-4 text-slate-500 dark:text-white/50" />
-                  <p className="text-sm text-slate-600 dark:text-white/60">{stat.label}</p>
+                  <p className="text-sm text-slate-600 dark:text-white/70">{stat.label}</p>
                 </div>
               </MotionDiv>
             ))}
