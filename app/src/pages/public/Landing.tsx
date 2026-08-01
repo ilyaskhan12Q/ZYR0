@@ -308,8 +308,8 @@ export default function Landing() {
   };
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Fixed SVG Background Layer */}
+    <div className="relative min-h-screen text-foreground overflow-hidden">
+      {/* Background Layer (Fixed z-0 Canvas) */}
       <BackgroundLayer />
 
       <SEO
@@ -319,6 +319,9 @@ export default function Landing() {
         keywords="internship platform, internship management, student internships, internships in Pakistan, internship tracking, internship certificates, mentor feedback, internship workflow, companies hiring interns"
         structuredData={homepageStructuredData}
       />
+
+      {/* Floating Content Layer (z-10) */}
+      <div className="relative z-10">
 
       {/* Hero Section — redesigned with Sora font pairing, SaaS color system, layered radial glows, and floating workspace preview */}
       <section
@@ -1128,6 +1131,7 @@ export default function Landing() {
           </MotionDiv>
         </div>
       </section>
+      </div>
     </div>
   );
 }

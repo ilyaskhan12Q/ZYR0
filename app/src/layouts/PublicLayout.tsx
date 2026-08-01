@@ -198,7 +198,7 @@ export default function PublicLayout() {
       </nav>
 
       {/* Main Content */}
-      <main><Outlet /></main>
+      <main className="relative z-10"><Outlet /></main>
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
