@@ -5,15 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.4] - 2026-08-01
+
+### Added
+- **Light Theme Background Optimization — Phase 1: Audit (`fix/light-theme-background-optimization`)**:
+  - Conducted repository-wide visual audit of light theme contrast, SVG visibility, and surface transparency.
+  - Documented contrast and legibility findings in `docs/LIGHT_THEME_AUDIT.md`.
+
 ## [0.17.3] - 2026-08-01
 
 ### Added
-- **Layered Landing Page Background Architecture (`feature/layered-landing-background`)**:
-  - Modularized background rendering into a dedicated `BackgroundLayer.tsx` component, decoupler from scroll logic managed by `ParabolicPentagonBg.tsx`.
-  - Converted landing page section containers to semi-transparent glassmorphic surfaces (`bg-card/70 backdrop-blur-md border border-border/60 dark:border-white/10`) exposing the underlying SVG pattern across the entire viewport.
-  - Implemented multi-spot ambient lighting radial glows (emerald for Hero, indigo for Features, cyan for CTA) providing rich visual depth in both dark and light modes.
-  - Enhanced GPU-accelerated parallax motion (`translate3d`) with scale overflow padding to eliminate edge whitespace, fully respecting user `prefers-reduced-motion` settings.
-  - Preserved WCAG AA text contrast readability and verified 100% clean TypeScript and ESLint build checks.
+- **Premium Landing Page Fixed Background (`feature/premium-landing-background`)**:
+  - Integrated `parabolic-pentagon.svg` as a fixed, viewport-covering background layer behind all landing content (`ParabolicPentagonBg.tsx`).
+  - Added full 50-950 color scale tokens for `text`, `background`, `primary`, `secondary`, and `accent` in `tailwind.config.js` and `src/index.css`.
+  - Implemented a multi-tiered gradient overlay (radial ambient glow, secondary accent aura, and adaptive top/bottom vignettes) to ensure visual depth and 100% WCAG AA text contrast compliance in both light and dark modes.
+  - Added GPU-accelerated scroll parallax translation (`translate3d`), respecting user `prefers-reduced-motion` settings.
+  - Preserved cross-device responsiveness and verified 100% clean TypeScript build with zero errors.
 
 ## [0.17.2] - 2026-07-31
 
