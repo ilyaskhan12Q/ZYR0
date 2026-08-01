@@ -340,7 +340,7 @@
 
 /* Feature card */
 .feature-card {
-  @apply bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300;
+  @apply bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300;
 }
 
 /* Internship card */

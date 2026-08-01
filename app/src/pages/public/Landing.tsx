@@ -777,7 +777,7 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
+                  className="bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30"
                 >
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
@@ -933,8 +933,8 @@ export default function Landing() {
               )}
               className="relative"
             >
-              <div className="bg-gradient-to-br from-primary to-accent dark:from-slate-900 dark:to-accent/50 rounded-2xl p-8 shadow-2xl">
-                <div className="bg-card rounded-xl p-6 shadow-lg space-y-4">
+              <div className="bg-gradient-to-br from-slate-900/80 to-accent/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+                <div className="bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-lg space-y-4 border border-border/40">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Cohort Size</p>
@@ -1008,7 +1008,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-card rounded-xl border border-border p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
+                className="bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30"
               >
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
@@ -1047,7 +1047,7 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-card rounded-xl border border-border p-6 shadow-md"
+                  className="bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-accent/30"
                 >
                   <Quote className="w-8 h-8 text-accent/20" />
                 <p className="mt-3 text-foreground italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
