@@ -330,14 +330,6 @@ export default function Landing() {
           '--mouse-y': '50%'
         } as React.CSSProperties}
       >
-        {/* Vector Background Graphic (final.svg) */}
-        <img
-          src="/svgs/final.svg"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-center opacity-30 mix-blend-screen pointer-events-none z-0"
-        />
-
         {/* Animated Particles - high performance Canvas based rendering */}
         <CanvasParticles />
 
@@ -636,7 +628,7 @@ export default function Landing() {
       </section>
 
       {/* Community / Stay Updated Section */}
-      <section className="py-14 lg:py-20 px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white relative overflow-hidden border-y border-white/10">
+      <section className="py-14 lg:py-20 px-4 bg-slate-950/40 backdrop-blur-md text-white relative overflow-hidden border-y border-white/10">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -745,7 +737,7 @@ export default function Landing() {
       </section>
 
       {/* Section 1 — Every Career Starts Somewhere */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-b border-border content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-background/20 backdrop-blur-xs border-b border-border/20 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left: Heading and Paragraph */}
@@ -842,7 +834,7 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/50 content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-background/20 backdrop-blur-xs content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <MotionDiv
             isMobile={isMobile}
@@ -986,7 +978,7 @@ export default function Landing() {
       </section>
 
       {/* Section 2 — Built on Transparency. Designed for Confidence. */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/30 border-t border-b border-border/50 content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-background/20 backdrop-blur-xs border-t border-b border-border/20 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <MotionDiv
             isMobile={isMobile}
@@ -1030,7 +1022,7 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-14 lg:py-20 px-4 bg-muted/50 content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-background/25 backdrop-blur-xs content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <MotionDiv
             isMobile={isMobile}
@@ -1073,7 +1065,7 @@ export default function Landing() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 lg:py-16 px-4 bg-primary dark:bg-slate-950 border-y border-border/10 content-visibility-auto">
+      <section className="py-12 lg:py-16 px-4 bg-slate-950/40 backdrop-blur-md border-y border-white/10 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => (
@@ -1107,7 +1099,7 @@ export default function Landing() {
               { opacity: 0, y: 20 },
               { opacity: 1, y: 0 }
             )}
-            className="bg-accent rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
+            className="bg-gradient-to-r from-emerald-600/85 via-teal-600/85 to-cyan-600/85 backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />

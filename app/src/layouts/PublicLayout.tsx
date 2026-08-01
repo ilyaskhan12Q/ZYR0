@@ -205,7 +205,7 @@ export default function PublicLayout() {
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
-        <footer className="bg-primary dark:bg-slate-950 text-white dark:text-slate-200 border-t border-border/10">
+        <footer className="bg-slate-950/60 dark:bg-slate-950/60 backdrop-blur-md text-white border-t border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {/* Brand */}
