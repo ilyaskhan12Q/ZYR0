@@ -205,7 +205,14 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-display, .font-heading {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-display,
+  .font-heading {
     font-family: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     letter-spacing: -0.028em;
     -webkit-font-smoothing: antialiased;
@@ -247,55 +254,115 @@
 
   .animate-shimmer {
     animation: shimmer 1.5s infinite;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
     background-size: 200% 100%;
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes pulseSubtle {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Scrollbar Styling */
@@ -340,12 +407,12 @@
 
 /* Feature card */
 .feature-card {
-  @apply bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300;
+  @apply bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300;
 }
 
 /* Internship card */
 .internship-card {
-  @apply bg-card rounded-xl border border-border shadow-md overflow-hidden transition-all duration-300;
+  @apply bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm dark:shadow-md overflow-hidden transition-all duration-300;
 }
 
 /* Table row hover */
@@ -358,15 +425,19 @@
   .sidebar-link:hover {
     @apply bg-accent/10 text-accent;
   }
+
   .stat-card:hover {
     @apply shadow-md -translate-y-0.5;
   }
+
   .feature-card:hover {
-    @apply shadow-lg -translate-y-1 border-primary/20;
+    @apply shadow-md -translate-y-1 border-primary/40 dark:border-primary/30;
   }
+
   .internship-card:hover {
     @apply shadow-lg -translate-y-1;
   }
+
   .table-row-hover:hover {
     @apply bg-muted/50;
   }
@@ -412,13 +483,27 @@
 }
 
 @keyframes toastEnter {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes toastExit {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(100%); opacity: 0; }
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 /* Modal */
@@ -512,18 +597,39 @@
 
 /* GPU-accelerated floating animations */
 @keyframes floatUp {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -12px, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -12px, 0);
+  }
 }
 
 @keyframes floatDown {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, 10px, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, 10px, 0);
+  }
 }
 
 @keyframes floatSlight {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(0, -8px, 0); }
+
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
 }
 
 .animate-float-up {
@@ -549,13 +655,15 @@
    - Reveal and position the printable document container at top-left.
    ========================================================================== */
 @media print {
+
   /* Default page dimensions: A4 portrait */
   @page {
     size: A4 portrait;
     margin: 10mm;
   }
 
-  html, body {
+  html,
+  body {
     background: #ffffff !important;
     color: #0f172a !important;
     height: auto !important;
@@ -633,6 +741,7 @@
 
 /* Mobile GPU & Performance Optimizations */
 @media (max-width: 1023px) {
+
   .backdrop-blur-md,
   .backdrop-blur-xl,
   .backdrop-blur-2xl,
@@ -646,5 +755,3 @@
     backface-visibility: hidden;
   }
 }
-
-

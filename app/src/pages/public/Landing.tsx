@@ -330,6 +330,14 @@ export default function Landing() {
           '--mouse-y': '50%'
         } as React.CSSProperties}
       >
+        {/* Vector Background Graphic (final.svg) */}
+        <img
+          src="/svgs/final.svg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center opacity-30 mix-blend-screen pointer-events-none z-0"
+        />
+
         {/* Animated Particles - high performance Canvas based rendering */}
         <CanvasParticles />
 
@@ -341,7 +349,7 @@ export default function Landing() {
 
         {/* Mouse-reactive lighting effect - Only rendered/active on desktop */}
         {!isMobile && (
-          <div 
+          <div
             className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
             style={{
               background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
@@ -362,7 +370,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* Left Column: Typography, Actions, Trust */}
             <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
-              
+
               {/* Top Announcement Badge */}
               <MotionDiv
                 isMobile={isMobile}
@@ -390,7 +398,7 @@ export default function Landing() {
                 >
                   Launch Your Career With
                 </MotionDiv>
-                
+
                 <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
                   <TextRotate
                     texts={[
@@ -506,7 +514,7 @@ export default function Landing() {
                   {...animProps(
                     { opacity: 0, y: 40, scale: 0.95 },
                     isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -12, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 0.8 } : { 
+                    isMobile ? { duration: 0.6, delay: 0.8 } : {
                       opacity: { duration: 0.6, delay: 0.8 },
                       scale: { duration: 0.6, delay: 0.8 },
                       y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
@@ -551,7 +559,7 @@ export default function Landing() {
                   {...animProps(
                     { opacity: 0, y: 40, scale: 0.95 },
                     isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, 10, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 1.0 } : { 
+                    isMobile ? { duration: 0.6, delay: 1.0 } : {
                       opacity: { duration: 0.6, delay: 1.0 },
                       scale: { duration: 0.6, delay: 1.0 },
                       y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
@@ -579,7 +587,7 @@ export default function Landing() {
                   {...animProps(
                     { opacity: 0, y: 40, scale: 0.95 },
                     isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -8, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 1.2 } : { 
+                    isMobile ? { duration: 0.6, delay: 1.2 } : {
                       opacity: { duration: 0.6, delay: 1.2 },
                       scale: { duration: 0.6, delay: 1.2 },
                       y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
@@ -614,7 +622,7 @@ export default function Landing() {
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden sm:flex">
           <span className="text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
           <div className="w-5 h-8 border border-white/20 rounded-full flex justify-center p-1">
-            <MotionDiv 
+            <MotionDiv
               isMobile={isMobile}
               {...animProps(
                 null,
@@ -628,26 +636,26 @@ export default function Landing() {
       </section>
 
       {/* Community / Stay Updated Section */}
-      <section className="py-14 lg:py-20 px-4 bg-slate-950/40 backdrop-blur-md text-white relative overflow-hidden border-y border-white/10">
+      <section className="py-14 lg:py-20 px-4 bg-emerald-500/5 dark:bg-slate-950/40 backdrop-blur-md relative overflow-hidden border-y border-slate-200/60 dark:border-white/10">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
               Official Community Channels
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground dark:text-white leading-tight">
               Never Miss an Opportunity. <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-600 dark:from-emerald-400 dark:via-teal-300 dark:to-blue-400">
                 Stay Connected in Real-Time.
               </span>
             </h2>
-            <p className="mt-4 text-white/70 text-base sm:text-lg leading-relaxed">
+            <p className="mt-4 text-slate-600 dark:text-white/70 text-base sm:text-lg leading-relaxed">
               Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
             </p>
           </div>
@@ -661,22 +669,22 @@ export default function Landing() {
                 { opacity: 1, y: 0 },
                 { duration: 0.5, delay: 0.1 }
               )}
-              className="bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 group"
+              className="bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group shadow-md dark:shadow-none"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
                     <WhatsAppIcon className="w-6 h-6 fill-current" />
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
                     Live Alerts
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                   WhatsApp Channel
                 </h3>
-                <p className="text-white/70 text-sm leading-relaxed mb-6">
+                <p className="text-slate-600 dark:text-white/70 text-sm leading-relaxed mb-6">
                   Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
                 </p>
               </div>
@@ -737,7 +745,7 @@ export default function Landing() {
       </section>
 
       {/* Section 1 — Every Career Starts Somewhere */}
-      <section className="py-14 lg:py-20 px-4 bg-background/20 backdrop-blur-xs border-b border-border/20 content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             {/* Left: Heading and Paragraph */}
@@ -777,7 +785,7 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30"
+                  className="bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
                 >
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
@@ -834,7 +842,7 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-14 lg:py-20 px-4 bg-background/20 backdrop-blur-xs content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <MotionDiv
             isMobile={isMobile}
@@ -849,18 +857,18 @@ export default function Landing() {
           </MotionDiv>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
-              {steps.map((step, i) => (
-                <MotionDiv
-                  isMobile={isMobile}
-                  key={i}
-                  role="article"
-                  {...viewProps(
-                    { opacity: 0, y: 30 },
-                    { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: i * 0.15 }
-                  )}
-                  className="text-center relative"
-                >
+            {steps.map((step, i) => (
+              <MotionDiv
+                isMobile={isMobile}
+                key={i}
+                role="article"
+                {...viewProps(
+                  { opacity: 0, y: 30 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.15 }
+                )}
+                className="text-center relative"
+              >
                 <span className="text-5xl font-bold text-accent/15">{step.num}</span>
                 <div className="mt-4 w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto">
                   <step.icon className="w-7 h-7 text-accent" />
@@ -933,8 +941,8 @@ export default function Landing() {
               )}
               className="relative"
             >
-              <div className="bg-gradient-to-br from-slate-900/80 to-accent/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-                <div className="bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-lg space-y-4 border border-border/40">
+              <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 dark:from-slate-900/80 dark:to-accent/40 backdrop-blur-xl border border-emerald-500/20 dark:border-white/10 rounded-2xl p-8 shadow-xl dark:shadow-2xl">
+                <div className="bg-white/75 dark:bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-md dark:shadow-lg space-y-4 border border-slate-200/80 dark:border-border/40">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Cohort Size</p>
@@ -978,7 +986,7 @@ export default function Landing() {
       </section>
 
       {/* Section 2 — Built on Transparency. Designed for Confidence. */}
-      <section className="py-14 lg:py-20 px-4 bg-background/20 backdrop-blur-xs border-t border-b border-border/20 content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <MotionDiv
             isMobile={isMobile}
@@ -1008,7 +1016,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/30"
+                className="bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
               >
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
@@ -1022,7 +1030,7 @@ export default function Landing() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-14 lg:py-20 px-4 bg-background/25 backdrop-blur-xs content-visibility-auto">
+      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <MotionDiv
             isMobile={isMobile}
@@ -1037,27 +1045,27 @@ export default function Landing() {
           </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.map((t, i) => (
-                <MotionDiv
-                  isMobile={isMobile}
-                  key={i}
-                  role="article"
-                  {...viewProps(
-                    { opacity: 0, y: 30 },
-                    { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: i * 0.1 }
-                  )}
-                  className="bg-card/70 backdrop-blur-md rounded-xl border border-border/60 dark:border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-accent/30"
-                >
-                  <Quote className="w-8 h-8 text-accent/20" />
+            {testimonials.map((t, i) => (
+              <MotionDiv
+                isMobile={isMobile}
+                key={i}
+                role="article"
+                {...viewProps(
+                  { opacity: 0, y: 30 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: i * 0.1 }
+                )}
+                className="bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-accent/40 dark:hover:border-accent/30"
+              >
+                <Quote className="w-8 h-8 text-accent/20" />
                 <p className="mt-3 text-foreground italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
-                  <figure className="mt-6 flex items-center gap-3">
-                    <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
-                    <figcaption>
-                      <p className="text-sm font-semibold">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">{t.role}</p>
-                    </figcaption>
-                  </figure>
+                <figure className="mt-6 flex items-center gap-3">
+                  <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
+                  <figcaption>
+                    <p className="text-sm font-semibold">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                  </figcaption>
+                </figure>
               </MotionDiv>
             ))}
           </div>
@@ -1065,7 +1073,7 @@ export default function Landing() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 lg:py-16 px-4 bg-slate-950/40 backdrop-blur-md border-y border-white/10 content-visibility-auto">
+      <section className="py-12 lg:py-16 px-4 bg-slate-100/40 dark:bg-slate-950/40 backdrop-blur-md border-y border-slate-200/60 dark:border-white/10 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => (
@@ -1077,12 +1085,12 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="text-center"
+                className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200/70 dark:border-white/10 rounded-xl p-5 shadow-xs dark:shadow-sm text-center"
               >
-                <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-white">{stat.value}</p>
+                <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">
-                  <stat.icon className="w-4 h-4 text-white/50" />
-                  <p className="text-sm text-white/60">{stat.label}</p>
+                  <stat.icon className="w-4 h-4 text-slate-500 dark:text-white/50" />
+                  <p className="text-sm text-slate-600 dark:text-white/60">{stat.label}</p>
                 </div>
               </MotionDiv>
             ))}
@@ -1099,7 +1107,7 @@ export default function Landing() {
               { opacity: 0, y: 20 },
               { opacity: 1, y: 0 }
             )}
-            className="bg-gradient-to-r from-emerald-600/85 via-teal-600/85 to-cyan-600/85 backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden"
+            className="bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 dark:from-emerald-600/85 dark:via-teal-600/85 dark:to-cyan-600/85 backdrop-blur-md border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-xl text-white"
           >
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />
