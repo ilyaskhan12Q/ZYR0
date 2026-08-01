@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.17.4] - 2026-08-01
 
 ### Added
-- **Light Theme Background Optimization — Phase 1: Audit (`fix/light-theme-background-optimization`)**:
-  - Conducted repository-wide visual audit of light theme contrast, SVG visibility, and surface transparency.
-  - Documented contrast and legibility findings in `docs/LIGHT_THEME_AUDIT.md`.
+- **Light Theme Background Optimization (`fix/light-theme-background-optimization`)**:
+  - **Phase 1: Audit**: Conducted repository-wide visual audit of light theme contrast, SVG visibility, and surface transparency (`docs/LIGHT_THEME_AUDIT.md`).
+  - **Phase 2: Light-Mode Gradient Overlay**: Integrated a `dark:hidden` gradient overlay (`rgba(255,255,255,0.70)`, soft slate `rgba(241,245,249,0.50)`, and subtle emerald `rgba(16,185,129,0.04)`) in `ParabolicPentagonBg.tsx` to elevate contrast in light mode while leaving dark mode completely untouched. Updated light mode SVG blend mode to `mix-blend-multiply` (`dark:mix-blend-screen`).
 
 ## [0.17.3] - 2026-08-01
 
