@@ -27,12 +27,18 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({ parallaxOffset
       </div>
 
       {/* 2. Gradient Overlays Layer (Depth, ambient lighting, vignette contrast) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/90 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/35 to-background/85 pointer-events-none" />
+      
+      {/* Ambient Radial Glows anchored to key landing sections */}
       <div
-        className="absolute inset-0 opacity-70 dark:opacity-80 transition-opacity duration-500 pointer-events-none"
+        className="absolute inset-0 opacity-80 dark:opacity-90 transition-opacity duration-500 pointer-events-none"
         style={{
-          background:
-            'radial-gradient(ellipse 85% 65% at 50% 25%, rgba(62, 11, 244, 0.15) 0%, rgba(32, 10, 194, 0.05) 50%, transparent 85%)',
+          background: `
+            radial-gradient(circle 650px at 50% 12%, rgba(16, 185, 129, 0.12), transparent 70%),
+            radial-gradient(circle 750px at 85% 42%, rgba(99, 102, 241, 0.10), transparent 70%),
+            radial-gradient(circle 650px at 15% 85%, rgba(14, 165, 233, 0.12), transparent 70%),
+            radial-gradient(ellipse 90% 70% at 50% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 80%)
+          `,
         }}
       />
     </div>
