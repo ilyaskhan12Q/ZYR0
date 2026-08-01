@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react"
 import { 
   Search, 
   FileCheck2, 
@@ -5,7 +6,6 @@ import {
   KanbanSquare, 
   Award, 
   Rocket, 
-  LucideIcon,
   CheckCircle,
   Clock,
   Sparkles,

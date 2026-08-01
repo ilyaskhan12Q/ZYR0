@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, User, Award, ExternalLink, Building2, Rocket } from "lucide-react"
-import { JourneyCardItem } from "./journey-data"
+import type { JourneyCardItem } from "./journey-data"
 import { cn } from "@/lib/utils"
 
 interface JourneyCardProps {
@@ -76,7 +76,7 @@ const BADGE_STYLES: Record<
   },
 }
 
-export function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
+export const JourneyCard = React.memo(function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
   const badgeStyle = BADGE_STYLES[card.badgeVariant]
   const Icon = card.icon
 
@@ -183,9 +183,9 @@ export function JourneyCard({ card, index, totalCards }: JourneyCardProps) {
       </div>
     </div>
   )
-}
+})
 
-function CardVisualPreview({ type }: { type: JourneyCardItem["previewType"] }) {
+const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type: JourneyCardItem["previewType"] }) {
   switch (type) {
     case "filter_drops":
       return (
@@ -375,4 +375,4 @@ function CardVisualPreview({ type }: { type: JourneyCardItem["previewType"] }) {
     default:
       return null
   }
-}
+})
