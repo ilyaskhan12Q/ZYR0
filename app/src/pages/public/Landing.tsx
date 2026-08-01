@@ -650,7 +650,7 @@ export default function Landing() {
                 Stay Connected in Real-Time.
               </span>
             </h2>
-            <p className="mt-4 text-slate-600 dark:text-white/70 text-base sm:text-lg leading-relaxed">
+            <p className="mt-4 text-slate-600 dark:text-white/80 text-base sm:text-lg leading-relaxed">
               Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
             </p>
           </div>
@@ -679,7 +679,7 @@ export default function Landing() {
                 <h3 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-300 transition-colors">
                   WhatsApp Channel
                 </h3>
-                <p className="text-slate-600 dark:text-white/70 text-sm leading-relaxed mb-6">
+                <p className="text-slate-600 dark:text-white/80 text-sm leading-relaxed mb-6">
                   Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
                 </p>
               </div>
