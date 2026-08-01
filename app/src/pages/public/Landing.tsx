@@ -308,7 +308,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="relative min-h-screen text-foreground overflow-hidden">
+    <div className="relative min-h-screen text-slate-100 overflow-hidden bg-slate-950">
       {/* Background Layer (Fixed z-0 Canvas) */}
       <BackgroundLayer />
 
@@ -631,7 +631,7 @@ export default function Landing() {
       </section>
 
       {/* Community / Stay Updated Section */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-transparent dark:border-white/10">
+      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-white/10">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -754,16 +754,16 @@ export default function Landing() {
               className="lg:col-span-5 space-y-6"
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-foreground dark:text-white tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
                 Every career starts somewhere.
               </h2>
-              <p className="text-muted-foreground dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
+              <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
               </p>
-              <p className="text-muted-foreground dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
                 Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
               </p>
-              <p className="text-muted-foreground dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+              <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
                 Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
               </p>
             </MotionDiv>
@@ -780,13 +780,13 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
+                  className="bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40"
                 >
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-foreground dark:text-white">{role.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">{role.desc}</p>
+                  <h3 className="mt-4 text-lg font-semibold text-white">{role.title}</h3>
+                  <p className="mt-2 text-sm text-slate-400 leading-relaxed">{role.desc}</p>
                 </MotionDiv>
               ))}
             </div>
@@ -806,8 +806,8 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white text-balance">Built for accountability and clear outcomes</h2>
-            <p className="mt-4 text-muted-foreground dark:text-slate-300 max-w-2xl mx-auto">
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-balance">Built for accountability and clear outcomes</h2>
+            <p className="mt-4 text-slate-300 max-w-2xl mx-auto">
               Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
             </p>
           </MotionDiv>
@@ -828,8 +828,8 @@ export default function Landing() {
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
                   <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold dark:text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">{feature.desc}</p>
+                <h3 className="mt-4 text-lg font-semibold text-white">{feature.title}</h3>
+                <p className="mt-2 text-sm text-slate-400 leading-relaxed">{feature.desc}</p>
               </MotionDiv>
             ))}
           </div>
@@ -848,7 +848,7 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Path</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white text-balance">How it works</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-balance">How it works</h2>
           </MotionDiv>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 relative">
@@ -868,8 +868,8 @@ export default function Landing() {
                 <div className="mt-4 w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto">
                   <step.icon className="w-7 h-7 text-accent" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold dark:text-white">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground dark:text-slate-400">{step.desc}</p>
+                <h3 className="mt-4 text-lg font-semibold text-white">{step.title}</h3>
+                <p className="mt-2 text-sm text-slate-400">{step.desc}</p>
                 {i < 3 && (
                   <div className="hidden md:block absolute top-16 right-0 w-1/2 border-t-2 border-dashed border-border" />
                 )}
@@ -892,11 +892,11 @@ export default function Landing() {
               )}
             >
               <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
-              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white">Run your internship programs with confidence</h2>
-              <p className="mt-4 text-muted-foreground dark:text-slate-300">
+              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Run your internship programs with confidence</h2>
+              <p className="mt-4 text-slate-300">
                 Manage cohorts of any size from one structured dashboard. Review candidate profiles, structure milestone tasks with clear acceptance criteria, assign industry mentors, track intern progress in real time, and issue verified completion certificates when each intern finishes their program.
               </p>
-              <p className="mt-3 text-muted-foreground dark:text-slate-400 text-sm">
+              <p className="mt-3 text-slate-400 text-sm">
                 ZYR0 replaces spreadsheets and email chains with a unified view of your entire internship pipeline — from posting listings and reviewing applicants to monitoring task completion and generating credentials. Companies retain full control over every stage while providing interns with the structured guidance they need to succeed.
               </p>
               <div className="mt-8 space-y-4">
@@ -911,10 +911,10 @@ export default function Landing() {
                     )}
                     className="flex items-center gap-3"
                   >
-                    <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                     </div>
-                    <span className="text-sm text-foreground dark:text-white/90">{feature}</span>
+                    <span className="text-sm text-white/90">{feature}</span>
                   </MotionDiv>
                 ))}
               </div>
@@ -936,15 +936,15 @@ export default function Landing() {
               )}
               className="relative"
             >
-              <div className="bg-transparent dark:from-slate-900/80 dark:to-accent/40 backdrop-blur-xl border border-transparent dark:border-white/10 rounded-2xl p-8 shadow-none dark:shadow-2xl">
-                <div className="bg-transparent dark:bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-none dark:shadow-lg space-y-4 border border-transparent dark:border-border/40">
+              <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
+                <div className="bg-slate-900/60 backdrop-blur-md rounded-xl p-6 shadow-lg space-y-4 border border-white/10">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground dark:text-slate-400">Cohort Size</p>
-                      <p className="text-2xl font-bold dark:text-white">24</p>
+                      <p className="text-sm text-slate-400">Cohort Size</p>
+                      <p className="text-2xl font-bold text-white">24</p>
                     </div>
-                    <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-emerald-400" />
                     </div>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -952,26 +952,26 @@ export default function Landing() {
                   </div>
                   <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
                     <div className="text-center">
-                      <p className="text-lg font-bold dark:text-white">156</p>
-                      <p className="text-xs text-muted-foreground dark:text-slate-400">Applicants</p>
+                      <p className="text-lg font-bold text-white">156</p>
+                      <p className="text-xs text-slate-400">Applicants</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-bold dark:text-white">89%</p>
-                      <p className="text-xs text-muted-foreground dark:text-slate-400">Completion</p>
+                      <p className="text-lg font-bold text-white">89%</p>
+                      <p className="text-xs text-slate-400">Completion</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-lg font-bold dark:text-white">4.8</p>
-                      <p className="text-xs text-muted-foreground dark:text-slate-400">Feedback</p>
+                      <p className="text-lg font-bold text-white">4.8</p>
+                      <p className="text-xs text-slate-400">Feedback</p>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 bg-card/90 backdrop-blur rounded-xl p-4 shadow-lg flex items-center gap-3">
+                <div className="mt-4 bg-slate-900/70 backdrop-blur rounded-xl p-4 shadow-lg flex items-center gap-3 border border-white/10">
                   <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-5 h-5 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium dark:text-white">Cohort activity up 32%</p>
-                    <p className="text-xs text-muted-foreground dark:text-slate-400">Compared to last month</p>
+                    <p className="text-sm font-medium text-white">Cohort activity up 32%</p>
+                    <p className="text-xs text-slate-400">Compared to last month</p>
                   </div>
                 </div>
               </div>
@@ -992,10 +992,10 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">System Credibility</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white tracking-tight">
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
               Built on transparency. Designed for confidence.
             </h2>
-            <p className="mt-4 text-muted-foreground dark:text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
+            <p className="mt-4 text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
               A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
             </p>
           </MotionDiv>
@@ -1011,13 +1011,13 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
+                className="bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40"
               >
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-foreground dark:text-white">{card.title}</h3>
-                <p className="mt-2 text-xs sm:text-sm text-muted-foreground dark:text-slate-400 leading-relaxed">{card.desc}</p>
+                <h3 className="mt-4 text-base font-semibold text-white">{card.title}</h3>
+                <p className="mt-2 text-xs sm:text-sm text-slate-400 leading-relaxed">{card.desc}</p>
               </MotionDiv>
             ))}
           </div>
@@ -1036,7 +1036,7 @@ export default function Landing() {
             className="text-center mb-14"
           >
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Reviews</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground dark:text-white">Verified experiences from our community</h2>
+            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Verified experiences from our community</h2>
           </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1050,15 +1050,15 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-accent/40 dark:hover:border-accent/30"
+                className="bg-slate-900/60 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-accent/40"
               >
                 <Quote className="w-8 h-8 text-accent/20" />
-                <p className="mt-3 text-foreground dark:text-white/90 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <p className="mt-3 text-white/90 italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <figure className="mt-6 flex items-center gap-3">
                   <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover" />
                   <figcaption>
-                    <p className="text-sm font-semibold dark:text-white">{t.name}</p>
-                    <p className="text-xs text-muted-foreground dark:text-slate-400">{t.role}</p>
+                    <p className="text-sm font-semibold text-white">{t.name}</p>
+                    <p className="text-xs text-slate-400">{t.role}</p>
                   </figcaption>
                 </figure>
               </MotionDiv>
@@ -1068,7 +1068,7 @@ export default function Landing() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 lg:py-16 px-4 bg-transparent border-y border-transparent dark:border-white/10 content-visibility-auto">
+      <section className="py-12 lg:py-16 px-4 bg-transparent border-y border-white/10 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => (
@@ -1080,12 +1080,12 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-transparent dark:bg-slate-900/50 backdrop-blur-sm border border-transparent dark:border-white/10 rounded-xl p-5 shadow-none dark:shadow-sm text-center"
+                className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-5 shadow-sm text-center"
               >
-                <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
+                <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-white">{stat.value}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">
-                  <stat.icon className="w-4 h-4 text-slate-500 dark:text-white/50" />
-                  <p className="text-sm text-slate-600 dark:text-white/70">{stat.label}</p>
+                  <stat.icon className="w-4 h-4 text-white/50" />
+                  <p className="text-sm text-white/70">{stat.label}</p>
                 </div>
               </MotionDiv>
             ))}
