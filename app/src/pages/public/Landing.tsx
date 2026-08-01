@@ -309,7 +309,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="relative min-h-screen text-slate-100 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen text-slate-100 overflow-x-clip bg-slate-950">
       {/* Background Layer (Fixed z-0 Canvas) */}
       <BackgroundLayer />
 

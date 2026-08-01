@@ -11,7 +11,7 @@ interface JourneySectionProps {
 
 export function JourneySection({ className }: JourneySectionProps) {
   return (
-    <section className={cn("py-16 lg:py-24 px-4 bg-transparent relative overflow-hidden", className)}>
+    <section className={cn("py-16 lg:py-24 px-4 bg-transparent relative overflow-x-clip", className)}>
       {/* Background Decorative Glow Effects */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
 
