@@ -631,7 +631,7 @@ export default function Landing() {
       </section>
 
       {/* Community / Stay Updated Section */}
-      <section className="py-14 lg:py-20 px-4 bg-emerald-500/5 dark:bg-slate-950/40 backdrop-blur-md relative overflow-hidden border-y border-slate-200/60 dark:border-white/10">
+      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-transparent dark:border-white/10">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -664,7 +664,7 @@ export default function Landing() {
                 { opacity: 1, y: 0 },
                 { duration: 0.5, delay: 0.1 }
               )}
-              className="bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group shadow-md dark:shadow-none"
+              className="bg-transparent dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group shadow-none"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
@@ -780,7 +780,7 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
+                  className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
                 >
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
@@ -936,8 +936,8 @@ export default function Landing() {
               )}
               className="relative"
             >
-              <div className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 dark:from-slate-900/80 dark:to-accent/40 backdrop-blur-xl border border-emerald-500/20 dark:border-white/10 rounded-2xl p-8 shadow-xl dark:shadow-2xl">
-                <div className="bg-white/75 dark:bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-md dark:shadow-lg space-y-4 border border-slate-200/80 dark:border-border/40">
+              <div className="bg-transparent dark:from-slate-900/80 dark:to-accent/40 backdrop-blur-xl border border-transparent dark:border-white/10 rounded-2xl p-8 shadow-none dark:shadow-2xl">
+                <div className="bg-transparent dark:bg-card/85 backdrop-blur-md rounded-xl p-6 shadow-none dark:shadow-lg space-y-4 border border-transparent dark:border-border/40">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Cohort Size</p>
@@ -1011,7 +1011,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
+                className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-primary/40 dark:hover:border-primary/30"
               >
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
@@ -1050,7 +1050,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-white/60 dark:bg-card/70 backdrop-blur-md rounded-xl border border-slate-200/80 dark:border-white/10 p-6 shadow-sm dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-accent/40 dark:hover:border-accent/30"
+                className="bg-transparent dark:bg-slate-900/60 backdrop-blur-md rounded-xl border border-transparent dark:border-white/10 p-6 shadow-none dark:shadow-md transition-all duration-300 hover:shadow-md hover:-translate-y-1 hover:border-accent/40 dark:hover:border-accent/30"
               >
                 <Quote className="w-8 h-8 text-accent/20" />
                 <p className="mt-3 text-foreground italic leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
@@ -1068,7 +1068,7 @@ export default function Landing() {
       </section>
 
       {/* Stats */}
-      <section className="py-12 lg:py-16 px-4 bg-slate-100/40 dark:bg-slate-950/40 backdrop-blur-md border-y border-slate-200/60 dark:border-white/10 content-visibility-auto">
+      <section className="py-12 lg:py-16 px-4 bg-transparent border-y border-transparent dark:border-white/10 content-visibility-auto">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {stats.map((stat, i) => (
@@ -1080,7 +1080,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border border-slate-200/70 dark:border-white/10 rounded-xl p-5 shadow-xs dark:shadow-sm text-center"
+                className="bg-transparent dark:bg-slate-900/50 backdrop-blur-sm border border-transparent dark:border-white/10 rounded-xl p-5 shadow-none dark:shadow-sm text-center"
               >
                 <p className="text-2xl xs:text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">{stat.value}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">

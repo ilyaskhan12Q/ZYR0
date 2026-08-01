@@ -407,12 +407,12 @@
 
 /* Feature card */
 .feature-card {
-  @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-xl border border-slate-200/80 dark:border-white/15 p-6 shadow-sm dark:shadow-lg transition-all duration-300;
+  @apply bg-transparent dark:bg-slate-900/60 backdrop-blur-xl rounded-xl border border-transparent dark:border-white/15 p-6 shadow-none dark:shadow-lg transition-all duration-300;
 }
 
 /* Internship card */
 .internship-card {
-  @apply bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-xl border border-slate-200/80 dark:border-white/15 shadow-sm dark:shadow-lg overflow-hidden transition-all duration-300;
+  @apply bg-transparent dark:bg-slate-900/60 backdrop-blur-xl rounded-xl border border-transparent dark:border-white/15 shadow-none dark:shadow-lg overflow-hidden transition-all duration-300;
 }
 
 /* Table row hover */
