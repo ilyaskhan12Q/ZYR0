@@ -130,13 +130,6 @@ function qcaSvg(): string {
 </svg>`;
 }
 
-function sealSvg(): string {
-  return `
-<svg viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-label="ZYRO Certified Badge">
-  <path d="M54.4,77.9c-0.4,0-0.7-0.1-1-0.3l-4.7-3.2L44,77.6c-0.8,0.6-1.9,0.4-2.5-0.4l-3.5-4.5l-5.5,1.6c-0.9,0.3-1.9-0.2-2.2-1.1  l-1.9-5.4l-5.7-0.1c-1,0-1.8-0.8-1.8-1.8l-0.1-5.7l-5.4-1.9c-0.9-0.3-1.4-1.3-1.1-2.2l1.6-5.5l-4.5-3.5c-0.8-0.6-1-1.7-0.4-2.5  l3.2-4.7L11,35.2c-0.6-0.8-0.4-1.9,0.4-2.5l4.5-3.5l-1.6-5.5c-0.3-0.9,0.2-1.9,1.1-2.3l5.4-1.9l0.1-5.7c0-1,0.8-1.8,1.8-1.8l5.7-0.1  l1.9-5.4c0.3-0.9,1.3-1.4,2.2-1.1l5.5,1.6l3.5-4.5c0.6-0.8,1.7-1,2.5-0.4l4.7,3.2l4.7-3.2c0.8-0.6,1.9-0.4,2.5,0.4l3.5,4.5l5.5-1.6  c0.9-0.3,1.9,0.2,2.3,1.1L69,12l5.7,0.1c1,0,1.8,0.8,1.8,1.8l0.1,5.7l5.4,1.9c0.9,0.3,1.4,1.3,1.1,2.3l-1.6,5.5l4.5,3.5  c0.8,0.6,0.9,1.7,0.4,2.5l-3.2,4.7l3.2,4.7c0.6,0.8,0.4,1.9-0.4,2.5l-4.5,3.5l1.6,5.5c0.3,0.9-0.2,1.9-1.1,2.2l-5.4,1.9l-0.1,5.7  c0,1-0.8,1.8-1.8,1.8L69,67.8l-1.9,5.4c-0.3,0.9-1.3,1.4-2.3,1.1l-5.5-1.6l-3.5,4.5C55.5,77.6,55,77.9,54.4,77.9L54.4,77.9z   M48.7,70.3c0.4,0,0.7,0.1,1,0.3l4.3,3l3.2-4.1c0.5-0.6,1.2-0.9,2-0.6l5,1.5l1.7-4.9c0.3-0.7,0.9-1.2,1.7-1.2l5.2-0.1l0.1-5.2  c0-0.8,0.5-1.4,1.2-1.7l4.9-1.7l-1.5-5c-0.2-0.7,0-1.5,0.6-2l4.1-3.2l-3-4.3c-0.4-0.6-0.4-1.5,0-2.1l3-4.3l-4.1-3.2  c-0.6-0.5-0.9-1.3-0.6-2l1.5-5l-4.9-1.7C73.5,22.4,73,21.7,73,21l-0.1-5.2l-5.2-0.1c-0.8,0-1.4-0.5-1.7-1.2l-1.7-4.9l-5,1.5  c-0.7,0.2-1.5,0-2-0.6L54,6.2l-4.3,3c-0.6,0.4-1.5,0.4-2.1,0l-4.3-3l-3.2,4.1c-0.5,0.6-1.2,0.9-2,0.6l-5-1.5l-1.7,4.9  c-0.3,0.7-0.9,1.2-1.7,1.2l-5.2,0.1L24.5,21c0,0.8-0.5,1.4-1.2,1.7l-4.9,1.7l1.5,5c0.2,0.7,0,1.5-0.6,2L15,34.5l3,4.3  c0.4,0.6,0.4,1.5,0,2.1l-3,4.3l4.1,3.2c0.6,0.5,0.9,1.3,0.6,2l-1.5,5l4.9,1.7c0.7,0.3,1.2,0.9,1.2,1.7l0.1,5.2l5.2,0.1  c0.8,0,1.4,0.5,1.7,1.2l1.7,4.9l5-1.5c0.7-0.2,1.5,0,2,0.6l3.2,4.1l4.3-3C48,70.4,48.3,70.3,48.7,70.3L48.7,70.3z M48.7,17  c-12.6,0-22.9,10.3-22.9,22.9c0,12.6,10.3,22.9,22.9,22.9c12.6,0,22.9-10.3,22.9-22.9C71.6,27.2,61.4,17,48.7,17z M38.7,97.9  c0.5,0,0.9-0.2,1.3-0.5l8.6-8l9.1,8.1c0.5,0.5,1.3,0.6,2,0.3c0.7-0.3,1.1-1,1.1-1.7V79.2c0-1-0.8-1.8-1.8-1.8c-1,0-1.8,0.8-1.8,1.8  V92l-7.3-6.5c-0.7-0.6-1.8-0.6-2.5,0l-6.7,6.3V79.2c0-1-0.8-1.8-1.8-1.8c-1,0-1.8,0.8-1.8,1.8V96c0,0.7,0.4,1.4,1.1,1.7  C38.2,97.8,38.4,97.9,38.7,97.9L38.7,97.9z"/>
-</svg>`;
-}
-
 // ── Main document builder ──────────────────────────────────────────────────
 
 export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
@@ -372,25 +365,38 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       margin-top: 14px;
       padding-top: 16px;
       display: grid;
-      grid-template-columns: 1fr auto auto auto 1fr;
+      grid-template-columns: 1fr auto 1fr;
       align-items: end;
-      gap: 24px;
+      gap: 28px;
     }
-    .logos { display: flex; gap: 18px; align-items: center; }
-    .footer-logo { height: 78px; width: auto; display: block; object-fit: contain; }
+    .sig-block { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 26px; color: #1a1a1a; line-height: 1; margin-bottom: 2px; }
+    .sig-underline { width: 210px; border-top: 1.6px solid #8a8a8a; }
+    .sig-name { font-size: 13px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
+    .sig-title { font-size: 9.5px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+    .sig-meta { margin-top: 8px; font-size: 8.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
+    .sig-meta b { color: #111; font-weight: 700; }
+    .center-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .logos { display: flex; gap: 16px; align-items: center; }
+    .footer-logo { height: 52px; width: auto; display: block; object-fit: contain; }
+    .seal-qr { display: flex; align-items: flex-end; gap: 16px; }
+    .seal-col { display: flex; flex-direction: column; align-items: center; }
+    .seal-gold {
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, #f59e0b 0%, #d97706 100%);
+      border-radius: 50%;
+      border: 4px dashed #fff;
+      box-shadow: 0 0 0 4px #d97706, 0 4px 10px rgba(0,0,0,.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .badge-text { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; margin-top: 7px; color: #b89c56; letter-spacing: 1.5px; }
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    .qr-img { width: 82px; height: 82px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
+    .qr-img { width: 70px; height: 70px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
     .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
-    .seal { width: 92px; display: flex; flex-direction: column; align-items: center; gap: 3px; transform: rotate(-8deg); }
-    .seal svg { display: block; width: 100%; height: auto; }
-    .seal svg path { fill: #a8843c; }
-    .seal-credit { font-size: 6px; color: #8a8a8a; letter-spacing: .5px; text-transform: uppercase; white-space: nowrap; }
-    .sign { text-align: right; margin-bottom: 16px; }
-    .sig-space { height: 26px; }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 27px; color: #1a1a1a; line-height: 1; margin-bottom: 3px; }
-    .sig-underline { width: 200px; margin-left: auto; border-top: 1.6px solid #8a8a8a; }
-    .sig-name { font-size: 12.5px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
-    .sig-caption { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .7px; margin-top: 1px; }
 
     @media print {
       body { width: 297mm; height: 210mm; }
@@ -472,29 +478,40 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
           </div>
 
           <div class="footer-row">
-            <div class="footer-left">
+            <div class="sig-block">
+              <div class="sig-script">${supervisorName}</div>
+              <div class="sig-underline"></div>
+              <div class="sig-name">${supervisorName}</div>
+              <div class="sig-title">Program Coordinator, ZYRO Interns</div>
+              <div class="sig-meta">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
+            </div>
+            <div class="center-col">
               <div class="logos">
                 <img class="footer-logo" src="${isoSrc}" alt="ISO 9001:2015" />
                 ${qcaSrc ? `<img class="footer-logo" src="${qcaSrc}" alt="QCA UK" />` : qcaSvg()}
                 <img class="footer-logo" src="${oLogoSrc}" alt="ZYRO Platform" />
               </div>
-              <div class="meta-row">
-                <div>Certificate ID: <b>${credentialId}</b></div>
-                <div>Issue Date: <b>${issueDateStr}</b></div>
+              <div class="seal-qr">
+                <div class="seal-col">
+                  <div class="seal-gold">
+                    <svg style="width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:2.2" viewBox="0 0 24 24">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      <path d="M9 11l2 2 4-4"/>
+                    </svg>
+                  </div>
+                  <div class="badge-text">VERIFIED SECURE</div>
+                </div>
+                <div class="qr">
+                  <img class="qr-img" src="${qrSrc}" alt="Verification QR" width="70" height="70" />
+                  <span class="qr-label">Scan to Verify</span>
+                </div>
               </div>
             </div>
-            <div class="qr">
-              <img class="qr-img" src="${qrSrc}" alt="Verification QR" width="82" height="82" />
-              <span class="qr-label">Scan to Verify</span>
-            </div>
-            <div class="seal">${sealSvg()}<span class="seal-credit">certified &middot; Noun Project</span></div>
-            <div class="sign">
-              <div class="sig-space"></div>
-              <div class="sig-script">${supervisorName}</div>
+            <div class="sig-block">
+              <div class="sig-script">ZYRO Director</div>
               <div class="sig-underline"></div>
-              <div class="sig-name">${supervisorName}</div>
-              <div class="sig-caption">Internship Supervisor</div>
-              <div class="sig-caption">ZYRO Director</div>
+              <div class="sig-name">Academic Director</div>
+              <div class="sig-title">ZYRO Platforms</div>
             </div>
           </div>
         </div>
