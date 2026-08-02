@@ -143,7 +143,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     skills,
     supervisorName,
     qrSrc,
-    crestSrc,
     isoSrc,
     oLogoSrc,
     qcaSrc,
@@ -252,9 +251,9 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 
     /* ── Header row: Govt crest | award sub-header | ZYRO brand ──────── */
     .top-row { display: grid; grid-template-columns: 1fr 1.5fr 1fr; align-items: start; }
-    .gov { display: flex; gap: 10px; align-items: flex-start; }
-    .gov-crest { width: 56px; height: auto; flex-shrink: 0; }
-    .gov-text { color: #0b5d2e; font-size: 8px; font-weight: 600; line-height: 1.5; text-transform: uppercase; letter-spacing: .35px; padding-top: 2px; }
+    .gov { display: flex; align-items: center; }
+    .logos-top { display: flex; gap: 14px; align-items: center; }
+    .logo-top { height: 46px; width: auto; display: block; object-fit: contain; }
     .award-sub {
       text-align: center;
       color: #8a1c1c;
@@ -433,12 +432,10 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
         <div class="inner">
           <div class="top-row">
             <div class="gov">
-              <img class="gov-crest" src="${crestSrc}" alt="Government of Pakistan" />
-              <div class="gov-text">
-                Government of Pakistan<br />
-                [INSERT MINISTRY/DEPARTMENT NAME]<br />
-                Department of Industrial Policy and Promotion (Islamabad)<br />
-                Udyog Bhawan (Islamabad)
+              <div class="logos-top">
+                <img class="logo-top" src="${isoSrc}" alt="ISO 9001:2015" />
+                ${qcaSrc ? `<img class="logo-top" src="${qcaSrc}" alt="QCA UK" />` : qcaSvg()}
+                <img class="logo-top" src="${oLogoSrc}" alt="ZYRO Platform" />
               </div>
             </div>
             <div class="award-sub">ZYRO Awarding this certificate of achievement</div>
