@@ -451,7 +451,7 @@ export default function Landing() {
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/15 backdrop-blur-md px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base"
+                  className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
                 >
                   For Companies
                 </Link>
@@ -459,7 +459,7 @@ export default function Landing() {
                   href={SITE_CONFIG.social.whatsappChannel}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-emerald-500/[0.08] border border-emerald-500/25 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-emerald-500/[0.16] hover:border-emerald-500/40 transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98]"
+                  className="inline-flex items-center justify-center gap-2 bg-slate-900/80 border border-emerald-500/35 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-slate-800/90 hover:border-emerald-400/50 backdrop-blur-xl transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98] shadow-md"
                   title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
                 >
                   <span className="relative flex h-2 w-2">
@@ -488,9 +488,9 @@ export default function Landing() {
                     { number: '100%', label: 'Certificate Validity' },
                     { number: '4.9★', label: 'Mentor Rating' },
                   ].map((stat, idx) => (
-                    <div key={idx} className="bg-white/[0.03] border border-white/[0.08] hover:border-white/[0.18] backdrop-blur-md rounded-xl p-3 sm:p-3.5 transition-all duration-300 hover:bg-white/[0.06] text-left">
+                    <div key={idx} className="bg-slate-900/80 border border-white/10 hover:border-white/20 backdrop-blur-xl rounded-xl p-3 sm:p-3.5 transition-all duration-300 hover:bg-slate-900/95 text-left shadow-lg">
                       <div className="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-300 text-lg sm:text-xl tracking-tight">{stat.number}</div>
-                      <div className="text-[11px] text-slate-400 font-medium">{stat.label}</div>
+                      <div className="text-[11px] text-slate-300 font-medium">{stat.label}</div>
                     </div>
                   ))}
                 </div>
