@@ -5,6 +5,107 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2026-08-02
+
+### Fixed
+- **Certificate Production Hardening (`feature/certificate-production-hardening`)**:
+  - Removed demo fallback records from the certificate verification flow and replaced them with honest placeholders.
+  - Softened the cryptographic signature claim on certificates to accurate wording.
+  - Added internship start/end dates to the company internship create form.
+  - Removed the duplicate `011` migration (superseded by `027_add_certificate_dates.sql`).
+
+## [0.19.5] - 2026-08-02
+
+### Added
+- **Real Internship Date Snapshots (`feature/certificate-real-dates`)**:
+  - Added `end_date` to `internships` and internship period snapshot columns on certificates (`supabase/migrations/027_add_certificate_dates.sql`).
+  - `issue-certificate` Edge Function snapshots internship start/end dates onto issued certificates.
+  - Company portal: internship end date field added to the edit modal; issue flow passes dates through.
+  - `CertificateDocument` renders the real internship period.
+
+## [0.19.4] - 2026-08-02
+
+### Changed
+- **Certificate Typography Finalization (`style/certificate-typography`)**:
+  - Added gold underlines beneath the signature script names.
+  - Underlined the internship title in gold and bolded it for emphasis.
+
+## [0.19.3] - 2026-08-02
+
+### Changed
+- **Certificate Layout Refinement (`style/certificate-layout`)**:
+  - Removed the footer logo strip and skills section; shifted main content down for visual balance.
+  - Enlarged and lowered the top partner logos; enlarged the award sub-header.
+  - Made the award sub-header bold and larger.
+  - Moved the title block up and enlarged the presented-to line.
+
+## [0.19.2] - 2026-08-02
+
+### Changed
+- **Certificate Structure Reorganization (`style/certificate-structure`)**:
+  - Rearranged the footer into dual signature blocks with center-aligned logos, VERIFIED SECURE seal, and QR code.
+  - Replaced the government crest with partner logos in the top row.
+
+## [0.19.1] - 2026-08-02
+
+### Changed
+- **Certificate Signature Block Redesign (`style/certificate-signature`)**:
+  - Refined the signature block so script names sit directly on the signature line; dropped the duplicate role label.
+  - Enlarged the signature block, moved it up, and added a ZYRO verified seal.
+  - Straightened the signature above the line and adopted the Noun Project certified badge as the seal.
+
+## [0.19.0] - 2026-08-02
+
+### Added
+- **Certificate Premium Redesign (`feature/certificate-premium-redesign`)**:
+  - Rebuilt `CertificateDocument.tsx` into a premium enterprise layout, extracting a dedicated `certificateTemplate.ts` for deterministic, print-identical document styling.
+  - Integrated real partner certification logos (ISO 9001:2015, ISO 9001 SGS, TÜV Rheinland, State Emblem of Pakistan) replacing generic placeholders.
+  - Progressively enlarged the footer partner logos (60px → 72px → 78px) to balance empty space.
+  - Replaced the recipient name pill with an elegant gold underline.
+
+## [0.18.5] - 2026-08-02
+
+### Changed
+- **Landing Polish (`feature/landing-polish`)**:
+  - Upgraded the "How It Works" section to glassmorphic cards with high-contrast step indicators.
+  - Removed dark-mode conditional text color fallbacks in the community channels section for consistent high-contrast rendering.
+  - Refined design tokens, card glassmorphism, and text contrast across the Landing V2 surface.
+  - Enhanced hero CTA buttons and stat cards opacity and contrast.
+
+## [0.18.4] - 2026-08-02
+
+### Fixed
+- Replaced `overflow-hidden` with `overflow-x-clip` on the Landing root to enable CSS `position: sticky` inside the journey section.
+
+## [0.18.3] - 2026-08-02
+
+### Changed
+- **Stacking Cards Scroll Spec (`refactor/landing-stacking-spec`)**:
+  - Aligned StackingCards scroll targets and card offsets with the Khoa Phan reference demo spec.
+  - Updated the stacking engine to the exact scale and `topPosition` specification.
+
+## [0.18.2] - 2026-08-02
+
+### Performance Improvements
+- **Landing Journey Performance (`perf/landing-stacking-cards`)**:
+  - Optimized responsive sticky stacking offsets with a reduced-motion fallback.
+  - Memoized `JourneyCard` and `CardVisualPreview` and enforced type-only imports.
+
+## [0.18.1] - 2026-08-02
+
+### Added
+- **Journey Section Integration (`feature/landing-stacking-cards`)**:
+  - Applied ZYR0 design system tokens and an enterprise visual redesign to the journey cards.
+  - Integrated the JourneySection stacking cards into the main landing page flow.
+
+## [0.18.0] - 2026-08-02
+
+### Added
+- **Landing Journey Stacking Cards Section (`feature/landing-stacking-cards`)**:
+  - Authored the UX audit and integration plan (`docs/LANDING_STACKING_CARDS_PLAN.md`) replacing the static 4-step "How It Works" grid with a 6-phase journey (Discover → Apply → Select → Work on Real Projects → Receive Verified Certificate → Launch Your Career).
+  - Added the ZYR0 6-phase journey content strategy and typed journey data model.
+  - Built the JourneySection stacking cards component structure (`JourneySection.tsx`, `JourneyCard.tsx`).
+
 ## [0.17.5] - 2026-08-01
 
 ### Added
