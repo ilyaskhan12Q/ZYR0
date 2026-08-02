@@ -321,6 +321,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     }
     .body-text p { margin: 0 0 7px; }
     .body-text b { font-weight: 700; color: #13100d; }
+    .body-text .internship-title { text-decoration: underline; text-decoration-thickness: 1.4px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
 
     .footer-left {
       display: flex;
@@ -440,7 +441,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
           </div>
 
           <div class="body-text">
-            <p>For successfully completing a <b>${internshipTitle}</b> at ZYRO through the ZYRO Platform from ${dates}, demonstrating exceptional proficiency, dedication, and technical skill in executing all professional responsibilities.</p>
+            <p>For successfully completing a <b class="internship-title">${internshipTitle}</b> at ZYRO through the ZYRO Platform from ${dates}, demonstrating exceptional proficiency, dedication, and technical skill in executing all professional responsibilities.</p>
             <p>The candidate has collaborated with <b>${companyName}</b> through the ZYRO Platform.</p>
             <p>Congratulations on your achievement and continued interest in the vital subject of software engineering.</p>
             <p>Keep up the great work in developing innovative and efficient digital tools.</p>
