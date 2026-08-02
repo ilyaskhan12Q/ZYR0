@@ -130,6 +130,27 @@ function qcaSvg(): string {
 </svg>`;
 }
 
+function sealSvg(): string {
+  return `
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="ZYRO Verified Seal">
+  <defs>
+    <path id="seal-arc-top" d="M 19,50 A 31,31 0 1 1 81,50"/>
+    <path id="seal-arc-bot" d="M 81,50 A 31,31 0 1 0 19,50"/>
+  </defs>
+  <circle cx="50" cy="50" r="47" fill="#fbf6ea" fill-opacity="0.55" stroke="#b89c56" stroke-width="1.8"/>
+  <circle cx="50" cy="50" r="41" fill="none" stroke="#b89c56" stroke-width="1" stroke-dasharray="2.6 3.6"/>
+  <circle cx="50" cy="50" r="30.5" fill="none" stroke="#b89c56" stroke-width="0.9" opacity="0.9"/>
+  <circle cx="50" cy="50" r="24.5" fill="none" stroke="#b89c56" stroke-width="0.6" opacity="0.55"/>
+  <text font-family="Montserrat, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#6b5425" letter-spacing="3.4">
+    <textPath href="#seal-arc-top">Z Y R O</textPath>
+  </text>
+  <text font-family="Montserrat, Arial, sans-serif" font-size="7.6" font-weight="700" fill="#6b5425" letter-spacing="2.2">
+    <textPath href="#seal-arc-bot">V E R I F I E D</textPath>
+  </text>
+  <path d="M 31,51.5 L 45,65 L 69.5,36.5" fill="none" stroke="#a8843c" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+}
+
 // ── Main document builder ──────────────────────────────────────────────────
 
 export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
@@ -365,7 +386,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       margin-top: 14px;
       padding-top: 16px;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: 1fr auto auto auto 1fr;
       align-items: end;
       gap: 24px;
     }
@@ -374,12 +395,14 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .qr-img { width: 82px; height: 82px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
     .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
-    .sign { text-align: right; }
+    .seal { width: 88px; transform: rotate(-8deg); }
+    .seal svg { display: block; width: 100%; height: auto; }
+    .sign { text-align: right; margin-bottom: 10px; }
     .sig-space { height: 26px; }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 22px; color: #1a1a1a; line-height: 1; margin-bottom: -5px; }
-    .sig-underline { width: 176px; margin-left: auto; border-top: 1.4px solid #8a8a8a; }
-    .sig-name { font-size: 10.5px; font-weight: 600; color: #333; margin-top: 6px; letter-spacing: .3px; }
-    .sig-caption { font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .7px; margin-top: 1px; }
+    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 27px; color: #1a1a1a; line-height: 1; margin-bottom: -6px; }
+    .sig-underline { width: 200px; margin-left: auto; border-top: 1.6px solid #8a8a8a; }
+    .sig-name { font-size: 12.5px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
+    .sig-caption { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .7px; margin-top: 1px; }
 
     @media print {
       body { width: 297mm; height: 210mm; }
@@ -476,6 +499,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
               <img class="qr-img" src="${qrSrc}" alt="Verification QR" width="82" height="82" />
               <span class="qr-label">Scan to Verify</span>
             </div>
+            <div class="seal">${sealSvg()}</div>
             <div class="sign">
               <div class="sig-space"></div>
               <div class="sig-script">${supervisorName}</div>
