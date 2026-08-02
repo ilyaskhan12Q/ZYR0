@@ -140,7 +140,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     dates,
     credentialId,
     issueDateStr,
-    skills,
     supervisorName,
     qrSrc,
     isoSrc,
@@ -148,10 +147,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     qcaSrc,
     fontCss,
   } = opts;
-
-  const skillPills = (skills.length > 0 ? skills.slice(0, 5) : ['[Skill 1]', '[Skill 2]', '[Skill 3]', '[Skill 4]', '[Skill 5]'])
-    .map(s => `<span class="skill-pill">${s}</span>`)
-    .join('');
 
   const noiseDataUri = `url("data:image/svg+xml,${encodeURIComponent(noiseSvg())}")`;
   const mottleDataUri = `url("data:image/svg+xml,${encodeURIComponent(mottleSvg())}")`;
@@ -274,6 +269,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       display: flex;
       flex-direction: column;
       justify-content: center;
+      padding-top: 70px;
       min-height: 0;
     }
     .title-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; }
@@ -345,21 +341,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     }
     .meta-row b { color: #111; font-weight: 700; }
 
-    /* ── Skills ──────────────────────────────────────────────────────── */
-    .skills { margin-top: 12px; text-align: center; }
-    .skills-head { font-size: 11px; font-weight: 800; letter-spacing: 2.6px; color: #26221e; }
-    .skills-row { margin-top: 8px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-    .skill-pill {
-      border: 1.4px solid #9aa0a8;
-      border-radius: 999px;
-      padding: 4px 16px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #3d3d3d;
-      background: #faf7ee;
-    }
-
-    /* ── Footer: compliance logos | QR | signatures ──────────────────── */
+    /* ── Footer: signatures | seal + QR ───────────────────────────────── */
     .footer-row {
       margin-top: 14px;
       padding-top: 16px;
@@ -375,9 +357,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .sig-title { font-size: 9.5px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
     .sig-meta { margin-top: 8px; font-size: 8.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
     .sig-meta b { color: #111; font-weight: 700; }
-    .center-col { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-    .logos { display: flex; gap: 16px; align-items: center; }
-    .footer-logo { height: 52px; width: auto; display: block; object-fit: contain; }
+    .center-col { display: flex; flex-direction: column; align-items: center; }
     .seal-qr { display: flex; align-items: flex-end; gap: 16px; }
     .seal-col { display: flex; flex-direction: column; align-items: center; }
     .seal-gold {
@@ -467,11 +447,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
             <p>Keep up the great work in developing innovative and efficient digital tools.</p>
             <p>Your contribution throughout the internship at ZYRO has been truly valuable and inspiring.</p>
           </div>
-
-            <div class="skills">
-              <div class="skills-head">DEMONSTRATED SKILLS &amp; TECHNOLOGIES</div>
-              <div class="skills-row">${skillPills}</div>
-            </div>
           </div>
 
           <div class="footer-row">
@@ -483,11 +458,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
               <div class="sig-meta">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
             <div class="center-col">
-              <div class="logos">
-                <img class="footer-logo" src="${isoSrc}" alt="ISO 9001:2015" />
-                ${qcaSrc ? `<img class="footer-logo" src="${qcaSrc}" alt="QCA UK" />` : qcaSvg()}
-                <img class="footer-logo" src="${oLogoSrc}" alt="ZYRO Platform" />
-              </div>
               <div class="seal-qr">
                 <div class="seal-col">
                   <div class="seal-gold">
