@@ -252,9 +252,9 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .award-sub {
       text-align: center;
       color: #8a1c1c;
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: 1.4px;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       margin-top: 8px;
     }
