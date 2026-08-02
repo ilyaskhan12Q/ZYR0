@@ -34,7 +34,7 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { internship_id, recipient_id, title, skills, description, certificate_id } = body;
+    const { internship_id, recipient_id, title, skills, description, certificate_id, start_date, end_date } = body;
 
     // Resend flow
     if (certificate_id) {
@@ -207,7 +207,7 @@ serve(async (req) => {
     // Verify caller is the company owner or admin
     const { data: internship } = await supabaseAdmin
       .from('internships')
-      .select('company_id, title, companies(owner_id)')
+      .select('company_id, title, start_date, end_date, companies(owner_id)')
       .eq('id', internship_id)
       .single();
 
@@ -261,6 +261,8 @@ serve(async (req) => {
           issued_by: user.id,
           status: 'Active',
           email_sent: false,
+          start_date: start_date || internship?.start_date || null,
+          end_date: end_date || internship?.end_date || null,
         })
         .select()
         .single();
