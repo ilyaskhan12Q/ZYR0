@@ -9,6 +9,8 @@ interface CertificateDocumentProps {
     issue_date: string;
     blockchain_hash?: string;
     skills?: string[];
+    start_date?: string | null;
+    end_date?: string | null;
     recipient?: {
       full_name: string;
     } | any;
@@ -19,6 +21,8 @@ interface CertificateDocumentProps {
     } | any;
     internship?: {
       title: string;
+      start_date?: string | null;
+      end_date?: string | null;
     } | any;
     issuer?: {
       full_name: string;
@@ -51,6 +55,16 @@ export default function CertificateDocument({ certificate }: CertificateDocument
   const supervisorName = certificate.issuer?.full_name || 'Ilyas Khan';
   const credentialId = certificate.credential_id || 'ZYRO-SE-2026-000000';
   const skills = useMemo(() => certificate.skills || [], [certificate.skills]);
+
+  // Real internship period: certificate snapshot → internship → placeholder.
+  const formatDate = (d?: string | null) => d
+    ? new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : null;
+  const periodStart = certificate.start_date || certificate.internship?.start_date || null;
+  const periodEnd = certificate.end_date || certificate.internship?.end_date || null;
+  const dates = periodStart && periodEnd
+    ? `${formatDate(periodStart)}, to ${formatDate(periodEnd)}`
+    : '[Insert Dates, e.g., Month Day, Year, to Month Day, Year]';
 
   const qrCodeUrl = useMemo(() => {
     const verifyUrl = `${window.location.origin}/verify/${certificate.credential_id}`;
@@ -153,12 +167,12 @@ export default function CertificateDocument({ certificate }: CertificateDocument
     recipientName,
     internshipTitle,
     companyName,
-    dates: '[Insert Dates, e.g., Month Day, Year, to Month Day, Year]',
+    dates,
     credentialId,
     issueDateStr,
     skills,
     supervisorName,
-  }), [recipientName, internshipTitle, companyName, issueDateStr, credentialId, skills, supervisorName]);
+  }), [recipientName, internshipTitle, companyName, dates, issueDateStr, credentialId, skills, supervisorName]);
 
   // Preview iframe — same document as print, scaled to fit the card.
   const frameWrapRef = useRef<HTMLDivElement>(null);

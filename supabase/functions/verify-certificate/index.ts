@@ -44,7 +44,7 @@ serve(async (req) => {
         *,
         recipient:profiles!recipient_id (full_name, avatar_url),
         company:companies!company_id (name, logo_url),
-        internship:internships!internship_id (title, domain)
+        internship:internships!internship_id (title, domain, start_date, end_date)
       `)
       .eq('credential_id', credentialId)
       .single();
@@ -83,6 +83,10 @@ serve(async (req) => {
         company_name: certificate.company?.name,
         company_logo: certificate.company?.logo_url,
         internship_title: certificate.internship?.title,
+        internship_start_date: certificate.internship?.start_date,
+        internship_end_date: certificate.internship?.end_date,
+        start_date: certificate.start_date,
+        end_date: certificate.end_date,
       },
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
