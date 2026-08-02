@@ -321,7 +321,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     }
     .body-text p { margin: 0 0 7px; }
     .body-text b { font-weight: 700; color: #13100d; }
-    .body-text .internship-title { text-decoration: underline; text-decoration-thickness: 1.4px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
+    .body-text .internship-title { font-weight: 800; text-decoration: underline; text-decoration-thickness: 1.4px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
 
     .footer-left {
       display: flex;
