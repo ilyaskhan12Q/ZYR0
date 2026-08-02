@@ -300,15 +300,19 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       text-transform: uppercase;
     }
 
-    /* ── Recipient name pill (purple→blue gradient) ──────────────────── */
-    .name-pill { margin: 14px auto 0; display: flex; justify-content: center; }
-    .name-pill-inner {
-      background: radial-gradient(circle at 32% 28%, #9572ff 0%, #6d4bff 48%, #3f7dff 100%);
-      border-radius: 999px;
-      padding: 11px 48px;
-      box-shadow: 0 7px 20px rgba(93, 92, 255, .35), inset 0 1px 0 rgba(255,255,255,.35);
+    /* ── Recipient name (gold underline) ──────────────────────────────── */
+    .name-pill { margin: 16px auto 0; display: flex; justify-content: center; }
+    .name-pill-inner { padding: 2px 8px 4px; }
+    .name-text {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 28px;
+      color: #191512;
+      letter-spacing: 1.6px;
+      padding: 0 18px 8px;
+      border-bottom: 2.5px solid #b89c56;
+      display: inline-block;
     }
-    .name-text { font-family: 'Cinzel', serif; font-weight: 700; font-size: 25px; color: #fff; letter-spacing: 1.2px; text-shadow: 0 1px 2px rgba(0,0,0,.25); }
 
     /* ── Body copy ───────────────────────────────────────────────────── */
     .body-text {
