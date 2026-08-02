@@ -96,6 +96,7 @@ export interface Internship {
   type: InternshipType | null;
   duration: string | null;
   start_date: string | null;
+  end_date: string | null;
   deadline: string | null;
   stipend: string | null;
   stipend_type: StipendType | null;

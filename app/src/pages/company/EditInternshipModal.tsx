@@ -36,6 +36,9 @@ export default function EditInternshipModal({
   const [startDate, setStartDate] = useState(
     internship?.start_date ? new Date(internship.start_date).toISOString().split('T')[0] : ''
   );
+  const [endDate, setEndDate] = useState(
+    internship?.end_date ? new Date(internship.end_date).toISOString().split('T')[0] : ''
+  );
   const [stipendType, setStipendType] = useState<StipendType>(internship?.stipend_type || 'Paid');
   const [stipend, setStipend] = useState(internship?.stipend || '');
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(internship?.experience_level || 'Beginner');
@@ -92,6 +95,7 @@ export default function EditInternshipModal({
       duration !== (internship?.duration || '3-6 months') ||
       deadline !== (internship?.deadline ? new Date(internship.deadline).toISOString().split('T')[0] : '') ||
       startDate !== (internship?.start_date ? new Date(internship.start_date).toISOString().split('T')[0] : '') ||
+      endDate !== (internship?.end_date ? new Date(internship.end_date).toISOString().split('T')[0] : '') ||
       stipendType !== (internship?.stipend_type || 'Paid') ||
       stipend !== (internship?.stipend || '') ||
       experienceLevel !== (internship?.experience_level || 'Beginner') ||
@@ -189,6 +193,7 @@ export default function EditInternshipModal({
         duration,
         deadline: deadline ? new Date(deadline).toISOString() : null,
         start_date: startDate ? new Date(startDate).toISOString() : null,
+        end_date: endDate ? new Date(endDate).toISOString() : null,
         stipend_type: stipendType,
         stipend: stipendType === 'Unpaid' ? 'Unpaid' : stipend.trim(),
         experience_level: experienceLevel,
@@ -383,6 +388,16 @@ export default function EditInternshipModal({
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase mb-1 block">End Date</label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    min={startDate || undefined}
+                    onChange={(e) => setEndDate(e.target.value)}
                     className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                 </div>
