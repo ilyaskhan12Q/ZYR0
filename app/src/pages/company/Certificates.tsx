@@ -68,7 +68,9 @@ export default function CompanyCertificates() {
         recipient_id: student.id,
         title: `${internship.title} Internship Completion`,
         skills: internship.skills || [],
-        description: `Successfully completed the ${internship.title} internship at ${company.name}.`
+        description: `Successfully completed the ${internship.title} internship at ${company.name}.`,
+        start_date: internship.start_date || undefined,
+        end_date: internship.end_date || undefined,
       });
 
       if (err) throw err;

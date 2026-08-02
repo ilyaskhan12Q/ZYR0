@@ -213,7 +213,7 @@
   h6,
   .font-display,
   .font-heading {
-    font-family: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     letter-spacing: -0.028em;
     -webkit-font-smoothing: antialiased;
   }
@@ -402,17 +402,17 @@
 
 /* Stat card */
 .stat-card {
-  @apply bg-card rounded-xl border border-border p-5 shadow-sm transition-all duration-200;
+  @apply bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300;
 }
 
 /* Feature card */
 .feature-card {
-  @apply bg-slate-900/60 backdrop-blur-xl rounded-xl border border-white/15 p-6 shadow-lg transition-all duration-300;
+  @apply bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300;
 }
 
 /* Internship card */
 .internship-card {
-  @apply bg-slate-900/60 backdrop-blur-xl rounded-xl border border-white/15 shadow-lg overflow-hidden transition-all duration-300;
+  @apply bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl overflow-hidden transition-all duration-300;
 }
 
 /* Table row hover */
@@ -427,15 +427,15 @@
   }
 
   .stat-card:hover {
-    @apply shadow-md -translate-y-0.5;
+    @apply shadow-xl -translate-y-1 border-white/20;
   }
 
   .feature-card:hover {
-    @apply shadow-md -translate-y-1 border-primary/40 dark:border-emerald-400/40 dark:shadow-emerald-500/10;
+    @apply shadow-xl -translate-y-1 border-white/20;
   }
 
   .internship-card:hover {
-    @apply shadow-lg -translate-y-1;
+    @apply shadow-xl -translate-y-1 border-white/20;
   }
 
   .table-row-hover:hover {

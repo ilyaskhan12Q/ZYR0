@@ -21,6 +21,8 @@ export default function PostInternship() {
   const [location, setLocation] = useState('');
   const [duration, setDuration] = useState('3-6 months');
   const [deadline, setDeadline] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [stipendType, setStipendType] = useState<'Paid' | 'Unpaid' | 'Academic Credit'>('Paid');
   const [stipend, setStipend] = useState('');
   const [skills, setSkills] = useState<string[]>([]);
@@ -94,6 +96,8 @@ export default function PostInternship() {
         location: locationType === 'Remote' ? 'Remote' : location.trim(),
         duration,
         deadline: deadline ? new Date(deadline).toISOString() : null,
+        start_date: startDate ? new Date(startDate).toISOString() : null,
+        end_date: endDate ? new Date(endDate).toISOString() : null,
         stipend_type: stipendType,
         stipend: stipendType === 'Unpaid' ? 'Unpaid' : stipend.trim(),
         benefits,
@@ -253,6 +257,25 @@ export default function PostInternship() {
                   onChange={(e) => setDeadline(e.target.value)}
                   className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20"
                   required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Start Date</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">End Date</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  min={startDate || undefined}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20"
                 />
               </div>
             </div>

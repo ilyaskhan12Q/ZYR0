@@ -4,7 +4,6 @@ import { Award, Download, Share2, ExternalLink, Shield, Calendar, Building2, QrC
 import { Loader } from '@/components/common/Loader';
 import { getMyCertificates } from '@/services/certificates';
 import { useAuth } from '@/contexts/AuthContext';
-import { certificates as mockCertificates } from '@/data/mockData';
 import CertificateDocument from '@/components/CertificateDocument';
 
 export default function StudentCertificates() {
@@ -17,35 +16,7 @@ export default function StudentCertificates() {
     async function loadCertificates() {
       try {
         const { data } = await getMyCertificates();
-        let list = data || [];
-        
-        // If DB has no certificates, pre-load mock certificates for Alex Johnson or demo purposes
-        if (list.length === 0) {
-          const userName = user?.user_metadata?.full_name || 'Alex Johnson';
-          const filteredMocks = mockCertificates.filter(
-            c => c.recipientName.toLowerCase() === userName.toLowerCase()
-          );
-          
-          list = (filteredMocks.length > 0 ? filteredMocks : mockCertificates).map(c => ({
-            id: c.id,
-            title: c.title,
-            credential_id: c.credentialId,
-            issue_date: c.issueDate,
-            blockchain_hash: c.blockchainHash,
-            skills: c.skills,
-            status: c.status,
-            recipient: {
-              full_name: c.recipientName
-            },
-            company: {
-              name: c.company
-            },
-            internship: {
-              title: c.internshipTitle
-            }
-          }));
-        }
-        setCerts(list);
+        setCerts(data || []);
       } catch (err) {
         console.error(err);
       } finally {
