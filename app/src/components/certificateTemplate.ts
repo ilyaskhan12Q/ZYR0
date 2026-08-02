@@ -351,8 +351,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       gap: 28px;
     }
     .sig-block { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 26px; color: #1a1a1a; line-height: 1; margin-bottom: 2px; }
-    .sig-underline { width: 210px; border-top: 1.6px solid #8a8a8a; }
+    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 26px; color: #1a1a1a; line-height: 1; margin-bottom: 6px; text-decoration: underline; text-decoration-thickness: 1.4px; text-underline-offset: 5px; text-decoration-color: #8a8a8a; }
     .sig-name { font-size: 13px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
     .sig-title { font-size: 9.5px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
     .sig-meta { margin-top: 8px; font-size: 8.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
@@ -452,8 +451,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
           <div class="footer-row">
             <div class="sig-block">
               <div class="sig-script">${supervisorName}</div>
-              <div class="sig-underline"></div>
-              <div class="sig-name">${supervisorName}</div>
+                            <div class="sig-name">${supervisorName}</div>
               <div class="sig-title">Program Coordinator, ZYRO Interns</div>
               <div class="sig-meta">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
@@ -476,8 +474,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
             </div>
             <div class="sig-block">
               <div class="sig-script">ZYRO Director</div>
-              <div class="sig-underline"></div>
-              <div class="sig-name">Academic Director</div>
+                            <div class="sig-name">Academic Director</div>
               <div class="sig-title">ZYRO Platforms</div>
             </div>
           </div>
