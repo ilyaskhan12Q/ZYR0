@@ -132,22 +132,8 @@ function qcaSvg(): string {
 
 function sealSvg(): string {
   return `
-<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="ZYRO Verified Seal">
-  <defs>
-    <path id="seal-arc-top" d="M 19,50 A 31,31 0 1 1 81,50"/>
-    <path id="seal-arc-bot" d="M 81,50 A 31,31 0 1 0 19,50"/>
-  </defs>
-  <circle cx="50" cy="50" r="47" fill="#fbf6ea" fill-opacity="0.55" stroke="#b89c56" stroke-width="1.8"/>
-  <circle cx="50" cy="50" r="41" fill="none" stroke="#b89c56" stroke-width="1" stroke-dasharray="2.6 3.6"/>
-  <circle cx="50" cy="50" r="30.5" fill="none" stroke="#b89c56" stroke-width="0.9" opacity="0.9"/>
-  <circle cx="50" cy="50" r="24.5" fill="none" stroke="#b89c56" stroke-width="0.6" opacity="0.55"/>
-  <text font-family="Montserrat, Arial, sans-serif" font-size="10.5" font-weight="800" fill="#6b5425" letter-spacing="3.4">
-    <textPath href="#seal-arc-top">Z Y R O</textPath>
-  </text>
-  <text font-family="Montserrat, Arial, sans-serif" font-size="7.6" font-weight="700" fill="#6b5425" letter-spacing="2.2">
-    <textPath href="#seal-arc-bot">V E R I F I E D</textPath>
-  </text>
-  <path d="M 31,51.5 L 45,65 L 69.5,36.5" fill="none" stroke="#a8843c" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg viewBox="0 0 100 125" xmlns="http://www.w3.org/2000/svg" aria-label="ZYRO Certified Badge">
+  <path d="M54.4,77.9c-0.4,0-0.7-0.1-1-0.3l-4.7-3.2L44,77.6c-0.8,0.6-1.9,0.4-2.5-0.4l-3.5-4.5l-5.5,1.6c-0.9,0.3-1.9-0.2-2.2-1.1  l-1.9-5.4l-5.7-0.1c-1,0-1.8-0.8-1.8-1.8l-0.1-5.7l-5.4-1.9c-0.9-0.3-1.4-1.3-1.1-2.2l1.6-5.5l-4.5-3.5c-0.8-0.6-1-1.7-0.4-2.5  l3.2-4.7L11,35.2c-0.6-0.8-0.4-1.9,0.4-2.5l4.5-3.5l-1.6-5.5c-0.3-0.9,0.2-1.9,1.1-2.3l5.4-1.9l0.1-5.7c0-1,0.8-1.8,1.8-1.8l5.7-0.1  l1.9-5.4c0.3-0.9,1.3-1.4,2.2-1.1l5.5,1.6l3.5-4.5c0.6-0.8,1.7-1,2.5-0.4l4.7,3.2l4.7-3.2c0.8-0.6,1.9-0.4,2.5,0.4l3.5,4.5l5.5-1.6  c0.9-0.3,1.9,0.2,2.3,1.1L69,12l5.7,0.1c1,0,1.8,0.8,1.8,1.8l0.1,5.7l5.4,1.9c0.9,0.3,1.4,1.3,1.1,2.3l-1.6,5.5l4.5,3.5  c0.8,0.6,0.9,1.7,0.4,2.5l-3.2,4.7l3.2,4.7c0.6,0.8,0.4,1.9-0.4,2.5l-4.5,3.5l1.6,5.5c0.3,0.9-0.2,1.9-1.1,2.2l-5.4,1.9l-0.1,5.7  c0,1-0.8,1.8-1.8,1.8L69,67.8l-1.9,5.4c-0.3,0.9-1.3,1.4-2.3,1.1l-5.5-1.6l-3.5,4.5C55.5,77.6,55,77.9,54.4,77.9L54.4,77.9z   M48.7,70.3c0.4,0,0.7,0.1,1,0.3l4.3,3l3.2-4.1c0.5-0.6,1.2-0.9,2-0.6l5,1.5l1.7-4.9c0.3-0.7,0.9-1.2,1.7-1.2l5.2-0.1l0.1-5.2  c0-0.8,0.5-1.4,1.2-1.7l4.9-1.7l-1.5-5c-0.2-0.7,0-1.5,0.6-2l4.1-3.2l-3-4.3c-0.4-0.6-0.4-1.5,0-2.1l3-4.3l-4.1-3.2  c-0.6-0.5-0.9-1.3-0.6-2l1.5-5l-4.9-1.7C73.5,22.4,73,21.7,73,21l-0.1-5.2l-5.2-0.1c-0.8,0-1.4-0.5-1.7-1.2l-1.7-4.9l-5,1.5  c-0.7,0.2-1.5,0-2-0.6L54,6.2l-4.3,3c-0.6,0.4-1.5,0.4-2.1,0l-4.3-3l-3.2,4.1c-0.5,0.6-1.2,0.9-2,0.6l-5-1.5l-1.7,4.9  c-0.3,0.7-0.9,1.2-1.7,1.2l-5.2,0.1L24.5,21c0,0.8-0.5,1.4-1.2,1.7l-4.9,1.7l1.5,5c0.2,0.7,0,1.5-0.6,2L15,34.5l3,4.3  c0.4,0.6,0.4,1.5,0,2.1l-3,4.3l4.1,3.2c0.6,0.5,0.9,1.3,0.6,2l-1.5,5l4.9,1.7c0.7,0.3,1.2,0.9,1.2,1.7l0.1,5.2l5.2,0.1  c0.8,0,1.4,0.5,1.7,1.2l1.7,4.9l5-1.5c0.7-0.2,1.5,0,2,0.6l3.2,4.1l4.3-3C48,70.4,48.3,70.3,48.7,70.3L48.7,70.3z M48.7,17  c-12.6,0-22.9,10.3-22.9,22.9c0,12.6,10.3,22.9,22.9,22.9c12.6,0,22.9-10.3,22.9-22.9C71.6,27.2,61.4,17,48.7,17z M38.7,97.9  c0.5,0,0.9-0.2,1.3-0.5l8.6-8l9.1,8.1c0.5,0.5,1.3,0.6,2,0.3c0.7-0.3,1.1-1,1.1-1.7V79.2c0-1-0.8-1.8-1.8-1.8c-1,0-1.8,0.8-1.8,1.8  V92l-7.3-6.5c-0.7-0.6-1.8-0.6-2.5,0l-6.7,6.3V79.2c0-1-0.8-1.8-1.8-1.8c-1,0-1.8,0.8-1.8,1.8V96c0,0.7,0.4,1.4,1.1,1.7  C38.2,97.8,38.4,97.9,38.7,97.9L38.7,97.9z"/>
 </svg>`;
 }
 
@@ -395,11 +381,13 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .qr-img { width: 82px; height: 82px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
     .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
-    .seal { width: 88px; transform: rotate(-8deg); }
+    .seal { width: 92px; display: flex; flex-direction: column; align-items: center; gap: 3px; transform: rotate(-8deg); }
     .seal svg { display: block; width: 100%; height: auto; }
-    .sign { text-align: right; margin-bottom: 10px; }
+    .seal svg path { fill: #a8843c; }
+    .seal-credit { font-size: 6px; color: #8a8a8a; letter-spacing: .5px; text-transform: uppercase; white-space: nowrap; }
+    .sign { text-align: right; margin-bottom: 16px; }
     .sig-space { height: 26px; }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 27px; color: #1a1a1a; line-height: 1; margin-bottom: -6px; }
+    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 27px; color: #1a1a1a; line-height: 1; margin-bottom: 3px; }
     .sig-underline { width: 200px; margin-left: auto; border-top: 1.6px solid #8a8a8a; }
     .sig-name { font-size: 12.5px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
     .sig-caption { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .7px; margin-top: 1px; }
@@ -499,7 +487,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
               <img class="qr-img" src="${qrSrc}" alt="Verification QR" width="82" height="82" />
               <span class="qr-label">Scan to Verify</span>
             </div>
-            <div class="seal">${sealSvg()}</div>
+            <div class="seal">${sealSvg()}<span class="seal-credit">certified &middot; Noun Project</span></div>
             <div class="sign">
               <div class="sig-space"></div>
               <div class="sig-script">${supervisorName}</div>
