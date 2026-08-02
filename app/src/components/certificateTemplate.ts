@@ -375,11 +375,10 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .qr-img { width: 82px; height: 82px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
     .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
     .sign { text-align: right; }
-    .sig-role { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; color: #333; }
-    .sig-space { height: 22px; }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 21px; color: #1a1a1a; line-height: 1; }
-    .sig-underline { width: 172px; margin-left: auto; border-top: 1.4px solid #777; margin-top: 4px; }
-    .sig-name { font-size: 10.5px; font-weight: 600; color: #333; margin-top: 3px; }
+    .sig-space { height: 26px; }
+    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 22px; color: #1a1a1a; line-height: 1; margin-bottom: -5px; }
+    .sig-underline { width: 176px; margin-left: auto; border-top: 1.4px solid #8a8a8a; }
+    .sig-name { font-size: 10.5px; font-weight: 600; color: #333; margin-top: 6px; letter-spacing: .3px; }
     .sig-caption { font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .7px; margin-top: 1px; }
 
     @media print {
@@ -478,7 +477,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
               <span class="qr-label">Scan to Verify</span>
             </div>
             <div class="sign">
-              <div class="sig-role">ZYRO Director</div>
               <div class="sig-space"></div>
               <div class="sig-script">${supervisorName}</div>
               <div class="sig-underline"></div>
