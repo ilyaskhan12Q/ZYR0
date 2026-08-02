@@ -246,13 +246,13 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 
     /* ── Header row: Govt crest | award sub-header | ZYRO brand ──────── */
     .top-row { display: grid; grid-template-columns: 1fr 1.5fr 1fr; align-items: start; }
-    .gov { display: flex; align-items: center; }
-    .logos-top { display: flex; gap: 14px; align-items: center; }
-    .logo-top { height: 46px; width: auto; display: block; object-fit: contain; }
+    .gov { display: flex; align-items: flex-end; }
+    .logos-top { display: flex; gap: 14px; align-items: center; margin-top: 12px; }
+    .logo-top { height: 64px; width: auto; display: block; object-fit: contain; }
     .award-sub {
       text-align: center;
       color: #8a1c1c;
-      font-size: 12.5px;
+      font-size: 17px;
       font-weight: 600;
       letter-spacing: 1.4px;
       text-transform: uppercase;
