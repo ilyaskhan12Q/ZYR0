@@ -269,7 +269,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding-top: 70px;
+      padding-top: 45px;
       min-height: 0;
     }
     .title-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; }
@@ -287,10 +287,10 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     }
     .presented {
       text-align: center;
-      font-size: 11px;
+      font-size: 13px;
       font-weight: 600;
       color: #4a4a4a;
-      letter-spacing: 3.6px;
+      letter-spacing: 3.2px;
       margin: 10px 0 0;
       text-transform: uppercase;
     }
