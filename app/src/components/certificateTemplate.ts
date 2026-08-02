@@ -327,15 +327,22 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .body-text p { margin: 0 0 7px; }
     .body-text b { font-weight: 700; color: #13100d; }
 
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 9px;
+    }
     .meta-row {
       display: flex;
-      justify-content: center;
-      gap: 44px;
-      margin-top: 11px;
-      font-size: 10.5px;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      font-size: 10px;
       font-weight: 600;
       color: #333;
       letter-spacing: .5px;
+      white-space: nowrap;
     }
     .meta-row b { color: #111; font-weight: 700; }
 
@@ -363,7 +370,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       gap: 24px;
     }
     .logos { display: flex; gap: 18px; align-items: center; }
-    .footer-logo { height: 72px; width: auto; display: block; object-fit: contain; }
+    .footer-logo { height: 78px; width: auto; display: block; object-fit: contain; }
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .qr-img { width: 82px; height: 82px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
     .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
@@ -448,11 +455,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
             <p>Your contribution throughout the internship at ZYRO has been truly valuable and inspiring.</p>
           </div>
 
-          <div class="meta-row">
-            <div>Certificate ID: <b>${credentialId}</b></div>
-            <div>Issue Date: <b>${issueDateStr}</b></div>
-          </div>
-
             <div class="skills">
               <div class="skills-head">DEMONSTRATED SKILLS &amp; TECHNOLOGIES</div>
               <div class="skills-row">${skillPills}</div>
@@ -460,10 +462,16 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
           </div>
 
           <div class="footer-row">
-            <div class="logos">
-              <img class="footer-logo" src="${isoSrc}" alt="ISO 9001:2015" />
-              ${qcaSrc ? `<img class="footer-logo" src="${qcaSrc}" alt="QCA UK" />` : qcaSvg()}
-              <img class="footer-logo" src="${oLogoSrc}" alt="ZYRO Platform" />
+            <div class="footer-left">
+              <div class="logos">
+                <img class="footer-logo" src="${isoSrc}" alt="ISO 9001:2015" />
+                ${qcaSrc ? `<img class="footer-logo" src="${qcaSrc}" alt="QCA UK" />` : qcaSvg()}
+                <img class="footer-logo" src="${oLogoSrc}" alt="ZYRO Platform" />
+              </div>
+              <div class="meta-row">
+                <div>Certificate ID: <b>${credentialId}</b></div>
+                <div>Issue Date: <b>${issueDateStr}</b></div>
+              </div>
             </div>
             <div class="qr">
               <img class="qr-img" src="${qrSrc}" alt="Verification QR" width="82" height="82" />
