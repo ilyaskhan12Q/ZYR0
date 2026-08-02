@@ -45,15 +45,17 @@ interface CertificateDocumentProps {
 
 export default function CertificateDocument({ certificate }: CertificateDocumentProps) {
   const recipientName = certificate.recipient?.full_name || certificate.recipientName || '[INSERT FULL NAME]';
-  const companyName = certificate.company?.name || 'TechFlow Inc.';
-  const internshipTitle = certificate.internship?.title || certificate.title || 'Software Engineering Internship';
-  const issueDateStr = new Date(certificate.issue_date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-  const supervisorName = certificate.issuer?.full_name || 'Ilyas Khan';
-  const credentialId = certificate.credential_id || 'ZYRO-SE-2026-000000';
+  const companyName = certificate.company?.name || '[INSERT COMPANY NAME]';
+  const internshipTitle = certificate.internship?.title || certificate.title || '[INSERT INTERNSHIP TITLE]';
+  const issueDateStr = certificate.issue_date
+    ? new Date(certificate.issue_date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : '[INSERT ISSUE DATE]';
+  const supervisorName = certificate.issuer?.full_name || '[INSERT ISSUER NAME]';
+  const credentialId = certificate.credential_id || '[INSERT CREDENTIAL ID]';
   const skills = useMemo(() => certificate.skills || [], [certificate.skills]);
 
   // Real internship period: certificate snapshot → internship → placeholder.

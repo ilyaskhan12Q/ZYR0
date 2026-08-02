@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check, HelpCircle, BookOpen } from 'lucide-react';
 import { verifyCertificate } from '@/services/certificates';
 import { supabase } from '@/lib/supabase';
-import { certificates as mockCertificates } from '@/data/mockData';
 import CertificateDocument from '@/components/CertificateDocument';
 import { SEO } from '@/components/SEO';
 import { ButtonLoader } from '@/components/common/Loader';
@@ -27,12 +26,8 @@ export default function Verify() {
         .from('certificates')
         .select('credential_id')
         .limit(3);
-      
-      const dbIds = data ? data.map(c => c.credential_id) : [];
-      // Combine with mock certificate IDs
-      const mockIds = mockCertificates.map(c => c.credentialId);
-      const uniqueIds = Array.from(new Set([...dbIds, ...mockIds])).slice(0, 4);
-      setSampleCerts(uniqueIds);
+
+      setSampleCerts(data ? data.map(c => c.credential_id) : []);
     }
     loadSamples();
   }, []);
@@ -47,61 +42,13 @@ export default function Verify() {
     try {
       const { data, error } = await verifyCertificate(targetId.trim());
       if (error || !data) {
-        // Fallback to mockData
-        const mockCert = mockCertificates.find(
-          c => c.credentialId.toLowerCase() === targetId.trim().toLowerCase()
-        );
-        if (mockCert) {
-          setResult('valid');
-          setVerifiedCert({
-            title: mockCert.title,
-            credential_id: mockCert.credentialId,
-            issue_date: mockCert.issueDate,
-            blockchain_hash: mockCert.blockchainHash,
-            skills: mockCert.skills,
-            recipient: {
-              full_name: mockCert.recipientName
-            },
-            company: {
-              name: mockCert.company
-            },
-            internship: {
-              title: mockCert.internshipTitle
-            }
-          });
-        } else {
-          setResult('invalid');
-        }
+        setResult('invalid');
       } else {
         setResult('valid');
         setVerifiedCert(data);
       }
     } catch (err) {
-      // Catch and check mockData
-      const mockCert = mockCertificates.find(
-        c => c.credentialId.toLowerCase() === targetId.trim().toLowerCase()
-      );
-      if (mockCert) {
-        setResult('valid');
-        setVerifiedCert({
-          title: mockCert.title,
-          credential_id: mockCert.credentialId,
-          issue_date: mockCert.issueDate,
-          blockchain_hash: mockCert.blockchainHash,
-          skills: mockCert.skills,
-          recipient: {
-            full_name: mockCert.recipientName
-          },
-          company: {
-            name: mockCert.company
-          },
-          internship: {
-            title: mockCert.internshipTitle
-          }
-        });
-      } else {
-        setResult('invalid');
-      }
+      setResult('invalid');
     } finally {
       setLoading(false);
     }
@@ -208,8 +155,8 @@ export default function Verify() {
                     <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-emerald-800 dark:text-emerald-400">Cryptographically Secured</h3>
-                    <p className="text-xs text-emerald-700/80 dark:text-emerald-500/80">This credential matches the decentralized ledger record.</p>
+                    <h3 className="font-bold text-emerald-800 dark:text-emerald-400">Verified Authentic</h3>
+                    <p className="text-xs text-emerald-700/80 dark:text-emerald-500/80">This credential matches ZYR0&apos;s official record for this certificate ID.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
