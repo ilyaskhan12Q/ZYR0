@@ -92,6 +92,8 @@ export async function issueCertificate(data: {
   skills?: string[];
   description?: string;
   certificate_id?: string;
+  start_date?: string;
+  end_date?: string;
 }) {
   const { data: { session } } = await supabase.auth.getSession();
 

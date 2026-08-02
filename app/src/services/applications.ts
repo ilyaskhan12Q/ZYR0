@@ -177,7 +177,7 @@ export async function getAllCompanyApplications(company_id: string) {
       .from('applications')
       .select(`
         *,
-        internship:internships!internship_id (id, title, company_id),
+        internship:internships!internship_id (id, title, company_id, start_date, end_date, skills),
         student:profiles!student_id (id, full_name, email, avatar_url, university)
       `)
       .in('internship_id', internshipIds)
