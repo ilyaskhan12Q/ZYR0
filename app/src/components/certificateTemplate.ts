@@ -358,8 +358,8 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       align-items: end;
       gap: 24px;
     }
-    .logos { display: flex; gap: 14px; align-items: center; }
-    .footer-logo { height: 44px; width: auto; display: block; object-fit: contain; }
+    .logos { display: flex; gap: 18px; align-items: center; }
+    .footer-logo { height: 60px; width: auto; display: block; object-fit: contain; }
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .qr-img { width: 82px; height: 82px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
     .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
