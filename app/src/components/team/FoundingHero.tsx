@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useReducedMotion, motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, Users, Layers, CalendarClock } from 'lucide-react';
 import { TEAM_ROLES, STATUS_META } from './team-data';
 import { CanvasParticles } from '@/components/CanvasParticles';
@@ -166,14 +167,13 @@ export function FoundingHero() {
               transition={{ duration: 0.4, delay: 0.3 }}
               className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-1"
             >
-              <button
-                type="button"
-                onClick={() => scrollToId('team-roles')}
+              <Link
+                to="/register"
                 className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
               >
                 Explore Open Roles
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
               <button
                 type="button"
                 onClick={() => scrollToId('team-culture')}

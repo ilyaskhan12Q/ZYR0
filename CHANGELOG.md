@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Careers — signup required to apply**: the application form now shows a sign-in gate for anonymous visitors; applications are linked to the applicant's ZYR0 account (`user_id`, migration `030`) and anonymous inserts are blocked by RLS. The hero "Explore Open Roles" CTA links to the registration page instead of scrolling to the roles list.
+- **Team application form**: motivation minimum lowered from 60 to 30 characters.
+
 ### Fixed
 - **Team application submit error**: submission actually succeeded, but the client read-back (`insert().select().single()`) failed under RLS (admins-only SELECT), surfacing a false "Something went wrong" error. The insert now skips the read-back, so applicants get the success screen immediately.
 
