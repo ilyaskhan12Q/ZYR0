@@ -16,6 +16,8 @@ import { TextRotate } from '@/components/fancy/text/TextRotate';
 import { BackgroundLayer } from '@/components/landing/BackgroundLayer';
 import { JourneySection } from '@/components/landing/JourneySection/JourneySection';
 import AnimatedSearchMockup from '@/components/landing/AnimatedSearchMockup';
+import StatsBand from '@/components/landing/StatsBand';
+import LogoMarquee from '@/components/landing/LogoMarquee';
 
 const homepageStructuredData = [
   {
@@ -78,13 +80,6 @@ const testimonials = [
   { name: 'Sarah Chen', role: 'Computer Science Student', quote: 'The structured task progress and mentor feedback helped me grow far faster than a standard internship. Having a clear roadmap kept me aligned.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
   { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor', quote: 'As a mentor, ZYR0 gives me a structured framework to evaluate work, track multiple interns, and provide actionable feedback without administrative overhead.', avatar: 'https://i.pravatar.cc/150?u=michael' },
   { name: 'TechFlow Inc.', role: 'Employer Partner', quote: 'Using ZYR0 to hire and manage our interns has streamlined our entire process. The quality of candidate tracking and verification has been exceptional.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
-];
-
-const stats = [
-  { value: '10,000+', label: 'Active Students', icon: GraduationCap },
-  { value: '500+', label: 'Partner Companies', icon: Building2 },
-  { value: '50+', label: 'Universities', icon: Globe },
-  { value: '25,000+', label: 'Completed Tasks', icon: Award },
 ];
 
 const checkFeatures = [
@@ -542,6 +537,12 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Stats Band — animated count-up social proof */}
+      <StatsBand />
+
+      {/* Employer Logo Marquee */}
+      <LogoMarquee />
+
       {/* Community / Stay Updated Section */}
       <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-white/10">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -934,28 +935,6 @@ export default function Landing() {
                     <p className="text-sm font-semibold text-white">{t.name}</p>
                     <p className="text-xs text-slate-400">{t.role}</p>
                   </div>
-                </div>
-              </MotionDiv>
-            ))}
-          </div>
-
-          {/* Key Metrics */}
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((stat, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                {...viewProps(
-                  { opacity: 0, scale: 0.9 },
-                  { opacity: 1, scale: 1 },
-                  { delay: i * 0.08 }
-                )}
-                className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl text-center hover:border-white/20 transition-all duration-300"
-              >
-                <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{stat.value}</p>
-                <div className="flex items-center justify-center gap-1.5 mt-1">
-                  <stat.icon className="w-4 h-4 text-emerald-400" />
-                  <p className="text-sm text-slate-300 font-medium">{stat.label}</p>
                 </div>
               </MotionDiv>
             ))}
