@@ -6,7 +6,7 @@ import {
   Home, FolderOpen, FileCheck, FileText, ClipboardList, CheckSquare, Award,
   Briefcase, BarChart3, Users, UserCog, Shield, MessageSquare,
   Building2, ChevronLeft, ChevronRight,
-  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark
+  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -70,6 +70,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Certificates', href: '/admin/certificates', icon: Award },
     { label: 'Offer Letters', href: '/admin/offer-letters', icon: FileText },
     { label: 'Applications', href: '/admin/applications', icon: FileCheck },
+    { label: 'Team Applications', href: '/admin/team-applications', icon: Rocket },
     { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { label: 'Reports', href: '/admin/reports', icon: Flag },
     { label: 'Settings', href: '/admin/settings', icon: Settings },

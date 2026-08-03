@@ -1,0 +1,517 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  AlertTriangle, Check, Download, Eye, FileText, Inbox, Loader2,
+  Mail, Search, Trash2, X,
+} from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { cn } from '@/lib/utils';
+import { TEAM_ROLES } from '@/components/team/team-data';
+import {
+  TEAM_APPLICATION_STATUSES,
+  deleteTeamApplication,
+  getTeamApplications,
+  markTeamApplicationEmailed,
+  updateTeamApplicationStatus,
+} from '@/services/teamApplications';
+import type { TeamApplicationStatus } from '@/lib/database.types';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+
+const tabs = ['All', ...TEAM_APPLICATION_STATUSES];
+
+const statusColors: Record<string, string> = {
+  New: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  'Under Review': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+  Shortlisted: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  Contacted: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400',
+  Rejected: 'bg-red-100 text-red-700 dark:bg-red-950/20 dark:text-red-400',
+};
+
+function roleTitle(roleId: string | null | undefined) {
+  if (!roleId) return '—';
+  return TEAM_ROLES.find((r) => r.id === roleId)?.title ?? roleId;
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/* ── Email templates ─────────────────────────────────────────────────────── */
+
+function buildShortlistEmail(app: any) {
+  const role = roleTitle(app.preferred_role);
+  const html = `
+    <div style="font-family: Arial, Helvetica, sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px 24px;">
+      <div style="max-width: 560px; margin: 0 auto; background: #ffffff; color: #0f172a; border-radius: 16px; overflow: hidden;">
+        <div style="background: linear-gradient(135deg, #2563eb, #06b6d4); padding: 28px 32px;">
+          <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">ZYR0</p>
+          <h1 style="margin: 8px 0 0; color: #ffffff; font-size: 22px;">You've been shortlisted</h1>
+        </div>
+        <div style="padding: 32px;">
+          <p style="font-size: 15px; line-height: 1.7;">Hi ${app.full_name},</p>
+          <p style="font-size: 15px; line-height: 1.7;">
+            Great news — your application for the <strong>${role}</strong> seat on the ZYR0 Founding
+            Development Team stood out, and we'd love to move forward with you.
+          </p>
+          <p style="font-size: 15px; line-height: 1.7;">
+            Next, we'll reach out directly to schedule a short conversation so we can learn about you
+            (and you about us). Keep an eye on your inbox — and in the meantime, feel free to reply
+            to this email with anything you'd like us to see before we talk.
+          </p>
+          <p style="font-size: 15px; line-height: 1.7; margin-bottom: 0;">
+            Talk soon,<br />
+            The ZYR0 Team
+          </p>
+        </div>
+      </div>
+    </div>`;
+  const text = [
+    `Hi ${app.full_name},`,
+    '',
+    `Great news — your application for the ${role} seat on the ZYR0 Founding Development Team stood out, and we'd love to move forward with you.`,
+    '',
+    'Next, we\'ll reach out directly to schedule a short conversation so we can learn about you (and you about us). Reply to this email with anything you\'d like us to see before we talk.',
+    '',
+    'Talk soon,',
+    'The ZYR0 Team',
+  ].join('\n');
+  return { to: app.email, subject: `You've been shortlisted — ZYR0 Founding Development Team`, html, text };
+}
+
+async function sendCandidateEmail(app: any) {
+  const { to, subject, html, text } = buildShortlistEmail(app);
+  const { data, error } = await supabase.functions.invoke('send-email', {
+    body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.dpdns.org>', replyTo: 'team@zyroo.dpdns.org' },
+  });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
+
+export default function AdminTeamApplications() {
+  const [activeTab, setActiveTab] = useState('All');
+  const [search, setSearch] = useState('');
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [detail, setDetail] = useState<any | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  const loadApplications = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await getTeamApplications(activeTab as any);
+      if (error) throw error;
+      setApplications(data);
+    } catch (err) {
+      console.error('Error loading team applications:', err);
+      setMessage({ type: 'err', text: 'Failed to load applications.' });
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return applications;
+    return applications.filter((a) =>
+      a.full_name?.toLowerCase().includes(q) ||
+      a.email?.toLowerCase().includes(q) ||
+      a.university?.toLowerCase().includes(q) ||
+      roleTitle(a.preferred_role).toLowerCase().includes(q) ||
+      (a.skills || []).some((s: string) => s.toLowerCase().includes(q))
+    );
+  }, [applications, search]);
+
+  const toggleSelected = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const allChecked = filtered.length > 0 && filtered.every((a) => prev.has(a.id));
+      if (allChecked) filtered.forEach((a) => next.delete(a.id));
+      else filtered.forEach((a) => next.add(a.id));
+      return next;
+    });
+  };
+
+  const changeStatus = async (id: string, status: TeamApplicationStatus) => {
+    setBusy(`status-${id}`);
+    try {
+      const { error } = await updateTeamApplicationStatus(id, status);
+      if (error) throw error;
+      setApplications((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'err', text: 'Failed to update status.' });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleBulkEmail = async () => {
+    const targets = filtered.filter((a) => selected.has(a.id));
+    if (targets.length === 0) return;
+    setBusy('email');
+    setMessage(null);
+    let ok = 0;
+    let failed = 0;
+    for (const app of targets) {
+      try {
+        await sendCandidateEmail(app);
+        await markTeamApplicationEmailed(app.id);
+        await updateTeamApplicationStatus(app.id, 'Shortlisted');
+        ok += 1;
+      } catch (err) {
+        console.error('Email failed for', app.email, err);
+        failed += 1;
+      }
+    }
+    setMessage({
+      type: failed === 0 ? 'ok' : 'ok',
+      text: failed === 0
+        ? `Shortlist email sent to ${ok} candidate${ok === 1 ? '' : 's'} and status updated.`
+        : `Emailed ${ok}, failed ${failed}. Check edge function logs.`,
+    });
+    setSelected(new Set());
+    setBusy(null);
+    loadApplications();
+  };
+
+  const exportCsv = () => {
+    const rows = filtered.map((a) => ({
+      'Full Name': a.full_name ?? '',
+      Email: a.email ?? '',
+      University: a.university ?? '',
+      'Degree Program': a.degree_program ?? '',
+      'Academic Year': a.academic_year ?? '',
+      'Preferred Role': roleTitle(a.preferred_role),
+      'Secondary Role': roleTitle(a.secondary_role),
+      Skills: (a.skills || []).join('; '),
+      GitHub: a.github ?? '',
+      LinkedIn: a.linkedin ?? '',
+      Portfolio: a.portfolio ?? '',
+      Availability: a.availability ?? '',
+      Projects: a.projects ?? '',
+      Motivation: a.motivation ?? '',
+      Status: a.status ?? '',
+      'Email Sent': a.email_sent ? 'Yes' : 'No',
+      'Applied On': a.created_at ? formatDate(a.created_at) : '',
+      'Resume URL': a.resume_url ?? '',
+    }));
+    const headers = Object.keys(rows[0] ?? {});
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
+    const csv = [
+      headers.join(','),
+      ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(',')),
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `team-applications-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setBusy('delete');
+    try {
+      const { error } = await deleteTeamApplication(deleteTarget.id);
+      if (error) throw error;
+      setMessage({ type: 'ok', text: 'Application deleted.' });
+      setDeleteTarget(null);
+      loadApplications();
+    } catch (err) {
+      console.error(err);
+      setMessage({ type: 'err', text: 'Failed to delete application.' });
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const allChecked = filtered.length > 0 && filtered.every((a) => selected.has(a.id));
+  const selectedCount = filtered.filter((a) => selected.has(a.id)).length;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Team Applications</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Founding development team recruitment — review, shortlist, email and export.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={exportCsv} disabled={filtered.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-border bg-card hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <Download className="w-4 h-4" /> Export CSV
+          </button>
+          <button onClick={handleBulkEmail} disabled={selectedCount === 0 || busy === 'email'}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            {busy === 'email' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            Email Selected ({selectedCount})
+          </button>
+        </div>
+      </div>
+
+      {message && (
+        <div role="status"
+          className={cn(
+            'p-4 rounded-lg border text-sm flex items-center gap-2',
+            message.type === 'ok'
+              ? 'border-emerald-300 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+              : 'border-red-300 dark:border-red-900/50 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-300'
+          )}>
+          {message.type === 'ok' ? <Check className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+          <span>{message.text}</span>
+          <button onClick={() => setMessage(null)} className="ml-auto opacity-60 hover:opacity-100" aria-label="Dismiss">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email, university, role or skill..."
+            className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 text-sm" />
+        </div>
+        <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto border border-border">
+          {tabs.map((tab) => (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              className={cn(
+                'px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors',
+                activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              )}>{tab}</button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center min-h-[30vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+        </div>
+      ) : (
+        <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  <th className="px-4 py-3 w-10">
+                    <input type="checkbox" checked={allChecked} onChange={toggleAll}
+                      aria-label="Select all" className="accent-blue-600 w-4 h-4" />
+                  </th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Applicant</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Preferred Role</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Skills</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Applied</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-12 text-center">
+                      <Inbox className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
+                      <p className="text-sm text-muted-foreground">No team applications found.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((app) => (
+                    <motion.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <input type="checkbox" checked={selected.has(app.id)} onChange={() => toggleSelected(app.id)}
+                          aria-label={`Select ${app.full_name}`} className="accent-blue-600 w-4 h-4" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(app.full_name || 'A')}`} alt="" className="w-8 h-8 rounded-full object-cover" />
+                          <div>
+                            <p className="text-sm font-medium">{app.full_name}</p>
+                            <p className="text-xs text-muted-foreground">{app.email} · {app.university || '—'}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm">{roleTitle(app.preferred_role)}</p>
+                        {app.secondary_role && (
+                          <p className="text-xs text-muted-foreground">also: {roleTitle(app.secondary_role)}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1 max-w-[240px]">
+                          {(app.skills || []).slice(0, 3).map((s: string) => (
+                            <span key={s} className="px-2 py-0.5 text-[11px] rounded-md bg-muted text-muted-foreground">{s}</span>
+                          ))}
+                          {(app.skills || []).length > 3 && (
+                            <span className="text-[11px] text-muted-foreground">+{(app.skills || []).length - 3}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={cn('px-2.5 py-0.5 text-xs rounded-full font-medium', statusColors[app.status] || 'bg-muted')}>
+                          {app.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{formatDate(app.created_at)}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => setDetail(app)} title="View application"
+                            className="p-2 rounded-lg border border-border hover:bg-muted/50 transition-colors" aria-label="View application">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <select
+                            value={app.status}
+                            onChange={(e) => changeStatus(app.id, e.target.value as TeamApplicationStatus)}
+                            disabled={busy === `status-${app.id}`}
+                            aria-label={`Change status for ${app.full_name}`}
+                            className="text-xs px-2 py-2 rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:opacity-50">
+                            {TEAM_APPLICATION_STATUSES.map((s) => (
+                              <option key={s} value={s}>{s}</option>
+                            ))}
+                          </select>
+                          <button onClick={() => setDeleteTarget(app)} title="Delete application"
+                            className="p-2 rounded-lg border border-border text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" aria-label="Delete application">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Detail dialog */}
+      <Dialog open={!!detail} onOpenChange={(open) => { if (!open) setDetail(null); }}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{detail?.full_name}</DialogTitle>
+            <DialogDescription>
+              {detail?.email} · Applied {detail ? formatDate(detail.created_at) : ''}
+            </DialogDescription>
+          </DialogHeader>
+          {detail && (
+            <div className="space-y-5 text-sm">
+              <div className="flex flex-wrap gap-2">
+                <span className={cn('px-2.5 py-0.5 text-xs rounded-full font-medium', statusColors[detail.status] || 'bg-muted')}>{detail.status}</span>
+                {detail.email_sent && (
+                  <span className="px-2.5 py-0.5 text-xs rounded-full font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
+                    Emailed {detail.email_sent_at ? formatDate(detail.email_sent_at) : ''}
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <DetailItem label="University" value={detail.university} />
+                <DetailItem label="Degree Program" value={detail.degree_program} />
+                <DetailItem label="Academic Year" value={detail.academic_year} />
+                <DetailItem label="Availability" value={detail.availability} />
+                <DetailItem label="Preferred Role" value={roleTitle(detail.preferred_role)} />
+                <DetailItem label="Secondary Role" value={roleTitle(detail.secondary_role)} />
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Links</p>
+                <div className="flex flex-wrap gap-2">
+                  {[['GitHub', detail.github], ['LinkedIn', detail.linkedin], ['Portfolio', detail.portfolio]].map(([label, url]) => (
+                    url ? (
+                      <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-muted/50 transition-colors">
+                        <FileText className="w-3.5 h-3.5" /> {label}
+                      </a>
+                    ) : null
+                  ))}
+                  {detail.resume_url ? (
+                    <a href={detail.resume_url} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-muted/50 transition-colors">
+                      <Download className="w-3.5 h-3.5" /> Resume ({detail.resume_filename ?? 'download'})
+                    </a>
+                  ) : (
+                    <span className="px-3 py-1.5 rounded-lg border border-dashed border-border text-xs text-muted-foreground">No resume attached</span>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Skills</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {(detail.skills || []).map((s: string) => (
+                    <span key={s} className="px-2.5 py-1 text-xs rounded-md bg-muted text-foreground">{s}</span>
+                  ))}
+                </div>
+              </div>
+
+              {detail.projects && (
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Projects & Experience</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{detail.projects}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Why this role</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{detail.motivation}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this application?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget?.full_name}&apos;s application ({deleteTarget?.email}) will be permanently removed. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy === 'delete'}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={busy === 'delete'}
+              className="bg-red-600 hover:bg-red-700 text-white">
+              {busy === 'delete' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+function DetailItem({ label, value }: { label: string; value?: string | null }) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">{label}</p>
+      <p className="text-sm font-medium">{value || '—'}</p>
+    </div>
+  );
+}

@@ -16,6 +16,7 @@ const navLinks = [
   { label: 'Companies', href: '/companies' },
   { label: 'Verify', href: '/verify' },
   { label: 'About', href: '/about' },
+  { label: 'Careers', href: '/careers' },
 ];
 
 export default function PublicLayout() {

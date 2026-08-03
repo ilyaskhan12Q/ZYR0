@@ -13,6 +13,7 @@ const AdminReports = lazy(() => import('./Reports'));
 const AdminSettings = lazy(() => import('./Settings'));
 const AdminLogs = lazy(() => import('./Logs'));
 const AdminOfferLetters = lazy(() => import('./OfferLetters'));
+const AdminTeamApplications = lazy(() => import('./TeamApplications'));
 
 export default function AdminPortal() {
   return (
@@ -30,6 +31,7 @@ export default function AdminPortal() {
       <Route path="certificates/:id" element={<AdminCertificates />} />
       <Route path="offer-letters" element={<AdminOfferLetters />} />
       <Route path="applications" element={<AdminApplications />} />
+      <Route path="team-applications" element={<AdminTeamApplications />} />
       <Route path="analytics" element={<AdminAnalytics />} />
       <Route path="reports" element={<AdminReports />} />
       <Route path="settings" element={<AdminSettings />} />
