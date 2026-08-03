@@ -26,8 +26,8 @@ export default function RoleChips() {
         <p className="text-center font-label text-[11px] uppercase tracking-[0.22em] text-sky-400 mb-3">
           Trending this week
         </p>
-        <h2 className="text-center font-display font-bold text-3xl sm:text-4xl tracking-tight text-white">
-          Roles companies are hiring for
+        <h2 className="text-center font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white">
+          Roles companies are <span className="font-accent text-sky-400">hiring for</span>
         </h2>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
           {ROLES.map((role) => (

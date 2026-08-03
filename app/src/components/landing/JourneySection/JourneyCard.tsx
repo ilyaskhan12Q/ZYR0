@@ -120,7 +120,7 @@ export const JourneyCard = React.memo(function JourneyCard({ card, index, totalC
           </div>
 
           {/* Title & Subtitle */}
-          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight mb-2">
+          <h3 className="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-tight mb-2">
             {card.title}
           </h3>
           <p className={cn("text-xs sm:text-sm font-semibold mb-4 tracking-wide uppercase", badgeStyle.text)}>

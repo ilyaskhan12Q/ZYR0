@@ -368,7 +368,7 @@ export default function Landing() {
                 className="inline-flex items-center gap-2.5 self-start bg-white/[0.04] border border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-white/90 shadow-sm hover:border-white/20 transition-all duration-200"
               >
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span className="font-display font-semibold uppercase tracking-wider text-[11px] text-emerald-300/90">Pakistan's Premier Internship Engine</span>
+                <span className="font-label text-[11px] tracking-[0.22em] text-sky-400">Pakistan's Premier Internship Engine</span>
               </MotionDiv>
 
               {/* Title Section with Oversized Sora Typography & TextRotate */}
@@ -458,7 +458,7 @@ export default function Landing() {
                   title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
                 >
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                   </span>
                   <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-400" />
@@ -519,16 +519,16 @@ export default function Landing() {
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-400/10 border border-sky-400/25 text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
               </span>
               Official Community Channels
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
               Never Miss an Opportunity. <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
+              <span className="font-accent text-sky-400">
                 Stay Connected in Real-Time.
               </span>
             </h2>
@@ -558,7 +558,7 @@ export default function Landing() {
                     Live Alerts
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-sky-300 transition-colors">
                   WhatsApp Channel
                 </h3>
                 <p className="text-slate-300 text-sm leading-relaxed mb-6">
@@ -598,7 +598,7 @@ export default function Landing() {
                     Official Page
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-sky-300 transition-colors">
                   LinkedIn Network
                 </h3>
                 <p className="text-slate-300 text-sm leading-relaxed mb-6">
@@ -635,9 +635,9 @@ export default function Landing() {
               )}
               className="lg:col-span-5 space-y-6"
             >
-              <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-                Every career starts somewhere.
+              <span className="font-label text-[11px] tracking-[0.22em] text-sky-400">Our Purpose</span>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
+                Every career starts <span className="font-accent text-sky-400">somewhere.</span>
               </h2>
               <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
@@ -667,7 +667,7 @@ export default function Landing() {
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-white">{role.title}</h3>
+                  <h3 className="mt-4 font-display text-lg font-bold text-white">{role.title}</h3>
                   <p className="mt-2 text-sm text-slate-300 leading-relaxed">{role.desc}</p>
                 </MotionDiv>
               ))}
@@ -687,8 +687,8 @@ export default function Landing() {
             )}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-balance">Built for accountability and clear outcomes</h2>
+            <span className="font-label text-[11px] tracking-[0.22em] text-sky-400">Capabilities</span>
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-balance">Built for accountability and <span className="font-accent text-sky-400">clear outcomes</span></h2>
             <p className="mt-4 text-slate-300 max-w-2xl mx-auto">
               Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
             </p>
@@ -710,7 +710,7 @@ export default function Landing() {
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
                   <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">{feature.title}</h3>
+                <h3 className="mt-4 font-display text-lg font-bold text-white">{feature.title}</h3>
                 <p className="mt-2 text-sm text-slate-300 leading-relaxed">{feature.desc}</p>
               </MotionDiv>
             ))}
@@ -738,9 +738,9 @@ export default function Landing() {
             )}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">System Credibility</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
-              Built on transparency. Designed for confidence.
+            <span className="font-label text-[11px] tracking-[0.22em] text-sky-400">System Credibility</span>
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+              Built on transparency. <span className="font-accent text-sky-400">Designed for confidence.</span>
             </h2>
             <p className="mt-4 text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
               A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
@@ -763,7 +763,7 @@ export default function Landing() {
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-white">{card.title}</h3>
+                <h3 className="mt-4 font-display text-base font-bold text-white">{card.title}</h3>
                 <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">{card.desc}</p>
               </MotionDiv>
             ))}
@@ -842,7 +842,7 @@ export default function Landing() {
                 Get Started Today
               </span>
               <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white max-w-2xl mx-auto">
-                Ready to transform how internships work?
+                Ready to transform <span className="font-accent text-sky-100">how internships work?</span>
               </h2>
               <p className="text-white/90 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
                 Join thousands of students, companies, mentors, and universities building Pakistan's structured internship ecosystem.
