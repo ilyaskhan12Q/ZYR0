@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.1] - 2026-08-02
+
+### Changed
+- **Certificate Internship Title Emphasis (`style/certificate-internship-title`)**:
+  - Made the internship title (e.g., "Frontend Development Intern") extra bold (`font-weight: 900`) and enlarged it above the body text size so it is the first element that catches the eye.
+  - Thickened the gold underline to `2px` with a darker ink color for stronger contrast against the body copy.
+
 ## [0.20.0] - 2026-08-02
 
 ### Fixed
