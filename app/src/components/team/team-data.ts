@@ -711,6 +711,10 @@ export const AVAILABILITY_OPTIONS: string[] = [
   '5–10 hours / week', '10–15 hours / week', '15–20 hours / week', '20+ hours / week',
 ];
 
+export const GENDER_OPTIONS: string[] = [
+  'Female', 'Male', 'Non-binary', 'Prefer not to say',
+];
+
 export const APPLICATION_STEPS: { id: string; label: string }[] = [
   { id: 'basics', label: 'Basics' },
   { id: 'links', label: 'Links & Resume' },

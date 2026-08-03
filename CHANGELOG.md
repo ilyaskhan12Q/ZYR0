@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Founding Development Team recruitment experience** (`/careers`, `feature/founding-development-team`):
   - Premium V3 recruitment page: FoundingHero (canvas particles + repo-window mockup + floating role cards), Mission, Why Join (6), Culture (8), Open Roles (11 roles / 20 seats across Engineering, Design, AI & Data, Platform, Community, Growth), Workflow timeline (7 steps), Selection timeline (7 steps), Expectations (9), Recognition (6), FAQ (6), and final CTA.
-  - Multi-step application form (Basics → Links & Resume → Role & Skills → Commitment → Review) with client-side validation, PDF/DOC resume upload (≤5 MB) and a confirmation success screen.
+  - Multi-step application form (Basics → Links & Resume → Role & Skills → Commitment → Review) with client-side validation, PDF/DOC resume upload (≤5 MB) and a confirmation success screen. Collects phone and gender in the Basics step (migration `029`).
   - SEO structured data: `BreadcrumbList` + `FAQPage` on the public careers route.
   - `Careers` link in the public navigation.
 - **Team applications database + admin workflow**:

@@ -9,6 +9,7 @@ import {
   APPLICATION_STEPS,
   ACADEMIC_YEARS,
   AVAILABILITY_OPTIONS,
+  GENDER_OPTIONS,
   TEAM_ROLES,
   TEAM_SKILLS,
 } from './team-data';
@@ -22,6 +23,8 @@ import { submitTeamApplication } from '@/services/teamApplications';
 interface ApplicationData {
   fullName: string;
   email: string;
+  phone: string;
+  gender: string;
   university: string;
   degreeProgram: string;
   academicYear: string;
@@ -43,6 +46,8 @@ type Errors = Partial<Record<keyof ApplicationData, string>>;
 const INITIAL_DATA: ApplicationData = {
   fullName: '',
   email: '',
+  phone: '',
+  gender: '',
   university: '',
   degreeProgram: '',
   academicYear: '',
@@ -64,11 +69,12 @@ const INPUT_CLASSES =
 const FIELD_LABEL = 'text-sm font-medium mb-1.5 block text-slate-900 dark:text-white';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[+]?[\d\s()-]{7,17}$/;
 const MAX_RESUME_MB = 5;
 const ALLOWED_RESUME_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
 const STEP_FIELDS: (keyof ApplicationData)[][] = [
-  ['fullName', 'email', 'university', 'degreeProgram', 'academicYear'],
+  ['fullName', 'email', 'phone', 'gender', 'university', 'degreeProgram', 'academicYear'],
   ['github', 'resume'],
   ['preferredRole', 'skills'],
   ['availability', 'motivation', 'agreement'],
@@ -81,6 +87,8 @@ function validateStep(step: number, data: ApplicationData): Errors {
   if (step === 0) {
     if (value('fullName').length < 2) errors.fullName = 'Please enter your full name.';
     if (!EMAIL_RE.test(value('email'))) errors.email = 'Please enter a valid email address.';
+    if (!PHONE_RE.test(value('phone'))) errors.phone = 'Please enter a valid phone number (e.g. +92 300 1234567).';
+    if (!data.gender) errors.gender = 'Please select your gender.';
     if (value('university').length < 2) errors.university = 'Please enter your university or institute.';
     if (value('degreeProgram').length < 2) errors.degreeProgram = 'Please enter your degree program.';
     if (!data.academicYear) errors.academicYear = 'Please select your academic year.';
@@ -378,6 +386,15 @@ export function TeamApplication({ preferredRole }: { preferredRole: string }) {
                         <TextField
                           id="app-email" label="Email Address" type="email" placeholder="you@example.com"
                           value={data.email} onChange={(v) => set('email', v)} error={errors.email}
+                        />
+                        <TextField
+                          id="app-phone" label="Phone Number" type="tel" placeholder="+92 300 1234567"
+                          value={data.phone} onChange={(v) => set('phone', v)} error={errors.phone}
+                        />
+                        <SelectField
+                          id="app-gender" label="Gender"
+                          value={data.gender} onChange={(v) => set('gender', v)}
+                          options={GENDER_OPTIONS} placeholder="Select" error={errors.gender}
                         />
                         <TextField
                           id="app-university" label="University / Institute" placeholder="e.g. NUST"
@@ -702,6 +719,8 @@ function ReviewStep({ data }: { data: ApplicationData }) {
       rows: [
         { label: 'Full Name', value: data.fullName, icon: User },
         { label: 'Email', value: data.email, icon: Mail },
+        { label: 'Phone', value: data.phone, icon: Mail },
+        { label: 'Gender', value: data.gender, icon: User },
         { label: 'University', value: data.university, icon: GraduationCap },
         { label: 'Degree Program', value: data.degreeProgram, icon: GraduationCap },
         { label: 'Academic Year', value: data.academicYear, icon: CalendarClock },

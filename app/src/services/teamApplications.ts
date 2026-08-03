@@ -12,6 +12,8 @@ export const TEAM_APPLICATION_STATUSES: TeamApplicationStatus[] = [
 export interface TeamApplicationPayload {
   fullName: string;
   email: string;
+  phone: string;
+  gender: string;
   university: string;
   degreeProgram: string;
   academicYear: string;
@@ -52,6 +54,8 @@ export async function submitTeamApplication(payload: TeamApplicationPayload) {
   const { data, error } = await supabase.from('team_applications').insert({
     full_name: payload.fullName.trim(),
     email: payload.email.trim().toLowerCase(),
+    phone: payload.phone.trim(),
+    gender: payload.gender.trim(),
     university: payload.university.trim(),
     degree_program: payload.degreeProgram.trim(),
     academic_year: payload.academicYear.trim(),
