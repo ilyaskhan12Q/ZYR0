@@ -1,6 +1,6 @@
 # Landing Page V3 — Design System & Implementation Plan
 
-> Branch: `landing-page-v3` · Target release: **v0.21.0** · Status: Phase 0 (Plan)
+> Branch: `landing-page-v3` · Released: **v0.22.0** · Status: Complete (Phases 0–6 + light theme)
 
 ## 1. Goal
 
