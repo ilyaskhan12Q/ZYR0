@@ -131,6 +131,7 @@ export default function AdminTeamApplications() {
     return applications.filter((a) =>
       a.full_name?.toLowerCase().includes(q) ||
       a.email?.toLowerCase().includes(q) ||
+      a.phone?.toLowerCase().includes(q) ||
       a.university?.toLowerCase().includes(q) ||
       roleTitle(a.preferred_role).toLowerCase().includes(q) ||
       (a.skills || []).some((s: string) => s.toLowerCase().includes(q))
@@ -203,6 +204,8 @@ export default function AdminTeamApplications() {
     const rows = filtered.map((a) => ({
       'Full Name': a.full_name ?? '',
       Email: a.email ?? '',
+      Phone: a.phone ?? '',
+      Gender: a.gender ?? '',
       University: a.university ?? '',
       'Degree Program': a.degree_program ?? '',
       'Academic Year': a.academic_year ?? '',
@@ -430,6 +433,8 @@ export default function AdminTeamApplications() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <DetailItem label="Phone" value={detail.phone} />
+                <DetailItem label="Gender" value={detail.gender} />
                 <DetailItem label="University" value={detail.university} />
                 <DetailItem label="Degree Program" value={detail.degree_program} />
                 <DetailItem label="Academic Year" value={detail.academic_year} />

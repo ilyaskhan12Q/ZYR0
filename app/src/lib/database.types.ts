@@ -135,6 +135,8 @@ export interface TeamApplication {
   id: string;
   full_name: string;
   email: string;
+  phone: string | null;
+  gender: string | null;
   university: string;
   degree_program: string;
   academic_year: string;
