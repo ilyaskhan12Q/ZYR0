@@ -9,6 +9,7 @@ export type UserStatus = 'active' | 'inactive' | 'pending';
 export type CompanyStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type InternshipStatus = 'Active' | 'Closed' | 'Draft';
 export type ApplicationStatus = 'Applied' | 'Under Review' | 'Shortlisted' | 'Accepted' | 'Rejected' | 'Withdrawn';
+export type TeamApplicationStatus = 'New' | 'Under Review' | 'Shortlisted' | 'Contacted' | 'Rejected';
 export type TaskStatus = 'Pending' | 'Submitted' | 'Under Review' | 'Approved' | 'Rejected';
 export type TaskPriority = 'High' | 'Medium' | 'Low';
 export type CertificateStatus = 'Active' | 'Revoked';
@@ -128,6 +129,32 @@ export interface Application {
   // Joined
   internship?: Internship;
   student?: Profile;
+}
+
+export interface TeamApplication {
+  id: string;
+  full_name: string;
+  email: string;
+  university: string;
+  degree_program: string;
+  academic_year: string;
+  github: string;
+  linkedin: string | null;
+  portfolio: string | null;
+  resume_url: string | null;
+  resume_filename: string | null;
+  resume_size: number | null;
+  preferred_role: string;
+  secondary_role: string | null;
+  skills: string[];
+  projects: string | null;
+  availability: string;
+  motivation: string;
+  status: TeamApplicationStatus;
+  email_sent: boolean;
+  email_sent_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TaskAttachment {
@@ -322,6 +349,7 @@ export interface Database {
       company_team_members: { Row: CompanyTeamMember; Insert: Partial<CompanyTeamMember>; Update: Partial<CompanyTeamMember> };
       internships: { Row: Internship; Insert: Partial<Internship>; Update: Partial<Internship> };
       applications: { Row: Application; Insert: Partial<Application>; Update: Partial<Application> };
+      team_applications: { Row: TeamApplication; Insert: Partial<TeamApplication>; Update: Partial<TeamApplication> };
       tasks: { Row: Task; Insert: Partial<Task>; Update: Partial<Task> };
       task_submissions: { Row: TaskSubmission; Insert: Partial<TaskSubmission>; Update: Partial<TaskSubmission> };
       certificates: { Row: Certificate; Insert: Partial<Certificate>; Update: Partial<Certificate> };

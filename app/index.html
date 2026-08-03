@@ -23,6 +23,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sora:wght@400;500;600;700;800&display=swap" />
     <link rel="dns-prefetch" href="https://i.pravatar.cc" />
 
+    <!-- Dark default: clear stored theme so every load starts dark; toggle still works per-session -->
+    <script>
+      try { localStorage.removeItem('theme'); } catch (e) {}
+    </script>
+
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "a254ead2f9524b6f8e64695dc07f23d7"}'></script><!-- End Cloudflare Web Analytics -->
   </head>
   <body>

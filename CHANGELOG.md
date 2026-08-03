@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Founding Development Team recruitment experience** (`/careers`, `feature/founding-development-team`):
+  - Premium V3 recruitment page: FoundingHero (canvas particles + repo-window mockup + floating role cards), Mission, Why Join (6), Culture (8), Open Roles (11 roles / 20 seats across Engineering, Design, AI & Data, Platform, Community, Growth), Workflow timeline (7 steps), Selection timeline (7 steps), Expectations (9), Recognition (6), FAQ (6), and final CTA.
+  - Multi-step application form (Basics → Links & Resume → Role & Skills → Commitment → Review) with client-side validation, PDF/DOC resume upload (≤5 MB) and a confirmation success screen.
+  - SEO structured data: `BreadcrumbList` + `FAQPage` on the public careers route.
+  - `Careers` link in the public navigation.
+- **Team applications database + admin workflow**:
+  - `team_applications` table and `team-resumes` storage bucket (public read, anonymous upload) in migration `028`; RLS allows public insert, admin-only read/update/delete via `is_admin()`.
+  - `app/src/services/teamApplications.ts`: anonymous submit (resume upload + insert), admin list/status/delete, email-sent tracking.
+  - New admin page `/admin/team-applications`: status tabs, search, bulk "Email Selected" shortlist emails via the `send-email` edge function, CSV export, full-detail dialog, per-row status updates and delete; registered in `AdminPortal` and the admin sidebar.
+
 ## [0.22.0] - 2026-08-03
 
 ### Added
