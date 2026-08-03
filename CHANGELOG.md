@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.3] - 2026-08-03
+
+### Fixed
+- **Broken Route Links (`fix/broken-route-links`)**:
+  - Landing hero "Explore Opportunities" CTA pointed to `/explore` (no route existed, landing on the 404 page) — now points to `/internships`.
+  - Public footer "Post Internship" link pointed to `/company/post-internship` (no route existed) — now points to the actual company route `/company/internships/new`.
+  - Full routing audit performed across `App.tsx`, all four portal sub-routers, nav config, verification gates, sitemap, and dynamic `navigate()`/`<Link to={...}>` targets — all other routes verified consistent.
+
 ## [0.20.2] - 2026-08-02
 
 ### Changed
