@@ -310,9 +310,13 @@ export function TeamApplication({ preferredRole }: { preferredRole: string }) {
       <div className="max-w-7xl mx-auto">
         <SectionHeading
           eyebrow="Application"
-          title="Start your application"
-          accent="in under ten minutes"
-          description="Four short steps, one review. No long forms, no gatekeeping — just honest questions so we can find the right seat for you."
+          title={user ? 'Start your application' : 'Sign in to apply'}
+          accent={user ? 'in under ten minutes' : 'to the founding team'}
+          description={
+            user
+              ? 'Four short steps, one review. No long forms, no gatekeeping — just honest questions so we can find the right seat for you.'
+              : 'Applications for the founding team are linked to your ZYR0 account. Create a free account or sign in to start — it takes under two minutes.'
+          }
           icon={Send}
         />
 

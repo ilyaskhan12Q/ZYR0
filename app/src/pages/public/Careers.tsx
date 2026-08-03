@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Users, HeartHandshake, ClipboardList, ArrowDownRight, Briefcase, Medal,
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { useAuth } from '@/contexts/AuthContext';
 import { BASE_URL } from '@/config/seo';
 import { BackgroundLayer } from '@/components/landing/BackgroundLayer';
 import { FoundingHero } from '@/components/team/FoundingHero';
@@ -40,9 +42,15 @@ const teamStructuredData = [
 ];
 
 export default function Careers() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState('');
 
   const handleApply = (roleId: string) => {
+    if (!user) {
+      navigate('/register');
+      return;
+    }
     setSelectedRole(roleId);
     document.getElementById('team-apply')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
