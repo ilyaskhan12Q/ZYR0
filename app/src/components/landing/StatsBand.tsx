@@ -12,9 +12,9 @@ interface StatItem {
 }
 
 const STATS: StatItem[] = [
-  { target: 2400, decimals: 0, suffix: '+', label: 'Student Placements', icon: GraduationCap },
-  { target: 450, decimals: 0, suffix: '+', label: 'Partner Companies', icon: Building2 },
-  { target: 18, decimals: 0, prefix: 'Rs ', suffix: 'M+', label: 'Stipends Disbursed', icon: Banknote },
+  { target: 500, decimals: 0, suffix: '+', label: 'Student Placements', icon: GraduationCap },
+  { target: 50, decimals: 0, suffix: '+', label: 'Partner Companies', icon: Building2 },
+  { target: 150, decimals: 0, prefix: 'Rs ', suffix: 'K+', label: 'Stipends Disbursed', icon: Banknote },
   { target: 4.9, decimals: 1, suffix: '★', label: 'Mentor Rating', icon: Star },
 ]
 

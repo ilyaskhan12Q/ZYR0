@@ -465,31 +465,6 @@ export default function Landing() {
                   <span>WhatsApp Channel</span>
                 </a>
               </MotionDiv>
-
-              {/* Trust Indicators & Proof Grid */}
-              <MotionDiv
-                isMobile={isMobile}
-                {...animProps(
-                  { opacity: 0 },
-                  { opacity: 1 },
-                  { duration: 0.4, delay: 0.6 }
-                )}
-                className="pt-5 border-t border-white/10"
-              >
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {[
-                    { number: '500+', label: 'Verified Students' },
-                    { number: '50+', label: 'Partner Companies' },
-                    { number: '100%', label: 'Certificate Validity' },
-                    { number: '4.9★', label: 'Mentor Rating' },
-                  ].map((stat, idx) => (
-                    <div key={idx} className="bg-slate-900/80 border border-white/10 hover:border-white/20 backdrop-blur-xl rounded-xl p-3 sm:p-3.5 transition-all duration-300 hover:bg-slate-900/95 text-left shadow-lg">
-                      <div className="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-300 text-lg sm:text-xl tracking-tight">{stat.number}</div>
-                      <div className="text-[11px] text-slate-300 font-medium">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </MotionDiv>
             </div>
 
             {/* Right Column: Animated Search Mockup */}
