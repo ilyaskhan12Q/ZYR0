@@ -807,10 +807,10 @@ export default function Landing() {
             )}
             className="text-center mb-14"
           >
-            <span className="font-label text-[11px] uppercase tracking-[0.22em] text-blue-600 dark:text-sky-400">Reviews</span>
-            <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white">
+            <span className="font-label text-[11px] uppercase tracking-[0.22em] text-sky-400">Reviews</span>
+            <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white">
               Verified experiences from{' '}
-              <span className="font-accent text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 dark:from-sky-400 dark:to-indigo-400">
+              <span className="font-accent text-sky-400">
                 our community
               </span>
             </h2>
@@ -827,17 +827,17 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="glass-card-v3 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/10 dark:hover:shadow-sky-500/5 flex flex-col justify-between"
+                className="glass-card-v3 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-sky-500/10 flex flex-col justify-between"
               >
                 <div className="space-y-4">
-                  <Quote className="w-8 h-8 text-blue-600/40 dark:text-sky-400/40" />
-                  <p className="text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
+                  <Quote className="w-8 h-8 text-sky-400/40" />
+                  <p className="text-sm text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                  <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-white/10" />
+                <div className="mt-6 pt-4 border-t border-white/10 flex items-center gap-3">
+                  <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover border border-white/10" />
                   <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{t.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{t.role}</p>
+                    <p className="text-sm font-semibold text-white">{t.name}</p>
+                    <p className="text-xs text-slate-400">{t.role}</p>
                   </div>
                 </div>
               </MotionDiv>
@@ -856,7 +856,7 @@ export default function Landing() {
               { opacity: 1, scale: 1 },
               { duration: 0.6 }
             )}
-            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 dark:from-sky-500 dark:via-blue-600 dark:to-indigo-700 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-blue-600/20 text-white"
+            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-blue-600/20 text-white"
           >
             {/* Ambient Lighting Orbs */}
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />

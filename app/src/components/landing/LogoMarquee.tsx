@@ -15,7 +15,7 @@ export default function LogoMarquee() {
   return (
     <section className="py-10 lg:py-14 px-4 bg-transparent">
       <div className="max-w-7xl mx-auto">
-        <p className="text-center font-label text-[11px] uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500 mb-8">
+        <p className="text-center font-label text-[11px] uppercase tracking-[0.22em] text-slate-400 mb-8">
           Trusted by employers &amp; campus programs
         </p>
         <div className="relative overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]">
@@ -23,7 +23,7 @@ export default function LogoMarquee() {
             {[...ITEMS, ...ITEMS].map((item, i) => (
               <div
                 key={`${item.name}-${i}`}
-                className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors select-none"
+                className="flex items-center gap-2.5 text-slate-400 hover:text-slate-200 transition-colors select-none"
               >
                 <item.icon className={`w-5 h-5 ${item.accent}`} />
                 <span className="whitespace-nowrap font-display font-semibold tracking-tight text-base">

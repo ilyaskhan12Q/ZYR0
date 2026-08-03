@@ -250,13 +250,9 @@
   }
 
   .glass-card-v3 {
-    @apply rounded-3xl border border-slate-200/80 dark:border-white/10 backdrop-blur-md;
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.35);
-  }
-
-  .dark .glass-card-v3 {
+    @apply rounded-3xl border border-white/10 backdrop-blur-md;
     background: rgba(15, 23, 42, 0.6);
+    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.35);
   }
 
   .chip-v3 {

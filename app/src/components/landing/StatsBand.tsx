@@ -61,16 +61,16 @@ function StatCell({ stat, active, delay }: { stat: StatItem; active: boolean; de
   return (
     <div className="flex flex-col items-center gap-2 text-center md:px-6">
       <div
-        className={`w-9 h-9 rounded-xl bg-blue-600/10 dark:bg-sky-400/10 flex items-center justify-center transition-all duration-700 ${
+        className={`w-9 h-9 rounded-xl bg-sky-400/10 flex items-center justify-center transition-all duration-700 ${
           done
-            ? 'scale-100 shadow-lg shadow-blue-600/25 dark:shadow-sky-400/25'
+            ? 'scale-100 shadow-lg shadow-sky-400/25'
             : 'scale-90 opacity-70'
         }`}
       >
-        <stat.icon className="w-4 h-4 text-blue-600 dark:text-sky-400" />
+        <stat.icon className="w-4 h-4 text-sky-400" />
       </div>
       <span
-        className={`stat-value text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-500 dark:from-sky-400 dark:to-indigo-400 transition-all duration-500 ${
+        className={`stat-value text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400 transition-all duration-500 ${
           done ? 'scale-100' : 'scale-95 opacity-60'
         }`}
       >
@@ -78,7 +78,7 @@ function StatCell({ stat, active, delay }: { stat: StatItem; active: boolean; de
         {formatValue(value, stat.decimals)}
         {stat.suffix}
       </span>
-      <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+      <span className="text-xs sm:text-sm text-slate-400 font-medium">
         {stat.label}
       </span>
     </div>
@@ -95,7 +95,7 @@ export default function StatsBand() {
       className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="glass-card-v3 grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-y-0 md:divide-x md:divide-slate-200/70 dark:md:divide-white/10 p-6 sm:p-8">
+        <div className="glass-card-v3 grid grid-cols-2 md:grid-cols-4 gap-y-10 md:gap-y-0 md:divide-x md:divide-white/10 p-6 sm:p-8">
           {STATS.map((stat, i) => (
             <StatCell key={stat.label} stat={stat} active={inView} delay={i * 0.3} />
           ))}

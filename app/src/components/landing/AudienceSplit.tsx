@@ -33,8 +33,8 @@ const CARDS = [
     icon: GraduationCap,
     iconBg: 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-600/25',
     glow: 'bg-blue-600/10',
-    checkBg: 'bg-blue-600/15 dark:bg-sky-400/15',
-    checkColor: 'text-blue-600 dark:text-sky-400',
+    checkBg: 'bg-sky-400/15',
+    checkColor: 'text-sky-400',
     items: STUDENT_CHECKLIST,
     cta: { label: 'Find an Internship', to: '/internships', className: 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-600/25 hover:shadow-blue-500/40' },
   },
@@ -46,7 +46,7 @@ const CARDS = [
     iconBg: 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/25',
     glow: 'bg-emerald-500/10',
     checkBg: 'bg-emerald-500/15',
-    checkColor: 'text-emerald-600 dark:text-emerald-400',
+    checkColor: 'text-emerald-400',
     items: EMPLOYER_CHECKLIST,
     cta: { label: 'Post an Internship', to: '/register', className: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25 hover:shadow-emerald-500/40' },
   },
@@ -58,7 +58,7 @@ const CARDS = [
     iconBg: 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/25',
     glow: 'bg-amber-500/10',
     checkBg: 'bg-amber-500/15',
-    checkColor: 'text-amber-600 dark:text-amber-400',
+    checkColor: 'text-amber-400',
     items: MENTOR_CHECKLIST,
     cta: { label: 'Become a Mentor', to: '/register', className: 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25 hover:shadow-amber-500/40' },
   },
@@ -69,16 +69,16 @@ export default function AudienceSplit() {
     <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="font-label text-[11px] uppercase tracking-[0.22em] text-blue-600 dark:text-sky-400">
+          <span className="font-label text-[11px] uppercase tracking-[0.22em] text-sky-400">
             Built for students, employers &amp; mentors
           </span>
-          <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white">
+          <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white">
             One platform.{' '}
-            <span className="font-accent text-blue-600 dark:text-sky-400">
+            <span className="font-accent text-sky-400">
               Three journeys.
             </span>
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-300">
+          <p className="mt-4 text-base sm:text-lg text-slate-300">
             Whether you are starting your career, growing your team, or mentoring the
             next generation, ZYR0 turns internships into a structured, verifiable advantage.
           </p>
@@ -96,10 +96,10 @@ export default function AudienceSplit() {
                   <card.icon className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-2xl text-slate-900 dark:text-white">
+                  <h3 className="font-display font-bold text-2xl text-white">
                     {card.title}
                   </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-slate-400">
                     {card.tagline}
                   </p>
                 </div>
@@ -111,7 +111,7 @@ export default function AudienceSplit() {
                     <span className={`mt-0.5 w-5 h-5 rounded-full ${card.checkBg} flex items-center justify-center flex-shrink-0`}>
                       <Check className={`w-3 h-3 ${card.checkColor}`} />
                     </span>
-                    <span className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                    <span className="text-sm text-slate-200 leading-relaxed">
                       {item}
                     </span>
                   </li>
