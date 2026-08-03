@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] - 2026-08-03
+
+### Added
+- **Landing Page V3 (`landing-page-v3`)**:
+  - **Hero V3**: Sora display headline with Fraunces italic gradient accent, dual CTAs (students / employers), animated search mockup (typewriter role typing + rotating location chips + floating "Hiring Now" / "Stipend Paid" badges), and a mini trust row.
+  - **StatsBand**: animated count-up social proof (2,400+ placements · 450+ companies · Rs 18M+ stipends · 4.9★ rating), reduced-motion aware.
+  - **LogoMarquee**: CSS infinite employer marquee, pauses on hover, disabled under `prefers-reduced-motion`.
+  - **AudienceSplit**: two-card Wellfound-style "For Students" / "For Employers" split with checklists and CTAs (replaces the old employer-only section).
+  - **RoleChips**: trending-roles chip cloud (Frontend, AI/ML, UI/UX, Data, Marketing, …), each linking to the internships listing.
+  - **Testimonials & Final CTA** restyled to the V3 system (glass cards, cobalt gradient CTA panel).
+
+### Changed
+- Design tokens: `Sora` mapped to all display/heading typography, `Fraunces` italic accent font, `Space Grotesk` label font; new utilities (`.glass-card-v3`, `.chip-v3`, `.stat-value`, `.text-gradient-v3`, `.animate-marquee`, `.v3-pulse-dot`).
+- Hero CTA "Explore Internships" → "Find an Internship" (cobalt primary).
+
 ## [0.20.3] - 2026-08-03
 
 ### Fixed

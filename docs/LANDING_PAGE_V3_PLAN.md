@@ -73,14 +73,14 @@ Gradient accent (hero title): **Cobalt → Sky → Indigo** (`#2563EB → #38BDF
 
 ## 5. Implementation Roadmap
 
-1. **Phase 0 — Research & Plan (this doc)** · `docs:` commit.
+1. **Phase 0 — Research & Plan (this doc)** · `docs:` commit. ✅ (`8dd29be`)
 2. **Phase 1 — Design tokens**: fonts (Sora display map, Fraunces italic, Space Grotesk),
-   cobalt/emerald/amber tokens, `.eyebrow` utility, gradient text class. Commit `feat(landing-v3): design tokens`.
+   cobalt/emerald/amber tokens, `.eyebrow` utility, gradient text class. Commit `feat(landing-v3): design tokens`. ✅ (`4066679`)
 3. **Phase 2 — Hero V3**: headline + accent, dual CTAs, animated search mockup, floating
-   badges, trust row. Commit `feat(landing-v3): hero`.
-4. **Phase 3 — Social proof**: `StatsBand` (animated counters) + `LogoMarquee`. Commit `feat(landing-v3): social proof`.
-5. **Phase 4 — Audience split + role chips**. Commit `feat(landing-v3): audience split`.
-6. **Phase 5 — Testimonials & CTA polish** for the new system. Commit `feat(landing-v3): polish`.
+   badges, trust row. Commit `feat(landing-v3): hero`. ✅ (`70013f7`)
+4. **Phase 3 — Social proof**: `StatsBand` (animated counters) + `LogoMarquee`. Commit `feat(landing-v3): social proof`. ✅ (`cfc3658`)
+5. **Phase 4 — Audience split + role chips**. Commit `feat(landing-v3): audience split`. ✅ (`8daf08f`)
+6. **Phase 5 — Testimonials & CTA polish** for the new system. Commit `feat(landing-v3): polish`. ✅ (`fc54ad1`)
 7. **Phase 6 — Validation**: `npm run build`, `tsc -b`, ESLint, CHANGELOG → **v0.21.0**. Commit `chore(release): ...`.
 
 ## 6. Success Criteria (verifiable)
