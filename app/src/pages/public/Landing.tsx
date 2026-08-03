@@ -15,6 +15,7 @@ import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 import { TextRotate } from '@/components/fancy/text/TextRotate';
 import { BackgroundLayer } from '@/components/landing/BackgroundLayer';
 import { JourneySection } from '@/components/landing/JourneySection/JourneySection';
+import AnimatedSearchMockup from '@/components/landing/AnimatedSearchMockup';
 
 const homepageStructuredData = [
   {
@@ -390,22 +391,24 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: 0.2 }
                   )}
-                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-300/90 leading-[1.06] drop-shadow-sm"
+                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-white leading-[1.06] drop-shadow-sm"
                 >
-                  Launch Your Career With
+                  Launch Your Career With{' '}
+                  <span className="font-accent text-gradient-v3">Internships</span>{' '}
+                  that Matter
                 </MotionDiv>
 
                 <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
                   <TextRotate
                     texts={[
-                      'Internships.',
+                      'Paid Roles.',
                       'Real Experience.',
                       'Verified Certificates.',
                       'Industry Projects.',
                       'Dream Companies.',
                       'Career Growth.',
                     ]}
-                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-300 font-display font-[900] tracking-[-0.035em] drop-shadow-[0_0_35px_rgba(16,185,129,0.3)]"
+                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-indigo-400 font-display font-[900] tracking-[-0.035em] drop-shadow-[0_0_35px_rgba(56,189,248,0.25)]"
                     staggerFrom="last"
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -429,7 +432,10 @@ export default function Landing() {
                 )}
                 className="text-base sm:text-lg text-slate-300/80 max-w-xl leading-relaxed font-normal"
               >
-                ZYR0 bridges academic learning with real-world industry demands. Complete structured milestone tasks, receive direct 1-on-1 mentor guidance, and earn employer-verified certificates that accelerate your hiring pipeline.
+                Free for students · Paid internships · 1,200+ live roles. ZYR0 bridges
+                academic learning with real-world industry demands — structured milestone
+                tasks, 1-on-1 mentor guidance, and employer-verified certificates that
+                accelerate your hiring pipeline.
               </MotionP>
 
               {/* Action CTAs */}
@@ -444,16 +450,16 @@ export default function Landing() {
               >
                 <Link
                   to="/internships"
-                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-emerald-400/30"
+                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
                 >
-                  Explore Internships
+                  Find an Internship
                   <ArrowRight className="w-4.5 h-4.5" />
                 </Link>
                 <Link
                   to="/register"
                   className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
                 >
-                  For Companies
+                  For Employers
                 </Link>
                 <a
                   href={SITE_CONFIG.social.whatsappChannel}
@@ -497,118 +503,23 @@ export default function Landing() {
               </MotionDiv>
             </div>
 
-            {/* Right Column: Engaging Visual Element */}
-            <div className="lg:col-span-5 relative w-full h-[400px] sm:h-[450px] lg:h-[500px] flex items-center justify-center">
+            {/* Right Column: Animated Search Mockup */}
+            <div className="lg:col-span-5 relative w-full h-[420px] sm:h-[470px] lg:h-[520px] flex items-center justify-center">
               {/* Glowing gradients */}
-              <div className="absolute w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
 
-              <div className="relative w-full max-w-md h-full">
-                {/* Floating Card 1: Workspace Tasks */}
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 40, scale: 0.95 },
-                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -12, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 0.8 } : {
-                      opacity: { duration: 0.6, delay: 0.8 },
-                      scale: { duration: 0.6, delay: 0.8 },
-                      y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
-                    }
-                  )}
-                  className="absolute top-8 left-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-5 shadow-2xl z-10"
-                >
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="text-[10px] font-display font-semibold text-emerald-400 uppercase tracking-wider">Workspace Tracker</span>
-                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-white/95">
-                      <span className="font-medium">Completed Milestones</span>
-                      <span className="text-emerald-400 font-semibold">4 / 5</span>
-                    </div>
-                    <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div className="w-4/5 bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full" />
-                    </div>
-                    <div className="space-y-2 pt-1 text-[11px]">
-                      <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Milestone 3: API Integration</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Milestone 4: Database Design</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-white/90">
-                        <div className="w-3.5 h-3.5 rounded-full border border-emerald-400 flex items-center justify-center">
-                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                        </div>
-                        <span className="font-medium text-white/90">Milestone 5: Production Deployment</span>
-                      </div>
-                    </div>
-                  </div>
-                </MotionDiv>
-
-                {/* Floating Card 2: Mentor Feedback */}
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 40, scale: 0.95 },
-                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, 10, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 1.0 } : {
-                      opacity: { duration: 0.6, delay: 1.0 },
-                      scale: { duration: 0.6, delay: 1.0 },
-                      y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
-                    }
-                  )}
-                  className="absolute bottom-12 right-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-4 shadow-2xl z-20"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-display font-semibold text-xs border border-emerald-500/30">
-                      SR
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-display font-semibold text-white">Sarah Jenkins</h4>
-                      <p className="text-[9px] text-white/50">Senior Engineer & Mentor</p>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-[11px] text-white/80 italic bg-white/5 p-2 rounded-lg border border-white/5">
-                    "Excellent database schema. Milestone 4 approved. Let's proceed with security rules validation."
-                  </p>
-                </MotionDiv>
-
-                {/* Floating Card 3: Certificate Preview */}
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 40, scale: 0.95 },
-                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -8, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 1.2 } : {
-                      opacity: { duration: 0.6, delay: 1.2 },
-                      scale: { duration: 0.6, delay: 1.2 },
-                      y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
-                    }
-                  )}
-                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-950 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-display font-bold">Secure ID</span>
-                    <span className="text-[8px] text-white/40">ZYR0-9182-X</span>
-                  </div>
-                  <div className="mt-4 text-center">
-                    <Award className="w-8 h-8 mx-auto text-emerald-400 mb-1.5" />
-                    <h5 className="text-[10px] font-semibold">Certificate of Excellence</h5>
-                    <p className="text-[8px] text-white/50 mt-0.5">Verified Internship Graduate</p>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[8px] text-white/40">
-                    <span>Instantly Verifiable</span>
-                    <span className="text-emerald-400 font-medium flex items-center gap-0.5">
-                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
-                      Secure
-                    </span>
-                  </div>
-                </MotionDiv>
-              </div>
+              <MotionDiv
+                isMobile={isMobile}
+                {...animProps(
+                  { opacity: 0, y: 40, scale: 0.95 },
+                  { opacity: 1, y: 0, scale: 1 },
+                  { duration: 0.6, delay: 0.7 }
+                )}
+                className="w-full flex justify-center"
+              >
+                <AnimatedSearchMockup />
+              </MotionDiv>
             </div>
 
           </div>
