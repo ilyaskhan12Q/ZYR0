@@ -80,7 +80,7 @@ export default function AnimatedSearchMockup() {
         {/* Search input mock */}
         <div className="mt-4 flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-white/15 bg-white/80 dark:bg-slate-900/80 px-4 py-3.5">
           <Search className="w-4.5 h-4.5 shrink-0 text-blue-600 dark:text-sky-400" />
-          <span className="truncate text-sm font-medium text-slate-200">
+          <span className="truncate text-sm font-medium text-slate-600 dark:text-slate-200">
             {typed}
             <span className="ml-0.5 inline-block w-0.5 h-4 bg-sky-400 align-middle animate-pulse" />
           </span>

@@ -23,7 +23,7 @@ export default function LogoMarquee() {
             {[...ITEMS, ...ITEMS].map((item, i) => (
               <div
                 key={`${item.name}-${i}`}
-                className="flex items-center gap-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-200 transition-colors select-none"
+                className="flex items-center gap-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors select-none"
               >
                 <item.icon className={`w-5 h-5 ${item.accent}`} />
                 <span className="whitespace-nowrap font-display font-semibold tracking-tight text-base">

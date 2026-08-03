@@ -150,7 +150,7 @@ export const JourneyCard = React.memo(function JourneyCard({ card, index, totalC
             <div className="grid grid-cols-2 gap-4 py-4 px-4 rounded-xl bg-slate-100/80 dark:bg-slate-950/60 border border-slate-200 dark:border-white/5 mb-6">
               {card.stats.map((stat, sIdx) => (
                 <div key={sIdx}>
-                  <div className="text-xs text-slate-500 dark:text-slate-600 dark:text-slate-400 font-medium">{stat.label}</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">{stat.label}</div>
                   <div className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white font-mono mt-0.5">{stat.value}</div>
                 </div>
               ))}
@@ -195,7 +195,7 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
               <div className="w-3 h-3 rounded-full bg-rose-500/80" />
               <div className="w-3 h-3 rounded-full bg-amber-500/80" />
               <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-              <span className="text-xs font-mono text-slate-500 dark:text-slate-600 dark:text-slate-400 ml-2">zyr0.co/internships</span>
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 ml-2">zyr0.co/internships</span>
             </div>
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">LIVE DROPS</span>
           </div>
@@ -212,7 +212,7 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
                     {drop.title}
                     {idx === 0 && <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />}
                   </div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-600 dark:text-slate-400 flex items-center gap-2 mt-1">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 mt-1">
                     <Building2 className="w-3 h-3 text-slate-500" /> {drop.company} • {drop.type}
                   </div>
                 </div>
@@ -235,13 +235,13 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
                 Ayesha Khan
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-600 dark:text-slate-400">BS Computer Science • NUST 2026</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">BS Computer Science • NUST 2026</div>
             </div>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-slate-500 dark:text-slate-600 dark:text-slate-400">Profile Readiness Score</span>
+              <span className="text-slate-500 dark:text-slate-400">Profile Readiness Score</span>
               <span className="text-emerald-600 dark:text-emerald-400 font-bold font-mono">100% Verified</span>
             </div>
             <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
@@ -261,11 +261,11 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
     case "selection_pipeline":
       return (
         <div className="w-full bg-slate-950/80 border border-white/10 rounded-2xl p-5 shadow-2xl space-y-4">
-          <div className="text-xs font-bold text-slate-500 dark:text-slate-600 dark:text-slate-400 tracking-wider uppercase mb-2">Live Application Tracker</div>
+          <div className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase mb-2">Live Application Tracker</div>
 
           <div className="space-y-3">
             {[
-              { stage: "Profile Submitted", time: "Just now", status: "COMPLETE", color: "text-slate-500 dark:text-slate-600 dark:text-slate-400 bg-slate-800 border-transparent" },
+              { stage: "Profile Submitted", time: "Just now", status: "COMPLETE", color: "text-slate-500 dark:text-slate-400 bg-slate-800 border-transparent" },
               { stage: "Employer Screening", time: "2 hours ago", status: "VERIFIED", color: "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/30" },
               { stage: "Shortlisted for Interview", time: "Live Alert", status: "SHORTLISTED", color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 border-emerald-500/40 animate-pulse" }
             ].map((step, idx) => (
@@ -303,15 +303,15 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
               <span className="font-semibold text-slate-900 dark:text-white">Task: Implement OAuth2 Authentication</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">IN REVIEW</span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-600 dark:text-slate-400">Assigned Mentor: Tariq Mahmood (Senior Staff Engineer)</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Assigned Mentor: Tariq Mahmood (Senior Staff Engineer)</p>
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-600 dark:text-slate-400">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
               <span>Rubric Check: Code Quality & Tests</span>
               <span className="text-emerald-600 dark:text-emerald-400 font-bold">PASSED (10/10)</span>
             </div>
-            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-600 dark:text-slate-400">
+            <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
               <span>Rubric Check: Security Hygiene</span>
               <span className="text-emerald-600 dark:text-emerald-400 font-bold">PASSED (10/10)</span>
             </div>
@@ -334,7 +334,7 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
 
           <div className="space-y-1">
             <div className="text-lg font-extrabold text-slate-900 dark:text-white">Software Engineering Internship</div>
-            <div className="text-xs text-slate-500 dark:text-slate-600 dark:text-slate-400">Issued to: Ayesha Khan • August 2026</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Issued to: Ayesha Khan • August 2026</div>
           </div>
 
           <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
@@ -364,7 +364,7 @@ const CardVisualPreview = React.memo(function CardVisualPreview({ type }: { type
               <Building2 className="w-5 h-5" />
             </div>
             <div className="text-sm font-bold text-slate-900 dark:text-white">Direct Return Offer Generated</div>
-            <div className="text-xs text-slate-500 dark:text-slate-600 dark:text-slate-400">Systems Limited • Junior Software Engineer</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">Systems Limited • Junior Software Engineer</div>
             <span className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-slate-900 dark:text-white shadow-md">
               Offer Accepted
             </span>

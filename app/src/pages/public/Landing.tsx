@@ -419,7 +419,7 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: 0.4 }
                 )}
-                className="text-base sm:text-lg text-slate-600 dark:text-slate-600 dark:text-slate-300/80 max-w-xl leading-relaxed font-normal"
+                className="text-base sm:text-lg text-slate-600 dark:text-slate-300/80 max-w-xl leading-relaxed font-normal"
               >
                 Free for students · Paid internships · 1,200+ live roles. ZYR0 bridges
                 academic learning with real-world industry demands — structured milestone

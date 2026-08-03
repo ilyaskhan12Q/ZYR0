@@ -36,7 +36,7 @@ const CARDS = [
     checkBg: 'bg-sky-400/15',
     checkColor: 'text-blue-600 dark:text-sky-400',
     items: STUDENT_CHECKLIST,
-    cta: { label: 'Find an Internship', to: '/internships', className: 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-600/25 hover:shadow-blue-500/40' },
+    cta: { label: 'Find an Internship', to: '/internships', className: 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-600/25 hover:shadow-blue-500/40', text: 'text-white' },
   },
   {
     key: 'employers',
@@ -48,7 +48,7 @@ const CARDS = [
     checkBg: 'bg-emerald-500/15',
     checkColor: 'text-emerald-600 dark:text-emerald-400',
     items: EMPLOYER_CHECKLIST,
-    cta: { label: 'Post an Internship', to: '/register', className: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25 hover:shadow-emerald-500/40' },
+    cta: { label: 'Post an Internship', to: '/register', className: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25 hover:shadow-emerald-500/40', text: 'text-white' },
   },
   {
     key: 'mentors',
@@ -60,7 +60,7 @@ const CARDS = [
     checkBg: 'bg-amber-500/15',
     checkColor: 'text-amber-400',
     items: MENTOR_CHECKLIST,
-    cta: { label: 'Become a Mentor', to: '/register', className: 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25 hover:shadow-amber-500/40' },
+    cta: { label: 'Become a Mentor', to: '/register', className: 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25 hover:shadow-amber-500/40', text: 'text-slate-900' },
   },
 ]
 
@@ -111,7 +111,7 @@ export default function AudienceSplit() {
                     <span className={`mt-0.5 w-5 h-5 rounded-full ${card.checkBg} flex items-center justify-center flex-shrink-0`}>
                       <Check className={`w-3 h-3 ${card.checkColor}`} />
                     </span>
-                    <span className="text-sm text-slate-200 leading-relaxed">
+                    <span className="text-sm text-slate-600 dark:text-slate-200 leading-relaxed">
                       {item}
                     </span>
                   </li>
@@ -120,7 +120,7 @@ export default function AudienceSplit() {
 
               <Link
                 to={card.cta.to}
-                className={`mt-8 inline-flex items-center justify-center gap-2 ${card.cta.className} text-slate-900 dark:text-white font-display font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm`}
+                className={`mt-8 inline-flex items-center justify-center gap-2 ${card.cta.className} ${card.cta.text} font-display font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm`}
               >
                 {card.cta.label}
                 <ArrowRight className="w-4 h-4" />
