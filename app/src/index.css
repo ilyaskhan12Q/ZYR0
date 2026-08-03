@@ -243,14 +243,40 @@
   }
 
   .text-gradient-v3 {
+    background: linear-gradient(92deg, #1d4ed8 0%, #0284c7 55%, #4338ca 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .text-gradient-v3 {
     background: linear-gradient(92deg, #2563eb 0%, #38bdf8 55%, #6366f1 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
+  .text-rotate-v3 {
+    background: linear-gradient(92deg, #1d4ed8 0%, #0e7490 55%, #4f46e5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .dark .text-rotate-v3 {
+    background: linear-gradient(92deg, #38bdf8 0%, #22d3ee 55%, #818cf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   .glass-card-v3 {
-    @apply rounded-3xl border border-white/10 backdrop-blur-md;
+    @apply rounded-3xl border border-slate-200/80 dark:border-white/10 backdrop-blur-md;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.2);
+  }
+
+  .dark .glass-card-v3 {
     background: rgba(15, 23, 42, 0.6);
     box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.35);
   }
@@ -484,7 +510,7 @@
 
 /* Feature card */
 .feature-card {
-  @apply bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300;
+  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300;
 }
 
 /* Internship card */
@@ -508,7 +534,7 @@
   }
 
   .feature-card:hover {
-    @apply shadow-xl -translate-y-1 border-white/20;
+    @apply shadow-xl -translate-y-1 border-slate-300 dark:border-white/20;
   }
 
   .internship-card:hover {

@@ -67,7 +67,7 @@ function StatCell({ stat, active, delay }: { stat: StatItem; active: boolean; de
             : 'scale-90 opacity-70'
         }`}
       >
-        <stat.icon className="w-4 h-4 text-sky-400" />
+        <stat.icon className="w-4 h-4 text-blue-600 dark:text-sky-400" />
       </div>
       <span
         className={`stat-value text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400 transition-all duration-500 ${
@@ -78,7 +78,7 @@ function StatCell({ stat, active, delay }: { stat: StatItem; active: boolean; de
         {formatValue(value, stat.decimals)}
         {stat.suffix}
       </span>
-      <span className="text-xs sm:text-sm text-slate-400 font-medium">
+      <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
         {stat.label}
       </span>
     </div>

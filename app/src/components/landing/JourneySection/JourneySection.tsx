@@ -18,17 +18,17 @@ export function JourneySection({ className }: JourneySectionProps) {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-400/10 border border-sky-400/25 text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-400/10 border border-sky-400/25 text-blue-600 dark:text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
             <Sparkles className="w-3.5 h-3.5" />
             End-to-End Internship Engine
           </div>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
             How ZYR0 Works <br className="hidden sm:inline" />
-            <span className="font-accent text-sky-400">
+            <span className="font-accent text-blue-600 dark:text-sky-400">
               The Complete Student & Employer Journey
             </span>
           </h2>
-          <p className="mt-4 text-slate-300 text-base sm:text-lg leading-relaxed">
+          <p className="mt-4 text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed">
             From discovering verified internship drops to earning tamper-proof credentials and transitioning into full-time roles — experience a transparent, structured pathway.
           </p>
         </div>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import {
   Menu, X, Bell, ChevronDown, LogOut, User, LayoutDashboard,
-  Briefcase, Settings, Mail,
+  Briefcase, Settings, Mail, Sun, Moon,
   Linkedin, Github
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,9 +23,15 @@ export default function PublicLayout() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthPage = location.pathname.startsWith('/login') || location.pathname.startsWith('/register') || location.pathname.startsWith('/forgot-password') || location.pathname.startsWith('/reset-password');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -80,22 +87,29 @@ export default function PublicLayout() {
 
             {/* Right Side Controls / Auth */}
             <div className="hidden md:flex items-center gap-3 lg:gap-4 shrink-0">
+              <button
+                aria-label="Toggle color theme"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}
+              >
+                {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
               {user ? (
                 <>
-                  <button className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-white/10 text-white'}`}>
+                  <button className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}>
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
                   </button>
                   <div className="relative">
                     <button
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-white/10'}`}
+                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-slate-900/10 dark:hover:bg-white/10'}`}
                     >
                       <img src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />
-                      <span className={`text-sm font-medium ${scrolled ? 'text-foreground' : 'text-white'}`}>
+                      <span className={`text-sm font-medium ${scrolled ? 'text-foreground' : 'text-slate-900 dark:text-white'}`}>
                         {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
                       </span>
-                      <ChevronDown className={`w-4 h-4 ${scrolled ? 'text-muted-foreground' : 'text-white/70'}`} />
+                      <ChevronDown className={`w-4 h-4 ${scrolled ? 'text-muted-foreground' : 'text-slate-900/70 dark:text-white/70'}`} />
                     </button>
                     <AnimatePresence>
                       {profileOpen && (
@@ -202,7 +216,7 @@ export default function PublicLayout() {
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
-        <footer className="bg-slate-900/60 dark:bg-slate-950/60 backdrop-blur-md text-white dark:text-slate-200 border-t border-slate-200/20 dark:border-white/10 relative z-10">
+        <footer className="bg-white/75 dark:bg-slate-900/60 backdrop-blur-md text-slate-900 dark:text-slate-200 border-t border-slate-200 dark:border-white/10 relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {/* Brand */}
@@ -213,7 +227,7 @@ export default function PublicLayout() {
                   </div>
                   <span className="text-xl font-bold">ZYR0</span>
                 </div>
-                <p className="text-white/60 text-sm leading-relaxed">
+                <p className="text-slate-600 dark:text-white/60 text-sm leading-relaxed">
                   A professional internship platform connecting students, companies, and mentors through a structured internship lifecycle.
                 </p>
                 <div className="flex items-center gap-4 mt-6">
@@ -223,7 +237,7 @@ export default function PublicLayout() {
                     rel="noopener noreferrer"
                     aria-label="ZYR0 WhatsApp Channel"
                     title="Join ZYR0 WhatsApp Channel for instant announcements"
-                    className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all duration-200"
+                    className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center hover:bg-emerald-500 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
                   >
                     <WhatsAppIcon className="w-4 h-4 fill-current" />
                   </a>
@@ -233,14 +247,14 @@ export default function PublicLayout() {
                     rel="noopener noreferrer"
                     aria-label="LinkedIn"
                     title="LinkedIn Page"
-                    className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-200"
+                    className="w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center hover:bg-blue-600 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
                   >
                     <LinkedInIcon className="w-4 h-4 fill-current" />
                   </a>
-                  <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-white/40 hover:text-white transition-colors">
+                  <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition-colors">
                     <Github className="w-5 h-5" />
                   </a>
-                  <a href="mailto:support@zyr0.com" aria-label="Email support" className="text-white/40 hover:text-white transition-colors">
+                  <a href="mailto:support@zyr0.com" aria-label="Email support" className="text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition-colors">
                     <Mail className="w-5 h-5" />
                   </a>
                 </div>
@@ -250,11 +264,11 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">For Students</h4>
                 <ul className="space-y-2.5">
-                  <li><Link to="/internships" className="text-white/60 text-sm hover:text-white transition-colors">Browse Internships</Link></li>
-                  <li><Link to="/student/applications" className="text-white/60 text-sm hover:text-white transition-colors">My Applications</Link></li>
-                  <li><Link to="/student/workspace" className="text-white/60 text-sm hover:text-white transition-colors">Workspace</Link></li>
-                  <li><Link to="/student/certificates" className="text-white/60 text-sm hover:text-white transition-colors">Certificates</Link></li>
-                  <li><Link to="/verify" className="text-white/60 text-sm hover:text-white transition-colors">Verify Certificate</Link></li>
+                  <li><Link to="/internships" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Browse Internships</Link></li>
+                  <li><Link to="/student/applications" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">My Applications</Link></li>
+                  <li><Link to="/student/workspace" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Workspace</Link></li>
+                  <li><Link to="/student/certificates" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Certificates</Link></li>
+                  <li><Link to="/verify" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Verify Certificate</Link></li>
                 </ul>
               </div>
 
@@ -262,10 +276,10 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">For Companies</h4>
                 <ul className="space-y-2.5">
-                  <li><Link to="/company/internships/new" className="text-white/60 text-sm hover:text-white transition-colors">Post Internship</Link></li>
-                  <li><Link to="/company/dashboard" className="text-white/60 text-sm hover:text-white transition-colors">Dashboard</Link></li>
-                  <li><Link to="/companies" className="text-white/60 text-sm hover:text-white transition-colors">Browse Companies</Link></li>
-                  <li><Link to="/careers" className="text-white/60 text-sm hover:text-white transition-colors">Careers</Link></li>
+                  <li><Link to="/company/internships/new" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Post Internship</Link></li>
+                  <li><Link to="/company/dashboard" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Dashboard</Link></li>
+                  <li><Link to="/companies" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Browse Companies</Link></li>
+                  <li><Link to="/careers" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Careers</Link></li>
                 </ul>
               </div>
 
@@ -295,19 +309,19 @@ export default function PublicLayout() {
                       LinkedIn Page
                     </a>
                   </li>
-                  <li><Link to="/help" className="text-white/60 text-sm hover:text-white transition-colors">Help Center</Link></li>
-                  <li><Link to="/faq" className="text-white/60 text-sm hover:text-white transition-colors">FAQ</Link></li>
-                  <li><Link to="/contact" className="text-white/60 text-sm hover:text-white transition-colors">Contact Us</Link></li>
-                  <li><Link to="/privacy" className="text-white/60 text-sm hover:text-white transition-colors">Privacy Policy</Link></li>
-                  <li><Link to="/terms" className="text-white/60 text-sm hover:text-white transition-colors">Terms of Service</Link></li>
-                  <li><Link to="/cookies" className="text-white/60 text-sm hover:text-white transition-colors">Cookie Policy</Link></li>
+                  <li><Link to="/help" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Help Center</Link></li>
+                  <li><Link to="/faq" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">FAQ</Link></li>
+                  <li><Link to="/contact" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Contact Us</Link></li>
+                  <li><Link to="/privacy" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</Link></li>
+                  <li><Link to="/terms" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</Link></li>
+                  <li><Link to="/cookies" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Cookie Policy</Link></li>
                 </ul>
               </div>
             </div>
 
             <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <p className="text-white/40 text-sm">&copy; 2026 ZYR0. All rights reserved.</p>
-              <p className="text-white/40 text-sm">Designed for the modern workforce.</p>
+              <p className="text-slate-500 dark:text-white/40 text-sm">&copy; 2026 ZYR0. All rights reserved.</p>
+              <p className="text-slate-500 dark:text-white/40 text-sm">Designed for the modern workforce.</p>
             </div>
           </div>
         </footer>

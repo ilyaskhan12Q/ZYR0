@@ -14,7 +14,7 @@ createRoot(document.getElementById('root')!).render(
       <HelmetProvider>
         <BrowserRouter>
           <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="dark">
               <App />
             </ThemeProvider>
           </AuthProvider>
