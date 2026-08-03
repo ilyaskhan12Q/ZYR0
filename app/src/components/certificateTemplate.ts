@@ -251,16 +251,17 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .logo-top { height: 64px; width: auto; display: block; object-fit: contain; }
     .award-sub {
       text-align: center;
-      color: #8a1c1c;
+      color: #1e40af;
       font-size: 20px;
       font-weight: 800;
       letter-spacing: 1.2px;
       text-transform: uppercase;
-      margin-top: 8px;
+      margin-top: 26px;
     }
     .zyro-brand { text-align: right; }
-    .brand-main { font-size: 34px; font-weight: 800; color: #6d28d9; letter-spacing: 2.5px; line-height: 1; }
-    .brand-sub { font-size: 11px; font-weight: 600; color: #333; letter-spacing: 1.2px; margin-top: 2px; }
+    .brand-main { font-size: 34px; font-weight: 800; color: #1e3a8a; letter-spacing: 2.5px; line-height: 1; }
+    .brand-main .brand-o { height: 36px; width: auto; display: inline-block; vertical-align: -5px; }
+    .brand-sub { font-size: 10.5px; font-weight: 700; color: #333; letter-spacing: 2px; margin-top: 2px; text-transform: uppercase; }
     .brand-sub b { color: #a1262a; font-weight: 800; }
 
     /* ── Title block ─────────────────────────────────────────────────── */
@@ -315,13 +316,15 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       max-width: 830px;
       text-align: center;
       font-family: 'Playfair Display', serif;
-      font-size: 13.5px;
-      line-height: 1.78;
+      font-size: 15px;
+      line-height: 1.72;
       color: #26221e;
     }
     .body-text p { margin: 0 0 7px; }
     .body-text b { font-weight: 700; color: #13100d; }
-    .body-text .internship-title { font-weight: 800; text-decoration: underline; text-decoration-thickness: 1.4px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
+    .body-text .internship-title { font-weight: 900; font-size: 17px; color: #13100d; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
+    .body-text .company-name { font-weight: 900; font-size: 17px; color: #13100d; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
+    .body-text .cert-dates { font-weight: 900; font-size: 17px; color: #13100d; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; text-decoration-color: #b89c56; }
 
     .footer-left {
       display: flex;
@@ -352,9 +355,11 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       gap: 28px;
     }
     .sig-block { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 26px; color: #1a1a1a; line-height: 1; margin-bottom: 6px; text-decoration: underline; text-decoration-thickness: 1.4px; text-underline-offset: 5px; text-decoration-color: #8a8a8a; }
+    .sig-block.sig-dir { transform: translate(14px, -20px); }
+    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 26px; color: #1a1a1a; line-height: 1; margin-bottom: 6px; display: inline-block; padding-bottom: 6px; border-bottom: 1.5px solid #666; }
     .sig-name { font-size: 13px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
     .sig-title { font-size: 9.5px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+    .sig-company { font-size: 11px; font-weight: 700; color: #333; letter-spacing: .5px; margin-top: 3px; }
     .sig-meta { margin-top: 8px; font-size: 8.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
     .sig-meta b { color: #111; font-weight: 700; }
     .center-col { display: flex; flex-direction: column; align-items: center; }
@@ -420,8 +425,8 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
             </div>
             <div class="award-sub">ZYRO Awarding this certificate of achievement</div>
             <div class="zyro-brand">
-              <div class="brand-main">ZYRO</div>
-              <div class="brand-sub">startup<b>ZYRO</b></div>
+              <div class="brand-main">ZYR<img class="brand-o" src="${oLogoSrc}" alt="" /></div>
+              <div class="brand-sub">Internship Platform</div>
             </div>
           </div>
 
@@ -441,8 +446,8 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
           </div>
 
           <div class="body-text">
-            <p>For successfully completing a <b class="internship-title">${internshipTitle}</b> at ZYRO through the ZYRO Platform from ${dates}, demonstrating exceptional proficiency, dedication, and technical skill in executing all professional responsibilities.</p>
-            <p>The candidate has collaborated with <b>${companyName}</b> through the ZYRO Platform.</p>
+            <p>For successfully completing a <b class="internship-title">${internshipTitle}</b> at ZYRO through the ZYRO Platform from <b class="cert-dates">${dates}</b>, demonstrating exceptional proficiency, dedication, and technical skill in executing all professional responsibilities.</p>
+            <p>The candidate has collaborated with <b class="company-name">${companyName}</b> through the ZYRO Platform.</p>
             <p>Congratulations on your achievement and continued interest in the vital subject of software engineering.</p>
             <p>Keep up the great work in developing innovative and efficient digital tools.</p>
             <p>Your contribution throughout the internship at ZYRO has been truly valuable and inspiring.</p>
@@ -452,8 +457,9 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
           <div class="footer-row">
             <div class="sig-block">
               <div class="sig-script">${supervisorName}</div>
-                            <div class="sig-name">${supervisorName}</div>
-              <div class="sig-title">Program Coordinator, ZYRO Interns</div>
+              <div class="sig-name">${supervisorName}</div>
+              <div class="sig-title">Program Coordinator</div>
+              <div class="sig-company">${companyName}</div>
               <div class="sig-meta">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
             <div class="center-col">
@@ -473,9 +479,9 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
                 </div>
               </div>
             </div>
-            <div class="sig-block">
-              <div class="sig-script">ZYRO Director</div>
-                            <div class="sig-name">Academic Director</div>
+            <div class="sig-block sig-dir">
+              <div class="sig-script">ilyas khan</div>
+              <div class="sig-name">ZYRO Director</div>
               <div class="sig-title">ZYRO Platforms</div>
             </div>
           </div>

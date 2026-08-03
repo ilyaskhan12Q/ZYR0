@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.3] - 2026-08-03
+
+### Fixed
+- **Broken Route Links (`fix/broken-route-links`)**:
+  - Landing hero "Explore Opportunities" CTA pointed to `/explore` (no route existed, landing on the 404 page) — now points to `/internships`.
+  - Public footer "Post Internship" link pointed to `/company/post-internship` (no route existed) — now points to the actual company route `/company/internships/new`.
+  - Full routing audit performed across `App.tsx`, all four portal sub-routers, nav config, verification gates, sitemap, and dynamic `navigate()`/`<Link to={...}>` targets — all other routes verified consistent.
+
+## [0.20.2] - 2026-08-02
+
+### Changed
+- **Certificate Brand Wordmark (`style/certificate-brand-wordmark`)**:
+  - Replaced the "ZYRO" text with the official wordmark: "ZYR" lettering with the ZYR0 logo mark standing in as the "0" glyph.
+  - Recolored the ZYR lettering from purple to dark navy blue (`#1e3a8a`) for a professional, authoritative brand presence; the logo mark retains its original brand colors.
+  - Sized the logo mark (36px) to optically match the ZYR lettering height.
+  - Replaced the "startupZYRO" tagline with "INTERNSHIP PLATFORM" (uppercase, letterspaced) beneath the wordmark.
+  - Recolored the "ZYRO Awarding this certificate of achievement" sub-header from maroon to the ZYR0 logo blue (`#1e40af`) and pushed it down for better spacing.
+- **Certificate Body Emphasis (`style/certificate-body-emphasis`)**:
+  - Enlarged the body copy from `13.5px` to `15px` for readability.
+  - Applied the extra-bold (`font-weight: 900`) + enlarged (`17px`) + gold-underline treatment to the company name and the internship period dates, matching the internship title, so every dynamic credential value catches the eye.
+- **Certificate Signature Blocks (`style/certificate-signature-blocks`)**:
+  - Left block now represents the company owner: cursive signature + printed name (dynamic from issuer), `PROGRAM COORDINATOR` title, and the real company name beneath the title.
+  - Right block is the fixed ZYRO platform signature: cursive `ilyas khan` (ZYRO Director) with `ZYRO Director` name and `ZYRO Platforms` title, offset up and right for perfect footer alignment.
+  - Replaced the `text-decoration` underline on script signatures with a robust `border-bottom` line that renders reliably under the cursive names.
+
+## [0.20.1] - 2026-08-02
+
+### Changed
+- **Certificate Internship Title Emphasis (`style/certificate-internship-title`)**:
+  - Made the internship title (e.g., "Frontend Development Intern") extra bold (`font-weight: 900`) and enlarged it above the body text size so it is the first element that catches the eye.
+  - Thickened the gold underline to `2px` with a darker ink color for stronger contrast against the body copy.
+
 ## [0.20.0] - 2026-08-02
 
 ### Fixed

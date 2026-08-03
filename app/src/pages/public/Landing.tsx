@@ -1086,7 +1086,7 @@ export default function Landing() {
                   Create Free Account
                 </Link>
                 <Link
-                  to="/explore"
+                  to="/internships"
                   className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-slate-900/40 hover:bg-slate-900/60 text-white border border-white/30 backdrop-blur-sm transition-all"
                 >
                   Explore Opportunities
