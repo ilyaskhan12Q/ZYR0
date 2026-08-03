@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.22.0] - 2026-08-03
+
+### Added
+- **Light / dark theme toggle** (`landing-page-v3`):
+  - Sun/moon toggle in the public navbar (`next-themes`, dark remains default; persists to localStorage).
+  - Entire landing page is now theme-aware: every V3 section, hero, glass cards, mockup, Journey timeline, AudienceSplit, RoleChips, stats band, logo marquee, nav and footer render correctly in both themes.
+  - Dual-theme utilities: `.glass-card-v3`, `.feature-card`, `.text-gradient-v3`, new `.text-rotate-v3` (hero TextRotate gradient, light/dark variants).
+- **AudienceSplit third card**: "For Mentors" (amber) alongside Students and Employers — "One platform. *Three journeys.*" headline.
+
+### Changed
+- **Unified heading system**: every section title now follows the Testimonials pattern — `Space Grotesk` eyebrow, Sora bold headline, Fraunces italic sky accent phrase (Community "Stay Connected in Real-Time.", Every Career "somewhere.", Features "clear outcomes.", Roles "hiring for.", Transparency "Designed for confidence.", CTA "how internships work?").
+- **StatsBand**: compact size (`text-2xl sm:text-3xl`), ease-out-expo count-up with settle glow; values lowered for credibility (500+ placements · 50+ companies · Rs 150K+ stipends · 4.9★ rating).
+- Hero trust-counter row removed in favor of the StatsBand.
+- Fixed invisible-headings root cause: page was permanently dark because `dark:` variants never activated (html always `light`); sections now carry explicit light/dark classes.
+- Per-card CTA text color on AudienceSplit (white on blue/emerald gradients, dark on amber); checklist/mockup/marquee text theme-aware.
+
+### Fixed
+- Mangled doubled `dark:` classes (slate-300/80 hero subtext, slate-400 JourneyCard labels) from bulk class rewrites.
+- `.text-gradient-v3` brace nesting bug in CSS.
+
+## [0.21.0] - 2026-08-03
+
+### Added
+- **Landing Page V3 (`landing-page-v3`)**:
+  - **Hero V3**: Sora display headline with Fraunces italic gradient accent, dual CTAs (students / employers), animated search mockup (typewriter role typing + rotating location chips + floating "Hiring Now" / "Stipend Paid" badges), and a mini trust row.
+  - **StatsBand**: animated count-up social proof (2,400+ placements · 450+ companies · Rs 18M+ stipends · 4.9★ rating), reduced-motion aware.
+  - **LogoMarquee**: CSS infinite employer marquee, pauses on hover, disabled under `prefers-reduced-motion`.
+  - **AudienceSplit**: two-card Wellfound-style "For Students" / "For Employers" split with checklists and CTAs (replaces the old employer-only section).
+  - **RoleChips**: trending-roles chip cloud (Frontend, AI/ML, UI/UX, Data, Marketing, …), each linking to the internships listing.
+  - **Testimonials & Final CTA** restyled to the V3 system (glass cards, cobalt gradient CTA panel).
+
+### Changed
+- Design tokens: `Sora` mapped to all display/heading typography, `Fraunces` italic accent font, `Space Grotesk` label font; new utilities (`.glass-card-v3`, `.chip-v3`, `.stat-value`, `.text-gradient-v3`, `.animate-marquee`, `.v3-pulse-dot`).
+- Hero CTA "Explore Internships" → "Find an Internship" (cobalt primary).
+
 ## [0.20.3] - 2026-08-03
 
 ### Fixed

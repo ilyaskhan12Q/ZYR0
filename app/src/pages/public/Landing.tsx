@@ -15,6 +15,11 @@ import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 import { TextRotate } from '@/components/fancy/text/TextRotate';
 import { BackgroundLayer } from '@/components/landing/BackgroundLayer';
 import { JourneySection } from '@/components/landing/JourneySection/JourneySection';
+import AnimatedSearchMockup from '@/components/landing/AnimatedSearchMockup';
+import StatsBand from '@/components/landing/StatsBand';
+import LogoMarquee from '@/components/landing/LogoMarquee';
+import AudienceSplit from '@/components/landing/AudienceSplit';
+import RoleChips from '@/components/landing/RoleChips';
 
 const homepageStructuredData = [
   {
@@ -77,21 +82,6 @@ const testimonials = [
   { name: 'Sarah Chen', role: 'Computer Science Student', quote: 'The structured task progress and mentor feedback helped me grow far faster than a standard internship. Having a clear roadmap kept me aligned.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
   { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor', quote: 'As a mentor, ZYR0 gives me a structured framework to evaluate work, track multiple interns, and provide actionable feedback without administrative overhead.', avatar: 'https://i.pravatar.cc/150?u=michael' },
   { name: 'TechFlow Inc.', role: 'Employer Partner', quote: 'Using ZYR0 to hire and manage our interns has streamlined our entire process. The quality of candidate tracking and verification has been exceptional.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
-];
-
-const stats = [
-  { value: '10,000+', label: 'Active Students', icon: GraduationCap },
-  { value: '500+', label: 'Partner Companies', icon: Building2 },
-  { value: '50+', label: 'Universities', icon: Globe },
-  { value: '25,000+', label: 'Completed Tasks', icon: Award },
-];
-
-const checkFeatures = [
-  'Publish detail-rich internship listings',
-  'Centralize applications in one unified pipeline',
-  'Organize cohort tasks and monitor overall progress',
-  'Generate verified completion certificates',
-  'Access cohort performance statistics',
 ];
 
 const roles = [
@@ -375,10 +365,10 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.4, delay: 0.1 }
                 )}
-                className="inline-flex items-center gap-2.5 self-start bg-white/[0.04] border border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-white/90 shadow-sm hover:border-white/20 transition-all duration-200"
+                className="inline-flex items-center gap-2.5 self-start bg-white/70 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-slate-900 dark:text-white/90 shadow-sm hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200"
               >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span className="font-display font-semibold uppercase tracking-wider text-[11px] text-emerald-300/90">Pakistan's Premier Internship Engine</span>
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Pakistan's Premier Internship Engine</span>
               </MotionDiv>
 
               {/* Title Section with Oversized Sora Typography & TextRotate */}
@@ -390,22 +380,24 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: 0.2 }
                   )}
-                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-100 to-slate-300/90 leading-[1.06] drop-shadow-sm"
+                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-slate-900 dark:text-white leading-[1.06] drop-shadow-sm"
                 >
-                  Launch Your Career With
+                  Launch Your Career With{' '}
+                  <span className="font-accent text-gradient-v3">Internships</span>{' '}
+                  that Matter
                 </MotionDiv>
 
                 <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
                   <TextRotate
                     texts={[
-                      'Internships.',
+                      'Paid Roles.',
                       'Real Experience.',
                       'Verified Certificates.',
                       'Industry Projects.',
                       'Dream Companies.',
                       'Career Growth.',
                     ]}
-                    mainClassName="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-cyan-300 to-indigo-300 font-display font-[900] tracking-[-0.035em] drop-shadow-[0_0_35px_rgba(16,185,129,0.3)]"
+                    mainClassName="text-rotate-v3 font-display font-[900] tracking-[-0.035em]"
                     staggerFrom="last"
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -427,9 +419,12 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: 0.4 }
                 )}
-                className="text-base sm:text-lg text-slate-300/80 max-w-xl leading-relaxed font-normal"
+                className="text-base sm:text-lg text-slate-600 dark:text-slate-300/80 max-w-xl leading-relaxed font-normal"
               >
-                ZYR0 bridges academic learning with real-world industry demands. Complete structured milestone tasks, receive direct 1-on-1 mentor guidance, and earn employer-verified certificates that accelerate your hiring pipeline.
+                Free for students · Paid internships · 1,200+ live roles. ZYR0 bridges
+                academic learning with real-world industry demands — structured milestone
+                tasks, 1-on-1 mentor guidance, and employer-verified certificates that
+                accelerate your hiring pipeline.
               </MotionP>
 
               {/* Action CTAs */}
@@ -444,16 +439,16 @@ export default function Landing() {
               >
                 <Link
                   to="/internships"
-                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-emerald-400/30"
+                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
                 >
-                  Explore Internships
+                  Find an Internship
                   <ArrowRight className="w-4.5 h-4.5" />
                 </Link>
                 <Link
                   to="/register"
                   className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
                 >
-                  For Companies
+                  For Employers
                 </Link>
                 <a
                   href={SITE_CONFIG.social.whatsappChannel}
@@ -463,152 +458,32 @@ export default function Landing() {
                   title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
                 >
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400" />
                   </span>
-                  <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-400" />
+                  <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-600 dark:text-emerald-400" />
                   <span>WhatsApp Channel</span>
                 </a>
               </MotionDiv>
+            </div>
 
-              {/* Trust Indicators & Proof Grid */}
+            {/* Right Column: Animated Search Mockup */}
+            <div className="lg:col-span-5 relative w-full h-[420px] sm:h-[470px] lg:h-[520px] flex items-center justify-center">
+              {/* Glowing gradients */}
+              <div className="absolute w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
+
               <MotionDiv
                 isMobile={isMobile}
                 {...animProps(
-                  { opacity: 0 },
-                  { opacity: 1 },
-                  { duration: 0.4, delay: 0.6 }
+                  { opacity: 0, y: 40, scale: 0.95 },
+                  { opacity: 1, y: 0, scale: 1 },
+                  { duration: 0.6, delay: 0.7 }
                 )}
-                className="pt-5 border-t border-white/10"
+                className="w-full flex justify-center"
               >
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {[
-                    { number: '500+', label: 'Verified Students' },
-                    { number: '50+', label: 'Partner Companies' },
-                    { number: '100%', label: 'Certificate Validity' },
-                    { number: '4.9★', label: 'Mentor Rating' },
-                  ].map((stat, idx) => (
-                    <div key={idx} className="bg-slate-900/80 border border-white/10 hover:border-white/20 backdrop-blur-xl rounded-xl p-3 sm:p-3.5 transition-all duration-300 hover:bg-slate-900/95 text-left shadow-lg">
-                      <div className="font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-emerald-300 text-lg sm:text-xl tracking-tight">{stat.number}</div>
-                      <div className="text-[11px] text-slate-300 font-medium">{stat.label}</div>
-                    </div>
-                  ))}
-                </div>
+                <AnimatedSearchMockup />
               </MotionDiv>
-            </div>
-
-            {/* Right Column: Engaging Visual Element */}
-            <div className="lg:col-span-5 relative w-full h-[400px] sm:h-[450px] lg:h-[500px] flex items-center justify-center">
-              {/* Glowing gradients */}
-              <div className="absolute w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
-
-              <div className="relative w-full max-w-md h-full">
-                {/* Floating Card 1: Workspace Tasks */}
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 40, scale: 0.95 },
-                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -12, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 0.8 } : {
-                      opacity: { duration: 0.6, delay: 0.8 },
-                      scale: { duration: 0.6, delay: 0.8 },
-                      y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
-                    }
-                  )}
-                  className="absolute top-8 left-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-5 shadow-2xl z-10"
-                >
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="text-[10px] font-display font-semibold text-emerald-400 uppercase tracking-wider">Workspace Tracker</span>
-                    <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-white/95">
-                      <span className="font-medium">Completed Milestones</span>
-                      <span className="text-emerald-400 font-semibold">4 / 5</span>
-                    </div>
-                    <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                      <div className="w-4/5 bg-gradient-to-r from-emerald-500 to-cyan-400 h-full rounded-full" />
-                    </div>
-                    <div className="space-y-2 pt-1 text-[11px]">
-                      <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Milestone 3: API Integration</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-white/60">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Milestone 4: Database Design</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-white/90">
-                        <div className="w-3.5 h-3.5 rounded-full border border-emerald-400 flex items-center justify-center">
-                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
-                        </div>
-                        <span className="font-medium text-white/90">Milestone 5: Production Deployment</span>
-                      </div>
-                    </div>
-                  </div>
-                </MotionDiv>
-
-                {/* Floating Card 2: Mentor Feedback */}
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 40, scale: 0.95 },
-                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, 10, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 1.0 } : {
-                      opacity: { duration: 0.6, delay: 1.0 },
-                      scale: { duration: 0.6, delay: 1.0 },
-                      y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }
-                    }
-                  )}
-                  className="absolute bottom-12 right-4 w-72 bg-slate-950/80 backdrop-blur-xl border border-white/15 rounded-xl p-4 shadow-2xl z-20"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300 font-display font-semibold text-xs border border-emerald-500/30">
-                      SR
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-display font-semibold text-white">Sarah Jenkins</h4>
-                      <p className="text-[9px] text-white/50">Senior Engineer & Mentor</p>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-[11px] text-white/80 italic bg-white/5 p-2 rounded-lg border border-white/5">
-                    "Excellent database schema. Milestone 4 approved. Let's proceed with security rules validation."
-                  </p>
-                </MotionDiv>
-
-                {/* Floating Card 3: Certificate Preview */}
-                <MotionDiv
-                  isMobile={isMobile}
-                  {...animProps(
-                    { opacity: 0, y: 40, scale: 0.95 },
-                    isMobile ? { opacity: 1, y: 0, scale: 1 } : { opacity: 1, y: [0, -8, 0], scale: 1 },
-                    isMobile ? { duration: 0.6, delay: 1.2 } : {
-                      opacity: { duration: 0.6, delay: 1.2 },
-                      scale: { duration: 0.6, delay: 1.2 },
-                      y: { duration: 5.5, repeat: Infinity, ease: "easeInOut", delay: 1.0 }
-                    }
-                  )}
-                  className="absolute top-36 -right-4 w-60 bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-950 border border-white/15 rounded-xl p-4 shadow-2xl z-0 text-white"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[8px] uppercase tracking-wider text-emerald-400 font-display font-bold">Secure ID</span>
-                    <span className="text-[8px] text-white/40">ZYR0-9182-X</span>
-                  </div>
-                  <div className="mt-4 text-center">
-                    <Award className="w-8 h-8 mx-auto text-emerald-400 mb-1.5" />
-                    <h5 className="text-[10px] font-semibold">Certificate of Excellence</h5>
-                    <p className="text-[8px] text-white/50 mt-0.5">Verified Internship Graduate</p>
-                  </div>
-                  <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-[8px] text-white/40">
-                    <span>Instantly Verifiable</span>
-                    <span className="text-emerald-400 font-medium flex items-center gap-0.5">
-                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
-                      Secure
-                    </span>
-                  </div>
-                </MotionDiv>
-              </div>
             </div>
 
           </div>
@@ -616,8 +491,8 @@ export default function Landing() {
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden sm:flex">
-          <span className="text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
-          <div className="w-5 h-8 border border-white/20 rounded-full flex justify-center p-1">
+          <span className="text-slate-500 dark:text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
+          <div className="w-5 h-8 border border-slate-300 dark:border-white/20 rounded-full flex justify-center p-1">
             <MotionDiv
               isMobile={isMobile}
               {...animProps(
@@ -631,27 +506,33 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Stats Band — animated count-up social proof */}
+      <StatsBand />
+
+      {/* Employer Logo Marquee */}
+      <LogoMarquee />
+
       {/* Community / Stay Updated Section */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-white/10">
+      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-slate-200 dark:border-white/10">
         <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-400/10 border border-sky-400/25 text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400"></span>
               </span>
               Official Community Channels
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
               Never Miss an Opportunity. <br className="hidden sm:inline" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
+              <span className="font-accent text-blue-600 dark:text-sky-400">
                 Stay Connected in Real-Time.
               </span>
             </h2>
-            <p className="mt-4 text-slate-300 text-base sm:text-lg leading-relaxed">
+            <p className="mt-4 text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed">
               Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
             </p>
           </div>
@@ -665,7 +546,7 @@ export default function Landing() {
                 { opacity: 1, y: 0 },
                 { duration: 0.5, delay: 0.1 }
               )}
-              className="bg-slate-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group"
+              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/40 dark:border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/60 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
@@ -677,10 +558,10 @@ export default function Landing() {
                     Live Alerts
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
                   WhatsApp Channel
                 </h3>
-                <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
                   Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
                 </p>
               </div>
@@ -705,22 +586,22 @@ export default function Landing() {
                 { opacity: 1, y: 0 },
                 { duration: 0.5, delay: 0.2 }
               )}
-              className="bg-slate-900/80 backdrop-blur-xl border border-blue-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-blue-500/40 dark:border-blue-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/60 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
                     <LinkedInIcon className="w-6 h-6 fill-current" />
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                    <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
                     Official Page
                   </span>
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
                   LinkedIn Network
                 </h3>
-                <p className="text-slate-300 text-sm leading-relaxed mb-6">
+                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
                   Follow our official LinkedIn page for professional networking, employer spotlights, student success stories, and corporate announcements.
                 </p>
               </div>
@@ -754,17 +635,17 @@ export default function Landing() {
               )}
               className="lg:col-span-5 space-y-6"
             >
-              <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-                Every career starts somewhere.
+              <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Our Purpose</span>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+                Every career starts <span className="font-accent text-blue-600 dark:text-sky-400">somewhere.</span>
               </h2>
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
+              <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
                 Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
               </p>
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
                 Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
               </p>
-              <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
                 Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
               </p>
             </MotionDiv>
@@ -781,13 +662,13 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-white/20 hover:shadow-emerald-500/5"
+                  className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
                 >
                   <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
                     <role.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-white">{role.title}</h3>
-                  <p className="mt-2 text-sm text-slate-300 leading-relaxed">{role.desc}</p>
+                  <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{role.title}</h3>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{role.desc}</p>
                 </MotionDiv>
               ))}
             </div>
@@ -806,9 +687,9 @@ export default function Landing() {
             )}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Capabilities</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-balance">Built for accountability and clear outcomes</h2>
-            <p className="mt-4 text-slate-300 max-w-2xl mx-auto">
+            <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Capabilities</span>
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white text-balance">Built for accountability and <span className="font-accent text-blue-600 dark:text-sky-400">clear outcomes</span></h2>
+            <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
               Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
             </p>
           </MotionDiv>
@@ -829,8 +710,8 @@ export default function Landing() {
                 <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
                   <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-slate-300 leading-relaxed">{feature.desc}</p>
+                <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{feature.title}</h3>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{feature.desc}</p>
               </MotionDiv>
             ))}
           </div>
@@ -840,106 +721,11 @@ export default function Landing() {
       {/* Stacking Cards Storytelling Journey */}
       <JourneySection />
 
-      {/* For Companies */}
-      <section className="py-14 lg:py-20 px-4 content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <MotionDiv
-              isMobile={isMobile}
-              {...viewProps(
-                { opacity: 0, x: -30 },
-                { opacity: 1, x: 0 },
-                { duration: 0.6 }
-              )}
-            >
-              <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
-              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Run your internship programs with confidence</h2>
-              <p className="mt-4 text-slate-300">
-                Manage cohorts of any size from one structured dashboard. Review candidate profiles, structure milestone tasks with clear acceptance criteria, assign industry mentors, track intern progress in real time, and issue verified completion certificates when each intern finishes their program.
-              </p>
-              <p className="mt-3 text-slate-300 text-sm">
-                ZYR0 replaces spreadsheets and email chains with a unified view of your entire internship pipeline — from posting listings and reviewing applicants to monitoring task completion and generating credentials. Companies retain full control over every stage while providing interns with the structured guidance they need to succeed.
-              </p>
-              <div className="mt-8 space-y-4">
-                {checkFeatures.map((feature, i) => (
-                  <MotionDiv
-                    isMobile={isMobile}
-                    key={i}
-                    {...viewProps(
-                      { opacity: 0, x: -20 },
-                      { opacity: 1, x: 0 },
-                      { delay: i * 0.1 }
-                    )}
-                    className="flex items-center gap-3"
-                  >
-                    <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <span className="text-sm text-white/90">{feature}</span>
-                  </MotionDiv>
-                ))}
-              </div>
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 mt-8 bg-accent text-white px-6 py-3 rounded-lg font-medium hover:bg-accent/90 transition-all"
-              >
-                Post an Internship
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </MotionDiv>
+      {/* Dual-Audience Split — Students / Employers */}
+      <AudienceSplit />
 
-            <MotionDiv
-              isMobile={isMobile}
-              {...viewProps(
-                { opacity: 0, x: 30 },
-                { opacity: 1, x: 0 },
-                { duration: 0.6, delay: 0.2 }
-              )}
-              className="relative"
-            >
-              <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-                <div className="bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl space-y-4 border border-white/10">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-400">Cohort Size</p>
-                      <p className="text-2xl font-bold text-white">24</p>
-                    </div>
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-emerald-400" />
-                    </div>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full w-3/4 bg-emerald-500 rounded-full" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-white">156</p>
-                      <p className="text-xs text-slate-400">Applicants</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-white">89%</p>
-                      <p className="text-xs text-slate-400">Completion</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-white">4.8</p>
-                      <p className="text-xs text-slate-400">Feedback</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 bg-slate-900/80 backdrop-blur-xl rounded-2xl p-4 shadow-xl flex items-center gap-3 border border-white/10">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">Cohort activity up 32%</p>
-                    <p className="text-xs text-slate-400">Compared to last month</p>
-                  </div>
-                </div>
-              </div>
-            </MotionDiv>
-          </div>
-        </div>
-      </section>
+      {/* Trending Roles Chip Cloud */}
+      <RoleChips />
 
       {/* Section 2 — Built on Transparency. Designed for Confidence. */}
       <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
@@ -952,11 +738,11 @@ export default function Landing() {
             )}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">System Credibility</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">
-              Built on transparency. Designed for confidence.
+            <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">System Credibility</span>
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
+              Built on transparency. <span className="font-accent text-blue-600 dark:text-sky-400">Designed for confidence.</span>
             </h2>
-            <p className="mt-4 text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
+            <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
               A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
             </p>
           </MotionDiv>
@@ -972,13 +758,13 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-white/20 hover:shadow-emerald-500/5"
+                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
               >
                 <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
                   <card.icon className="w-5 h-5" />
                 </div>
-                <h3 className="mt-4 text-base font-semibold text-white">{card.title}</h3>
-                <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">{card.desc}</p>
+                <h3 className="mt-4 font-display text-base font-bold text-slate-900 dark:text-white">{card.title}</h3>
+                <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{card.desc}</p>
               </MotionDiv>
             ))}
           </div>
@@ -996,8 +782,13 @@ export default function Landing() {
             )}
             className="text-center mb-14"
           >
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Reviews</span>
-            <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Verified experiences from our community</h2>
+            <span className="font-label text-[11px] uppercase tracking-[0.22em] text-sky-400">Reviews</span>
+            <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white">
+              Verified experiences from{' '}
+              <span className="font-accent text-blue-600 dark:text-sky-400">
+                our community
+              </span>
+            </h2>
           </MotionDiv>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1011,40 +802,18 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: i * 0.1 }
                 )}
-                className="bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-white/20 hover:shadow-emerald-500/5 flex flex-col justify-between"
+                className="glass-card-v3 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 flex flex-col justify-between"
               >
                 <div className="space-y-4">
-                  <Quote className="w-8 h-8 text-accent/40" />
-                  <p className="text-sm text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
+                  <Quote className="w-8 h-8 text-blue-600/40 dark:text-sky-400/40" />
+                  <p className="text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-border/50 flex items-center gap-3">
+                <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
                   <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover border border-white/10" />
                   <div>
-                    <p className="text-sm font-semibold text-white">{t.name}</p>
-                    <p className="text-xs text-slate-400">{t.role}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{t.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{t.role}</p>
                   </div>
-                </div>
-              </MotionDiv>
-            ))}
-          </div>
-
-          {/* Key Metrics */}
-          <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((stat, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                {...viewProps(
-                  { opacity: 0, scale: 0.9 },
-                  { opacity: 1, scale: 1 },
-                  { delay: i * 0.08 }
-                )}
-                className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-xl text-center hover:border-white/20 transition-all duration-300"
-              >
-                <p className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{stat.value}</p>
-                <div className="flex items-center justify-center gap-1.5 mt-1">
-                  <stat.icon className="w-4 h-4 text-emerald-400" />
-                  <p className="text-sm text-slate-300 font-medium">{stat.label}</p>
                 </div>
               </MotionDiv>
             ))}
@@ -1062,18 +831,18 @@ export default function Landing() {
               { opacity: 1, scale: 1 },
               { duration: 0.6 }
             )}
-            className="bg-gradient-to-r from-emerald-600/90 via-teal-600/90 to-cyan-600/90 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl text-white"
+            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-blue-600/20 text-white"
           >
             {/* Ambient Lighting Orbs */}
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-violet-400/25 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 space-y-6">
               <span className="inline-block px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30">
                 Get Started Today
               </span>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white max-w-2xl mx-auto">
-                Ready to transform how internships work?
+              <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white max-w-2xl mx-auto">
+                Ready to transform <span className="font-accent text-sky-100">how internships work?</span>
               </h2>
               <p className="text-white/90 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
                 Join thousands of students, companies, mentors, and universities building Pakistan's structured internship ecosystem.
