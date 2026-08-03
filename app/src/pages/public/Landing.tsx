@@ -18,6 +18,8 @@ import { JourneySection } from '@/components/landing/JourneySection/JourneySecti
 import AnimatedSearchMockup from '@/components/landing/AnimatedSearchMockup';
 import StatsBand from '@/components/landing/StatsBand';
 import LogoMarquee from '@/components/landing/LogoMarquee';
+import AudienceSplit from '@/components/landing/AudienceSplit';
+import RoleChips from '@/components/landing/RoleChips';
 
 const homepageStructuredData = [
   {
@@ -80,14 +82,6 @@ const testimonials = [
   { name: 'Sarah Chen', role: 'Computer Science Student', quote: 'The structured task progress and mentor feedback helped me grow far faster than a standard internship. Having a clear roadmap kept me aligned.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
   { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor', quote: 'As a mentor, ZYR0 gives me a structured framework to evaluate work, track multiple interns, and provide actionable feedback without administrative overhead.', avatar: 'https://i.pravatar.cc/150?u=michael' },
   { name: 'TechFlow Inc.', role: 'Employer Partner', quote: 'Using ZYR0 to hire and manage our interns has streamlined our entire process. The quality of candidate tracking and verification has been exceptional.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
-];
-
-const checkFeatures = [
-  'Publish detail-rich internship listings',
-  'Centralize applications in one unified pipeline',
-  'Organize cohort tasks and monitor overall progress',
-  'Generate verified completion certificates',
-  'Access cohort performance statistics',
 ];
 
 const roles = [
@@ -752,106 +746,11 @@ export default function Landing() {
       {/* Stacking Cards Storytelling Journey */}
       <JourneySection />
 
-      {/* For Companies */}
-      <section className="py-14 lg:py-20 px-4 content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <MotionDiv
-              isMobile={isMobile}
-              {...viewProps(
-                { opacity: 0, x: -30 },
-                { opacity: 1, x: 0 },
-                { duration: 0.6 }
-              )}
-            >
-              <span className="text-accent text-sm font-semibold uppercase tracking-wider">For Employers</span>
-              <h2 className="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Run your internship programs with confidence</h2>
-              <p className="mt-4 text-slate-300">
-                Manage cohorts of any size from one structured dashboard. Review candidate profiles, structure milestone tasks with clear acceptance criteria, assign industry mentors, track intern progress in real time, and issue verified completion certificates when each intern finishes their program.
-              </p>
-              <p className="mt-3 text-slate-300 text-sm">
-                ZYR0 replaces spreadsheets and email chains with a unified view of your entire internship pipeline — from posting listings and reviewing applicants to monitoring task completion and generating credentials. Companies retain full control over every stage while providing interns with the structured guidance they need to succeed.
-              </p>
-              <div className="mt-8 space-y-4">
-                {checkFeatures.map((feature, i) => (
-                  <MotionDiv
-                    isMobile={isMobile}
-                    key={i}
-                    {...viewProps(
-                      { opacity: 0, x: -20 },
-                      { opacity: 1, x: 0 },
-                      { delay: i * 0.1 }
-                    )}
-                    className="flex items-center gap-3"
-                  >
-                    <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <span className="text-sm text-white/90">{feature}</span>
-                  </MotionDiv>
-                ))}
-              </div>
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 mt-8 bg-accent text-white px-6 py-3 rounded-lg font-medium hover:bg-accent/90 transition-all"
-              >
-                Post an Internship
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </MotionDiv>
+      {/* Dual-Audience Split — Students / Employers */}
+      <AudienceSplit />
 
-            <MotionDiv
-              isMobile={isMobile}
-              {...viewProps(
-                { opacity: 0, x: 30 },
-                { opacity: 1, x: 0 },
-                { duration: 0.6, delay: 0.2 }
-              )}
-              className="relative"
-            >
-              <div className="bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-                <div className="bg-slate-900/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl space-y-4 border border-white/10">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-slate-400">Cohort Size</p>
-                      <p className="text-2xl font-bold text-white">24</p>
-                    </div>
-                    <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                      <Users className="w-5 h-5 text-emerald-400" />
-                    </div>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full w-3/4 bg-emerald-500 rounded-full" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-white">156</p>
-                      <p className="text-xs text-slate-400">Applicants</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-white">89%</p>
-                      <p className="text-xs text-slate-400">Completion</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-white">4.8</p>
-                      <p className="text-xs text-slate-400">Feedback</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 bg-slate-900/80 backdrop-blur-xl rounded-2xl p-4 shadow-xl flex items-center gap-3 border border-white/10">
-                  <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">Cohort activity up 32%</p>
-                    <p className="text-xs text-slate-400">Compared to last month</p>
-                  </div>
-                </div>
-              </div>
-            </MotionDiv>
-          </div>
-        </div>
-      </section>
+      {/* Trending Roles Chip Cloud */}
+      <RoleChips />
 
       {/* Section 2 — Built on Transparency. Designed for Confidence. */}
       <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
