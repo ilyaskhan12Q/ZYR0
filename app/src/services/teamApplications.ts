@@ -71,9 +71,9 @@ export async function submitTeamApplication(payload: TeamApplicationPayload) {
     projects: payload.projects.trim() || null,
     availability: payload.availability.trim(),
     motivation: payload.motivation.trim(),
-  }).select().single();
+  });
 
-  return { data, error };
+  return { data: null, error };
 }
 
 /** Admin: fetch all team applications, optionally filtered by status. */
