@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail } from 'lucide-react';
+import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail, Phone, Headphones, Megaphone } from 'lucide-react';
 import { SEO } from '@/components/SEO';
+import { SITE_CONFIG } from '@/config/site';
+import { WhatsAppIcon } from '@/components/icons/BrandIcons';
 
 const guides = [
   {
@@ -146,8 +148,101 @@ export default function HelpCenter() {
         </div>
       </section>
 
-      {/* FAQ Link */}
-      <section className="px-4 pb-8">
+      {/* Get Support */}
+      <section className="px-4 py-16 bg-muted/40 border-b border-border">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
+            <h2 className="text-3xl font-bold">Get Support</h2>
+            <p className="mt-2 text-muted-foreground">Facing an issue or have a question? Pick the channel that fits — we are here to help.</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <motion.a
+              href={SITE_CONFIG.social.whatsappSupportGroup}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              role="link"
+              className="bg-card rounded-xl border border-border p-6 shadow-sm flex items-start gap-4 hover:border-emerald-500/40 hover:shadow-emerald-500/10 transition-all"
+            >
+              <div className="w-11 h-11 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <WhatsAppIcon className="w-5 h-5 fill-current text-emerald-500" />
+              </div>
+              <div>
+                <p className="font-semibold">WhatsApp Support Group</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Community help &amp; discussion</p>
+                <p className="text-sm text-muted-foreground mt-2">Get answers to questions or issues quickly — connect with the ZYR0 team and other users in real time.</p>
+                <p className="text-sm font-medium text-emerald-600 mt-2">Join the group →</p>
+              </div>
+            </motion.a>
+
+            <motion.a
+              href={SITE_CONFIG.social.whatsappChannel}
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              role="link"
+              className="bg-card rounded-xl border border-border p-6 shadow-sm flex items-start gap-4 hover:border-emerald-500/40 hover:shadow-emerald-500/10 transition-all"
+            >
+              <div className="w-11 h-11 bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Megaphone className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="font-semibold">WhatsApp Channel</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Latest updates &amp; announcements</p>
+                <p className="text-sm text-muted-foreground mt-2">Follow for new internship openings, deadlines, and official platform news — announcements only, no chat.</p>
+                <p className="text-sm font-medium text-emerald-600 mt-2">Follow the channel →</p>
+              </div>
+            </motion.a>
+
+            <motion.a
+              href={`mailto:${SITE_CONFIG.supportEmail}`}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              role="link"
+              className="bg-card rounded-xl border border-border p-6 shadow-sm flex items-start gap-4 hover:border-accent/30 transition-all"
+            >
+              <div className="w-11 h-11 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <p className="font-semibold">Email Support</p>
+                <p className="text-xs text-muted-foreground mt-0.5">We reply within 24 hours</p>
+                <p className="text-sm text-muted-foreground mt-2">For account issues, verification queries, or partnership requests — write to {SITE_CONFIG.supportEmail}.</p>
+                <p className="text-sm font-medium text-accent mt-2">Send an email →</p>
+              </div>
+            </motion.a>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-card rounded-xl border border-border p-6 shadow-sm flex items-start gap-4"
+            >
+              <div className="w-11 h-11 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Phone className="w-5 h-5 text-accent" />
+              </div>
+              <div>
+                <p className="font-semibold">Phone</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Mon–Fri 9am–6pm PKT</p>
+                <p className="text-sm text-muted-foreground mt-2">Prefer to talk? Call us directly during business hours and we will walk you through the issue.</p>
+                <p className="text-sm font-medium text-accent mt-2">+92 327 988 3150</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ & Contact */}
+      <section className="px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div
@@ -164,21 +259,24 @@ export default function HelpCenter() {
                 View FAQ <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
-            <motion.div
+            <motion.a
+              href={SITE_CONFIG.social.whatsappSupportGroup}
+              target="_blank"
+              rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-card rounded-xl border border-border p-6 shadow-sm flex items-center justify-between"
+              className="bg-card rounded-xl border border-border p-6 shadow-sm flex items-center justify-between hover:border-emerald-500/40 transition-colors"
             >
               <div>
                 <h3 className="font-semibold">Contact Support</h3>
-                <p className="text-sm text-muted-foreground mt-1">Can&apos;t find your answer? Reach out directly.</p>
+                <p className="text-sm text-muted-foreground mt-1">Can&apos;t find your answer? Join the WhatsApp support group.</p>
               </div>
-              <Link to="/contact" className="flex items-center gap-1 text-sm font-medium text-accent hover:underline flex-shrink-0">
-                <Mail className="w-4 h-4" /> Contact
-              </Link>
-            </motion.div>
+              <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 flex-shrink-0">
+                <Headphones className="w-4 h-4" /> Get help
+              </span>
+            </motion.a>
           </div>
         </div>
       </section>
