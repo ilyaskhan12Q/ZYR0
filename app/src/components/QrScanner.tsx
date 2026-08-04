@@ -44,6 +44,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
     []
   );
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const startedRef = useRef(false);
   const onScanRef = useRef(onScan);
   const [active, setActive] = useState(false);
   const [status, setStatus] = useState<ScanStatus>('idle');
@@ -82,6 +83,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
           await scanner.stop().catch(() => {});
           return;
         }
+        startedRef.current = true;
         setStatus('scanning');
       } catch (err) {
         if (cancelled) return;
@@ -99,12 +101,19 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
       cancelled = true;
       const scanner = scannerRef.current;
       scannerRef.current = null;
-      if (scanner) {
-        scanner
-          .stop()
-          .then(() => scanner.clear())
-          .catch(() => {});
+      // A failed start() leaves the scanner in NOT_STARTED; stop() throws there,
+      // which would crash the app through the error boundary.
+      if (scanner && startedRef.current) {
+        try {
+          scanner
+            .stop()
+            .then(() => scanner.clear())
+            .catch(() => {});
+        } catch {
+          /* scanner is not running — nothing to tear down */
+        }
       }
+      startedRef.current = false;
     };
   }, [active, readerId]);
 
