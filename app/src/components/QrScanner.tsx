@@ -13,14 +13,23 @@ interface QrScannerProps {
 
 /** Classify a getUserMedia start failure into a user-facing state + message. */
 function classifyError(err: any): { status: ScanStatus; message: string } {
-  const name = err?.name ?? err?.code ?? '';
+  // html5-qrcode wraps getUserMedia failures in a plain string like
+  // "Error getting userMedia, error = NotAllowedError: Permission denied",
+  // so pull the real error name out of the text when err is not an object.
+  let name = '';
+  if (typeof err === 'string') {
+    const match = /error\s*=\s*([A-Za-z]+(?:Error)?)/.exec(err);
+    name = match ? match[1] : '';
+  } else {
+    name = err?.name ?? err?.code ?? '';
+  }
   if (name === 'NotAllowedError' || name === 'PermissionDeniedError' || name === 'SecurityError') {
     return {
       status: 'denied',
       message: 'Camera access was denied. Allow camera access for this site in your browser settings and try again, or use the certificate ID field below.',
     };
   }
-  if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+  if (name === 'NotFoundError' || name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
     return {
       status: 'denied',
       message: 'No camera was found on this device. Use the certificate ID field below instead.',
@@ -44,6 +53,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
     []
   );
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const startedRef = useRef(false);
   const onScanRef = useRef(onScan);
   const [active, setActive] = useState(false);
   const [status, setStatus] = useState<ScanStatus>('idle');
@@ -82,6 +92,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
           await scanner.stop().catch(() => {});
           return;
         }
+        startedRef.current = true;
         setStatus('scanning');
       } catch (err) {
         if (cancelled) return;
@@ -99,12 +110,19 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
       cancelled = true;
       const scanner = scannerRef.current;
       scannerRef.current = null;
-      if (scanner) {
-        scanner
-          .stop()
-          .then(() => scanner.clear())
-          .catch(() => {});
+      // A failed start() leaves the scanner in NOT_STARTED; stop() throws there,
+      // which would crash the app through the error boundary.
+      if (scanner && startedRef.current) {
+        try {
+          scanner
+            .stop()
+            .then(() => scanner.clear())
+            .catch(() => {});
+        } catch {
+          /* scanner is not running — nothing to tear down */
+        }
       }
+      startedRef.current = false;
     };
   }, [active, readerId]);
 

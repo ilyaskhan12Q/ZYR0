@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.5] - 2026-08-04
+
+### Fixed
+- **Camera failures showed the wrong reason in Chrome**: `html5-qrcode` wraps every `getUserMedia` failure in a plain string ("Error getting userMedia, error = …"), so the error classifier never saw the real error name and always fell back to the generic "Could not start the camera" message. The classifier now unwraps the inner error name (denied / no camera / busy camera are each reported correctly) and recognizes Chrome's legacy `ConstraintNotSatisfiedError`.
+
+## [0.25.4] - 2026-08-04
+
+### Fixed
+- **Scanner crash wiped the whole page on first use**: when the camera failed to start (first-time permission prompt denied, no camera, or busy device), the error handler unmounted the scanner and the cleanup called `html5-qrcode.stop()` on a scanner that never started — which throws `"Cannot stop, scanner is not running or paused."` synchronously during React's commit phase, tripping the error boundary and replacing the entire page with "Application error". The scanner now only tears down when a camera actually started, and the stop call is guarded, so camera failures show the friendly inline message instead of crashing the app.
+
 ## [0.25.3] - 2026-08-04
 
 ### Fixed
