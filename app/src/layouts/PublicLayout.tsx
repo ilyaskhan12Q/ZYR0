@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -30,11 +30,27 @@ export default function PublicLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [bannerVisible, setBannerVisible] = useState(false);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const isAuthPage = location.pathname.startsWith('/login') || location.pathname.startsWith('/register') || location.pathname.startsWith('/forgot-password') || location.pathname.startsWith('/reset-password');
 
   const handleBannerVisibility = useCallback((visible: boolean) => {
     setBannerVisible(visible);
   }, []);
+
+  useEffect(() => {
+    if (!bannerVisible) {
+      setHeaderHeight(0);
+      return;
+    }
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => setHeaderHeight(el.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [bannerVisible]);
 
   useEffect(() => {
     setMounted(true);
@@ -57,7 +73,7 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen bg-transparent">
       {/* Fixed header: optional announcement bar + navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50">
+      <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50">
         <SiteBannerBar onVisibilityChange={handleBannerVisibility} />
         <nav
           className={`transition-all duration-300 ${scrolled ? 'glass shadow-sm' : 'bg-transparent'
@@ -222,7 +238,12 @@ export default function PublicLayout() {
       </header>
 
       {/* Main Content */}
-      <main className={`relative z-10 ${bannerVisible ? 'pt-9' : ''}`}><Outlet /></main>
+      <main
+        className="relative z-10"
+        style={bannerVisible ? { paddingTop: headerHeight } : undefined}
+      >
+        <Outlet />
+      </main>
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
