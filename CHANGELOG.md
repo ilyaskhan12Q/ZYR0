@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.0] - 2026-08-04
+
+### Fixed
+- **Internship cards in light theme**: `.internship-card` was hardcoded dark (`bg-slate-900/80` + `border-white/10`), making card text unreadable when the light theme is active. The card now mirrors the theme-aware `.feature-card` pattern — `bg-white/80` with `slate-200` border in light, unchanged in dark (hover: `slate-300` / `white/20`). Applies to the public `/internships` cards and the student dashboard internship cards (same class, unlayered rule previously overrode their `bg-card` overrides).
+
 ## [0.24.5] - 2026-08-04
 
 ### Fixed
