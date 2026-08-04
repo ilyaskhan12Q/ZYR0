@@ -1,24 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle2, XCircle, Award, Shield, Calendar, Building2, QrCode, Copy, Check, HelpCircle, BookOpen } from 'lucide-react';
 import { verifyCertificate } from '@/services/certificates';
 import { supabase } from '@/lib/supabase';
 import CertificateDocument from '@/components/CertificateDocument';
+import { QrScanner } from '@/components/QrScanner';
 import { SEO } from '@/components/SEO';
 import { ButtonLoader } from '@/components/common/Loader';
+
+/** Pull a credential ID out of a scanned QR payload (full URL or raw ID). */
+function extractCredentialId(decodedText: string): string | null {
+  const candidate = decodedText.split('/').filter(Boolean).pop()?.split('?')[0]?.trim();
+  return candidate || null;
+}
 
 export default function Verify() {
   const { code } = useParams();
   const [searchParams] = useSearchParams();
   const idQuery = searchParams.get('id');
-  
+
   const [certId, setCertId] = useState('');
   const [result, setResult] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [loading, setLoading] = useState(false);
   const [verifiedCert, setVerifiedCert] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [sampleCerts, setSampleCerts] = useState<string[]>([]);
+  const lastScanRef = useRef(0);
 
   useEffect(() => {
     async function loadSamples() {
@@ -61,6 +69,19 @@ export default function Verify() {
       handleVerify(activeId);
     }
   }, [code, idQuery]);
+
+  /** Handle a QR scan result — extracts the ID, fills the input and verifies immediately. */
+  const handleScanned = (decodedText: string) => {
+    const now = Date.now();
+    if (now - lastScanRef.current < 1000) return;
+    lastScanRef.current = now;
+
+    const scannedId = extractCredentialId(decodedText);
+    if (!scannedId) return;
+    setCertId(scannedId);
+    setResult('idle');
+    handleVerify(scannedId);
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(certId);
@@ -112,9 +133,12 @@ export default function Verify() {
               )}
             </button>
           </div>
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-            <QrCode className="w-4 h-4" aria-hidden="true" />
-            <span>Or scan a QR code</span>
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <QrCode className="w-4 h-4" aria-hidden="true" />
+              <span>Or scan a QR code</span>
+            </div>
+            <QrScanner onScan={handleScanned} />
           </div>
 
           {/* Sample IDs */}

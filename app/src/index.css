@@ -518,6 +518,14 @@
   @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl overflow-hidden transition-all duration-300;
 }
 
+/* QR scanner frame */
+.qr-reader-frame {
+  @apply aspect-square max-w-[280px] mx-auto rounded-xl overflow-hidden border border-border bg-slate-950 relative;
+}
+.qr-reader-frame video {
+  @apply w-full h-full object-cover;
+}
+
 /* Table row hover */
 .table-row-hover {
   @apply transition-colors duration-150;
