@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.2] - 2026-08-04
+
+### Fixed
+- **Offer letter QR code is now real**: the "QR code" on generated offer letters was a non-scannable pseudo-random matrix. It now encodes the verification URL with a genuine QR encoder (`qrcode`, pure-JS, stays fully offline), so scanning the letter opens the verify page. The printed "Verify at …" text remains as a fallback.
+
+## [0.25.1] - 2026-08-04
+
+### Added
+- **Realtime QR scanner on `/verify`**: a "Scan QR Code" button opens the rear camera (`html5-qrcode`) with a live scan window; a detected certificate QR instantly fills the ID and verifies it with no extra click. Camera stops on success, cancel, or page leave; permission-denied / no-camera devices get a friendly message with the manual entry fallback.
+
 ## [0.25.0] - 2026-08-04
 
 ### Fixed
