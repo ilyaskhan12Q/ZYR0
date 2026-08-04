@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { Camera, Loader2, X, CameraOff, ShieldAlert } from 'lucide-react';
+import { Camera, Loader2, X, CameraOff, ShieldAlert, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ScanStatus = 'idle' | 'starting' | 'scanning' | 'denied' | 'error';
@@ -47,6 +47,16 @@ function classifyError(err: any): { status: ScanStatus; message: string } {
   };
 }
 
+/** Stored camera permission state ('prompt' | 'granted' | 'denied'), or null when unsupported. */
+async function getCameraPermissionState(): Promise<PermissionState | null> {
+  try {
+    const permission = await navigator.permissions.query({ name: 'camera' } as any);
+    return permission.state;
+  } catch {
+    return null;
+  }
+}
+
 export function QrScanner({ onScan, disabled }: QrScannerProps) {
   const readerId = useMemo(
     () => `qr-reader-${Math.random().toString(36).slice(2, 9)}`,
@@ -58,6 +68,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
   const [active, setActive] = useState(false);
   const [status, setStatus] = useState<ScanStatus>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [permissionBlocked, setPermissionBlocked] = useState(false);
 
   useEffect(() => {
     onScanRef.current = onScan;
@@ -100,6 +111,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
         const classified = classifyError(err);
         setStatus(classified.status);
         setErrorMsg(classified.message);
+        setPermissionBlocked(classified.status === 'denied');
         setActive(false);
       }
     };
@@ -126,7 +138,7 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
     };
   }, [active, readerId]);
 
-  const start = () => {
+  const start = async () => {
     if (disabled) return;
     // Camera APIs are only available in secure contexts (HTTPS or localhost).
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
@@ -136,7 +148,28 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
       );
       return;
     }
+    // If the browser has the camera permission stored as blocked, getUserMedia
+    // fails instantly WITHOUT showing the prompt again — tell the user how to
+    // re-enable it instead. A 'prompt' state means the browser will ask.
+    const permissionState = await getCameraPermissionState();
+    if (permissionState === 'denied') {
+      setPermissionBlocked(true);
+      setStatus('denied');
+      setErrorMsg(
+        'Camera access is blocked for this site. Click "Open Camera Settings" to allow it, then try again — or use the certificate ID field below.'
+      );
+      return;
+    }
+    setPermissionBlocked(false);
     setActive(true);
+  };
+
+  const openCameraSettings = () => {
+    // chrome:// URLs only work in Chromium browsers; other browsers have to
+    // change the permission from their own settings page.
+    if (typeof navigator !== 'undefined' && /chrome|edge|chromium/i.test(navigator.userAgent)) {
+      window.open('chrome://settings/content/camera', '_blank');
+    }
   };
 
   if (status === 'denied' || status === 'error') {
@@ -148,6 +181,15 @@ export function QrScanner({ onScan, disabled }: QrScannerProps) {
           <ShieldAlert className="w-6 h-6 text-muted-foreground mx-auto mb-2" aria-hidden="true" />
         )}
         <p className="text-sm text-muted-foreground">{errorMsg}</p>
+        {status === 'denied' && permissionBlocked && (
+          <button
+            type="button"
+            onClick={openCameraSettings}
+            className="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors"
+          >
+            <Settings className="w-4 h-4" /> Open Camera Settings
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setStatus('idle')}

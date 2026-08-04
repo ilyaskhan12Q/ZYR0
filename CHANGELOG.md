@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.0] - 2026-08-04
+
+### Added
+- **Camera permission guidance on `/verify`**: clicking "Scan QR Code" now checks the browser's stored camera permission first. If it's still undecided, the normal browser prompt appears so the user can allow it; if the permission is stored as blocked (a denied prompt is remembered forever in Chrome and never re-asked), the page now explains this and offers an "Open Camera Settings" button that jumps straight to the browser's camera settings instead of just failing.
+
 ## [0.25.5] - 2026-08-04
 
 ### Fixed
