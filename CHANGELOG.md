@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.5] - 2026-08-04
+
+### Fixed
+- **Camera failures showed the wrong reason in Chrome**: `html5-qrcode` wraps every `getUserMedia` failure in a plain string ("Error getting userMedia, error = …"), so the error classifier never saw the real error name and always fell back to the generic "Could not start the camera" message. The classifier now unwraps the inner error name (denied / no camera / busy camera are each reported correctly) and recognizes Chrome's legacy `ConstraintNotSatisfiedError`.
+
 ## [0.25.4] - 2026-08-04
 
 ### Fixed
