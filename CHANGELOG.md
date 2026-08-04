@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.4] - 2026-08-04
+
+### Added
+- **Admin banner management**: new `/admin/site-banners` page — list banners, toggle active/inactive, create, edit (title, message, CTA label/URL) and delete; registered in `AdminPortal` and the admin sidebar.
+
+## [0.24.3] - 2026-08-04
+
+### Added
+- **Site-wide announcement bar**: `SiteBannerBar` renders the first active banner at the top of every public page (fixed header, above the nav), with the current maintenance notice: *"ZYR0 is undergoing scheduled maintenance. If you run into any issues while exploring, reach out — our team is here to help."* with a "Contact us" CTA (WhatsApp support group by default). Dismissible per visitor (localStorage); page content offsets for the bar height automatically.
+
+## [0.24.2] - 2026-08-04
+
+### Added
+- **`site_banners` table** (migration `031`): site-wide announcement/notification rows (title, message, link URL/label, active flag, optional time window) with RLS — public reads only active banners, admins manage all; seeded with the current maintenance notice. `app/src/services/siteBanners.ts` provides public fetch + admin CRUD.
+
 ## [0.24.1] - 2026-08-04
 
 ### Docs

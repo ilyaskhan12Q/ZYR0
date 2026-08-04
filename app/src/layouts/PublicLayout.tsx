@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
+import { SiteBannerBar } from '@/components/SiteBannerBar';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 const navLinks = [
@@ -28,7 +29,12 @@ export default function PublicLayout() {
   const [mounted, setMounted] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [bannerVisible, setBannerVisible] = useState(false);
   const isAuthPage = location.pathname.startsWith('/login') || location.pathname.startsWith('/register') || location.pathname.startsWith('/forgot-password') || location.pathname.startsWith('/reset-password');
+
+  const handleBannerVisibility = useCallback((visible: boolean) => {
+    setBannerVisible(visible);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -50,11 +56,13 @@ export default function PublicLayout() {
 
   return (
     <div className="min-h-screen bg-transparent">
-      {/* Navigation */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'glass shadow-sm' : 'bg-transparent'
-          }`}
-      >
+      {/* Fixed header: optional announcement bar + navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50">
+        <SiteBannerBar onVisibilityChange={handleBannerVisibility} />
+        <nav
+          className={`transition-all duration-300 ${scrolled ? 'glass shadow-sm' : 'bg-transparent'
+            }`}
+        >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo */}
@@ -210,10 +218,11 @@ export default function PublicLayout() {
             </motion.div>
           )}
         </AnimatePresence>
-      </nav>
+        </nav>
+      </header>
 
       {/* Main Content */}
-      <main className="relative z-10"><Outlet /></main>
+      <main className={`relative z-10 ${bannerVisible ? 'pt-9' : ''}`}><Outlet /></main>
 
       {/* Footer (hidden on auth pages) */}
       {!isAuthPage && (
