@@ -5,7 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.1] - 2026-08-04
+
+### Docs
+- **Versioning policy documented**: every commit produces one changelog release entry; patch bumps within a minor series and the minor bumps after five patches (`0.23.1 → … → 0.23.5 → 0.24.0 → 0.24.1 → …`). Recorded in `docs/GIT_WORKFLOW.md` §0 and this file.
+
+## [0.24.0] - 2026-08-04
+
+### Added
+- **Support FAQ entries**: new "Support & Help" category on the public FAQ (group vs channel vs email, response times) and application-troubleshooting entries on the careers FAQ. Support email unified to `support@zyroo.dpdns.org` throughout the FAQs.
+
+## [0.23.5] - 2026-08-04
+
+### Changed
+- **Careers call-to-action**: the "Ask a Question" button on the founding-team final CTA now opens the WhatsApp support group instead of the announcements channel; the sign-in gate gained a "Trouble signing in or applying?" line linking to the support group.
+
+## [0.23.4] - 2026-08-04
+
+### Added
+- **Footer support links**: a second WhatsApp icon (support group, next to the channel icon) and a "WhatsApp Support Group" entry in the footer's Community & Support list; the email icon now opens `mailto:support@zyroo.dpdns.org`.
+
+## [0.23.3] - 2026-08-04
+
+### Added
+- **Contact page**: "WhatsApp Support Group" card (community help & discussion); the WhatsApp Channel card description now reads "Latest updates & announcements".
+
+## [0.23.2] - 2026-08-04
+
+### Added
+- **Help Center "Get Support" section**: four cards — WhatsApp Support Group (community help), WhatsApp Channel (announcements), Email Support (24h SLA), Phone (business hours) — plus the "Contact Support" card now points to the support group.
+
+## [0.23.1] - 2026-08-04
+
+### Changed
+- **Site config**: added `SITE_CONFIG.social.whatsappSupportGroup` (env `VITE_WHATSAPP_SUPPORT_GROUP_URL`, fallback `https://chat.whatsapp.com/Hp2rnX1B61PDzVlbF89Tha`) and unified the support email to `support@zyroo.dpdns.org`.
+
 ## [Unreleased]
+
+### Changed
+- **Careers — signup required to apply**: the application form now shows a sign-in gate for anonymous visitors; applications are linked to the applicant's ZYR0 account (`user_id`, migration `030`) and anonymous inserts are blocked by RLS. The hero "Explore Open Roles" CTA links to the registration page instead of scrolling to the roles list.
+- **Team application form**: motivation minimum lowered from 60 to 30 characters.
 
 ### Fixed
 - **Team application submit error**: submission actually succeeded, but the client read-back (`insert().select().single()`) failed under RLS (admins-only SELECT), surfacing a false "Something went wrong" error. The insert now skips the read-back, so applicants get the success screen immediately.

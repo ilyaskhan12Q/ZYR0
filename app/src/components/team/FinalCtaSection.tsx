@@ -46,7 +46,7 @@ export function FinalCtaSection() {
                 <ArrowRight className="w-4 h-4" />
               </button>
               <a
-                href={SITE_CONFIG.social.whatsappChannel}
+                href={SITE_CONFIG.social.whatsappSupportGroup}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-semibold bg-slate-900/40 hover:bg-slate-900/60 border border-white/30 backdrop-blur-sm transition-all"

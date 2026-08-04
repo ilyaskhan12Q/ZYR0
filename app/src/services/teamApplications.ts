@@ -29,8 +29,13 @@ export interface TeamApplicationPayload {
   motivation: string;
 }
 
-/** Submit a founding-team application from the public careers page (no auth). */
+/** Submit a founding-team application (requires a signed-in user). */
 export async function submitTeamApplication(payload: TeamApplicationPayload) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { data: null, error: new Error('You must be signed in to apply for a team role.') };
+  }
+
   let resumeUrl: string | null = null;
   let resumeFilename: string | null = null;
   let resumeSize: number | null = null;
@@ -51,7 +56,8 @@ export async function submitTeamApplication(payload: TeamApplicationPayload) {
     resumeSize = payload.resume.size;
   }
 
-  const { data, error } = await supabase.from('team_applications').insert({
+  const { error } = await supabase.from('team_applications').insert({
+    user_id: user.id,
     full_name: payload.fullName.trim(),
     email: payload.email.trim().toLowerCase(),
     phone: payload.phone.trim(),
@@ -74,9 +80,7 @@ export async function submitTeamApplication(payload: TeamApplicationPayload) {
   });
 
   return { data: null, error };
-}
-
-/** Admin: fetch all team applications, optionally filtered by status. */
+}/** Admin: fetch all team applications, optionally filtered by status. */
 export async function getTeamApplications(status?: TeamApplicationStatus | 'All') {
   let query = supabase
     .from('team_applications')

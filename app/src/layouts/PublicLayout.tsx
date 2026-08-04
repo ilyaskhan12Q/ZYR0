@@ -243,6 +243,16 @@ export default function PublicLayout() {
                     <WhatsAppIcon className="w-4 h-4 fill-current" />
                   </a>
                   <a
+                    href={SITE_CONFIG.social.whatsappSupportGroup}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="ZYR0 WhatsApp Support Group"
+                    title="Join ZYR0 WhatsApp Support Group for help & discussions"
+                    className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center hover:bg-emerald-500 hover:text-slate-900 dark:hover:text-white transition-all duration-200"
+                  >
+                    <WhatsAppIcon className="w-4 h-4 fill-current" />
+                  </a>
+                  <a
                     href={SITE_CONFIG.social.linkedinCompany}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -255,7 +265,7 @@ export default function PublicLayout() {
                   <a href="https://ilyaskhan12q.github.io/portfolio" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition-colors">
                     <Github className="w-5 h-5" />
                   </a>
-                  <a href="mailto:support@zyr0.com" aria-label="Email support" className="text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  <a href={`mailto:${SITE_CONFIG.supportEmail}`} aria-label="Email support" className="text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white transition-colors">
                     <Mail className="w-5 h-5" />
                   </a>
                 </div>
@@ -297,6 +307,17 @@ export default function PublicLayout() {
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       WhatsApp Channel
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={SITE_CONFIG.social.whatsappSupportGroup}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 font-medium text-sm hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      WhatsApp Support Group
                     </a>
                   </li>
                   <li>

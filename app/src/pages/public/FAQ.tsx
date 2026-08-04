@@ -119,7 +119,7 @@ const faqData: FAQCategory[] = [
       },
       {
         q: 'Can I change my role after registering?',
-        a: 'Role changes are not currently supported through self-service. If you registered with the wrong role, please contact our support team at support@zyr0.com and we will assist you.',
+        a: 'Role changes are not currently supported through self-service. If you registered with the wrong role, please contact our support team at support@zyroo.dpdns.org and we will assist you.',
       },
       {
         q: 'How do I reset my password?',
@@ -135,7 +135,24 @@ const faqData: FAQCategory[] = [
       },
       {
         q: 'How do I delete my account?',
-        a: 'To request account deletion, contact us at support@zyr0.com with the subject line "Account Deletion Request". We will process your request within 30 days. Note that issued certificates will remain verifiable through the public verification system even after account deletion.',
+        a: 'To request account deletion, contact us at support@zyroo.dpdns.org with the subject line "Account Deletion Request". We will process your request within 30 days. Note that issued certificates will remain verifiable through the public verification system even after account deletion.',
+      },
+    ],
+  },
+  {
+    label: 'Support & Help',
+    items: [
+      {
+        q: 'How do I get help with an issue on ZYR0?',
+        a: 'The fastest way to get help is to join our WhatsApp support group, where the ZYR0 team and other users help answer questions in real time. For anything that needs a formal reply — like account verification or partnership requests — email us at support@zyroo.dpdns.org and we will respond within 24 hours.',
+      },
+      {
+        q: 'What is the difference between the WhatsApp channel and the support group?',
+        a: 'The WhatsApp support group is a community space for help and discussion — ask questions, report issues, and talk with the ZYR0 team. The WhatsApp channel is announcements only: it shares new internship openings, deadlines, and official platform updates. For one-to-one help, email support@zyroo.dpdns.org.',
+      },
+      {
+        q: 'How quickly will I get a response from support?',
+        a: 'Email support is answered within 24 hours on business days. For urgent or quick questions, the WhatsApp support group is usually the fastest route — join the group and post your question directly.',
       },
     ],
   },

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Briefcase, CalendarClock, Check, CheckCircle2,
   ChevronDown, FileText, FileUp, Github, Globe, GraduationCap, Linkedin,
-  Loader2, Mail, PartyPopper, Send, Sparkles, User, X,
+  Loader2, LogIn, Mail, PartyPopper, Send, Sparkles, User, UserCheck, X,
 } from 'lucide-react';
 import { Reveal, SectionHeading } from './SectionHeading';
 import {
@@ -14,7 +15,9 @@ import {
   TEAM_SKILLS,
 } from './team-data';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 import { submitTeamApplication } from '@/services/teamApplications';
+import { SITE_CONFIG } from '@/config/site';
 
 /* ────────────────────────────────────────────────────────────────
    Types & constants
@@ -115,8 +118,8 @@ function validateStep(step: number, data: ApplicationData): Errors {
 
   if (step === 3) {
     if (!data.availability) errors.availability = 'Please select your weekly availability.';
-    if (value('motivation').length < 60) {
-      errors.motivation = 'Please write at least 60 characters about why you want to join.';
+    if (value('motivation').length < 30) {
+      errors.motivation = 'Please write at least 30 characters about why you want to join.';
     }
     if (!data.agreement) errors.agreement = 'Please confirm the commitment statement.';
   }
@@ -220,6 +223,7 @@ function SelectField({
    ──────────────────────────────────────────────────────────────── */
 
 export function TeamApplication({ preferredRole }: { preferredRole: string }) {
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [data, setData] = useState<ApplicationData>(INITIAL_DATA);
   const [errors, setErrors] = useState<Errors>({});
@@ -307,16 +311,22 @@ export function TeamApplication({ preferredRole }: { preferredRole: string }) {
       <div className="max-w-7xl mx-auto">
         <SectionHeading
           eyebrow="Application"
-          title="Start your application"
-          accent="in under ten minutes"
-          description="Four short steps, one review. No long forms, no gatekeeping — just honest questions so we can find the right seat for you."
+          title={user ? 'Start your application' : 'Sign in to apply'}
+          accent={user ? 'in under ten minutes' : 'to the founding team'}
+          description={
+            user
+              ? 'Four short steps, one review. No long forms, no gatekeeping — just honest questions so we can find the right seat for you.'
+              : 'Applications for the founding team are linked to your ZYR0 account. Create a free account or sign in to start — it takes under two minutes.'
+          }
           icon={Send}
         />
 
         <div ref={formRef} className="max-w-3xl mx-auto scroll-mt-24">
           <Reveal>
             <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden">
-              {submitted ? (
+              {!user ? (
+                <SignInGate />
+              ) : submitted ? (
                 <SuccessScreen onRestart={() => { setSubmitted(false); setStep(0); setData(INITIAL_DATA); setVisited([true, false, false, false, false]); }} />
               ) : (
                 <div className="p-6 sm:p-10">
@@ -818,6 +828,52 @@ function SuccessScreen({ onRestart }: { onRestart: () => void }) {
         Submit another application
         <ArrowRight className="w-4 h-4" />
       </button>
+    </div>
+  );
+}
+
+function SignInGate() {
+  return (
+    <div className="p-8 sm:p-12 text-center">
+      <div className="w-20 h-20 mx-auto rounded-full bg-blue-500/15 border border-blue-500/30 flex items-center justify-center">
+        <UserCheck className="w-9 h-9 text-blue-600 dark:text-sky-400" />
+      </div>
+      <h3 className="mt-6 font-display text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+        Sign in to apply
+      </h3>
+      <p className="mt-3 text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+        Applications for the founding development team are linked to your ZYR0 account.
+        Create a free account or sign in to start your application — it takes under
+        two minutes.
+      </p>
+      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Link
+          to="/register"
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-6 py-3 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 text-sm"
+        >
+          Create an account
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+        >
+          <LogIn className="w-4 h-4" />
+          Sign in
+        </Link>
+      </div>
+      <p className="mt-6 text-xs text-slate-500 dark:text-slate-400">
+        Trouble signing in or applying?{' '}
+        <a
+          href={SITE_CONFIG.social.whatsappSupportGroup}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+        >
+          Join our WhatsApp support group
+        </a>{' '}
+        and we will help you out.
+      </p>
     </div>
   );
 }
