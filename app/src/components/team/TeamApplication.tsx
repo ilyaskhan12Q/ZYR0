@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { submitTeamApplication } from '@/services/teamApplications';
+import { SITE_CONFIG } from '@/config/site';
 
 /* ────────────────────────────────────────────────────────────────
    Types & constants
@@ -862,7 +863,16 @@ function SignInGate() {
         </Link>
       </div>
       <p className="mt-6 text-xs text-slate-500 dark:text-slate-400">
-        Your progress is saved in the form — sign in and pick up where you left off.
+        Trouble signing in or applying?{' '}
+        <a
+          href={SITE_CONFIG.social.whatsappSupportGroup}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+        >
+          Join our WhatsApp support group
+        </a>{' '}
+        and we will help you out.
       </p>
     </div>
   );
