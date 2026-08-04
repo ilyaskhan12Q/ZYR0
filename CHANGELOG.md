@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.25.3] - 2026-08-04
+
+### Fixed
+- **QR scanner could not start the camera**: the camera was being initialized before the scan frame existed in the DOM, so `html5-qrcode` couldn't find its container and threw on every device. The scanner now starts in a `useEffect` after the frame is mounted (and stops via effect cleanup on cancel/leave). Also added a clear error for insecure contexts (`navigator.mediaDevices` unavailable — camera requires HTTPS/localhost) and better messages for denied / missing / busy cameras.
+
 ## [0.25.2] - 2026-08-04
 
 ### Fixed
