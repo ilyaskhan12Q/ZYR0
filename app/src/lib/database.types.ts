@@ -160,6 +160,19 @@ export interface TeamApplication {
   updated_at: string;
 }
 
+export interface SiteBanner {
+  id: string;
+  title: string;
+  message: string;
+  link_url: string | null;
+  link_label: string | null;
+  is_active: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TaskAttachment {
   id: string;
   name: string;
@@ -353,6 +366,7 @@ export interface Database {
       internships: { Row: Internship; Insert: Partial<Internship>; Update: Partial<Internship> };
       applications: { Row: Application; Insert: Partial<Application>; Update: Partial<Application> };
       team_applications: { Row: TeamApplication; Insert: Partial<TeamApplication>; Update: Partial<TeamApplication> };
+      site_banners: { Row: SiteBanner; Insert: Partial<SiteBanner>; Update: Partial<SiteBanner> };
       tasks: { Row: Task; Insert: Partial<Task>; Update: Partial<Task> };
       task_submissions: { Row: TaskSubmission; Insert: Partial<TaskSubmission>; Update: Partial<TaskSubmission> };
       certificates: { Row: Certificate; Insert: Partial<Certificate>; Update: Partial<Certificate> };
