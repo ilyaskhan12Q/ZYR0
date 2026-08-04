@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.24.5] - 2026-08-04
+
+### Fixed
+- **Announcement bar on mobile**: the message now wraps naturally (was truncated to one unreadable line with the contact CTA hidden) and the CTA appears as an inline "Contact us →" link inside the message; larger tap target for the dismiss button. The page content offset now tracks the real header height (ResizeObserver) instead of a fixed `pt-9`, so no overlap regardless of message length.
+
 ## [0.24.4] - 2026-08-04
 
 ### Added
