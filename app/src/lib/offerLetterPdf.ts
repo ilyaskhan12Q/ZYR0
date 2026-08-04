@@ -8,6 +8,7 @@
  */
 
 import type { OfferLetter } from '@/lib/database.types';
+import QRCode from 'qrcode';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -465,8 +466,9 @@ function roundRect(
 }
 
 /**
- * Render a crisp, 100% offline QR Code matrix directly onto Canvas context.
- * Guaranteed zero network calls & zero CORS errors.
+ * Render a real, scannable QR Code directly onto Canvas context.
+ * Uses the pure-JS `qrcode` encoder, so it stays 100% offline —
+ * zero network calls & zero CORS errors, while remaining machine-readable.
  */
 function renderSafeCanvasQr(
   ctx: CanvasRenderingContext2D,
@@ -474,46 +476,27 @@ function renderSafeCanvasQr(
   x: number, y: number,
   size: number
 ) {
+  const qr = QRCode.create(text, { errorCorrectionLevel: 'M' });
+  const count = qr.modules.size;
+  const quiet = 3; // QR spec quiet zone (modules of padding)
+
+  // Cell size fits the module grid + quiet zone into the requested box
+  const cellSize = size / (count + quiet * 2);
+
   ctx.save();
+
+  // White background (required for reliable scanning)
   ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(x, y, size, size);
 
-  ctx.strokeStyle = '#0F172A';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(x, y, size, size);
-
-  // Hash payload string to generate a deterministic 21x21 pseudo QR matrix layout
-  const gridCount = 21;
-  const cellSize = size / gridCount;
-
-  ctx.fillStyle = '#0F172A';
-
-  // 1. Draw 3 Corner Finder Patterns (Top-Left, Top-Right, Bottom-Left)
-  drawQrFinderPattern(ctx, x, y, cellSize);
-  drawQrFinderPattern(ctx, x + (gridCount - 7) * cellSize, y, cellSize);
-  drawQrFinderPattern(ctx, x, y + (gridCount - 7) * cellSize, cellSize);
-
-  // 2. Draw Data Pattern Modules based on deterministic Hash
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    hash = (hash << 5) - hash + text.charCodeAt(i);
-    hash |= 0;
-  }
-
-  for (let r = 0; r < gridCount; r++) {
-    for (let c = 0; c < gridCount; c++) {
-      // Exclude finder pattern areas
-      if ((r < 7 && c < 7) || (r < 7 && c >= gridCount - 7) || (r >= gridCount - 7 && c < 7)) {
-        continue;
-      }
-      
-      const seed = Math.sin(hash + r * gridCount + c) * 10000;
-      const isDark = (seed - Math.floor(seed)) > 0.45;
-      
-      if (isDark) {
+  // Draw data modules
+  ctx.fillStyle = PRIMARY_DARK;
+  for (let r = 0; r < count; r++) {
+    for (let c = 0; c < count; c++) {
+      if (qr.modules.get(r, c)) {
         ctx.fillRect(
-          Math.floor(x + c * cellSize),
-          Math.floor(y + r * cellSize),
+          Math.floor(x + (c + quiet) * cellSize),
+          Math.floor(y + (r + quiet) * cellSize),
           Math.ceil(cellSize),
           Math.ceil(cellSize)
         );
@@ -522,16 +505,4 @@ function renderSafeCanvasQr(
   }
 
   ctx.restore();
-}
-
-/** Helper to draw QR corner finder pattern */
-function drawQrFinderPattern(ctx: CanvasRenderingContext2D, x: number, y: number, cellSize: number) {
-  // 7x7 outer square
-  ctx.fillRect(x, y, 7 * cellSize, 7 * cellSize);
-  // 5x5 inner white square
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(x + cellSize, y + cellSize, 5 * cellSize, 5 * cellSize);
-  // 3x3 inner dark square
-  ctx.fillStyle = '#0F172A';
-  ctx.fillRect(x + 2 * cellSize, y + 2 * cellSize, 3 * cellSize, 3 * cellSize);
 }
