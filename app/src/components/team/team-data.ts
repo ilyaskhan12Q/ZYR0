@@ -689,6 +689,16 @@ export const FAQS: FaqItem[] = [
     answer:
       'Yes. Once you are part of the team, you can shift focus based on interest and skill growth. Cross-functional moves are encouraged — they make better engineers and a stronger team.',
   },
+  {
+    question: 'I am having trouble applying. Who can I ask?',
+    answer:
+      'Hop into our WhatsApp support group — the fastest way to get live help from the team — or email us at support@zyroo.dpdns.org and we will get back to you within 24 hours.',
+  },
+  {
+    question: 'How do I know if my application was submitted?',
+    answer:
+      'After you submit, your application is saved to your ZYR0 account and linked to your email. You will see a confirmation screen right after submission. If something goes wrong, join the WhatsApp support group and we will fix it with you.',
+  },
 ];
 
 /* ────────────────────────────────────────────────────────────────
