@@ -4,6 +4,26 @@ This document defines the official repository branching model, merge rules, and 
 
 ---
 
+> **Backlog note:** the current feature branch `feature/founding-development-team` (careers + team applications) intentionally does **not** branch off `develop`; `develop` does not contain the careers code yet. Keep work on that branch and merge via a PR to `main` (see section 1).
+
+---
+
+## 0. Release Versioning
+
+Each **commit** produces exactly one `CHANGELOG.md` release entry. Versions advance per commit as a **patch** bump within a minor series; when the patch digit hits `5`, the next commit bumps the **minor** and resets the patch. Continuing after a minor bump resumes with patch `1`.
+
+```text
+0.23.1 → 0.23.2 → 0.23.3 → 0.23.4 → 0.23.5 → 0.24.0 →
+0.24.1 → 0.24.2 → 0.24.3 → 0.24.4 → 0.24.5 → 0.25.0 → ...
+```
+
+Rules:
+- New release sections go **above** `[Unreleased]`, newest first, dated the day of the commit.
+- A changelog-only commit (e.g. recording this policy) still gets the next patch bump.
+- Create `[Unreleased]` anew if it does not exist on top of the newest release.
+
+---
+
 ## 1. Repository Branching Model
 
 We use a simple, dual-trunk branching structure designed for rapid iteration with a high quality bar.
