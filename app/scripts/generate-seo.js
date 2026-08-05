@@ -51,6 +51,7 @@ const pages = [
   { path: 'internships', priority: '0.9', changefreq: 'daily' },
   { path: 'companies', priority: '0.8', changefreq: 'daily' },
   { path: 'careers', priority: '0.8', changefreq: 'weekly' },
+  { path: 'careers/apply', priority: '0.7', changefreq: 'weekly' },
   { path: 'about', priority: '0.7', changefreq: 'monthly' },
   { path: 'contact', priority: '0.7', changefreq: 'monthly' },
   { path: 'faq', priority: '0.6', changefreq: 'weekly' },
