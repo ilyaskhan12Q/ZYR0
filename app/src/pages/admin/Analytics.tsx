@@ -27,6 +27,7 @@ import {
   Cell 
 } from 'recharts';
 import { supabase } from '@/lib/supabase';
+import { INTERNSHIP_DOMAINS } from '@/lib/internshipDomains';
 
 const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#EC4899'];
 
@@ -347,11 +348,13 @@ export default function AdminAnalytics() {
             className="bg-card border border-border text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-accent transition-all cursor-pointer"
           >
             <option value="All">All Domains</option>
-            <option value="Software Engineering">Software Engineering</option>
-            <option value="Data Science">Data Science</option>
-            <option value="Product Management">Product Management</option>
-            <option value="Design">Design</option>
-            <option value="Marketing">Marketing</option>
+            {INTERNSHIP_DOMAINS.map(group => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map(option => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </optgroup>
+            ))}
           </select>
         </div>
       </div>
