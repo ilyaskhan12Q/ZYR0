@@ -505,7 +505,7 @@
 
 /* Stat card */
 .stat-card {
-  @apply bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-xl transition-all duration-300;
+  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300;
 }
 
 /* Feature card */
@@ -538,7 +538,7 @@
   }
 
   .stat-card:hover {
-    @apply shadow-xl -translate-y-1 border-white/20;
+    @apply shadow-xl -translate-y-1 border-slate-300 dark:border-white/20;
   }
 
   .feature-card:hover {
