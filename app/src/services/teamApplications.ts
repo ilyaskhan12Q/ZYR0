@@ -154,7 +154,7 @@ export async function updateTeamApplicationStatus(id: string, status: TeamApplic
     try {
       await createNotification({
         user_id: data.user_id,
-        type: 'team_application',
+        type: 'application',
         title: `Founding team application ${status.toLowerCase()}`,
         message: `Your application${roleTitle ? ` for ${roleTitle}` : ''} is now "${status}".`,
         action_url: '/student/team-applications',
