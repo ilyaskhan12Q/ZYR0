@@ -21,6 +21,7 @@ const CookiePolicy = lazy(() => import('@/pages/public/CookiePolicy'));
 const FAQ = lazy(() => import('@/pages/public/FAQ'));
 const HelpCenter = lazy(() => import('@/pages/public/HelpCenter'));
 const Careers = lazy(() => import('@/pages/public/Careers'));
+const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const CompleteProfileRedirect = lazy(() => import('@/pages/public/CompleteProfileRedirect'));
 
@@ -63,6 +64,7 @@ function App() {
             <Route path="/faq" element={<FAQ />} />
             <Route path="/help" element={<HelpCenter />} />
             <Route path="/careers" element={<Careers />} />
+            <Route path="/careers/apply" element={<TeamApply />} />
           </Route>
 
           {/* Auth Routes — redirect to dashboard if already logged in */}

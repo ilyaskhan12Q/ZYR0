@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageSquare, AlertCircle, CheckCircle2, Circle } from 'lucide-react';
+import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageSquare, AlertCircle, CheckCircle2, Circle, Rocket } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyApplications } from '@/services/applications';
 import { getMyTasks } from '@/services/tasks';
 import { getUnreadCount, getMyConversations } from '@/services/messages';
 import { getMyCertificates } from '@/services/certificates';
+import { getMyTeamApplications } from '@/services/teamApplications';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, Award, Briefcase };
@@ -20,16 +21,18 @@ export default function StudentDashboard() {
   const [conversations, setConversations] = useState<any[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [certificates, setCertificates] = useState<any[]>([]);
+  const [teamApplications, setTeamApplications] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [apps, myTasks, unread, convos, certs] = await Promise.all([
+        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.all([
           getMyApplications(),
           getMyTasks(),
           getUnreadCount(),
           getMyConversations(),
-          getMyCertificates()
+          getMyCertificates(),
+          getMyTeamApplications()
         ]);
         
         setApplications(apps?.data || []);
@@ -37,6 +40,7 @@ export default function StudentDashboard() {
         setUnreadMessages(unread || 0);
         setConversations(convos?.data || []);
         setCertificates(certs?.data || []);
+        setTeamApplications(teamApps?.data || []);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
@@ -272,6 +276,50 @@ export default function StudentDashboard() {
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Join the Founding Team */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="rounded-xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-blue-600 via-sky-600 to-indigo-700 p-5 text-white shadow-lg shadow-blue-600/20">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
+                <Rocket className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Join the Founding Team</h3>
+                <p className="text-xs text-blue-100/90">11 student-friendly roles, real product work</p>
+              </div>
+            </div>
+            {teamApplications.length > 0 ? (
+              <>
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-blue-100/90">Application status</span>
+                  <span className="px-2.5 py-1 rounded-full bg-white/20 text-xs font-semibold">
+                    {teamApplications[0].status}
+                  </span>
+                </div>
+                <Link
+                  to="/student/team-applications"
+                  className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-white text-blue-700 font-semibold px-4 py-2.5 rounded-lg text-sm hover:bg-blue-50 transition-colors"
+                >
+                  Track application
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="mt-4 text-sm text-blue-100/90 leading-relaxed">
+                  Build shipped products, get reviewed code, and earn verified recognition.
+                </p>
+                <Link
+                  to="/careers/apply"
+                  className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-white text-blue-700 font-semibold px-4 py-2.5 rounded-lg text-sm hover:bg-blue-50 transition-colors"
+                >
+                  Apply now
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
+            )}
+          </motion.div>
+
           {/* Quick Actions */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">

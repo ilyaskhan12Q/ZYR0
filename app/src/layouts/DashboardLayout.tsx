@@ -30,6 +30,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Internships', href: '/student/internships', icon: FolderOpen },
     { label: 'Saved', href: '/student/saved', icon: Bookmark },
     { label: 'Applications', href: '/student/applications', icon: FileCheck, badge: 4 },
+    { label: 'Team Applications', href: '/student/team-applications', icon: Rocket },
     { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, badge: 3 },
     { label: 'Progress', href: '/student/progress', icon: TrendingUp },
     { label: 'Messages', href: '/student/messages', icon: MessageSquare, badge: 3 },

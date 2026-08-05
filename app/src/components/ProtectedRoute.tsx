@@ -4,6 +4,20 @@ import type { UserRole } from '@/lib/database.types';
 
 import { Loader } from '@/components/common/Loader';
 
+/**
+ * Builds the post-auth redirect target from `?redirect=` (+ optional `?apply=`).
+ * Only relative paths starting with a single "/" are accepted, preventing
+ * open-redirects (e.g. "//evil.com" or "javascript:...").
+ */
+export function postAuthRedirect(searchParams: URLSearchParams): string | null {
+  const redirect = searchParams.get('redirect');
+  if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//')) return null;
+  const apply = searchParams.get('apply');
+  if (!apply) return redirect;
+  const separator = redirect.includes('?') ? '&' : '?';
+  return `${redirect}${separator}apply=${encodeURIComponent(apply)}`;
+}
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   /** If provided, user must have this role */
@@ -53,10 +67,15 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
  */
 export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { session, profile, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) return null;
 
   if (session && profile) {
+    const redirect = postAuthRedirect(new URLSearchParams(location.search));
+    if (redirect) {
+      return <Navigate to={redirect} replace />;
+    }
     const dashboardMap: Record<UserRole, string> = {
       student: '/student/dashboard',
       company: '/company/dashboard',
