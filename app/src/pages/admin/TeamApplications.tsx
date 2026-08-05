@@ -87,7 +87,7 @@ function buildShortlistEmail(app: any) {
 async function sendCandidateEmail(app: any) {
   const { to, subject, html, text } = buildShortlistEmail(app);
   const { data, error } = await supabase.functions.invoke('send-email', {
-    body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.dpdns.org>', replyTo: 'team@zyroo.dpdns.org' },
+    body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.org>', replyTo: 'team@zyroo.org' },
   });
   if (error) throw error;
   if (data?.error) throw new Error(data.error);

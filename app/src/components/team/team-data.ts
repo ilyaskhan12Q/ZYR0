@@ -692,7 +692,7 @@ export const FAQS: FaqItem[] = [
   {
     question: 'I am having trouble applying. Who can I ask?',
     answer:
-      'Hop into our WhatsApp support group — the fastest way to get live help from the team — or email us at support@zyroo.dpdns.org and we will get back to you within 24 hours.',
+      'Hop into our WhatsApp support group — the fastest way to get live help from the team — or email us at support@zyroo.org and we will get back to you within 24 hours.',
   },
   {
     question: 'How do I know if my application was submitted?',

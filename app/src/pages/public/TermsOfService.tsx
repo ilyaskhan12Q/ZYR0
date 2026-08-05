@@ -62,11 +62,11 @@ const sections = [
     icon: Mail,
     title: 'Termination & Contact',
     content: [
-      'You may terminate your account at any time by contacting us at support@zyroo.dpdns.org.',
+      'You may terminate your account at any time by contacting us at support@zyroo.org.',
       'ZYR0 may suspend or terminate accounts that violate these Terms, with or without notice.',
       'Upon termination, your access to the Service will cease. Issued certificates remain verifiable through the public verification system.',
       'These Terms are governed by applicable law. Any disputes shall be resolved through binding arbitration.',
-      'For questions about these Terms, contact us at legal@zyroo.dpdns.org.',
+      'For questions about these Terms, contact us at legal@zyroo.org.',
     ],
   },
 ];

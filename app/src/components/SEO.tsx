@@ -39,7 +39,7 @@ export function SEO({
   const normalizeBranding = (text: string): string => {
     if (!text) return text;
     // Replace standalone "Zyro" or "zyro" (case-insensitive) with "ZYR0"
-    // Does not match URLs (e.g. zyroo.dpdns.org) or email addresses/handles (@zyroplatform)
+    // Does not match URLs (e.g. zyroo.org) or email addresses/handles (@zyroplatform)
     return text.replace(/\b[Zz]yro\b/g, 'ZYR0');
   };
 

@@ -3,6 +3,6 @@
   <ShortName>ZYR0 Search</ShortName>
   <Description>Search for internships on ZYR0</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/png">https://zyroo.dpdns.org/zyro-logo.png</Image>
-  <Url type="text/html" template="https://zyroo.dpdns.org/internships?search={searchTerms}"/>
+  <Image width="16" height="16" type="image/png">https://zyroo.org/zyro-logo.png</Image>
+  <Url type="text/html" template="https://zyroo.org/internships?search={searchTerms}"/>
 </OpenSearchDescription>

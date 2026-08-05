@@ -108,16 +108,16 @@ serve(async (req) => {
           sanitizedFrom.includes('onboarding@resend.dev') || 
           sanitizedFrom.includes('noreply@') || 
           sanitizedFrom.includes('example.com') ||
-          sanitizedFrom.includes('zyr0.com')) {
-        sanitizedFrom = 'ZYR0 Team <team@zyroo.dpdns.org>';
+          !sanitizedFrom.includes('zyroo.org')) {
+        sanitizedFrom = 'ZYR0 Team <team@zyroo.org>';
       }
 
       let sanitizedReplyTo = replyTo || reply_to;
       if (!sanitizedReplyTo || 
           sanitizedReplyTo.includes('onboarding@resend.dev') ||
           sanitizedReplyTo.includes('example.com') ||
-          sanitizedReplyTo.includes('zyr0.com')) {
-        sanitizedReplyTo = 'team@zyroo.dpdns.org';
+          !sanitizedReplyTo.includes('zyroo.org')) {
+        sanitizedReplyTo = 'team@zyroo.org';
       }
 
       console.log(`[send-email] Sanitized sender info: from="${sanitizedFrom}", replyTo="${sanitizedReplyTo}"`);

@@ -1,5 +1,5 @@
-Contact: mailto:security@zyr0.com
+Contact: mailto:security@zyroo.org
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en
-Canonical: https://zyroo.dpdns.org/.well-known/security.txt
-Canonical: https://zyroo.dpdns.org/security.txt
+Canonical: https://zyroo.org/.well-known/security.txt
+Canonical: https://zyroo.org/security.txt

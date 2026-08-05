@@ -55,10 +55,10 @@ const sections = [
     title: 'Your Rights',
     content: [
       'You may access and update your profile information at any time from your account settings.',
-      'You may request deletion of your account by contacting us at privacy@zyroo.dpdns.org. We will process requests within 30 days.',
+      'You may request deletion of your account by contacting us at privacy@zyroo.org. We will process requests within 30 days.',
       'You may opt out of non-essential email communications by following the unsubscribe link in any marketing email.',
       'If you are located in the European Economic Area, you have rights under the GDPR including the right to access, rectify, erase, restrict processing, and data portability.',
-      'To exercise any of these rights, contact us at privacy@zyroo.dpdns.org.',
+      'To exercise any of these rights, contact us at privacy@zyroo.org.',
     ],
   },
   {
@@ -67,8 +67,8 @@ const sections = [
     content: [
       'This Privacy Policy was last updated in July 2026.',
       'We may update this policy periodically to reflect changes in our practices or applicable law. We will notify you of significant changes via email or a prominent notice on the platform.',
-      'For privacy-related questions or concerns, contact our Privacy team at privacy@zyroo.dpdns.org.',
-      'For general inquiries, visit our Contact page or email support@zyroo.dpdns.org.',
+      'For privacy-related questions or concerns, contact our Privacy team at privacy@zyroo.org.',
+      'For general inquiries, visit our Contact page or email support@zyroo.org.',
     ],
   },
 ];

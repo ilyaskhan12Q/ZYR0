@@ -20,7 +20,7 @@ export async function dispatchNotificationWithSimulation({
   message,
   type,
   actionUrl,
-  studentEmail = 'intern@zyr0.com',
+  studentEmail = 'intern@zyroo.org',
   studentPhone,
 }: NotificationPayload) {
   // 1. Always create the DB in-app notification

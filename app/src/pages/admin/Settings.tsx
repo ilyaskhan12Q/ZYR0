@@ -28,7 +28,7 @@ export default function AdminSettings() {
       try {
         return {
           smtpHost: 'smtp.example.com',
-          senderEmail: 'noreply@zyr0.com',
+          senderEmail: 'noreply@zyroo.org',
           ...JSON.parse(savedData)
         };
       } catch (e) {
@@ -45,7 +45,7 @@ export default function AdminSettings() {
       autoBackup: true,
       analyticsEnabled: true,
       smtpHost: 'smtp.example.com',
-      senderEmail: 'noreply@zyr0.com',
+      senderEmail: 'noreply@zyroo.org',
     };
   });
 
@@ -92,7 +92,7 @@ export default function AdminSettings() {
           </div>
           <div>
             <label className="text-sm font-medium mb-1.5 block">Sender Email</label>
-            <input type="email" placeholder="noreply@zyr0.com" value={settings.senderEmail} onChange={(e) => setSettings({ ...settings, senderEmail: e.target.value })}
+            <input type="email" placeholder="noreply@zyroo.org" value={settings.senderEmail} onChange={(e) => setSettings({ ...settings, senderEmail: e.target.value })}
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
         </div>

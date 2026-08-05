@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.26.2] - 2026-08-05
+
+### Changed
+- **Production domain migrated `zyroo.dpdns.org` → `zyroo.org`**: the site was using a free dynamic-DNS domain (dpdns.org) that Gmail flagged as "likely unsolicited mail" — emails sent from `team@zyroo.dpdns.org` were bounced at the reputation filter. `zyroo.org` is now registered at Cloudflare (with free Email Routing mailboxes `info@`, `support@`, `careers@`, `partnerships@`, `privacy@`, `legal@`, `security@` forwarding to the team inbox) and verified in Resend (DKIM/SPF). All site/edge-function references to the old domain plus stale `zyr0.com` placeholders now use `zyroo.org`. Transactional email now sends from `team@zyroo.org`.
+
 ## [0.26.1] - 2026-08-05
 
 ### Fixed

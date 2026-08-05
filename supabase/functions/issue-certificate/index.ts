@@ -91,7 +91,7 @@ serve(async (req) => {
       try {
         const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
         const emailSubject = `Certificate of Completion: ${certificate.title}`;
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.dpdns.org';
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.org';
         
         const emailHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -132,7 +132,7 @@ serve(async (req) => {
           
           <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
             <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
+            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.org</a></p>
           </div>
         </div>
       </td>
@@ -149,7 +149,7 @@ serve(async (req) => {
           `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
           `Best regards,\n` +
           `The ZYR0 Team\n` +
-          `team@zyroo.dpdns.org`;
+          `team@zyroo.org`;
 
         const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         console.log(`[issue-certificate] Invoking send-email endpoint for resend: to=${student.email}`);
@@ -162,8 +162,8 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             to: student.email,
-            from: 'ZYR0 Team <team@zyroo.dpdns.org>',
-            replyTo: 'team@zyroo.dpdns.org',
+            from: 'ZYR0 Team <team@zyroo.org>',
+            replyTo: 'team@zyroo.org',
             subject: emailSubject,
             html: emailHtml,
             text: emailText,
@@ -314,7 +314,7 @@ serve(async (req) => {
       try {
         const sendEmailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
         const emailSubject = `Certificate of Completion: ${title}`;
-        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.dpdns.org';
+        const siteUrl = Deno.env.get('SITE_URL') || 'https://zyroo.org';
         
         const emailHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -355,7 +355,7 @@ serve(async (req) => {
           
           <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
             <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
+            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.org</a></p>
           </div>
         </div>
       </td>
@@ -372,7 +372,7 @@ serve(async (req) => {
           `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
           `Best regards,\n` +
           `The ZYR0 Team\n` +
-          `team@zyroo.dpdns.org`;
+          `team@zyroo.org`;
 
         const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         console.log(`[issue-certificate] Invoking send-email endpoint: to=${student.email}`);
@@ -385,8 +385,8 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             to: student.email,
-            from: 'ZYR0 Team <team@zyroo.dpdns.org>',
-            replyTo: 'team@zyroo.dpdns.org',
+            from: 'ZYR0 Team <team@zyroo.org>',
+            replyTo: 'team@zyroo.org',
             subject: emailSubject,
             html: emailHtml,
             text: emailText,

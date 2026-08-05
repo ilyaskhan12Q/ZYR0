@@ -47,7 +47,7 @@ const guides = [
     title: 'Certificate Verification',
     desc: 'Verify the authenticity of any ZYR0-issued certificate using its credential ID.',
     steps: [
-      'Navigate to zyroo.dpdns.org/verify.',
+      'Navigate to zyroo.org/verify.',
       'Enter the credential ID printed on the certificate.',
       'The system will display the certificate holder\'s name, the internship completed, the issuing company, and the date of issuance.',
       'A green verification badge confirms the certificate is authentic and has not been revoked.',

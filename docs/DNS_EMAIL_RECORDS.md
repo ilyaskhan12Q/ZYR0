@@ -1,5 +1,10 @@
 # Email DNS Records — zyroo.dpdns.org (stopgap)
 
+> **SUPERSEDED 2026-08-05**: the production domain is now **`zyroo.org`**
+> (registered at Cloudflare, verified in Resend — domain id `6409c771-2535-4c8e-be1c-ae135997f41d`,
+> account `re_K5LL...`). See `docs/ZYR0_MIGRATION_TRACKER.md` for the migration.
+> The records below document the old dynamic-DNS stopgap and are kept for history.
+
 Status: 2026-08-05. All records below verified live via `dig`. Resend domain
 status: `verified`, sending enabled, region ap-northeast-1 (SES-backed).
 Resend domain id: `19e3888e-9ef6-452d-ba3a-15e6db6c351e`.

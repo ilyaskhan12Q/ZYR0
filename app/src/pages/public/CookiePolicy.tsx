@@ -133,7 +133,7 @@ export default function CookiePolicy() {
             <div className="flex items-start gap-3 mt-4 p-4 bg-muted/50 rounded-lg">
               <Mail className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
               <p className="text-sm text-muted-foreground">
-                For questions about our cookie usage, contact us at <span className="text-accent">privacy@zyroo.dpdns.org</span>.
+                For questions about our cookie usage, contact us at <span className="text-accent">privacy@zyroo.org</span>.
               </p>
             </div>
           </motion.div>
