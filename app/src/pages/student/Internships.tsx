@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { Search, MapPin, Calendar, DollarSign, X, ArrowRight, Loader2 } from 'lucide-react';
 import { getInternships } from '@/services/internships';
 import { SaveButton } from '@/components/SaveButton';
+import { INTERNSHIP_DOMAINS } from '@/lib/internshipDomains';
 
-const domains = ['All', 'Engineering', 'Design', 'Data Science', 'Marketing', 'Business', 'Research'];
 const locations = ['All', 'Remote', 'On-site', 'Hybrid'];
 
 export default function StudentInternships() {
@@ -57,7 +57,14 @@ export default function StudentInternships() {
           {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2"><X className="w-4 h-4 text-muted-foreground" /></button>}
         </div>
         <select value={selectedDomain} onChange={(e) => setSelectedDomain(e.target.value)} className="px-3 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
-          {domains.map(d => <option key={d} value={d}>{d}</option>)}
+          <option value="All">All Domains</option>
+          {INTERNSHIP_DOMAINS.map(group => (
+            <optgroup key={group.label} label={group.label}>
+              {group.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </optgroup>
+          ))}
         </select>
         <select value={selectedLocation} onChange={(e) => setSelectedLocation(e.target.value)} className="px-3 py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20">
           {locations.map(l => <option key={l} value={l}>{l}</option>)}

@@ -5,6 +5,7 @@ import { ArrowLeft, Save, Send, Plus, X, Loader2 } from 'lucide-react';
 import { getMyCompany } from '@/services/companies';
 import { createInternship } from '@/services/internships';
 import { useAuth } from '@/contexts/AuthContext';
+import { INTERNSHIP_DOMAINS, DEFAULT_DOMAIN } from '@/lib/internshipDomains';
 
 export default function PostInternship() {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function PostInternship() {
   // Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [domain, setDomain] = useState('Engineering');
+  const [domain, setDomain] = useState(DEFAULT_DOMAIN);
   const [type, setType] = useState<'Full-time' | 'Part-time' | 'Project-based'>('Full-time');
   const [locationType, setLocationType] = useState<'Remote' | 'On-site' | 'Hybrid'>('Remote');
   const [location, setLocation] = useState('');
@@ -187,12 +188,13 @@ export default function PostInternship() {
                   onChange={(e) => setDomain(e.target.value)}
                   className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20"
                 >
-                  <option>Engineering</option>
-                  <option>Design</option>
-                  <option>Data Science</option>
-                  <option>Marketing</option>
-                  <option>Business</option>
-                  <option>Research</option>
+                  {INTERNSHIP_DOMAINS.map(group => (
+                    <optgroup key={group.label} label={group.label}>
+                      {group.options.map(option => (
+                        <option key={option} value={option}>{option}</option>
+                      ))}
+                    </optgroup>
+                  ))}
                 </select>
               </div>
               <div>

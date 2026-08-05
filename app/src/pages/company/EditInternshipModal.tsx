@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save, Plus, Trash2, AlertCircle, Loader2, Info, Calendar, DollarSign, MapPin, Users, CheckCircle2 } from 'lucide-react';
 import type { Internship, LocationType, InternshipType, StipendType, ExperienceLevel, InternshipStatus } from '@/lib/database.types';
 import { updateInternship, getAcceptedCountForInternship } from '@/services/internships';
+import { INTERNSHIP_DOMAINS, DEFAULT_DOMAIN } from '@/lib/internshipDomains';
 import { toast } from 'sonner';
 
 interface EditInternshipModalProps {
@@ -25,7 +26,7 @@ export default function EditInternshipModal({
   // Form State
   const [title, setTitle] = useState(internship?.title || '');
   const [description, setDescription] = useState(internship?.description || '');
-  const [domain, setDomain] = useState(internship?.domain || 'Engineering');
+  const [domain, setDomain] = useState(internship?.domain || DEFAULT_DOMAIN);
   const [type, setType] = useState<InternshipType>(internship?.type || 'Full-time');
   const [locationType, setLocationType] = useState<LocationType>(internship?.location_type || 'Remote');
   const [location, setLocation] = useState(internship?.location || '');
@@ -88,7 +89,7 @@ export default function EditInternshipModal({
     Boolean(internship) && (
       title !== (internship?.title || '') ||
       description !== (internship?.description || '') ||
-      domain !== (internship?.domain || 'Engineering') ||
+      domain !== (internship?.domain || DEFAULT_DOMAIN) ||
       type !== (internship?.type || 'Full-time') ||
       locationType !== (internship?.location_type || 'Remote') ||
       location !== (internship?.location || '') ||
@@ -304,12 +305,13 @@ export default function EditInternshipModal({
                     onChange={(e) => setDomain(e.target.value)}
                     className="w-full px-3 py-2.5 bg-background border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
                   >
-                    <option>Engineering</option>
-                    <option>Design</option>
-                    <option>Data Science</option>
-                    <option>Marketing</option>
-                    <option>Business</option>
-                    <option>Research</option>
+                    {INTERNSHIP_DOMAINS.map(group => (
+                      <optgroup key={group.label} label={group.label}>
+                        {group.options.map(option => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
+                      </optgroup>
+                    ))}
                   </select>
                 </div>
                 <div>
