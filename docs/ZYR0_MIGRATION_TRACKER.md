@@ -57,7 +57,9 @@ Source:  https://github.com/ilyaskhan12Q/ZYR0
 - Domain `zyroo.org` live: Email Routing MX (route1/2/3.mx.cloudflare.net), SPF (cloudflare + amazonses), DKIM (resend._domainkey, new account key C5etom7…)
 - Resend domain verified (id 6409c771-2535-4c8e-be1c-ae135997f41d, key re_K5LL…) — sending enabled
 - Test email **delivered** from team@zyroo.org (first ever successful delivery vs. Gmail-reputation bounces on zyroo.dpdns.org)
-- Still open: verify actual inbox receipt (not spam), wait ~24h for sender reputation to settle
+- **Confirmed received in ik7408008@gmail.com inbox** ✓
+- zyroo.org → 200 (app) · zyroo.dpdns.org → 307 → zyroo.org · og:url/sitemap on zyroo.org
+- VITE_SITE_URL=https://zyroo.org added to Vercel prod env; fresh deploy via PR #66 picked it up
 
 ---
 
