@@ -177,7 +177,7 @@ serve(async (req) => {
     console.log(`[send-email] Attachment count: ${attachments?.length || 0}`);
 
     // ── Build the mail pieces (contact mode transforms structured fields) ──
-    let mailTo = Array.isArray(to) ? to : [to];
+    const mailTo = Array.isArray(to) ? to : [to];
     let mailSubject = subject;
     let mailHtml = html;
     let mailText = text;
@@ -367,12 +367,12 @@ serve(async (req) => {
       console.log('[send-email] Skipping Resend API delivery: RESEND_API_KEY is not configured.');
     }
 
-    const message = lastError
+    const failureDetail = lastError
       ? `Email sending failed. SMTP/Resend errors: ${lastError.message || lastError}`
       : 'Neither SMTP nor Resend API keys are configured.';
 
-    console.error(`[send-email] ${message}`);
-    return new Response(JSON.stringify({ error: message }), {
+    console.error(`[send-email] ${failureDetail}`);
+    return new Response(JSON.stringify({ error: failureDetail }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
