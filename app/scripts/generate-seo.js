@@ -39,7 +39,7 @@ function getSiteUrl() {
       }
     }
   }
-  return 'https://zyroo.dpdns.org'; // Centralized fallback
+  return 'https://zyroo.org'; // Centralized fallback
 }
 
 const SITE_URL = getSiteUrl();
@@ -185,7 +185,7 @@ const staticPagesMeta = {
         ],
         'contactPoint': {
           '@type': 'ContactPoint',
-          'email': 'support@zyr0.com',
+          'email': 'support@zyroo.org',
           'contactType': 'customer support',
           'availableLanguage': 'English'
         }
@@ -624,17 +624,17 @@ function generateBodyHtml(routePath, data = {}) {
           <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
             <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Email Support</h3>
             <p style="color: #475569; font-size: 0.95rem; margin-bottom: 0.5rem;">For general queries, accounts, and help:</p>
-            <a href="mailto:support@zyr0.com" style="color: #2563eb; font-weight: 600; text-decoration: none;">support@zyr0.com</a>
+            <a href="mailto:support@zyroo.org" style="color: #2563eb; font-weight: 600; text-decoration: none;">support@zyroo.org</a>
           </div>
           <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
             <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Business Partnerships</h3>
             <p style="color: #475569; font-size: 0.95rem; margin-bottom: 0.5rem;">For university partnerships and enterprise plans:</p>
-            <a href="mailto:partnerships@zyr0.com" style="color: #2563eb; font-weight: 600; text-decoration: none;">partnerships@zyr0.com</a>
+            <a href="mailto:partnerships@zyroo.org" style="color: #2563eb; font-weight: 600; text-decoration: none;">partnerships@zyroo.org</a>
           </div>
         </div>
 
         <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 1rem;">Send Us a Message</h2>
-        <p style="color: #64748b; margin-bottom: 1.5rem;">Please enable JavaScript to use our secure interactive contact form. Alternatively, feel free to send us an email directly at support@zyr0.com.</p>
+        <p style="color: #64748b; margin-bottom: 1.5rem;">Please enable JavaScript to use our secure interactive contact form. Alternatively, feel free to send us an email directly at support@zyroo.org.</p>
       </section>
     `;
   } else if (routePath === 'faq') {
@@ -698,7 +698,7 @@ function generateBodyHtml(routePath, data = {}) {
         <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 2rem; margin-bottom: 3rem;">
           <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Express Your Interest</h3>
           <p style="color: #475569; font-size: 0.95rem; line-height: 1.5; margin-bottom: 1rem;">Interested in joining us? Send your CV/Portfolio and a brief description of how you want to contribute to our engineering or operations teams:</p>
-          <a href="mailto:careers@zyr0.com" style="color: #2563eb; font-weight: 600; text-decoration: none; font-size: 1.1rem;">careers@zyr0.com</a>
+          <a href="mailto:careers@zyroo.org" style="color: #2563eb; font-weight: 600; text-decoration: none; font-size: 1.1rem;">careers@zyroo.org</a>
         </div>
       </section>
     `;

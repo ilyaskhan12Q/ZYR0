@@ -17,7 +17,7 @@ If you discover a security vulnerability within ZYR0, please do **not** disclose
 
 Instead, please report vulnerabilities privately by contacting the core development team:
 
-- **Email**: security@zyroo.dpdns.org (or open a private security advisory on GitHub)
+- **Email**: security@zyroo.org (or open a private security advisory on GitHub)
 - **Response Time**: We aim to acknowledge vulnerability reports within 48 hours and provide a fix or mitigation timeline within 5 business days.
 
 Please include the following information in your report:

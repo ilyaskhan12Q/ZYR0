@@ -11,7 +11,7 @@ It bridges the gap between academic learning and industry experience by enabling
 ## Technology Stack
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Radix UI, Framer Motion
 - **Backend / Database**: Supabase (PostgreSQL), Edge Functions (Deno)
-- **Deployment**: https://zyroo.dpdns.org
+- **Deployment**: https://zyroo.org
 
 ## Key Architectural Principles
 - **GitHub First**: Student code is never hosted on ZYR0; students submit GitHub repository URLs to simulate real software engineering workflows.
@@ -20,10 +20,10 @@ It bridges the gap between academic learning and industry experience by enabling
 - **Verified Credentials**: Certificates are generated securely on the backend with a unique SHA-256 blockchain-style hash to ensure authenticity.
 
 ## URLs
-- **Production URL**: https://zyroo.dpdns.org
-- **Search**: https://zyroo.dpdns.org/internships?search={query}
-- **Verify Certificates**: https://zyroo.dpdns.org/verify
+- **Production URL**: https://zyroo.org
+- **Search**: https://zyroo.org/internships?search={query}
+- **Verify Certificates**: https://zyroo.org/verify
 
 ## Contact & Support
-- Email: support@zyroo.dpdns.org
+- Email: support@zyroo.org
 - Twitter: @zyr0platform

@@ -87,7 +87,7 @@ function buildShortlistEmail(app: any) {
 async function sendCandidateEmail(app: any) {
   const { to, subject, html, text } = buildShortlistEmail(app);
   const { data, error } = await supabase.functions.invoke('send-email', {
-    body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.dpdns.org>', replyTo: 'team@zyroo.dpdns.org' },
+    body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.org>', replyTo: 'team@zyroo.org' },
   });
   if (error) throw error;
   if (data?.error) throw new Error(data.error);
@@ -178,11 +178,13 @@ export default function AdminTeamApplications() {
     setMessage(null);
     let ok = 0;
     let failed = 0;
+    const sentIds: { name: string; id: string }[] = [];
     for (const app of targets) {
       try {
-        await sendCandidateEmail(app);
-        await markTeamApplicationEmailed(app.id);
+        const res = await sendCandidateEmail(app);
+        await markTeamApplicationEmailed(app.id, res?.id);
         await updateTeamApplicationStatus(app.id, 'Shortlisted');
+        if (res?.id) sentIds.push({ name: app.full_name, id: res.id });
         ok += 1;
       } catch (err) {
         console.error('Email failed for', app.email, err);
@@ -190,10 +192,10 @@ export default function AdminTeamApplications() {
       }
     }
     setMessage({
-      type: failed === 0 ? 'ok' : 'ok',
+      type: failed === 0 ? 'ok' : 'err',
       text: failed === 0
-        ? `Shortlist email sent to ${ok} candidate${ok === 1 ? '' : 's'} and status updated.`
-        : `Emailed ${ok}, failed ${failed}. Check edge function logs.`,
+        ? `Shortlist email accepted for delivery to ${ok} candidate${ok === 1 ? '' : 's'} (delivery is async — verify in the recipient's inbox or Resend if it doesn't arrive).`
+        : `Emailed ${ok}, failed ${failed}. ${sentIds.length ? 'Sent IDs: ' + sentIds.map(s => `${s.name}=${s.id}`).join(', ') + '. ' : ''}Check the edge function logs for failure reasons.`,
     });
     setSelected(new Set());
     setBusy(null);
@@ -220,6 +222,7 @@ export default function AdminTeamApplications() {
       Motivation: a.motivation ?? '',
       Status: a.status ?? '',
       'Email Sent': a.email_sent ? 'Yes' : 'No',
+      'Email Message ID': a.email_message_id ?? '',
       'Applied On': a.created_at ? formatDate(a.created_at) : '',
       'Resume URL': a.resume_url ?? '',
     }));
@@ -428,6 +431,11 @@ export default function AdminTeamApplications() {
                 {detail.email_sent && (
                   <span className="px-2.5 py-0.5 text-xs rounded-full font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400">
                     Emailed {detail.email_sent_at ? formatDate(detail.email_sent_at) : ''}
+                  </span>
+                )}
+                {detail.email_message_id && (
+                  <span className="px-2.5 py-0.5 text-xs rounded-full font-medium bg-muted text-muted-foreground" title="Resend message ID (look up delivery in the Resend dashboard)">
+                    Resend ID: {detail.email_message_id.slice(0, 8)}
                   </span>
                 )}
               </div>

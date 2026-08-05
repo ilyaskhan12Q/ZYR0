@@ -55,7 +55,7 @@ const homepageStructuredData = [
     ],
     'contactPoint': {
       '@type': 'ContactPoint',
-      'email': 'support@zyr0.com',
+      'email': 'support@zyroo.org',
       'contactType': 'customer support',
       'availableLanguage': 'English'
     }

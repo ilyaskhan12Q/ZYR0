@@ -53,7 +53,7 @@ export default function Contact() {
           {/* Contact Info */}
           <address className="space-y-4 not-italic">
             {[
-              { icon: Mail, title: 'Email', value: 'support@zyroo.dpdns.org', desc: 'We reply within 24 hours' },
+              { icon: Mail, title: 'Email', value: 'support@zyroo.org', desc: 'We reply within 24 hours' },
               { icon: Phone, title: 'Phone', value: '+923279883150', desc: 'Mon-Fri 9am-6pm PKT' },
               { icon: MapPin, title: 'Office', value: 'Lahore, Pakistan', desc: 'Arfa Software Technology Park, Ferozepur Road' },
               { icon: WhatsAppIcon, title: 'WhatsApp Support Group', value: SITE_CONFIG.social.whatsappSupportGroup, desc: 'Join our community group for quick help & discussions', isBrand: true, color: 'text-emerald-500' },

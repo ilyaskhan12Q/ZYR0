@@ -105,7 +105,7 @@ async function sendOfferLetterEmail(opts: {
           
           <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
             <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent on behalf of ${companyName} via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.dpdns.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.dpdns.org</a></p>
+            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.org</a></p>
           </div>
         </div>
       </td>
@@ -121,13 +121,13 @@ async function sendOfferLetterEmail(opts: {
     `If you have any questions regarding the terms or the role, please contact ${companyName} directly.\n\n` +
     `Best regards,\n` +
     `The ZYR0 Team\n` +
-    `team@zyroo.dpdns.org`;
+    `team@zyroo.org`;
 
   const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
     body: {
       to: studentEmail,
-      from: 'ZYR0 Team <team@zyroo.dpdns.org>',
-      replyTo: 'team@zyroo.dpdns.org',
+      from: 'ZYR0 Team <team@zyroo.org>',
+      replyTo: 'team@zyroo.org',
       subject: emailSubject,
       html: emailHtml,
       text: emailText,

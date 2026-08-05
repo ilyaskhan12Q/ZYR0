@@ -156,6 +156,7 @@ export interface TeamApplication {
   status: TeamApplicationStatus;
   email_sent: boolean;
   email_sent_at: string | null;
+  email_message_id: string | null;
   created_at: string;
   updated_at: string;
 }
