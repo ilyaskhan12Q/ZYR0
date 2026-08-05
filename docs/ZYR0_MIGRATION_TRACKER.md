@@ -51,6 +51,14 @@ Source:  https://github.com/ilyaskhan12Q/ZYR0
 - [x] supabase functions list — send-email v29, issue-certificate v41 deployed (2026-08-05 16:29)
 - [x] Test send to ik7408008@gmail.com from team@zyroo.org → **last_event: delivered** ✓ (id 492a5197-6f84-4218-b4eb-281fa99be511)
 
+## Contact form (post-migration) — 2026-08-05
+- [x] Migration 034 `contact_messages` table (INSERT anon/auth; SELECT/UPDATE admin-only via `public.is_admin()`)
+- [x] `send-email` edge function: `kind: 'contact'` mode (allowlist support/info/partnerships/careers@zyroo.org, honeypot `website`, rate limits 3/email + 5/IP per 10min, length caps, sanitized HTML, service-role insert, reply-to = submitter)
+- [x] Internal sends now require `x-internal-token` == `EMAIL_INTERNAL_TOKEN` (set on Supabase via deploy workflow; client sends `VITE_EMAIL_INTERNAL_TOKEN` from Vercel env; `issue-certificate` passes it too)
+- [x] Contact.tsx real submission (status machine, honeypot field, error banner, success text)
+- [x] Admin Inbox `/admin/inbox`: search, tabs, detail dialog, mailto reply, mark read/replied; nav entry
+- [ ] PR merge → deploy → live test matrix: submit lands in team Gmail · reply reaches submitter · 4th rapid submit rate-limited · honeypot dropped silently · foreign `to` rejected · internal flows still work · admin inbox shows row
+
 ---
 
 ## DONE — 2026-08-05

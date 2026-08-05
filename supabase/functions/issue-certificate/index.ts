@@ -159,6 +159,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
             'apikey': serviceRoleKey,
             'Authorization': `Bearer ${serviceRoleKey}`,
+            'x-internal-token': Deno.env.get('EMAIL_INTERNAL_TOKEN') || '',
           },
           body: JSON.stringify({
             to: student.email,
@@ -382,6 +383,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
             'apikey': serviceRoleKey,
             'Authorization': `Bearer ${serviceRoleKey}`,
+            'x-internal-token': Deno.env.get('EMAIL_INTERNAL_TOKEN') || '',
           },
           body: JSON.stringify({
             to: student.email,

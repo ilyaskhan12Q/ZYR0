@@ -174,6 +174,21 @@ export interface SiteBanner {
   updated_at: string;
 }
 
+export type ContactMessageStatus = 'new' | 'read' | 'replied';
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  category: string;
+  message: string;
+  ip_hash: string | null;
+  status: ContactMessageStatus;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface TaskAttachment {
   id: string;
   name: string;
@@ -378,6 +393,7 @@ export interface Database {
       evaluations: { Row: Evaluation; Insert: Partial<Evaluation>; Update: Partial<Evaluation> };
       activity_logs: { Row: ActivityLog; Insert: Partial<ActivityLog>; Update: Partial<ActivityLog> };
       workspace_events: { Row: WorkspaceEvent; Insert: Partial<WorkspaceEvent>; Update: Partial<WorkspaceEvent> };
+      contact_messages: { Row: ContactMessage; Insert: Partial<ContactMessage>; Update: Partial<ContactMessage> };
     };
     Views: {
       [_ in never]: never

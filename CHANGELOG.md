@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.27.0] - 2026-08-05
+
+### Added
+- **Contact form now really sends email**: the `/contact` page submits through the `send-email` edge function (`kind: 'contact'`) and delivers to `support@`/`info@`/`partnerships@`/`careers@zyroo.org` (team mailbox) with the submitter's address as reply-to. Spam protection: hidden honeypot field (bots silently dropped), per-email/per-IP rate limits (3 per 10 min per email, 5 per 10 min per IP), and length caps. Submissions are stored in the new `contact_messages` table (via service role) for the admin inbox.
+- **Admin Inbox page (`/admin/inbox`)**: lists contact submissions with search, status tabs (new/read/replied), a detail dialog with a `mailto:` reply button, and mark-read (on open) / mark-replied actions.
+- **Internal email sends now require a shared token**: the `send-email` edge function only accepts non-contact sends with the `x-internal-token` header equal to the new `EMAIL_INTERNAL_TOKEN` secret (set in Supabase via deploy workflow); client callers (`TeamApplications`, `OfferLetters`) and `issue-certificate` pass it from `VITE_EMAIL_INTERNAL_TOKEN`.
+
 ## [0.26.2] - 2026-08-05
 
 ### Changed
