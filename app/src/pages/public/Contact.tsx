@@ -1,11 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle2, Globe, HelpCircle, BookOpen, Facebook } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2, Globe, HelpCircle, BookOpen, Facebook, Loader2, AlertTriangle } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 import { SITE_CONFIG } from '@/config/site';
+import { supabase } from '@/lib/supabase';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
+
+const CONTACT_CATEGORIES: Record<string, { label: string; to: string }> = {
+  general: { label: 'General Inquiry', to: 'support@zyroo.org' },
+  support: { label: 'Technical Support', to: 'support@zyroo.org' },
+  partnership: { label: 'Partnership', to: 'partnerships@zyroo.org' },
+  feedback: { label: 'Feedback', to: 'info@zyroo.org' },
+};
 
 const contactStructuredData = [
   {
@@ -26,12 +34,47 @@ const contactStructuredData = [
 ];
 
 export default function Contact() {
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '', website: '' });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (status === 'sending') return;
+    setStatus('sending');
+    setError('');
+
+    const category = form.subject;
+    const recipient = CONTACT_CATEGORIES[category]?.to || 'support@zyroo.org';
+    const { data, error: invokeError } = await supabase.functions.invoke('send-email', {
+      body: {
+        kind: 'contact',
+        to: [recipient],
+        name: form.name,
+        email: form.email,
+        category,
+        subject: `[Contact] ${form.name}`,
+        message: form.message,
+        website: form.website,
+        allowUserReplyTo: true,
+        from: 'ZYR0 Team <team@zyroo.org>',
+        replyTo: form.email,
+      },
+    });
+
+    if (invokeError) {
+      console.error('Contact form send failed:', invokeError);
+      setError(invokeError.message || 'Could not send your message. Please try again.');
+      setStatus('error');
+      return;
+    }
+    if (data?.error) {
+      console.error('Contact form send error:', data.error);
+      setError(data.error || 'Could not send your message. Please try again.');
+      setStatus('error');
+      return;
+    }
+    setStatus('success');
   };
 
   return (
@@ -84,16 +127,22 @@ export default function Contact() {
 
           {/* Contact Form */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2">
-            {submitted ? (
+            {status === 'success' ? (
               <div className="bg-card rounded-xl border border-border p-10 shadow-sm text-center">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
                   <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
                 </motion.div>
                 <h3 className="mt-4 text-xl font-bold">Message Sent!</h3>
-                <p className="mt-2 text-muted-foreground">Thank you for reaching out. We will get back to you within 24 hours.</p>
+                <p className="mt-2 text-muted-foreground">Thank you for reaching out. We received your message and will get back to you within 24 hours.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="bg-card rounded-xl border border-border p-6 shadow-sm space-y-4">
+                {status === 'error' && (
+                  <div role="alert" className="flex items-start gap-2.5 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg px-4 py-3 text-sm">
+                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                    <span>{error}</span>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="contact-name" className="text-sm font-medium mb-1.5 block">Name</label>
@@ -101,9 +150,11 @@ export default function Contact() {
                       id="contact-name"
                       type="text"
                       required
+                      disabled={status === 'sending'}
+                      maxLength={100}
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
+                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring disabled:opacity-60"
                       placeholder="Your name"
                     />
                   </div>
@@ -113,21 +164,35 @@ export default function Contact() {
                       id="contact-email"
                       type="email"
                       required
+                      disabled={status === 'sending'}
+                      maxLength={320}
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
+                      className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring disabled:opacity-60"
                       placeholder="you@example.com"
                     />
                   </div>
+                </div>
+                <div aria-hidden="true" className="hidden">
+                  <label htmlFor="contact-website">Website</label>
+                  <input
+                    id="contact-website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(e) => setForm({ ...form, website: e.target.value })}
+                  />
                 </div>
                 <div>
                   <label htmlFor="contact-subject" className="text-sm font-medium mb-1.5 block">Subject</label>
                   <select
                     id="contact-subject"
                     required
+                    disabled={status === 'sending'}
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
+                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring disabled:opacity-60"
                   >
                     <option value="">Select a subject</option>
                     <option value="general">General Inquiry</option>
@@ -142,17 +207,21 @@ export default function Contact() {
                     id="contact-message"
                     required
                     rows={5}
+                    maxLength={5000}
+                    disabled={status === 'sending'}
                     value={form.message}
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none focus-visible-ring"
+                    className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent resize-none focus-visible-ring disabled:opacity-60"
                     placeholder="Tell us how we can help..."
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring"
+                  disabled={status === 'sending'}
+                  className="w-full flex items-center justify-center gap-2 bg-accent text-white py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" aria-hidden="true" /> Send Message
+                  {status === 'sending' ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : <Send className="w-4 h-4" aria-hidden="true" />}
+                  {status === 'sending' ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}

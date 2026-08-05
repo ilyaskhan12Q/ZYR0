@@ -73,6 +73,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Applications', href: '/admin/applications', icon: FileCheck },
     { label: 'Team Applications', href: '/admin/team-applications', icon: Rocket },
     { label: 'Site Banners', href: '/admin/site-banners', icon: Megaphone },
+    { label: 'Inbox', href: '/admin/inbox', icon: MessageSquare },
     { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { label: 'Reports', href: '/admin/reports', icon: Flag },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
