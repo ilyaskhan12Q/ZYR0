@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Briefcase, CalendarClock, Check, CheckCircle2,
   ChevronDown, FileText, FileUp, Github, Globe, GraduationCap, Linkedin,
@@ -321,7 +321,7 @@ export function TeamApplication({ preferredRole }: { preferredRole: string }) {
           icon={Send}
         />
 
-        <div ref={formRef} className="max-w-3xl mx-auto scroll-mt-24">
+        <div ref={formRef} id="team-apply-form" className="max-w-3xl mx-auto scroll-mt-24">
           <Reveal>
             <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden">
               {!user ? (
@@ -820,19 +820,36 @@ function SuccessScreen({ onRestart }: { onRestart: () => void }) {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={onRestart}
-        className="mt-9 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
-      >
-        Submit another application
-        <ArrowRight className="w-4 h-4" />
-      </button>
+      <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <Link
+          to="/student/team-applications"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 shadow-lg shadow-blue-600/25 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200"
+        >
+          Track your application
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+        <button
+          type="button"
+          onClick={onRestart}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
+        >
+          Submit another application
+        </button>
+      </div>
     </div>
   );
 }
 
 function SignInGate() {
+  const location = useLocation();
+  const apply = new URLSearchParams(location.search).get('apply');
+  const redirect = apply
+    ? `/register/student?redirect=${encodeURIComponent('/careers/apply')}&apply=${encodeURIComponent(apply)}`
+    : '/register/student?redirect=' + encodeURIComponent('/careers/apply');
+  const loginTo = apply
+    ? `/login?redirect=${encodeURIComponent('/careers/apply')}&apply=${encodeURIComponent(apply)}`
+    : '/login?redirect=' + encodeURIComponent('/careers/apply');
+
   return (
     <div className="p-8 sm:p-12 text-center">
       <div className="w-20 h-20 mx-auto rounded-full bg-blue-500/15 border border-blue-500/30 flex items-center justify-center">
@@ -848,14 +865,14 @@ function SignInGate() {
       </p>
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
         <Link
-          to="/register"
+          to={redirect}
           className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-6 py-3 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.01] active:scale-[0.98] transition-all duration-200 text-sm"
         >
           Create an account
           <ArrowRight className="w-4 h-4" />
         </Link>
         <Link
-          to="/login"
+          to={loginTo}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-colors"
         >
           <LogIn className="w-4 h-4" />

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import type { UserRole } from '@/lib/database.types';
+import { postAuthRedirect } from '@/components/ProtectedRoute';
 import { SEO } from '@/components/SEO';
 import { Loader } from '@/components/common/Loader';
 
@@ -64,6 +65,11 @@ export default function AuthCallback() {
         await refreshProfile();
 
         if (currentProfile) {
+          const authRedirect = postAuthRedirect(searchParams);
+          if (authRedirect) {
+            navigate(authRedirect, { replace: true });
+            return;
+          }
           const dashboardMap: Record<UserRole, string> = {
             student: '/student/dashboard',
             company: '/company/dashboard',

@@ -1,5 +1,22 @@
 import { supabase } from '@/lib/supabase';
 import type { TeamApplicationStatus } from '@/lib/database.types';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
+import { dedupRequest } from '@/lib/cache/requestRegistry';
+import { createNotification } from '@/services/notifications';
+
+const TEAM_ROLE_TITLES: Record<string, string> = {
+  'product-designer': 'Product Designer (UI/UX)',
+  'frontend-engineer': 'Frontend Software Engineer',
+  'backend-engineer': 'Backend Software Engineer',
+  'ai-systems-engineer': 'AI Systems Engineer',
+  'devops-engineer': 'DevOps & Cloud Engineer',
+  'database-engineer': 'Database Systems Engineer',
+  'security-engineer': 'Security Engineer',
+  'qa-engineer': 'QA & Reliability Engineer',
+  'technical-writer': 'Technical Writer & Documentation Engineer',
+  'devrel-coordinator': 'Developer Relations Coordinator',
+  'seo-specialist': 'Technical SEO Specialist',
+};
 
 export const TEAM_APPLICATION_STATUSES: TeamApplicationStatus[] = [
   'New',
@@ -79,7 +96,34 @@ export async function submitTeamApplication(payload: TeamApplicationPayload) {
     motivation: payload.motivation.trim(),
   });
 
+  if (!error) {
+    clearCache(`my_team_applications_${user.id}`);
+  }
+
   return { data: null, error };
+}
+
+/** Student: fetch the current user's founding-team applications. */
+export async function getMyTeamApplications(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [], error: new Error('Not authenticated') };
+
+  const cacheKey = `my_team_applications_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const fetchFn = () => supabase
+    .from('team_applications')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) setCachedData(cacheKey, res);
+  return res;
 }/** Admin: fetch all team applications, optionally filtered by status. */
 export async function getTeamApplications(status?: TeamApplicationStatus | 'All') {
   let query = supabase
@@ -95,9 +139,32 @@ export async function getTeamApplications(status?: TeamApplicationStatus | 'All'
   return { data: (data ?? []) as any[], error };
 }
 
-/** Admin: update an application's status. */
+/** Admin: update an application's status (also notifies the applicant). */
 export async function updateTeamApplicationStatus(id: string, status: TeamApplicationStatus) {
-  return supabase.from('team_applications').update({ status }).eq('id', id);
+  const { data, error } = await supabase
+    .from('team_applications')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select('id, user_id, preferred_role')
+    .single();
+
+  if (!error && data?.user_id) {
+    clearCache(`my_team_applications_${data.user_id}`);
+    const roleTitle = TEAM_ROLE_TITLES[data.preferred_role] || data.preferred_role;
+    try {
+      await createNotification({
+        user_id: data.user_id,
+        type: 'application',
+        title: `Founding team application ${status.toLowerCase()}`,
+        message: `Your application${roleTitle ? ` for ${roleTitle}` : ''} is now "${status}".`,
+        action_url: '/student/team-applications',
+      });
+    } catch {
+      // Notification is best-effort; never fail a status change because of it.
+    }
+  }
+
+  return { data, error };
 }
 
 /** Admin: delete an application. */

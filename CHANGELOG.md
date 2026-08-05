@@ -95,6 +95,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Site config**: added `SITE_CONFIG.social.whatsappSupportGroup` (env `VITE_WHATSAPP_SUPPORT_GROUP_URL`, fallback `https://chat.whatsapp.com/Hp2rnX1B61PDzVlbF89Tha`) and unified the support email to `support@zyroo.dpdns.org`.
 
+## [0.26.3] - 2026-08-05
+
+### Fixed
+- **Students could not see their own team applications**: RLS only allowed admins to read `team_applications`, so the new tracking page showed nothing and the submit read-back could fail. Migration `032` adds an owner SELECT policy so applicants can read their own rows. Also, the status-change notification used the type `team_application`, which violates the `notifications` CHECK constraint — notifications now use the valid `application` type.
+
+## [0.26.2] - 2026-08-05
+
+### Added
+- **Standalone team application form** at `/careers/apply`: applying from the careers page opens a dedicated form (no scroll-target gating), with the chosen role preselected via the `?apply=<role>` param. Registering or signing in from the careers flow now returns to the application form with the role intact.
+- **Team application tracking for students**: a "Team Applications" page in the student dashboard lists every application with status tabs and a per-application timeline; the dashboard's "Join the Founding Team" card switches between "Apply" and "Track your application" based on existing applications. Application status changes raise a bell notification.
+
+## [0.26.1] - 2026-08-05
+
+### Added
+- **CS-focused domain dropdown**: internship Domain fields now use a grouped list of computer-science domains (Computer Science, AI & Data, Security & Cloud, Hardware & Systems, Business & Other) shared across the company post/edit internship forms, the student internship filters, and admin analytics — replacing the small generic list.
+
 ## [Unreleased]
 
 ### Changed

@@ -19,6 +19,7 @@ This document provides a quick reference for the implementation status of each m
 | Offer Letter Acceptance / Rejection | ✅ | Dedicated UI with Go‑to‑Workspace redirects and automatic application state triggers. |
 | Notification System (email/SMS) | ✅ | Dual email/SMS settings and live Toast dispatcher simulating background alerts on lifecycle updates. |
 | Certificate Generation & QR Verification | ✅ | Full digital certificates, print-friendly template, secure QR verification, and fallback mock support. |
+| **Careers & Team Applications** | ✅ | Standalone `/careers/apply` form, student dashboard tracking page with status tabs & timeline, RLS owner-select, status-change notifications. |
 | Analytics & Reporting | ✅ | Interactive filters (domain/timeframe), CSV dataset export, and browser-native print reports. |
 | Accessibility (WCAG 2.2 AA) | ✅ | Implemented global focus ring, form control labels, dynamic status live regions, and keyboard role selections. |
 | Test Suite (Unit / Integration) | 🚧 | Coverage improvements required. |

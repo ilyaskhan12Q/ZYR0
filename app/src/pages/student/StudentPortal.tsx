@@ -5,6 +5,7 @@ import { RouteLoading } from '@/components/RouteLoading';
 const StudentDashboard = lazy(() => import('./Dashboard'));
 const StudentInternships = lazy(() => import('./Internships'));
 const StudentApplications = lazy(() => import('./Applications'));
+const StudentTeamApplications = lazy(() => import('./TeamApplications'));
 const StudentTasks = lazy(() => import('./Tasks'));
 const StudentProgress = lazy(() => import('./Progress'));
 const StudentMessages = lazy(() => import('./Messages'));
@@ -29,6 +30,7 @@ export default function StudentPortal() {
       <Route path="internships/:id" element={<InternshipDetail />} />
       <Route path="saved" element={<StudentSavedInternships />} />
       <Route path="applications" element={<StudentApplications />} />
+      <Route path="team-applications" element={<StudentTeamApplications />} />
       <Route path="tasks" element={<StudentTasks />} />
       <Route path="tasks/:id" element={<StudentTasks />} />
       <Route path="progress" element={<StudentProgress />} />

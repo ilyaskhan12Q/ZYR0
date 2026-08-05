@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Users, HeartHandshake, ClipboardList, ArrowDownRight, Briefcase, Medal,
 } from 'lucide-react';
@@ -44,16 +44,32 @@ const teamStructuredData = [
 export default function Careers() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedRole, setSelectedRole] = useState('');
 
   const handleApply = (roleId: string) => {
     if (!user) {
-      navigate('/register');
+      navigate(`/register/student?redirect=${encodeURIComponent('/careers/apply')}&apply=${roleId}`);
       return;
     }
     setSelectedRole(roleId);
     document.getElementById('team-apply')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  /* Land directly on the application form with the role pre-selected when
+     returning from registration/login (fallback for logged-out users). */
+  useEffect(() => {
+    const roleId = searchParams.get('apply');
+    if (!roleId) return;
+    setSelectedRole(roleId);
+    setSearchParams({}, { replace: true });
+    const timer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('team-apply-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchParams, setSearchParams]);
 
   return (
     <div className="relative min-h-screen text-slate-900 dark:text-slate-100 overflow-x-clip bg-slate-100 dark:bg-slate-950">

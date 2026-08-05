@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, CheckCircle2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
@@ -7,14 +7,21 @@ import { signUp, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
 import type { UserRole } from '../../lib/database.types';
 import { supabase } from '../../lib/supabase';
 import { SEO } from '@/components/SEO';
+import { postAuthRedirect } from '@/components/ProtectedRoute';
 
 type Role = UserRole | null;
 type Step = 'role' | 'form' | 'otp' | 'success';
 
+const REGISTER_ROLES: UserRole[] = ['student', 'company', 'mentor'];
+
 export default function Register() {
   const navigate = useNavigate();
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+  const initialRole = REGISTER_ROLES.includes(params.role as UserRole) ? (params.role as UserRole) : null;
   const [step, setStep] = useState<Step>('role');
-  const [selectedRole, setSelectedRole] = useState<Role>(null);
+  const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
+  const postAuthTarget = postAuthRedirect(searchParams);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -94,6 +101,9 @@ export default function Register() {
     } else {
       setLoading(false);
       setStep('success');
+      if (postAuthTarget) {
+        setTimeout(() => navigate(postAuthTarget), 1500);
+      }
     }
   };
 
@@ -101,9 +111,13 @@ export default function Register() {
     if (!selectedRole) return;
     setLoading(true);
     setLocalError(null);
+    const oauthOptions = {
+      redirect: searchParams.get('redirect') || undefined,
+      apply: searchParams.get('apply') || undefined,
+    };
     const { error } = provider === 'google' 
-      ? await signInWithGoogle(selectedRole) 
-      : await signInWithLinkedIn(selectedRole);
+      ? await signInWithGoogle(selectedRole, oauthOptions) 
+      : await signInWithLinkedIn(selectedRole, oauthOptions);
     if (error) {
       setLocalError(error.message);
       setLoading(false);
@@ -388,9 +402,13 @@ export default function Register() {
                   </div>
                 </motion.div>
                 <h2 className="mt-6 text-2xl font-bold">Email Verified! 🎉</h2>
-                <p className="mt-2 text-muted-foreground">Your email has been successfully verified, and your account is active. You can now access your dashboard.</p>
-                <button onClick={() => navigate('/')} className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring">
-                  Go to Dashboard <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                <p className="mt-2 text-muted-foreground">
+                  {postAuthTarget
+                    ? 'Your email has been successfully verified, and your account is active. You can now continue with your application.'
+                    : 'Your email has been successfully verified, and your account is active. You can now access your dashboard.'}
+                </p>
+                <button onClick={() => navigate(postAuthTarget || '/')} className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring">
+                  {postAuthTarget ? 'Continue to Application' : 'Go to Dashboard'} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </motion.div>

@@ -33,10 +33,8 @@ export async function signIn({ email, password }: SignInData) {
 }
 
 /** Google OAuth — redirects to Google, then back to /auth/callback */
-export async function signInWithGoogle(role?: UserRole) {
-  const redirectTo = role 
-    ? `${window.location.origin}/auth/callback?role=${role}` 
-    : `${window.location.origin}/auth/callback`;
+export async function signInWithGoogle(role?: UserRole, redirectOptions?: { redirect?: string; apply?: string }) {
+  const redirectTo = buildCallbackUrl(role, redirectOptions);
   return supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -46,16 +44,24 @@ export async function signInWithGoogle(role?: UserRole) {
 }
 
 /** LinkedIn OAuth — redirects to LinkedIn, then back to /auth/callback */
-export async function signInWithLinkedIn(role?: UserRole) {
-  const redirectTo = role 
-    ? `${window.location.origin}/auth/callback?role=${role}` 
-    : `${window.location.origin}/auth/callback`;
+export async function signInWithLinkedIn(role?: UserRole, redirectOptions?: { redirect?: string; apply?: string }) {
+  const redirectTo = buildCallbackUrl(role, redirectOptions);
   return supabase.auth.signInWithOAuth({
     provider: 'linkedin_oidc',
     options: {
       redirectTo,
     },
   });
+}
+
+/** Build the OAuth callback URL with optional role + post-auth redirect params. */
+function buildCallbackUrl(role?: UserRole, opts?: { redirect?: string; apply?: string }) {
+  const params = new URLSearchParams();
+  if (role) params.set('role', role);
+  if (opts?.redirect) params.set('redirect', opts.redirect);
+  if (opts?.apply) params.set('apply', opts.apply);
+  const query = params.toString();
+  return `${window.location.origin}/auth/callback${query ? `?${query}` : ''}`;
 }
 
 /** Password reset email */
