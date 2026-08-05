@@ -57,7 +57,17 @@ Source:  https://github.com/ilyaskhan12Q/ZYR0
 - [x] Internal sends now require `x-internal-token` == `EMAIL_INTERNAL_TOKEN` (set on Supabase via deploy workflow; client sends `VITE_EMAIL_INTERNAL_TOKEN` from Vercel env; `issue-certificate` passes it too)
 - [x] Contact.tsx real submission (status machine, honeypot field, error banner, success text)
 - [x] Admin Inbox `/admin/inbox`: search, tabs, detail dialog, mailto reply, mark read/replied; nav entry
-- [ ] PR merge → deploy → live test matrix: submit lands in team Gmail · reply reaches submitter · 4th rapid submit rate-limited · honeypot dropped silently · foreign `to` rejected · internal flows still work · admin inbox shows row
+- [x] PR #68 merged → deployed (Vercel env + Supabase secret + migration 034 + edge functions)
+- [x] Rate limiting made DB-backed (in-memory buckets reset per isolate; counts recent `contact_messages` rows by email + stable SHA-256 `ip_hash`)
+- [x] Live test matrix ✓:
+  - Contact submit → `support@zyroo.org` → **delivered** to team Gmail (multiple Resend ids confirmed)
+  - Honeypot filled → `{"success":true,"id":null,"honeypot":true}` silently dropped
+  - Foreign `to: attacker@evil.com` → 403 "Invalid recipient"
+  - Internal send without token → 403 "Forbidden"; with token → delivered
+  - 4th rapid submit same email → **429** (email limit 3/10min) ✓
+  - 6th submit same IP fresh emails → **429** (IP limit 5/10min) ✓
+  - anon RLS read of contact_messages → `[]` (admin-only) ✓
+- [ ] Manual: admin inbox UI renders rows + mark read/replied (needs admin login in browser)
 
 ---
 
