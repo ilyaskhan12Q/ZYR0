@@ -10,7 +10,7 @@
 //   * `to` is allowlisted to ZYR0's own mailboxes (no open relay)
 //   * `allowUserReplyTo: true` permits the submitter's email as reply-to
 //   * honeypot `website` field: if non-empty, pretend success, send nothing
-//   * rate limit per email + per IP (in-memory, best-effort)
+//   * rate limit per email + per IP (DB-backed: counts recent contact_messages rows)
 //   * submissions are also persisted to `contact_messages` (service role)
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
@@ -41,18 +41,27 @@ const RATE_EMAIL_MAX = 3;        // per 10 min per email
 const RATE_IP_MAX = 5;           // per 10 min per IP
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 
-const rateBuckets = new Map<string, number[]>();
-
-function isRateLimited(key: string, max: number): boolean {
-  const now = Date.now();
-  const bucket = (rateBuckets.get(key) || []).filter((t) => now - t < RATE_WINDOW_MS);
-  if (bucket.length >= max) {
-    rateBuckets.set(key, bucket);
-    return true;
+// DB-backed rate limiting: contact submissions are persisted to contact_messages,
+// so we count recent rows instead of relying on in-memory state (edge function
+// isolates do not share memory).
+async function countRecentRows(client: ReturnType<typeof createClient>, column: string, value: string): Promise<number> {
+  const since = new Date(Date.now() - RATE_WINDOW_MS).toISOString();
+  const { count, error } = await client
+    .from('contact_messages')
+    .select('id', { count: 'exact', head: true })
+    .eq(column, value)
+    .gte('created_at', since);
+  if (error) {
+    console.warn(`[send-email] Rate-limit count query failed (${column}):`, error.message);
+    return 0; // fail open: never block the form on a DB hiccup
   }
-  bucket.push(now);
-  rateBuckets.set(key, bucket);
-  return false;
+  return count || 0;
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 function sanitizeHtml(value: unknown): string {
@@ -216,39 +225,45 @@ serve(async (req) => {
         }
       }
 
-      if (isRateLimited(`em:${senderEmail.toLowerCase()}`, RATE_EMAIL_MAX)) {
-        console.warn(`[send-email] Rate limited (email): ${senderEmail}`);
-        return new Response(JSON.stringify({ error: 'Too many submissions. Please wait a few minutes and try again.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (isRateLimited(`ip:${ip}`, RATE_IP_MAX)) {
-        console.warn(`[send-email] Rate limited (ip): ${ip}`);
-        return new Response(JSON.stringify({ error: 'Too many submissions. Please wait a few minutes and try again.' }), {
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
+      const serviceRole = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      const adminClient = serviceRole && supabaseUrl ? createClient(supabaseUrl, serviceRole) : null;
 
-      // Persist to contact_messages (service role) — best effort, non-blocking.
-      try {
-        const serviceRole = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-        const supabaseUrl = Deno.env.get('SUPABASE_URL');
-        if (serviceRole && supabaseUrl) {
-          const adminClient = createClient(supabaseUrl, serviceRole);
+      if (adminClient) {
+        const emailCount = await countRecentRows(adminClient, 'email', senderEmail.toLowerCase());
+        if (emailCount >= RATE_EMAIL_MAX) {
+          console.warn(`[send-email] Rate limited (email): ${senderEmail}`);
+          return new Response(JSON.stringify({ error: 'Too many submissions. Please wait a few minutes and try again.' }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        const ipHash = await sha256Hex(ip);
+        const ipCount = await countRecentRows(adminClient, 'ip_hash', ipHash);
+        if (ipCount >= RATE_IP_MAX) {
+          console.warn(`[send-email] Rate limited (ip): ${ip}`);
+          return new Response(JSON.stringify({ error: 'Too many submissions. Please wait a few minutes and try again.' }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Persist to contact_messages (service role) — best effort, non-blocking.
+        try {
           const { error: dbErr } = await adminClient.from('contact_messages').insert({
             name: cleanName,
             email: senderEmail,
             subject: cleanSubject,
             category: cleanCategory,
             message: cleanMessage,
-            ip_hash: crypto.randomUUID().slice(0, 8), // opaque marker, never the raw IP
+            ip_hash: ipHash, // stable SHA-256 of the client IP (never the raw IP)
           });
           if (dbErr) console.error('[send-email] Failed to persist contact message:', dbErr);
+        } catch (dbErr) {
+          console.error('[send-email] contact_messages persistence error:', dbErr);
         }
-      } catch (dbErr) {
-        console.error('[send-email] contact_messages persistence error:', dbErr);
+      } else {
+        console.warn('[send-email] No service role configured — skipping rate limit + persistence.');
       }
 
       mailSubject = cleanSubject || `[Contact] ${cleanCategory}`;
