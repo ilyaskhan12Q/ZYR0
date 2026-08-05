@@ -46,10 +46,18 @@ Source:  https://github.com/ilyaskhan12Q/ZYR0
 - [x] Docs: SECURITY.md (security@zyroo.org), DNS_EMAIL_RECORDS.md (marked superseded), CHANGELOG entry
 
 ## Phase 4 — Deploy & verify
-- [ ] npm run build (typecheck + sitemap regen)
-- [ ] Commit + push → GitHub Actions (Vercel frontend + supabase functions deploy)
-- [ ] supabase functions list — confirm deployed
-- [ ] Test send to ik7408008@gmail.com from team@zyroo.org → last_event + inbox (not spam)
+- [x] npm run build (typecheck + sitemap regen)
+- [x] Commit + push → PR #65 merged to main → GitHub Actions deploy (Vercel frontend + supabase functions)
+- [x] supabase functions list — send-email v29, issue-certificate v41 deployed (2026-08-05 16:29)
+- [x] Test send to ik7408008@gmail.com from team@zyroo.org → **last_event: delivered** ✓ (id 492a5197-6f84-4218-b4eb-281fa99be511)
+
+---
+
+## DONE — 2026-08-05
+- Domain `zyroo.org` live: Email Routing MX (route1/2/3.mx.cloudflare.net), SPF (cloudflare + amazonses), DKIM (resend._domainkey, new account key C5etom7…)
+- Resend domain verified (id 6409c771-2535-4c8e-be1c-ae135997f41d, key re_K5LL…) — sending enabled
+- Test email **delivered** from team@zyroo.org (first ever successful delivery vs. Gmail-reputation bounces on zyroo.dpdns.org)
+- Still open: verify actual inbox receipt (not spam), wait ~24h for sender reputation to settle
 
 ---
 
