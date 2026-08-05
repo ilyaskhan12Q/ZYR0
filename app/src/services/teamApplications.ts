@@ -173,9 +173,11 @@ export async function deleteTeamApplication(id: string) {
 }
 
 /** Admin: mark email_sent on an application. */
-export async function markTeamApplicationEmailed(id: string) {
+export async function markTeamApplicationEmailed(id: string, messageId?: string | null) {
+  const updates: Record<string, unknown> = { email_sent: true, email_sent_at: new Date().toISOString() };
+  if (messageId) updates.email_message_id = messageId;
   return supabase
     .from('team_applications')
-    .update({ email_sent: true, email_sent_at: new Date().toISOString() })
+    .update(updates)
     .eq('id', id);
 }
