@@ -124,10 +124,14 @@ async function sendOfferLetterEmail(opts: {
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 14px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">
-                Having trouble signing in or need assistance? Our support team is ready to help —
-                <a href="mailto:support@zyroo.org" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Contact Support</a>.
-              </p>
+              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Having trouble signing in or need assistance? Our support team is ready to help.</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
+                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
+                  </td>
+                </tr>
+              </table>
               <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">
                 We look forward to welcoming you on board.<br>
                 <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong>
@@ -154,8 +158,8 @@ async function sendOfferLetterEmail(opts: {
     `Offer Code: ${offerCodeStr}\n` +
     `Verify this offer: ${siteUrl}/verify?type=offer&id=${offerId}\n\n` +
     `This offer remains open until ${expiryDateStr}. We encourage you to accept or decline before the deadline so your internship can be finalized without delay.\n\n` +
-    `If you encounter any issues or have questions, our support team is here to help:\n` +
-    `support@zyroo.org\n\n` +
+    `If you encounter any issues or have questions, contact our support team (your message goes straight to the platform team):\n` +
+    `${siteUrl}/contact\n\n` +
     `We look forward to welcoming you on board.\n\n` +
     `With warm regards,\n` +
     `The ZYR0 Team\n` +
