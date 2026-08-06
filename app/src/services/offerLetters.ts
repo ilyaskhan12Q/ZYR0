@@ -44,7 +44,7 @@ export async function getMyOfferLetters(useCache = true) {
   return res;
 }
 
-/** Get a single offer letter by id (student, company, or admin). */
+/** Get a single offer letter by id or human-readable offer code (student, company, admin, or public verify). */
 export async function getOfferLetterById(id: string, useCache = true) {
   const cacheKey = createRequestKey('offer_letter', id);
   if (useCache) {
@@ -52,11 +52,24 @@ export async function getOfferLetterById(id: string, useCache = true) {
     if (cached) return cached;
   }
 
-  const fetchFn = () => supabase
-    .from('offer_letters')
-    .select(OFFER_LETTER_SELECT)
-    .eq('id', id)
-    .single();
+  const trimmed = id.trim();
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
+
+  const fetchFn = () => {
+    if (isUuid) {
+      return supabase
+        .from('offer_letters')
+        .select(OFFER_LETTER_SELECT)
+        .eq('id', trimmed)
+        .single();
+    }
+    // Human-readable code (ZYRO-OF-…), case-insensitive
+    return supabase
+      .from('offer_letters')
+      .select(OFFER_LETTER_SELECT)
+      .ilike('offer_code', trimmed)
+      .single();
+  };
 
   const res = await dedupRequest(cacheKey, fetchFn);
 
@@ -108,6 +121,13 @@ export async function getCompanyOfferLetters(company_id: string, useCache = true
 
 // ── Company: create ───────────────────────────────────────────────────────────
 
+/** Generate a human-readable offer code (ZYRO-OF-<year>-<random6>). */
+export function generateOfferCode(): string {
+  const year = new Date().getFullYear();
+  const random = Math.floor(100000 + Math.random() * 900000);
+  return `ZYRO-OF-${year}-${random}`;
+}
+
 /** Generate (insert) a new offer letter record. Called after accepting an application. */
 export async function generateOfferLetter(data: {
   internship_id: string;
@@ -117,23 +137,33 @@ export async function generateOfferLetter(data: {
   expires_at?: string;
   notes?: string;
 }) {
-  const res = await supabase
-    .from('offer_letters')
-    .insert({
-      ...data,
-      status: 'Pending',
-      issued_at: new Date().toISOString(),
-    })
-    .select(OFFER_LETTER_SELECT)
-    .single();
+  let lastError: { message: string } | null = null;
 
-  if (!res.error) {
-    clearCache(createRequestKey('my_offer_letters', data.student_id));
-    clearCache(createRequestKey('company_offer_letters', data.company_id));
-    clearCache(createRequestKey('all_offer_letters'));
+  // Retry on unique collision of the offer_code (mirrors certificate pattern).
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await supabase
+      .from('offer_letters')
+      .insert({
+        ...data,
+        offer_code: generateOfferCode(),
+        status: 'Pending',
+        issued_at: new Date().toISOString(),
+      })
+      .select(OFFER_LETTER_SELECT)
+      .single();
+
+    if (!res.error) {
+      clearCache(createRequestKey('my_offer_letters', data.student_id));
+      clearCache(createRequestKey('company_offer_letters', data.company_id));
+      clearCache(createRequestKey('all_offer_letters'));
+      return res;
+    }
+
+    lastError = res.error;
+    if (!/duplicate|unique/i.test(res.error?.message ?? '')) break;
   }
 
-  return res;
+  return { data: null, error: lastError };
 }
 
 // ── Company: update ───────────────────────────────────────────────────────────
