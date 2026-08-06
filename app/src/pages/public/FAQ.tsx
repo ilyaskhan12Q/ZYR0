@@ -43,6 +43,10 @@ const faqData: FAQCategory[] = [
         a: 'Upon successful completion of all assigned tasks and your mentor\'s final approval, ZYR0 automatically generates a digital certificate with a unique credential ID. You can download it from your Certificates dashboard. Anyone can verify the authenticity of your certificate at zyroo.org/verify by entering the credential ID.',
       },
       {
+        q: 'How are offer letters verified?',
+        a: 'Every offer letter issued through ZYR0 carries a unique offer ID and a scannable QR code. Anyone can verify the authenticity of an offer letter at zyroo.org/verify — switch to the "Offer Letter" tab and enter the offer ID, or simply scan the QR code printed on the document. The page shows the offer\'s current status, including accepted, rejected, expired, or revoked.',
+      },
+      {
         q: 'Can I apply to multiple internships at once?',
         a: 'Yes. You can apply to as many internships as you are qualified for. There is no limit on the number of simultaneous applications. However, once you accept an offer letter, you are expected to commit to that internship for its duration.',
       },

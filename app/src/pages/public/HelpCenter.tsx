@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail, Phone, Headphones, Megaphone } from 'lucide-react';
+import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail, Phone, Headphones, Megaphone, FileCheck } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon } from '@/components/icons/BrandIcons';
@@ -51,6 +51,17 @@ const guides = [
       'Enter the credential ID printed on the certificate.',
       'The system will display the certificate holder\'s name, the internship completed, the issuing company, and the date of issuance.',
       'A green verification badge confirms the certificate is authentic and has not been revoked.',
+    ],
+  },
+  {
+    icon: FileCheck,
+    title: 'Offer Letter Verification',
+    desc: 'Verify the authenticity of any ZYR0-issued offer letter using its offer ID or QR code.',
+    steps: [
+      'Navigate to zyroo.org/verify and switch to the "Offer Letter" tab.',
+      'Enter the offer ID printed on the offer letter, or scan its QR code.',
+      'The full offer letter document is displayed with its current status.',
+      'The badge shows Verified, or marks the offer as Expired / Revoked where applicable.',
     ],
   },
 ];
