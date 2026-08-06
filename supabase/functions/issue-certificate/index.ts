@@ -100,41 +100,58 @@ serve(async (req) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Certificate of Completion</title>
 </head>
-<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
+<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
     <tr>
-      <td align="center">
-        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
-            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Certificate of Completion</h2>
-            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Issued via ZYR0</p>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${student.full_name}</strong>,</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">Congratulations on successfully completing your internship. We are proud to issue your official digital certificate for <strong>${certificate.title}</strong>.</p>
-          
-          <div style="margin: 24px 0; padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center;">
-            <span style="display: block; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Credential ID</span>
-            <strong style="color: #0f172a; font-size: 15px; letter-spacing: 0.05em;">${certificate.credential_id}</strong>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform.</p>
-          
-          <div style="text-align: center; margin: 32px 0;">
-            <a href="${siteUrl}/verify/${certificate.credential_id}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
-          </div>
-          
-          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">Verify this digital credential securely on the ZYR0 network at any time using your credential ID.</p>
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
-          </div>
-          
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
-            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.org</a></p>
-          </div>
-        </div>
+      <td align="center" style="padding: 24px 12px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+          <tr>
+            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
+              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">Certificate of Completion</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 40px;">
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear <strong>${student.full_name}</strong>,</p>
+              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
+                Congratulations on successfully completing your internship. It has been a privilege to
+                witness your dedication, and we are proud to issue your official digital certificate for
+                <strong style="color: #1e3a8a;">${certificate.title}</strong>. This credential is a testament to your
+                hard work — may it open many doors ahead.
+              </p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+                <tr>
+                  <td style="padding: 18px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Credential ID</p>
+                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.05em; color: #13100d;">${certificate.credential_id}</p>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">You may view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform at any time.</p>
+              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Verify Your Credential</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
+                    <a href="${siteUrl}/verify/${certificate.credential_id}" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View Verified Certificate</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
+                <a href="${siteUrl}/about" style="color: #1e3a8a;">Discover ZYR0</a>
+                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <a href="${siteUrl}/internships" style="color: #1e3a8a;">Explore New Opportunities</a>
+              </p>
+              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
+              <p style="margin: 0; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -146,8 +163,10 @@ serve(async (req) => {
           `Credential ID: ${certificate.credential_id}\n\n` +
           `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
           `${siteUrl}/verify/${certificate.credential_id}\n\n` +
-          `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
-          `Best regards,\n` +
+          `Explore ZYR0:\n` +
+          `- About: ${siteUrl}/about\n` +
+          `- Internships: ${siteUrl}/internships\n\n` +
+          `With warm regards,\n` +
           `The ZYR0 Team\n` +
           `team@zyroo.org`;
 
@@ -324,41 +343,58 @@ serve(async (req) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Certificate of Completion</title>
 </head>
-<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
+<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
     <tr>
-      <td align="center">
-        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
-            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Certificate of Completion</h2>
-            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Issued via ZYR0</p>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${student.full_name}</strong>,</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;">Congratulations on successfully completing your internship. We are proud to issue your official digital certificate for <strong>${title}</strong>.</p>
-          
-          <div style="margin: 24px 0; padding: 16px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; text-align: center;">
-            <span style="display: block; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 4px;">Credential ID</span>
-            <strong style="color: #0f172a; font-size: 15px; letter-spacing: 0.05em;">${credentialId}</strong>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform.</p>
-          
-          <div style="text-align: center; margin: 32px 0;">
-            <a href="${siteUrl}/verify/${credentialId}" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">View Verified Certificate</a>
-          </div>
-          
-          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">Verify this digital credential securely on the ZYR0 network at any time using your credential ID.</p>
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
-          </div>
-          
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
-            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.org</a></p>
-          </div>
-        </div>
+      <td align="center" style="padding: 24px 12px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+          <tr>
+            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
+              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">Certificate of Completion</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 40px;">
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear <strong>${student.full_name}</strong>,</p>
+              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
+                Congratulations on successfully completing your internship. It has been a privilege to
+                witness your dedication, and we are proud to issue your official digital certificate for
+                <strong style="color: #1e3a8a;">${title}</strong>. This credential is a testament to your
+                hard work — may it open many doors ahead.
+              </p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+                <tr>
+                  <td style="padding: 18px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Credential ID</p>
+                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.05em; color: #13100d;">${credentialId}</p>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">You may view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform at any time.</p>
+              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Verify Your Credential</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
+                    <a href="${siteUrl}/verify/${credentialId}" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View Verified Certificate</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
+                <a href="${siteUrl}/about" style="color: #1e3a8a;">Discover ZYR0</a>
+                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <a href="${siteUrl}/internships" style="color: #1e3a8a;">Explore New Opportunities</a>
+              </p>
+              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
+              <p style="margin: 0; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -370,8 +406,10 @@ serve(async (req) => {
           `Credential ID: ${credentialId}\n\n` +
           `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
           `${siteUrl}/verify/${credentialId}\n\n` +
-          `Verify this digital credential securely on the ZYR0 network at any time using your credential ID.\n\n` +
-          `Best regards,\n` +
+          `Explore ZYR0:\n` +
+          `- About: ${siteUrl}/about\n` +
+          `- Internships: ${siteUrl}/internships\n\n` +
+          `With warm regards,\n` +
           `The ZYR0 Team\n` +
           `team@zyroo.org`;
 

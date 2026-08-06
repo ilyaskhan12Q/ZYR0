@@ -71,6 +71,7 @@ async function sendOfferLetterEmail(opts: {
 
   const base64Pdf = await blobToBase64(pdfBlob);
   const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
+  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
   const emailHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,36 +79,57 @@ async function sendOfferLetterEmail(opts: {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Internship Offer</title>
 </head>
-<body style="margin: 0; padding: 20px; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;">
-  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; padding: 20px 0;">
+<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
     <tr>
-      <td align="center">
-        <div style="max-width: 580px; margin: 0 auto; padding: 32px 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff; text-align: left; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-          <div style="text-align: center; margin-bottom: 32px; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px;">
-            <h2 style="color: #0f172a; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Internship Offer Extended</h2>
-            <p style="color: #4f46e5; margin: 6px 0 0 0; font-size: 16px; font-weight: 600;">${companyName}</p>
-          </div>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">Dear <strong>${studentName}</strong>,</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">We are pleased to inform you that <strong>${companyName}</strong> has extended an official internship offer for the <strong>${internshipTitle}</strong> position.</p>
-          
-          <p style="color: #334155; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">The official offer letter is attached to this email. You can view the details, terms, and submit your response directly through the ZYR0 platform.</p>
-          
-          <div style="text-align: center; margin: 32px 0;">
-            <a href="${window.location.origin}/student/offer-letters" style="background-color: #4f46e5; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.15);">Review & Respond to Offer</a>
-          </div>
-          
-          <div style="border-top: 1px solid #f1f5f9; padding-top: 24px; margin-top: 32px;">
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0 0 8px 0;">If you have any questions regarding the terms or the role, please contact ${companyName} directly.</p>
-            <p style="color: #64748b; font-size: 13px; line-height: 1.5; margin: 0;">Best regards,<br><strong>The ZYR0 Team</strong></p>
-          </div>
-          
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 32px; text-align: center;">
-            <p style="color: #94a3b8; font-size: 11px; margin: 0 0 4px 0;">This email was sent on behalf of ${companyName} via ZYR0.</p>
-            <p style="color: #94a3b8; font-size: 11px; margin: 0;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #4f46e5; text-decoration: none;">team@zyroo.org</a></p>
-          </div>
-        </div>
+      <td align="center" style="padding: 24px 12px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+          <tr>
+            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
+              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">Internship Offer Extended</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 40px;">
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${studentName},</p>
+              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
+                We are delighted to inform you that <strong style="color: #1e3a8a;">${companyName}</strong> has extended
+                an official internship offer for the <strong style="color: #1e3a8a;">${internshipTitle}</strong> position.
+                Congratulations — this is a wonderful recognition of your potential, and we are proud to be part of the journey.
+              </p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+                <tr>
+                  <td style="padding: 18px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Offer Recipient</p>
+                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #1e3a8a;">${companyName} — ${internshipTitle}</p>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">The official offer letter is attached to this email. You may review the full details and terms, and submit your response, directly through the ZYR0 platform.</p>
+              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Your Next Steps</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
+                    <a href="${siteUrl}/student/offer-letters" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">Review &amp; Respond to Offer</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
+                <a href="${siteUrl}/about" style="color: #1e3a8a;">Discover ZYR0</a>
+                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <a href="${siteUrl}/internships" style="color: #1e3a8a;">Explore Internships</a>
+              </p>
+              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">This email was sent on behalf of ${companyName} via ZYR0.</p>
+              <p style="margin: 0; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -115,11 +137,14 @@ async function sendOfferLetterEmail(opts: {
 </html>`;
 
   const emailText = `Dear ${studentName},\n\n` +
-    `We are pleased to inform you that ${companyName} has extended an official internship offer for the ${internshipTitle} position.\n\n` +
+    `We are delighted to inform you that ${companyName} has extended an official internship offer for the ${internshipTitle} position. Congratulations!\n\n` +
     `The official offer letter is attached to this email as a PDF. You can view the details, terms, and submit your response directly through the ZYR0 platform:\n` +
-    `${window.location.origin}/student/offer-letters\n\n` +
+    `${siteUrl}/student/offer-letters\n\n` +
+    `Explore ZYR0:\n` +
+    `- About: ${siteUrl}/about\n` +
+    `- Internships: ${siteUrl}/internships\n\n` +
     `If you have any questions regarding the terms or the role, please contact ${companyName} directly.\n\n` +
-    `Best regards,\n` +
+    `With warm regards,\n` +
     `The ZYR0 Team\n` +
     `team@zyroo.org`;
 

@@ -46,39 +46,88 @@ function formatDate(iso: string) {
 
 function buildShortlistEmail(app: any) {
   const role = roleTitle(app.preferred_role);
-  const html = `
-    <div style="font-family: Arial, Helvetica, sans-serif; background: #0f172a; color: #e2e8f0; padding: 40px 24px;">
-      <div style="max-width: 560px; margin: 0 auto; background: #ffffff; color: #0f172a; border-radius: 16px; overflow: hidden;">
-        <div style="background: linear-gradient(135deg, #2563eb, #06b6d4); padding: 28px 32px;">
-          <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 13px; letter-spacing: 1px; text-transform: uppercase;">ZYR0</p>
-          <h1 style="margin: 8px 0 0; color: #ffffff; font-size: 22px;">You've been shortlisted</h1>
-        </div>
-        <div style="padding: 32px;">
-          <p style="font-size: 15px; line-height: 1.7;">Hi ${app.full_name},</p>
-          <p style="font-size: 15px; line-height: 1.7;">
-            Great news — your application for the <strong>${role}</strong> seat on the ZYR0 Founding
-            Development Team stood out, and we'd love to move forward with you.
-          </p>
-          <p style="font-size: 15px; line-height: 1.7;">
-            Next, we'll reach out directly to schedule a short conversation so we can learn about you
-            (and you about us). Keep an eye on your inbox — and in the meantime, feel free to reply
-            to this email with anything you'd like us to see before we talk.
-          </p>
-          <p style="font-size: 15px; line-height: 1.7; margin-bottom: 0;">
-            Talk soon,<br />
-            The ZYR0 Team
-          </p>
-        </div>
-      </div>
-    </div>`;
+  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
+  const linkedInUrl = import.meta.env.VITE_LINKEDIN_COMPANY_URL || 'https://linkedin.com/company/zyroo';
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Congratulations — You've Been Shortlisted</title>
+</head>
+<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
+    <tr>
+      <td align="center" style="padding: 24px 12px;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+          <tr>
+            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
+              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">A Note of Congratulations</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 32px 40px;">
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${app.full_name},</p>
+              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
+                It is with great pleasure that we write to you today. Your application for the
+                <strong style="color: #1e3a8a;">${role}</strong> seat on the ZYR0 Founding Development
+                Team stood out among a distinguished field — and we would be honoured to move forward with you.
+              </p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+                <tr>
+                  <td style="padding: 18px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Shortlisted For</p>
+                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #13100d;">${role}</p>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
+                In the coming days, a member of our team will reach out to schedule a conversation — a chance
+                for us to learn about you, and for you to learn about us. Please keep an eye on your inbox,
+                and feel free to reply to this email with anything you would like us to consider before we speak.
+              </p>
+              <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
+                    <a href="${siteUrl}/careers" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View ZYR0 Careers</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
+                <a href="${siteUrl}/about" style="color: #1e3a8a;">About ZYR0</a>
+                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <a href="${linkedInUrl}" style="color: #1e3a8a;">ZYR0 on LinkedIn</a>
+              </p>
+              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved.</p>
+              <p style="margin: 0; font-size: 11px; color: #8a7f6c;"><a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
   const text = [
-    `Hi ${app.full_name},`,
+    `Dear ${app.full_name},`,
     '',
-    `Great news — your application for the ${role} seat on the ZYR0 Founding Development Team stood out, and we'd love to move forward with you.`,
+    `It is with great pleasure that we write to you today. Your application for the ${role} seat on the ZYR0 Founding Development Team stood out among a distinguished field — and we would be honoured to move forward with you.`,
     '',
-    'Next, we\'ll reach out directly to schedule a short conversation so we can learn about you (and you about us). Reply to this email with anything you\'d like us to see before we talk.',
+    `In the coming days, a member of our team will reach out to schedule a conversation — a chance for us to learn about you, and for you to learn about us. Please keep an eye on your inbox, and feel free to reply to this email with anything you would like us to consider before we speak.`,
     '',
-    'Talk soon,',
+    `Explore ZYR0:`,
+    `- Careers: ${siteUrl}/careers`,
+    `- About: ${siteUrl}/about`,
+    `- LinkedIn: ${linkedInUrl}`,
+    '',
+    'With warm regards,',
     'The ZYR0 Team',
   ].join('\n');
   return { to: app.email, subject: `You've been shortlisted — ZYR0 Founding Development Team`, html, text };
