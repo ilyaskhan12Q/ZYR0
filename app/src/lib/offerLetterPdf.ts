@@ -286,12 +286,16 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.font = `700 11px ${FONT_SANS}`;
   ctx.fillText('POSITION & ENGAGEMENT DETAILS', MARGIN + 40, y + 26);
 
+  const workArrangement = internship?.location && internship.location !== internship.location_type
+    ? `${internship?.location_type ?? 'Remote'} (${internship.location})`
+    : (internship?.location_type || 'Remote');
+
   let fieldsY = y + 56;
   const fields: Array<[string, string]> = [
     ['Candidate Name', student?.full_name ?? '—'],
     ['Position Title', internship?.title ?? '—'],
     ['Internship Category', internship?.type ?? 'Internship'],
-    ['Work Arrangement', `${internship?.location_type ?? 'Remote'} (${internship?.location ?? company?.location ?? 'Remote'})`],
+    ['Work Arrangement', workArrangement],
     ['Duration', internship?.duration ?? 'Flexible'],
     ['Proposed Start', internship?.start_date ? new Date(internship.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'To be agreed'],
     ['Stipend / Compensation', internship?.stipend ? `${internship.stipend} (${internship.stipend_type ?? 'Monthly'})` : 'Experience-Based'],
