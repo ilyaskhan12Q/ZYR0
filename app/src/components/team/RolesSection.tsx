@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Briefcase, CheckCircle2, ArrowRight, SlidersHorizontal } from 'lucide-react';
+import { Briefcase, CheckCircle2, ArrowRight, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
 import { Reveal, SectionHeading } from './SectionHeading';
 import {
   TEAM_ROLES,
@@ -114,9 +114,19 @@ function RoleCard({ role, onApply }: { role: TeamRole; onApply: (roleId: string)
 
 export function RolesSection({ onApply }: RolesSectionProps) {
   const [filter, setFilter] = useState<string>('all');
+  const [showAll, setShowAll] = useState(false);
   const departments = departmentCounts(TEAM_ROLES);
   const visibleRoles =
     filter === 'all' ? TEAM_ROLES : TEAM_ROLES.filter((r) => r.department === filter);
+
+  // In the "All roles" view we surface a compact preview first, then let
+  // candidates reveal the rest — department views are small enough to show fully.
+  const limited = filter === 'all' && !showAll;
+  const shownRoles = limited ? visibleRoles.slice(0, 2) : visibleRoles;
+  const selectDepartment = (name: string) => {
+    setFilter(name);
+    setShowAll(false);
+  };
 
   return (
     <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto" id="team-roles">
@@ -137,7 +147,7 @@ export function RolesSection({ onApply }: RolesSectionProps) {
           </span>
           <button
             type="button"
-            onClick={() => setFilter('all')}
+            onClick={() => selectDepartment('all')}
             className={cn(
               'px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
               filter === 'all'
@@ -152,7 +162,7 @@ export function RolesSection({ onApply }: RolesSectionProps) {
             <button
               key={dept.name}
               type="button"
-              onClick={() => setFilter(dept.name)}
+              onClick={() => selectDepartment(dept.name)}
               className={cn(
                 'px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200',
                 filter === dept.name
@@ -168,12 +178,30 @@ export function RolesSection({ onApply }: RolesSectionProps) {
 
         {/* Role cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {visibleRoles.map((role, i) => (
+          {shownRoles.map((role, i) => (
             <Reveal key={role.id} delay={(i % 2) * 0.08} className="h-full">
               <RoleCard role={role} onApply={onApply} />
             </Reveal>
           ))}
         </div>
+
+        {/* Show all / Show less */}
+        {filter === 'all' && visibleRoles.length > 2 && (
+          <div className="flex justify-center mt-10">
+            <button
+              type="button"
+              onClick={() => setShowAll((prev) => !prev)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border border-slate-300 dark:border-white/15 bg-white/70 dark:bg-slate-900/70 text-slate-700 dark:text-slate-200 hover:border-blue-400/60 hover:text-blue-600 dark:hover:text-sky-400 transition-all duration-200"
+              aria-expanded={showAll}
+            >
+              {showAll ? (
+                <>Show less <ChevronUp className="w-4 h-4" /></>
+              ) : (
+                <>Show all {visibleRoles.length} roles <ChevronDown className="w-4 h-4" /></>
+              )}
+            </button>
+          </div>
+        )}
 
         {visibleRoles.length === 0 && (
           <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-10">
