@@ -203,7 +203,7 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillText('OFFICIAL INTERNSHIP OFFER LETTER', titleX, y + 48);
 
   // Document metadata box (top right)
-  const metaBoxW = 208;
+  const metaBoxW = 236;
   const metaBoxH = 68;
   const metaBoxX = PAGE_WIDTH - MARGIN - metaBoxW;
 
@@ -234,7 +234,7 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     ctx.fillText(value, metaBoxX + vx, vy);
   };
 
-  metaLabel('Offer ID', 78, y + 22, offer.id.slice(0, 10).toUpperCase(), true);
+  metaLabel('Offer Code', 82, y + 22, offer.offer_code || offer.id.slice(0, 12).toUpperCase(), true);
   metaLabel('Issued', 78, y + 40, issueDate);
   metaLabel('Expiration', 90, y + 56, expiryDate);
 
@@ -427,16 +427,19 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillRect(0, footerY + 2, PAGE_WIDTH, footerH - 2);
 
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `500 10.5px ${FONT_SANS}`;
+  ctx.font = `400 8.5px ${FONT_SANS}`;
   ctx.textAlign = 'center';
+  const footerOfferLabel = offer.offer_code
+    ? `Offer Code: ${offer.offer_code}  ·  Offer ID: ${offer.id.slice(0, 8)}`
+    : `Offer ID: ${offer.id.slice(0, 8)}`;
   ctx.fillText(
-    `Offer ID: ${offer.id.slice(0, 16).toUpperCase()}  ·  Verify at ${verificationUrl}`,
+    `${footerOfferLabel}  ·  Verify at ${verificationUrl}`,
     PAGE_WIDTH / 2,
-    footerY + 24
+    footerY + 23
   );
 
   ctx.fillStyle = 'rgba(255,255,255,.65)';
-  ctx.font = `400 9.5px ${FONT_SANS}`;
+  ctx.font = `400 9px ${FONT_SANS}`;
   ctx.fillText(
     `© ${new Date().getFullYear()} ZYR0 Platform · ${company?.name ?? ''} · Confidential Document`,
     PAGE_WIDTH / 2,

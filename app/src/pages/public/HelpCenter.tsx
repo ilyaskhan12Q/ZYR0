@@ -56,10 +56,10 @@ const guides = [
   {
     icon: FileCheck,
     title: 'Offer Letter Verification',
-    desc: 'Verify the authenticity of any ZYR0-issued offer letter using its offer ID or QR code.',
+    desc: 'Verify the authenticity of any ZYR0-issued offer letter using its offer code, offer ID, or QR code.',
     steps: [
       'Navigate to zyroo.org/verify and switch to the "Offer Letter" tab.',
-      'Enter the offer ID printed on the offer letter, or scan its QR code.',
+      'Enter the offer code (e.g. ZYRO-OF-2026-123456) or offer ID printed on the offer letter, or scan its QR code.',
       'The full offer letter document is displayed with its current status.',
       'The badge shows Verified, or marks the offer as Expired / Revoked where applicable.',
     ],

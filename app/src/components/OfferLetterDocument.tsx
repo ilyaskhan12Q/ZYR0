@@ -251,8 +251,10 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
               }}
             >
               <div>
-                <span style={{ letterSpacing: '1px', textTransform: 'uppercase', color: '#a99a78' }}>Offer ID</span>{' '}
-                <strong style={{ color: '#1e3a8a', fontFamily: SERIF }}>{offer.id.slice(0, 12).toUpperCase()}</strong>
+                <span style={{ letterSpacing: '1px', textTransform: 'uppercase', color: '#a99a78' }}>Offer Code</span>{' '}
+                <strong style={{ color: '#1e3a8a', fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: '.5px' }}>
+                  {offer.offer_code || offer.id.slice(0, 12).toUpperCase()}
+                </strong>
               </div>
               <div>
                 <span style={{ letterSpacing: '1px', textTransform: 'uppercase', color: '#a99a78' }}>Issued</span>{' '}
@@ -439,8 +441,8 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
             <div>
               © {new Date().getFullYear()} ZYR0 Platform&nbsp;&nbsp;·&nbsp;&nbsp;{companyName}&nbsp;&nbsp;·&nbsp;&nbsp;Confidential
             </div>
-            <div>
-              Offer ID <strong style={{ color: '#1e3a8a', fontFamily: "'Montserrat', sans-serif" }}>·</strong> {offer.id.slice(0, 8).toUpperCase()}
+            <div className="font-mono normal-case tracking-normal text-[9.5px]">
+              Offer ID <strong style={{ color: '#1e3a8a' }}>·</strong> <span style={{ wordBreak: 'break-all' }}>{offer.id}</span>
             </div>
           </footer>
         </div>

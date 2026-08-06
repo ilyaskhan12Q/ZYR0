@@ -262,6 +262,7 @@ export interface Certificate {
 
 export interface OfferLetter {
   id: string;
+  offer_code: string;
   internship_id: string;
   application_id: string;
   student_id: string;

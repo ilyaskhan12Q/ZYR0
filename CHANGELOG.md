@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.28.0] - 2026-08-06
+
+### Added
+- **Offer letters now carry a human-readable offer code** (`ZYRO-OF-<year>-<random6>`, e.g. `ZYRO-OF-2026-436784`) mirroring the certificate `credential_id` pattern. New codes are generated on insert with a retry loop against unique collisions; existing offers were backfilled in place (`036_offer_codes.sql`). The code appears on the document's meta box, the canvas PDF, the company/student/admin detail views, and the offer email — and it is exactly what `/verify` accepts.
+- **Offer verification accepts the offer code or the full ID**: `getOfferLetterById` resolves UUIDs directly and human-readable codes case-insensitively (`ilike` on `offer_code`), so the printed code always verifies. The `/verify` offer tab placeholder now says "Enter Offer Code (e.g., ZYRO-OF-2026-123456) or Offer ID".
+
+### Changed
+- **Printed offer documents are now fully verifiable**: the HTML document and canvas PDF footer print the complete offer UUID (previously truncated to 8–16 characters, which could never match a lookup), and the meta row was widened to fit the code on one line.
+- **Offer email includes the code**: the `sendOfferLetterEmail` detail box and text version now show `Offer Code` plus a direct `zyroo.org/verify?type=offer&id=…` link.
+- **Admin offer list**: search now also matches `offer_code`, the list shows the code in place of the truncated ID, and the detail panel adds an "Offer Code" row.
+
+### Fixed
+- **Offer letter QR/verify links can never fail again**: previously documents truncated the offer UUID for display while verification looked up the full UUID, so IDs shown on printed documents were unverifiable by design. Display and lookup are now unified through `offer_code` with the full ID retained for internal use and QR payloads.
+
 ## [0.27.0] - 2026-08-05
 
 ### Added
