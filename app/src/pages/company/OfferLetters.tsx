@@ -47,8 +47,9 @@ async function sendOfferLetterEmail(opts: {
   pdfBlob: Blob;
   offerId: string;
   offerCode?: string | null;
+  expiresAt?: string | null;
 }): Promise<void> {
-  const { student, company, internship, pdfBlob, offerId, offerCode } = opts;
+  const { student, company, internship, pdfBlob, offerId, offerCode, expiresAt } = opts;
   let studentEmail = student.email;
 
   if (!studentEmail && student.id) {
@@ -73,6 +74,10 @@ async function sendOfferLetterEmail(opts: {
   const base64Pdf = await blobToBase64(pdfBlob);
   const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
   const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+  const expiryDateStr = expiresAt
+    ? new Date(expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : '30 days from issuance';
+  const offerCodeStr = offerCode ?? offerId.slice(0, 8).toUpperCase();
   const emailHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,21 +100,23 @@ async function sendOfferLetterEmail(opts: {
             <td style="padding: 32px 40px;">
               <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${studentName},</p>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                We are delighted to inform you that <strong style="color: #1e3a8a;">${companyName}</strong> has extended
-                an official internship offer for the <strong style="color: #1e3a8a;">${internshipTitle}</strong> position.
-                Congratulations — this is a wonderful recognition of your potential, and we are proud to be part of the journey.
+                On behalf of <strong style="color: #1e3a8a;">${companyName}</strong>, we are pleased to confirm that an
+                official internship offer has been extended to you for the
+                <strong style="color: #1e3a8a;">${internshipTitle}</strong> position. Your application demonstrated genuine
+                potential, and we are confident in the contributions you will bring to the team.
               </p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
                 <tr>
                   <td style="padding: 18px 24px; text-align: center;">
                     <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Offer Recipient</p>
                     <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #1e3a8a;">${companyName} — ${internshipTitle}</p>
-                    <p style="margin: 10px 0 0; font-size: 11px; letter-spacing: 1.5px; color: #8a7f6c;">Offer Code: <strong style="color: #1e3a8a;">${offerCode ?? offerId.slice(0, 8).toUpperCase()}</strong> &nbsp;·&nbsp; Verify at <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="color: #1e3a8a;">${siteUrl}/verify</a></p>
+                    <p style="margin: 10px 0 0; font-size: 11px; letter-spacing: 1.5px; color: #8a7f6c;">Offer Code: <strong style="color: #1e3a8a;">${offerCodeStr}</strong> &nbsp;·&nbsp; Verify at <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="color: #1e3a8a;">${siteUrl}/verify</a></p>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">The official offer letter is attached to this email. You may review the full details and terms, and submit your response, directly through the ZYR0 platform.</p>
-              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Your Next Steps</p>
+              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">The official offer letter is attached to this email. Please review the full terms and conditions, then confirm your decision through the ZYR0 platform at your earliest convenience.</p>
+              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Your Next Step: Respond Before It Expires</p>
+              <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.7; color: #3d372e;">This offer remains open until <strong style="color: #1e3a8a;">${expiryDateStr}</strong>. We encourage you to accept or decline before the deadline so your internship can be finalized without delay.</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
                 <tr>
                   <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
@@ -117,12 +124,14 @@ async function sendOfferLetterEmail(opts: {
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
-                <a href="${siteUrl}/about" style="color: #1e3a8a;">Discover ZYR0</a>
-                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <a href="${siteUrl}/internships" style="color: #1e3a8a;">Explore Internships</a>
+              <p style="margin: 0 0 14px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">
+                Having trouble signing in or need assistance? Our support team is ready to help —
+                <a href="mailto:support@zyroo.org" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Contact Support</a>.
               </p>
-              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">
+                We look forward to welcoming you on board.<br>
+                <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong>
+              </p>
             </td>
           </tr>
           <tr>
@@ -139,15 +148,15 @@ async function sendOfferLetterEmail(opts: {
 </html>`;
 
   const emailText = `Dear ${studentName},\n\n` +
-    `We are delighted to inform you that ${companyName} has extended an official internship offer for the ${internshipTitle} position. Congratulations!\n\n` +
-    `The official offer letter is attached to this email as a PDF. You can view the details, terms, and submit your response directly through the ZYR0 platform:\n` +
+    `On behalf of ${companyName}, we are pleased to confirm that an official internship offer has been extended to you for the ${internshipTitle} position.\n\n` +
+    `The official offer letter is attached to this email as a PDF. Please review the full terms and conditions, then confirm your decision through the ZYR0 platform:\n` +
     `${siteUrl}/student/offer-letters\n\n` +
-    `Offer Code: ${offerCode ?? offerId.slice(0, 8).toUpperCase()}\n` +
+    `Offer Code: ${offerCodeStr}\n` +
     `Verify this offer: ${siteUrl}/verify?type=offer&id=${offerId}\n\n` +
-    `Explore ZYR0:\n` +
-    `- About: ${siteUrl}/about\n` +
-    `- Internships: ${siteUrl}/internships\n\n` +
-    `If you have any questions regarding the terms or the role, please contact ${companyName} directly.\n\n` +
+    `This offer remains open until ${expiryDateStr}. We encourage you to accept or decline before the deadline so your internship can be finalized without delay.\n\n` +
+    `If you encounter any issues or have questions, our support team is here to help:\n` +
+    `support@zyroo.org\n\n` +
+    `We look forward to welcoming you on board.\n\n` +
     `With warm regards,\n` +
     `The ZYR0 Team\n` +
     `team@zyroo.org`;
@@ -311,6 +320,7 @@ export default function CompanyOfferLetters() {
           pdfBlob,
           offerId: newOffer!.id,
           offerCode: newOffer!.offer_code,
+          expiresAt: newOffer!.expires_at,
         });
         console.log('Offer letter email sent successfully');
       } catch (emailErr) {
@@ -400,6 +410,7 @@ export default function CompanyOfferLetters() {
         pdfBlob,
         offerId: offer.id,
         offerCode: offer.offer_code,
+        expiresAt: offer.expires_at,
       });
       console.log('Offer letter email resent successfully');
 
