@@ -12,6 +12,7 @@ This document provides a quick reference for the implementation status of each m
 | Internship Listings (Public) | ✅ | Users can browse and view details. |
 | Application Submission | ✅ | Students can apply to internships. |
 | Offer Letter Generation & Storage | ✅ (PNG storage) | Email is treated as a notification; acceptance flow pending. |
+| Offer Letter Premium Document & Verification | ✅ | Premium cotton-paper/gold document (HTML print + canvas PNG) with human-readable `offer_code` (ZYRO-OF-<year>-<random6>), unified `/verify` page (certificate + offer tabs, code/ID entry, QR auto-detection, public RLS read, status-aware outcomes). |
 | **GitHub Submission (first‑class)** | ✅ | Regex URL validation and database-level anti-plagiarism duplicate checking. |
 | **Internship Workspace & Progress Engine** | ✅ | Dynamic database-backed progress timeline with PostgreSQL triggers & real-time updates. |
 | Task Management (Create/Edit) | ✅ | Dual-purpose Create/Edit modal with robust form validation and inline errors. |
