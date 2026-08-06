@@ -832,14 +832,12 @@
     left: 0 !important;
     width: 100% !important;
     margin: 0 !important;
-    padding: 20px !important;
-    border: none !important;
     box-shadow: none !important;
     border-radius: 0 !important;
-    background: #ffffff !important;
-    color: #0f172a !important;
     overflow: visible !important;
     z-index: 999999 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   /* Suppress action bar inside printable roots */
