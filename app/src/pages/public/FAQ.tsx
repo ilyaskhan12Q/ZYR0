@@ -44,7 +44,7 @@ const faqData: FAQCategory[] = [
       },
       {
         q: 'How are offer letters verified?',
-        a: 'Every offer letter issued through ZYR0 carries a unique offer ID and a scannable QR code. Anyone can verify the authenticity of an offer letter at zyroo.org/verify — switch to the "Offer Letter" tab and enter the offer ID, or simply scan the QR code printed on the document. The page shows the offer\'s current status, including accepted, rejected, expired, or revoked.',
+        a: 'Every offer letter issued through ZYR0 carries a unique offer code (e.g. ZYRO-OF-2026-123456), a unique offer ID, and a scannable QR code. Anyone can verify the authenticity of an offer letter at zyroo.org/verify — switch to the "Offer Letter" tab and enter either the offer code or offer ID, or simply scan the QR code printed on the document. The page shows the offer\'s current status, including accepted, rejected, expired, or revoked.',
       },
       {
         q: 'Can I apply to multiple internships at once?',
