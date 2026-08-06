@@ -47,7 +47,7 @@ function formatDate(iso: string) {
 function buildShortlistEmail(app: any) {
   const role = roleTitle(app.preferred_role);
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
-  const linkedInUrl = import.meta.env.VITE_LINKEDIN_COMPANY_URL || 'https://linkedin.com/company/zyroo';
+  const teamGroupUrl = import.meta.env.VITE_WHATSAPP_TEAM_GROUP_URL || 'https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX';
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,9 +70,9 @@ function buildShortlistEmail(app: any) {
             <td style="padding: 32px 40px;">
               <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${app.full_name},</p>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                It is with great pleasure that we write to you today. Your application for the
-                <strong style="color: #1e3a8a;">${role}</strong> seat on the ZYR0 Founding Development
-                Team stood out among a distinguished field — and we would be honoured to move forward with you.
+                Thank you for applying to join the ZYR0 Founding Development Team. After a careful
+                review of all applications, we are pleased to confirm that you have advanced to the
+                shortlist stage for the <strong style="color: #1e3a8a;">${role}</strong> team seat.
               </p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
                 <tr>
@@ -83,23 +83,30 @@ function buildShortlistEmail(app: any) {
                 </tr>
               </table>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                In the coming days, a member of our team will reach out to schedule a conversation — a chance
-                for us to learn about you, and for you to learn about us. Please keep an eye on your inbox,
-                and feel free to reply to this email with anything you would like us to consider before we speak.
+                A member of our team will reach out in the coming days to schedule a conversation —
+                an opportunity to get to know you better and for you to learn more about the role.
+                Please keep an eye on your inbox.
               </p>
-              <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
+              <p style="margin: 0 0 18px; font-size: 14px; line-height: 1.8; color: #3d372e;">
+                In the meantime, you are welcome to join the ZYR0 team group on WhatsApp to connect
+                with your future teammates: <a href="${teamGroupUrl}" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Join the Team WhatsApp Group</a>.
+              </p>
+              <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">What Happens Next</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
                 <tr>
                   <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
-                    <a href="${siteUrl}/careers" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View ZYR0 Careers</a>
+                    <a href="${siteUrl}/careers" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">Explore ZYR0 Careers</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
-                <a href="${siteUrl}/about" style="color: #1e3a8a;">About ZYR0</a>
-                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <a href="${linkedInUrl}" style="color: #1e3a8a;">ZYR0 on LinkedIn</a>
-              </p>
+              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Have questions about your application? Our support team is ready to help.</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
+                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
+                  </td>
+                </tr>
+              </table>
               <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
             </td>
           </tr>
@@ -118,14 +125,15 @@ function buildShortlistEmail(app: any) {
   const text = [
     `Dear ${app.full_name},`,
     '',
-    `It is with great pleasure that we write to you today. Your application for the ${role} seat on the ZYR0 Founding Development Team stood out among a distinguished field — and we would be honoured to move forward with you.`,
+    `Thank you for applying to join the ZYR0 Founding Development Team. After a careful review of all applications, we are pleased to confirm that you have advanced to the shortlist stage for the ${role} team seat.`,
     '',
-    `In the coming days, a member of our team will reach out to schedule a conversation — a chance for us to learn about you, and for you to learn about us. Please keep an eye on your inbox, and feel free to reply to this email with anything you would like us to consider before we speak.`,
+    `A member of our team will reach out in the coming days to schedule a conversation — an opportunity to get to know you better and for you to learn more about the role. Please keep an eye on your inbox.`,
     '',
-    `Explore ZYR0:`,
-    `- Careers: ${siteUrl}/careers`,
-    `- About: ${siteUrl}/about`,
-    `- LinkedIn: ${linkedInUrl}`,
+    `What Happens Next:`,
+    `- Explore ZYR0 Careers: ${siteUrl}/careers`,
+    `- Join the Team WhatsApp Group: ${teamGroupUrl}`,
+    '',
+    `Have questions about your application? Contact our support team: ${siteUrl}/contact`,
     '',
     'With warm regards,',
     'The ZYR0 Team',
