@@ -49,6 +49,8 @@ const FONTS_CSS_URL =
   '&family=Montserrat:wght@300;400;500;600;700;800' +
   '&family=Playfair+Display:ital,wght@1,600&display=swap';
 
+const FOOTER_H = 54;
+
 // ── Main Export ───────────────────────────────────────────────────────────────
 
 /**
@@ -262,8 +264,8 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     `academic background, and prior experience, we believe your talent and commitment will be a valuable ` +
     `addition to our organization. Please find the terms of engagement and offer details below:`;
 
-  wrapText(ctx, openingText, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 22, INK, `400 13.5px ${FONT_SANS}`, 1.55);
-  y += 96;
+  // Advance by the paragraph's *measured* height so the card below never overlaps it.
+  y = wrapText(ctx, openingText, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 20, INK, `400 13px ${FONT_SANS}`, 1.45) + 20;
 
   // ── Position & Engagement Details Card ─────────────────────────────────────
   const cardW = PAGE_WIDTH - MARGIN * 2;
@@ -284,12 +286,16 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.font = `700 11px ${FONT_SANS}`;
   ctx.fillText('POSITION & ENGAGEMENT DETAILS', MARGIN + 40, y + 26);
 
+  const workArrangement = internship?.location && internship.location !== internship.location_type
+    ? `${internship?.location_type ?? 'Remote'} (${internship.location})`
+    : (internship?.location_type || 'Remote');
+
   let fieldsY = y + 56;
   const fields: Array<[string, string]> = [
     ['Candidate Name', student?.full_name ?? '—'],
     ['Position Title', internship?.title ?? '—'],
     ['Internship Category', internship?.type ?? 'Internship'],
-    ['Work Arrangement', `${internship?.location_type ?? 'Remote'} (${internship?.location ?? company?.location ?? 'Remote'})`],
+    ['Work Arrangement', workArrangement],
     ['Duration', internship?.duration ?? 'Flexible'],
     ['Proposed Start', internship?.start_date ? new Date(internship.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'To be agreed'],
     ['Stipend / Compensation', internship?.stipend ? `${internship.stipend} (${internship.stipend_type ?? 'Monthly'})` : 'Experience-Based'],
@@ -315,24 +321,67 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
 
   y += cardH + 30;
 
+  // ── Responsibilities & Terms: content sizing ────────────────────────────────
+  // Everything below flows with *measured* heights. A budget loop runs first:
+  // if the natural content would collide with the signature zone, trailing
+  // responsibilities (least essential) are dropped, then trailing terms,
+  // until it fits — the card, signature, and footer are never overlapped.
+  const contentW = PAGE_WIDTH - MARGIN * 2;
+
+  const RESP_FONT = `400 11.5px ${FONT_SANS}`;
+  const RESP_LH = 17;
+  const RESP_SP = 1.35;
+
+  const TERM_FONT = `400 11px ${FONT_SANS}`;
+  const TERM_LH = 16;
+  const TERM_SP = 1.4;
+
+  let respList = internship?.responsibilities?.length
+    ? internship.responsibilities.slice()
+    : [];
+
+  let termList = [
+    'This offer is contingent upon verification of candidate credentials and completion of required onboarding paperwork.',
+    'You are expected to maintain professional standards, confidentiality, and data safety during the internship.',
+    `This offer remains valid until ${offer.expires_at ? new Date(offer.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '30 days from issuance'}, after which it may expire automatically unless extended.`,
+  ];
+
+  const respLines = (r: string) => measureWrapped(ctx, r, contentW - 22, RESP_FONT, RESP_LH, RESP_SP);
+  const termLines = (t: string) => measureWrapped(ctx, t, contentW - 22, TERM_FONT, TERM_LH, TERM_SP);
+  const sectionSpace = () => {
+    const respH = respList.length
+      ? 22 + respList.reduce((h, r) => h + respLines(r) * RESP_LH * RESP_SP, 0) + 14
+      : 0;
+    const termsH = termList.reduce((h, t) => h + termLines(t) * TERM_LH * TERM_SP, 0);
+    return respH + 22 + termsH + 26;
+  };
+
+  // Safe zone: signature rule sits between ideal (917) and just above the footer.
+  const idealSigY = PAGE_HEIGHT - 214;
+  const maxSigY = PAGE_HEIGHT - FOOTER_H - 106;
+
+  for (let guard = 0; guard < 20; guard++) {
+    if (y + sectionSpace() <= maxSigY - 6) break;
+    if (respList.length) respList.pop();
+    else if (termList.length > 2) termList.pop();
+    else break;
+  }
+
   // ── Responsibilities Section ───────────────────────────────────────────────
-  if (internship?.responsibilities && internship.responsibilities.length > 0) {
+  if (respList.length) {
     ctx.fillStyle = NAVY;
     ctx.font = `700 13px ${FONT_SANS}`;
     ctx.fillText('KEY RESPONSIBILITIES', MARGIN, y);
     y += 22;
 
-    internship.responsibilities.slice(0, 4).forEach((resp) => {
+    for (const resp of respList) {
       ctx.fillStyle = GOLD;
-      ctx.font = `700 14px ${FONT_CINZEL}`;
+      ctx.font = `700 13px ${FONT_CINZEL}`;
       ctx.fillText('•', MARGIN + 4, y);
 
-      ctx.fillStyle = TEXT_SOFT;
-      ctx.font = `400 12px ${FONT_SANS}`;
-      ctx.fillText(truncateString(resp, 92), MARGIN + 22, y);
-      y += 21;
-    });
-    y += 12;
+      y = wrapText(ctx, resp, MARGIN + 22, y, contentW - 22, RESP_LH, TEXT_SOFT, RESP_FONT, RESP_SP);
+    }
+    y += 14;
   }
 
   // ── Terms & Conditions ─────────────────────────────────────────────────────
@@ -341,25 +390,20 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillText('TERMS & CONDITIONS', MARGIN, y);
   y += 22;
 
-  const terms = [
-    'This offer is contingent upon verification of candidate credentials and completion of required onboarding paperwork.',
-    'You are expected to maintain professional standards, confidentiality, and data safety during the internship.',
-    `This offer remains valid until ${offer.expires_at ? new Date(offer.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '30 days from issuance'}, after which it may expire automatically unless extended.`,
-  ];
-
-  terms.forEach((term, index) => {
+  termList.forEach((term, index) => {
     ctx.fillStyle = GOLD;
     ctx.font = `700 12px ${FONT_CINZEL}`;
     ctx.fillText(`${index + 1}`, MARGIN, y);
 
-    wrapText(ctx, term, MARGIN + 22, y, PAGE_WIDTH - MARGIN * 2 - 22, 18, TEXT_SOFT, `400 11.5px ${FONT_SANS}`, 1.4);
-    y += 26;
+    y = wrapText(ctx, term, MARGIN + 22, y, contentW - 22, TERM_LH, TEXT_SOFT, TERM_FONT, TERM_SP);
   });
 
   y += 26;
 
   // ── Signatory Line & Verification Section ───────────────────────────────────
-  const sigY = PAGE_HEIGHT - 214;
+  // Floats between the ideal position and just above the footer so the
+  // signature block can never collide with content or the navy footer.
+  const sigY = Math.max(idealSigY, Math.min(y + 4, maxSigY));
 
   // Signature rule + details
   ctx.strokeStyle = GOLD;
@@ -392,8 +436,8 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   }
 
   // Verification QR box (gold-framed, right side)
-  const qrBoxW = 212;
-  const qrBoxH = 84;
+  const qrBoxW = 224;
+  const qrBoxH = 96;
   const qrBoxX = PAGE_WIDTH - MARGIN - qrBoxW;
   const qrBoxY = sigY - 6;
 
@@ -405,45 +449,46 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fill();
   ctx.stroke();
 
-  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 60);
+  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 76);
 
   ctx.fillStyle = NAVY;
   ctx.font = `700 11px ${FONT_SANS}`;
-  ctx.fillText('VERIFIED OFFER', qrBoxX + 88, qrBoxY + 26);
+  ctx.fillText('VERIFIED OFFER', qrBoxX + 100, qrBoxY + 30);
 
   ctx.fillStyle = TEXT_MUTED;
   ctx.font = `400 9.5px ${FONT_SANS}`;
-  ctx.fillText('Scan to authenticate', qrBoxX + 88, qrBoxY + 42);
-  ctx.fillText('via ZYR0 Platform', qrBoxX + 88, qrBoxY + 56);
+  ctx.fillText('Scan to authenticate', qrBoxX + 100, qrBoxY + 48);
+  ctx.fillText('via ZYR0 Platform', qrBoxX + 100, qrBoxY + 62);
 
   // ── Bottom navy security footer with gold rule ─────────────────────────────
-  const footerH = 48;
-  const footerY = PAGE_HEIGHT - footerH;
+  const footerY = PAGE_HEIGHT - FOOTER_H;
 
   ctx.fillStyle = GOLD;
   ctx.fillRect(0, footerY, PAGE_WIDTH, 2);
 
   ctx.fillStyle = NAVY;
-  ctx.fillRect(0, footerY + 2, PAGE_WIDTH, footerH - 2);
+  ctx.fillRect(0, footerY + 2, PAGE_WIDTH, FOOTER_H - 2);
+
+  ctx.textAlign = 'center';
+
+  const footerOfferLabel = offer.offer_code
+    ? `Offer Code: ${offer.offer_code}   ·   Offer ID: ${offer.id.slice(0, 8)}`
+    : `Offer ID: ${offer.id.slice(0, 8)}`;
 
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `400 8.5px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  const footerOfferLabel = offer.offer_code
-    ? `Offer Code: ${offer.offer_code}  ·  Offer ID: ${offer.id.slice(0, 8)}`
-    : `Offer ID: ${offer.id.slice(0, 8)}`;
-  ctx.fillText(
-    `${footerOfferLabel}  ·  Verify at ${verificationUrl}`,
-    PAGE_WIDTH / 2,
-    footerY + 23
-  );
+  ctx.font = `400 9.5px ${FONT_SANS}`;
+  ctx.fillText(footerOfferLabel, PAGE_WIDTH / 2, footerY + 22);
+
+  ctx.fillStyle = 'rgba(255,255,255,.8)';
+  ctx.font = `400 9px ${FONT_SANS}`;
+  ctx.fillText(`Verify at ${verificationUrl}`, PAGE_WIDTH / 2, footerY + 38);
 
   ctx.fillStyle = 'rgba(255,255,255,.65)';
-  ctx.font = `400 9px ${FONT_SANS}`;
+  ctx.font = `400 8.5px ${FONT_SANS}`;
   ctx.fillText(
-    `© ${new Date().getFullYear()} ZYR0 Platform · ${company?.name ?? ''} · Confidential Document`,
+    `© ${new Date().getFullYear()} ZYR0 Platform · ${truncateString(company?.name ?? '', 60)} · Confidential Document`,
     PAGE_WIDTH / 2,
-    footerY + 40
+    footerY + 52
   );
   ctx.textAlign = 'left';
 
@@ -583,7 +628,7 @@ function renderInitialsAvatar(
   ctx.restore();
 }
 
-/** Wrap multiline text nicely within maxWidth. */
+/** Wrap multiline text nicely within maxWidth. Returns the y just below the last line. */
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -593,7 +638,7 @@ function wrapText(
   color: string,
   font: string,
   lineSpacing = 1
-) {
+): number {
   ctx.fillStyle = color;
   ctx.font = font;
   const words = text.split(' ');
@@ -611,6 +656,34 @@ function wrapText(
     }
   }
   if (line) ctx.fillText(line, x, curY);
+  return curY + lineHeight * lineSpacing;
+}
+
+/** Count how many lines wrapped text will occupy, without drawing. */
+function measureWrapped(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  maxWidth: number,
+  font: string,
+  lineHeight: number,
+  lineSpacing = 1
+): number {
+  if (!text) return 0;
+  ctx.font = font;
+  const words = text.split(' ');
+  let line = '';
+  let lines = 1;
+
+  for (const word of words) {
+    const testLine = line ? `${line} ${word}` : word;
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      lines++;
+      line = word;
+    } else {
+      line = testLine;
+    }
+  }
+  return lines;
 }
 
 /** Truncate text string if too long. */

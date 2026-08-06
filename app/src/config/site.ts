@@ -12,6 +12,7 @@ export const SITE_CONFIG = {
   social: {
     whatsappChannel: import.meta.env.VITE_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F',
     whatsappSupportGroup: import.meta.env.VITE_WHATSAPP_SUPPORT_GROUP_URL || 'https://chat.whatsapp.com/Hp2rnX1B61PDzVlbF89Tha',
+    whatsappTeamGroup: import.meta.env.VITE_WHATSAPP_TEAM_GROUP_URL || 'https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX',
     linkedinCompany: import.meta.env.VITE_LINKEDIN_COMPANY_URL || 'https://linkedin.com/company/zyr0-co',
   }
 };

@@ -115,10 +115,10 @@ serve(async (req) => {
             <td style="padding: 32px 40px;">
               <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear <strong>${student.full_name}</strong>,</p>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                Congratulations on successfully completing your internship. It has been a privilege to
-                witness your dedication, and we are proud to issue your official digital certificate for
-                <strong style="color: #1e3a8a;">${certificate.title}</strong>. This credential is a testament to your
-                hard work — may it open many doors ahead.
+                Congratulations on completing your internship. Your dedication throughout the program
+                has been recognized, and we are pleased to issue your official digital certificate for
+                <strong style="color: #1e3a8a;">${certificate.title}</strong>. This credential can be
+                viewed, shared, or verified at any time through the ZYR0 platform.
               </p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
                 <tr>
@@ -137,11 +137,14 @@ serve(async (req) => {
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
-                <a href="${siteUrl}/about" style="color: #1e3a8a;">Discover ZYR0</a>
-                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <a href="${siteUrl}/internships" style="color: #1e3a8a;">Explore New Opportunities</a>
-              </p>
+              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Having trouble viewing your certificate or need assistance? Our support team is ready to help.</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
+                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
+                  </td>
+                </tr>
+              </table>
               <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
             </td>
           </tr>
@@ -159,13 +162,12 @@ serve(async (req) => {
 </html>`;
 
         const emailText = `Dear ${student.full_name},\n\n` +
-          `Congratulations on successfully completing your internship! We are proud to issue your official digital certificate for ${certificate.title}.\n\n` +
+          `Congratulations on completing your internship. Your dedication throughout the program has been recognized, and we are pleased to issue your official digital certificate for ${certificate.title}.\n\n` +
           `Credential ID: ${certificate.credential_id}\n\n` +
           `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
           `${siteUrl}/verify/${certificate.credential_id}\n\n` +
-          `Explore ZYR0:\n` +
-          `- About: ${siteUrl}/about\n` +
-          `- Internships: ${siteUrl}/internships\n\n` +
+          `Having trouble viewing your certificate? Contact our support team:\n` +
+          `${siteUrl}/contact\n\n` +
           `With warm regards,\n` +
           `The ZYR0 Team\n` +
           `team@zyroo.org`;
@@ -358,10 +360,10 @@ serve(async (req) => {
             <td style="padding: 32px 40px;">
               <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear <strong>${student.full_name}</strong>,</p>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                Congratulations on successfully completing your internship. It has been a privilege to
-                witness your dedication, and we are proud to issue your official digital certificate for
-                <strong style="color: #1e3a8a;">${title}</strong>. This credential is a testament to your
-                hard work — may it open many doors ahead.
+                Congratulations on completing your internship. Your dedication throughout the program
+                has been recognized, and we are pleased to issue your official digital certificate for
+                <strong style="color: #1e3a8a;">${title}</strong>. This credential can be viewed,
+                shared, or verified at any time through the ZYR0 platform.
               </p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
                 <tr>
@@ -380,11 +382,14 @@ serve(async (req) => {
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 14px; font-size: 14px; line-height: 1.8; color: #3d372e; text-align: center;">
-                <a href="${siteUrl}/about" style="color: #1e3a8a;">Discover ZYR0</a>
-                <span style="color: #b89c56;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <a href="${siteUrl}/internships" style="color: #1e3a8a;">Explore New Opportunities</a>
-              </p>
+              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Having trouble viewing your certificate or need assistance? Our support team is ready to help.</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
+                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
+                  </td>
+                </tr>
+              </table>
               <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
             </td>
           </tr>
@@ -402,13 +407,12 @@ serve(async (req) => {
 </html>`;
 
         const emailText = `Dear ${student.full_name},\n\n` +
-          `Congratulations on successfully completing your internship! We are proud to issue your official digital certificate for ${title}.\n\n` +
+          `Congratulations on completing your internship. Your dedication throughout the program has been recognized, and we are pleased to issue your official digital certificate for ${title}.\n\n` +
           `Credential ID: ${credentialId}\n\n` +
           `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
           `${siteUrl}/verify/${credentialId}\n\n` +
-          `Explore ZYR0:\n` +
-          `- About: ${siteUrl}/about\n` +
-          `- Internships: ${siteUrl}/internships\n\n` +
+          `Having trouble viewing your certificate? Contact our support team:\n` +
+          `${siteUrl}/contact\n\n` +
           `With warm regards,\n` +
           `The ZYR0 Team\n` +
           `team@zyroo.org`;
