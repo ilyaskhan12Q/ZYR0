@@ -336,7 +336,9 @@ serve(async (req) => {
         lastError = smtpErr;
       }
     } else {
-      console.log('[send-email] Skipping SMTP delivery: SMTP configuration is incomplete or missing.');
+      const missingSmtp = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS']
+        .filter((key) => !Deno.env.get(key));
+      console.log(`[send-email] Skipping SMTP delivery: missing env var(s): ${missingSmtp.join(', ')}`);
     }
 
     // Fallback to Resend API
