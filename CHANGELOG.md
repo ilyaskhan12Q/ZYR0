@@ -5,6 +5,71 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- **Careers — signup required to apply**: the application form now shows a sign-in gate for anonymous visitors; applications are linked to the applicant's ZYR0 account (`user_id`, migration `030`) and anonymous inserts are blocked by RLS. The hero "Explore Open Roles" CTA links to the registration page instead of scrolling to the roles list.
+- **Team application form**: motivation minimum lowered from 60 to 30 characters.
+
+### Fixed
+- **Team application submit error**: submission actually succeeded, but the client read-back (`insert().select().single()`) failed under RLS (admins-only SELECT), surfacing a false "Something went wrong" error. The insert now skips the read-back, so applicants get the success screen immediately.
+
+### Added
+- **Founding Development Team recruitment experience** (`/careers`, `feature/founding-development-team`):
+  - Premium V3 recruitment page: FoundingHero (canvas particles + repo-window mockup + floating role cards), Mission, Why Join (6), Culture (8), Open Roles (11 roles / 20 seats across Engineering, Design, AI & Data, Platform, Community, Growth), Workflow timeline (7 steps), Selection timeline (7 steps), Expectations (9), Recognition (6), FAQ (6), and final CTA.
+  - Multi-step application form (Basics → Links & Resume → Role & Skills → Commitment → Review) with client-side validation, PDF/DOC resume upload (≤5 MB) and a confirmation success screen. Collects phone and gender in the Basics step (migration `029`).
+  - SEO structured data: `BreadcrumbList` + `FAQPage` on the public careers route.
+  - `Careers` link in the public navigation.
+- **Team applications database + admin workflow**:
+  - `team_applications` table and `team-resumes` storage bucket (public read, anonymous upload) in migration `028`; RLS allows public insert, admin-only read/update/delete via `is_admin()`.
+  - `app/src/services/teamApplications.ts`: anonymous submit (resume upload + insert), admin list/status/delete, email-sent tracking.
+  - New admin page `/admin/team-applications`: status tabs, search, bulk "Email Selected" shortlist emails via the `send-email` edge function, CSV export, full-detail dialog, per-row status updates and delete; registered in `AdminPortal` and the admin sidebar.
+
+## [0.29.3] - 2026-08-06
+
+### Changed
+- **Careers — Open Roles is now a compact preview**: the section shows the first 2 roles under the "All roles" filter with a centered "Show all 11 roles" / "Show less" toggle (chevron rotates); changing the department filter resets the preview.
+
+## [0.29.2] - 2026-08-06
+
+### Changed
+- **Certificate of completion emails humanized**: both the real and fallback templates now use professional formal copy with a single "View Verified Certificate" CTA and a gold-outlined "Contact Support" secondary button linking to the support page; plain-text versions match.
+
+## [0.29.1] - 2026-08-06
+
+### Added
+- **ZYR0 team WhatsApp group invite**: `SITE_CONFIG.social.whatsappTeamGroup` (env `VITE_WHATSAPP_TEAM_GROUP_URL`, fallback `https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX`); the shortlist email now invites shortlisted candidates to the team's WhatsApp group alongside the careers CTA and support button.
+
+## [0.29.0] - 2026-08-06
+
+### Changed
+- **Contact Support is a real secondary button**: in transactional emails, the support link is now a gold-outlined button (navy text) linking to the support page (`/contact`) instead of a plain text link — still secondary to the single primary CTA.
+
+## [0.28.5] - 2026-08-06
+
+### Changed
+- **Offer-letter email rewritten to a professional tone**: single CTA "Review & Respond to Offer" linking to `/student/offer-letters`, an expiry reminder derived from the offer's `expiresAt` date, a support link, and a matching plain-text version.
+
+## [0.28.4] - 2026-08-06
+
+### Fixed
+- **Offer letter PDF shows the work arrangement once**: values that already included the type (e.g. `Remote (Remote)`) were double-labeled — the arrangement is now de-duplicated (`Remote (Remote)` → `Remote`).
+
+## [0.28.3] - 2026-08-06
+
+### Fixed
+- **Offer letter PDF footer never clips on wide URLs**: the footer is split into three clean lines with its own reserved band (`FOOTER_H = 54`), so the full offer ID, QR prompt, and page number always render inside the page; the signature rule is clamped above the footer band.
+
+## [0.28.2] - 2026-08-06
+
+### Fixed
+- **Offer letter QR enlarged for reliable scanning**: the scannable QR code was bumped from 60px to 76px inside a taller gold box, matching the certificate's scannability.
+
+## [0.28.1] - 2026-08-06
+
+### Fixed
+- **Offer letter PDF text flow is now measured**: `wrapText` returns the consumed height and the layout measures every wrapped line, so the opening paragraph and terms never overlap the gold card or the signature; when content exceeds the page, a content budget trims trailing responsibilities/terms instead of overlapping them.
+
 ## [0.28.0] - 2026-08-06
 
 ### Added
@@ -142,26 +207,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **CS-focused domain dropdown**: internship Domain fields now use a grouped list of computer-science domains (Computer Science, AI & Data, Security & Cloud, Hardware & Systems, Business & Other) shared across the company post/edit internship forms, the student internship filters, and admin analytics — replacing the small generic list.
-
-## [Unreleased]
-
-### Changed
-- **Careers — signup required to apply**: the application form now shows a sign-in gate for anonymous visitors; applications are linked to the applicant's ZYR0 account (`user_id`, migration `030`) and anonymous inserts are blocked by RLS. The hero "Explore Open Roles" CTA links to the registration page instead of scrolling to the roles list.
-- **Team application form**: motivation minimum lowered from 60 to 30 characters.
-
-### Fixed
-- **Team application submit error**: submission actually succeeded, but the client read-back (`insert().select().single()`) failed under RLS (admins-only SELECT), surfacing a false "Something went wrong" error. The insert now skips the read-back, so applicants get the success screen immediately.
-
-### Added
-- **Founding Development Team recruitment experience** (`/careers`, `feature/founding-development-team`):
-  - Premium V3 recruitment page: FoundingHero (canvas particles + repo-window mockup + floating role cards), Mission, Why Join (6), Culture (8), Open Roles (11 roles / 20 seats across Engineering, Design, AI & Data, Platform, Community, Growth), Workflow timeline (7 steps), Selection timeline (7 steps), Expectations (9), Recognition (6), FAQ (6), and final CTA.
-  - Multi-step application form (Basics → Links & Resume → Role & Skills → Commitment → Review) with client-side validation, PDF/DOC resume upload (≤5 MB) and a confirmation success screen. Collects phone and gender in the Basics step (migration `029`).
-  - SEO structured data: `BreadcrumbList` + `FAQPage` on the public careers route.
-  - `Careers` link in the public navigation.
-- **Team applications database + admin workflow**:
-  - `team_applications` table and `team-resumes` storage bucket (public read, anonymous upload) in migration `028`; RLS allows public insert, admin-only read/update/delete via `is_admin()`.
-  - `app/src/services/teamApplications.ts`: anonymous submit (resume upload + insert), admin list/status/delete, email-sent tracking.
-  - New admin page `/admin/team-applications`: status tabs, search, bulk "Email Selected" shortlist emails via the `send-email` edge function, CSV export, full-detail dialog, per-row status updates and delete; registered in `AdminPortal` and the admin sidebar.
 
 ## [0.22.0] - 2026-08-03
 
