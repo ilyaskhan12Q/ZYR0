@@ -283,7 +283,7 @@ export default function Verify() {
                 type="text"
                 value={offerId}
                 onChange={(e) => { setOfferId(e.target.value); setOfferResult('idle'); }}
-                placeholder="Enter Offer ID (e.g., f67880b0-9ed4-41d3-8657-80b4778713bd)"
+                placeholder="Enter Offer Code (e.g., ZYRO-OF-2026-123456) or Offer ID"
                 className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
                 onKeyDown={(e) => e.key === 'Enter' && handleVerifyOffer()}
               />
