@@ -73,7 +73,8 @@ export default function AdminOfferLetters() {
       || (o.student?.full_name  ?? '').toLowerCase().includes(q)
       || (o.company?.name       ?? '').toLowerCase().includes(q)
       || (o.internship?.title   ?? '').toLowerCase().includes(q)
-      || o.id.toLowerCase().includes(q);
+      || o.id.toLowerCase().includes(q)
+      || (o.offer_code ?? '').toLowerCase().includes(q);
   });
 
   // ── Revoke ───────────────────────────────────────────────────────────────────
@@ -202,7 +203,7 @@ export default function AdminOfferLetters() {
                             />
                             <div>
                               <p className="text-sm font-medium">{offer.student?.full_name ?? '—'}</p>
-                              <p className="text-xs text-muted-foreground font-mono">{offer.id.slice(0, 8)}</p>
+                              <p className="text-xs text-muted-foreground font-mono">{offer.offer_code ?? offer.id.slice(0, 8)}</p>
                             </div>
                           </div>
                         </td>
@@ -317,6 +318,7 @@ export default function AdminOfferLetters() {
             <div className="p-5 space-y-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 {[
+                  ['Offer Code', selected.offer_code ?? '—'],
                   ['Offer ID',  selected.id],
                   ['Company',   selected.company?.name   ?? '—'],
                   ['Status',    selected.status],

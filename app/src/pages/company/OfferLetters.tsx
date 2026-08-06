@@ -46,8 +46,9 @@ async function sendOfferLetterEmail(opts: {
   internship: { title?: string | null };
   pdfBlob: Blob;
   offerId: string;
+  offerCode?: string | null;
 }): Promise<void> {
-  const { student, company, internship, pdfBlob, offerId } = opts;
+  const { student, company, internship, pdfBlob, offerId, offerCode } = opts;
   let studentEmail = student.email;
 
   if (!studentEmail && student.id) {
@@ -103,6 +104,7 @@ async function sendOfferLetterEmail(opts: {
                   <td style="padding: 18px 24px; text-align: center;">
                     <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Offer Recipient</p>
                     <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #1e3a8a;">${companyName} — ${internshipTitle}</p>
+                    <p style="margin: 10px 0 0; font-size: 11px; letter-spacing: 1.5px; color: #8a7f6c;">Offer Code: <strong style="color: #1e3a8a;">${offerCode ?? offerId.slice(0, 8).toUpperCase()}</strong> &nbsp;·&nbsp; Verify at <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="color: #1e3a8a;">${siteUrl}/verify</a></p>
                   </td>
                 </tr>
               </table>
@@ -140,6 +142,8 @@ async function sendOfferLetterEmail(opts: {
     `We are delighted to inform you that ${companyName} has extended an official internship offer for the ${internshipTitle} position. Congratulations!\n\n` +
     `The official offer letter is attached to this email as a PDF. You can view the details, terms, and submit your response directly through the ZYR0 platform:\n` +
     `${siteUrl}/student/offer-letters\n\n` +
+    `Offer Code: ${offerCode ?? offerId.slice(0, 8).toUpperCase()}\n` +
+    `Verify this offer: ${siteUrl}/verify?type=offer&id=${offerId}\n\n` +
     `Explore ZYR0:\n` +
     `- About: ${siteUrl}/about\n` +
     `- Internships: ${siteUrl}/internships\n\n` +
@@ -306,6 +310,7 @@ export default function CompanyOfferLetters() {
           internship,
           pdfBlob,
           offerId: newOffer!.id,
+          offerCode: newOffer!.offer_code,
         });
         console.log('Offer letter email sent successfully');
       } catch (emailErr) {
@@ -394,6 +399,7 @@ export default function CompanyOfferLetters() {
         internship,
         pdfBlob,
         offerId: offer.id,
+        offerCode: offer.offer_code,
       });
       console.log('Offer letter email resent successfully');
 
@@ -754,7 +760,8 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
               )}
 
               <div className="text-xs text-muted-foreground font-mono bg-muted px-3 py-2 rounded-lg break-all">
-                Offer ID: {offer.id}
+                {offer.offer_code ? `Offer Code: ${offer.offer_code}` : 'Offer Code: —'}{' '}
+                <span className="opacity-60">· Offer ID: {offer.id}</span>
               </div>
             </div>
           )}
