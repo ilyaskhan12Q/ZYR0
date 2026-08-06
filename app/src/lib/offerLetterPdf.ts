@@ -1,14 +1,19 @@
 /**
  * Offer Letter PDF / Image Generator
  *
- * Generates a professional, high-trust offer letter document directly in the browser
+ * Generates a premium, classical offer letter document directly in the browser
  * using HTML5 Canvas API with ZERO external network dependencies or CORS failure risks.
+ *
+ * Mirrors the certificate's design language: cream cotton-paper texture, champagne-gold
+ * double frame, filigree corners, guilloché "O" + ZYR0 logo watermark, Cinzel/Montserrat
+ * typography.
  *
  * The output is returned as a Blob (PNG/image format) for Supabase Storage or direct download.
  */
 
 import type { OfferLetter } from '@/lib/database.types';
 import QRCode from 'qrcode';
+import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg } from '@/components/certificateTemplate';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -21,19 +26,33 @@ export interface OfferLetterPdfData {
 
 const PAGE_WIDTH = 800;   // A4 proportions @96 dpi
 const PAGE_HEIGHT = 1131;
-const MARGIN = 54;
-const PRIMARY_DARK = '#0F172A'; // Slate 900
-const PRIMARY_BLUE = '#2563EB'; // Blue 600
-const TEXT_DARK = '#1E293B';    // Slate 800
-const TEXT_MUTED = '#64748B';   // Slate 500
-const TEXT_LIGHT = '#94A3B8';   // Slate 400
-const BG_CARD = '#F8FAFC';      // Slate 50
-const BORDER_COLOR = '#E2E8F0'; // Slate 200
+const MARGIN = 64;
+
+// Classical premium palette (shared with certificate + email redesigns)
+const PAPER_CREAM = '#f1ece0';
+const PAPER_IVORY = '#fffdf5';
+const PAPER_TAN = '#efe5ca';
+const GOLD = '#b89c56';
+const GOLD_DARK = '#a3874f';
+const GOLD_SOFT = '#cbb880';
+const NAVY = '#1e3a8a';
+const INK = '#13100d';
+const TEXT_MUTED = '#8a7f6c';
+const TEXT_SOFT = '#5b544a';
+
+const FONT_CINZEL = `'Cinzel', Georgia, 'Times New Roman', serif`;
+const FONT_SANS = `'Montserrat', -apple-system, 'Segoe UI', Arial, sans-serif`;
+const FONT_SCRIPT = `'Playfair Display', Georgia, serif`;
+
+const FONTS_CSS_URL =
+  'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700' +
+  '&family=Montserrat:wght@300;400;500;600;700;800' +
+  '&family=Playfair+Display:ital,wght@1,600&display=swap';
 
 // ── Main Export ───────────────────────────────────────────────────────────────
 
 /**
- * Render a professional offer letter on an off-screen Canvas and return it as a Blob.
+ * Render a premium offer letter on an off-screen Canvas and return it as a Blob.
  * Uses safe image pre-loading and fallback initial avatars to guarantee success.
  */
 export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<Blob> {
@@ -43,28 +62,107 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   const student    = offer.student;
   const company    = offer.company;
 
+  // Preload premium fonts + texture assets (never blocks: graceful fallbacks).
+  const [paperTex, filigreeImg, zyroLogo] = await Promise.all([
+    Promise.all([
+      svgToImage(noiseSvg()),
+      svgToImage(mottleSvg()),
+      svgToImage(fiberSvg()),
+    ]),
+    svgToImage(filigreeSvg()),
+    safeLoadImage(`${window.location.origin}/zyro-logo.png`),
+    ensurePremiumFonts(),
+  ]);
+
   // ── Create off-screen canvas ──────────────────────────────────────────────
   const canvas = document.createElement('canvas');
   canvas.width  = PAGE_WIDTH;
   canvas.height = PAGE_HEIGHT;
   const ctx = canvas.getContext('2d')!;
 
-  // ── Background ────────────────────────────────────────────────────────────
-  ctx.fillStyle = '#FFFFFF';
+  // ── Cotton-paper background ───────────────────────────────────────────────
+  ctx.fillStyle = PAPER_CREAM;
   ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
-  // Top Accent Bar (Gradient)
-  const topGrad = ctx.createLinearGradient(0, 0, PAGE_WIDTH, 0);
-  topGrad.addColorStop(0, PRIMARY_DARK);
-  topGrad.addColorStop(0.5, PRIMARY_BLUE);
-  topGrad.addColorStop(1, '#4F46E5');
-  ctx.fillStyle = topGrad;
-  ctx.fillRect(0, 0, PAGE_WIDTH, 8);
+  const bgGrad = ctx.createRadialGradient(400, 400, 80, 400, 460, 700);
+  bgGrad.addColorStop(0, PAPER_IVORY);
+  bgGrad.addColorStop(0.68, '#f7f0dd');
+  bgGrad.addColorStop(1, PAPER_TAN);
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
-  let y = 50;
+  // Paper grain layers (noise / mottle / fibers)
+  drawTiled(ctx, paperTex[0], 0.5);
+  drawTiled(ctx, paperTex[1], 0.5);
+  drawTiled(ctx, paperTex[2], 0.4);
 
-  // ── Header Section ────────────────────────────────────────────────────────
-  // Company Logo or Initials Avatar
+  // ── Soft purple glow behind the watermark ─────────────────────────────────
+  const glow = ctx.createRadialGradient(400, 470, 20, 400, 470, 380);
+  glow.addColorStop(0, 'rgba(140,115,255,.13)');
+  glow.addColorStop(0.45, 'rgba(140,115,255,.05)');
+  glow.addColorStop(1, 'rgba(140,115,255,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 200, PAGE_WIDTH, 560);
+
+  // ── Guilloché "O" watermark ───────────────────────────────────────────────
+  ctx.save();
+  ctx.globalAlpha = 0.55;
+  ctx.lineCap = 'round';
+  for (let r = 72; r <= 232; r += 20) {
+    const purple = r % 40 === 0;
+    ctx.strokeStyle = purple ? '#cdc2ea' : '#d6d2c6';
+    ctx.lineWidth = r === 192 ? 3.2 : 1.7;
+    ctx.setLineDash(r % 60 === 0 ? [14, 10] : [2.5, 5.5]);
+    ctx.stroke(ringPath(400, 470, r, 5, 7, r * 0.23));
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // ── ZYR0 logo watermark ───────────────────────────────────────────────────
+  if (zyroLogo) {
+    ctx.save();
+    ctx.globalAlpha = 0.1;
+    const s = 300;
+    ctx.drawImage(zyroLogo, 400 - s / 2, 470 - s / 2, s, s);
+    ctx.restore();
+  }
+
+  // ── Champagne-gold double frame + thin inner rule ─────────────────────────
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(9, 9, PAGE_WIDTH - 18, PAGE_HEIGHT - 18);
+  ctx.lineWidth = 1;
+  ctx.strokeRect(17, 17, PAGE_WIDTH - 34, PAGE_HEIGHT - 34);
+
+  ctx.globalAlpha = 0.8;
+  ctx.strokeRect(25, 25, PAGE_WIDTH - 50, PAGE_HEIGHT - 50);
+  ctx.globalAlpha = 1;
+
+  // ── Filigree corner ornaments ─────────────────────────────────────────────
+  if (filigreeImg) {
+    const fc = 104;
+    const pad = 30;
+    const corners: Array<[number, number, number, number]> = [
+      [pad, pad, 1, 1],
+      [PAGE_WIDTH - pad - fc, pad, -1, 1],
+      [pad, PAGE_HEIGHT - pad - fc, 1, -1],
+      [PAGE_WIDTH - pad - fc, PAGE_HEIGHT - pad - fc, -1, -1],
+    ];
+    for (const [x, y, sx, sy] of corners) {
+      ctx.save();
+      ctx.translate(sx === -1 ? x + fc : x, sy === -1 ? y + fc : y);
+      ctx.scale(sx, sy);
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(filigreeImg, 0, 0, fc, fc);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  let y = 64;
+
+  // ── Letterhead ────────────────────────────────────────────────────────────
+  // Company logo (gold-framed) or initials avatar
   const logoSize = 64;
   let logoLoaded = false;
   if (company?.logo_url) {
@@ -77,10 +175,9 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
         ctx.clip();
         ctx.drawImage(logoImg, MARGIN, y, logoSize, logoSize);
         ctx.restore();
-        
-        // Subtle border around logo
-        ctx.strokeStyle = BORDER_COLOR;
-        ctx.lineWidth = 1;
+
+        ctx.strokeStyle = GOLD;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
         roundRect(ctx, MARGIN, y, logoSize, logoSize, 12);
         ctx.stroke();
@@ -92,34 +189,26 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   }
 
   if (!logoLoaded) {
-    renderInitialsAvatar(
-      ctx,
-      company?.name ?? 'CO',
-      MARGIN,
-      y,
-      logoSize,
-      PRIMARY_DARK,
-      '#FFFFFF'
-    );
+    renderInitialsAvatar(ctx, company?.name ?? 'CO', MARGIN, y, logoSize, NAVY, PAPER_IVORY);
   }
 
-  // Header Title & Subtitle
+  // Company name + letter subtitle
   const titleX = MARGIN + logoSize + 18;
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
-  ctx.fillText(company?.name ?? 'Company', titleX, y + 26);
+  ctx.fillStyle = INK;
+  ctx.font = `700 21px ${FONT_CINZEL}`;
+  ctx.fillText(truncateString(company?.name ?? 'Company', 30), titleX, y + 26);
 
-  ctx.fillStyle = PRIMARY_BLUE;
-  ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = NAVY;
+  ctx.font = `700 11px ${FONT_SANS}`;
   ctx.fillText('OFFICIAL INTERNSHIP OFFER LETTER', titleX, y + 48);
 
-  // Document Metadata Box (Top Right)
-  const metaBoxW = 200;
+  // Document metadata box (top right)
+  const metaBoxW = 208;
   const metaBoxH = 68;
   const metaBoxX = PAGE_WIDTH - MARGIN - metaBoxW;
-  
-  ctx.fillStyle = BG_CARD;
-  ctx.strokeStyle = BORDER_COLOR;
+
+  ctx.fillStyle = 'rgba(255,253,245,.72)';
+  ctx.strokeStyle = GOLD;
   ctx.lineWidth = 1;
   ctx.beginPath();
   roundRect(ctx, metaBoxX, y, metaBoxW, metaBoxH, 10);
@@ -134,212 +223,224 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     ? new Date(offer.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
     : '30 Days';
 
-  ctx.fillStyle = TEXT_MUTED;
-  ctx.font = '10px monospace';
-  ctx.fillText('OFFER ID:', metaBoxX + 12, y + 22);
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.font = 'bold 10px monospace';
-  ctx.fillText(offer.id.slice(0, 10).toUpperCase(), metaBoxX + 72, y + 22);
+  const metaLabel = (text: string, vx: number, vy: number, value: string, mono = false) => {
+    ctx.fillStyle = '#a99a78';
+    ctx.font = `600 9px ${FONT_SANS}`;
+    ctx.fillText(text.toUpperCase(), metaBoxX + 12, vy);
+    ctx.fillStyle = NAVY;
+    ctx.font = mono
+      ? `700 10px ${FONT_CINZEL}`
+      : `600 10px ${FONT_SANS}`;
+    ctx.fillText(value, metaBoxX + vx, vy);
+  };
 
-  ctx.fillStyle = TEXT_MUTED;
-  ctx.font = '10px sans-serif';
-  ctx.fillText('ISSUED:', metaBoxX + 12, y + 40);
-  ctx.fillStyle = TEXT_DARK;
-  ctx.font = 'semibold 10px sans-serif';
-  ctx.fillText(issueDate, metaBoxX + 72, y + 40);
+  metaLabel('Offer ID', 78, y + 22, offer.id.slice(0, 10).toUpperCase(), true);
+  metaLabel('Issued', 78, y + 40, issueDate);
+  metaLabel('Expiration', 90, y + 56, expiryDate);
 
-  ctx.fillStyle = TEXT_MUTED;
-  ctx.font = '10px sans-serif';
-  ctx.fillText('EXPIRATION:', metaBoxX + 12, y + 56);
-  ctx.fillStyle = TEXT_DARK;
-  ctx.font = 'semibold 10px sans-serif';
-  ctx.fillText(expiryDate, metaBoxX + 72, y + 56);
+  y += 104;
 
-  y += 100;
-
-  // Divider Line
-  ctx.strokeStyle = BORDER_COLOR;
+  // Gold divider rule
+  ctx.strokeStyle = GOLD;
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(MARGIN, y);
   ctx.lineTo(PAGE_WIDTH - MARGIN, y);
   ctx.stroke();
 
-  y += 32;
+  y += 34;
 
   // ── Salutation & Opening Paragraph ─────────────────────────────────────────
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.font = 'bold 15px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = NAVY;
+  ctx.font = `700 15px ${FONT_CINZEL}`;
   ctx.fillText(`Dear ${student?.full_name ?? 'Candidate'},`, MARGIN, y);
-  y += 26;
+  y += 28;
 
   const openingText =
-    `On behalf of ${company?.name ?? 'our company'}, we are pleased to extend an official offer of ` +
-    `internship for the position of ${internship?.title ?? 'Intern'}. After evaluating your ` +
-    `qualifications and background, we believe your skills and enthusiasm will be a great addition to our team. ` +
-    `Please review the position details and terms of engagement set forth below:`;
+    `On behalf of ${company?.name ?? 'our company'}, we are delighted to extend an official offer of ` +
+    `internship for the position of ${internship?.title ?? 'Intern'}. Having reviewed your qualifications, ` +
+    `academic background, and prior experience, we believe your talent and commitment will be a valuable ` +
+    `addition to our organization. Please find the terms of engagement and offer details below:`;
 
-  wrapText(ctx, openingText, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 22, TEXT_DARK, '13.5px system-ui, -apple-system, sans-serif');
-  y += 75;
+  wrapText(ctx, openingText, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 22, INK, `400 13.5px ${FONT_SANS}`, 1.55);
+  y += 96;
 
   // ── Position & Engagement Details Card ─────────────────────────────────────
   const cardW = PAGE_WIDTH - MARGIN * 2;
-  const cardH = 210;
-  
-  ctx.fillStyle = BG_CARD;
-  ctx.strokeStyle = BORDER_COLOR;
+  const cardH = 216;
+
+  ctx.fillStyle = 'rgba(255,253,245,.7)';
+  ctx.strokeStyle = GOLD;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   roundRect(ctx, MARGIN, y, cardW, cardH, 12);
   ctx.fill();
   ctx.stroke();
 
-  // Card Header Accent
-  ctx.fillStyle = PRIMARY_BLUE;
-  ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
-  ctx.fillText('POSITION & COMPENSATION DETAILS', MARGIN + 20, y + 26);
+  // Card header with gold accent rule
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(MARGIN + 20, y + 18, 14, 2);
+  ctx.fillStyle = NAVY;
+  ctx.font = `700 11px ${FONT_SANS}`;
+  ctx.fillText('POSITION & ENGAGEMENT DETAILS', MARGIN + 40, y + 26);
 
-  let fieldsY = y + 52;
-  const fields: [string, string][] = [
+  let fieldsY = y + 56;
+  const fields: Array<[string, string]> = [
     ['Candidate Name', student?.full_name ?? '—'],
     ['Position Title', internship?.title ?? '—'],
-    ['Category / Type', internship?.type ?? 'Internship'],
+    ['Internship Category', internship?.type ?? 'Internship'],
     ['Work Arrangement', `${internship?.location_type ?? 'Remote'} (${internship?.location ?? company?.location ?? 'Remote'})`],
     ['Duration', internship?.duration ?? 'Flexible'],
     ['Proposed Start', internship?.start_date ? new Date(internship.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'To be agreed'],
     ['Stipend / Compensation', internship?.stipend ? `${internship.stipend} (${internship.stipend_type ?? 'Monthly'})` : 'Experience-Based'],
-    ['Signatory / Mentor', company?.owner?.full_name ?? 'Company Representative'],
+    ['Reporting Signatory', company?.owner?.full_name ?? 'Company Representative'],
   ];
 
-  const col1X = MARGIN + 20;
-  const col2X = MARGIN + (cardW / 2) + 10;
+  const col1X = MARGIN + 24;
+  const col2X = MARGIN + (cardW / 2) + 18;
 
   fields.forEach(([label, value], idx) => {
     const isCol2 = idx % 2 === 1;
     const curX = isCol2 ? col2X : col1X;
-    if (idx > 0 && !isCol2) fieldsY += 36;
+    if (idx > 0 && !isCol2) fieldsY += 38;
 
     ctx.fillStyle = TEXT_MUTED;
-    ctx.font = '11px system-ui, -apple-system, sans-serif';
-    ctx.fillText(label, curX, fieldsY);
+    ctx.font = `600 9.5px ${FONT_SANS}`;
+    ctx.fillText(label.toUpperCase(), curX, fieldsY);
 
-    ctx.fillStyle = TEXT_DARK;
-    ctx.font = 'bold 12px system-ui, -apple-system, sans-serif';
-    ctx.fillText(truncateString(value, 32), curX, fieldsY + 16);
+    ctx.fillStyle = INK;
+    ctx.font = `700 12px ${FONT_SANS}`;
+    ctx.fillText(truncateString(value, 36), curX, fieldsY + 17);
   });
 
-  y += cardH + 28;
+  y += cardH + 30;
 
   // ── Responsibilities Section ───────────────────────────────────────────────
   if (internship?.responsibilities && internship.responsibilities.length > 0) {
-    ctx.fillStyle = PRIMARY_DARK;
-    ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = NAVY;
+    ctx.font = `700 13px ${FONT_SANS}`;
     ctx.fillText('KEY RESPONSIBILITIES', MARGIN, y);
-    y += 20;
+    y += 22;
 
     internship.responsibilities.slice(0, 4).forEach((resp) => {
-      ctx.fillStyle = PRIMARY_BLUE;
-      ctx.font = 'bold 14px sans-serif';
+      ctx.fillStyle = GOLD;
+      ctx.font = `700 14px ${FONT_CINZEL}`;
       ctx.fillText('•', MARGIN + 4, y);
 
-      ctx.fillStyle = TEXT_DARK;
-      ctx.font = '12px system-ui, -apple-system, sans-serif';
-      ctx.fillText(truncateString(resp, 90), MARGIN + 20, y);
-      y += 20;
+      ctx.fillStyle = TEXT_SOFT;
+      ctx.font = `400 12px ${FONT_SANS}`;
+      ctx.fillText(truncateString(resp, 92), MARGIN + 22, y);
+      y += 21;
     });
-    y += 10;
+    y += 12;
   }
 
-  // ── Terms & Expiration ─────────────────────────────────────────────────────
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
+  // ── Terms & Conditions ─────────────────────────────────────────────────────
+  ctx.fillStyle = NAVY;
+  ctx.font = `700 13px ${FONT_SANS}`;
   ctx.fillText('TERMS & CONDITIONS', MARGIN, y);
-  y += 20;
+  y += 22;
 
   const terms = [
-    'This offer is contingent upon credential verification and completion of required onboarding documentation.',
-    'You are expected to maintain professional standards, confidentiality, and data security during the program.',
-    `This offer expires on ${offer.expires_at ? new Date(offer.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '30 days from issuance'}.`,
+    'This offer is contingent upon verification of candidate credentials and completion of required onboarding paperwork.',
+    'You are expected to maintain professional standards, confidentiality, and data safety during the internship.',
+    `This offer remains valid until ${offer.expires_at ? new Date(offer.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '30 days from issuance'}, after which it may expire automatically unless extended.`,
   ];
 
   terms.forEach((term, index) => {
-    wrapText(ctx, `${index + 1}. ${term}`, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 18, TEXT_MUTED, '11.5px system-ui, -apple-system, sans-serif');
-    y += 24;
+    ctx.fillStyle = GOLD;
+    ctx.font = `700 12px ${FONT_CINZEL}`;
+    ctx.fillText(`${index + 1}`, MARGIN, y);
+
+    wrapText(ctx, term, MARGIN + 22, y, PAGE_WIDTH - MARGIN * 2 - 22, 18, TEXT_SOFT, `400 11.5px ${FONT_SANS}`, 1.4);
+    y += 26;
   });
 
-  y += 25;
+  y += 26;
 
   // ── Signatory Line & Verification Section ───────────────────────────────────
-  const sigY = PAGE_HEIGHT - 210;
+  const sigY = PAGE_HEIGHT - 214;
 
-  // Signatory Line
-  ctx.strokeStyle = TEXT_LIGHT;
-  ctx.lineWidth = 1;
+  // Signature rule + details
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(MARGIN, sigY);
-  ctx.lineTo(MARGIN + 220, sigY);
+  ctx.lineTo(MARGIN + 230, sigY);
   ctx.stroke();
 
   const signatoryName = company?.owner?.full_name || 'Authorized Signatory';
   const signatoryTitle = company?.owner?.title || 'Company Representative';
+  const signatoryEmail = company?.owner?.email;
 
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.font = 'bold 13px system-ui, -apple-system, sans-serif';
-  ctx.fillText(signatoryName, MARGIN, sigY + 20);
+  ctx.fillStyle = NAVY;
+  ctx.font = `italic 600 19px ${FONT_SCRIPT}`;
+  ctx.fillText(truncateString(signatoryName, 26), MARGIN, sigY + 30);
 
-  ctx.fillStyle = TEXT_MUTED;
-  ctx.font = '11px system-ui, -apple-system, sans-serif';
-  ctx.fillText(signatoryTitle, MARGIN, sigY + 36);
-  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 52);
+  ctx.fillStyle = INK;
+  ctx.font = `700 12px ${FONT_SANS}`;
+  ctx.fillText(signatoryName, MARGIN, sigY + 50);
 
-  // Safe Local QR Code Box (Right Side)
-  const qrBoxW = 210;
-  const qrBoxH = 80;
+  ctx.fillStyle = TEXT_SOFT;
+  ctx.font = `400 11px ${FONT_SANS}`;
+  ctx.fillText(signatoryTitle, MARGIN, sigY + 66);
+  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 82);
+  if (signatoryEmail) {
+    ctx.fillStyle = TEXT_MUTED;
+    ctx.font = `400 10px ${FONT_SANS}`;
+    ctx.fillText(signatoryEmail, MARGIN, sigY + 98);
+  }
+
+  // Verification QR box (gold-framed, right side)
+  const qrBoxW = 212;
+  const qrBoxH = 84;
   const qrBoxX = PAGE_WIDTH - MARGIN - qrBoxW;
-  const qrBoxY = sigY - 10;
+  const qrBoxY = sigY - 6;
 
-  ctx.fillStyle = BG_CARD;
-  ctx.strokeStyle = BORDER_COLOR;
-  ctx.lineWidth = 1;
+  ctx.fillStyle = 'rgba(255,253,245,.75)';
+  ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   roundRect(ctx, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 10);
   ctx.fill();
   ctx.stroke();
 
-  // Native Canvas QR Matrix Rendering
-  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 12, qrBoxY + 10, 60);
+  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 60);
 
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
-  ctx.fillText('VERIFIED OFFER', qrBoxX + 82, qrBoxY + 26);
+  ctx.fillStyle = NAVY;
+  ctx.font = `700 11px ${FONT_SANS}`;
+  ctx.fillText('VERIFIED OFFER', qrBoxX + 88, qrBoxY + 26);
 
   ctx.fillStyle = TEXT_MUTED;
-  ctx.font = '9.5px system-ui, -apple-system, sans-serif';
-  ctx.fillText('Scan to authenticate', qrBoxX + 82, qrBoxY + 42);
-  ctx.fillText('via ZYR0 Platform', qrBoxX + 82, qrBoxY + 56);
+  ctx.font = `400 9.5px ${FONT_SANS}`;
+  ctx.fillText('Scan to authenticate', qrBoxX + 88, qrBoxY + 42);
+  ctx.fillText('via ZYR0 Platform', qrBoxX + 88, qrBoxY + 56);
 
-  // ── Bottom Security Footer ──────────────────────────────────────────────────
+  // ── Bottom navy security footer with gold rule ─────────────────────────────
   const footerH = 48;
   const footerY = PAGE_HEIGHT - footerH;
 
-  ctx.fillStyle = PRIMARY_DARK;
-  ctx.fillRect(0, footerY, PAGE_WIDTH, footerH);
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(0, footerY, PAGE_WIDTH, 2);
+
+  ctx.fillStyle = NAVY;
+  ctx.fillRect(0, footerY + 2, PAGE_WIDTH, footerH - 2);
 
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = '10.5px system-ui, -apple-system, sans-serif';
+  ctx.font = `500 10.5px ${FONT_SANS}`;
   ctx.textAlign = 'center';
   ctx.fillText(
-    `Offer ID: ${offer.id}  ·  Verify at ${verificationUrl}`,
+    `Offer ID: ${offer.id.slice(0, 16).toUpperCase()}  ·  Verify at ${verificationUrl}`,
     PAGE_WIDTH / 2,
-    footerY + 22
+    footerY + 24
   );
 
-  ctx.fillStyle = TEXT_LIGHT;
-  ctx.font = '9.5px system-ui, -apple-system, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.65)';
+  ctx.font = `400 9.5px ${FONT_SANS}`;
   ctx.fillText(
     `© ${new Date().getFullYear()} ZYR0 Platform · ${company?.name ?? ''} · Confidential Document`,
     PAGE_WIDTH / 2,
-    footerY + 38
+    footerY + 40
   );
   ctx.textAlign = 'left';
 
@@ -349,9 +450,9 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     ctx.globalAlpha = 0.09;
     ctx.translate(PAGE_WIDTH / 2, PAGE_HEIGHT / 2);
     ctx.rotate(-Math.PI / 6);
-    
+
     ctx.fillStyle = offer.status === 'Accepted' ? '#10B981' : offer.status === 'Rejected' ? '#EF4444' : '#64748B';
-    ctx.font = 'extrabold 110px system-ui, -apple-system, sans-serif';
+    ctx.font = `700 104px ${FONT_CINZEL}`;
     ctx.textAlign = 'center';
     ctx.fillText(offer.status.toUpperCase(), 0, 0);
     ctx.restore();
@@ -367,6 +468,75 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
 }
 
 // ── Private Helpers ───────────────────────────────────────────────────────────
+
+/** Preload premium web fonts (Cinzel / Montserrat / Playfair) with a bounded wait. */
+async function ensurePremiumFonts(): Promise<void> {
+  try {
+    if (typeof document === 'undefined') return;
+    if (!document.getElementById('zyro-premium-fonts')) {
+      const link = document.createElement('link');
+      link.id = 'zyro-premium-fonts';
+      link.rel = 'stylesheet';
+      link.href = FONTS_CSS_URL;
+      document.head.appendChild(link);
+    }
+    if (document.fonts) {
+      const faces = [
+        '700 22px "Cinzel"',
+        '700 15px "Cinzel"',
+        '600 12px "Montserrat"',
+        '700 12px "Montserrat"',
+        '400 13px "Montserrat"',
+        'italic 600 19px "Playfair Display"',
+      ];
+      await Promise.race([
+        Promise.allSettled(faces.map((f) => document.fonts.load(f))),
+        new Promise((res) => setTimeout(res, 2500)),
+      ]);
+    }
+  } catch {
+    // Fonts are optional — renderers fall back to Georgia / Arial.
+  }
+}
+
+/** Convert an SVG string to an Image (data-URI, fully offline). */
+function svgToImage(svg: string): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  });
+}
+
+/** Tile a texture image across the page at the given global alpha. */
+function drawTiled(ctx: CanvasRenderingContext2D, img: HTMLImageElement | null, alpha: number) {
+  if (!img) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const tile = 320;
+  for (let ty = 0; ty < PAGE_HEIGHT; ty += tile) {
+    for (let tx = 0; tx < PAGE_WIDTH; tx += tile) {
+      ctx.drawImage(img, tx, ty, tile, tile);
+    }
+  }
+  ctx.restore();
+}
+
+/** Build a wavy concentric guilloché ring as a Path2D. */
+function ringPath(cx: number, cy: number, r: number, wobbles: number, amplitude: number, phase: number): Path2D {
+  const N = 140;
+  const path = new Path2D();
+  for (let i = 0; i <= N; i++) {
+    const t = (i / N) * 2 * Math.PI;
+    const rr = r + amplitude * Math.sin(wobbles * t + phase);
+    const x = cx + rr * Math.cos(t);
+    const y = cy + rr * Math.sin(t);
+    if (i === 0) path.moveTo(x, y);
+    else path.lineTo(x, y);
+  }
+  return path;
+}
 
 /** Load image with crossOrigin fallback without throwing exception on failure. */
 function safeLoadImage(src: string): Promise<HTMLImageElement | null> {
@@ -399,7 +569,7 @@ function renderInitialsAvatar(
   ctx.fill();
 
   ctx.fillStyle = fg;
-  ctx.font = `bold ${size * 0.38}px system-ui, -apple-system, sans-serif`;
+  ctx.font = `700 ${size * 0.36}px ${FONT_CINZEL}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(
@@ -418,7 +588,8 @@ function wrapText(
   maxWidth: number,
   lineHeight: number,
   color: string,
-  font: string
+  font: string,
+  lineSpacing = 1
 ) {
   ctx.fillStyle = color;
   ctx.font = font;
@@ -430,7 +601,7 @@ function wrapText(
     const testLine = line ? `${line} ${word}` : word;
     if (ctx.measureText(testLine).width > maxWidth && line) {
       ctx.fillText(line, x, curY);
-      curY += lineHeight;
+      curY += lineHeight * lineSpacing;
       line = word;
     } else {
       line = testLine;
@@ -490,7 +661,7 @@ function renderSafeCanvasQr(
   ctx.fillRect(x, y, size, size);
 
   // Draw data modules
-  ctx.fillStyle = PRIMARY_DARK;
+  ctx.fillStyle = INK;
   for (let r = 0; r < count; r++) {
     for (let c = 0; c < count; c++) {
       if (qr.modules.get(r, c)) {

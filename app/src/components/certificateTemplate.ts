@@ -30,7 +30,7 @@ export interface CertificateTemplateOptions {
 // ── SVG assets (generated as strings, injected into the print window) ──────
 
 /** Concentric wavy guilloché rings forming the large central "O" watermark. */
-function wavyRingPath(cx: number, cy: number, r: number, wobbles: number, amplitude: number, phase: number): string {
+export function wavyRingPath(cx: number, cy: number, r: number, wobbles: number, amplitude: number, phase: number): string {
   const N = 140;
   let d = '';
   for (let i = 0; i <= N; i++) {
@@ -43,7 +43,7 @@ function wavyRingPath(cx: number, cy: number, r: number, wobbles: number, amplit
   return d;
 }
 
-function guillocheSvg(): string {
+export function guillocheSvg(): string {
   let rings = '';
   for (let r = 72; r <= 232; r += 20) {
     const purple = r % 40 === 0;
@@ -59,7 +59,7 @@ function guillocheSvg(): string {
 }
 
 /** Fine engraved damask/filigree corner ornament (placed in the 4 corners). */
-function filigreeSvg(): string {
+export function filigreeSvg(): string {
   return `
 <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
   <g fill="none" stroke="#b89c56" stroke-width="1">
@@ -87,7 +87,7 @@ function filigreeSvg(): string {
 }
 
 /** Soft mottled clouds — low-frequency noise for cotton-paper feel. */
-function mottleSvg(): string {
+export function mottleSvg(): string {
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
   <filter id="m"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
@@ -96,7 +96,7 @@ function mottleSvg(): string {
 }
 
 /** Fine streaky cotton fibers. */
-function fiberSvg(): string {
+export function fiberSvg(): string {
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
   <filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.22" numOctaves="2" seed="11" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
@@ -105,7 +105,7 @@ function fiberSvg(): string {
 }
 
 /** Subtle paper grain (feTurbulence noise tile). */
-function noiseSvg(): string {
+export function noiseSvg(): string {
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
   <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
