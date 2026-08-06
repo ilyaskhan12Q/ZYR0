@@ -432,8 +432,8 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   }
 
   // Verification QR box (gold-framed, right side)
-  const qrBoxW = 212;
-  const qrBoxH = 84;
+  const qrBoxW = 224;
+  const qrBoxH = 96;
   const qrBoxX = PAGE_WIDTH - MARGIN - qrBoxW;
   const qrBoxY = sigY - 6;
 
@@ -445,16 +445,16 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fill();
   ctx.stroke();
 
-  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 60);
+  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 76);
 
   ctx.fillStyle = NAVY;
   ctx.font = `700 11px ${FONT_SANS}`;
-  ctx.fillText('VERIFIED OFFER', qrBoxX + 88, qrBoxY + 26);
+  ctx.fillText('VERIFIED OFFER', qrBoxX + 100, qrBoxY + 30);
 
   ctx.fillStyle = TEXT_MUTED;
   ctx.font = `400 9.5px ${FONT_SANS}`;
-  ctx.fillText('Scan to authenticate', qrBoxX + 88, qrBoxY + 42);
-  ctx.fillText('via ZYR0 Platform', qrBoxX + 88, qrBoxY + 56);
+  ctx.fillText('Scan to authenticate', qrBoxX + 100, qrBoxY + 48);
+  ctx.fillText('via ZYR0 Platform', qrBoxX + 100, qrBoxY + 62);
 
   // ── Bottom navy security footer with gold rule ─────────────────────────────
   const footerH = 48;
