@@ -457,33 +457,34 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillText('via ZYR0 Platform', qrBoxX + 100, qrBoxY + 62);
 
   // ── Bottom navy security footer with gold rule ─────────────────────────────
-  const footerH = 48;
-  const footerY = PAGE_HEIGHT - footerH;
+  const footerY = PAGE_HEIGHT - FOOTER_H;
 
   ctx.fillStyle = GOLD;
   ctx.fillRect(0, footerY, PAGE_WIDTH, 2);
 
   ctx.fillStyle = NAVY;
-  ctx.fillRect(0, footerY + 2, PAGE_WIDTH, footerH - 2);
+  ctx.fillRect(0, footerY + 2, PAGE_WIDTH, FOOTER_H - 2);
+
+  ctx.textAlign = 'center';
+
+  const footerOfferLabel = offer.offer_code
+    ? `Offer Code: ${offer.offer_code}   ·   Offer ID: ${offer.id.slice(0, 8)}`
+    : `Offer ID: ${offer.id.slice(0, 8)}`;
 
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `400 8.5px ${FONT_SANS}`;
-  ctx.textAlign = 'center';
-  const footerOfferLabel = offer.offer_code
-    ? `Offer Code: ${offer.offer_code}  ·  Offer ID: ${offer.id.slice(0, 8)}`
-    : `Offer ID: ${offer.id.slice(0, 8)}`;
-  ctx.fillText(
-    `${footerOfferLabel}  ·  Verify at ${verificationUrl}`,
-    PAGE_WIDTH / 2,
-    footerY + 23
-  );
+  ctx.font = `400 9.5px ${FONT_SANS}`;
+  ctx.fillText(footerOfferLabel, PAGE_WIDTH / 2, footerY + 22);
+
+  ctx.fillStyle = 'rgba(255,255,255,.8)';
+  ctx.font = `400 9px ${FONT_SANS}`;
+  ctx.fillText(`Verify at ${verificationUrl}`, PAGE_WIDTH / 2, footerY + 38);
 
   ctx.fillStyle = 'rgba(255,255,255,.65)';
-  ctx.font = `400 9px ${FONT_SANS}`;
+  ctx.font = `400 8.5px ${FONT_SANS}`;
   ctx.fillText(
-    `© ${new Date().getFullYear()} ZYR0 Platform · ${company?.name ?? ''} · Confidential Document`,
+    `© ${new Date().getFullYear()} ZYR0 Platform · ${truncateString(company?.name ?? '', 60)} · Confidential Document`,
     PAGE_WIDTH / 2,
-    footerY + 40
+    footerY + 52
   );
   ctx.textAlign = 'left';
 
