@@ -1,7 +1,16 @@
 import { supabase } from '@/lib/supabase';
-import type { Application } from '@/lib/database.types';
+import type { Application, ApplicationStatus } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+
+export const APPLICATION_STATUSES: ApplicationStatus[] = [
+  'Applied',
+  'Under Review',
+  'Shortlisted',
+  'Accepted',
+  'Rejected',
+  'Withdrawn',
+];
 
 /** Get applications for the current student */
 export async function getMyApplications(useCache = true) {

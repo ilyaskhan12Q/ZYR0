@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.4] - 2026-08-07
+
+### Added
+- **Shared student-application detail dialog**: new reusable `ApplicationDetailDialog` component and shared `APPLICATION_STATUSES` constants, used by both the admin and company internship-application panels. The dialog shows the applicant's profile (avatar, name, email, university, graduation year, bio, skills, portfolio/resume links), the internship they applied to, their status, and any cover letter or application answers when present.
+
 ## [0.30.3] - 2026-08-07
 
 ### Changed
