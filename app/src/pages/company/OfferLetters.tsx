@@ -144,17 +144,22 @@ async function sendOfferLetterEmail(opts: {
 
               <!-- Quick Action Grid -->
               <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
-                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Verification</p>
+                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Latest Updates</p>
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
-                    <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Verify Credential</a>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #1e3a8a; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Verify Credential</a>
                     </td>
-                    <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Career Hub</a>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${whatsAppChannelUrl}" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #10b981; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">WhatsApp Channel</a>
                     </td>
-                    <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Contact Support</a>
+                  </tr>
+                  <tr>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${siteUrl}/careers" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #0284c7; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Career Hub</a>
+                    </td>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Contact Support</a>
                     </td>
                   </tr>
                 </table>
