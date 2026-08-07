@@ -21,7 +21,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import nodemailer from 'npm:nodemailer@6.9.13';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 interface EmailAttachment {
   filename: string;
