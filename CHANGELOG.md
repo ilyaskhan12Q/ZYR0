@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-08-07
+
+### Fixed
+- **Shortlist emails are no longer vulnerable to HTML injection from applicant data**: the admin shortlist email template interpolated `full_name` and `preferred_role` directly into the email HTML. Both fields come from the public application form, so a candidate could embed markup/link injection into the emails the admin sends to every selected candidate. Applicant-controlled values are now HTML-escaped before interpolation (the plain-text version uses the raw values).
+
 ## [0.29.5] - 2026-08-07
 
 ### Fixed

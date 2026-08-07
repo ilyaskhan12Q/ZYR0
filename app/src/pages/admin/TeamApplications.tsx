@@ -42,10 +42,19 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+function escapeHtml(value: string | null | undefined) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 /* ── Email templates ─────────────────────────────────────────────────────── */
 
 function buildShortlistEmail(app: any) {
-  const role = roleTitle(app.preferred_role);
+  // full_name and preferred_role come from the applicant (public form input),
+  // so they are escaped before interpolation into the HTML template.
+  const fullName = escapeHtml(app.full_name);
+  const role = escapeHtml(roleTitle(app.preferred_role));
+  const plainRole = roleTitle(app.preferred_role);
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
   const teamGroupUrl = import.meta.env.VITE_WHATSAPP_TEAM_GROUP_URL || 'https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX';
   const html = `<!DOCTYPE html>
@@ -68,7 +77,7 @@ function buildShortlistEmail(app: any) {
           </tr>
           <tr>
             <td style="padding: 32px 40px;">
-              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${app.full_name},</p>
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${fullName},</p>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
                 Thank you for applying to join the ZYR0 Founding Development Team. After a careful
                 review of all applications, we are pleased to confirm that you have advanced to the
@@ -125,7 +134,7 @@ function buildShortlistEmail(app: any) {
   const text = [
     `Dear ${app.full_name},`,
     '',
-    `Thank you for applying to join the ZYR0 Founding Development Team. After a careful review of all applications, we are pleased to confirm that you have advanced to the shortlist stage for the ${role} team seat.`,
+    `Thank you for applying to join the ZYR0 Founding Development Team. After a careful review of all applications, we are pleased to confirm that you have advanced to the shortlist stage for the ${plainRole} team seat.`,
     '',
     `A member of our team will reach out in the coming days to schedule a conversation — an opportunity to get to know you better and for you to learn more about the role. Please keep an eye on your inbox.`,
     '',
