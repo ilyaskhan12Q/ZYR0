@@ -56,7 +56,8 @@ function buildShortlistEmail(app: any) {
   const role = escapeHtml(roleTitle(app.preferred_role));
   const plainRole = roleTitle(app.preferred_role);
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
-  const teamGroupUrl = import.meta.env.VITE_WHATSAPP_TEAM_GROUP_URL || 'https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX';
+  const whatsAppCommunityUrl = 'https://chat.whatsapp.com/EfivEcFI4cJ8pWnbW9OmWh';
+  const whatsAppChannelUrl = 'https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F';
   const linkedInUrl = 'https://www.linkedin.com/company/zyr0-co/';
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -98,8 +99,8 @@ function buildShortlistEmail(app: any) {
                 Please keep an eye on your inbox.
               </p>
               <p style="margin: 0 0 18px; font-size: 14px; line-height: 1.8; color: #3d372e;">
-                In the meantime, you are welcome to join the ZYR0 team group on WhatsApp to connect
-                with your future teammates: <a href="${teamGroupUrl}" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Join the Team WhatsApp Group</a>.
+                In the meantime, you are welcome to join the ZYR0 community on WhatsApp to connect
+                with your future teammates: <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Join the ZYR0 WhatsApp Community</a>.
               </p>
               <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">What Happens Next</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
@@ -121,11 +122,32 @@ function buildShortlistEmail(app: any) {
             </td>
           </tr>
           <tr>
-            <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 14px;">
+            <td style="padding: 28px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 20px;">
                 <tr>
-                  <td align="center">
-                    <a href="${linkedInUrl}" style="display: inline-block; padding: 10px 22px; font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border: 1.5px solid #1e3a8a; border-radius: 4px;">Follow ZYR0 on LinkedIn</a>
+                  <td align="center" style="padding: 5px 0;">
+                    <a href="${siteUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Website</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/internships" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Browse Internships</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/companies" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">For Companies</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/contact" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Contact</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/help" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Help Center</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Stay Connected</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 22px;">
+                <tr>
+                  <td align="center" style="padding: 5px 0;">
+                    <a href="${linkedInUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">LinkedIn</a>
+                    <span style="color: #b9a856; padding: 0 4px;">·</span>
+                    <a href="${whatsAppCommunityUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Community</a>
+                    <span style="color: #b9a856; padding: 0 4px;">·</span>
+                    <a href="${whatsAppChannelUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Channel</a>
                   </td>
                 </tr>
               </table>
@@ -148,11 +170,21 @@ function buildShortlistEmail(app: any) {
     '',
     `What Happens Next:`,
     `- Explore ZYR0 Careers: ${siteUrl}/careers`,
-    `- Join the Team WhatsApp Group: ${teamGroupUrl}`,
+    `- Join the ZYR0 WhatsApp Community: ${whatsAppCommunityUrl}`,
     '',
     `Have questions about your application? Contact our support team: ${siteUrl}/contact`,
     '',
-    `Follow ZYR0 on LinkedIn for latest updates: ${linkedInUrl}`,
+    `Explore ZYR0:`,
+    `- Website: ${siteUrl}`,
+    `- Browse Internships: ${siteUrl}/internships`,
+    `- For Companies: ${siteUrl}/companies`,
+    `- Contact: ${siteUrl}/contact`,
+    `- Help Center: ${siteUrl}/help`,
+    '',
+    `Stay Connected:`,
+    `- LinkedIn: ${linkedInUrl}`,
+    `- WhatsApp Community: ${whatsAppCommunityUrl}`,
+    `- WhatsApp Channel: ${whatsAppChannelUrl}`,
     '',
     'With warm regards,',
     'The ZYR0 Team',

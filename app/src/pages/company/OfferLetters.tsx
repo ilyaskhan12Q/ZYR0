@@ -74,6 +74,9 @@ async function sendOfferLetterEmail(opts: {
   const base64Pdf = await blobToBase64(pdfBlob);
   const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
   const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+  const linkedInUrl = 'https://www.linkedin.com/company/zyr0-co/';
+  const whatsAppCommunityUrl = 'https://chat.whatsapp.com/EfivEcFI4cJ8pWnbW9OmWh';
+  const whatsAppChannelUrl = 'https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F';
   const expiryDateStr = expiresAt
     ? new Date(expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : '30 days from issuance';
@@ -139,7 +142,35 @@ async function sendOfferLetterEmail(opts: {
             </td>
           </tr>
           <tr>
-            <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+            <td style="padding: 28px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 20px;">
+                <tr>
+                  <td align="center" style="padding: 5px 0;">
+                    <a href="${siteUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Website</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/internships" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Browse Internships</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/companies" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">For Companies</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/contact" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Contact</a>
+                    <span style="color: #b89c56; padding: 0 8px;">·</span>
+                    <a href="${siteUrl}/help" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Help Center</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Stay Connected</p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 22px;">
+                <tr>
+                  <td align="center" style="padding: 5px 0;">
+                    <a href="${linkedInUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">LinkedIn</a>
+                    <span style="color: #b89c56; padding: 0 4px;">·</span>
+                    <a href="${whatsAppCommunityUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Community</a>
+                    <span style="color: #b89c56; padding: 0 4px;">·</span>
+                    <a href="${whatsAppChannelUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Channel</a>
+                  </td>
+                </tr>
+              </table>
               <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">This email was sent on behalf of ${companyName} via ZYR0.</p>
               <p style="margin: 0; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
             </td>
@@ -160,6 +191,16 @@ async function sendOfferLetterEmail(opts: {
     `This offer remains open until ${expiryDateStr}. We encourage you to accept or decline before the deadline so your internship can be finalized without delay.\n\n` +
     `If you encounter any issues or have questions, contact our support team (your message goes straight to the platform team):\n` +
     `${siteUrl}/contact\n\n` +
+    `Explore ZYR0:\n` +
+    `- Website: ${siteUrl}\n` +
+    `- Browse Internships: ${siteUrl}/internships\n` +
+    `- For Companies: ${siteUrl}/companies\n` +
+    `- Contact: ${siteUrl}/contact\n` +
+    `- Help Center: ${siteUrl}/help\n\n` +
+    `Stay Connected:\n` +
+    `- LinkedIn: ${linkedInUrl}\n` +
+    `- WhatsApp Community: ${whatsAppCommunityUrl}\n` +
+    `- WhatsApp Channel: ${whatsAppChannelUrl}\n\n` +
     `We look forward to welcoming you on board.\n\n` +
     `With warm regards,\n` +
     `The ZYR0 Team\n` +

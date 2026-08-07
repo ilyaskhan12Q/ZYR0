@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.3] - 2026-08-07
+
+### Changed
+- **Professional explore/stay-connected link footer on all candidate-facing emails**: the founding team shortlist email, company offer-letter email, and both certificate emails now close with a `Explore ZYR0` link row (Website, Browse Internships, For Companies, Contact, Help Center) and a `Stay Connected` row (LinkedIn, WhatsApp Community, WhatsApp Channel). Plain-text fallbacks include the full URL set too. The shortlist email's inline community link now points to the ZYR0 WhatsApp Community.
+
 ## [0.31.2] - 2026-08-07
 
 ### Fixed
