@@ -2,6 +2,9 @@
 // POST /functions/v1/send-email
 // Body: { to, subject, html, from, text, attachments, kind?, allowUserReplyTo?, website? }
 // Uses SMTP (if configured) or Resend fallback
+// Responds with { success: true, id, provider } where `id` is the provider
+// message/email id regardless of which backend delivered (SMTP → messageId,
+// Resend → email id), so callers can persist a single traceable id.
 //
 // Security model:
 // - Non-contact (internal) sends require EITHER an authenticated admin/company JWT
@@ -409,7 +412,7 @@ serve(async (req) => {
         });
 
         console.log(`[send-email] SMTP delivery successful. MessageId: ${info.messageId}`);
-        return new Response(JSON.stringify({ success: true, messageId: info.messageId }), {
+        return new Response(JSON.stringify({ success: true, id: info.messageId, provider: 'smtp' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (smtpErr) {
@@ -454,7 +457,7 @@ serve(async (req) => {
 
         const data = await res.json();
         console.log(`[send-email] Resend API delivery successful. Email Id: ${data.id}`);
-        return new Response(JSON.stringify({ success: true, id: data.id }), {
+        return new Response(JSON.stringify({ success: true, id: data.id, provider: 'resend' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (resendErr) {

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.5] - 2026-08-07
+
+### Fixed
+- **Shortlist emails now record the provider message ID under SMTP too**: the `send-email` edge function returned `messageId` for SMTP deliveries but `id` for Resend, so the admin team-applications panel (which reads `id`) stored no traceable message ID — and showed no "Sent IDs" in failure banners — whenever SMTP was the active provider. Both backends now respond with a consistent `{ success, id, provider }` shape, so `email_message_id` is persisted for every send regardless of provider.
+
 ## [0.29.4] - 2026-08-07
 
 ### Fixed
