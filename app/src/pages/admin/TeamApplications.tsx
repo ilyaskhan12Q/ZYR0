@@ -57,6 +57,7 @@ function buildShortlistEmail(app: any) {
   const plainRole = roleTitle(app.preferred_role);
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
   const teamGroupUrl = import.meta.env.VITE_WHATSAPP_TEAM_GROUP_URL || 'https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX';
+  const linkedInUrl = 'https://www.linkedin.com/company/zyr0-co/';
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -103,16 +104,16 @@ function buildShortlistEmail(app: any) {
               <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">What Happens Next</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
                 <tr>
-                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
-                    <a href="${siteUrl}/careers" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">Explore ZYR0 Careers</a>
+                  <td align="center">
+                    <a href="${siteUrl}/careers" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; line-height: 1.4; letter-spacing: 1px; color: #fffdf5; text-decoration: none; background-color: #1e3a8a; border: 1px solid #b89c56; border-radius: 4px;">Explore ZYR0 Careers</a>
                   </td>
                 </tr>
               </table>
               <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Have questions about your application? Our support team is ready to help.</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
-                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
-                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
+                  <td align="center">
+                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border: 1.5px solid #b89c56; border-radius: 4px;">Contact Support</a>
                   </td>
                 </tr>
               </table>
@@ -121,6 +122,13 @@ function buildShortlistEmail(app: any) {
           </tr>
           <tr>
             <td style="padding: 24px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 14px;">
+                <tr>
+                  <td align="center">
+                    <a href="${linkedInUrl}" style="display: inline-block; padding: 10px 22px; font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border: 1.5px solid #1e3a8a; border-radius: 4px;">Follow ZYR0 on LinkedIn</a>
+                  </td>
+                </tr>
+              </table>
               <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved.</p>
               <p style="margin: 0; font-size: 11px; color: #8a7f6c;"><a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
             </td>
@@ -143,6 +151,8 @@ function buildShortlistEmail(app: any) {
     `- Join the Team WhatsApp Group: ${teamGroupUrl}`,
     '',
     `Have questions about your application? Contact our support team: ${siteUrl}/contact`,
+    '',
+    `Follow ZYR0 on LinkedIn for latest updates: ${linkedInUrl}`,
     '',
     'With warm regards,',
     'The ZYR0 Team',

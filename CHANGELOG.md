@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.2] - 2026-08-07
+
+### Fixed
+- **Founding team shortlist email CTAs are reliably clickable**: the "Explore ZYR0 Careers" and "Contact Support" buttons no longer place their styling on a wrapper `<td>`; the full click surface, background, and border now sit on the `<a>` itself (bulletproof email-button pattern), so the links open `zyroo.org/careers` and `zyroo.org/contact` directly in strict clients like Outlook desktop.
+
+### Added
+- **LinkedIn follow link in the founding team shortlist email**: a new "Follow ZYR0 on LinkedIn" button in the email footer links to the ZYR0 LinkedIn company page, and the plain-text fallback now includes the LinkedIn URL as well.
+
 ## [0.31.1] - 2026-08-07
 
 ### Changed
