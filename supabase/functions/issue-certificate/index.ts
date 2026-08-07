@@ -103,86 +103,87 @@ serve(async (req) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Certificate of Completion</title>
 </head>
-<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
+<body style="margin: 0; padding: 32px 16px; background-color: #f8fafc; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc;">
     <tr>
       <td align="center" style="padding: 24px 12px;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);">
+          <!-- Header Banner -->
           <tr>
-            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
-              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
-              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">Certificate of Completion</p>
+            <td style="padding: 36px 40px 24px; text-align: center; background-color: #1e3a8a; border-bottom: 3px solid #b89c56;">
+              <p style="margin: 0 0 6px; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #ffffff;">ZYR0</p>
+              <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #f1c40f;">Official Digital Credential</p>
             </td>
           </tr>
+          <!-- Body Content -->
           <tr>
-            <td style="padding: 32px 40px;">
-              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear <strong>${student.full_name}</strong>,</p>
-              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                Congratulations on completing your internship. Your dedication throughout the program
-                has been recognized, and we are pleased to issue your official digital certificate for
-                <strong style="color: #1e3a8a;">${certificate.title}</strong>. This credential can be
-                viewed, shared, or verified at any time through the ZYR0 platform.
+            <td style="padding: 36px 40px;">
+              <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: #0f172a;">Dear <strong>${student.full_name}</strong>,</p>
+              <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
+                Congratulations on your outstanding achievement! We are truly inspired by the dedication and hard work you demonstrated throughout your internship. It is our pleasure to issue your official digital certificate for <strong style="color: #1e3a8a;">${certificate.title}</strong>.
               </p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+              
+              <!-- Credential Card -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; border: 1px solid #cbd5e1; border-radius: 8px; background-color: #f8fafc;">
                 <tr>
-                  <td style="padding: 18px 24px; text-align: center;">
-                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Credential ID</p>
-                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; letter-spacing: 0.05em; color: #13100d;">${certificate.credential_id}</p>
+                  <td style="padding: 20px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Credential ID</p>
+                    <p style="margin: 0; font-family: 'Courier New', Courier, monospace; font-size: 18px; font-weight: 700; letter-spacing: 0.05em; color: #0f172a;">${certificate.credential_id}</p>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">You may view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform at any time.</p>
-              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Verify Your Credential</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+
+              <!-- Main Primary CTA Button -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
-                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
-                    <a href="${siteUrl}/verify/${certificate.credential_id}" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View Verified Certificate</a>
+                  <td align="center" style="border-radius: 8px; background-color: #1e3a8a; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);">
+                    <a href="${siteUrl}/verify/${certificate.credential_id}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">View Verified Certificate</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Having trouble viewing your certificate or need assistance? Our support team is ready to help.</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                <tr>
-                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
-                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+
+              <p style="margin: 0 0 20px; font-size: 14.5px; line-height: 1.7; color: #475569; text-align: center;">
+                Your credential is publicly verifiable, tamper-proof, and ready to add to your resume or LinkedIn profile!
+              </p>
+
+              <!-- Quick Action Buttons Row -->
+              <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
+                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions</p>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${whatsAppCommunityUrl}" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #10b981; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Join Community</a>
+                    </td>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Explore Roles</a>
+                    </td>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Need Help?</a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <p style="margin: 28px 0 0; font-size: 15px; line-height: 1.8; color: #0f172a;">
+                We wish you continued success in your professional journey. Keep reaching higher!<br><br>
+                Warmest regards,<br>
+                <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #1e3a8a;">The ZYR0 Team</strong>
+              </p>
             </td>
           </tr>
+          <!-- Footer -->
           <tr>
-            <td style="padding: 28px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
-              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 20px;">
-                <tr>
-                  <td align="center" style="padding: 5px 0;">
-                    <a href="${siteUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Website</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/internships" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Browse Internships</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/companies" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">For Companies</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/contact" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Contact</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/help" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Help Center</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Stay Connected</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 22px;">
-                <tr>
-                  <td align="center" style="padding: 5px 0;">
-                    <a href="${linkedInUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">LinkedIn</a>
-                    <span style="color: #b89c56; padding: 0 4px;">·</span>
-                    <a href="${whatsAppCommunityUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Community</a>
-                    <span style="color: #b89c56; padding: 0 4px;">·</span>
-                    <a href="${whatsAppChannelUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Channel</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">This email was sent to notify you of a digital credential issued via ZYR0.</p>
-              <p style="margin: 0; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            <td style="padding: 28px 40px 32px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8;">Stay Connected</p>
+              <p style="margin: 0 0 16px; font-size: 12px; color: #475569;">
+                <a href="${linkedInUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <span style="color: #cbd5e1; padding: 0 8px;">·</span>
+                <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
+                <span style="color: #cbd5e1; padding: 0 8px;">·</span>
+                <a href="${whatsAppChannelUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+              </p>
+              <p style="margin: 0 0 6px; font-size: 11px; color: #94a3b8;">This email was automatically sent regarding your digital credential issued via ZYR0.</p>
+              <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
             </td>
           </tr>
         </table>
@@ -193,23 +194,18 @@ serve(async (req) => {
 </html>`;
 
         const emailText = `Dear ${student.full_name},\n\n` +
-          `Congratulations on completing your internship. Your dedication throughout the program has been recognized, and we are pleased to issue your official digital certificate for ${certificate.title}.\n\n` +
+          `Congratulations on your outstanding achievement! We are truly inspired by the dedication and hard work you demonstrated throughout your internship. It is our pleasure to issue your official digital certificate for ${certificate.title}.\n\n` +
           `Credential ID: ${certificate.credential_id}\n\n` +
-          `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
+          `View Your Verified Certificate:\n` +
           `${siteUrl}/verify/${certificate.credential_id}\n\n` +
-          `Having trouble viewing your certificate? Contact our support team:\n` +
-          `${siteUrl}/contact\n\n` +
-          `Explore ZYR0:\n` +
-          `- Website: ${siteUrl}\n` +
-          `- Browse Internships: ${siteUrl}/internships\n` +
-          `- For Companies: ${siteUrl}/companies\n` +
-          `- Contact: ${siteUrl}/contact\n` +
-          `- Help Center: ${siteUrl}/help\n\n` +
+          `Quick Actions:\n` +
+          `- Join WhatsApp Community: ${whatsAppCommunityUrl}\n` +
+          `- Explore New Opportunities: ${siteUrl}/internships\n` +
+          `- Contact Support: ${siteUrl}/contact\n\n` +
           `Stay Connected:\n` +
           `- LinkedIn: ${linkedInUrl}\n` +
-          `- WhatsApp Community: ${whatsAppCommunityUrl}\n` +
           `- WhatsApp Channel: ${whatsAppChannelUrl}\n\n` +
-          `With warm regards,\n` +
+          `Warmest regards,\n` +
           `The ZYR0 Team\n` +
           `team@zyroo.org`;
 

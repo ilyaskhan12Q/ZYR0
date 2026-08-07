@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.2] - 2026-08-07
+
+### Changed
+- **Modernized platform email templates across all modules**:
+  - **Emoji-Free Enterprise Aesthetics**: Removed all decorative emojis from buttons, headers, alert boxes, and action links across all transactional and administrative email templates for a clean, formal visual presentation.
+  - **Offer Letters (`OfferLetters.tsx`)**: Upgraded to ZYR0 brand design tokens (`#f8fafc` slate background, `#1e3a8a` navy header with gold accent border, `#ffffff` card container), added structured Offer Details card, prominent Emerald action CTA, 4-button quick action grid (Verify Credential, WhatsApp Channel for latest updates, Career Hub, Contact Support), and warm, encouraging candidate-centric copy.
+  - **Certificate Issued (`issue-certificate/index.ts`)**: Applied standardized header, card container, primary action button, and structured quick action links.
+  - **Contact Notifications (`send-email/index.ts`)**: Styled administrative header, metadata-rich details card, and direct response action button.
+  - **Candidate Shortlist (`TeamApplications.tsx`)**: Applied founding team branding, role highlight card, and unified quick-action button bar.
+
+## [0.32.1] - 2026-08-07
+
+### Added
+- **Post-login welcome popup for students**: after signing in, students with an incomplete profile now land directly on the dashboard with a professional welcome modal. It offers two clear actions based on role — students get "Apply for an Internship" (`/student/internships`) plus "Complete Your Profile" (`/student/profile`, noted as taking less than 2 minutes), with role-aware copy for company/mentor/admin users. The popup is gated per session (`login_welcome_dismissed_session`) so it shows once per login, and is sized to not overlap the existing profile-completion modal.
+
+## [0.32.0] - 2026-08-07
+
+### Fixed
+- **Light/dark mode toggle now visible on mobile**: the theme toggle in the public navbar was only rendered on `md+` screens (inside the desktop controls wrapper). It now renders in the header on all breakpoints, so mobile users can switch themes without resizing to desktop mode.
+- **Clear "Get Started" on mobile**: the hamburger menu's auth row is now role-aware — logged-out visitors get a prominent "Get Started" accent CTA alongside "Log in", and logged-in users get a "Go to Dashboard" action instead of sign-in links.
 ## [0.31.5] - 2026-08-07
 
 ### Changed
