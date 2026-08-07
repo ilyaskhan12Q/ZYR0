@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.1] - 2026-08-07
+
+### Fixed
+- **Team applications CSV export no longer breaks on multiline answers**: free-text fields (`projects`, `motivation`) containing line breaks were written into the CSV verbatim, splitting the exported rows apart in Excel. Line breaks inside fields are now collapsed to spaces and a UTF-8 BOM is prepended so Excel decodes special characters correctly.
+
 ## [0.30.0] - 2026-08-07
 
 ### Fixed

@@ -293,8 +293,8 @@ export default function AdminTeamApplications() {
       'Resume URL': a.resume_url ?? '',
     }));
     const headers = Object.keys(rows[0] ?? {});
-    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
-    const csv = [
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""').replace(/[\r\n]+/g, ' ')}"`;
+    const csv = '\uFEFF' + [
       headers.join(','),
       ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(',')),
     ].join('\n');
