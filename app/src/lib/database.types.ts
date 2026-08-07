@@ -37,6 +37,14 @@ export interface Profile {
   company_id: string | null;
   title: string | null;
   department: string | null;
+  phone?: string | null;
+  degree?: string | null;
+  major?: string | null;
+  academic_year?: string | null;
+  location?: string | null;
+  linkedin?: string | null;
+  github?: string | null;
+  role_interest?: string | null;
   created_at: string;
   updated_at: string;
   company?: Company | null;

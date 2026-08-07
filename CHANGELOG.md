@@ -7,7 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.32.2] - 2026-08-07
+## [0.33.0] - 2026-08-07
+
+### Added
+- **Database Schema Migration for Student Profiles (`037_extend_student_profile_fields.sql`)**:
+  - Added dedicated database columns (`phone`, `degree`, `major`, `academic_year`, `location`, `linkedin`, `github`, `role_interest`) to `public.profiles`.
+
+### Changed
+- **Persistent Student Profile Editing (`Profile.tsx`)**:
+  - Implemented auto-save draft persistence using `localStorage` so unsaved form edits are recovered if students switch tabs or navigate away before saving.
+  - Added mandatory field highlighting (`*` red indicators and border callouts) for key required profile fields.
+  - Refactored form population (`getServerFormData`) to prioritize structured DB columns with automatic fallback to `user_metadata`.
+- **Comprehensive Applicant Profile Review (`ApplicationDetailDialog.tsx`)**:
+  - Surface applicant student attributes (Phone, Degree/Program, Major/Specialization, Academic Status, Graduation Year, Location, Role Interest, GitHub, LinkedIn, Portfolio, and Resume) across Admin and Company application review dialogs.
 
 ### Changed
 - **Modernized platform email templates across all modules**:
