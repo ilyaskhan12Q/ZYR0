@@ -66,93 +66,87 @@ function buildShortlistEmail(app: any) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Congratulations — You've Been Shortlisted</title>
 </head>
-<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
+<body style="margin: 0; padding: 32px 16px; background-color: #f8fafc; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc;">
     <tr>
       <td align="center" style="padding: 24px 12px;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);">
+          <!-- Header Banner -->
           <tr>
-            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
-              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
-              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">A Note of Congratulations</p>
+            <td style="padding: 36px 40px 24px; text-align: center; background-color: #1e3a8a; border-bottom: 3px solid #b89c56;">
+              <p style="margin: 0 0 6px; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #ffffff;">ZYR0</p>
+              <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #f1c40f;">Candidate Selection</p>
             </td>
           </tr>
+          <!-- Body Content -->
           <tr>
-            <td style="padding: 32px 40px;">
-              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${fullName},</p>
-              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                Thank you for applying to join the ZYR0 Founding Development Team. After a careful
-                review of all applications, we are pleased to confirm that you have advanced to the
-                shortlist stage for the <strong style="color: #1e3a8a;">${role}</strong> team seat.
+            <td style="padding: 36px 40px;">
+              <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: #0f172a;">Dear <strong>${fullName}</strong>,</p>
+              <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
+                We have wonderful news! After a thorough review of all candidate applications for the ZYR0 Founding Development Team, we were immensely impressed by your background and passion. We are thrilled to confirm that you have been <strong>shortlisted</strong> for the <strong style="color: #1e3a8a;">${role}</strong> role!
               </p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+              
+              <!-- Role Highlight Box -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; border: 1px solid #cbd5e1; border-radius: 8px; background-color: #f8fafc;">
                 <tr>
-                  <td style="padding: 18px 24px; text-align: center;">
-                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Shortlisted For</p>
-                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #13100d;">${role}</p>
+                  <td style="padding: 20px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Shortlisted Position</p>
+                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #0f172a;">${role}</p>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                A member of our team will reach out in the coming days to schedule a conversation —
-                an opportunity to get to know you better and for you to learn more about the role.
-                Please keep an eye on your inbox.
+
+              <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
+                Our team is currently coordinating schedules to host a friendly introductory conversation with you. This will be a great opportunity to explore how your talents align with our ambitious roadmap and answer any questions you have about ZYR0.
               </p>
-              <p style="margin: 0 0 18px; font-size: 14px; line-height: 1.8; color: #3d372e;">
-                In the meantime, you are welcome to join the ZYR0 community on WhatsApp to connect
-                with your future teammates: <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; font-weight: 600; text-decoration: none;">Join the ZYR0 WhatsApp Community</a>.
-              </p>
-              <p style="margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">What Happens Next</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+
+              <!-- Main Primary CTA Button -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
-                  <td align="center">
-                    <a href="${siteUrl}/careers" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; line-height: 1.4; letter-spacing: 1px; color: #fffdf5; text-decoration: none; background-color: #1e3a8a; border: 1px solid #b89c56; border-radius: 4px;">Explore ZYR0 Careers</a>
+                  <td align="center" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                    <a href="${whatsAppCommunityUrl}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">💬 Connect on WhatsApp Community</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Have questions about your application? Our support team is ready to help.</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                <tr>
-                  <td align="center">
-                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; line-height: 1.4; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border: 1.5px solid #b89c56; border-radius: 4px;">Contact Support</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">With warm regards,<br><strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong></p>
+
+              <!-- Quick Action Grid -->
+              <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
+                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Next Steps & Resources</p>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🚀 Explore Careers</a>
+                    </td>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">💼 Active Programs</a>
+                    </td>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🤝 Contact Support</a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <p style="margin: 28px 0 0; font-size: 15px; line-height: 1.8; color: #0f172a;">
+                Congratulations once again on taking this step. We are excited to speak with you soon!<br><br>
+                Warmest regards,<br>
+                <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #1e3a8a;">The ZYR0 Founding Team</strong>
+              </p>
             </td>
           </tr>
+          <!-- Footer -->
           <tr>
-            <td style="padding: 28px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
-              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 20px;">
-                <tr>
-                  <td align="center" style="padding: 5px 0;">
-                    <a href="${siteUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Website</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/internships" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Browse Internships</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/companies" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">For Companies</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/contact" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Contact</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/help" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Help Center</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Stay Connected</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 22px;">
-                <tr>
-                  <td align="center" style="padding: 5px 0;">
-                    <a href="${linkedInUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">LinkedIn</a>
-                    <span style="color: #b9a856; padding: 0 4px;">·</span>
-                    <a href="${whatsAppCommunityUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Community</a>
-                    <span style="color: #b9a856; padding: 0 4px;">·</span>
-                    <a href="${whatsAppChannelUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Channel</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved.</p>
-              <p style="margin: 0; font-size: 11px; color: #8a7f6c;"><a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            <td style="padding: 28px 40px 32px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8;">Stay Connected</p>
+              <p style="margin: 0 0 16px; font-size: 12px; color: #475569;">
+                <a href="${linkedInUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <span style="color: #cbd5e1; padding: 0 8px;">·</span>
+                <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
+                <span style="color: #cbd5e1; padding: 0 8px;">·</span>
+                <a href="${whatsAppChannelUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+              </p>
+              <p style="margin: 0 0 6px; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved.</p>
+              <p style="margin: 0; font-size: 11px; color: #94a3b8;"><a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
             </td>
           </tr>
         </table>
@@ -164,32 +158,24 @@ function buildShortlistEmail(app: any) {
   const text = [
     `Dear ${app.full_name},`,
     '',
-    `Thank you for applying to join the ZYR0 Founding Development Team. After a careful review of all applications, we are pleased to confirm that you have advanced to the shortlist stage for the ${plainRole} team seat.`,
+    `We have wonderful news! After a thorough review of all candidate applications for the ZYR0 Founding Development Team, we are thrilled to confirm that you have been shortlisted for the ${plainRole} position!`,
     '',
-    `A member of our team will reach out in the coming days to schedule a conversation — an opportunity to get to know you better and for you to learn more about the role. Please keep an eye on your inbox.`,
+    `A member of our team will reach out in the coming days to schedule a introductory conversation with you.`,
     '',
-    `What Happens Next:`,
+    `Quick Actions & Resources:`,
+    `- Join WhatsApp Community: ${whatsAppCommunityUrl}`,
     `- Explore ZYR0 Careers: ${siteUrl}/careers`,
-    `- Join the ZYR0 WhatsApp Community: ${whatsAppCommunityUrl}`,
-    '',
-    `Have questions about your application? Contact our support team: ${siteUrl}/contact`,
-    '',
-    `Explore ZYR0:`,
-    `- Website: ${siteUrl}`,
-    `- Browse Internships: ${siteUrl}/internships`,
-    `- For Companies: ${siteUrl}/companies`,
-    `- Contact: ${siteUrl}/contact`,
-    `- Help Center: ${siteUrl}/help`,
+    `- Browse Active Internships: ${siteUrl}/internships`,
+    `- Support: ${siteUrl}/contact`,
     '',
     `Stay Connected:`,
     `- LinkedIn: ${linkedInUrl}`,
-    `- WhatsApp Community: ${whatsAppCommunityUrl}`,
     `- WhatsApp Channel: ${whatsAppChannelUrl}`,
     '',
-    'With warm regards,',
-    'The ZYR0 Team',
+    'Warmest regards,',
+    'The ZYR0 Founding Team',
   ].join('\n');
-  return { to: app.email, subject: `You've been shortlisted — ZYR0 Founding Development Team`, html, text };
+  return { to: app.email, subject: `Congratulations! You've been shortlisted — ZYR0 Founding Team`, html, text };
 }
 
 async function sendCandidateEmail(app: any) {
