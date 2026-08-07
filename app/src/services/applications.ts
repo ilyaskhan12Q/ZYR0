@@ -199,6 +199,31 @@ export async function getAllCompanyApplications(company_id: string) {
   return res;
 }
 
+/** Admin: fetch all internship applications, optionally filtered by status. */
+export async function getAllAdminApplications(status?: ApplicationStatus | 'All') {
+  let query = supabase
+    .from('applications')
+    .select(`
+      *,
+      internship:internships!internship_id (
+        id, title, location, location_type, type, deadline,
+        company:companies!company_id (id, name)
+      ),
+      student:profiles!student_id (
+        id, full_name, email, avatar_url, university, graduation_year,
+        bio, skills, portfolio_url, resume_url
+      )
+    `)
+    .order('applied_at', { ascending: false });
+
+  if (status && status !== 'All') {
+    query = query.eq('status', status);
+  }
+
+  const { data, error } = await query;
+  return { data: (data ?? []) as any[], error };
+}
+
 /** Update application status (company: shortlist, accept, reject) */
 export async function updateApplicationStatus(
   id: string,

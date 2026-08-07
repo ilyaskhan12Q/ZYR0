@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.5] - 2026-08-07
+
+### Added
+- **Admin applications panel now reviews applicants like team applications**: `/admin/applications` gains status tabs, search across name/email/university/internship/company/skills, a one-click **View** button that opens the student-application detail dialog, and a per-row status dropdown (all six statuses). Admin data is served by a new `getAllAdminApplications` service call that joins the applicant's full profile.
+
 ## [0.30.4] - 2026-08-07
 
 ### Added
