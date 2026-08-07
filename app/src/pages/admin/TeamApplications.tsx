@@ -144,7 +144,6 @@ function buildShortlistEmail(app: any) {
 async function sendCandidateEmail(app: any) {
   const { to, subject, html, text } = buildShortlistEmail(app);
   const { data, error } = await supabase.functions.invoke('send-email', {
-    headers: { 'x-internal-token': import.meta.env.VITE_EMAIL_INTERNAL_TOKEN || '' },
     body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.org>', replyTo: 'team@zyroo.org' },
   });
   if (error) throw error;

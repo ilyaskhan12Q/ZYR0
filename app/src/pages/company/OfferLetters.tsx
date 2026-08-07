@@ -166,7 +166,6 @@ async function sendOfferLetterEmail(opts: {
     `team@zyroo.org`;
 
   const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
-    headers: { 'x-internal-token': import.meta.env.VITE_EMAIL_INTERNAL_TOKEN || '' },
     body: {
       to: studentEmail,
       from: 'ZYR0 Team <team@zyroo.org>',

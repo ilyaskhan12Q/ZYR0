@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.29.4] - 2026-08-07
+
+### Fixed
+- **Internal email sends are now gated on the caller's account, not a client-exposed token**: the `EMAIL_INTERNAL_TOKEN` secret was shipped to the browser as `VITE_EMAIL_INTERNAL_TOKEN`, so anyone could extract it from the public JS bundle and relay emails to arbitrary recipients through `send-email`. Internal sends now require a valid session JWT whose profile role is `admin` or `company` (admin shortlist emails, company offer letters), with the shared token kept only for server-to-server callers (`issue-certificate`). The Vite env var and its Vercel export are removed; the function secret stays.
+
 ## [0.29.3] - 2026-08-06
 
 ### Changed
