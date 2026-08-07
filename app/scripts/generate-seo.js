@@ -12,34 +12,44 @@ const publicDir = path.join(projectRoot, 'public');
 const distDir = path.join(projectRoot, 'dist');
 
 // Read env files to get VITE_SITE_URL
-function getSiteUrl() {
-  if (process.env.VITE_SITE_URL) {
-    return process.env.VITE_SITE_URL.trim().replace(/\/+$/, '');
+const PROD_URL = 'https://zyroo.org';
+
+// Only accept URLs that belong to this site (production domain, subdomains, or Vercel previews).
+// Anything malformed or foreign falls back to the canonical production URL.
+function isTrustedSiteUrl(value) {
+  try {
+    const u = new URL(value);
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false;
+    const host = u.hostname;
+    return host === 'zyroo.org' || host.endsWith('.zyroo.org') || host.endsWith('.vercel.app');
+  } catch {
+    return false;
   }
+}
+
+function getSiteUrl() {
+  const candidates = [process.env.VITE_SITE_URL];
   const envFiles = ['.env.production', '.env.local', '.env'];
   for (const file of envFiles) {
     const filePath = path.join(projectRoot, file);
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, 'utf-8');
-      const lines = content.split('\n');
-      for (const line of lines) {
-        const match = line.match(/^\s*VITE_SITE_URL\s*=\s*([^\s#]+)/);
-        if (match) {
-          let url = match[1].trim();
-          // Remove wrapping quotes if present
-          if (url.startsWith('"') && url.endsWith('"')) {
-            url = url.substring(1, url.length - 1);
-          }
-          if (url.startsWith("'") && url.endsWith("'")) {
-            url = url.substring(1, url.length - 1);
-          }
-          // Clean trailing slash
-          return url.replace(/\/+$/, '');
-        }
+    if (!fs.existsSync(filePath)) continue;
+    const content = fs.readFileSync(filePath, 'utf-8');
+    for (const line of content.split('\n')) {
+      const match = line.match(/^\s*VITE_SITE_URL\s*=\s*([^\s#]+)/);
+      if (match) {
+        let url = match[1].trim();
+        if (url.startsWith('"') && url.endsWith('"')) url = url.substring(1, url.length - 1);
+        if (url.startsWith("'") && url.endsWith("'")) url = url.substring(1, url.length - 1);
+        candidates.push(url);
       }
     }
   }
-  return 'https://zyroo.org'; // Centralized fallback
+  for (const candidate of candidates) {
+    if (candidate && isTrustedSiteUrl(candidate)) {
+      return candidate.replace(/\/+$/, '');
+    }
+  }
+  return PROD_URL; // Canonical fallback — never emit invalid domains
 }
 
 const SITE_URL = getSiteUrl();
@@ -1071,21 +1081,34 @@ async function prerenderDynamicPages(indexHtml) {
     return;
   }
 
+  // PostgREST helper — plain fetch (no supabase-js, so no WebSocket requirement on Node 20 CI)
+  async function supabaseQuery(path, params) {
+    const url = new URL(`${creds.url}/rest/v1/${path}`);
+    for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+    const res = await fetch(url, {
+      headers: {
+        apikey: creds.key,
+        Authorization: `Bearer ${creds.key}`,
+        Accept: 'application/json',
+      },
+    });
+    if (!res.ok) throw new Error(`Supabase ${path} failed: HTTP ${res.status} ${await res.text()}`);
+    return res.json();
+  }
+
   try {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(creds.url, creds.key);
+    let companies = [];
+    let internships = [];
 
     console.log('[SEO Prerender] Fetching approved companies from Supabase...');
-    const { data: companies, error: compErr } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('status', 'approved');
-
-    if (compErr) {
-      console.error('[SEO Prerender] Error fetching companies:', compErr.message);
-    } else if (companies) {
+    try {
+      companies = await supabaseQuery('companies', { select: '*', status: 'eq.approved' });
       console.log(`[SEO Prerender] Pre-rendering ${companies.length} approved company profiles...`);
-      for (const company of companies) {
+    } catch (err) {
+      console.error('[SEO Prerender] Error fetching companies:', err.message);
+    }
+
+    for (const company of companies) {
         const id = company.id;
         const pagePath = `companies/${id}`;
         const canonicalUrl = `${SITE_URL}/${pagePath}`;
@@ -1132,19 +1155,19 @@ async function prerenderDynamicPages(indexHtml) {
         fs.mkdirSync(routeDir, { recursive: true });
         fs.writeFileSync(path.join(routeDir, 'index.html'), pageHtml, 'utf-8');
       }
-    }
 
     console.log('[SEO Prerender] Fetching active internships from Supabase...');
-    const { data: internships, error: internErr } = await supabase
-      .from('internships')
-      .select('*, company:companies(name, website, logo_url)')
-      .eq('status', 'Active');
-
-    if (internErr) {
-      console.error('[SEO Prerender] Error fetching internships:', internErr.message);
-    } else if (internships) {
+    try {
+      internships = await supabaseQuery('internships', {
+        select: '*,company:companies(name, website, logo_url)',
+        status: 'eq.Active',
+      });
       console.log(`[SEO Prerender] Pre-rendering ${internships.length} active internship opportunities...`);
-      for (const internship of internships) {
+    } catch (err) {
+      console.error('[SEO Prerender] Error fetching internships:', err.message);
+    }
+
+    for (const internship of internships) {
         const id = internship.id;
         const pagePath = `internships/${id}`;
         const canonicalUrl = `${SITE_URL}/${pagePath}`;
@@ -1216,7 +1239,6 @@ async function prerenderDynamicPages(indexHtml) {
         fs.mkdirSync(routeDir, { recursive: true });
         fs.writeFileSync(path.join(routeDir, 'index.html'), pageHtml, 'utf-8');
       }
-    }
 
     // Append dynamic URLs to the sitemap now that real data is available
     writeEnhancedSitemap(companies, internships);
