@@ -7,7 +7,7 @@ const CompanyDashboard = lazy(() => import('./Dashboard'));
 const CompanyProfile = lazy(() => import('./Profile'));
 const CompanyInternships = lazy(() => import('./Internships'));
 const PostInternship = lazy(() => import('./PostInternship'));
-const CompanyApplicants = lazy(() => import('./Applicants'));
+const CompanyApplications = lazy(() => import('./Applications'));
 const CompanyInterns = lazy(() => import('./Interns'));
 const CompanyTasks = lazy(() => import('./Tasks'));
 const CompanyAnalytics = lazy(() => import('./Analytics'));
@@ -63,10 +63,10 @@ export default function CompanyPortal() {
         } 
       />
       <Route 
-        path="applicants" 
+        path="applications" 
         element={
           <CompanyVerificationGate mode="block">
-            <CompanyApplicants />
+            <CompanyApplications />
           </CompanyVerificationGate>
         } 
       />

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.1] - 2026-08-07
+
+### Changed
+- **Company applications moved to `/company/applications`**: the company review page was renamed from `/company/applicants` to `/company/applications` (matching the admin `applications` naming). Sidebar entry, company dashboard "View All" link, and the profile-completion restricted-routes map were updated; the old `Applicants` page was removed.
+
 ## [0.31.0] - 2026-08-07
 
 ### Added
