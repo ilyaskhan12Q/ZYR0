@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.5] - 2026-08-07
+
+### Changed
+- **License changed to proprietary (§ All Rights Reserved)**: the project is no longer open-source. `LICENSE` now contains a ZYR0 proprietary license (copyright © 2026 ZYR0 Contributors). README badge, project tree, and License section updated, and `app/package.json` declares `"license": "UNLICENSED"`.
+
 ## [0.31.4] - 2026-08-07
 
 ### Fixed
