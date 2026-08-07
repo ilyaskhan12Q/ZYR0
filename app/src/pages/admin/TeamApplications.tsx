@@ -246,17 +246,22 @@ export default function AdminTeamApplications() {
     let ok = 0;
     let failed = 0;
     const sentIds: { name: string; id: string }[] = [];
-    for (const app of targets) {
-      try {
-        const res = await sendCandidateEmail(app);
-        await markTeamApplicationEmailed(app.id, res?.id);
-        await updateTeamApplicationStatus(app.id, 'Shortlisted');
-        if (res?.id) sentIds.push({ name: app.full_name, id: res.id });
-        ok += 1;
-      } catch (err) {
-        console.error('Email failed for', app.email, err);
-        failed += 1;
-      }
+    const CONCURRENCY = 3;
+    for (let i = 0; i < targets.length; i += CONCURRENCY) {
+      const chunk = targets.slice(i, i + CONCURRENCY);
+      await Promise.all(chunk.map(async (app) => {
+        try {
+          const res = await sendCandidateEmail(app);
+          await markTeamApplicationEmailed(app.id, res?.id);
+          await updateTeamApplicationStatus(app.id, 'Shortlisted');
+          if (res?.id) sentIds.push({ name: app.full_name, id: res.id });
+          ok += 1;
+        } catch (err) {
+          console.error('Email failed for', app.email, err);
+          failed += 1;
+        }
+      }));
+      setMessage({ type: 'ok', text: `Sending shortlist emails… ${ok + failed} of ${targets.length} done.` });
     }
     setMessage({
       type: failed === 0 ? 'ok' : 'err',

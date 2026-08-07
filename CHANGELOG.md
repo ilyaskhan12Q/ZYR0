@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.3] - 2026-08-07
+
+### Changed
+- **Bulk shortlist emails are sent with bounded concurrency and progress feedback**: a large selection previously sent each email strictly one-at-a-time with the whole UI blocked on a silent loop. Sends now run 3 at a time with a live "Sending… X of Y done" banner, while still reporting per-candidate failures when the batch completes.
+
 ## [0.30.2] - 2026-08-07
 
 ### Changed
