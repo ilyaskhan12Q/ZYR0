@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.4] - 2026-08-07
+
+### Fixed
+- **Certificate email error reporting under strict type-checking**: the `issue-certificate` edge function's catch blocks accessed `.message` on an `unknown` caught value, which failed `deno check` with three `TS18046` errors. Error text now narrows with `instanceof Error` before reading `.message`.
+
 ## [0.31.3] - 2026-08-07
 
 ### Changed

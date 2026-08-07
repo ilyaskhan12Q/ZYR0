@@ -251,7 +251,7 @@ serve(async (req) => {
           }
         }
       } catch (emailErr) {
-        email_error = `Failed to dispatch certificate email notification: ${emailErr.message}`;
+        email_error = `Failed to dispatch certificate email notification: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`;
         console.error(`[issue-certificate] ${email_error}`);
       }
 
@@ -537,7 +537,7 @@ serve(async (req) => {
           }
         }
       } catch (emailErr) {
-        email_error = `Failed to dispatch certificate email notification: ${emailErr.message}`;
+        email_error = `Failed to dispatch certificate email notification: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`;
         console.error(`[issue-certificate] ${email_error}`);
       }
     }
@@ -547,7 +547,7 @@ serve(async (req) => {
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
