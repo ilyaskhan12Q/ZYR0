@@ -1,29 +1,19 @@
-# ZYR0 - Internship Management Platform
+# ZYR0
 
-ZYR0 is a modern, production-grade Internship & Workforce Readiness Platform.
-It bridges the gap between academic learning and industry experience by enabling organizations to manage project-based internships, assigning real-world tasks, reviewing code submissions on GitHub, and issuing blockchain-verified digital certificates.
+> ZYR0 is Pakistan's structured internship platform. Students apply for verified internship opportunities, work on real milestone-based tasks with professional mentors, and earn blockchain-verified digital certificates that employers can instantly authenticate online. Companies hire and manage interns; mentors review and guide their work.
 
-## Core Audience
-- **Students**: Apply for internships, work on real-world tasks, submit GitHub repositories, and earn digital certificates.
-- **Companies**: Create internships, review applications, assign tasks, review code submissions, and issue certificates.
-- **Mentors**: Provide guidance, review submissions, and evaluate intern performance.
+## Important
+- [Home](https://zyroo.org/): ZYR0 — structured internships for students and employers in Pakistan.
+- [Browse Internships](https://zyroo.org/internships): Search verified internship opportunities in Pakistan by domain, location, and type.
+- [Partner Companies](https://zyroo.org/companies): Verified companies offering structured internships on ZYR0.
+- [Verify Certificate](https://zyroo.org/verify): Instantly verify ZYR0 internship certificates and offer letters by credential ID.
+- [About ZYR0](https://zyroo.org/about): ZYR0's mission, vision, and values.
+- [FAQ](https://zyroo.org/faq): Common questions about applying, stipends, milestone tasks, and certificates.
+- [Help Center](https://zyroo.org/help): Getting-started guides for students, companies, and mentors.
 
-## Technology Stack
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Radix UI, Framer Motion
-- **Backend / Database**: Supabase (PostgreSQL), Edge Functions (Deno)
-- **Deployment**: https://zyroo.org
-
-## Key Architectural Principles
-- **GitHub First**: Student code is never hosted on ZYR0; students submit GitHub repository URLs to simulate real software engineering workflows.
-- **No LMS Features**: ZYR0 focuses on real-world internships. It is not an online course platform.
-- **Role-Based Access**: Specialized dashboards and views for Students, Mentors, Companies, and Admins.
-- **Verified Credentials**: Certificates are generated securely on the backend with a unique SHA-256 blockchain-style hash to ensure authenticity.
-
-## URLs
-- **Production URL**: https://zyroo.org
-- **Search**: https://zyroo.org/internships?search={query}
-- **Verify Certificates**: https://zyroo.org/verify
-
-## Contact & Support
-- Email: support@zyroo.org
-- Twitter: @zyr0platform
+## Optional
+- [Contact](https://zyroo.org/contact): Contact ZYR0 support and partnerships.
+- [Careers](https://zyroo.org/careers): Join the ZYR0 founding team.
+- [Privacy Policy](https://zyroo.org/privacy): How ZYR0 handles your personal data.
+- [Terms of Service](https://zyroo.org/terms): Terms governing use of the ZYR0 platform.
+- [Cookie Policy](https://zyroo.org/cookies): How ZYR0 uses cookies.

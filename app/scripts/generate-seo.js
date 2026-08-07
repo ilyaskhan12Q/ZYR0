@@ -45,80 +45,140 @@ function getSiteUrl() {
 const SITE_URL = getSiteUrl();
 console.log(`[SEO Generate] Using domain: ${SITE_URL}`);
 
-// Public pages list
+// Public pages list — static routes with honest lastmod dates
+// (update these only when the page's content genuinely changes)
 const pages = [
-  { path: '', priority: '1.0', changefreq: 'daily' },
-  { path: 'internships', priority: '0.9', changefreq: 'daily' },
-  { path: 'companies', priority: '0.8', changefreq: 'daily' },
-  { path: 'careers', priority: '0.8', changefreq: 'weekly' },
-  { path: 'careers/apply', priority: '0.7', changefreq: 'weekly' },
-  { path: 'about', priority: '0.7', changefreq: 'monthly' },
-  { path: 'contact', priority: '0.7', changefreq: 'monthly' },
-  { path: 'faq', priority: '0.6', changefreq: 'weekly' },
-  { path: 'help', priority: '0.6', changefreq: 'weekly' },
-  { path: 'verify', priority: '0.5', changefreq: 'monthly' },
-  { path: 'privacy', priority: '0.3', changefreq: 'monthly' },
-  { path: 'terms', priority: '0.3', changefreq: 'monthly' },
-  { path: 'cookies', priority: '0.3', changefreq: 'monthly' }
+  { path: '', lastmod: '2026-08-06' },
+  { path: 'internships', lastmod: '2026-08-06' },
+  { path: 'companies', lastmod: '2026-08-06' },
+  { path: 'careers', lastmod: '2026-08-06' },
+  { path: 'careers/apply', lastmod: '2026-08-06' },
+  { path: 'about', lastmod: '2026-08-06' },
+  { path: 'contact', lastmod: '2026-08-06' },
+  { path: 'faq', lastmod: '2026-08-06' },
+  { path: 'help', lastmod: '2026-08-06' },
+  { path: 'verify', lastmod: '2026-08-06' },
+  { path: 'privacy', lastmod: '2026-07-18' },
+  { path: 'terms', lastmod: '2026-07-18' },
+  { path: 'cookies', lastmod: '2026-07-18' }
 ];
 
-const today = new Date().toISOString().split('T')[0];
+function escapeXml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
 
-// Generate sitemap.xml
-function generateSitemap() {
+function isoDate(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return '';
+  return d.toISOString().split('T')[0];
+}
+
+function buildStaticSitemapEntries() {
+  return pages.map((page) => ({
+    loc: page.path ? `${SITE_URL}/${page.path}` : `${SITE_URL}/`,
+    lastmod: page.lastmod
+  }));
+}
+
+// Generate sitemap.xml — loc + honest lastmod only (Google ignores priority/changefreq)
+function buildSitemapXml(entries) {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-  
-  for (const page of pages) {
-    const loc = page.path ? `${SITE_URL}/${page.path}` : `${SITE_URL}/`;
+  for (const entry of entries) {
     xml += '  <url>\n';
-    xml += `    <loc>${loc}</loc>\n`;
-    xml += `    <lastmod>${today}</lastmod>\n`;
-    xml += `    <changefreq>${page.changefreq}</changefreq>\n`;
-    xml += `    <priority>${page.priority}</priority>\n`;
+    xml += `    <loc>${escapeXml(entry.loc)}</loc>\n`;
+    if (entry.lastmod) {
+      xml += `    <lastmod>${entry.lastmod}</lastmod>\n`;
+    }
     xml += '  </url>\n';
   }
-  
   xml += '</urlset>\n';
   return xml;
 }
 
-// Generate robots.txt
+function writeSitemap(entries) {
+  const sitemapContent = buildSitemapXml(entries);
+  fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemapContent, 'utf-8');
+  if (fs.existsSync(distDir)) {
+    fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemapContent, 'utf-8');
+  }
+  console.log(`[SEO Generate] Wrote sitemap.xml with ${entries.length} URLs`);
+}
+
+// Generate robots.txt — public crawl rules, private-area blocks, and 2026 AI crawler policy
+// (training bots blocked, retrieval/search bots allowed to keep content citable in AI answers)
 function generateRobots() {
   return `User-agent: *
 Allow: /
 
-# Public pages — index
-Allow: /internships
-Allow: /companies
-Allow: /about
-Allow: /contact
-Allow: /privacy
-Allow: /terms
-Allow: /cookies
-Allow: /faq
-Allow: /help
-Allow: /careers
-Allow: /verify
-
-# Auth pages — no index
+# Authenticated & private areas — not for public crawlers
 Disallow: /login
 Disallow: /register
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /auth/
-
-# Authenticated dashboard routes — not for public crawlers
 Disallow: /student/
 Disallow: /company/
 Disallow: /mentor/
 Disallow: /admin/
 
-# Build artifacts
-Disallow: /src/
-Disallow: /.vite/
+# AI training crawlers — blocked (content stays out of model training sets)
+User-agent: GPTBot
+Disallow: /
+User-agent: CCBot
+Disallow: /
+User-agent: Google-Extended
+Disallow: /
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Applebot-Extended
+Disallow: /
+User-agent: Bytespider
+Disallow: /
+
+# AI retrieval crawlers — allowed (stay citable in ChatGPT, Perplexity, Claude answers)
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: PerplexityBot
+Allow: /
 
 Sitemap: ${SITE_URL}/sitemap.xml
+`;
+}
+
+// Generate llms.txt — AI-discovery index (llms.txt spec) guiding AI crawlers to priority pages
+function generateLlmsTxt() {
+  return `# ZYR0
+
+> ZYR0 is Pakistan's structured internship platform. Students apply for verified internship opportunities, work on real milestone-based tasks with professional mentors, and earn blockchain-verified digital certificates that employers can instantly authenticate online. Companies hire and manage interns; mentors review and guide their work.
+
+## Important
+- [Home](${SITE_URL}/): ZYR0 — structured internships for students and employers in Pakistan.
+- [Browse Internships](${SITE_URL}/internships): Search verified internship opportunities in Pakistan by domain, location, and type.
+- [Partner Companies](${SITE_URL}/companies): Verified companies offering structured internships on ZYR0.
+- [Verify Certificate](${SITE_URL}/verify): Instantly verify ZYR0 internship certificates and offer letters by credential ID.
+- [About ZYR0](${SITE_URL}/about): ZYR0's mission, vision, and values.
+- [FAQ](${SITE_URL}/faq): Common questions about applying, stipends, milestone tasks, and certificates.
+- [Help Center](${SITE_URL}/help): Getting-started guides for students, companies, and mentors.
+
+## Optional
+- [Contact](${SITE_URL}/contact): Contact ZYR0 support and partnerships.
+- [Careers](${SITE_URL}/careers): Join the ZYR0 founding team.
+- [Privacy Policy](${SITE_URL}/privacy): How ZYR0 handles your personal data.
+- [Terms of Service](${SITE_URL}/terms): Terms governing use of the ZYR0 platform.
+- [Cookie Policy](${SITE_URL}/cookies): How ZYR0 uses cookies.
 `;
 }
 
@@ -127,20 +187,24 @@ if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
 }
 
-// Write sitemap and robots to public/ (source directory)
-const sitemapContent = generateSitemap();
+// Write sitemap (static baseline; dynamic URLs are appended after the Supabase fetch below)
+writeSitemap(buildStaticSitemapEntries());
+
+// Write robots.txt to public/ and dist/ (if it exists)
 const robotsContent = generateRobots();
-
-fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemapContent, 'utf-8');
 fs.writeFileSync(path.join(publicDir, 'robots.txt'), robotsContent, 'utf-8');
-console.log(`[SEO Generate] Wrote sitemap.xml and robots.txt to ${publicDir}`);
-
-// If dist/ exists (meaning build has run), write them to dist/ too
 if (fs.existsSync(distDir)) {
-  fs.writeFileSync(path.join(distDir, 'sitemap.xml'), sitemapContent, 'utf-8');
   fs.writeFileSync(path.join(distDir, 'robots.txt'), robotsContent, 'utf-8');
-  console.log(`[SEO Generate] Wrote sitemap.xml and robots.txt to ${distDir}`);
 }
+console.log(`[SEO Generate] Wrote robots.txt to ${publicDir}`);
+
+// Write llms.txt (AI-discovery index) to public/ and dist/ (if it exists)
+const llmsContent = generateLlmsTxt();
+fs.writeFileSync(path.join(publicDir, 'llms.txt'), llmsContent, 'utf-8');
+if (fs.existsSync(distDir)) {
+  fs.writeFileSync(path.join(distDir, 'llms.txt'), llmsContent, 'utf-8');
+}
+console.log(`[SEO Generate] Wrote llms.txt to ${publicDir}`);
 
 // ==========================================
 // STATIC PRE-RENDERING (SSG) FOR CRAWLERS
@@ -766,6 +830,14 @@ function generateBodyHtml(routePath, data = {}) {
         <p>We use strictly necessary cookies to keep you logged in to your student or employer dashboard, remember your security sessions, and handle system settings. We also use performance/analytics cookies to track page views and optimize loading times.</p>
       </section>
     `;
+  } else if (routePath === '404') {
+    contentHtml = `
+      <section style="text-align: center; padding: 5rem 2rem; max-width: 600px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin-bottom: 1rem;">Page Not Found</h1>
+        <p style="font-size: 1.125rem; color: #475569; line-height: 1.6; margin-bottom: 2rem;">The page you are looking for does not exist or has been moved.</p>
+        <a href="/" style="color: #2563eb; font-weight: 600; text-decoration: none;">Return to ZYR0 Home &rarr;</a>
+      </section>
+    `;
   } else if (routePath === 'company_profile') {
     const c = data.company || {};
     contentHtml = `
@@ -959,6 +1031,39 @@ function prerenderStaticPages(indexHtml) {
   }
 }
 
+// Extend the sitemap with dynamic, indexable URLs (approved companies + active internships)
+// using honest lastmod dates from the database. Listing pages adopt the newest record date.
+function writeEnhancedSitemap(companies, internships) {
+  const entries = buildStaticSitemapEntries();
+
+  const newest = (rows) => {
+    if (!rows || rows.length === 0) return '';
+    return isoDate(Math.max(...rows.map((r) => new Date(r.updated_at || r.created_at).getTime())));
+  };
+  const newestCompany = newest(companies);
+  const newestInternship = newest(internships);
+
+  for (const entry of entries) {
+    if (entry.loc === `${SITE_URL}/companies` && newestCompany) entry.lastmod = newestCompany;
+    if (entry.loc === `${SITE_URL}/internships` && newestInternship) entry.lastmod = newestInternship;
+  }
+
+  for (const company of companies || []) {
+    entries.push({
+      loc: `${SITE_URL}/companies/${company.id}`,
+      lastmod: isoDate(company.updated_at || company.created_at),
+    });
+  }
+  for (const internship of internships || []) {
+    entries.push({
+      loc: `${SITE_URL}/internships/${internship.id}`,
+      lastmod: isoDate(internship.updated_at || internship.created_at),
+    });
+  }
+
+  writeSitemap(entries);
+}
+
 async function prerenderDynamicPages(indexHtml) {
   const creds = getSupabaseCreds();
   if (!creds.url || !creds.key) {
@@ -1113,6 +1218,9 @@ async function prerenderDynamicPages(indexHtml) {
       }
     }
 
+    // Append dynamic URLs to the sitemap now that real data is available
+    writeEnhancedSitemap(companies, internships);
+
   } catch (err) {
     console.error('[SEO Prerender] Dynamic pre-rendering failed:', err);
   }
@@ -1128,6 +1236,18 @@ if (fs.existsSync(distDir)) {
     
     // First pre-render static pages (which also updates dist/index.html)
     prerenderStaticPages(cleanIndexHtml);
+
+    // Pre-render a no-index 404 fallback for crawlers that hit unknown URLs without JS
+    const notFoundMeta = {
+      title: 'Page Not Found',
+      description: 'The page you are looking for does not exist or has been moved. Return to ZYR0 to find internships and career opportunities.',
+      canonicalUrl: `${SITE_URL}/`,
+      path: '404',
+      noIndex: true,
+    };
+    const notFoundHtml = renderTemplate(cleanIndexHtml, notFoundMeta);
+    fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml, 'utf-8');
+    console.log('[SEO Prerender] Wrote noindex 404 fallback to dist/404.html');
     
     // Then pre-render dynamic pages using the clean original indexHtml template
     await prerenderDynamicPages(cleanIndexHtml);

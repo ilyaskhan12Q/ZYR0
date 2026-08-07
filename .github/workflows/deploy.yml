@@ -77,6 +77,10 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      - name: Ping IndexNow for instant Bing/Copilot discovery
+        run: node app/scripts/indexnow-ping.js
+        continue-on-error: true
+
   # ── Apply Supabase migrations on production deploy ─────────────────────────
   migrate-production:
     name: Apply Supabase Migrations
