@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.2] - 2026-08-07
+
+### Changed
+- **Bulk shortlist email now asks for confirmation**: clicking "Email Selected" opens a confirmation dialog showing how many candidates will be emailed (with a name preview) and that their status will become "Shortlisted", so a single click can no longer fire emails to every selected candidate by accident.
+- **Row selection resets when switching status tabs**: selections made in one tab no longer linger invisibly after switching to another.
+
 ## [0.30.1] - 2026-08-07
 
 ### Fixed

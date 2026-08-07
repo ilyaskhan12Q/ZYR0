@@ -170,6 +170,7 @@ export default function AdminTeamApplications() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<any | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [confirmEmail, setConfirmEmail] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
@@ -341,7 +342,7 @@ export default function AdminTeamApplications() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-border bg-card hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             <Download className="w-4 h-4" /> Export CSV
           </button>
-          <button onClick={handleBulkEmail} disabled={selectedCount === 0 || busy === 'email'}
+          <button onClick={() => setConfirmEmail(true)} disabled={selectedCount === 0 || busy === 'email'}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {busy === 'email' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
             Email Selected ({selectedCount})
@@ -373,7 +374,7 @@ export default function AdminTeamApplications() {
         </div>
         <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto border border-border">
           {tabs.map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
+            <button key={tab} onClick={() => { setActiveTab(tab); setSelected(new Set()); }}
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors',
                 activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
@@ -562,6 +563,36 @@ export default function AdminTeamApplications() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Bulk email confirmation */}
+      <AlertDialog open={confirmEmail} onOpenChange={setConfirmEmail}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send shortlist emails to {selectedCount} selected candidate{selectedCount === 1 ? '' : 's'}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(() => {
+                const targets = filtered.filter((a) => selected.has(a.id)).slice(0, 3);
+                return targets.length > 0 ? (
+                  <>
+                    <span className="font-medium text-foreground">{targets.map((t) => t.full_name).join(', ')}{selectedCount > targets.length ? '…' : ''}</span>
+                    <br />
+                  </>
+                ) : null;
+              })()}
+              Each candidate will receive the shortlist email and their application status will be set to
+              &ldquo;Shortlisted&rdquo;. This cannot be undone by this panel — re-run the email flow to resend.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy === 'email'}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setConfirmEmail(false); handleBulkEmail(); }} disabled={busy === 'email'}
+              className="bg-blue-600 hover:bg-blue-700 text-white">
+              {busy === 'email' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+              Send Shortlist Emails
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
