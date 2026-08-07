@@ -2,10 +2,16 @@
 // POST /functions/v1/send-email
 // Body: { to, subject, html, from, text, attachments, kind?, allowUserReplyTo?, website? }
 // Uses SMTP (if configured) or Resend fallback
+// Responds with { success: true, id, provider } where `id` is the provider
+// message/email id regardless of which backend delivered (SMTP → messageId,
+// Resend → email id), so callers can persist a single traceable id.
 //
 // Security model:
-// - Non-contact sends require header `x-internal-token` == EMAIL_INTERNAL_TOKEN (env).
-//   These are the app's own flows (shortlist, offer letters, certificates).
+// - Non-contact (internal) sends require EITHER an authenticated admin/company JWT
+//   (browser flows: TeamApplications shortlists, company offer letters) OR the
+//   server-only `x-internal-token` == EMAIL_INTERNAL_TOKEN (server-to-server:
+//   issue-certificate). The token is never shipped to browsers; clients rely on
+//   their session JWT, attached automatically by supabase.functions.invoke.
 // - Contact sends (kind: 'contact') are public (contact/support form):
 //   * `to` is allowlisted to ZYR0's own mailboxes (no open relay)
 //   * `allowUserReplyTo: true` permits the submitter's email as reply-to
@@ -337,10 +343,34 @@ serve(async (req) => {
       mailText = `New Contact Submission (${cleanCategory})\n\nName: ${cleanName}\nEmail: ${senderEmail}\nSubject: ${cleanSubject || '—'}\n\n${cleanMessage}\n\n— Sent from the ZYR0 contact form.`;
       mailReplyTo = senderEmail; // replies go back to the submitter
     } else {
-      // Internal (authenticated) mode: caller must present the shared token.
+      // Internal (authenticated) mode. Accept the call when EITHER:
+      //  1. a valid JWT whose profile role is admin or company
+      //     (browser flows: TeamApplications shortlists, company offer letters), or
+      //  2. the server-only token `x-internal-token` == EMAIL_INTERNAL_TOKEN
+      //     (reserved for server-to-server callers such as issue-certificate).
       const providedToken = req.headers.get('x-internal-token');
-      if (!INTERNAL_TOKEN || !providedToken || providedToken !== INTERNAL_TOKEN) {
-        console.warn('[send-email] Internal send rejected: missing/invalid x-internal-token.');
+      const tokenOk = !!INTERNAL_TOKEN && !!providedToken && providedToken === INTERNAL_TOKEN;
+
+      let jwtOk = false;
+      const authHeader = req.headers.get('Authorization');
+      const serviceRole = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      if (authHeader?.startsWith('Bearer ') && serviceRole && supabaseUrl) {
+        try {
+          const adminClient = createClient(supabaseUrl, serviceRole);
+          const { data: { user }, error: authError } = await adminClient.auth.getUser(authHeader.replace('Bearer ', ''));
+          if (!authError && user) {
+            const { data: profile } = await adminClient
+              .from('profiles').select('role').eq('id', user.id).single();
+            jwtOk = profile?.role === 'admin' || profile?.role === 'company';
+          }
+        } catch (authErr) {
+          console.warn('[send-email] JWT auth check failed:', authErr);
+        }
+      }
+
+      if (!tokenOk && !jwtOk) {
+        console.warn('[send-email] Internal send rejected: missing/invalid JWT or x-internal-token.');
         return new Response(JSON.stringify({ error: 'Forbidden' }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -382,7 +412,7 @@ serve(async (req) => {
         });
 
         console.log(`[send-email] SMTP delivery successful. MessageId: ${info.messageId}`);
-        return new Response(JSON.stringify({ success: true, messageId: info.messageId }), {
+        return new Response(JSON.stringify({ success: true, id: info.messageId, provider: 'smtp' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (smtpErr) {
@@ -427,7 +457,7 @@ serve(async (req) => {
 
         const data = await res.json();
         console.log(`[send-email] Resend API delivery successful. Email Id: ${data.id}`);
-        return new Response(JSON.stringify({ success: true, id: data.id }), {
+        return new Response(JSON.stringify({ success: true, id: data.id, provider: 'resend' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } catch (resendErr) {

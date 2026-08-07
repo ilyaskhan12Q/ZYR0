@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.30.3] - 2026-08-07
+
+### Changed
+- **Bulk shortlist emails are sent with bounded concurrency and progress feedback**: a large selection previously sent each email strictly one-at-a-time with the whole UI blocked on a silent loop. Sends now run 3 at a time with a live "Sending… X of Y done" banner, while still reporting per-candidate failures when the batch completes.
+
+## [0.30.2] - 2026-08-07
+
+### Changed
+- **Bulk shortlist email now asks for confirmation**: clicking "Email Selected" opens a confirmation dialog showing how many candidates will be emailed (with a name preview) and that their status will become "Shortlisted", so a single click can no longer fire emails to every selected candidate by accident.
+- **Row selection resets when switching status tabs**: selections made in one tab no longer linger invisibly after switching to another.
+
+## [0.30.1] - 2026-08-07
+
+### Fixed
+- **Team applications CSV export no longer breaks on multiline answers**: free-text fields (`projects`, `motivation`) containing line breaks were written into the CSV verbatim, splitting the exported rows apart in Excel. Line breaks inside fields are now collapsed to spaces and a UTF-8 BOM is prepended so Excel decodes special characters correctly.
+
+## [0.30.0] - 2026-08-07
+
+### Fixed
+- **Shortlist emails are no longer vulnerable to HTML injection from applicant data**: the admin shortlist email template interpolated `full_name` and `preferred_role` directly into the email HTML. Both fields come from the public application form, so a candidate could embed markup/link injection into the emails the admin sends to every selected candidate. Applicant-controlled values are now HTML-escaped before interpolation (the plain-text version uses the raw values).
+
+## [0.29.5] - 2026-08-07
+
+### Fixed
+- **Shortlist emails now record the provider message ID under SMTP too**: the `send-email` edge function returned `messageId` for SMTP deliveries but `id` for Resend, so the admin team-applications panel (which reads `id`) stored no traceable message ID — and showed no "Sent IDs" in failure banners — whenever SMTP was the active provider. Both backends now respond with a consistent `{ success, id, provider }` shape, so `email_message_id` is persisted for every send regardless of provider.
+
+## [0.29.4] - 2026-08-07
+
+### Fixed
+- **Internal email sends are now gated on the caller's account, not a client-exposed token**: the `EMAIL_INTERNAL_TOKEN` secret was shipped to the browser as `VITE_EMAIL_INTERNAL_TOKEN`, so anyone could extract it from the public JS bundle and relay emails to arbitrary recipients through `send-email`. Internal sends now require a valid session JWT whose profile role is `admin` or `company` (admin shortlist emails, company offer letters), with the shared token kept only for server-to-server callers (`issue-certificate`). The Vite env var and its Vercel export are removed; the function secret stays.
+
 ## [0.29.3] - 2026-08-06
 
 ### Changed

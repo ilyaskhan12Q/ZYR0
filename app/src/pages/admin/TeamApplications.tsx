@@ -42,10 +42,19 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+function escapeHtml(value: string | null | undefined) {
+  return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 /* ── Email templates ─────────────────────────────────────────────────────── */
 
 function buildShortlistEmail(app: any) {
-  const role = roleTitle(app.preferred_role);
+  // full_name and preferred_role come from the applicant (public form input),
+  // so they are escaped before interpolation into the HTML template.
+  const fullName = escapeHtml(app.full_name);
+  const role = escapeHtml(roleTitle(app.preferred_role));
+  const plainRole = roleTitle(app.preferred_role);
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
   const teamGroupUrl = import.meta.env.VITE_WHATSAPP_TEAM_GROUP_URL || 'https://chat.whatsapp.com/DeVmUUkldtqLR0ho5x95MX';
   const html = `<!DOCTYPE html>
@@ -68,7 +77,7 @@ function buildShortlistEmail(app: any) {
           </tr>
           <tr>
             <td style="padding: 32px 40px;">
-              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${app.full_name},</p>
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${fullName},</p>
               <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
                 Thank you for applying to join the ZYR0 Founding Development Team. After a careful
                 review of all applications, we are pleased to confirm that you have advanced to the
@@ -125,7 +134,7 @@ function buildShortlistEmail(app: any) {
   const text = [
     `Dear ${app.full_name},`,
     '',
-    `Thank you for applying to join the ZYR0 Founding Development Team. After a careful review of all applications, we are pleased to confirm that you have advanced to the shortlist stage for the ${role} team seat.`,
+    `Thank you for applying to join the ZYR0 Founding Development Team. After a careful review of all applications, we are pleased to confirm that you have advanced to the shortlist stage for the ${plainRole} team seat.`,
     '',
     `A member of our team will reach out in the coming days to schedule a conversation — an opportunity to get to know you better and for you to learn more about the role. Please keep an eye on your inbox.`,
     '',
@@ -144,7 +153,6 @@ function buildShortlistEmail(app: any) {
 async function sendCandidateEmail(app: any) {
   const { to, subject, html, text } = buildShortlistEmail(app);
   const { data, error } = await supabase.functions.invoke('send-email', {
-    headers: { 'x-internal-token': import.meta.env.VITE_EMAIL_INTERNAL_TOKEN || '' },
     body: { to, subject, html, text, from: 'ZYR0 Team <team@zyroo.org>', replyTo: 'team@zyroo.org' },
   });
   if (error) throw error;
@@ -162,6 +170,7 @@ export default function AdminTeamApplications() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [detail, setDetail] = useState<any | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<any | null>(null);
+  const [confirmEmail, setConfirmEmail] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
@@ -237,17 +246,22 @@ export default function AdminTeamApplications() {
     let ok = 0;
     let failed = 0;
     const sentIds: { name: string; id: string }[] = [];
-    for (const app of targets) {
-      try {
-        const res = await sendCandidateEmail(app);
-        await markTeamApplicationEmailed(app.id, res?.id);
-        await updateTeamApplicationStatus(app.id, 'Shortlisted');
-        if (res?.id) sentIds.push({ name: app.full_name, id: res.id });
-        ok += 1;
-      } catch (err) {
-        console.error('Email failed for', app.email, err);
-        failed += 1;
-      }
+    const CONCURRENCY = 3;
+    for (let i = 0; i < targets.length; i += CONCURRENCY) {
+      const chunk = targets.slice(i, i + CONCURRENCY);
+      await Promise.all(chunk.map(async (app) => {
+        try {
+          const res = await sendCandidateEmail(app);
+          await markTeamApplicationEmailed(app.id, res?.id);
+          await updateTeamApplicationStatus(app.id, 'Shortlisted');
+          if (res?.id) sentIds.push({ name: app.full_name, id: res.id });
+          ok += 1;
+        } catch (err) {
+          console.error('Email failed for', app.email, err);
+          failed += 1;
+        }
+      }));
+      setMessage({ type: 'ok', text: `Sending shortlist emails… ${ok + failed} of ${targets.length} done.` });
     }
     setMessage({
       type: failed === 0 ? 'ok' : 'err',
@@ -285,8 +299,8 @@ export default function AdminTeamApplications() {
       'Resume URL': a.resume_url ?? '',
     }));
     const headers = Object.keys(rows[0] ?? {});
-    const escape = (v: string) => `"${String(v).replace(/"/g, '""')}"`;
-    const csv = [
+    const escape = (v: string) => `"${String(v).replace(/"/g, '""').replace(/[\r\n]+/g, ' ')}"`;
+    const csv = '\uFEFF' + [
       headers.join(','),
       ...rows.map((r) => headers.map((h) => escape((r as any)[h])).join(',')),
     ].join('\n');
@@ -333,7 +347,7 @@ export default function AdminTeamApplications() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-border bg-card hover:bg-muted/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             <Download className="w-4 h-4" /> Export CSV
           </button>
-          <button onClick={handleBulkEmail} disabled={selectedCount === 0 || busy === 'email'}
+          <button onClick={() => setConfirmEmail(true)} disabled={selectedCount === 0 || busy === 'email'}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {busy === 'email' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
             Email Selected ({selectedCount})
@@ -365,7 +379,7 @@ export default function AdminTeamApplications() {
         </div>
         <div className="flex gap-1 bg-muted rounded-lg p-1 overflow-x-auto border border-border">
           {tabs.map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
+            <button key={tab} onClick={() => { setActiveTab(tab); setSelected(new Set()); }}
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors',
                 activeTab === tab ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
@@ -554,6 +568,36 @@ export default function AdminTeamApplications() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Bulk email confirmation */}
+      <AlertDialog open={confirmEmail} onOpenChange={setConfirmEmail}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send shortlist emails to {selectedCount} selected candidate{selectedCount === 1 ? '' : 's'}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(() => {
+                const targets = filtered.filter((a) => selected.has(a.id)).slice(0, 3);
+                return targets.length > 0 ? (
+                  <>
+                    <span className="font-medium text-foreground">{targets.map((t) => t.full_name).join(', ')}{selectedCount > targets.length ? '…' : ''}</span>
+                    <br />
+                  </>
+                ) : null;
+              })()}
+              Each candidate will receive the shortlist email and their application status will be set to
+              &ldquo;Shortlisted&rdquo;. This cannot be undone by this panel — re-run the email flow to resend.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy === 'email'}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setConfirmEmail(false); handleBulkEmail(); }} disabled={busy === 'email'}
+              className="bg-blue-600 hover:bg-blue-700 text-white">
+              {busy === 'email' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+              Send Shortlist Emails
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>

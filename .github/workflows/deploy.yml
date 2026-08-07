@@ -44,14 +44,6 @@ jobs:
         run: npm ci
         working-directory: app
 
-      - name: Set VITE_EMAIL_INTERNAL_TOKEN on Vercel
-        run: |
-          vercel env rm VITE_EMAIL_INTERNAL_TOKEN production --yes --token=${{ secrets.VERCEL_TOKEN }} 2>/dev/null || true
-          echo "${{ secrets.EMAIL_INTERNAL_TOKEN }}" | vercel env add VITE_EMAIL_INTERNAL_TOKEN production --yes --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
       - name: Pull Vercel environment (production)
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         env:
@@ -65,7 +57,6 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VITE_SUPABASE_URL: "https://iczhrvgzbnuvlgjfzeol.supabase.co"
           VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTYxOTgsImV4cCI6MjA5ODg5MjE5OH0.XVlrp-DDrPtxRbcr52nmHvgIv_XZ6CZaBImgZQMmlOo"
-          VITE_EMAIL_INTERNAL_TOKEN: "${{ secrets.EMAIL_INTERNAL_TOKEN }}"
 
       - name: Deploy to production
         id: deploy
