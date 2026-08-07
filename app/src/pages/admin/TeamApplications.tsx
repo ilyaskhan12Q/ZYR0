@@ -104,7 +104,7 @@ function buildShortlistEmail(app: any) {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
                   <td align="center" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-                    <a href="${whatsAppCommunityUrl}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">💬 Connect on WhatsApp Community</a>
+                    <a href="${whatsAppCommunityUrl}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">Connect on WhatsApp Community</a>
                   </td>
                 </tr>
               </table>
@@ -115,13 +115,13 @@ function buildShortlistEmail(app: any) {
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🚀 Explore Careers</a>
+                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Explore Careers</a>
                     </td>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">💼 Active Programs</a>
+                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Active Programs</a>
                     </td>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🤝 Contact Support</a>
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Contact Support</a>
                     </td>
                   </tr>
                 </table>
