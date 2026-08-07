@@ -2,7 +2,7 @@
   "name": "my-app",
   "private": true,
   "version": "0.22.0",
-  "license": "Apache-2.0",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",

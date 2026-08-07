@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.16.2-blue.svg" alt="Version" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue.svg" alt="License" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-red.svg" alt="License" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react" alt="React" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178c6.svg?logo=typescript" alt="TypeScript" /></a>
   <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-7-646cff.svg?logo=vite" alt="Vite" /></a>
@@ -138,7 +138,7 @@ zyro-kim/
 ├── supabase/                   # Database migrations, RLS policies, & Edge Functions
 ├── CHANGELOG.md                # Detailed release history and version tracking
 ├── CONTRIBUTING.md             # Guidelines for community contributions
-├── LICENSE                     # Open-source Apache License 2.0 terms
+├── LICENSE                     # Proprietary license — all rights reserved
 ├── README.md                   # Project overview & documentation
 └── SECURITY.md                 # Vulnerability disclosure & security policies
 ```
@@ -244,7 +244,7 @@ Security is fundamental to ZYR0. If you discover a security vulnerability or sec
 
 ## License
 
-This project is open-source software licensed under the **[Apache License 2.0](./LICENSE)**.
+This project is proprietary software. All rights reserved. See the **[LICENSE](./LICENSE)** for the full terms. Third-party open-source libraries used within this project remain under their respective licenses.
 
 ---
 
