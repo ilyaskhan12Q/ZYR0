@@ -27,7 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Light/dark mode toggle now visible on mobile**: the theme toggle in the public navbar was only rendered on `md+` screens (inside the desktop controls wrapper). It now renders in the header on all breakpoints, so mobile users can switch themes without resizing to desktop mode.
 - **Clear "Get Started" on mobile**: the hamburger menu's auth row is now role-aware — logged-out visitors get a prominent "Get Started" accent CTA alongside "Log in", and logged-in users get a "Go to Dashboard" action instead of sign-in links.
-
 ## [0.31.5] - 2026-08-07
 
 ### Changed
