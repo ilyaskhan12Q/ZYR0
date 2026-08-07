@@ -111,7 +111,7 @@ export default function PublicLayout() {
             </div>
 
             {/* Right Side Controls / Auth */}
-            <div className="hidden md:flex items-center gap-3 lg:gap-4 shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
               <button
                 aria-label="Toggle color theme"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -121,11 +121,11 @@ export default function PublicLayout() {
               </button>
               {user ? (
                 <>
-                  <button className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}>
+                  <button className={`hidden md:block relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}>
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
                   </button>
-                  <div className="relative">
+                  <div className="relative hidden md:block">
                     <button
                       onClick={() => setProfileOpen(!profileOpen)}
                       className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-slate-900/10 dark:hover:bg-white/10'}`}
@@ -223,12 +223,23 @@ export default function PublicLayout() {
                 </div>
 
                 <div className="pt-3 border-t border-border flex gap-3">
-                  <Link to="/login" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors">
-                    Log in
-                  </Link>
-                  <Link to="/register" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors">
-                    Get Started
-                  </Link>
+                  {user ? (
+                    <Link
+                      to={`/${profile?.role || 'student'}/dashboard`}
+                      className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
+                    >
+                      Go to Dashboard
+                    </Link>
+                  ) : (
+                    <>
+                      <Link to="/login" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors">
+                        Log in
+                      </Link>
+                      <Link to="/register" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors">
+                        Get Started
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

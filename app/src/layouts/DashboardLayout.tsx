@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -14,6 +14,7 @@ import { SEO } from '@/components/SEO';
 import type { UserRole } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
+import LoginWelcomeModal from '@/components/onboarding/LoginWelcomeModal';
 
 interface NavItem {
   label: string;
@@ -108,15 +109,41 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const welcomeShown = useRef(false);
 
   useEffect(() => {
     if (profile && !profileCompleted && profile.role !== 'admin') {
       const dismissed = sessionStorage.getItem('profile_modal_dismissed_session');
-      if (!dismissed) {
+      if (!dismissed && !welcomeShown.current && !sessionStorage.getItem('login_welcome_dismissed_session')) {
         setShowModal(true);
       }
     }
+  }, [profile, profileCompleted, showWelcome]);
+
+  useEffect(() => {
+    if (profile && profile.role === 'student' && !profileCompleted) {
+      const dismissed = sessionStorage.getItem('login_welcome_dismissed_session');
+      if (!dismissed && !welcomeShown.current) {
+        welcomeShown.current = true;
+        setShowWelcome(true);
+      }
+    }
   }, [profile, profileCompleted]);
+
+  useEffect(() => {
+    if (showWelcome) setShowModal(false);
+  }, [showWelcome]);
+
+  const handleCloseWelcome = () => {
+    sessionStorage.setItem('login_welcome_dismissed_session', 'true');
+    setShowWelcome(false);
+  };
+
+  const handleWelcomeAction = (path: string) => {
+    handleCloseWelcome();
+    navigate(path);
+  };
 
   const handleCloseModal = () => {
     sessionStorage.setItem('profile_modal_dismissed_session', 'true');
@@ -697,6 +724,14 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
           </div>
         )}
       </AnimatePresence>
+
+      <LoginWelcomeModal
+        open={showWelcome}
+        role={profile?.role ?? 'student'}
+        firstName={user?.user_metadata?.full_name?.split(' ')[0]}
+        onAction={handleWelcomeAction}
+        onDismiss={handleCloseWelcome}
+      />
     </div>
   );
 }

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.7] - 2026-08-07
+
+### Added
+- **Post-login welcome popup for students**: after signing in, students with an incomplete profile now land directly on the dashboard with a professional welcome modal. It offers two clear actions based on role — students get "Apply for an Internship" (`/student/internships`) plus "Complete Your Profile" (`/student/profile`, noted as taking less than 2 minutes), with role-aware copy for company/mentor/admin users. The popup is gated per session (`login_welcome_dismissed_session`) so it shows once per login, and is sized to not overlap the existing profile-completion modal.
+
+## [0.31.6] - 2026-08-07
+
+### Fixed
+- **Light/dark mode toggle now visible on mobile**: the theme toggle in the public navbar was only rendered on `md+` screens (inside the desktop controls wrapper). It now renders in the header on all breakpoints, so mobile users can switch themes without resizing to desktop mode.
+- **Clear "Get Started" on mobile**: the hamburger menu's auth row is now role-aware — logged-out visitors get a prominent "Get Started" accent CTA alongside "Log in", and logged-in users get a "Go to Dashboard" action instead of sign-in links.
+
+## [0.31.5] - 2026-08-07
+
+### Changed
+- **License changed to proprietary (§ All Rights Reserved)**: the project is no longer open-source. `LICENSE` now contains a ZYR0 proprietary license (copyright © 2026 ZYR0 Contributors). README badge, project tree, and License section updated, and `app/package.json` declares `"license": "UNLICENSED"`.
+
 ## [0.31.4] - 2026-08-07
 
 ### Fixed
