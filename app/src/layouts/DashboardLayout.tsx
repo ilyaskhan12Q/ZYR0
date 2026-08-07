@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -110,24 +110,30 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const welcomeShown = useRef(false);
 
   useEffect(() => {
     if (profile && !profileCompleted && profile.role !== 'admin') {
       const dismissed = sessionStorage.getItem('profile_modal_dismissed_session');
-      if (!dismissed) {
+      if (!dismissed && !welcomeShown.current && !sessionStorage.getItem('login_welcome_dismissed_session')) {
         setShowModal(true);
+      }
+    }
+  }, [profile, profileCompleted, showWelcome]);
+
+  useEffect(() => {
+    if (profile && profile.role === 'student' && !profileCompleted) {
+      const dismissed = sessionStorage.getItem('login_welcome_dismissed_session');
+      if (!dismissed && !welcomeShown.current) {
+        welcomeShown.current = true;
+        setShowWelcome(true);
       }
     }
   }, [profile, profileCompleted]);
 
   useEffect(() => {
-    if (profile && profile.role === 'student' && !profileCompleted) {
-      const dismissed = sessionStorage.getItem('login_welcome_dismissed_session');
-      if (!dismissed) {
-        setShowWelcome(true);
-      }
-    }
-  }, [profile, profileCompleted]);
+    if (showWelcome) setShowModal(false);
+  }, [showWelcome]);
 
   const handleCloseWelcome = () => {
     sessionStorage.setItem('login_welcome_dismissed_session', 'true');
