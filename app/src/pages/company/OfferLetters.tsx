@@ -86,93 +86,100 @@ async function sendOfferLetterEmail(opts: {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Internship Offer</title>
+  <title>Internship Offer — ZYR0</title>
 </head>
-<body style="margin: 0; padding: 32px 16px; background-color: #f1ece0; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f1ece0;">
+<body style="margin: 0; padding: 32px 16px; background-color: #f8fafc; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc;">
     <tr>
       <td align="center" style="padding: 24px 12px;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #fffdf5; border: 1px solid #b89c56; box-shadow: 0 10px 30px rgba(25, 21, 18, 0.08);">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);">
+          <!-- Header Banner -->
           <tr>
-            <td style="padding: 36px 40px 22px; text-align: center; border-bottom: 1px solid #e8dcc0;">
-              <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 700; letter-spacing: 5px; color: #1e3a8a;">ZYR0</p>
-              <p style="margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: #b89c56;">Internship Offer Extended</p>
+            <td style="padding: 36px 40px 24px; text-align: center; background-color: #1e3a8a; border-bottom: 3px solid #b89c56;">
+              <p style="margin: 0 0 6px; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #ffffff;">ZYR0</p>
+              <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #f1c40f;">Official Internship Offer</p>
             </td>
           </tr>
+          <!-- Body Content -->
           <tr>
-            <td style="padding: 32px 40px;">
-              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.7; color: #13100d;">Dear ${studentName},</p>
-              <p style="margin: 0 0 18px; font-size: 15px; line-height: 1.8; color: #3d372e;">
-                On behalf of <strong style="color: #1e3a8a;">${companyName}</strong>, we are pleased to confirm that an
-                official internship offer has been extended to you for the
-                <strong style="color: #1e3a8a;">${internshipTitle}</strong> position. Your application demonstrated genuine
-                potential, and we are confident in the contributions you will bring to the team.
+            <td style="padding: 36px 40px;">
+              <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: #0f172a;">Dear <strong>${studentName}</strong>,</p>
+              <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
+                Congratulations! On behalf of <strong style="color: #1e3a8a;">${companyName}</strong>, we are thrilled to extend an official internship offer to you for the <strong style="color: #1e3a8a;">${internshipTitle}</strong> position. Your background and dedication during the selection process impressed our team, and we are confident in the impact you will bring!
               </p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 26px 0; border: 1px solid #b89c56; background-color: #faf6ea;">
+
+              <!-- Offer Details Card -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; border: 1px solid #cbd5e1; border-radius: 8px; background-color: #f8fafc;">
                 <tr>
-                  <td style="padding: 18px 24px; text-align: center;">
-                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Offer Recipient</p>
-                    <p style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 17px; font-weight: 700; color: #1e3a8a;">${companyName} — ${internshipTitle}</p>
-                    <p style="margin: 10px 0 0; font-size: 11px; letter-spacing: 1.5px; color: #8a7f6c;">Offer Code: <strong style="color: #1e3a8a;">${offerCodeStr}</strong> &nbsp;·&nbsp; Verify at <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="color: #1e3a8a;">${siteUrl}/verify</a></p>
+                  <td style="padding: 20px 24px; text-align: center;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Position & Partner Company</p>
+                    <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #0f172a;">${companyName} — ${internshipTitle}</p>
+                    <p style="margin: 0; font-size: 12px; color: #64748b;">
+                      Offer Code: <strong style="color: #1e3a8a; font-family: monospace; font-size: 13px;">${offerCodeStr}</strong> &nbsp;·&nbsp; 
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">Verify Online</a>
+                    </p>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">The official offer letter is attached to this email. Please review the full terms and conditions, then confirm your decision through the ZYR0 platform at your earliest convenience.</p>
-              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Your Next Step: Respond Before It Expires</p>
-              <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.7; color: #3d372e;">This offer remains open until <strong style="color: #1e3a8a;">${expiryDateStr}</strong>. We encourage you to accept or decline before the deadline so your internship can be finalized without delay.</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
+
+              <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
+                Your official Offer Letter document is attached to this email. Please review the full engagement terms, duration, and details in the document.
+              </p>
+
+              <!-- Expiry Alert -->
+              <div style="background-color: #fefce8; border-left: 4px solid #eab308; padding: 14px 18px; margin: 20px 0; border-radius: 4px;">
+                <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: #854d0e;">
+                  ⏳ <strong>Action Required:</strong> This offer remains open until <strong>${expiryDateStr}</strong>. Please review and confirm your decision on the ZYR0 portal before the deadline.
+                </p>
+              </div>
+
+              <!-- Main Primary CTA Button -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
-                  <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
-                    <a href="${siteUrl}/student/offer-letters" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">Review &amp; Respond to Offer</a>
+                  <td align="center" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                    <a href="${siteUrl}/student/offer-letters" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">🎯 Review & Respond to Offer</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Having trouble signing in or need assistance? Our support team is ready to help.</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                <tr>
-                  <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
-                    <a href="${siteUrl}/contact" style="display: inline-block; padding: 12px 28px; font-size: 13px; font-weight: 600; letter-spacing: 1px; color: #1e3a8a; text-decoration: none; border-radius: 4px;">Contact Support</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 24px 0 0; font-size: 15px; line-height: 1.8; color: #13100d;">
-                We look forward to welcoming you on board.<br>
-                <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px;">The ZYR0 Team</strong>
+
+              <!-- Quick Action Grid -->
+              <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
+                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Verification</p>
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">📄 Verify Credential</a>
+                    </td>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🚀 Career Hub</a>
+                    </td>
+                    <td align="center" style="padding: 4px;">
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🤝 Contact Support</a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+
+              <p style="margin: 28px 0 0; font-size: 15px; line-height: 1.8; color: #0f172a;">
+                We are excited to welcome you on board!<br><br>
+                Warmest regards,<br>
+                <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #1e3a8a;">The ZYR0 Team & ${companyName}</strong>
               </p>
             </td>
           </tr>
+          <!-- Footer -->
           <tr>
-            <td style="padding: 28px 40px 32px; text-align: center; border-top: 1px solid #e8dcc0;">
-              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Explore ZYR0</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 20px;">
-                <tr>
-                  <td align="center" style="padding: 5px 0;">
-                    <a href="${siteUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Website</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/internships" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Browse Internships</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/companies" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">For Companies</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/contact" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Contact</a>
-                    <span style="color: #b89c56; padding: 0 8px;">·</span>
-                    <a href="${siteUrl}/help" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">Help Center</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Stay Connected</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 420px; margin: 0 auto 22px;">
-                <tr>
-                  <td align="center" style="padding: 5px 0;">
-                    <a href="${linkedInUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">LinkedIn</a>
-                    <span style="color: #b89c56; padding: 0 4px;">·</span>
-                    <a href="${whatsAppCommunityUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Community</a>
-                    <span style="color: #b89c56; padding: 0 4px;">·</span>
-                    <a href="${whatsAppChannelUrl}" style="font-size: 12px; line-height: 1.8; color: #1e3a8a; text-decoration: none;">WhatsApp Channel</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 0 0 6px; font-size: 11px; color: #8a7f6c;">This email was sent on behalf of ${companyName} via ZYR0.</p>
-              <p style="margin: 0; font-size: 11px; color: #8a7f6c;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+            <td style="padding: 28px 40px 32px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
+              <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8;">Stay Connected</p>
+              <p style="margin: 0 0 16px; font-size: 12px; color: #475569;">
+                <a href="${linkedInUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <span style="color: #cbd5e1; padding: 0 8px;">·</span>
+                <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
+                <span style="color: #cbd5e1; padding: 0 8px;">·</span>
+                <a href="${whatsAppChannelUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+              </p>
+              <p style="margin: 0 0 6px; font-size: 11px; color: #94a3b8;">This email was sent on behalf of ${companyName} via ZYR0.</p>
+              <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
             </td>
           </tr>
         </table>
@@ -182,29 +189,36 @@ async function sendOfferLetterEmail(opts: {
 </body>
 </html>`;
 
-  const emailText = `Dear ${studentName},\n\n` +
-    `On behalf of ${companyName}, we are pleased to confirm that an official internship offer has been extended to you for the ${internshipTitle} position.\n\n` +
-    `The official offer letter is attached to this email as a PDF. Please review the full terms and conditions, then confirm your decision through the ZYR0 platform:\n` +
-    `${siteUrl}/student/offer-letters\n\n` +
-    `Offer Code: ${offerCodeStr}\n` +
-    `Verify this offer: ${siteUrl}/verify?type=offer&id=${offerId}\n\n` +
-    `This offer remains open until ${expiryDateStr}. We encourage you to accept or decline before the deadline so your internship can be finalized without delay.\n\n` +
-    `If you encounter any issues or have questions, contact our support team (your message goes straight to the platform team):\n` +
-    `${siteUrl}/contact\n\n` +
-    `Explore ZYR0:\n` +
-    `- Website: ${siteUrl}\n` +
-    `- Browse Internships: ${siteUrl}/internships\n` +
-    `- For Companies: ${siteUrl}/companies\n` +
-    `- Contact: ${siteUrl}/contact\n` +
-    `- Help Center: ${siteUrl}/help\n\n` +
-    `Stay Connected:\n` +
-    `- LinkedIn: ${linkedInUrl}\n` +
-    `- WhatsApp Community: ${whatsAppCommunityUrl}\n` +
-    `- WhatsApp Channel: ${whatsAppChannelUrl}\n\n` +
-    `We look forward to welcoming you on board.\n\n` +
-    `With warm regards,\n` +
-    `The ZYR0 Team\n` +
-    `team@zyroo.org`;
+  const emailText = [
+    `Dear ${studentName},`,
+    '',
+    `Congratulations! On behalf of ${companyName}, we are thrilled to extend an official internship offer for the ${internshipTitle} position.`,
+    '',
+    `Your official Offer Letter document is attached to this email.`,
+    '',
+    `Offer Details:`,
+    `- Company: ${companyName}`,
+    `- Position: ${internshipTitle}`,
+    `- Offer Code: ${offerCodeStr}`,
+    `- Verify Online: ${siteUrl}/verify?type=offer&id=${offerId}`,
+    '',
+    `Important: This offer remains open until ${expiryDateStr}. Please review and respond on the platform before the deadline:`,
+    `${siteUrl}/student/offer-letters`,
+    '',
+    `Quick Links:`,
+    `- Verify Credential: ${siteUrl}/verify?type=offer&id=${offerId}`,
+    `- Career Hub: ${siteUrl}/careers`,
+    `- Support: ${siteUrl}/contact`,
+    '',
+    `Stay Connected:`,
+    `- LinkedIn: ${linkedInUrl}`,
+    `- WhatsApp Community: ${whatsAppCommunityUrl}`,
+    `- WhatsApp Channel: ${whatsAppChannelUrl}`,
+    '',
+    'Warmest regards,',
+    `The ZYR0 Team & ${companyName}`,
+    'team@zyroo.org',
+  ].join('\n');
 
   const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
     body: {
