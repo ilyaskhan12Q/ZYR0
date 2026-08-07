@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.4] - 2026-08-07
+
+### Fixed
+- **Certificate email error reporting under strict type-checking**: the `issue-certificate` edge function's catch blocks accessed `.message` on an `unknown` caught value, which failed `deno check` with three `TS18046` errors. Error text now narrows with `instanceof Error` before reading `.message`.
+
+## [0.31.3] - 2026-08-07
+
+### Changed
+- **Professional explore/stay-connected link footer on all candidate-facing emails**: the founding team shortlist email, company offer-letter email, and both certificate emails now close with a `Explore ZYR0` link row (Website, Browse Internships, For Companies, Contact, Help Center) and a `Stay Connected` row (LinkedIn, WhatsApp Community, WhatsApp Channel). Plain-text fallbacks include the full URL set too. The shortlist email's inline community link now points to the ZYR0 WhatsApp Community.
+
+## [0.31.2] - 2026-08-07
+
+### Fixed
+- **Founding team shortlist email CTAs are reliably clickable**: the "Explore ZYR0 Careers" and "Contact Support" buttons no longer place their styling on a wrapper `<td>`; the full click surface, background, and border now sit on the `<a>` itself (bulletproof email-button pattern), so the links open `zyroo.org/careers` and `zyroo.org/contact` directly in strict clients like Outlook desktop.
+
+### Added
+- **LinkedIn follow link in the founding team shortlist email**: a new "Follow ZYR0 on LinkedIn" button in the email footer links to the ZYR0 LinkedIn company page, and the plain-text fallback now includes the LinkedIn URL as well.
+
 ## [0.31.1] - 2026-08-07
 
 ### Changed
