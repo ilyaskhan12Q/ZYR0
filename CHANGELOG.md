@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-08-07
+
+### Added
+- **Company applications page with full applicant details**: the company applicants page becomes a full applications panel — status tabs, search (name/email/university/position/skills), a **View** button opening the student-application detail dialog, a per-row status dropdown alongside the existing shortlist/accept/reject quick actions, and richer joined applicant data (graduation year, bio, skills, portfolio, resume) from `getAllCompanyApplications`.
+
 ## [0.30.5] - 2026-08-07
 
 ### Added

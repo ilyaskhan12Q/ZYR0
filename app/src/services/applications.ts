@@ -186,8 +186,8 @@ export async function getAllCompanyApplications(company_id: string) {
       .from('applications')
       .select(`
         *,
-        internship:internships!internship_id (id, title, company_id, start_date, end_date, skills),
-        student:profiles!student_id (id, full_name, email, avatar_url, university)
+        internship:internships!internship_id (id, title, company_id, location, start_date, end_date, skills, company:companies!company_id (id, name)),
+        student:profiles!student_id (id, full_name, email, avatar_url, university, graduation_year, bio, skills, portfolio_url, resume_url)
       `)
       .in('internship_id', internshipIds)
       .order('applied_at', { ascending: false });
