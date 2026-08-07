@@ -1,7 +1,16 @@
 import { supabase } from '@/lib/supabase';
-import type { Application } from '@/lib/database.types';
+import type { Application, ApplicationStatus } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+
+export const APPLICATION_STATUSES: ApplicationStatus[] = [
+  'Applied',
+  'Under Review',
+  'Shortlisted',
+  'Accepted',
+  'Rejected',
+  'Withdrawn',
+];
 
 /** Get applications for the current student */
 export async function getMyApplications(useCache = true) {
@@ -177,8 +186,8 @@ export async function getAllCompanyApplications(company_id: string) {
       .from('applications')
       .select(`
         *,
-        internship:internships!internship_id (id, title, company_id, start_date, end_date, skills),
-        student:profiles!student_id (id, full_name, email, avatar_url, university)
+        internship:internships!internship_id (id, title, company_id, location, start_date, end_date, skills, company:companies!company_id (id, name)),
+        student:profiles!student_id (id, full_name, email, avatar_url, university, graduation_year, bio, skills, portfolio_url, resume_url)
       `)
       .in('internship_id', internshipIds)
       .order('applied_at', { ascending: false });
@@ -188,6 +197,31 @@ export async function getAllCompanyApplications(company_id: string) {
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;
+}
+
+/** Admin: fetch all internship applications, optionally filtered by status. */
+export async function getAllAdminApplications(status?: ApplicationStatus | 'All') {
+  let query = supabase
+    .from('applications')
+    .select(`
+      *,
+      internship:internships!internship_id (
+        id, title, location, location_type, type, deadline,
+        company:companies!company_id (id, name)
+      ),
+      student:profiles!student_id (
+        id, full_name, email, avatar_url, university, graduation_year,
+        bio, skills, portfolio_url, resume_url
+      )
+    `)
+    .order('applied_at', { ascending: false });
+
+  if (status && status !== 'All') {
+    query = query.eq('status', status);
+  }
+
+  const { data, error } = await query;
+  return { data: (data ?? []) as any[], error };
 }
 
 /** Update application status (company: shortlist, accept, reject) */

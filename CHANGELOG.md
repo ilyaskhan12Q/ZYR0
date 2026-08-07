@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.1] - 2026-08-07
+
+### Changed
+- **Company applications moved to `/company/applications`**: the company review page was renamed from `/company/applicants` to `/company/applications` (matching the admin `applications` naming). Sidebar entry, company dashboard "View All" link, and the profile-completion restricted-routes map were updated; the old `Applicants` page was removed.
+
+## [0.31.0] - 2026-08-07
+
+### Added
+- **Company applications page with full applicant details**: the company applicants page becomes a full applications panel — status tabs, search (name/email/university/position/skills), a **View** button opening the student-application detail dialog, a per-row status dropdown alongside the existing shortlist/accept/reject quick actions, and richer joined applicant data (graduation year, bio, skills, portfolio, resume) from `getAllCompanyApplications`.
+
+## [0.30.5] - 2026-08-07
+
+### Added
+- **Admin applications panel now reviews applicants like team applications**: `/admin/applications` gains status tabs, search across name/email/university/internship/company/skills, a one-click **View** button that opens the student-application detail dialog, and a per-row status dropdown (all six statuses). Admin data is served by a new `getAllAdminApplications` service call that joins the applicant's full profile.
+
+## [0.30.4] - 2026-08-07
+
+### Added
+- **Shared student-application detail dialog**: new reusable `ApplicationDetailDialog` component and shared `APPLICATION_STATUSES` constants, used by both the admin and company internship-application panels. The dialog shows the applicant's profile (avatar, name, email, university, graduation year, bio, skills, portfolio/resume links), the internship they applied to, their status, and any cover letter or application answers when present.
+
 ## [0.30.3] - 2026-08-07
 
 ### Changed

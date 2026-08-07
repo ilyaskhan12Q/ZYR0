@@ -96,7 +96,7 @@ export default function CompanyDashboard() {
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">Recent Applicants</h3>
-              <Link to="/company/applicants" className="text-sm text-accent hover:underline flex items-center gap-1">View All <ArrowRight className="w-3.5 h-3.5" /></Link>
+              <Link to="/company/applications" className="text-sm text-accent hover:underline flex items-center gap-1">View All <ArrowRight className="w-3.5 h-3.5" /></Link>
             </div>
             <div className="divide-y divide-border">
               {recentApps.length === 0 ? (

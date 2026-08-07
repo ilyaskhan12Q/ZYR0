@@ -46,7 +46,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
       { label: 'All Internships', href: '/company/internships' },
       { label: 'Post New', href: '/company/internships/new' },
     ]},
-    { label: 'Applicants', href: '/company/applicants', icon: FileCheck, badge: 12 },
+    { label: 'Applications', href: '/company/applications', icon: FileCheck, badge: 12 },
     { label: 'Interns', href: '/company/interns', icon: Users },
     { label: 'Tasks', href: '/company/tasks', icon: ClipboardList },
     { label: 'Messages', href: '/company/messages', icon: MessageSquare },
@@ -83,7 +83,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
 
 const RESTRICTED_ROUTES: Record<string, string[]> = {
   student: ['/student/workspace', '/student/certificates'],
-  company: ['/company/internships/new', '/company/applicants', '/company/team', '/company/certificates'],
+  company: ['/company/internships/new', '/company/applications', '/company/team', '/company/certificates'],
   mentor: ['/mentor/tasks', '/mentor/evaluations']
 };
 
