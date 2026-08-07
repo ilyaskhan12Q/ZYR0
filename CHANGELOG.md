@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Modernized platform email templates across all modules**:
-  - **Offer Letters (`OfferLetters.tsx`)**: Upgraded to ZYR0 brand design tokens (`#f8fafc` slate background, `#1e3a8a` navy header with gold accent border, `#ffffff` card container), added structured Offer Details card, prominent Emerald action CTA, 3-button quick action grid (Verify, Career Hub, Support), and warm, encouraging candidate-centric copy.
+  - **Emoji-Free Enterprise Aesthetics**: Removed all decorative emojis from buttons, headers, alert boxes, and action links across all transactional and administrative email templates for a clean, formal visual presentation.
+  - **Offer Letters (`OfferLetters.tsx`)**: Upgraded to ZYR0 brand design tokens (`#f8fafc` slate background, `#1e3a8a` navy header with gold accent border, `#ffffff` card container), added structured Offer Details card, prominent Emerald action CTA, 4-button quick action grid (Verify Credential, WhatsApp Channel for latest updates, Career Hub, Contact Support), and warm, encouraging candidate-centric copy.
   - **Certificate Issued (`issue-certificate/index.ts`)**: Applied standardized header, card container, primary action button, and structured quick action links.
   - **Contact Notifications (`send-email/index.ts`)**: Styled administrative header, metadata-rich details card, and direct response action button.
   - **Candidate Shortlist (`TeamApplications.tsx`)**: Applied founding team branding, role highlight card, and unified quick-action button bar.

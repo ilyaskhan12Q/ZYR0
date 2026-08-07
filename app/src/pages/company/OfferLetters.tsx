@@ -129,7 +129,7 @@ async function sendOfferLetterEmail(opts: {
               <!-- Expiry Alert -->
               <div style="background-color: #fefce8; border-left: 4px solid #eab308; padding: 14px 18px; margin: 20px 0; border-radius: 4px;">
                 <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: #854d0e;">
-                  ⏳ <strong>Action Required:</strong> This offer remains open until <strong>${expiryDateStr}</strong>. Please review and confirm your decision on the ZYR0 portal before the deadline.
+                  <strong>Action Required:</strong> This offer remains open until <strong>${expiryDateStr}</strong>. Please review and confirm your decision on the ZYR0 portal before the deadline.
                 </p>
               </div>
 
@@ -137,24 +137,29 @@ async function sendOfferLetterEmail(opts: {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
                   <td align="center" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-                    <a href="${siteUrl}/student/offer-letters" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">🎯 Review & Respond to Offer</a>
+                    <a href="${siteUrl}/student/offer-letters" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">Review & Respond to Offer</a>
                   </td>
                 </tr>
               </table>
 
               <!-- Quick Action Grid -->
               <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
-                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Verification</p>
+                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Latest Updates</p>
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
-                    <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">📄 Verify Credential</a>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #1e3a8a; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Verify Credential</a>
                     </td>
-                    <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🚀 Career Hub</a>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${whatsAppChannelUrl}" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #10b981; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">WhatsApp Channel</a>
                     </td>
-                    <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🤝 Contact Support</a>
+                  </tr>
+                  <tr>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${siteUrl}/careers" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #0284c7; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Career Hub</a>
+                    </td>
+                    <td align="center" style="padding: 4px;" width="50%">
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Contact Support</a>
                     </td>
                   </tr>
                 </table>

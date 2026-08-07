@@ -332,7 +332,7 @@ serve(async (req) => {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto; text-align: center;">
                 <tr>
                   <td align="center" style="border-radius: 8px; background-color: #1e3a8a; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);">
-                    <a href="mailto:${sanitizeHtml(senderEmail)}" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">✉️ Reply Directly to Sender</a>
+                    <a href="mailto:${sanitizeHtml(senderEmail)}" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">Reply Directly to Sender</a>
                   </td>
                 </tr>
               </table>

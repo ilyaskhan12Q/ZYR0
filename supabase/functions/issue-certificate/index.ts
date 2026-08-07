@@ -137,7 +137,7 @@ serve(async (req) => {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
                   <td align="center" style="border-radius: 8px; background-color: #1e3a8a; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);">
-                    <a href="${siteUrl}/verify/${certificate.credential_id}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">🏆 View Verified Certificate</a>
+                    <a href="${siteUrl}/verify/${certificate.credential_id}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">View Verified Certificate</a>
                   </td>
                 </tr>
               </table>
@@ -152,13 +152,13 @@ serve(async (req) => {
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
                     <td align="center" style="padding: 4px;">
-                      <a href="${whatsAppCommunityUrl}" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #10b981; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">💬 Join Community</a>
+                      <a href="${whatsAppCommunityUrl}" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #10b981; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Join Community</a>
                     </td>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">💼 Explore Roles</a>
+                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Explore Roles</a>
                     </td>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">🤝 Need Help?</a>
+                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 16px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Need Help?</a>
                     </td>
                   </tr>
                 </table>
