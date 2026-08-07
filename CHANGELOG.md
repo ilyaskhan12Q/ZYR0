@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.7] - 2026-08-07
+
+### Added
+- **Post-login welcome popup for students**: after signing in, students with an incomplete profile now land directly on the dashboard with a professional welcome modal. It offers two clear actions based on role — students get "Apply for an Internship" (`/student/internships`) plus "Complete Your Profile" (`/student/profile`, noted as taking less than 2 minutes), with role-aware copy for company/mentor/admin users. The popup is gated per session (`login_welcome_dismissed_session`) so it shows once per login, and is sized to not overlap the existing profile-completion modal.
+
 ## [0.31.6] - 2026-08-07
 
 ### Fixed
