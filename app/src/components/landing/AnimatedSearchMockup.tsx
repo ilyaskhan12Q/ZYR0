@@ -112,7 +112,7 @@ export default function AnimatedSearchMockup() {
         </button>
 
         <p className="mt-3 text-center text-[10px] text-slate-500 dark:text-slate-400">
-          1,200+ live internships · Updated 2 min ago
+          Live internships · Updated 2 min ago
         </p>
       </div>
 
