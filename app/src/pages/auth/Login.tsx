@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Banknote, Star } from 'lucide-react';
 import { signIn, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
+import type { UserRole } from '../../lib/database.types';
 import { SEO } from '@/components/SEO';
+import { postAuthRedirect } from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { profile, user } = useAuth();
+  const postAuthTarget = postAuthRedirect(searchParams);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +37,7 @@ export default function Login() {
     setLoading(true);
     setLocalError(null);
 
-    const { error } = await signIn({ email, password });
+    const { data: signInData, error } = await signIn({ email, password });
     
     if (error) {
       let msg = error.message;
@@ -41,7 +47,9 @@ export default function Login() {
       setLocalError(msg);
       setLoading(false);
     } else {
-      // The AuthContext will automatically redirect based on role when session updates
+      const role = profile?.role || (signInData?.user?.user_metadata?.role as UserRole) || (user?.user_metadata?.role as UserRole) || 'student';
+      const target = postAuthTarget || `/${role}/dashboard`;
+      navigate(target, { replace: true });
     }
   };
 

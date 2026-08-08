@@ -22,6 +22,7 @@ const navLinks = [
 
 export default function PublicLayout() {
   const { user, profile, signOut } = useAuth();
+  const effectiveRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -149,13 +150,13 @@ export default function PublicLayout() {
                             <p className="text-xs text-muted-foreground">{user.email}</p>
                           </div>
                           <div className="py-1">
-                            <button onClick={() => navigate(`/${profile?.role || 'student'}/dashboard`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => navigate(`/${effectiveRole}/dashboard`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <LayoutDashboard className="w-4 h-4" /> Dashboard
                             </button>
-                            <button onClick={() => navigate(`/${profile?.role || 'student'}/profile`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => navigate(`/${effectiveRole}/profile`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <User className="w-4 h-4" /> Profile
                             </button>
-                            <button onClick={() => navigate(`/${profile?.role || 'student'}/settings`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => navigate(`/${effectiveRole}/settings`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <Settings className="w-4 h-4" /> Settings
                             </button>
                           </div>
@@ -225,7 +226,7 @@ export default function PublicLayout() {
                 <div className="pt-3 border-t border-border flex gap-3">
                   {user ? (
                     <Link
-                      to={`/${profile?.role || 'student'}/dashboard`}
+                      to={`/${effectiveRole}/dashboard`}
                       className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
                     >
                       Go to Dashboard

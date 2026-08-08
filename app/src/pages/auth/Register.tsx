@@ -8,6 +8,7 @@ import type { UserRole } from '../../lib/database.types';
 import { supabase } from '../../lib/supabase';
 import { SEO } from '@/components/SEO';
 import { postAuthRedirect } from '@/components/ProtectedRoute';
+import { useAuth } from '@/contexts/AuthContext';
 
 type Role = UserRole | null;
 type Step = 'role' | 'form' | 'otp' | 'success';
@@ -15,6 +16,7 @@ type Step = 'role' | 'form' | 'otp' | 'success';
 const REGISTER_ROLES: UserRole[] = ['student', 'company', 'mentor'];
 
 export default function Register() {
+  const { profile, user } = useAuth();
   const navigate = useNavigate();
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -407,7 +409,13 @@ export default function Register() {
                     ? 'Your email has been successfully verified, and your account is active. You can now continue with your application.'
                     : 'Your email has been successfully verified, and your account is active. You can now access your dashboard.'}
                 </p>
-                <button onClick={() => navigate(postAuthTarget || '/')} className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring">
+                <button 
+                  onClick={() => {
+                    const effectiveRole = profile?.role || (user?.user_metadata?.role as UserRole) || selectedRole || 'student';
+                    navigate(postAuthTarget || `/${effectiveRole}/dashboard`);
+                  }} 
+                  className="mt-6 inline-flex items-center gap-2 bg-accent text-white px-8 py-3 rounded-lg font-medium hover:bg-accent/90 transition-colors focus-visible-ring"
+                >
                   {postAuthTarget ? 'Continue to Application' : 'Go to Dashboard'} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
