@@ -7,19 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.34.0] - 2026-08-08
+
 ### Added
-- **AI-aware crawlability layer (`robots.txt` v2, `llms.txt`, IndexNow)**: `robots.txt` now blocks AI training crawlers (GPTBot, CCBot, Google-Extended, anthropic-ai, Applebot-Extended, Bytespider) while allowing retrieval bots (ChatGPT-User, OAI-SearchBot, ClaudeBot, Claude-SearchBot, PerplexityBot). The `sitemap.xml` includes active internships and approved companies from Supabase with honest `lastmod` timestamps (no more build-date freshness). A spec-compliant `llms.txt` AI-discovery index replaces the tech-stack README, and IndexNow gains a key file plus a post-deploy ping script for Bing/Copilot discovery. `og-image` resized to 1200×630, the 404 prerender is `noindex`, and the duplicate `manifest.webmanifest` was dropped.
+- **Communication & Navigation Minor Release Baseline**: Consolidated transactional email reliability, student profile fetch-on-open administrative modal, session-gated student onboarding welcome workflow, and global route scroll restoration.
+
+## [0.33.5] - 2026-08-08
+
+### Added
+- **Global Route Transition Scroll Restoration (`ScrollToTop.tsx`)**: Implemented a global `ScrollToTop` navigation handler using `react-router-dom`'s `useLocation()` hook. Automatically resets viewport scroll coordinates to `(0,0)` on route changes while preserving deep anchor hash links (`#id`).
+
+## [0.33.4] - 2026-08-08
+
+### Fixed
+- **Admin & Company Applicant Detail Profile Data Fetching (`ApplicationDetailDialog.tsx`)**: Implemented explicit fetch-on-open logic to retrieve complete student profile records directly from `public.profiles` upon opening the detail dialog, resolving missing attributes (Phone, Degree, Major, Graduation Year, Location, Role Interest, GitHub, LinkedIn).
+
+## [0.33.3] - 2026-08-08
+
+### Fixed
+- **Offer Letter & Candidate Shortlist Email CTAs & Expiration Messaging (`OfferLetters.tsx`, `TeamApplications.tsx`)**:
+  - Refactored CTA buttons to use robust, nested `<table>` HTML layouts and centralized `SITE_CONFIG` URL resolution to ensure full actionability across all major mail clients (Gmail, Outlook).
+  - Added explicit expiration warning blocks to offer letters, directing candidates to their personalized student dashboards before deadline expiry.
+
+## [0.33.2] - 2026-08-08
+
+### Added
+- **Student Welcome Modal & Profile Completion Enforcement (`DashboardLayout.tsx`, `ProfileCompletionModal.tsx`)**:
+  - Implemented a humanized, professional post-login welcome modal clarifying one-time profile setup for multi-internship one-click applications.
+  - Gated modal dismissal per session (`login_welcome_dismissed_session`) for smooth onboarding UX.
+
+## [0.33.1] - 2026-08-08
+
+### Added
+- **AI-aware crawlability layer (`robots.txt` v2, `llms.txt`, IndexNow)**: `robots.txt` blocks AI training crawlers while allowing retrieval bots. Added `sitemap.xml` dynamic generation from Supabase, spec-compliant `llms.txt`, and IndexNow integration.
 
 ### Changed
-- **Bulletproof site URL resolution + fetch-based PostgREST prerender (`generate-seo.js`)**: `getSiteUrl()` now validates candidates against trusted hosts (`zyroo.org`, `*.zyroo.org`, `*.vercel.app`) and falls back to the canonical production URL — rejecting placeholder/invalid `VITE_SITE_URL` values (Vercel project env was literally `[SENSITIVE]`, which deployed bogus canonicals). The dynamic prerender replaced `@supabase/supabase-js` with plain `fetch` against the PostgREST REST API, because CI runs Node 20 which lacks native WebSocket — dynamic prerender and dynamic sitemap entries previously failed silently in CI.
-- **`send-email` edge function import fixed (`supabase/functions/send-email/index.ts`)**: the shared import now uses the `npm:` specifier expected by Supabase Edge Runtime instead of a relative path.
-- **Landing — student card copy rewritten for trust, without numbers (`AudienceSplit.tsx`)**: "Browse 1,200+ paid internships across 40+ roles" and "1-on-1 mentorship" were replaced with trust-focused wording — "Explore paid internships across industries and roles" and "Personal mentorship from verified industry professionals" — while keeping employer-verified certificates, milestone tasks, and the free-for-students promise.
-- **Platform stats are now a single consistent set across the site**:
-  - `StatsBand.tsx` remains the canonical source: **500+ Student Placements · 50+ Partner Companies · Rs 150K+ Stipends Disbursed · 4.9★ Mentor Rating**.
-  - `JourneySection/journey-data.ts` aligned: Partner Companies `45+` → `50+`, Mentor Rating `4.9/5.0` → `4.9★`.
-  - `Login.tsx` sidebar replaced its fabricated counts (Students 10K+ / Companies 500+ / Mentors 200+) with the canonical four metrics in a 2×2 grid.
-  - Unverifiable counts removed: hero "1,200+ live roles" (`Landing.tsx`), "1,200+ live internships" (`AnimatedSearchMockup.tsx`), and "Browse 500+ internships" (`Register.tsx` student card).
-- **Contact page office location updated (`Contact.tsx`)**: the office is now `Islamabad, 44000, Pakistan` — `Chashte Abad, Haji Camp Road` (replacing the Lahore / Arfa Software Technology Park address).
+- **Bulletproof site URL resolution & fetch-based PostgREST prerender (`generate-seo.js`)**: Validates `VITE_SITE_URL` against trusted domain hosts and falls back to production URL.
+- **Platform stats canonicalization across site**: `StatsBand.tsx` canonical metrics applied consistently (500+ Placements, 50+ Partners, Rs 150K+ Stipends, 4.9★ Rating).
+- **Contact page office location updated (`Contact.tsx`)**: Address updated to Islamabad, Pakistan.
+
 
 ## [0.33.0] - 2026-08-07
 
