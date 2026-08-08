@@ -10,11 +10,12 @@ import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 import { SaveButton } from '@/components/SaveButton';
+import ProfileCompletionRequiredModal from '@/components/onboarding/ProfileCompletionRequiredModal';
 
 export default function InternshipDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, profile, profileCompleted } = useAuth();
+  const { user, profile, profileCompleted, profileCompletionPercentage, profileCompletionRequirements } = useAuth();
 
   const [internship, setInternship] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,7 @@ export default function InternshipDetail() {
   const [error, setError] = useState<string | null>(null);
   const [activeTabLabel, setActiveTabLabel] = useState('Overview');
   const [now, setNow] = useState(0);
+  const [showProfileRequiredModal, setShowProfileRequiredModal] = useState(false);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -65,7 +67,7 @@ export default function InternshipDetail() {
     }
 
     if (!profileCompleted) {
-      toast.error("Please complete your profile before using this feature.");
+      setShowProfileRequiredModal(true);
       return;
     }
 
@@ -451,6 +453,18 @@ export default function InternshipDetail() {
           </motion.div>
         </div>
       </div>
+
+      <ProfileCompletionRequiredModal
+        open={showProfileRequiredModal}
+        onClose={() => setShowProfileRequiredModal(false)}
+        onCompleteProfile={() => {
+          setShowProfileRequiredModal(false);
+          navigate('/student/profile');
+        }}
+        percentage={profileCompletionPercentage}
+        requirements={profileCompletionRequirements}
+        actionTitle="Apply for Internship"
+      />
     </div>
   );
 }
