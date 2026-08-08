@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Users } from 'lucide-react';
+import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Banknote, Star } from 'lucide-react';
 import { signIn, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
 import { SEO } from '@/components/SEO';
 
@@ -86,11 +86,12 @@ export default function Login() {
           </div>
           <h2 className="text-3xl font-bold text-white mb-4 tracking-tight">Welcome Back to ZYR0</h2>
           <p className="text-white/80 dark:text-slate-300 mb-8 max-w-sm mx-auto">Your gateway to professional growth and meaningful internship experiences.</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {[
-              { icon: GraduationCap, label: 'Students', count: '10K+' },
-              { icon: Building2, label: 'Companies', count: '500+' },
-              { icon: Users, label: 'Mentors', count: '200+' },
+              { icon: GraduationCap, label: 'Student Placements', count: '500+' },
+              { icon: Building2, label: 'Partner Companies', count: '50+' },
+              { icon: Banknote, label: 'Stipends Disbursed', count: 'Rs 150K+' },
+              { icon: Star, label: 'Mentor Rating', count: '4.9★' },
             ].map((item, i) => (
               <div 
                 key={i} 
