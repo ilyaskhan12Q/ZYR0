@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { SITE_CONFIG } from '@/config/site';
 import { TEAM_ROLES } from '@/components/team/team-data';
 import {
   TEAM_APPLICATION_STATUSES,
@@ -55,10 +56,10 @@ function buildShortlistEmail(app: any) {
   const fullName = escapeHtml(app.full_name);
   const role = escapeHtml(roleTitle(app.preferred_role));
   const plainRole = roleTitle(app.preferred_role);
-  const siteUrl = import.meta.env.VITE_SITE_URL || 'https://zyroo.org';
-  const whatsAppCommunityUrl = 'https://chat.whatsapp.com/EfivEcFI4cJ8pWnbW9OmWh';
-  const whatsAppChannelUrl = 'https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F';
-  const linkedInUrl = 'https://www.linkedin.com/company/zyr0-co/';
+  const siteUrl = (SITE_CONFIG.url || import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/+$/, '');
+  const whatsAppCommunityUrl = SITE_CONFIG.social.whatsappSupportGroup;
+  const whatsAppChannelUrl = SITE_CONFIG.social.whatsappChannel;
+  const linkedInUrl = SITE_CONFIG.social.linkedinCompany;
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,7 +76,7 @@ function buildShortlistEmail(app: any) {
           <tr>
             <td style="padding: 36px 40px 24px; text-align: center; background-color: #1e3a8a; border-bottom: 3px solid #b89c56;">
               <p style="margin: 0 0 6px; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 700; letter-spacing: 6px; color: #ffffff;">ZYR0</p>
-              <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #f1c40f;">Candidate Selection</p>
+              <p style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #f1c40f;">Candidate Selection Notice</p>
             </td>
           </tr>
           <!-- Body Content -->
@@ -104,7 +105,7 @@ function buildShortlistEmail(app: any) {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
                   <td align="center" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-                    <a href="${whatsAppCommunityUrl}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">Connect on WhatsApp Community</a>
+                    <a href="${whatsAppCommunityUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #059669;">Connect on WhatsApp Community &rarr;</a>
                   </td>
                 </tr>
               </table>
@@ -115,13 +116,13 @@ function buildShortlistEmail(app: any) {
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/careers" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Explore Careers</a>
+                      <a href="${siteUrl}/careers" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 11px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Explore Careers</a>
                     </td>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/internships" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Active Programs</a>
+                      <a href="${siteUrl}/internships" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 11px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Active Programs</a>
                     </td>
                     <td align="center" style="padding: 4px;">
-                      <a href="${siteUrl}/contact" style="display: inline-block; width: 85%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Contact Support</a>
+                      <a href="${siteUrl}/contact" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 11px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Contact Support</a>
                     </td>
                   </tr>
                 </table>
@@ -139,11 +140,12 @@ function buildShortlistEmail(app: any) {
             <td style="padding: 28px 40px 32px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8;">Stay Connected</p>
               <p style="margin: 0 0 16px; font-size: 12px; color: #475569;">
-                <a href="${linkedInUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <a href="${linkedInUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
                 <span style="color: #cbd5e1; padding: 0 8px;">·</span>
-                <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
+                <a href="${whatsAppCommunityUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
                 <span style="color: #cbd5e1; padding: 0 8px;">·</span>
-                <a href="${whatsAppChannelUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+                <a href="${whatsAppChannelUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+              </p>AppChannelUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
               </p>
               <p style="margin: 0 0 6px; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved.</p>
               <p style="margin: 0; font-size: 11px; color: #94a3b8;"><a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>

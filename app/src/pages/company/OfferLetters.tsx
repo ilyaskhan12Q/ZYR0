@@ -22,6 +22,7 @@ import OfferLetterDocument from '@/components/OfferLetterDocument';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
+import { SITE_CONFIG } from '@/config/site';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -73,14 +74,16 @@ async function sendOfferLetterEmail(opts: {
 
   const base64Pdf = await blobToBase64(pdfBlob);
   const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
-  const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
-  const linkedInUrl = 'https://www.linkedin.com/company/zyr0-co/';
-  const whatsAppCommunityUrl = 'https://chat.whatsapp.com/EfivEcFI4cJ8pWnbW9OmWh';
-  const whatsAppChannelUrl = 'https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F';
+  const siteUrl = (SITE_CONFIG.url || import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/+$/, '');
+  const linkedInUrl = SITE_CONFIG.social.linkedinCompany;
+  const whatsAppCommunityUrl = SITE_CONFIG.social.whatsappSupportGroup;
+  const whatsAppChannelUrl = SITE_CONFIG.social.whatsappChannel;
   const expiryDateStr = expiresAt
     ? new Date(expiresAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : '30 days from issuance';
   const offerCodeStr = offerCode ?? offerId.slice(0, 8).toUpperCase();
+  const offerLettersDashboardUrl = `${siteUrl}/student/offer-letters`;
+
   const emailHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,50 +119,57 @@ async function sendOfferLetterEmail(opts: {
                     <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #0f172a;">${companyName} — ${internshipTitle}</p>
                     <p style="margin: 0; font-size: 12px; color: #64748b;">
                       Offer Code: <strong style="color: #1e3a8a; font-family: monospace; font-size: 13px;">${offerCodeStr}</strong> &nbsp;·&nbsp; 
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">Verify Online</a>
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">Verify Online</a>
                     </p>
                   </td>
                 </tr>
               </table>
 
               <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
-                Your official Offer Letter document is attached to this email. Please review the full engagement terms, duration, and details in the document.
+                Your official Offer Letter document is attached to this email. Please review the full engagement terms, duration, and details in the attached document.
               </p>
 
               <!-- Expiry Alert -->
-              <div style="background-color: #fefce8; border-left: 4px solid #eab308; padding: 14px 18px; margin: 20px 0; border-radius: 4px;">
-                <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: #854d0e;">
-                  <strong>Action Required:</strong> This offer remains open until <strong>${expiryDateStr}</strong>. Please review and confirm your decision on the ZYR0 portal before the deadline.
+              <div style="background-color: #fefce8; border-left: 4px solid #eab308; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
+                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #854d0e;">
+                  <strong>Action Required — Offer Expiration Notice:</strong><br>
+                  This internship offer is valid until <strong>${expiryDateStr}</strong>. To accept or decline this offer, please click the button below to review your offer letter directly on your ZYR0 Student Dashboard before it expires.
                 </p>
               </div>
 
-              <!-- Main Primary CTA Button -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
+              <!-- Primary CTA Button -->
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0; text-align: center;">
                 <tr>
-                  <td align="center" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-                    <a href="${siteUrl}/student/offer-letters" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">Review & Respond to Offer</a>
+                  <td align="center" style="padding: 0;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                      <tr>
+                        <td align="center" bgcolor="#10b981" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+                          <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 16px 36px; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #059669; text-align: center; box-sizing: border-box;">Review & Respond to Offer &rarr;</a>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
 
               <!-- Quick Action Grid -->
               <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
-                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Latest Updates</p>
+                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Platform Links</p>
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                   <tr>
-                    <td align="center" style="padding: 4px;" width="50%">
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #1e3a8a; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Verify Credential</a>
+                    <td align="center" style="padding: 6px;" width="50%">
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Verify Credential</a>
                     </td>
-                    <td align="center" style="padding: 4px;" width="50%">
-                      <a href="${whatsAppChannelUrl}" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #10b981; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">WhatsApp Channel</a>
+                    <td align="center" style="padding: 6px;" width="50%">
+                      <a href="${whatsAppChannelUrl}" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #10b981; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">WhatsApp Channel</a>
                     </td>
                   </tr>
                   <tr>
-                    <td align="center" style="padding: 4px;" width="50%">
-                      <a href="${siteUrl}/careers" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #0284c7; color: #ffffff; font-size: 12.5px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Career Hub</a>
+                    <td align="center" style="padding: 6px;" width="50%">
+                      <a href="${siteUrl}/careers" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Career Hub</a>
                     </td>
-                    <td align="center" style="padding: 4px;" width="50%">
-                      <a href="${siteUrl}/contact" style="display: inline-block; width: 88%; padding: 11px 12px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center;">Contact Support</a>
+                    <td align="center" style="padding: 6px;" width="50%">
+                      <a href="${siteUrl}/contact" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Contact Support</a>
                     </td>
                   </tr>
                 </table>
@@ -177,11 +187,11 @@ async function sendOfferLetterEmail(opts: {
             <td style="padding: 28px 40px 32px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8;">Stay Connected</p>
               <p style="margin: 0 0 16px; font-size: 12px; color: #475569;">
-                <a href="${linkedInUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <a href="${linkedInUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
                 <span style="color: #cbd5e1; padding: 0 8px;">·</span>
-                <a href="${whatsAppCommunityUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
+                <a href="${whatsAppCommunityUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
                 <span style="color: #cbd5e1; padding: 0 8px;">·</span>
-                <a href="${whatsAppChannelUrl}" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+                <a href="${whatsAppChannelUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
               </p>
               <p style="margin: 0 0 6px; font-size: 11px; color: #94a3b8;">This email was sent on behalf of ${companyName} via ZYR0.</p>
               <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>

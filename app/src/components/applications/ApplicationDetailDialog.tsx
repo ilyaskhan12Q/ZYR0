@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
@@ -36,7 +38,29 @@ export default function ApplicationDetailDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const student = toStudent(application);
+  const [fetchedProfile, setFetchedProfile] = useState<any>(null);
+
+  const rawStudent = toStudent(application);
+  const studentId = application?.student_id || rawStudent?.id;
+
+  useEffect(() => {
+    if (open && studentId) {
+      supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', studentId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setFetchedProfile(data);
+          }
+        });
+    } else {
+      setFetchedProfile(null);
+    }
+  }, [open, studentId]);
+
+  const student = fetchedProfile ? { ...rawStudent, ...fetchedProfile } : rawStudent;
   const internship = toInternship(application);
   const resumeUrl = application?.resume_url || student?.resume_url;
   const meta = student?.raw_user_meta_data || {};
