@@ -41,7 +41,7 @@ export default function Register() {
 
 
   const roles = [
-    { id: 'student' as Role, icon: GraduationCap, title: "I'm a Student", desc: 'Find internships, complete tasks, and earn verified certificates.', features: ['Browse 500+ internships', 'Track applications & tasks', 'Earn certificates'] },
+    { id: 'student' as Role, icon: GraduationCap, title: "I'm a Student", desc: 'Find internships, complete tasks, and earn verified certificates.', features: ['Browse internships', 'Track applications & tasks', 'Earn certificates'] },
     { id: 'company' as Role, icon: Building2, title: "I'm a Company", desc: 'Post internships, manage applicants, and issue certificates.', features: ['Post unlimited internships', 'Review applicants', 'Issue certificates'] },
     { id: 'mentor' as Role, icon: Users, title: "I'm a Mentor", desc: 'Guide interns, review work, and provide feedback.', features: ['Manage assigned interns', 'Review submissions', 'Provide evaluations'] },
   ];

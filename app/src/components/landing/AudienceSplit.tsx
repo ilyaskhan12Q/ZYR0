@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom'
 import { GraduationCap, Building2, UserCheck, Check, ArrowRight } from 'lucide-react'
 
 const STUDENT_CHECKLIST = [
-  'Browse 1,200+ paid internships across 40+ roles',
-  '1-on-1 mentorship from industry professionals',
+  'Explore paid internships across industries and roles',
+  'Personal mentorship from verified industry professionals',
   'Employer-verified certificates with unique credential IDs',
   'Structured milestone tasks that build real portfolios',
   'Free for students — no fees, no strings attached',

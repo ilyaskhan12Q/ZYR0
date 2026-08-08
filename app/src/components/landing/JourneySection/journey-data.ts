@@ -43,7 +43,7 @@ export const JOURNEY_CARDS: JourneyCardItem[] = [
     tags: ["Software Engineering", "AI & ML", "Product Design", "Cybersecurity", "Fintech"],
     stats: [
       { label: "Active Drops", value: "150+" },
-      { label: "Partner Companies", value: "45+" }
+      { label: "Partner Companies", value: "50+" }
     ],
     previewType: "filter_drops",
     ctaText: "Explore Opportunities",
@@ -97,7 +97,7 @@ export const JOURNEY_CARDS: JourneyCardItem[] = [
     tags: ["Sprint Kanban", "Mentor Reviews", "Code Submissions", "Milestone Tracking"],
     stats: [
       { label: "Milestone Completion", value: "Tracked" },
-      { label: "Mentor Rating", value: "4.9/5.0" }
+      { label: "Mentor Rating", value: "4.9★" }
     ],
     previewType: "workspace_sprint",
     ctaText: "See Workspace Specs",

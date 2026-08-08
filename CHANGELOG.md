@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **AI-aware crawlability layer (`robots.txt` v2, `llms.txt`, IndexNow)**: `robots.txt` now blocks AI training crawlers (GPTBot, CCBot, Google-Extended, anthropic-ai, Applebot-Extended, Bytespider) while allowing retrieval bots (ChatGPT-User, OAI-SearchBot, ClaudeBot, Claude-SearchBot, PerplexityBot). The `sitemap.xml` includes active internships and approved companies from Supabase with honest `lastmod` timestamps (no more build-date freshness). A spec-compliant `llms.txt` AI-discovery index replaces the tech-stack README, and IndexNow gains a key file plus a post-deploy ping script for Bing/Copilot discovery. `og-image` resized to 1200×630, the 404 prerender is `noindex`, and the duplicate `manifest.webmanifest` was dropped.
+
+### Changed
+- **Bulletproof site URL resolution + fetch-based PostgREST prerender (`generate-seo.js`)**: `getSiteUrl()` now validates candidates against trusted hosts (`zyroo.org`, `*.zyroo.org`, `*.vercel.app`) and falls back to the canonical production URL — rejecting placeholder/invalid `VITE_SITE_URL` values (Vercel project env was literally `[SENSITIVE]`, which deployed bogus canonicals). The dynamic prerender replaced `@supabase/supabase-js` with plain `fetch` against the PostgREST REST API, because CI runs Node 20 which lacks native WebSocket — dynamic prerender and dynamic sitemap entries previously failed silently in CI.
+- **`send-email` edge function import fixed (`supabase/functions/send-email/index.ts`)**: the shared import now uses the `npm:` specifier expected by Supabase Edge Runtime instead of a relative path.
+- **Landing — student card copy rewritten for trust, without numbers (`AudienceSplit.tsx`)**: "Browse 1,200+ paid internships across 40+ roles" and "1-on-1 mentorship" were replaced with trust-focused wording — "Explore paid internships across industries and roles" and "Personal mentorship from verified industry professionals" — while keeping employer-verified certificates, milestone tasks, and the free-for-students promise.
+- **Platform stats are now a single consistent set across the site**:
+  - `StatsBand.tsx` remains the canonical source: **500+ Student Placements · 50+ Partner Companies · Rs 150K+ Stipends Disbursed · 4.9★ Mentor Rating**.
+  - `JourneySection/journey-data.ts` aligned: Partner Companies `45+` → `50+`, Mentor Rating `4.9/5.0` → `4.9★`.
+  - `Login.tsx` sidebar replaced its fabricated counts (Students 10K+ / Companies 500+ / Mentors 200+) with the canonical four metrics in a 2×2 grid.
+  - Unverifiable counts removed: hero "1,200+ live roles" (`Landing.tsx`), "1,200+ live internships" (`AnimatedSearchMockup.tsx`), and "Browse 500+ internships" (`Register.tsx` student card).
+- **Contact page office location updated (`Contact.tsx`)**: the office is now `Islamabad, 44000, Pakistan` — `Chashte Abad, Haji Camp Road` (replacing the Lahore / Arfa Software Technology Park address).
+
 ## [0.33.0] - 2026-08-07
 
 ### Added
