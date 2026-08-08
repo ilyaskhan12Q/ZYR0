@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.34.2] - 2026-08-08
+
+### Fixed
+- **Post-Authentication Dashboard Navigation & Role Redirection (`Register.tsx`, `Login.tsx`, `ProtectedRoute.tsx`, `PublicLayout.tsx`)**:
+  - Fixed post-registration completion action target in `Register.tsx` to dynamically route users to their respective role dashboard (`/{role}/dashboard`) instead of defaulting to the landing page (`/`).
+  - Added immediate post-login role-based navigation in `Login.tsx` to prevent authentication state lag.
+  - Enhanced `PublicOnlyRoute` and `PublicLayout` navigation controls to utilize `user.user_metadata.role` as a fallback when profile fetching is pending, ensuring accurate dashboard links for all user roles.
+
 ## [0.34.1] - 2026-08-08
 
 ### Added
