@@ -5,6 +5,7 @@ import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/sonner';
 import { RouteLoading } from '@/components/RouteLoading';
+import ScrollToTop from '@/components/ScrollToTop';
 
 // Public Pages
 const Landing = lazy(() => import('@/pages/public/Landing'));
@@ -44,6 +45,7 @@ const LazyDashboardLayout = lazy(() => import('@/layouts/DashboardLayout'));
 function App() {
   return (
     <LazyMotion features={domAnimation}>
+      <ScrollToTop />
       <Suspense fallback={<RouteLoading />}>
         <Routes>
           {/* Public Routes */}

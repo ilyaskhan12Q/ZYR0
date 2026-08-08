@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, Award, Briefcase };
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
+  const { user, profileCompleted, profileCompletionPercentage, profileCompletionRequirements } = useAuth();
   
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState<any[]>([]);
@@ -172,6 +172,65 @@ export default function StudentDashboard() {
         <h1 className="text-2xl font-bold">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Student'}!</h1>
         <p className="text-sm text-muted-foreground mt-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
       </motion.div>
+
+      {/* Profile Completion Warning Banner */}
+      {!profileCompleted && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-5 shadow-sm space-y-4"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 text-amber-600 dark:text-amber-400 mt-0.5">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-foreground">Action Required: Complete Candidate Profile</h3>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                    {profileCompletionPercentage}% Done
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Setup your profile once to enable instant 1-click applications for all company internships.
+                </p>
+              </div>
+            </div>
+
+            <Link
+              to="/student/profile"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition-colors shrink-0 shadow-md shadow-amber-600/20"
+            >
+              Complete Profile ({profileCompletionPercentage}%)
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Missing items badges & progress bar */}
+          <div className="pt-3 border-t border-amber-500/20 space-y-2">
+            <div className="flex items-center justify-between text-xs font-medium">
+              <span className="text-muted-foreground">Missing Profile Items:</span>
+              <span className="text-amber-600 dark:text-amber-400 font-semibold">{profileCompletionRequirements.length} item(s) left</span>
+            </div>
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-amber-500 transition-all duration-500"
+                style={{ width: `${profileCompletionPercentage}%` }}
+              />
+            </div>
+            {profileCompletionRequirements.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {profileCompletionRequirements.map((req, i) => (
+                  <span key={i} className="px-2 py-0.5 text-[11px] font-medium rounded-md bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
+                    {req}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

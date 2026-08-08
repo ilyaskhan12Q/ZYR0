@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
@@ -36,21 +38,52 @@ export default function ApplicationDetailDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const student = toStudent(application);
+  const [fetchedProfile, setFetchedProfile] = useState<any>(null);
+
+  const rawStudent = toStudent(application);
+  const studentId = application?.student_id || rawStudent?.id;
+
+  useEffect(() => {
+    if (open && studentId) {
+      supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', studentId)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setFetchedProfile(data);
+          }
+        });
+    } else {
+      setFetchedProfile(null);
+    }
+  }, [open, studentId]);
+
+  const student = fetchedProfile ? { ...rawStudent, ...fetchedProfile } : rawStudent;
   const internship = toInternship(application);
   const resumeUrl = application?.resume_url || student?.resume_url;
-  const skills = student?.skills || [];
   const meta = student?.raw_user_meta_data || {};
 
-  const phone = student?.phone || meta.phone;
-  const location = student?.location || meta.location;
-  const degree = student?.degree || meta.degree;
-  const major = student?.major || meta.major;
-  const academicYear = student?.academic_year || meta.academic_year;
+  const skills: string[] = Array.isArray(student?.skills) && student.skills.length > 0
+    ? student.skills
+    : Array.isArray(meta.skills)
+    ? meta.skills
+    : typeof meta.skills === 'string'
+    ? meta.skills.split(',').map((s: string) => s.trim()).filter(Boolean)
+    : [];
+
+  const university = student?.university || meta.university || meta.school;
+  const graduationYear = student?.graduation_year || meta.graduation_year;
+  const phone = student?.phone || meta.phone || meta.phone_number;
+  const location = student?.location || meta.location || meta.address;
+  const degree = student?.degree || meta.degree || meta.program;
+  const major = student?.major || meta.major || meta.specialization;
+  const academicYear = student?.academic_year || meta.academic_year || meta.academic_status;
   const roleInterest = student?.role_interest || meta.role_interest;
-  const linkedin = student?.linkedin || meta.linkedin;
-  const github = student?.github || meta.github;
-  const portfolioUrl = student?.portfolio_url || student?.website || meta.website;
+  const linkedin = student?.linkedin || meta.linkedin || meta.linkedin_url;
+  const github = student?.github || meta.github || meta.github_url;
+  const portfolioUrl = student?.portfolio_url || student?.website || meta.portfolio_url || meta.website;
 
   const answers: Record<string, string> = application?.answers && typeof application.answers === 'object'
     ? (application.answers as Record<string, string>)
@@ -90,11 +123,11 @@ export default function ApplicationDetailDialog({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/30 p-4 rounded-xl border border-border">
-            <DetailItem label="University" value={student?.university} />
+            <DetailItem label="University" value={university} />
             <DetailItem label="Degree / Program" value={degree} />
             <DetailItem label="Major / Specialization" value={major} />
             <DetailItem label="Academic Status" value={academicYear} />
-            <DetailItem label="Graduation Year" value={student?.graduation_year} />
+            <DetailItem label="Graduation Year" value={graduationYear} />
             <DetailItem label="Phone Number" value={phone} />
             <DetailItem label="Location" value={location} />
             <DetailItem label="Applied On" value={formatDate(application?.applied_at)} />

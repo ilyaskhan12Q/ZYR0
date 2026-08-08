@@ -156,7 +156,7 @@ export async function getApplicationsForInternship(internship_id: string, useCac
     .from('applications')
     .select(`
       *,
-      student:profiles!student_id (id, full_name, email, avatar_url, university, skills, resume_url)
+      student:profiles!student_id (*)
     `)
     .eq('internship_id', internship_id)
     .order('applied_at', { ascending: false });
@@ -187,7 +187,7 @@ export async function getAllCompanyApplications(company_id: string) {
       .select(`
         *,
         internship:internships!internship_id (id, title, company_id, location, start_date, end_date, skills, company:companies!company_id (id, name)),
-        student:profiles!student_id (id, full_name, email, avatar_url, university, graduation_year, bio, skills, portfolio_url, resume_url)
+        student:profiles!student_id (*)
       `)
       .in('internship_id', internshipIds)
       .order('applied_at', { ascending: false });
@@ -209,10 +209,7 @@ export async function getAllAdminApplications(status?: ApplicationStatus | 'All'
         id, title, location, location_type, type, deadline,
         company:companies!company_id (id, name)
       ),
-      student:profiles!student_id (
-        id, full_name, email, avatar_url, university, graduation_year,
-        bio, skills, portfolio_url, resume_url
-      )
+      student:profiles!student_id (*)
     `)
     .order('applied_at', { ascending: false });
 
