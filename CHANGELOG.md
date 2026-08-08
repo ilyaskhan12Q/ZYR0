@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.34.1] - 2026-08-08
+
+### Added
+- **Authenticated Dashboard Light/Dark Theme Toggle (`ThemeToggle.tsx`, `DashboardLayout.tsx`)**:
+  - Extracted modular `ThemeToggle` component supporting reactive system/stored theme state with `next-themes` and smooth icon state transitions (`Sun` / `Moon`).
+  - Added persistent theme switcher to the `DashboardLayout` top header, enabling effortless light/dark mode toggling across Student, Company, Mentor, and Admin portals.
+
 ## [0.34.0] - 2026-08-08
 
 ### Added
