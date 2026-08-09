@@ -5,7 +5,6 @@ import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg, guillocheSvg } from '@/comp
 
 interface OfferLetterDocumentProps {
   offer: OfferLetter;
-  onPrint?: () => void;
   showActions?: boolean;
 }
 
@@ -18,7 +17,7 @@ const SANS = `'Montserrat', -apple-system, 'Segoe UI', Arial, sans-serif`;
 const SERIF = `'Cinzel', Georgia, 'Times New Roman', serif`;
 const SCRIPT = `'Playfair Display', Georgia, 'Times New Roman', serif`;
 
-export default function OfferLetterDocument({ offer, onPrint, showActions = true }: OfferLetterDocumentProps) {
+export default function OfferLetterDocument({ offer, showActions = true }: OfferLetterDocumentProps) {
   const student = offer.student;
   const company = offer.company;
   const internship = offer.internship;
@@ -79,10 +78,6 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
   }, []);
 
   const handlePrintWindow = () => {
-    if (onPrint) {
-      onPrint();
-      return;
-    }
     window.print();
   };
 
