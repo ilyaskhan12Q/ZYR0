@@ -194,7 +194,7 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
         <div className="relative z-10 px-8 sm:px-14 py-10">
 
           {/* ── Letterhead ── */}
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b gap-6" style={{ borderColor: 'rgba(184,156,86,.55)' }}>
+          <header className="offer-letter-header flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b gap-6" style={{ borderColor: 'rgba(184,156,86,.55)' }}>
             <div className="flex items-center gap-4">
               {company?.logo_url ? (
                 <img

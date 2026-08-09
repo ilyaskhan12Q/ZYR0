@@ -790,9 +790,13 @@
   .no-print,
   .print\:hidden,
   nav,
-  header,
   aside,
   button {
+    display: none !important;
+  }
+
+  /* Hide site headers (Public/Dashboard layouts) but keep the offer letter's own letterhead */
+  header:not(.offer-letter-header) {
     display: none !important;
   }
 
