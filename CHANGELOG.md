@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.35.3] - 2026-08-09
+
+### Docs
+- **Changelog release entries for the offer-letter print & PDF work**: recorded entries `0.34.3` through `0.35.2` per `docs/GIT_WORKFLOW.md` (one entry per commit) and bumped the version to `0.35.3`.
+
+## [0.35.2] - 2026-08-09
+
+### Changed
+- **Removed the unused `onPrint` prop from `OfferLetterDocument.tsx`**: no caller ever passed it; the print toolbar now always falls back to `window.print()`.
+
+## [0.35.1] - 2026-08-09
+
+### Fixed
+- **Resend Email now gives real-time feedback (`OfferLetters.tsx`)**:
+  - The row and modal "Resend Email" buttons show a spinner and disable while the PDF is regenerated and the email is being sent, so it is immediately clear the click registered.
+  - Re-clicking during a send is blocked, preventing duplicate emails to the student.
+  - Success/failure is now also rendered inline inside the preview modal, so the result is visible without closing it (previously the page-level banner was hidden behind the modal overlay).
+
+## [0.35.0] - 2026-08-09
+
+### Changed
+- **Offer letter emails now attach a real A4 PDF (`offerLetterPdf.ts`, `offerLetters.ts`, company/student dashboards)**:
+  - The canvas renderer was upscaled 2× (800×1131 → 1600×2262, ~192 DPI print) and the output is now wrapped into a genuine single-page A4 PDF via `jspdf`, so the emailed "Offer Letter.pdf" prints crisply instead of the previous ~96 DPI PNG.
+  - Storage uploads, download filenames, and the "Download PDF" button now use `.pdf` with `application/pdf`; legacy `.png` URLs remain readable.
+  - Added the `jspdf` dependency (code-split into the lazy offer-letters route chunk only).
+
+## [0.34.5] - 2026-08-09
+
+### Fixed
+- **Offer letter prints on a single A4 page (`index.css` print rules)**: the offer-letter sheet is compressed so the full document — letterhead through signature — lands on one A4 page when printed or saved as PDF.
+
+## [0.34.4] - 2026-08-09
+
+### Fixed
+- **Offer letter letterhead restored in print**: the document's own header was being hidden by the print isolation rules; `header:not(.offer-letter-header)` now keeps the letterhead visible, and the public verify page gained a print action.
+
+## [0.34.3] - 2026-08-09
+
+### Fixed
+- **Signatory name shown once on the signature line**: the offer letter (canvas PDF and HTML document) previously rendered the signatory's name twice; it now appears a single time on the signature line.
+
 ## [0.34.2] - 2026-08-08
 
 ### Fixed
