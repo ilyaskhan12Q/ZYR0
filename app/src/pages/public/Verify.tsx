@@ -392,7 +392,7 @@ export default function Verify() {
                 </div>
               </div>
               <div className="flex justify-center">
-                <OfferLetterDocument offer={verifiedOffer} showActions={false} />
+                <OfferLetterDocument offer={verifiedOffer} />
               </div>
             </motion.div>
           )}

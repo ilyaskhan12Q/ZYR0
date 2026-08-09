@@ -8,9 +8,12 @@
  * double frame, filigree corners, guilloché "O" + ZYR0 logo watermark, Cinzel/Montserrat
  * typography.
  *
- * The output is returned as a Blob (PNG/image format) for Supabase Storage or direct download.
+ * The output is returned as a single-page A4 PDF Blob (with the canvas raster
+ * embedded at 2x resolution for crisp print) for Supabase Storage, email
+ * attachment, or direct download.
  */
 
+import { jsPDF } from 'jspdf';
 import type { OfferLetter } from '@/lib/database.types';
 import QRCode from 'qrcode';
 import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg } from '@/components/certificateTemplate';
@@ -24,8 +27,8 @@ export interface OfferLetterPdfData {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const PAGE_WIDTH = 800;   // A4 proportions @96 dpi
-const PAGE_HEIGHT = 1131;
+const PAGE_WIDTH = 1600;  // A4 proportions @192 dpi (2x for crisp print)
+const PAGE_HEIGHT = 2262;
 const MARGIN = 64;
 
 // Classical premium palette (shared with certificate + email redesigns)
@@ -54,8 +57,9 @@ const FOOTER_H = 54;
 // ── Main Export ───────────────────────────────────────────────────────────────
 
 /**
- * Render a premium offer letter on an off-screen Canvas and return it as a Blob.
- * Uses safe image pre-loading and fallback initial avatars to guarantee success.
+ * Render a premium offer letter on an off-screen Canvas and return it as a
+ * single-page A4 PDF Blob. Uses safe image pre-loading and fallback initial
+ * avatars to guarantee success.
  */
 export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<Blob> {
   const { offer, verificationUrl } = data;
@@ -81,6 +85,7 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   canvas.width  = PAGE_WIDTH;
   canvas.height = PAGE_HEIGHT;
   const ctx = canvas.getContext('2d')!;
+  ctx.scale(2, 2);
 
   // ── Cotton-paper background ───────────────────────────────────────────────
   ctx.fillStyle = PAPER_CREAM;
@@ -419,20 +424,16 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
 
   ctx.fillStyle = NAVY;
   ctx.font = `italic 600 19px ${FONT_SCRIPT}`;
-  ctx.fillText(truncateString(signatoryName, 26), MARGIN, sigY + 30);
-
-  ctx.fillStyle = INK;
-  ctx.font = `700 12px ${FONT_SANS}`;
-  ctx.fillText(signatoryName, MARGIN, sigY + 50);
+  ctx.fillText(truncateString(signatoryName, 26), MARGIN, sigY + 4);
 
   ctx.fillStyle = TEXT_SOFT;
   ctx.font = `400 11px ${FONT_SANS}`;
-  ctx.fillText(signatoryTitle, MARGIN, sigY + 66);
-  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 82);
+  ctx.fillText(signatoryTitle, MARGIN, sigY + 32);
+  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 48);
   if (signatoryEmail) {
     ctx.fillStyle = TEXT_MUTED;
     ctx.font = `400 10px ${FONT_SANS}`;
-    ctx.fillText(signatoryEmail, MARGIN, sigY + 98);
+    ctx.fillText(signatoryEmail, MARGIN, sigY + 64);
   }
 
   // Verification QR box (gold-framed, right side)
@@ -506,13 +507,11 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     ctx.restore();
   }
 
-  // ── Export to PNG Blob ────────────────────────────────────────────────────
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error('Canvas toBlob returned null'));
-    }, 'image/png');
-  });
+  // ── Export to single-page A4 PDF ──────────────────────────────────────────
+  const imgData = canvas.toDataURL('image/png');
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+  doc.addImage(imgData, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
+  return doc.output('blob');
 }
 
 // ── Private Helpers ───────────────────────────────────────────────────────────

@@ -5,7 +5,6 @@ import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg, guillocheSvg } from '@/comp
 
 interface OfferLetterDocumentProps {
   offer: OfferLetter;
-  onPrint?: () => void;
   showActions?: boolean;
 }
 
@@ -18,7 +17,7 @@ const SANS = `'Montserrat', -apple-system, 'Segoe UI', Arial, sans-serif`;
 const SERIF = `'Cinzel', Georgia, 'Times New Roman', serif`;
 const SCRIPT = `'Playfair Display', Georgia, 'Times New Roman', serif`;
 
-export default function OfferLetterDocument({ offer, onPrint, showActions = true }: OfferLetterDocumentProps) {
+export default function OfferLetterDocument({ offer, showActions = true }: OfferLetterDocumentProps) {
   const student = offer.student;
   const company = offer.company;
   const internship = offer.internship;
@@ -79,10 +78,6 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
   }, []);
 
   const handlePrintWindow = () => {
-    if (onPrint) {
-      onPrint();
-      return;
-    }
     window.print();
   };
 
@@ -194,7 +189,7 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
         <div className="relative z-10 px-8 sm:px-14 py-10">
 
           {/* ── Letterhead ── */}
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b gap-6" style={{ borderColor: 'rgba(184,156,86,.55)' }}>
+          <header className="offer-letter-header flex flex-col sm:flex-row sm:items-center justify-between pb-8 border-b gap-6" style={{ borderColor: 'rgba(184,156,86,.55)' }}>
             <div className="flex items-center gap-4">
               {company?.logo_url ? (
                 <img
@@ -384,8 +379,7 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
                   >
                     {signatoryName}
                   </div>
-                  <p className="text-xs font-bold pt-2" style={{ color: '#13100d' }}>{signatoryName}</p>
-                  <p className="text-xs" style={{ color: '#6b645a' }}>{signatoryTitle}</p>
+                  <p className="text-xs pt-2" style={{ color: '#6b645a' }}>{signatoryTitle}</p>
                   <p className="text-xs font-semibold" style={{ color: '#1e3a8a' }}>{companyName}</p>
                   {signatoryEmail && (
                     <p className="text-[10px]" style={{ color: '#8a7f6c' }}>{signatoryEmail}</p>

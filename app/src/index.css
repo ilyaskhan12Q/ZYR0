@@ -777,8 +777,8 @@
   body {
     background: #ffffff !important;
     color: #0f172a !important;
-    height: auto !important;
-    overflow: visible !important;
+    height: 100vh !important;
+    overflow: hidden !important;
   }
 
   /* Hide all body content by default for print isolation */
@@ -790,9 +790,13 @@
   .no-print,
   .print\:hidden,
   nav,
-  header,
   aside,
   button {
+    display: none !important;
+  }
+
+  /* Hide site headers (Public/Dashboard layouts) but keep the offer letter's own letterhead */
+  header:not(.offer-letter-header) {
     display: none !important;
   }
 
@@ -845,6 +849,164 @@
   .offer-letter-print-root .no-print {
     display: none !important;
     visibility: hidden !important;
+  }
+
+  /* Neutralize every ancestor of the printable sheets so their containing
+     block becomes the page box itself. Otherwise an absolutely positioned
+     sheet fragments at its wrapper's height (not the page height), which
+     pushes trailing content onto a blank second page. Descendants of the
+     print roots keep their internal positioning (watermarks, filigree). */
+  body *:not(.certificate-print-root):not(.certificate-print-root *):not(.offer-letter-print-root):not(.offer-letter-print-root *) {
+    position: static !important;
+    transform: none !important;
+    will-change: auto !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* ── Offer letter single-page fit ────────────────────────────────────────
+     The sheet is taller than one A4 page, so print-only rules compress
+     typography and spacing until the whole document fits one page.
+     Screen preview is unaffected (these rules exist only inside @media print). */
+  .offer-letter-print-root > div.relative.z-10 {
+    padding: 22px 32px 18px !important;
+  }
+
+  /* Letterhead */
+  .offer-letter-print-root header {
+    padding-bottom: 14px !important;
+    gap: 16px !important;
+  }
+  .offer-letter-print-root header > div:first-child > :first-child {
+    width: 44px !important;
+    height: 44px !important;
+  }
+  .offer-letter-print-root header h1 {
+    font-size: 20px !important;
+  }
+  .offer-letter-print-root header p {
+    font-size: 10.5px !important;
+    margin-top: 2px !important;
+  }
+  .offer-letter-print-root header p svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .offer-letter-print-root header > div:last-child {
+    padding: 8px 10px !important;
+    font-size: 10px !important;
+  }
+  .offer-letter-print-root header > div:last-child > div + div {
+    margin-top: 4px !important;
+  }
+
+  /* Body */
+  .offer-letter-print-root main {
+    padding: 16px 0 !important;
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+  }
+  .offer-letter-print-root main > * + * {
+    margin-top: 16px !important;
+  }
+
+  /* Greeting */
+  .offer-letter-print-root main p.text-base {
+    font-size: 13px !important;
+  }
+  .offer-letter-print-root main .space-y-4 > * + * {
+    margin-top: 10px !important;
+  }
+
+  /* Details card */
+  .offer-letter-print-root main section.rounded-2xl {
+    padding: 14px 16px !important;
+  }
+  .offer-letter-print-root main section h2 {
+    font-size: 10.5px !important;
+  }
+  .offer-letter-print-root main section.rounded-2xl h2 {
+    margin-bottom: 10px !important;
+  }
+  .offer-letter-print-root main section.rounded-2xl .grid {
+    gap: 10px 20px !important;
+  }
+  .offer-letter-print-root main section.rounded-2xl span.block {
+    font-size: 9px !important;
+    letter-spacing: 1.2px !important;
+    margin-bottom: 3px !important;
+  }
+
+  /* Responsibilities + Terms */
+  .offer-letter-print-root main section.space-y-3 > * + * {
+    margin-top: 8px !important;
+  }
+  .offer-letter-print-root main ul > li + li,
+  .offer-letter-print-root main ol > li + li {
+    margin-top: 7px !important;
+  }
+  .offer-letter-print-root main ul li span:first-child {
+    width: 4px !important;
+    height: 4px !important;
+    margin-top: 5px !important;
+  }
+  .offer-letter-print-root main ol {
+    font-size: 10.5px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Signatures */
+  .offer-letter-print-root main > div.pt-8 {
+    padding-top: 12px !important;
+    gap: 16px !important;
+  }
+  .offer-letter-print-root main .space-y-5 > * + * {
+    margin-top: 10px !important;
+  }
+  .offer-letter-print-root main > div.pt-8 > div:first-child > p {
+    font-size: 12px !important;
+  }
+  .offer-letter-print-root main > div.pt-8 div.inline-block {
+    font-size: 16px !important;
+    padding-bottom: 2px !important;
+  }
+  .offer-letter-print-root main .space-y-1 > * + * {
+    margin-top: 4px !important;
+  }
+  .offer-letter-print-root main p.text-xs {
+    font-size: 10.5px !important;
+  }
+  .offer-letter-print-root main p.text-\[10px\] {
+    font-size: 9px !important;
+  }
+
+  /* Verification QR box */
+  .offer-letter-print-root main > div.pt-8 > div:last-child {
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+  .offer-letter-print-root main > div.pt-8 > div:last-child > img {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  .offer-letter-print-root main > div.pt-8 > div:last-child > div {
+    font-size: 10px !important;
+  }
+  .offer-letter-print-root main > div.pt-8 .space-y-1\.5 > * + * {
+    margin-top: 4px !important;
+  }
+  .offer-letter-print-root main p.text-\[11px\] {
+    font-size: 9.5px !important;
+  }
+
+  /* Footer */
+  .offer-letter-print-root footer {
+    padding-top: 8px !important;
+    font-size: 9px !important;
+    gap: 6px !important;
+  }
+  .offer-letter-print-root footer div:last-child {
+    font-size: 8.5px !important;
   }
 }
 
