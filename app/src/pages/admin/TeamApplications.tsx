@@ -56,7 +56,10 @@ function buildShortlistEmail(app: any) {
   const fullName = escapeHtml(app.full_name);
   const role = escapeHtml(roleTitle(app.preferred_role));
   const plainRole = roleTitle(app.preferred_role);
-  const siteUrl = (SITE_CONFIG.url || import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/+$/, '');
+  let siteUrl = (import.meta.env.VITE_SITE_URL || SITE_CONFIG.url || 'https://zyroo.org').replace(/\/+$/, '');
+  if (!siteUrl || siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')) {
+    siteUrl = 'https://zyroo.org';
+  }
   const whatsAppCommunityUrl = SITE_CONFIG.social.whatsappSupportGroup;
   const whatsAppChannelUrl = SITE_CONFIG.social.whatsappChannel;
   const linkedInUrl = SITE_CONFIG.social.linkedinCompany;
