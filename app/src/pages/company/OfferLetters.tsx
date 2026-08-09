@@ -108,76 +108,67 @@ async function sendOfferLetterEmail(opts: {
             <td style="padding: 36px 40px;">
               <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.6; color: #0f172a;">Dear <strong>${studentName}</strong>,</p>
               <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
-                Congratulations! On behalf of <strong style="color: #1e3a8a;">${companyName}</strong>, we are thrilled to extend an official internship offer to you for the <strong style="color: #1e3a8a;">${internshipTitle}</strong> position. Your background and dedication during the selection process impressed our team, and we are confident in the impact you will bring!
+                On behalf of <strong style="color: #1e3a8a;">${companyName}</strong>, we are pleased to extend an official internship offer to you for the position of <strong style="color: #1e3a8a;">${internshipTitle}</strong>. Following a careful evaluation of your qualifications and experience, we were thoroughly impressed by your technical potential and dedication, and we are confident in the valuable contributions you will bring to our team.
               </p>
 
               <!-- Offer Details Card -->
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; border: 1px solid #cbd5e1; border-radius: 8px; background-color: #f8fafc;">
                 <tr>
-                  <td style="padding: 20px 24px; text-align: center;">
-                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Position & Partner Company</p>
-                    <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 20px; font-weight: 700; color: #0f172a;">${companyName} — ${internshipTitle}</p>
-                    <p style="margin: 0; font-size: 12px; color: #64748b;">
-                      Offer Code: <strong style="color: #1e3a8a; font-family: monospace; font-size: 13px;">${offerCodeStr}</strong> &nbsp;·&nbsp; 
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">Verify Online</a>
+                  <td style="padding: 20px 24px;">
+                    <p style="margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Offer Summary</p>
+                    <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #0f172a;">${companyName} — ${internshipTitle}</p>
+                    <p style="margin: 0 0 6px; font-size: 13px; color: #334155;">
+                      <strong>Offer Code:</strong> <span style="color: #1e3a8a; font-family: monospace; font-size: 13px; font-weight: 700;">${offerCodeStr}</span>
+                    </p>
+                    <p style="margin: 0; font-size: 13px; color: #334155;">
+                      <strong>Online Verification Link:</strong><br>
+                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${siteUrl}/verify?type=offer&id=${offerId}</a>
                     </p>
                   </td>
                 </tr>
               </table>
 
               <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
-                Your official Offer Letter document is attached to this email. Please review the full engagement terms, duration, and details in the attached document.
+                Your official, printable Offer Letter document is attached to this email as a PDF file. Please review the attached document for complete details regarding duration, stipends, and engagement terms.
               </p>
 
               <!-- Expiry Alert -->
               <div style="background-color: #fefce8; border-left: 4px solid #eab308; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
-                <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #854d0e;">
+                <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: #854d0e;">
                   <strong>Action Required — Offer Expiration Notice:</strong><br>
-                  This internship offer is valid until <strong>${expiryDateStr}</strong>. To accept or decline this offer, please click the button below to review your offer letter directly on your ZYR0 Student Dashboard before it expires.
+                  This internship offer remains valid until <strong>${expiryDateStr}</strong>. To accept or decline this offer, please access your offer details directly on your ZYR0 Student Dashboard using the following link:
+                </p>
+                <p style="margin: 0; font-size: 14px; word-break: break-all;">
+                  <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 700;">${offerLettersDashboardUrl}</a>
                 </p>
               </div>
 
-              <!-- Primary CTA Button -->
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0; text-align: center;">
-                <tr>
-                  <td align="center" style="padding: 0;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
-                      <tr>
-                        <td align="center" bgcolor="#10b981" style="border-radius: 8px; background-color: #10b981; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
-                          <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 16px 36px; font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 700; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #059669; text-align: center; box-sizing: border-box;">Review & Respond to Offer &rarr;</a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Quick Action Grid -->
+              <!-- Direct Platform Links -->
               <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
-                <p style="margin: 0 0 16px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b; text-align: center;">Quick Actions & Platform Links</p>
-                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                  <tr>
-                    <td align="center" style="padding: 6px;" width="50%">
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #1e3a8a; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Verify Credential</a>
-                    </td>
-                    <td align="center" style="padding: 6px;" width="50%">
-                      <a href="${whatsAppChannelUrl}" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #10b981; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">WhatsApp Channel</a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td align="center" style="padding: 6px;" width="50%">
-                      <a href="${siteUrl}/careers" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #0284c7; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Career Hub</a>
-                    </td>
-                    <td align="center" style="padding: 6px;" width="50%">
-                      <a href="${siteUrl}/contact" target="_blank" rel="noopener noreferrer" style="display: block; width: 100%; padding: 12px 14px; background-color: #475569; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 6px; text-align: center; box-sizing: border-box;">Contact Support</a>
-                    </td>
-                  </tr>
-                </table>
+                <p style="margin: 0 0 14px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b;">Direct Links & Verification</p>
+                <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: #334155;">
+                  <li style="margin-bottom: 8px;">
+                    <strong>Review & Respond to Offer:</strong><br>
+                    <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${offerLettersDashboardUrl}</a>
+                  </li>
+                  <li style="margin-bottom: 8px;">
+                    <strong>Verify Credential:</strong><br>
+                    <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${siteUrl}/verify?type=offer&id=${offerId}</a>
+                  </li>
+                  <li style="margin-bottom: 8px;">
+                    <strong>ZYR0 Career Hub:</strong><br>
+                    <a href="${siteUrl}/careers" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${siteUrl}/careers</a>
+                  </li>
+                  <li style="margin-bottom: 0;">
+                    <strong>Contact Support:</strong><br>
+                    <a href="${siteUrl}/contact" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${siteUrl}/contact</a>
+                  </li>
+                </ul>
               </div>
 
               <p style="margin: 28px 0 0; font-size: 15px; line-height: 1.8; color: #0f172a;">
-                We are excited to welcome you on board!<br><br>
-                Warmest regards,<br>
+                We look forward to welcoming you to the team and supporting your professional growth.<br><br>
+                Sincerely,<br>
                 <strong style="font-family: Georgia, 'Times New Roman', serif; font-size: 16px; color: #1e3a8a;">The ZYR0 Team & ${companyName}</strong>
               </p>
             </td>
@@ -187,14 +178,14 @@ async function sendOfferLetterEmail(opts: {
             <td style="padding: 28px 40px 32px; text-align: center; background-color: #f8fafc; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0 0 12px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8;">Stay Connected</p>
               <p style="margin: 0 0 16px; font-size: 12px; color: #475569;">
-                <a href="${linkedInUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">LinkedIn</a>
+                <a href="${linkedInUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600;">LinkedIn</a>
                 <span style="color: #cbd5e1; padding: 0 8px;">·</span>
-                <a href="${whatsAppCommunityUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Community</a>
+                <a href="${whatsAppCommunityUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600;">WhatsApp Community</a>
                 <span style="color: #cbd5e1; padding: 0 8px;">·</span>
-                <a href="${whatsAppChannelUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: none; font-weight: 600;">WhatsApp Channel</a>
+                <a href="${whatsAppChannelUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600;">WhatsApp Channel</a>
               </p>
               <p style="margin: 0 0 6px; font-size: 11px; color: #94a3b8;">This email was sent on behalf of ${companyName} via ZYR0.</p>
-              <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: none;">team@zyroo.org</a></p>
+              <p style="margin: 0; font-size: 11px; color: #94a3b8;">© 2026 ZYR0. All rights reserved. | <a href="mailto:team@zyroo.org" style="color: #1e3a8a; text-decoration: underline;">team@zyroo.org</a></p>
             </td>
           </tr>
         </table>
@@ -207,30 +198,31 @@ async function sendOfferLetterEmail(opts: {
   const emailText = [
     `Dear ${studentName},`,
     '',
-    `Congratulations! On behalf of ${companyName}, we are thrilled to extend an official internship offer for the ${internshipTitle} position.`,
+    `On behalf of ${companyName}, we are pleased to extend an official internship offer to you for the position of ${internshipTitle}.`,
     '',
-    `Your official Offer Letter document is attached to this email.`,
+    `Your official Offer Letter document is attached to this email as a PDF file.`,
     '',
-    `Offer Details:`,
+    `Offer Summary:`,
     `- Company: ${companyName}`,
     `- Position: ${internshipTitle}`,
     `- Offer Code: ${offerCodeStr}`,
-    `- Verify Online: ${siteUrl}/verify?type=offer&id=${offerId}`,
+    `- Online Verification: ${siteUrl}/verify?type=offer&id=${offerId}`,
     '',
-    `Important: This offer remains open until ${expiryDateStr}. Please review and respond on the platform before the deadline:`,
-    `${siteUrl}/student/offer-letters`,
+    `Action Required: This offer remains valid until ${expiryDateStr}. Please review and respond to your offer on the platform using the following link:`,
+    `${offerLettersDashboardUrl}`,
     '',
-    `Quick Links:`,
+    `Direct Links:`,
+    `- Review Offer: ${offerLettersDashboardUrl}`,
     `- Verify Credential: ${siteUrl}/verify?type=offer&id=${offerId}`,
-    `- Career Hub: ${siteUrl}/careers`,
-    `- Support: ${siteUrl}/contact`,
+    `- ZYR0 Career Hub: ${siteUrl}/careers`,
+    `- Contact Support: ${siteUrl}/contact`,
     '',
     `Stay Connected:`,
     `- LinkedIn: ${linkedInUrl}`,
     `- WhatsApp Community: ${whatsAppCommunityUrl}`,
     `- WhatsApp Channel: ${whatsAppChannelUrl}`,
     '',
-    'Warmest regards,',
+    'Sincerely,',
     `The ZYR0 Team & ${companyName}`,
     'team@zyroo.org',
   ].join('\n');
