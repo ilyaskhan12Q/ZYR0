@@ -26,31 +26,16 @@ import { SITE_CONFIG } from '@/config/site';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/** Convert a Blob to a base64 string (data-URI content portion). */
-function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64data = reader.result as string;
-      const base64 = base64data.split(',')[1];
-      resolve(base64);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
-/** Build and send the offer letter email via the send-email Edge Function. */
+/** Build and send the offer letter notification email via the send-email Edge Function. */
 async function sendOfferLetterEmail(opts: {
   student: { id?: string; email?: string | null; full_name?: string | null };
   company: { name?: string | null };
   internship: { title?: string | null };
-  pdfBlob: Blob;
   offerId: string;
   offerCode?: string | null;
   expiresAt?: string | null;
 }): Promise<void> {
-  const { student, company, internship, pdfBlob, offerId, offerCode, expiresAt } = opts;
+  const { student, company, internship, offerId, offerCode, expiresAt } = opts;
   let studentEmail = student.email;
 
   if (!studentEmail && student.id) {
@@ -72,7 +57,6 @@ async function sendOfferLetterEmail(opts: {
     throw new Error('Student email is missing for this application.');
   }
 
-  const base64Pdf = await blobToBase64(pdfBlob);
   const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
   const siteUrl = (SITE_CONFIG.url || import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/+$/, '');
   const linkedInUrl = SITE_CONFIG.social.linkedinCompany;
@@ -83,6 +67,8 @@ async function sendOfferLetterEmail(opts: {
     : '30 days from issuance';
   const offerCodeStr = offerCode ?? offerId.slice(0, 8).toUpperCase();
   const offerLettersDashboardUrl = `${siteUrl}/student/offer-letters`;
+  const publicVerifyUrl = `${siteUrl}/verify`;
+  const verifyOfferUrl = `${siteUrl}/verify?type=offer&id=${encodeURIComponent(offerCodeStr)}`;
 
   const emailHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -117,26 +103,40 @@ async function sendOfferLetterEmail(opts: {
                   <td style="padding: 20px 24px;">
                     <p style="margin: 0 0 6px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #b89c56;">Offer Summary</p>
                     <p style="margin: 0 0 10px; font-family: Georgia, 'Times New Roman', serif; font-size: 18px; font-weight: 700; color: #0f172a;">${companyName} — ${internshipTitle}</p>
-                    <p style="margin: 0 0 6px; font-size: 13px; color: #334155;">
-                      <strong>Offer Code:</strong> <span style="color: #1e3a8a; font-family: monospace; font-size: 13px; font-weight: 700;">${offerCodeStr}</span>
+                    <p style="margin: 0 0 8px; font-size: 13px; color: #334155;">
+                      <strong>Unique Offer Code:</strong> <span style="color: #1e3a8a; font-family: monospace; font-size: 14px; font-weight: 700;">${offerCodeStr}</span>
                     </p>
                     <p style="margin: 0; font-size: 13px; color: #334155;">
-                      <strong>Online Verification Link:</strong><br>
-                      <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${siteUrl}/verify?type=offer&id=${offerId}</a>
+                      <strong>Credential Verification URL:</strong><br>
+                      <a href="${verifyOfferUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${verifyOfferUrl}</a>
                     </p>
                   </td>
                 </tr>
               </table>
 
-              <p style="margin: 0 0 20px; font-size: 15px; line-height: 1.8; color: #334155;">
-                Your official, printable Offer Letter document is attached to this email as a PDF file. Please review the attached document for complete details regarding duration, stipends, and engagement terms.
-              </p>
+              <!-- How to Access Offer Letter Section -->
+              <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; margin: 24px 0; background-color: #ffffff;">
+                <p style="margin: 0 0 12px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #1e3a8a;">How to Download & Respond to Your Offer Letter</p>
+                <p style="margin: 0 0 12px; font-size: 14px; line-height: 1.7; color: #334155;">
+                  Your official, printable Offer Letter document is stored on the ZYR0 platform. You can access and download your document through either of the following methods:
+                </p>
+                <ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: #334155;">
+                  <li style="margin-bottom: 10px;">
+                    <strong>ZYR0 Student Dashboard:</strong><br>
+                    Log in to your student account at <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${offerLettersDashboardUrl}</a> to view complete offer terms, accept or decline the offer, and download your official PDF document.
+                  </li>
+                  <li style="margin-bottom: 0;">
+                    <strong>Public Verification Portal:</strong><br>
+                    Visit <a href="${publicVerifyUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${publicVerifyUrl}</a> or use your direct verification link <a href="${verifyOfferUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${verifyOfferUrl}</a> and enter your unique Offer Code <strong>${offerCodeStr}</strong> to instantly verify and download your offer letter.
+                  </li>
+                </ol>
+              </div>
 
               <!-- Expiry Alert -->
               <div style="background-color: #fefce8; border-left: 4px solid #eab308; padding: 16px 20px; margin: 24px 0; border-radius: 6px;">
                 <p style="margin: 0 0 8px; font-size: 14px; line-height: 1.6; color: #854d0e;">
                   <strong>Action Required — Offer Expiration Notice:</strong><br>
-                  This internship offer remains valid until <strong>${expiryDateStr}</strong>. To accept or decline this offer, please access your offer details directly on your ZYR0 Student Dashboard using the following link:
+                  This internship offer remains valid until <strong>${expiryDateStr}</strong>. Please access your student dashboard to review and respond before the expiration date:
                 </p>
                 <p style="margin: 0; font-size: 14px; word-break: break-all;">
                   <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 700;">${offerLettersDashboardUrl}</a>
@@ -148,12 +148,12 @@ async function sendOfferLetterEmail(opts: {
                 <p style="margin: 0 0 14px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b;">Direct Links & Verification</p>
                 <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: #334155;">
                   <li style="margin-bottom: 8px;">
-                    <strong>Review & Respond to Offer:</strong><br>
+                    <strong>Student Offer Letters Dashboard:</strong><br>
                     <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${offerLettersDashboardUrl}</a>
                   </li>
                   <li style="margin-bottom: 8px;">
-                    <strong>Verify Credential:</strong><br>
-                    <a href="${siteUrl}/verify?type=offer&id=${offerId}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${siteUrl}/verify?type=offer&id=${offerId}</a>
+                    <strong>Public Credential Verification:</strong><br>
+                    <a href="${verifyOfferUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${verifyOfferUrl}</a>
                   </li>
                   <li style="margin-bottom: 8px;">
                     <strong>ZYR0 Career Hub:</strong><br>
@@ -200,20 +200,23 @@ async function sendOfferLetterEmail(opts: {
     '',
     `On behalf of ${companyName}, we are pleased to extend an official internship offer to you for the position of ${internshipTitle}.`,
     '',
-    `Your official Offer Letter document is attached to this email as a PDF file.`,
-    '',
     `Offer Summary:`,
     `- Company: ${companyName}`,
     `- Position: ${internshipTitle}`,
     `- Offer Code: ${offerCodeStr}`,
-    `- Online Verification: ${siteUrl}/verify?type=offer&id=${offerId}`,
+    `- Credential Verification URL: ${verifyOfferUrl}`,
     '',
-    `Action Required: This offer remains valid until ${expiryDateStr}. Please review and respond to your offer on the platform using the following link:`,
+    `How to Download & Respond to Your Offer Letter:`,
+    `Your official, printable Offer Letter document is stored on the ZYR0 platform. You can access and download your document through either of the following methods:`,
+    `1. ZYR0 Student Dashboard: ${offerLettersDashboardUrl} (log in to review terms, accept/decline, and download PDF)`,
+    `2. Public Verification Portal: ${publicVerifyUrl} (enter Offer Code: ${offerCodeStr} to verify and download)`,
+    '',
+    `Action Required: This offer remains valid until ${expiryDateStr}. Please access your student dashboard to review and respond before the expiration date:`,
     `${offerLettersDashboardUrl}`,
     '',
     `Direct Links:`,
-    `- Review Offer: ${offerLettersDashboardUrl}`,
-    `- Verify Credential: ${siteUrl}/verify?type=offer&id=${offerId}`,
+    `- Student Offer Letters Dashboard: ${offerLettersDashboardUrl}`,
+    `- Public Credential Verification: ${verifyOfferUrl}`,
     `- ZYR0 Career Hub: ${siteUrl}/careers`,
     `- Contact Support: ${siteUrl}/contact`,
     '',
@@ -235,12 +238,6 @@ async function sendOfferLetterEmail(opts: {
       subject: emailSubject,
       html: emailHtml,
       text: emailText,
-      attachments: [
-        {
-          filename: `Offer_Letter_${companyName.replace(/\s+/g, '_')}.pdf`,
-          content: base64Pdf,
-        }
-      ]
     }
   });
   if (invokeErr) {
@@ -384,7 +381,6 @@ export default function CompanyOfferLetters() {
           student,
           company,
           internship,
-          pdfBlob,
           offerId: newOffer!.id,
           offerCode: newOffer!.offer_code,
           expiresAt: newOffer!.expires_at,
@@ -481,19 +477,11 @@ export default function CompanyOfferLetters() {
         throw new Error('Missing student or internship data for resending');
       }
 
-      // 1. Regenerate PDF locally
-      const verificationUrl = `${window.location.origin}/verify-offer/${offer.id}`;
-      const pdfBlob = await generateOfferLetterPdf({
-        offer,
-        verificationUrl,
-      });
-
-      // 2. Send email via shared function
+      // Send email via shared function (no attachment needed)
       await sendOfferLetterEmail({
         student,
         company,
         internship,
-        pdfBlob,
         offerId: offer.id,
         offerCode: offer.offer_code,
         expiresAt: offer.expires_at,
