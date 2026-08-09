@@ -245,7 +245,7 @@ async function sendOfferLetterEmail(opts: {
       text: emailText,
       attachments: [
         {
-          filename: `Offer_Letter_${companyName.replace(/\s+/g, '_')}.png`,
+          filename: `Offer_Letter_${companyName.replace(/\s+/g, '_')}.pdf`,
           content: base64Pdf,
         }
       ]
@@ -448,7 +448,7 @@ export default function CompanyOfferLetters() {
     if (!offer.pdf_url) return;
     const a = document.createElement('a');
     a.href     = offer.pdf_url;
-    a.download = `offer-letter-${offer.id.slice(0, 8)}.png`;
+    a.download = `offer-letter-${offer.id.slice(0, 8)}.pdf`;
     a.target   = '_blank';
     document.body.appendChild(a);
     a.click();
@@ -861,7 +861,7 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
                 >
                   <Download className="w-4 h-4" />
-                  Download PNG
+                  Download PDF
                 </button>
                 <a
                   href={offer.pdf_url}

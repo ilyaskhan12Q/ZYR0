@@ -138,7 +138,7 @@ export default function StudentOfferLetters() {
     if (!offer.pdf_url) return;
     const a = document.createElement('a');
     a.href     = offer.pdf_url;
-    a.download = `offer-letter-${offer.id.slice(0, 8)}.png`;
+    a.download = `offer-letter-${offer.id.slice(0, 8)}.pdf`;
     a.target   = '_blank';
     document.body.appendChild(a);
     a.click();
