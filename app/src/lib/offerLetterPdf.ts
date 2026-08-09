@@ -1,5 +1,5 @@
 /**
- * Offer Letter PDF / Image Generator
+ * Offer Letter PDF Generator
  *
  * Generates a premium, classical offer letter document directly in the browser
  * using HTML5 Canvas API with ZERO external network dependencies or CORS failure risks.
@@ -8,15 +8,25 @@
  * double frame, filigree corners, guilloché "O" + ZYR0 logo watermark, Cinzel/Montserrat
  * typography.
  *
- * The output is returned as a single-page A4 PDF Blob (with the canvas raster
- * embedded at 2x resolution for crisp print) for Supabase Storage, email
- * attachment, or direct download.
+ * The output is returned as a single-page A4 PDF Blob (rasterized canvas embedded
+ * at 192 DPI for crisp print) for Supabase Storage, email attachment, or direct download.
  */
 
 import { jsPDF } from 'jspdf';
 import type { OfferLetter } from '@/lib/database.types';
 import QRCode from 'qrcode';
 import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg } from '@/components/certificateTemplate';
+import {
+  OFFER_LETTER_COLORS,
+  FONT_CINZEL,
+  FONT_SANS,
+  FONT_SCRIPT,
+  OFFER_LETTER_FONTS_CSS_URL,
+  CANVAS_PAGE_WIDTH,
+  CANVAS_PAGE_HEIGHT,
+  CANVAS_MARGIN,
+  buildOfferDetails,
+} from '@/lib/offerLetterConfig';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -27,30 +37,20 @@ export interface OfferLetterPdfData {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const PAGE_WIDTH = 1600;  // A4 proportions @192 dpi (2x for crisp print)
-const PAGE_HEIGHT = 2262;
-const MARGIN = 64;
+const PAGE_WIDTH = CANVAS_PAGE_WIDTH;  // A4 proportions @192 dpi (1600 x 2262)
+const PAGE_HEIGHT = CANVAS_PAGE_HEIGHT;
+const MARGIN = CANVAS_MARGIN;
 
-// Classical premium palette (shared with certificate + email redesigns)
-const PAPER_CREAM = '#f1ece0';
-const PAPER_IVORY = '#fffdf5';
-const PAPER_TAN = '#efe5ca';
-const GOLD = '#b89c56';
-const GOLD_DARK = '#a3874f';
-const GOLD_SOFT = '#cbb880';
-const NAVY = '#1e3a8a';
-const INK = '#13100d';
-const TEXT_MUTED = '#8a7f6c';
-const TEXT_SOFT = '#5b544a';
-
-const FONT_CINZEL = `'Cinzel', Georgia, 'Times New Roman', serif`;
-const FONT_SANS = `'Montserrat', -apple-system, 'Segoe UI', Arial, sans-serif`;
-const FONT_SCRIPT = `'Playfair Display', Georgia, serif`;
-
-const FONTS_CSS_URL =
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700' +
-  '&family=Montserrat:wght@300;400;500;600;700;800' +
-  '&family=Playfair+Display:ital,wght@1,600&display=swap';
+const {
+  PAPER_CREAM,
+  PAPER_IVORY,
+  PAPER_TAN,
+  GOLD,
+  NAVY,
+  INK,
+  TEXT_MUTED,
+  TEXT_SOFT,
+} = OFFER_LETTER_COLORS;
 
 const FOOTER_H = 54;
 
@@ -85,13 +85,12 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   canvas.width  = PAGE_WIDTH;
   canvas.height = PAGE_HEIGHT;
   const ctx = canvas.getContext('2d')!;
-  ctx.scale(2, 2);
 
   // ── Cotton-paper background ───────────────────────────────────────────────
   ctx.fillStyle = PAPER_CREAM;
   ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
-  const bgGrad = ctx.createRadialGradient(400, 400, 80, 400, 460, 700);
+  const bgGrad = ctx.createRadialGradient(800, 800, 160, 800, 920, 1400);
   bgGrad.addColorStop(0, PAPER_IVORY);
   bgGrad.addColorStop(0.68, '#f7f0dd');
   bgGrad.addColorStop(1, PAPER_TAN);
@@ -104,23 +103,23 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   drawTiled(ctx, paperTex[2], 0.4);
 
   // ── Soft purple glow behind the watermark ─────────────────────────────────
-  const glow = ctx.createRadialGradient(400, 470, 20, 400, 470, 380);
+  const glow = ctx.createRadialGradient(800, 940, 40, 800, 940, 760);
   glow.addColorStop(0, 'rgba(140,115,255,.13)');
   glow.addColorStop(0.45, 'rgba(140,115,255,.05)');
   glow.addColorStop(1, 'rgba(140,115,255,0)');
   ctx.fillStyle = glow;
-  ctx.fillRect(0, 200, PAGE_WIDTH, 560);
+  ctx.fillRect(0, 400, PAGE_WIDTH, 1120);
 
   // ── Guilloché "O" watermark ───────────────────────────────────────────────
   ctx.save();
   ctx.globalAlpha = 0.55;
   ctx.lineCap = 'round';
-  for (let r = 72; r <= 232; r += 20) {
-    const purple = r % 40 === 0;
+  for (let r = 144; r <= 464; r += 40) {
+    const purple = r % 80 === 0;
     ctx.strokeStyle = purple ? '#cdc2ea' : '#d6d2c6';
-    ctx.lineWidth = r === 192 ? 3.2 : 1.7;
-    ctx.setLineDash(r % 60 === 0 ? [14, 10] : [2.5, 5.5]);
-    ctx.stroke(ringPath(400, 470, r, 5, 7, r * 0.23));
+    ctx.lineWidth = r === 384 ? 3.2 : 1.7;
+    ctx.setLineDash(r % 120 === 0 ? [14, 10] : [2.5, 5.5]);
+    ctx.stroke(ringPath(800, 940, r, 5, 7, r * 0.23));
   }
   ctx.setLineDash([]);
   ctx.restore();
@@ -129,26 +128,26 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   if (zyroLogo) {
     ctx.save();
     ctx.globalAlpha = 0.1;
-    const s = 300;
-    ctx.drawImage(zyroLogo, 400 - s / 2, 470 - s / 2, s, s);
+    const s = 330;
+    ctx.drawImage(zyroLogo, 800 - s / 2, 940 - s / 2, s, s);
     ctx.restore();
   }
 
   // ── Champagne-gold double frame + thin inner rule ─────────────────────────
   ctx.strokeStyle = GOLD;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(18, 18, PAGE_WIDTH - 36, PAGE_HEIGHT - 36);
   ctx.lineWidth = 2;
-  ctx.strokeRect(9, 9, PAGE_WIDTH - 18, PAGE_HEIGHT - 18);
-  ctx.lineWidth = 1;
-  ctx.strokeRect(17, 17, PAGE_WIDTH - 34, PAGE_HEIGHT - 34);
+  ctx.strokeRect(34, 34, PAGE_WIDTH - 68, PAGE_HEIGHT - 68);
 
   ctx.globalAlpha = 0.8;
-  ctx.strokeRect(25, 25, PAGE_WIDTH - 50, PAGE_HEIGHT - 50);
+  ctx.strokeRect(50, 50, PAGE_WIDTH - 100, PAGE_HEIGHT - 100);
   ctx.globalAlpha = 1;
 
   // ── Filigree corner ornaments ─────────────────────────────────────────────
   if (filigreeImg) {
-    const fc = 104;
-    const pad = 30;
+    const fc = 118;
+    const pad = 34;
     const corners: Array<[number, number, number, number]> = [
       [pad, pad, 1, 1],
       [PAGE_WIDTH - pad - fc, pad, -1, 1],
@@ -166,11 +165,11 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     ctx.globalAlpha = 1;
   }
 
-  let y = 64;
+  let y = 80;
 
   // ── Letterhead ────────────────────────────────────────────────────────────
   // Company logo (gold-framed) or initials avatar
-  const logoSize = 64;
+  const logoSize = 68;
   let logoLoaded = false;
   if (company?.logo_url) {
     try {
@@ -200,18 +199,18 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   }
 
   // Company name + letter subtitle
-  const titleX = MARGIN + logoSize + 18;
+  const titleX = MARGIN + logoSize + 20;
   ctx.fillStyle = INK;
-  ctx.font = `700 21px ${FONT_CINZEL}`;
-  ctx.fillText(truncateString(company?.name ?? 'Company', 30), titleX, y + 26);
+  ctx.font = `700 24px ${FONT_CINZEL}`;
+  ctx.fillText(truncateString(company?.name ?? 'Company', 32), titleX, y + 30);
 
   ctx.fillStyle = NAVY;
-  ctx.font = `700 11px ${FONT_SANS}`;
-  ctx.fillText('OFFICIAL INTERNSHIP OFFER LETTER', titleX, y + 48);
+  ctx.font = `700 12px ${FONT_SANS}`;
+  ctx.fillText('GENERAL OFFICE OF THE BOARD  ·  OFFICIAL INTERNSHIP OFFER LETTER', titleX, y + 54);
 
   // Document metadata box (top right)
-  const metaBoxW = 236;
-  const metaBoxH = 68;
+  const metaBoxW = 260;
+  const metaBoxH = 74;
   const metaBoxX = PAGE_WIDTH - MARGIN - metaBoxW;
 
   ctx.fillStyle = 'rgba(255,253,245,.72)';
@@ -232,20 +231,20 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
 
   const metaLabel = (text: string, vx: number, vy: number, value: string, mono = false) => {
     ctx.fillStyle = '#a99a78';
-    ctx.font = `600 9px ${FONT_SANS}`;
-    ctx.fillText(text.toUpperCase(), metaBoxX + 12, vy);
+    ctx.font = `600 10px ${FONT_SANS}`;
+    ctx.fillText(text.toUpperCase(), metaBoxX + 14, vy);
     ctx.fillStyle = NAVY;
     ctx.font = mono
-      ? `700 10px ${FONT_CINZEL}`
-      : `600 10px ${FONT_SANS}`;
+      ? `700 11px ${FONT_CINZEL}`
+      : `600 11px ${FONT_SANS}`;
     ctx.fillText(value, metaBoxX + vx, vy);
   };
 
-  metaLabel('Offer Code', 82, y + 22, offer.offer_code || offer.id.slice(0, 12).toUpperCase(), true);
-  metaLabel('Issued', 78, y + 40, issueDate);
-  metaLabel('Expiration', 90, y + 56, expiryDate);
+  metaLabel('Offer Code', 94, y + 24, offer.offer_code || offer.id.slice(0, 12).toUpperCase(), true);
+  metaLabel('Issued', 90, y + 44, issueDate);
+  metaLabel('Expires', 98, y + 62, expiryDate);
 
-  y += 104;
+  y += 114;
 
   // Gold divider rule
   ctx.strokeStyle = GOLD;
@@ -255,28 +254,31 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.lineTo(PAGE_WIDTH - MARGIN, y);
   ctx.stroke();
 
-  y += 34;
+  y += 40;
 
   // ── Salutation & Opening Paragraph ─────────────────────────────────────────
+  const studentName = student?.full_name ?? 'Candidate';
+  const companyName = company?.name ?? 'our company';
+  const position    = internship?.title ?? 'Intern';
+
   ctx.fillStyle = NAVY;
-  ctx.font = `700 15px ${FONT_CINZEL}`;
-  ctx.fillText(`Dear ${student?.full_name ?? 'Candidate'},`, MARGIN, y);
-  y += 28;
+  ctx.font = `700 17px ${FONT_CINZEL}`;
+  ctx.fillText(`Dear ${studentName},`, MARGIN, y);
+  y += 32;
 
   const openingText =
-    `On behalf of ${company?.name ?? 'our company'}, we are delighted to extend an official offer of ` +
-    `internship for the position of ${internship?.title ?? 'Intern'}. Having reviewed your qualifications, ` +
+    `On behalf of ${companyName}, we are delighted to extend an official offer of ` +
+    `internship for the position of ${position}. Having reviewed your qualifications, ` +
     `academic background, and prior experience, we believe your talent and commitment will be a valuable ` +
     `addition to our organization. Please find the terms of engagement and offer details below:`;
 
-  // Advance by the paragraph's *measured* height so the card below never overlaps it.
-  y = wrapText(ctx, openingText, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 20, INK, `400 13px ${FONT_SANS}`, 1.45) + 20;
+  y = wrapText(ctx, openingText, MARGIN, y, PAGE_WIDTH - MARGIN * 2, 22, INK, `400 14px ${FONT_SANS}`, 1.45) + 24;
 
   // ── Position & Engagement Details Card ─────────────────────────────────────
   const cardW = PAGE_WIDTH - MARGIN * 2;
-  const cardH = 216;
+  const cardH = 224;
 
-  ctx.fillStyle = 'rgba(255,253,245,.7)';
+  ctx.fillStyle = 'rgba(255,253,245,.75)';
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -288,61 +290,69 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillStyle = GOLD;
   ctx.fillRect(MARGIN + 20, y + 18, 14, 2);
   ctx.fillStyle = NAVY;
-  ctx.font = `700 11px ${FONT_SANS}`;
-  ctx.fillText('POSITION & ENGAGEMENT DETAILS', MARGIN + 40, y + 26);
+  ctx.font = `700 12px ${FONT_SANS}`;
+  ctx.fillText('POSITION & ENGAGEMENT DETAILS', MARGIN + 42, y + 26);
 
   const workArrangement = internship?.location && internship.location !== internship.location_type
     ? `${internship?.location_type ?? 'Remote'} (${internship.location})`
     : (internship?.location_type || 'Remote');
 
-  let fieldsY = y + 56;
-  const fields: Array<[string, string]> = [
-    ['Candidate Name', student?.full_name ?? '—'],
-    ['Position Title', internship?.title ?? '—'],
-    ['Internship Category', internship?.type ?? 'Internship'],
-    ['Work Arrangement', workArrangement],
-    ['Duration', internship?.duration ?? 'Flexible'],
-    ['Proposed Start', internship?.start_date ? new Date(internship.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'To be agreed'],
-    ['Stipend / Compensation', internship?.stipend ? `${internship.stipend} (${internship.stipend_type ?? 'Monthly'})` : 'Experience-Based'],
-    ['Reporting Signatory', company?.owner?.full_name ?? 'Company Representative'],
-  ];
+  const signatoryName  = company?.owner?.full_name || 'Authorized Signatory';
+  const signatoryTitle = company?.owner?.title || 'Company Representative';
+  const signatoryInfo  = `${signatoryName} · ${signatoryTitle}`;
 
-  const col1X = MARGIN + 24;
-  const col2X = MARGIN + (cardW / 2) + 18;
+  const startDate = internship?.start_date
+    ? new Date(internship.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'To be agreed upon';
 
-  fields.forEach(([label, value], idx) => {
-    const isCol2 = idx % 2 === 1;
-    const curX = isCol2 ? col2X : col1X;
-    if (idx > 0 && !isCol2) fieldsY += 38;
+  const compensation = internship?.stipend
+    ? `${internship.stipend} (${internship.stipend_type ?? 'Monthly'})`
+    : 'Unpaid / Experience-Based';
 
-    ctx.fillStyle = TEXT_MUTED;
-    ctx.font = `600 9.5px ${FONT_SANS}`;
-    ctx.fillText(label.toUpperCase(), curX, fieldsY);
-
-    ctx.fillStyle = INK;
-    ctx.font = `700 12px ${FONT_SANS}`;
-    ctx.fillText(truncateString(value, 36), curX, fieldsY + 17);
+  const rawFields = buildOfferDetails({
+    studentName,
+    position,
+    internshipType: internship?.type ?? 'Internship',
+    workArrangement,
+    duration: internship?.duration ?? 'Flexible',
+    startDate,
+    compensation,
+    signatoryInfo,
   });
 
-  y += cardH + 30;
+  const col1X = MARGIN + 24;
+  const col2X = MARGIN + (cardW / 2) + 20;
+  let fieldsY = y + 58;
+
+  rawFields.forEach((field, idx) => {
+    const isCol2 = idx % 2 === 1;
+    const curX = isCol2 ? col2X : col1X;
+    if (idx > 0 && !isCol2) fieldsY += 40;
+
+    ctx.fillStyle = TEXT_MUTED;
+    ctx.font = `600 10px ${FONT_SANS}`;
+    ctx.fillText(field.label.toUpperCase(), curX, fieldsY);
+
+    ctx.fillStyle = INK;
+    ctx.font = `700 13px ${FONT_SANS}`;
+    ctx.fillText(truncateString(field.value, 40), curX, fieldsY + 18);
+  });
+
+  y += cardH + 34;
 
   // ── Responsibilities & Terms: content sizing ────────────────────────────────
-  // Everything below flows with *measured* heights. A budget loop runs first:
-  // if the natural content would collide with the signature zone, trailing
-  // responsibilities (least essential) are dropped, then trailing terms,
-  // until it fits — the card, signature, and footer are never overlapped.
   const contentW = PAGE_WIDTH - MARGIN * 2;
 
-  const RESP_FONT = `400 11.5px ${FONT_SANS}`;
-  const RESP_LH = 17;
+  const RESP_FONT = `400 12.5px ${FONT_SANS}`;
+  const RESP_LH = 18;
   const RESP_SP = 1.35;
 
-  const TERM_FONT = `400 11px ${FONT_SANS}`;
-  const TERM_LH = 16;
+  const TERM_FONT = `400 12px ${FONT_SANS}`;
+  const TERM_LH = 17;
   const TERM_SP = 1.4;
 
   let respList = internship?.responsibilities?.length
-    ? internship.responsibilities.slice()
+    ? internship.responsibilities.slice(0, 5)
     : [];
 
   let termList = [
@@ -351,19 +361,18 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     `This offer remains valid until ${offer.expires_at ? new Date(offer.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '30 days from issuance'}, after which it may expire automatically unless extended.`,
   ];
 
-  const respLines = (r: string) => measureWrapped(ctx, r, contentW - 22, RESP_FONT, RESP_LH, RESP_SP);
-  const termLines = (t: string) => measureWrapped(ctx, t, contentW - 22, TERM_FONT, TERM_LH, TERM_SP);
+  const respLines = (r: string) => measureWrapped(ctx, r, contentW - 24, RESP_FONT, RESP_LH, RESP_SP);
+  const termLines = (t: string) => measureWrapped(ctx, t, contentW - 24, TERM_FONT, TERM_LH, TERM_SP);
   const sectionSpace = () => {
     const respH = respList.length
-      ? 22 + respList.reduce((h, r) => h + respLines(r) * RESP_LH * RESP_SP, 0) + 14
+      ? 24 + respList.reduce((h, r) => h + respLines(r) * RESP_LH * RESP_SP, 0) + 16
       : 0;
     const termsH = termList.reduce((h, t) => h + termLines(t) * TERM_LH * TERM_SP, 0);
-    return respH + 22 + termsH + 26;
+    return respH + 24 + termsH + 30;
   };
 
-  // Safe zone: signature rule sits between ideal (917) and just above the footer.
-  const idealSigY = PAGE_HEIGHT - 214;
-  const maxSigY = PAGE_HEIGHT - FOOTER_H - 106;
+  const idealSigY = PAGE_HEIGHT - 230;
+  const maxSigY   = PAGE_HEIGHT - FOOTER_H - 110;
 
   for (let guard = 0; guard < 20; guard++) {
     if (y + sectionSpace() <= maxSigY - 6) break;
@@ -375,39 +384,37 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   // ── Responsibilities Section ───────────────────────────────────────────────
   if (respList.length) {
     ctx.fillStyle = NAVY;
-    ctx.font = `700 13px ${FONT_SANS}`;
+    ctx.font = `700 14px ${FONT_SANS}`;
     ctx.fillText('KEY RESPONSIBILITIES', MARGIN, y);
-    y += 22;
+    y += 24;
 
     for (const resp of respList) {
       ctx.fillStyle = GOLD;
-      ctx.font = `700 13px ${FONT_CINZEL}`;
+      ctx.font = `700 14px ${FONT_CINZEL}`;
       ctx.fillText('•', MARGIN + 4, y);
 
-      y = wrapText(ctx, resp, MARGIN + 22, y, contentW - 22, RESP_LH, TEXT_SOFT, RESP_FONT, RESP_SP);
+      y = wrapText(ctx, resp, MARGIN + 24, y, contentW - 24, RESP_LH, TEXT_SOFT, RESP_FONT, RESP_SP);
     }
-    y += 14;
+    y += 16;
   }
 
   // ── Terms & Conditions ─────────────────────────────────────────────────────
   ctx.fillStyle = NAVY;
-  ctx.font = `700 13px ${FONT_SANS}`;
+  ctx.font = `700 14px ${FONT_SANS}`;
   ctx.fillText('TERMS & CONDITIONS', MARGIN, y);
-  y += 22;
+  y += 24;
 
   termList.forEach((term, index) => {
     ctx.fillStyle = GOLD;
-    ctx.font = `700 12px ${FONT_CINZEL}`;
-    ctx.fillText(`${index + 1}`, MARGIN, y);
+    ctx.font = `700 13px ${FONT_CINZEL}`;
+    ctx.fillText(`${index + 1}.`, MARGIN, y);
 
-    y = wrapText(ctx, term, MARGIN + 22, y, contentW - 22, TERM_LH, TEXT_SOFT, TERM_FONT, TERM_SP);
+    y = wrapText(ctx, term, MARGIN + 24, y, contentW - 24, TERM_LH, TEXT_SOFT, TERM_FONT, TERM_SP);
   });
 
-  y += 26;
+  y += 28;
 
   // ── Signatory Line & Verification Section ───────────────────────────────────
-  // Floats between the ideal position and just above the footer so the
-  // signature block can never collide with content or the navy footer.
   const sigY = Math.max(idealSigY, Math.min(y + 4, maxSigY));
 
   // Signature rule + details
@@ -415,34 +422,32 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(MARGIN, sigY);
-  ctx.lineTo(MARGIN + 230, sigY);
+  ctx.lineTo(MARGIN + 240, sigY);
   ctx.stroke();
 
-  const signatoryName = company?.owner?.full_name || 'Authorized Signatory';
-  const signatoryTitle = company?.owner?.title || 'Company Representative';
   const signatoryEmail = company?.owner?.email;
 
   ctx.fillStyle = NAVY;
-  ctx.font = `italic 600 19px ${FONT_SCRIPT}`;
-  ctx.fillText(truncateString(signatoryName, 26), MARGIN, sigY + 4);
+  ctx.font = `italic 600 20px ${FONT_SCRIPT}`;
+  ctx.fillText(truncateString(signatoryName, 28), MARGIN, sigY + 24);
 
   ctx.fillStyle = TEXT_SOFT;
-  ctx.font = `400 11px ${FONT_SANS}`;
-  ctx.fillText(signatoryTitle, MARGIN, sigY + 32);
-  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 48);
+  ctx.font = `400 11.5px ${FONT_SANS}`;
+  ctx.fillText(signatoryTitle, MARGIN, sigY + 44);
+  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 60);
   if (signatoryEmail) {
     ctx.fillStyle = TEXT_MUTED;
-    ctx.font = `400 10px ${FONT_SANS}`;
-    ctx.fillText(signatoryEmail, MARGIN, sigY + 64);
+    ctx.font = `400 10.5px ${FONT_SANS}`;
+    ctx.fillText(signatoryEmail, MARGIN, sigY + 76);
   }
 
   // Verification QR box (gold-framed, right side)
-  const qrBoxW = 224;
-  const qrBoxH = 96;
+  const qrBoxW = 240;
+  const qrBoxH = 104;
   const qrBoxX = PAGE_WIDTH - MARGIN - qrBoxW;
   const qrBoxY = sigY - 6;
 
-  ctx.fillStyle = 'rgba(255,253,245,.75)';
+  ctx.fillStyle = 'rgba(255,253,245,.8)';
   ctx.strokeStyle = GOLD;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -450,16 +455,16 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fill();
   ctx.stroke();
 
-  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 76);
+  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 80);
 
   ctx.fillStyle = NAVY;
-  ctx.font = `700 11px ${FONT_SANS}`;
-  ctx.fillText('VERIFIED OFFER', qrBoxX + 100, qrBoxY + 30);
+  ctx.font = `700 11.5px ${FONT_SANS}`;
+  ctx.fillText('VERIFIED OFFER', qrBoxX + 106, qrBoxY + 32);
 
   ctx.fillStyle = TEXT_MUTED;
-  ctx.font = `400 9.5px ${FONT_SANS}`;
-  ctx.fillText('Scan to authenticate', qrBoxX + 100, qrBoxY + 48);
-  ctx.fillText('via ZYR0 Platform', qrBoxX + 100, qrBoxY + 62);
+  ctx.font = `400 10px ${FONT_SANS}`;
+  ctx.fillText('Scan to authenticate', qrBoxX + 106, qrBoxY + 52);
+  ctx.fillText('via ZYR0 Platform', qrBoxX + 106, qrBoxY + 66);
 
   // ── Bottom navy security footer with gold rule ─────────────────────────────
   const footerY = PAGE_HEIGHT - FOOTER_H;
@@ -477,19 +482,19 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
     : `Offer ID: ${offer.id.slice(0, 8)}`;
 
   ctx.fillStyle = '#FFFFFF';
-  ctx.font = `400 9.5px ${FONT_SANS}`;
+  ctx.font = `400 10px ${FONT_SANS}`;
   ctx.fillText(footerOfferLabel, PAGE_WIDTH / 2, footerY + 22);
 
-  ctx.fillStyle = 'rgba(255,255,255,.8)';
-  ctx.font = `400 9px ${FONT_SANS}`;
-  ctx.fillText(`Verify at ${verificationUrl}`, PAGE_WIDTH / 2, footerY + 38);
+  ctx.fillStyle = 'rgba(255,255,255,.85)';
+  ctx.font = `400 9.5px ${FONT_SANS}`;
+  ctx.fillText(`Verify at ${verificationUrl}`, PAGE_WIDTH / 2, footerY + 37);
 
-  ctx.fillStyle = 'rgba(255,255,255,.65)';
-  ctx.font = `400 8.5px ${FONT_SANS}`;
+  ctx.fillStyle = 'rgba(255,255,255,.7)';
+  ctx.font = `400 9px ${FONT_SANS}`;
   ctx.fillText(
     `© ${new Date().getFullYear()} ZYR0 Platform · ${truncateString(company?.name ?? '', 60)} · Confidential Document`,
     PAGE_WIDTH / 2,
-    footerY + 52
+    footerY + 50
   );
   ctx.textAlign = 'left';
 
@@ -524,17 +529,17 @@ async function ensurePremiumFonts(): Promise<void> {
       const link = document.createElement('link');
       link.id = 'zyro-premium-fonts';
       link.rel = 'stylesheet';
-      link.href = FONTS_CSS_URL;
+      link.href = OFFER_LETTER_FONTS_CSS_URL;
       document.head.appendChild(link);
     }
     if (document.fonts) {
       const faces = [
-        '700 22px "Cinzel"',
-        '700 15px "Cinzel"',
-        '600 12px "Montserrat"',
-        '700 12px "Montserrat"',
-        '400 13px "Montserrat"',
-        'italic 600 19px "Playfair Display"',
+        '700 24px "Cinzel"',
+        '700 17px "Cinzel"',
+        '600 13px "Montserrat"',
+        '700 13px "Montserrat"',
+        '400 14px "Montserrat"',
+        'italic 600 20px "Playfair Display"',
       ];
       await Promise.race([
         Promise.allSettled(faces.map((f) => document.fonts.load(f))),
@@ -585,19 +590,18 @@ function ringPath(cx: number, cy: number, r: number, wobbles: number, amplitude:
   return path;
 }
 
-/** Load image with crossOrigin fallback without throwing exception on failure. */
+/**
+ * Load image with CORS check.
+ * Crucial safety fix: Never falls back to non-CORS loading because drawing a cross-origin
+ * non-CORS image onto canvas taints it, breaking canvas.toDataURL() with a SecurityError.
+ */
 function safeLoadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
+    if (!src) return resolve(null);
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
-    img.onerror = () => {
-      // Retry without crossOrigin
-      const fallbackImg = new Image();
-      fallbackImg.onload = () => resolve(fallbackImg);
-      fallbackImg.onerror = () => resolve(null);
-      fallbackImg.src = src;
-    };
+    img.onerror = () => resolve(null); // Resolve null on failure so avatar fallback is used cleanly
     img.src = src;
   });
 }
@@ -724,9 +728,8 @@ function renderSafeCanvasQr(
 ) {
   const qr = QRCode.create(text, { errorCorrectionLevel: 'M' });
   const count = qr.modules.size;
-  const quiet = 3; // QR spec quiet zone (modules of padding)
+  const quiet = 3;
 
-  // Cell size fits the module grid + quiet zone into the requested box
   const cellSize = size / (count + quiet * 2);
 
   ctx.save();
