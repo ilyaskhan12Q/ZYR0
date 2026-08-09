@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.35.3] - 2026-08-09
+## [0.35.4] - 2026-08-09
+
+### Added
+- **Offer Letter Design Token Alignment & PDF Preview Sandbox (`offerLetterConfig.ts`, `offerLetterPdf.ts`, `OfferLetterDocument.tsx`, `OfferLetters.tsx`)**:
+  - **Single Source of Truth (`offerLetterConfig.ts`)**: Extracted all design system tokens (classical palette, fonts, page dimensions, and standard terms) shared by the React DOM preview and HTML5 Canvas PDF generator.
+  - **Canvas Distortion Fix (`offerLetterPdf.ts`)**: Fixed canvas scaling logic to eliminate layout clipping and unneeded coordinate doubling on exported single-page A4 PDFs.
+  - **CORS-Safe Canvas Rendering**: Fixed image loading fallbacks so cross-origin image errors fail gracefully to initial avatars without tainting the canvas context.
+  - **"Preview Canvas PDF" Debug Utility**: Integrated instant PDF canvas preview buttons into the Company portal offer modal and document view, enabling immediate visual validation of attached PDF files before emailing.
 
 ### Docs
 - **Changelog release entries for the offer-letter print & PDF work**: recorded entries `0.34.3` through `0.35.2` per `docs/GIT_WORKFLOW.md` (one entry per commit) and bumped the version to `0.35.3`.

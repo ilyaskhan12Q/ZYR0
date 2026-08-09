@@ -1,23 +1,33 @@
-import React, { useEffect, useMemo } from 'react';
-import { ShieldCheck, Printer, Building2, ExternalLink, FileCheck } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ShieldCheck, Printer, Building2, ExternalLink, FileCheck, FileCode, Loader2 } from 'lucide-react';
 import type { OfferLetter } from '@/lib/database.types';
 import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg, guillocheSvg } from '@/components/certificateTemplate';
+import {
+  OFFER_LETTER_COLORS,
+  FONT_CINZEL,
+  FONT_SANS,
+  FONT_SCRIPT,
+  OFFER_LETTER_FONTS_CSS_URL,
+  DEFAULT_OFFER_TERMS,
+  buildOfferDetails,
+} from '@/lib/offerLetterConfig';
+import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
 
 interface OfferLetterDocumentProps {
   offer: OfferLetter;
   showActions?: boolean;
 }
 
-const PREMIUM_FONTS =
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700' +
-  '&family=Montserrat:wght@300;400;500;600;700;800' +
-  '&family=Playfair+Display:ital,wght@1,600&display=swap';
-
-const SANS = `'Montserrat', -apple-system, 'Segoe UI', Arial, sans-serif`;
-const SERIF = `'Cinzel', Georgia, 'Times New Roman', serif`;
-const SCRIPT = `'Playfair Display', Georgia, 'Times New Roman', serif`;
+const {
+  GOLD,
+  NAVY,
+  INK,
+  TEXT_MUTED,
+  TEXT_SOFT,
+} = OFFER_LETTER_COLORS;
 
 export default function OfferLetterDocument({ offer, showActions = true }: OfferLetterDocumentProps) {
+  const [previewingPdf, setPreviewingPdf] = useState(false);
   const student = offer.student;
   const company = offer.company;
   const internship = offer.internship;
@@ -48,6 +58,7 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
   const signatoryName = company?.owner?.full_name || 'Authorized Signatory';
   const signatoryTitle = company?.owner?.title || 'Company Representative';
   const signatoryEmail = company?.owner?.email;
+  const signatoryInfo = `${signatoryName} · ${signatoryTitle}`;
 
   const verifyUrl = useMemo(() => {
     return `${window.location.origin}/verify-offer/${offer.id}`;
@@ -57,14 +68,14 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
     return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(verifyUrl)}`;
   }, [verifyUrl]);
 
-  // ── Preload the premium font families once (used by preview + window.print) ──
+  // ── Preload the premium font families once ───────────────────────────────────
   useEffect(() => {
     if (typeof document === 'undefined') return;
     if (document.getElementById('zyro-premium-fonts')) return;
     const link = document.createElement('link');
     link.id = 'zyro-premium-fonts';
     link.rel = 'stylesheet';
-    link.href = PREMIUM_FONTS;
+    link.href = OFFER_LETTER_FONTS_CSS_URL;
     document.head.appendChild(link);
   }, []);
 
@@ -81,31 +92,61 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
     window.print();
   };
 
-  const details: Array<{ label: string; value: string }> = [
-    { label: 'Candidate Name', value: studentName },
-    { label: 'Position Title', value: position },
-    { label: 'Internship Category', value: internshipType },
-    { label: 'Work Arrangement', value: `${workMode} (${location})` },
-    { label: 'Duration', value: duration },
-    { label: 'Proposed Start Date', value: startDate },
-    { label: 'Stipend / Compensation', value: compensation },
-    { label: 'Reporting Signatory', value: `${signatoryName} · ${signatoryTitle}` },
-  ];
+  /** Temporary Debug / Validation Tool: Generate PDF from Canvas & Preview */
+  const handlePreviewPdfCanvas = async () => {
+    try {
+      setPreviewingPdf(true);
+      const pdfBlob = await generateOfferLetterPdf({
+        offer,
+        verificationUrl: verifyUrl,
+      });
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      window.open(blobUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to render PDF preview canvas:', err);
+    } finally {
+      setPreviewingPdf(false);
+    }
+  };
+
+  const workArrangement = location && location !== workMode
+    ? `${workMode} (${location})`
+    : workMode;
+
+  const details = buildOfferDetails({
+    studentName,
+    position,
+    internshipType,
+    workArrangement,
+    duration,
+    startDate,
+    compensation,
+    signatoryInfo,
+  });
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4">
       {/* Top Action Bar */}
       {showActions && (
-        <div className="flex items-center justify-between bg-card border border-border p-3 px-4 rounded-xl shadow-sm print:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-card border border-border p-3 px-4 rounded-xl shadow-sm print:hidden">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <FileCheck className="w-4 h-4 text-[#b89c56]" />
             <span>Official ZYR0 Verified Offer Letter</span>
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={handlePreviewPdfCanvas}
+              disabled={previewingPdf}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors disabled:opacity-50"
+              title="Generate & preview raw canvas PDF attachment"
+            >
+              {previewingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileCode className="w-4 h-4 text-[#b89c56]" />}
+              {previewingPdf ? 'Rendering PDF…' : 'Preview as PDF Canvas'}
+            </button>
+            <button
               onClick={handlePrintWindow}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm"
-              style={{ background: '#1e3a8a', color: '#fff' }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm text-white"
+              style={{ background: NAVY }}
             >
               <Printer className="w-4 h-4" />
               Print / Save PDF
@@ -120,12 +161,12 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
         className="offer-letter-print-root relative overflow-hidden shadow-xl print:shadow-none print:rounded-none print:m-0"
         style={{
           background: `${paperLayers.noise}, ${paperLayers.mottle}, ${paperLayers.fiber}, radial-gradient(ellipse at 50% 32%, #fffdf5 0%, #f7f0dd 68%, #efe5ca 100%)`,
-          border: '9px double #b89c56',
-          outline: '1px solid #b89c56',
+          border: `9px double ${GOLD}`,
+          outline: `1px solid ${GOLD}`,
           outlineOffset: '-13px',
           borderRadius: 0,
-          color: '#13100d',
-          fontFamily: SANS,
+          color: INK,
+          fontFamily: FONT_SANS,
           WebkitPrintColorAdjust: 'exact',
           printColorAdjust: 'exact',
         }}
@@ -178,7 +219,7 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                   ? 'text-red-600 border-red-600'
                   : 'text-slate-600 border-slate-600'
               }`}
-              style={{ fontFamily: SERIF, fontWeight: 700 }}
+              style={{ fontFamily: FONT_CINZEL, fontWeight: 700 }}
             >
               {offer.status}
             </div>
@@ -196,18 +237,18 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                   src={company.logo_url}
                   alt={companyName}
                   className="w-16 h-16 rounded-xl object-contain p-1"
-                  style={{ background: '#fffdf5', border: '1.5px solid #b89c56' }}
+                  style={{ background: '#fffdf5', border: `1.5px solid ${GOLD}` }}
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
                     const parent = (e.target as HTMLElement).parentElement;
                     if (parent) {
                       const fallback = document.createElement('div');
                       fallback.className = 'w-16 h-16 rounded-xl flex items-center justify-center';
-                      fallback.style.background = '#1e3a8a';
+                      fallback.style.background = NAVY;
                       fallback.style.color = '#f6efdf';
                       fallback.style.fontWeight = '700';
                       fallback.style.fontSize = '20px';
-                      fallback.style.fontFamily = SERIF;
+                      fallback.style.fontFamily = FONT_CINZEL;
                       fallback.innerText = (companyName || 'CO').substring(0, 2).toUpperCase();
                       parent.appendChild(fallback);
                     }
@@ -215,21 +256,21 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                 />
               ) : (
                 <div
-                  className="w-16 h-16 rounded-xl flex items-center justify-center shadow-md"
-                  style={{ background: '#1e3a8a', color: '#f6efdf', fontFamily: SERIF, fontWeight: 700, fontSize: 20 }}
+                  className="w-16 h-16 rounded-xl flex items-center justify-center shadow-md text-white font-bold"
+                  style={{ background: NAVY, color: '#f6efdf', fontFamily: FONT_CINZEL, fontSize: 20 }}
                 >
                   {(companyName || 'CO').substring(0, 2).toUpperCase()}
                 </div>
               )}
               <div>
                 <h1
-                  className="text-2xl font-bold tracking-wide text-[#13100d]"
-                  style={{ fontFamily: SERIF, fontWeight: 700 }}
+                  className="text-2xl font-bold tracking-wide"
+                  style={{ fontFamily: FONT_CINZEL, color: INK, fontWeight: 700 }}
                 >
                   {companyName}
                 </h1>
-                <p className="text-sm font-medium mt-1 flex items-center gap-1.5" style={{ color: '#1e3a8a', letterSpacing: '1.2px' }}>
-                  <Building2 className="w-4 h-4" style={{ color: '#b89c56' }} />
+                <p className="text-sm font-medium mt-1 flex items-center gap-1.5" style={{ color: NAVY, letterSpacing: '1.2px' }}>
+                  <Building2 className="w-4 h-4" style={{ color: GOLD }} />
                   GENERAL OFFICE OF THE BOARD &nbsp;·&nbsp; OFFICIAL INTERNSHIP OFFER LETTER
                 </p>
               </div>
@@ -239,25 +280,25 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
             <div
               className="text-left sm:text-right text-xs space-y-1.5 p-3.5 rounded-xl border"
               style={{
-                fontFamily: SANS,
+                fontFamily: FONT_SANS,
                 background: 'rgba(255,253,245,.6)',
                 borderColor: 'rgba(184,156,86,.55)',
-                color: '#8a7f6c',
+                color: TEXT_MUTED,
               }}
             >
               <div>
                 <span style={{ letterSpacing: '1px', textTransform: 'uppercase', color: '#a99a78' }}>Offer Code</span>{' '}
-                <strong style={{ color: '#1e3a8a', fontFamily: "'Courier New', monospace", fontWeight: 700, letterSpacing: '.5px' }}>
+                <strong style={{ color: NAVY, fontFamily: FONT_CINZEL, fontWeight: 700, letterSpacing: '.5px' }}>
                   {offer.offer_code || offer.id.slice(0, 12).toUpperCase()}
                 </strong>
               </div>
               <div>
                 <span style={{ letterSpacing: '1px', textTransform: 'uppercase', color: '#a99a78' }}>Issued</span>{' '}
-                <strong style={{ color: '#13100d', fontWeight: 600 }}>{issueDateStr}</strong>
+                <strong style={{ color: INK, fontWeight: 600 }}>{issueDateStr}</strong>
               </div>
               <div>
                 <span style={{ letterSpacing: '1px', textTransform: 'uppercase', color: '#a99a78' }}>Expires</span>{' '}
-                <strong style={{ color: '#13100d', fontWeight: 600 }}>{expiryDateStr}</strong>
+                <strong style={{ color: INK, fontWeight: 600 }}>{expiryDateStr}</strong>
               </div>
             </div>
           </header>
@@ -267,13 +308,13 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
 
             {/* Greeting */}
             <div className="space-y-4">
-              <p className="text-base font-bold" style={{ fontFamily: SERIF, color: '#1e3a8a' }}>
+              <p className="text-base font-bold" style={{ fontFamily: FONT_CINZEL, color: NAVY }}>
                 Dear {studentName},
               </p>
-              <p style={{ color: '#26221e', fontFamily: SANS }}>
-                On behalf of <strong style={{ color: '#13100d' }}>{companyName}</strong>, we are delighted to extend an
+              <p style={{ color: '#26221e', fontFamily: FONT_SANS }}>
+                On behalf of <strong style={{ color: INK }}>{companyName}</strong>, we are delighted to extend an
                 official offer of internship for the position of{' '}
-                <strong style={{ color: '#13100d' }}>{position}</strong>. Having reviewed your qualifications, academic
+                <strong style={{ color: INK }}>{position}</strong>. Having reviewed your qualifications, academic
                 background, and prior experience, we believe your talent and commitment will be a valuable addition to our
                 organization. Please find the terms of engagement and offer details below.
               </p>
@@ -290,9 +331,9 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
             >
               <h2
                 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2 mb-5"
-                style={{ color: '#1e3a8a', fontFamily: SANS }}
+                style={{ color: NAVY, fontFamily: FONT_SANS }}
               >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#b89c56' }} />
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: GOLD }} />
                 Position &amp; Engagement Details
               </h2>
 
@@ -301,11 +342,11 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                   <div key={field.label}>
                     <span
                       className="block mb-1 uppercase tracking-wider"
-                      style={{ color: '#8a7f6c', fontSize: 10, fontWeight: 600, letterSpacing: '1.4px' }}
+                      style={{ color: TEXT_MUTED, fontSize: 10, fontWeight: 600, letterSpacing: '1.4px' }}
                     >
                       {field.label}
                     </span>
-                    <span className="font-semibold" style={{ color: '#13100d', fontFamily: SANS }}>
+                    <span className="font-semibold" style={{ color: INK, fontFamily: FONT_SANS }}>
                       {field.value}
                     </span>
                   </div>
@@ -318,14 +359,14 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
               <section className="space-y-3">
                 <h2
                   className="text-xs font-bold uppercase tracking-widest"
-                  style={{ color: '#1e3a8a', fontFamily: SANS }}
+                  style={{ color: NAVY, fontFamily: FONT_SANS }}
                 >
                   Key Responsibilities
                 </h2>
                 <ul className="space-y-2.5 pl-1" style={{ color: '#3a342c' }}>
                   {internship.responsibilities.slice(0, 5).map((resp, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#b89c56' }} />
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: GOLD }} />
                       <span>{resp}</span>
                     </li>
                   ))}
@@ -337,52 +378,52 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
             <section className="space-y-3">
               <h2
                 className="text-xs font-bold uppercase tracking-widest"
-                style={{ color: '#1e3a8a', fontFamily: SANS }}
+                style={{ color: NAVY, fontFamily: FONT_SANS }}
               >
                 Terms &amp; Conditions
               </h2>
               <ol className="space-y-2.5 pl-1 text-xs leading-relaxed" style={{ color: '#3a342c' }}>
-                <li className="flex gap-3">
-                  <span style={{ color: '#b89c56', fontFamily: SERIF, fontWeight: 700 }}>1.</span>
-                  <span>This offer is contingent upon verification of candidate credentials and completion of required onboarding paperwork.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span style={{ color: '#b89c56', fontFamily: SERIF, fontWeight: 700 }}>2.</span>
-                  <span>You are expected to maintain professional standards, confidentiality, and data safety during the internship.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span style={{ color: '#b89c56', fontFamily: SERIF, fontWeight: 700 }}>3.</span>
-                  <span>
-                    This offer remains valid until <strong style={{ color: '#13100d' }}>{expiryDateStr}</strong>, after
-                    which it may expire automatically unless extended.
-                  </span>
-                </li>
+                {DEFAULT_OFFER_TERMS.map((term, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span style={{ color: GOLD, fontFamily: FONT_CINZEL, fontWeight: 700 }}>{i + 1}.</span>
+                    <span>
+                      {i === 2 ? (
+                        <>
+                          This offer remains valid until <strong style={{ color: INK }}>{expiryDateStr}</strong>, after
+                          which it may expire automatically unless extended.
+                        </>
+                      ) : (
+                        term
+                      )}
+                    </span>
+                  </li>
+                ))}
               </ol>
             </section>
 
             {/* Closing & Signatures */}
             <div className="pt-8 flex flex-col sm:flex-row justify-between items-end gap-8" style={{ borderTop: '1px solid rgba(184,156,86,.55)' }}>
               <div className="space-y-5">
-                <p className="text-sm" style={{ color: '#5b544a', fontFamily: SCRIPT, fontStyle: 'italic' }}>
+                <p className="text-sm" style={{ color: TEXT_SOFT, fontFamily: FONT_SCRIPT, fontStyle: 'italic' }}>
                   Sincerely,
                 </p>
                 <div className="space-y-1">
                   <div
                     className="inline-block font-bold pb-1 pr-8"
                     style={{
-                      fontFamily: SCRIPT,
+                      fontFamily: FONT_SCRIPT,
                       fontStyle: 'italic',
                       fontSize: 20,
-                      color: '#1e3a8a',
-                      borderBottom: '2px solid #b89c56',
+                      color: NAVY,
+                      borderBottom: `2px solid ${GOLD}`,
                     }}
                   >
                     {signatoryName}
                   </div>
                   <p className="text-xs pt-2" style={{ color: '#6b645a' }}>{signatoryTitle}</p>
-                  <p className="text-xs font-semibold" style={{ color: '#1e3a8a' }}>{companyName}</p>
+                  <p className="text-xs font-semibold" style={{ color: NAVY }}>{companyName}</p>
                   {signatoryEmail && (
-                    <p className="text-[10px]" style={{ color: '#8a7f6c' }}>{signatoryEmail}</p>
+                    <p className="text-[10px]" style={{ color: TEXT_MUTED }}>{signatoryEmail}</p>
                   )}
                 </div>
               </div>
@@ -406,8 +447,8 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                   }}
                 />
                 <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1 font-bold" style={{ color: '#1e3a8a', fontFamily: SANS }}>
-                    <ShieldCheck className="w-3.5 h-3.5" style={{ color: '#b89c56' }} />
+                  <div className="flex items-center gap-1 font-bold" style={{ color: NAVY, fontFamily: FONT_SANS }}>
+                    <ShieldCheck className="w-3.5 h-3.5" style={{ color: GOLD }} />
                     Verified Credential
                   </div>
                   <p className="text-[11px] leading-tight max-w-[150px]" style={{ color: '#5a7a4a' }}>
@@ -418,7 +459,7 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold"
-                    style={{ color: '#1e3a8a' }}
+                    style={{ color: NAVY }}
                   >
                     Verify URL <ExternalLink className="w-2.5 h-2.5" />
                   </a>
@@ -430,13 +471,13 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
           {/* ── Footer ── */}
           <footer
             className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] uppercase tracking-widest"
-            style={{ borderTop: '1px solid rgba(184,156,86,.55)', color: '#8a7f6c', letterSpacing: '1.2px' }}
+            style={{ borderTop: '1px solid rgba(184,156,86,.55)', color: TEXT_MUTED, letterSpacing: '1.2px' }}
           >
             <div>
               © {new Date().getFullYear()} ZYR0 Platform&nbsp;&nbsp;·&nbsp;&nbsp;{companyName}&nbsp;&nbsp;·&nbsp;&nbsp;Confidential
             </div>
             <div className="font-mono normal-case tracking-normal text-[9.5px]">
-              Offer ID <strong style={{ color: '#1e3a8a' }}>·</strong> <span style={{ wordBreak: 'break-all' }}>{offer.id}</span>
+              Offer ID <strong style={{ color: NAVY }}>·</strong> <span style={{ wordBreak: 'break-all' }}>{offer.id}</span>
             </div>
           </footer>
         </div>

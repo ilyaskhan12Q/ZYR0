@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Send, Download, Eye, XCircle, Search, Clock,
   CheckCircle2, AlertTriangle, Loader2, RotateCcw, Building2,
-  Calendar, Users, Plus, ExternalLink, RefreshCw
+  Calendar, Users, Plus, ExternalLink, RefreshCw, FileCode
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -457,6 +457,22 @@ export default function CompanyOfferLetters() {
     document.body.removeChild(a);
   }
 
+  // ── Preview Canvas PDF (debug & instant verification) ────────────────────────
+  async function handlePreviewCanvasPdf(offer: OfferLetter) {
+    try {
+      const verificationUrl = `${window.location.origin}/verify-offer/${offer.id}`;
+      const pdfBlob = await generateOfferLetterPdf({
+        offer,
+        verificationUrl,
+      });
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      window.open(blobUrl, '_blank');
+    } catch (err) {
+      console.error('Failed to generate PDF canvas preview:', err);
+      setError('Could not generate PDF canvas preview.');
+    }
+  }
+
   // ── Resend email ─────────────────────────────────────────────────────────────
   async function handleResend(offer: OfferLetter) {
     if (resending === offer.id) return; // block double-clicks / duplicate emails
@@ -749,6 +765,7 @@ export default function CompanyOfferLetters() {
             offer={selected}
             onClose={() => setSelected(null)}
             onDownload={handleDownload}
+            onPreviewCanvas={handlePreviewCanvasPdf}
             onRevoke={handleRevoke}
             onResend={handleResend}
             revoking={revoking}
@@ -767,6 +784,7 @@ interface ModalProps {
   offer: OfferLetter;
   onClose: () => void;
   onDownload: (o: OfferLetter) => void;
+  onPreviewCanvas: (o: OfferLetter) => void;
   onRevoke: (id: string) => void;
   onResend: (o: OfferLetter) => void;
   revoking: string | null;
@@ -774,7 +792,7 @@ interface ModalProps {
   resendFeedback: { offerId: string; ok: boolean; message: string } | null;
 }
 
-function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, revoking, resending, resendFeedback }: ModalProps) {
+function CompanyOfferModal({ offer, onClose, onDownload, onPreviewCanvas, onRevoke, onResend, revoking, resending, resendFeedback }: ModalProps) {
   const cfg     = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
   const Icon    = cfg.icon;
   const canRevoke = ['Pending', 'Sent'].includes(offer.status);
@@ -869,6 +887,14 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
         {/* Footer Actions */}
         <div className="p-4 px-6 border-t border-border bg-card flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => onPreviewCanvas(offer)}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
+              title="Preview raw canvas PDF attachment"
+            >
+              <FileCode className="w-4 h-4 text-[#b89c56]" />
+              Preview Canvas PDF
+            </button>
             {offer.pdf_url && (
               <>
                 <button
