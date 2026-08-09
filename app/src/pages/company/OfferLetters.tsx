@@ -58,7 +58,10 @@ async function sendOfferLetterEmail(opts: {
   }
 
   const emailSubject = `Internship Offer: ${internshipTitle} - ${companyName}`;
-  const siteUrl = (SITE_CONFIG.url || import.meta.env.VITE_SITE_URL || window.location.origin).replace(/\/+$/, '');
+  let siteUrl = (import.meta.env.VITE_SITE_URL || SITE_CONFIG.url || 'https://zyroo.org').replace(/\/+$/, '');
+  if (!siteUrl || siteUrl.includes('localhost') || siteUrl.includes('127.0.0.1')) {
+    siteUrl = 'https://zyroo.org';
+  }
   const linkedInUrl = SITE_CONFIG.social.linkedinCompany;
   const whatsAppCommunityUrl = SITE_CONFIG.social.whatsappSupportGroup;
   const whatsAppChannelUrl = SITE_CONFIG.social.whatsappChannel;
