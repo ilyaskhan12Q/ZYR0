@@ -50,3 +50,20 @@ Available gstack skills:
 - `/unfreeze`
 - `/gstack-upgrade`
 - `/learn`
+
+---
+
+## Permanent Project Architecture & Email Delivery Rules
+
+1. **Email Delivery Architecture**:
+   - **No PDF Attachments**: Do not attach heavy base64 PDFs directly to transactional email dispatches (`sendOfferLetterEmail`).
+   - **Verified Platform Retrieval**: Transactional emails notify the candidate and direct them to retrieve official documents on-demand via the Student Dashboard (`/student/offer-letters`) or the Public Verification Portal (`/verify?type=offer&id=...`).
+   - **Storage Persistence**: PDFs must continue to be generated and stored in Supabase Storage (`offer-letters` bucket) on creation for user portal downloads.
+
+2. **Canonical HTTPS Domain Resolution**:
+   - All email template link generation must use the hardcoded canonical origin `https://zyroo.org` (`const siteUrl = 'https://zyroo.org';`).
+   - Never resolve `siteUrl` to dynamic `window.location.origin`, `localhost`, or `127.0.0.1` in transactional emails to avoid link redaction or security warnings in email clients.
+
+3. **Versioning & Release Rules**:
+   - Version jumps for consolidated releases bump `package.json` and `CHANGELOG.md` (e.g., `0.36.0`).
+

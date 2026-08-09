@@ -7,7 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.35.4] - 2026-08-09
+## [0.36.0] - 2026-08-09
+
+### Changed
+- **Shifted Offer Letter Email Delivery to Verified Platform Links (`OfferLetters.tsx`)**:
+  - Removed base64 PDF attachment payload from `send-email` Edge Function call to eliminate deliverability issues and reduce email size.
+  - Redesigned email template with clear step-by-step guidance directing candidates to retrieve their official offer letters via the Student Dashboard (`/student/offer-letters`) or Public Verification Portal (`/verify?type=offer&id=...`).
+  - Preserved on-demand PDF rendering and Supabase Storage persistence for student/company portal downloads.
+
+### Fixed
+- **Canonical Production Domain Hardcoding in Email Templates (`OfferLetters.tsx`, `TeamApplications.tsx`)**:
+  - Explicitly hardcoded `const siteUrl = 'https://zyroo.org';` for all transactional email template links.
+  - Guarantees 100% predictable URL output (`https://zyroo.org/verify?...`, `https://zyroo.org/student/offer-letters`, `https://zyroo.org/careers`) regardless of execution environment or local dev port.
+  - Prevents security filters and email clients from masking or redacting `localhost` links.
+
+## [0.35.3] - 2026-08-09
 
 ### Added
 - **Offer Letter Design Token Alignment & PDF Preview Sandbox (`offerLetterConfig.ts`, `offerLetterPdf.ts`, `OfferLetterDocument.tsx`, `OfferLetters.tsx`)**:
