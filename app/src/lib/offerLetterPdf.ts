@@ -419,20 +419,16 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
 
   ctx.fillStyle = NAVY;
   ctx.font = `italic 600 19px ${FONT_SCRIPT}`;
-  ctx.fillText(truncateString(signatoryName, 26), MARGIN, sigY + 30);
-
-  ctx.fillStyle = INK;
-  ctx.font = `700 12px ${FONT_SANS}`;
-  ctx.fillText(signatoryName, MARGIN, sigY + 50);
+  ctx.fillText(truncateString(signatoryName, 26), MARGIN, sigY + 4);
 
   ctx.fillStyle = TEXT_SOFT;
   ctx.font = `400 11px ${FONT_SANS}`;
-  ctx.fillText(signatoryTitle, MARGIN, sigY + 66);
-  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 82);
+  ctx.fillText(signatoryTitle, MARGIN, sigY + 32);
+  ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 48);
   if (signatoryEmail) {
     ctx.fillStyle = TEXT_MUTED;
     ctx.font = `400 10px ${FONT_SANS}`;
-    ctx.fillText(signatoryEmail, MARGIN, sigY + 98);
+    ctx.fillText(signatoryEmail, MARGIN, sigY + 64);
   }
 
   // Verification QR box (gold-framed, right side)

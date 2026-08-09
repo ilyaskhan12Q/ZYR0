@@ -384,8 +384,7 @@ export default function OfferLetterDocument({ offer, onPrint, showActions = true
                   >
                     {signatoryName}
                   </div>
-                  <p className="text-xs font-bold pt-2" style={{ color: '#13100d' }}>{signatoryName}</p>
-                  <p className="text-xs" style={{ color: '#6b645a' }}>{signatoryTitle}</p>
+                  <p className="text-xs pt-2" style={{ color: '#6b645a' }}>{signatoryTitle}</p>
                   <p className="text-xs font-semibold" style={{ color: '#1e3a8a' }}>{companyName}</p>
                   {signatoryEmail && (
                     <p className="text-[10px]" style={{ color: '#8a7f6c' }}>{signatoryEmail}</p>
