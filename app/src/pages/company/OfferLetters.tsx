@@ -292,6 +292,8 @@ export default function CompanyOfferLetters() {
   const [selected, setSelected]         = useState<OfferLetter | null>(null);
   const [generating, setGenerating]     = useState<string | null>(null);
   const [revoking, setRevoking]         = useState<string | null>(null);
+  const [resending, setResending]       = useState<string | null>(null);
+  const [resendFeedback, setResendFeedback] = useState<{ offerId: string; ok: boolean; message: string } | null>(null);
   const [error, setError]               = useState<string | null>(null);
   const [successMsg, setSuccessMsg]     = useState<string | null>(null);
 
@@ -457,6 +459,9 @@ export default function CompanyOfferLetters() {
 
   // ── Resend email ─────────────────────────────────────────────────────────────
   async function handleResend(offer: OfferLetter) {
+    if (resending === offer.id) return; // block double-clicks / duplicate emails
+    setResending(offer.id);
+    setResendFeedback(null);
     setError(null);
     setSuccessMsg(null);
     try {
@@ -487,12 +492,17 @@ export default function CompanyOfferLetters() {
       });
       console.log('Offer letter email resent successfully');
 
-      setSuccessMsg(`Offer letter email resent to ${student.full_name}!`);
+      const okMsg = `Offer letter email resent to ${student.full_name}!`;
+      setSuccessMsg(okMsg);
+      setResendFeedback({ offerId: offer.id, ok: true, message: okMsg });
       await load();
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Failed to resend email.';
       console.error('Failed to resend email:', err);
       setError(errMsg);
+      setResendFeedback({ offerId: offer.id, ok: false, message: errMsg });
+    } finally {
+      setResending(null);
     }
   }
 
@@ -704,10 +714,11 @@ export default function CompanyOfferLetters() {
                             )}
                             <button
                               onClick={() => handleResend(offer)}
-                              className="p-1.5 hover:bg-muted rounded-md text-muted-foreground hover:text-foreground transition-colors"
-                              title="Resend Email"
+                              disabled={resending === offer.id}
+                              className="p-1.5 hover:bg-muted rounded-md text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                              title={resending === offer.id ? 'Sending…' : 'Resend Email'}
                             >
-                              <RefreshCw className="w-4 h-4" />
+                              {resending === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                             </button>
                             {canRevoke && (
                               <button
@@ -741,6 +752,8 @@ export default function CompanyOfferLetters() {
             onRevoke={handleRevoke}
             onResend={handleResend}
             revoking={revoking}
+            resending={resending}
+            resendFeedback={resendFeedback}
           />
         )}
       </AnimatePresence>
@@ -757,9 +770,11 @@ interface ModalProps {
   onRevoke: (id: string) => void;
   onResend: (o: OfferLetter) => void;
   revoking: string | null;
+  resending: string | null;
+  resendFeedback: { offerId: string; ok: boolean; message: string } | null;
 }
 
-function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, revoking }: ModalProps) {
+function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, revoking, resending, resendFeedback }: ModalProps) {
   const cfg     = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
   const Icon    = cfg.icon;
   const canRevoke = ['Pending', 'Sent'].includes(offer.status);
@@ -876,12 +891,20 @@ function CompanyOfferModal({ offer, onClose, onDownload, onRevoke, onResend, rev
             )}
             <button
               onClick={() => onResend(offer)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium"
+              disabled={resending === offer.id}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border text-sm hover:bg-muted transition-colors font-medium disabled:opacity-50 disabled:pointer-events-none"
             >
-              <RefreshCw className="w-4 h-4" />
-              Resend Email
+              {resending === offer.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              {resending === offer.id ? 'Sending…' : 'Resend Email'}
             </button>
           </div>
+
+          {resendFeedback?.offerId === offer.id && (
+            <div className={`w-full flex items-center gap-2 text-sm font-medium ${resendFeedback.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+              {resendFeedback.ok ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
+              {resendFeedback.message}
+            </div>
+          )}
 
           {canRevoke && (
             <button
