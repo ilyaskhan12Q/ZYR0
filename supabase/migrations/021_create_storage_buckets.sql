@@ -13,7 +13,7 @@ VALUES (
   true,
   false,
   52428800,
-  ARRAY['image/png']::text[]
+  ARRAY['application/pdf']::text[]
 )
 ON CONFLICT (id) DO NOTHING;
 

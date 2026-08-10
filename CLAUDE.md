@@ -56,7 +56,7 @@ Available gstack skills:
 ## Permanent Project Architecture & Email Delivery Rules
 
 1. **Email Delivery Architecture**:
-   - **No PDF Attachments**: Do not attach heavy base64 PDFs directly to transactional email dispatches (`sendOfferLetterEmail`).
+   - **PDF Attachment Policy**: `sendOfferLetterEmail` may attach the offer letter PDF **only when** the PDF is produced by the identical-design DOM renderer (`generateIdenticalOfferLetterPdf` — the same `<OfferLetterDocument>` component rendered on `/verify`). Attach only the freshly generated blob (JPEG-embedded A4, well under email provider size limits); never attach legacy canvas-rendered PDFs. When the identical renderer fails, fall back to attachment-free dispatch.
    - **Verified Platform Retrieval**: Transactional emails notify the candidate and direct them to retrieve official documents on-demand via the Student Dashboard (`/student/offer-letters`) or the Public Verification Portal (`/verify?type=offer&id=...`).
    - **Storage Persistence**: PDFs must continue to be generated and stored in Supabase Storage (`offer-letters` bucket) on creation for user portal downloads.
 

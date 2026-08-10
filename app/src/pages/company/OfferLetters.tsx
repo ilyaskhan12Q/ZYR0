@@ -18,6 +18,7 @@ import {
   markOfferSent,
 } from '@/services/offerLetters';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
+import { generateIdenticalOfferLetterPdf } from '@/lib/offerLetterPdfDom';
 import OfferLetterDocument from '@/components/OfferLetterDocument';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
@@ -34,8 +35,9 @@ async function sendOfferLetterEmail(opts: {
   offerId: string;
   offerCode?: string | null;
   expiresAt?: string | null;
+  pdfBlob?: Blob | null;
 }): Promise<void> {
-  const { student, company, internship, offerId, offerCode, expiresAt } = opts;
+  const { student, company, internship, offerId, offerCode, expiresAt, pdfBlob } = opts;
   let studentEmail = student.email;
 
   if (!studentEmail && student.id) {
@@ -238,6 +240,12 @@ async function sendOfferLetterEmail(opts: {
       subject: emailSubject,
       html: emailHtml,
       text: emailText,
+      attachments: pdfBlob ? [
+        {
+          filename: `Offer-Letter-${offerCodeStr}.pdf`,
+          content: await blobToBase64(pdfBlob),
+        },
+      ] : undefined,
     }
   });
   if (invokeErr) {
@@ -252,6 +260,16 @@ async function sendOfferLetterEmail(opts: {
   if (markErr) {
     throw markErr;
   }
+}
+
+/** Convert a Blob to a base64 string (for email attachments via the send-email Edge Function). */
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '');
+    reader.onerror = () => reject(reader.error ?? new Error('Failed to read PDF blob'));
+    reader.readAsDataURL(blob);
+  });
 }
 
 // ── Status config (mirrors student page) ─────────────────────────────────────
@@ -357,17 +375,25 @@ export default function CompanyOfferLetters() {
       });
       if (insertErr) throw insertErr;
 
-      // 3. Generate PDF
+      // 3. Generate PDF — prefer the identical DOM renderer (same design as
+      //    /verify), falling back to the legacy canvas renderer if capture fails.
       const fullOffer: OfferLetter = {
         ...newOffer!,
         student,
         company,
         internship,
       };
-      const pdfBlob = await generateOfferLetterPdf({
-        offer: fullOffer,
-        verificationUrl: `${window.location.origin}/verify-offer/${newOffer!.id}`,
-      });
+      const canonicalSiteUrl = 'https://zyroo.org';
+      const verificationUrl = `${canonicalSiteUrl}/verify?type=offer&id=${encodeURIComponent(newOffer!.offer_code ?? newOffer!.id)}`;
+      let pdfBlob: Blob;
+      let pdfMatchesVerifiedDesign = true;
+      try {
+        pdfBlob = await generateIdenticalOfferLetterPdf(fullOffer);
+      } catch (renderErr) {
+        console.error('Identical-design PDF capture failed, using legacy renderer:', renderErr);
+        pdfMatchesVerifiedDesign = false;
+        pdfBlob = await generateOfferLetterPdf({ offer: fullOffer, verificationUrl });
+      }
 
       // 4. Upload to Storage
       const pdfUrl = await uploadOfferLetterPdf(newOffer!.id, student.id, pdfBlob);
@@ -376,6 +402,8 @@ export default function CompanyOfferLetters() {
       await attachOfferLetterPdf(newOffer!.id, pdfUrl);
 
       // Send actual offer letter email via custom SMTP (send-email Edge Function)
+      // Attach the PDF only when it matches the verified design; otherwise the
+      // email stays attachment-free and directs to the platform retrieval portals.
       try {
         await sendOfferLetterEmail({
           student,
@@ -384,6 +412,7 @@ export default function CompanyOfferLetters() {
           offerId: newOffer!.id,
           offerCode: newOffer!.offer_code,
           expiresAt: newOffer!.expires_at,
+          pdfBlob: pdfMatchesVerifiedDesign ? pdfBlob : null,
         });
         console.log('Offer letter email sent successfully');
       } catch (emailErr) {
@@ -445,19 +474,24 @@ export default function CompanyOfferLetters() {
     document.body.removeChild(a);
   }
 
-  // ── Preview Canvas PDF (debug & instant verification) ────────────────────────
+  // ── Preview PDF (identical to /verify design; legacy renderer as fallback) ──
   async function handlePreviewCanvasPdf(offer: OfferLetter) {
     try {
-      const verificationUrl = `${window.location.origin}/verify-offer/${offer.id}`;
-      const pdfBlob = await generateOfferLetterPdf({
-        offer,
-        verificationUrl,
-      });
+      let pdfBlob: Blob;
+      try {
+        pdfBlob = await generateIdenticalOfferLetterPdf(offer);
+      } catch (renderErr) {
+        console.error('Identical-design PDF capture failed, using legacy renderer:', renderErr);
+        pdfBlob = await generateOfferLetterPdf({
+          offer,
+          verificationUrl: `${window.location.origin}/verify-offer/${offer.id}`,
+        });
+      }
       const blobUrl = URL.createObjectURL(pdfBlob);
       window.open(blobUrl, '_blank');
     } catch (err) {
-      console.error('Failed to generate PDF canvas preview:', err);
-      setError('Could not generate PDF canvas preview.');
+      console.error('Failed to generate PDF preview:', err);
+      setError('Could not generate PDF preview.');
     }
   }
 
@@ -477,7 +511,17 @@ export default function CompanyOfferLetters() {
         throw new Error('Missing student or internship data for resending');
       }
 
-      // Send email via shared function (no attachment needed)
+      // Regenerate the identical-design PDF client-side so the attached
+      // document always matches the /verify design. If capture fails, resend
+      // without attachment (fallback to portal retrieval).
+      let pdfBlob: Blob | null = null;
+      try {
+        pdfBlob = await generateIdenticalOfferLetterPdf(offer);
+      } catch (renderErr) {
+        console.error('Identical-design PDF capture failed on resend, sending without attachment:', renderErr);
+      }
+
+      // Send email via shared function
       await sendOfferLetterEmail({
         student,
         company,
@@ -485,6 +529,7 @@ export default function CompanyOfferLetters() {
         offerId: offer.id,
         offerCode: offer.offer_code,
         expiresAt: offer.expires_at,
+        pdfBlob,
       });
       console.log('Offer letter email resent successfully');
 

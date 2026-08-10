@@ -12,6 +12,7 @@ import {
   buildOfferDetails,
 } from '@/lib/offerLetterConfig';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
+import { generateIdenticalOfferLetterPdf } from '@/lib/offerLetterPdfDom';
 
 interface OfferLetterDocumentProps {
   offer: OfferLetter;
@@ -92,18 +93,25 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
     window.print();
   };
 
-  /** Temporary Debug / Validation Tool: Generate PDF from Canvas & Preview */
+  /** Generate & preview the exact same PDF that is attached to the offer email. */
   const handlePreviewPdfCanvas = async () => {
     try {
       setPreviewingPdf(true);
-      const pdfBlob = await generateOfferLetterPdf({
-        offer,
-        verificationUrl: verifyUrl,
-      });
+      const pdfBlob = await generateIdenticalOfferLetterPdf(offer);
       const blobUrl = URL.createObjectURL(pdfBlob);
       window.open(blobUrl, '_blank');
     } catch (err) {
-      console.error('Failed to render PDF preview canvas:', err);
+      console.error('Failed to render PDF preview:', err);
+      try {
+        const pdfBlob = await generateOfferLetterPdf({
+          offer,
+          verificationUrl: `${window.location.origin}/verify-offer/${offer.id}`,
+        });
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        window.open(blobUrl, '_blank');
+      } catch (legacyErr) {
+        console.error('Failed to render legacy PDF preview:', legacyErr);
+      }
     } finally {
       setPreviewingPdf(false);
     }
