@@ -839,18 +839,17 @@ export default function Landing() {
                       { opacity: 1, y: 0 },
                       { duration: 0.5, delay: i * 0.1 }
                     )}
-                    className="md:col-span-8 md:row-span-3 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 grid md:grid-cols-[5fr_6fr]"
+                    className="md:col-span-12 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 grid md:grid-cols-[5fr_6fr]"
                   >
-                    <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden">
+                    <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden bg-slate-50 dark:bg-slate-800/40">
                       <img
                         src={t.image}
                         alt={`${t.name} review`}
                         width="1200"
                         height="1600"
                         loading="lazy"
-                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent md:bg-gradient-to-r pointer-events-none" />
                     </div>
                     <div className="p-6 md:p-8 flex flex-col justify-center">
                       <span className={`inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
@@ -883,17 +882,22 @@ export default function Landing() {
                   )}
                   className="md:col-span-4 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 flex flex-col"
                 >
-                  {t.image && (
-                    <div className="relative aspect-[3/4] shrink-0 overflow-hidden">
+                  {t.image ? (
+                    <div className="relative h-56 shrink-0 overflow-hidden bg-slate-50 dark:bg-slate-800/40">
                       <img
                         src={t.image}
                         alt={`${t.name} review`}
                         width="1200"
                         height="1600"
                         loading="lazy"
-                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
+                    </div>
+                  ) : (
+                    <div className="relative h-56 shrink-0 overflow-hidden bg-gradient-to-br from-blue-600/10 via-indigo-600/10 to-violet-600/10 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-600/25">
+                        <Users className="w-8 h-8 text-white" />
+                      </div>
                     </div>
                   )}
                   <div className="p-6 flex flex-col flex-1">
