@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.38.1] - 2026-08-10
+
+### Docs
+- **Changelog release entries for Landing Page V3 Testimonials redesign**: Recorded release entries `0.36.1` through `0.38.0` per `docs/GIT_WORKFLOW.md` (one entry per commit) and bumped version to `0.38.1`.
+
+## [0.38.0] - 2026-08-10
+
+### Changed
+- **Cropped Portrait Headshot Assets (`app/public/reviews/`)**:
+  - Replaced review images (`akbar-review.jpeg`, `atta-review.jpeg`, `bibi-tabassum-review.jpeg`, `jawad-review.jpeg`, `saba-review.jpeg`) with cropped portrait assets.
+  - Adjusted secondary card avatar cropping to `object-[center_15%]` for face alignment.
+
+## [0.37.5] - 2026-08-10
+
+### Fixed
+- **Hero Section Layout & DOM Structure (`Landing.tsx`)**: Resolved merge conflict anomaly by removing duplicate `MotionP` value proposition paragraph and restoring clean right-column grid container.
+
+## [0.37.4] - 2026-08-10
+
+### Changed
+- **Testimonial Visual Impact Elevation (`Landing.tsx`)**:
+  - Replaced initials avatar with ZYR0 official logo in Akbar Ali featured card footer.
+  - Increased featured card quote typography (`text-xl/2xl`) and added depth gradient overlay on hero image.
+  - Added descriptive section subtitle under section header.
+  - Standardized desktop layout to clean 4-column display (`lg:col-span-3`).
+  - Increased secondary card image height to `h-60` with gradient masking.
+
+## [0.37.3] - 2026-08-10
+
+### Changed
+- **Bibi Tabassum Intern Card Integration (`Landing.tsx`)**: Replaced placeholder card with Bibi Tabassum's intern testimonial and image asset.
+
+## [0.37.2] - 2026-08-10
+
+### Changed
+- **Testimonial Copy Refinement (`Landing.tsx`)**: Polished quote typography, role descriptions, and brand references for clarity, trust, and professional impact.
+
+## [0.37.1] - 2026-08-10
+
+### Added
+- **Saba Iftikhar Mentor Review (`Landing.tsx`)**: Added dedicated mentor feedback card for Saba Iftikhar (AI/ML Engineer & Mentor).
+
+## [0.37.0] - 2026-08-10
+
+### Added
+- **BlobCard Component Integration (`BlobCard.tsx`, `Landing.tsx`)**: Wrapped testimonial items inside animated glassmorphic `BlobCard` components with subtle background accent gradients.
+
+## [0.36.5] - 2026-08-10
+
+### Changed
+- **Full-Width Featured Review Layout (`Landing.tsx`)**: Upgraded featured company review to a full-width hero layout with secondary 3-card row below it.
+
+## [0.36.4] - 2026-08-10
+
+### Changed
+- **Testimonials Section Layout (`Landing.tsx`)**: Restructured testimonial layout to highlight a hero featured card alongside stacked student and mentor review cards.
+
+## [0.36.3] - 2026-08-10
+
+### Added
+- **Atta Review Headshot Asset (`app/public/reviews/atta-review.jpeg`)**: Added dedicated review photo for Atta's student testimonial card.
+
+## [0.36.2] - 2026-08-10
+
+### Changed
+- **Testimonials Content & Branding (`Landing.tsx`)**: Replaced generic testimonial placeholders with real student and mentor experiences, updating section title and community branding.
+
+## [0.36.1] - 2026-08-10
+
+### Added
+- **Real Student Review Images (`app/public/reviews/`)**: Added initial student review headshots (`akbar-review.jpeg`, `jawad-review.jpeg`, `saba-review.jpeg`, `bibi-tabassum-review.jpeg`, `atta-review.jpeg`).
+
 ## [0.36.0] - 2026-08-09
 
 ### Changed
