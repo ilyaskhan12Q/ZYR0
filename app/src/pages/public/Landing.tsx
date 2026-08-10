@@ -104,8 +104,15 @@ const testimonials = [
   {
     kind: 'mentor',
     name: 'Michael Rodriguez',
-    role: 'Senior Engineer & Mentor',
+    role: 'AI/ML Engineer & Mentor',
     quote: 'As a mentor, ZYR0 gives me a structured framework to evaluate work, track multiple interns, and provide actionable feedback without administrative overhead.',
+  },
+  {
+    kind: 'mentor',
+    name: 'Saba Iftikhar',
+    role: 'AI/ML Engineer & Mentor',
+    quote: 'The mentorship and real-world tasks at ZYRO pushed me to build skills I could not have learned in a classroom.',
+    image: '/reviews/saba-review.jpeg',
   },
 ];
 
@@ -894,7 +901,7 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="md:col-span-4 group h-full transition-all duration-300 hover:-translate-y-1"
+                  className="md:col-span-6 lg:col-span-4 xl:col-span-3 group h-full transition-all duration-300 hover:-translate-y-1"
                 >
                   <BlobCard accent={accent} className="w-full h-full min-h-[520px]" contentClassName="w-full h-full">
                     {t.image ? (
