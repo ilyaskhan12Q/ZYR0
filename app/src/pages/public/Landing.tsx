@@ -20,6 +20,7 @@ import StatsBand from '@/components/landing/StatsBand';
 import LogoMarquee from '@/components/landing/LogoMarquee';
 import AudienceSplit from '@/components/landing/AudienceSplit';
 import RoleChips from '@/components/landing/RoleChips';
+import { BlobCard } from '@/components/ui/blob-card';
 
 const homepageStructuredData = [
   {
@@ -116,6 +117,12 @@ const testimonialKindLabel: Record<string, { label: string; className: string }>
   featured: { label: 'Company Official', className: 'bg-blue-600/10 text-blue-600 dark:text-sky-400 border-blue-600/20' },
   student: { label: 'Student', className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
   mentor: { label: 'Mentor', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+};
+
+const testimonialKindAccent: Record<string, string> = {
+  featured: '#3b82f6',
+  student: '#10b981',
+  mentor: '#f59e0b',
 };
 
 const roles = [
@@ -828,6 +835,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
             {testimonials.map((t, i) => {
               const label = testimonialKindLabel[t.kind];
+              const accent = testimonialKindAccent[t.kind];
               if (t.kind === 'featured') {
                 return (
                   <MotionDiv
@@ -839,34 +847,40 @@ export default function Landing() {
                       { opacity: 1, y: 0 },
                       { duration: 0.5, delay: i * 0.1 }
                     )}
-                    className="md:col-span-12 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 grid md:grid-cols-[5fr_6fr]"
+                    className="md:col-span-12 group h-full transition-all duration-300 hover:-translate-y-1"
                   >
-                    <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden bg-slate-50 dark:bg-slate-800/40">
-                      <img
-                        src={t.image}
-                        alt={`${t.name} review`}
-                        width="1200"
-                        height="1600"
-                        loading="lazy"
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                      />
-                    </div>
-                    <div className="p-6 md:p-8 flex flex-col justify-center">
-                      <span className={`inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
-                        {label.label}
-                      </span>
-                      <Quote className="mt-4 w-9 h-9 text-blue-600/30 dark:text-sky-400/30" />
-                      <p className="mt-3 text-base md:text-lg leading-relaxed font-normal text-slate-700 dark:text-slate-200">&ldquo;{t.quote}&rdquo;</p>
-                      <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-sm font-bold ring-2 ring-white/10 shrink-0">
-                          {testimonialInitials(t.name)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-base font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
-                          <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
+                    <BlobCard
+                      accent={accent}
+                      className="w-full h-full min-h-[880px] md:min-h-[440px]"
+                      contentClassName="grid md:grid-cols-[5fr_6fr] w-full h-full"
+                    >
+                      <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden bg-slate-50 dark:bg-slate-800/40">
+                        <img
+                          src={t.image}
+                          alt={`${t.name} review`}
+                          width="1200"
+                          height="1600"
+                          loading="lazy"
+                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                        />
+                      </div>
+                      <div className="p-6 md:p-8 flex flex-col justify-center">
+                        <span className={`inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
+                          {label.label}
+                        </span>
+                        <Quote className="mt-4 w-9 h-9 text-blue-600/30 dark:text-sky-400/30" />
+                        <p className="mt-3 text-base md:text-lg leading-relaxed font-normal text-slate-700 dark:text-slate-200">&ldquo;{t.quote}&rdquo;</p>
+                        <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-sm font-bold ring-2 ring-white/10 shrink-0">
+                            {testimonialInitials(t.name)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-base font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </BlobCard>
                   </MotionDiv>
                 );
               }
@@ -880,44 +894,46 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="md:col-span-4 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 flex flex-col"
+                  className="md:col-span-4 group h-full transition-all duration-300 hover:-translate-y-1"
                 >
-                  {t.image ? (
-                    <div className="relative h-56 shrink-0 overflow-hidden bg-slate-50 dark:bg-slate-800/40">
-                      <img
-                        src={t.image}
-                        alt={`${t.name} review`}
-                        width="1200"
-                        height="1600"
-                        loading="lazy"
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative h-56 shrink-0 overflow-hidden bg-gradient-to-br from-blue-600/10 via-indigo-600/10 to-violet-600/10 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-600/25">
-                        <Users className="w-8 h-8 text-white" />
+                  <BlobCard accent={accent} className="w-full h-full min-h-[520px]" contentClassName="w-full h-full">
+                    {t.image ? (
+                      <div className="relative h-56 w-full shrink-0 overflow-hidden bg-slate-50 dark:bg-slate-800/40">
+                        <img
+                          src={t.image}
+                          alt={`${t.name} review`}
+                          width="1200"
+                          height="1600"
+                          loading="lazy"
+                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                        />
+                      </div>
+                    ) : (
+                      <div className="relative h-56 w-full shrink-0 overflow-hidden flex items-center justify-center" style={{ background: `${accent}1a` }}>
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${accent}, #6366f1)` }}>
+                          <Users className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+                    )}
+                    <div className="p-6 flex flex-col flex-1 w-full">
+                      <div className="flex-1">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
+                          {label.label}
+                        </span>
+                        <Quote className="mt-4 w-7 h-7 text-blue-600/30 dark:text-sky-400/30" />
+                        <p className="mt-2 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-300">&ldquo;{t.quote}&rdquo;</p>
+                      </div>
+                      <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
+                        <div className="w-10 h-10 text-xs rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold ring-2 ring-white/10 shrink-0">
+                          {testimonialInitials(t.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
+                        </div>
                       </div>
                     </div>
-                  )}
-                  <div className="p-6 flex flex-col flex-1">
-                    <div className="flex-1">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
-                        {label.label}
-                      </span>
-                      <Quote className="mt-4 w-7 h-7 text-blue-600/30 dark:text-sky-400/30" />
-                      <p className="mt-2 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-300">&ldquo;{t.quote}&rdquo;</p>
-                    </div>
-                    <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                      <div className="w-10 h-10 text-xs rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold ring-2 ring-white/10 shrink-0">
-                        {testimonialInitials(t.name)}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
-                      </div>
-                    </div>
-                  </div>
+                  </BlobCard>
                 </MotionDiv>
               );
             })}

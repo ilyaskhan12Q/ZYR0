@@ -292,7 +292,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .animate-marquee,
-    .v3-float {
+    .v3-float,
+    .blob-card__blob {
       animation: none !important;
     }
   }
