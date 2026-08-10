@@ -365,101 +365,157 @@ export default function Landing() {
       {/* Floating Content Layer (z-10) */}
       <div className="relative z-10">
 
-      {/* Hero Section — redesigned with Sora font pairing, SaaS color system, layered radial glows, and floating workspace preview */}
-      <section
-        aria-label="Platform introduction"
-        onPointerMove={handlePointerMove}
-        className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-14 lg:py-20"
-        style={{
-          '--mouse-x': '50%',
-          '--mouse-y': '50%'
-        } as React.CSSProperties}
-      >
-        {/* Animated Particles - high performance Canvas based rendering */}
-        <CanvasParticles />
+        {/* Hero Section — redesigned with Sora font pairing, SaaS color system, layered radial glows, and floating workspace preview */}
+        <section
+          aria-label="Platform introduction"
+          onPointerMove={handlePointerMove}
+          className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-14 lg:py-20"
+          style={{
+            '--mouse-x': '50%',
+            '--mouse-y': '50%'
+          } as React.CSSProperties}
+        >
+          {/* Animated Particles - high performance Canvas based rendering */}
+          <CanvasParticles />
 
-        {/* Layered Radial Glows & SaaS Ambient Background */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.14),rgba(79,70,229,0.16),transparent_80%)] pointer-events-none" />
-        <div className="hidden lg:block absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="hidden lg:block absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
-        <div className="hidden lg:block absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+          {/* Layered Radial Glows & SaaS Ambient Background */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.14),rgba(79,70,229,0.16),transparent_80%)] pointer-events-none" />
+          <div className="hidden lg:block absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+          <div className="hidden lg:block absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
+          <div className="hidden lg:block absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Mouse-reactive lighting effect - Only rendered/active on desktop */}
-        {!isMobile && (
-          <div
-            className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
-            style={{
-              background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
-            }}
-          />
-        )}
+          {/* Mouse-reactive lighting effect - Only rendered/active on desktop */}
+          {!isMobile && (
+            <div
+              className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
+              style={{
+                background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
+              }}
+            />
+          )}
 
 
-        {/* Subtle Masked Grid Overlay */}
-        <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-          maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-        }} />
+          {/* Subtle Masked Grid Overlay */}
+          <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
+          }} />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-6 lg:mt-0">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-            {/* Left Column: Typography, Actions, Trust */}
-            <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-6 lg:mt-0">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+              {/* Left Column: Typography, Actions, Trust */}
+              <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
 
-              {/* Top Announcement Badge */}
-              <MotionDiv
-                isMobile={isMobile}
-                {...animProps(
-                  { opacity: 0, y: -10 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.4, delay: 0.1 }
-                )}
-                className="inline-flex items-center gap-2.5 self-start bg-white/70 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-slate-900 dark:text-white/90 shadow-sm hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Pakistan's Premier Internship Engine</span>
-              </MotionDiv>
-
-              {/* Title Section with Oversized Sora Typography & TextRotate */}
-              <div className="space-y-2 sm:space-y-3">
+                {/* Top Announcement Badge */}
                 <MotionDiv
                   isMobile={isMobile}
                   {...animProps(
-                    { opacity: 0, y: 15 },
+                    { opacity: 0, y: -10 },
                     { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: 0.2 }
+                    { duration: 0.4, delay: 0.1 }
                   )}
-                  className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-slate-900 dark:text-white leading-[1.06] drop-shadow-sm"
+                  className="inline-flex items-center gap-2.5 self-start bg-white/70 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-slate-900 dark:text-white/90 shadow-sm hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200"
                 >
-                  Launch Your Career With{' '}
-                  <span className="font-accent text-gradient-v3">Internships</span>{' '}
-                  that Matter
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                  <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Pakistan's Premier Internship Engine</span>
                 </MotionDiv>
 
-                <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
-                  <TextRotate
-                    texts={[
-                      'Paid Roles.',
-                      'Real Experience.',
-                      'Verified Certificates.',
-                      'Industry Projects.',
-                      'Dream Companies.',
-                      'Career Growth.',
-                    ]}
-                    mainClassName="text-rotate-v3 font-display font-[900] tracking-[-0.035em]"
-                    staggerFrom="last"
-                    initial={{ y: '100%', opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: '-120%', opacity: 0 }}
-                    staggerDuration={0.02}
-                    splitLevelClassName="overflow-hidden py-1"
-                    transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-                    rotationInterval={3400}
-                    ariaLabel="Career Opportunities on ZYR0"
-                  />
+                {/* Title Section with Oversized Sora Typography & TextRotate */}
+                <div className="space-y-2 sm:space-y-3">
+                  <MotionDiv
+                    isMobile={isMobile}
+                    {...animProps(
+                      { opacity: 0, y: 15 },
+                      { opacity: 1, y: 0 },
+                      { duration: 0.5, delay: 0.2 }
+                    )}
+                    className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-slate-900 dark:text-white leading-[1.06] drop-shadow-sm"
+                  >
+                    Launch Your Career With{' '}
+                    <span className="font-accent text-gradient-v3">Internships</span>{' '}
+                    that Matter
+                  </MotionDiv>
+
+                  <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
+                    <TextRotate
+                      texts={[
+                        'Paid Roles.',
+                        'Real Experience.',
+                        'Verified Certificates.',
+                        'Industry Projects.',
+                        'Dream Companies.',
+                        'Career Growth.',
+                      ]}
+                      mainClassName="text-rotate-v3 font-display font-[900] tracking-[-0.035em]"
+                      staggerFrom="last"
+                      initial={{ y: '100%', opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: '-120%', opacity: 0 }}
+                      staggerDuration={0.02}
+                      splitLevelClassName="overflow-hidden py-1"
+                      transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+                      rotationInterval={3400}
+                      ariaLabel="Career Opportunities on ZYR0"
+                    />
+                  </div>
                 </div>
+
+                {/* Supporting Value Proposition */}
+                <MotionP
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 20 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: 0.4 }
+                  )}
+                  className="text-base sm:text-lg text-slate-600 dark:text-slate-300/80 max-w-xl leading-relaxed font-normal"
+                >
+                  Free for students · Paid internships · 1,200+ live roles. ZYR0 bridges
+                  academic learning with real-world industry demands — structured milestone
+                  tasks, 1-on-1 mentor guidance, and employer-verified certificates that
+                  accelerate your hiring pipeline.
+                </MotionP>
+
+                {/* Action CTAs */}
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 20 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.4, delay: 0.5 }
+                  )}
+                  className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-1"
+                >
+                  <Link
+                    to="/internships"
+                    className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
+                  >
+                    Find an Internship
+                    <ArrowRight className="w-4.5 h-4.5" />
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
+                  >
+                    For Employers
+                  </Link>
+                  <a
+                    href={SITE_CONFIG.social.whatsappChannel}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 bg-slate-900/80 border border-emerald-500/35 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-slate-800/90 hover:border-emerald-400/50 backdrop-blur-xl transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98] shadow-md"
+                    title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400" />
+                    </span>
+                    <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-600 dark:text-emerald-400" />
+                    <span>WhatsApp Channel</span>
+                  </a>
+                </MotionDiv>
               </div>
 
               {/* Supporting Value Proposition */}
@@ -478,232 +534,288 @@ export default function Landing() {
                 accelerate your hiring pipeline.
               </MotionP>
 
-              {/* Action CTAs */}
+              {/* Right Column: Animated Search Mockup */}
+              <div className="lg:col-span-5 relative w-full h-[420px] sm:h-[470px] lg:h-[520px] flex items-center justify-center">
+                {/* Glowing gradients */}
+                <div className="absolute w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
+
+                <MotionDiv
+                  isMobile={isMobile}
+                  {...animProps(
+                    { opacity: 0, y: 40, scale: 0.95 },
+                    { opacity: 1, y: 0, scale: 1 },
+                    { duration: 0.6, delay: 0.7 }
+                  )}
+                  className="w-full flex justify-center"
+                >
+                  <AnimatedSearchMockup />
+                </MotionDiv>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden sm:flex">
+            <span className="text-slate-500 dark:text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
+            <div className="w-5 h-8 border border-slate-300 dark:border-white/20 rounded-full flex justify-center p-1">
               <MotionDiv
                 isMobile={isMobile}
                 {...animProps(
+                  null,
+                  isMobile ? {} : { y: [0, 10, 0] },
+                  isMobile ? {} : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
+                )}
+                className="w-1.5 h-1.5 bg-accent rounded-full"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Band — animated count-up social proof */}
+        <StatsBand />
+
+        {/* Employer Logo Marquee */}
+        <LogoMarquee />
+
+        {/* Community / Stay Updated Section */}
+        <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-slate-200 dark:border-white/10">
+          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-400/10 border border-sky-400/25 text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400"></span>
+                </span>
+                Official Community Channels
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+                Never Miss an Opportunity. <br className="hidden sm:inline" />
+                <span className="font-accent text-blue-600 dark:text-sky-400">
+                  Stay Connected in Real-Time.
+                </span>
+              </h2>
+              <p className="mt-4 text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed">
+                Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* Live WhatsApp Channel Card */}
+              <MotionDiv
+                isMobile={isMobile}
+                {...viewProps(
                   { opacity: 0, y: 20 },
                   { opacity: 1, y: 0 },
-                  { duration: 0.4, delay: 0.5 }
+                  { duration: 0.5, delay: 0.1 }
                 )}
-                className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-1"
+                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/40 dark:border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/60 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group"
               >
-                <Link
-                  to="/internships"
-                  className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
-                >
-                  Find an Internship
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </Link>
-                <Link
-                  to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
-                >
-                  For Employers
-                </Link>
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                      <WhatsAppIcon className="w-6 h-6 fill-current" />
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      Live Alerts
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
+                    WhatsApp Channel
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
+                    Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
+                  </p>
+                </div>
                 <a
                   href={SITE_CONFIG.social.whatsappChannel}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-slate-900/80 border border-emerald-500/35 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-slate-800/90 hover:border-emerald-400/50 backdrop-blur-xl transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98] shadow-md"
-                  title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
+                  aria-label="Join ZYR0 WhatsApp Channel for instant updates"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 group/btn"
                 >
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400" />
-                  </span>
-                  <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-600 dark:text-emerald-400" />
-                  <span>WhatsApp Channel</span>
+                  <WhatsAppIcon className="w-4.5 h-4.5 fill-current" />
+                  Join WhatsApp Channel
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+                </a>
+              </MotionDiv>
+
+              {/* Live LinkedIn Network Card */}
+              <MotionDiv
+                isMobile={isMobile}
+                {...viewProps(
+                  { opacity: 0, y: 20 },
+                  { opacity: 1, y: 0 },
+                  { duration: 0.5, delay: 0.2 }
+                )}
+                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-blue-500/40 dark:border-blue-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/60 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+                      <LinkedInIcon className="w-6 h-6 fill-current" />
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
+                      Official Page
+                    </span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
+                    LinkedIn Network
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
+                    Follow our official LinkedIn page for professional networking, employer spotlights, student success stories, and corporate announcements.
+                  </p>
+                </div>
+                <a
+                  href={SITE_CONFIG.social.linkedinCompany}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow ZYR0 on LinkedIn"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-600/25 active:scale-95 group/btn"
+                >
+                  <LinkedInIcon className="w-4.5 h-4.5 fill-current" />
+                  Follow on LinkedIn
+                  <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
                 </a>
               </MotionDiv>
             </div>
+          </div>
+        </section>
 
-            {/* Right Column: Animated Search Mockup */}
-            <div className="lg:col-span-5 relative w-full h-[420px] sm:h-[470px] lg:h-[520px] flex items-center justify-center">
-              {/* Glowing gradients */}
-              <div className="absolute w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
-
+        {/* Section 1 — Every Career Starts Somewhere */}
+        <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              {/* Left: Heading and Paragraph */}
               <MotionDiv
                 isMobile={isMobile}
-                {...animProps(
-                  { opacity: 0, y: 40, scale: 0.95 },
-                  { opacity: 1, y: 0, scale: 1 },
-                  { duration: 0.6, delay: 0.7 }
+                {...viewProps(
+                  { opacity: 0, x: -30 },
+                  { opacity: 1, x: 0 },
+                  { duration: 0.6 }
                 )}
-                className="w-full flex justify-center"
+                className="lg:col-span-5 space-y-6"
               >
-                <AnimatedSearchMockup />
+                <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Our Purpose</span>
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+                  Every career starts <span className="font-accent text-blue-600 dark:text-sky-400">somewhere.</span>
+                </h2>
+                <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
+                  Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
+                </p>
+                <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                  Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
+                </p>
+                <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                  Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
+                </p>
               </MotionDiv>
+
+              {/* Right: Four Elegant Cards */}
+              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {roles.map((role, i) => (
+                  <MotionDiv
+                    isMobile={isMobile}
+                    key={i}
+                    role="article"
+                    {...viewProps(
+                      { opacity: 0, y: 30 },
+                      { opacity: 1, y: 0 },
+                      { duration: 0.5, delay: i * 0.1 }
+                    )}
+                    className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
+                  >
+                    <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
+                      <role.icon className="w-5 h-5" />
+                    </div>
+                    <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{role.title}</h3>
+                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{role.desc}</p>
+                  </MotionDiv>
+                ))}
+              </div>
             </div>
-
           </div>
-        </div>
+        </section>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 pointer-events-none hidden sm:flex">
-          <span className="text-slate-500 dark:text-white/30 text-[9px] tracking-[0.2em] uppercase font-medium">Scroll to Explore</span>
-          <div className="w-5 h-8 border border-slate-300 dark:border-white/20 rounded-full flex justify-center p-1">
-            <MotionDiv
-              isMobile={isMobile}
-              {...animProps(
-                null,
-                isMobile ? {} : { y: [0, 10, 0] },
-                isMobile ? {} : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }
-              )}
-              className="w-1.5 h-1.5 bg-accent rounded-full"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Band — animated count-up social proof */}
-      <StatsBand />
-
-      {/* Employer Logo Marquee */}
-      <LogoMarquee />
-
-      {/* Community / Stay Updated Section */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-slate-200 dark:border-white/10">
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-400/10 border border-sky-400/25 text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400"></span>
-              </span>
-              Official Community Channels
-            </div>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
-              Never Miss an Opportunity. <br className="hidden sm:inline" />
-              <span className="font-accent text-blue-600 dark:text-sky-400">
-                Stay Connected in Real-Time.
-              </span>
-            </h2>
-            <p className="mt-4 text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed">
-              Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Live WhatsApp Channel Card */}
+        {/* Features Grid */}
+        <section className="py-14 lg:py-20 px-4 content-visibility-auto">
+          <div className="max-w-7xl mx-auto">
             <MotionDiv
               isMobile={isMobile}
               {...viewProps(
                 { opacity: 0, y: 20 },
-                { opacity: 1, y: 0 },
-                { duration: 0.5, delay: 0.1 }
+                { opacity: 1, y: 0 }
               )}
-              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/40 dark:border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/60 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group"
+              className="text-center mb-14"
             >
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
-                    <WhatsAppIcon className="w-6 h-6 fill-current" />
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    Live Alerts
-                  </span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
-                  WhatsApp Channel
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
-                  Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
-                </p>
-              </div>
-              <a
-                href={SITE_CONFIG.social.whatsappChannel}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Join ZYR0 WhatsApp Channel for instant updates"
-                className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 group/btn"
-              >
-                <WhatsAppIcon className="w-4.5 h-4.5 fill-current" />
-                Join WhatsApp Channel
-                <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
-              </a>
+              <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Capabilities</span>
+              <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white text-balance">Built for accountability and <span className="font-accent text-blue-600 dark:text-sky-400">clear outcomes</span></h2>
+              <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+                Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
+              </p>
             </MotionDiv>
 
-            {/* Live LinkedIn Network Card */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {features.map((feature, i) => (
+                <MotionDiv
+                  isMobile={isMobile}
+                  key={i}
+                  {...viewProps(
+                    { opacity: 0, y: 40 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: i * 0.1 }
+                  )}
+                  className="feature-card"
+                  role="article"
+                >
+                  <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{feature.title}</h3>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{feature.desc}</p>
+                </MotionDiv>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Stacking Cards Storytelling Journey */}
+        <JourneySection />
+
+        {/* Dual-Audience Split — Students / Employers */}
+        <AudienceSplit />
+
+        {/* Trending Roles Chip Cloud */}
+        <RoleChips />
+
+        {/* Section 2 — Built on Transparency. Designed for Confidence. */}
+        <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
+          <div className="max-w-7xl mx-auto">
             <MotionDiv
               isMobile={isMobile}
               {...viewProps(
                 { opacity: 0, y: 20 },
-                { opacity: 1, y: 0 },
-                { duration: 0.5, delay: 0.2 }
+                { opacity: 1, y: 0 }
               )}
-              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-blue-500/40 dark:border-blue-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/60 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+              className="text-center mb-14"
             >
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
-                    <LinkedInIcon className="w-6 h-6 fill-current" />
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30">
-                    <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
-                    Official Page
-                  </span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
-                  LinkedIn Network
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
-                  Follow our official LinkedIn page for professional networking, employer spotlights, student success stories, and corporate announcements.
-                </p>
-              </div>
-              <a
-                href={SITE_CONFIG.social.linkedinCompany}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Follow ZYR0 on LinkedIn"
-                className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-600/25 active:scale-95 group/btn"
-              >
-                <LinkedInIcon className="w-4.5 h-4.5 fill-current" />
-                Follow on LinkedIn
-                <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
-              </a>
-            </MotionDiv>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 1 — Every Career Starts Somewhere */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Left: Heading and Paragraph */}
-            <MotionDiv
-              isMobile={isMobile}
-              {...viewProps(
-                { opacity: 0, x: -30 },
-                { opacity: 1, x: 0 },
-                { duration: 0.6 }
-              )}
-              className="lg:col-span-5 space-y-6"
-            >
-              <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Our Purpose</span>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
-                Every career starts <span className="font-accent text-blue-600 dark:text-sky-400">somewhere.</span>
+              <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">System Credibility</span>
+              <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
+                Built on transparency. <span className="font-accent text-blue-600 dark:text-sky-400">Designed for confidence.</span>
               </h2>
-              <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
-                Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
-              </p>
-              <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-                Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
-              </p>
-              <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-                Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
+              <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
+                A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
               </p>
             </MotionDiv>
 
-            {/* Right: Four Elegant Cards */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {roles.map((role, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {confidenceCards.map((card, i) => (
                 <MotionDiv
                   isMobile={isMobile}
                   key={i}
@@ -715,138 +827,102 @@ export default function Landing() {
                   )}
                   className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
                 >
-                  <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
-                    <role.icon className="w-5 h-5" />
+                  <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
+                    <card.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{role.title}</h3>
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{role.desc}</p>
+                  <h3 className="mt-4 font-display text-base font-bold text-slate-900 dark:text-white">{card.title}</h3>
+                  <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{card.desc}</p>
                 </MotionDiv>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Features Grid */}
-      <section className="py-14 lg:py-20 px-4 content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
-          <MotionDiv
-            isMobile={isMobile}
-            {...viewProps(
-              { opacity: 0, y: 20 },
-              { opacity: 1, y: 0 }
-            )}
-            className="text-center mb-14"
-          >
-            <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Capabilities</span>
-            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white text-balance">Built for accountability and <span className="font-accent text-blue-600 dark:text-sky-400">clear outcomes</span></h2>
-            <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-              Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
-            </p>
-          </MotionDiv>
+        {/* Testimonials */}
+        <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
+          <div className="max-w-7xl mx-auto">
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0 }
+              )}
+              className="text-center mb-14"
+            >
+              <span className="font-label text-[11px] uppercase tracking-[0.22em] text-sky-400">Reviews</span>
+              <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white">
+                Verified experiences from{' '}
+                <span className="font-accent text-blue-600 dark:text-sky-400">
+                  our community
+                </span>
+              </h2>
+              <p className="mt-4 text-slate-500 dark:text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
+                Real people, real results — from students, mentors, and companies who've experienced ZYR0 first-hand.
+              </p>
+            </MotionDiv>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                {...viewProps(
-                  { opacity: 0, y: 40 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: i * 0.1 }
-                )}
-                className="feature-card"
-                role="article"
-              >
-                <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
-                  <feature.icon className="w-6 h-6" />
-                </div>
-                <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{feature.desc}</p>
-              </MotionDiv>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+              {testimonials.map((t, i) => {
+                const label = testimonialKindLabel[t.kind];
+                const accent = testimonialKindAccent[t.kind];
+                if (t.kind === 'featured') {
+                  return (
+                    <MotionDiv
+                      isMobile={isMobile}
+                      key={i}
+                      role="article"
+                      {...viewProps(
+                        { opacity: 0, y: 30 },
+                        { opacity: 1, y: 0 },
+                        { duration: 0.5, delay: i * 0.1 }
+                      )}
+                      className="md:col-span-12 group h-full transition-all duration-300 hover:-translate-y-1"
+                    >
+                      <BlobCard
+                        accent={accent}
+                        className="w-full h-full min-h-[820px] md:min-h-[460px]"
+                        contentClassName="grid md:grid-cols-[5fr_7fr] w-full h-full"
+                      >
+                        {/* Photo with gradient overlay for depth */}
+                        <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden bg-slate-100 dark:bg-slate-800/40">
+                          <img
+                            src={t.image}
+                            alt={`${t.name}`}
+                            width="1200"
+                            height="1600"
+                            loading="lazy"
+                            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                        </div>
 
-      {/* Stacking Cards Storytelling Journey */}
-      <JourneySection />
+                        {/* Quote side */}
+                        <div className="p-7 md:p-10 flex flex-col justify-center gap-6">
+                          <span className={`inline-flex self-start items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.2em] border ${label.className}`}>
+                            {label.label}
+                          </span>
 
-      {/* Dual-Audience Split — Students / Employers */}
-      <AudienceSplit />
+                          <div>
+                            <Quote className="w-10 h-10 text-blue-500/20 dark:text-sky-400/20 mb-3" />
+                            <p className="text-lg md:text-xl lg:text-2xl leading-[1.55] font-normal text-slate-800 dark:text-slate-100 tracking-[-0.01em]">
+                              {t.quote}
+                            </p>
+                          </div>
 
-      {/* Trending Roles Chip Cloud */}
-      <RoleChips />
-
-      {/* Section 2 — Built on Transparency. Designed for Confidence. */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
-          <MotionDiv
-            isMobile={isMobile}
-            {...viewProps(
-              { opacity: 0, y: 20 },
-              { opacity: 1, y: 0 }
-            )}
-            className="text-center mb-14"
-          >
-            <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">System Credibility</span>
-            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Built on transparency. <span className="font-accent text-blue-600 dark:text-sky-400">Designed for confidence.</span>
-            </h2>
-            <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
-              A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
-            </p>
-          </MotionDiv>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {confidenceCards.map((card, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                role="article"
-                {...viewProps(
-                  { opacity: 0, y: 30 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: i * 0.1 }
-                )}
-                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
-              >
-                <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
-                  <card.icon className="w-5 h-5" />
-                </div>
-                <h3 className="mt-4 font-display text-base font-bold text-slate-900 dark:text-white">{card.title}</h3>
-                <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{card.desc}</p>
-              </MotionDiv>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
-        <div className="max-w-7xl mx-auto">
-          <MotionDiv
-            isMobile={isMobile}
-            {...viewProps(
-              { opacity: 0, y: 20 },
-              { opacity: 1, y: 0 }
-            )}
-            className="text-center mb-14"
-          >
-            <span className="font-label text-[11px] uppercase tracking-[0.22em] text-sky-400">Reviews</span>
-            <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white">
-              Verified experiences from{' '}
-              <span className="font-accent text-blue-600 dark:text-sky-400">
-                our community
-              </span>
-            </h2>
-          </MotionDiv>
-
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-            {testimonials.map((t, i) => {
-              const label = testimonialKindLabel[t.kind];
-              const accent = testimonialKindAccent[t.kind];
-              if (t.kind === 'featured') {
+                          <div className="pt-5 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-white ring-2 ring-slate-200 dark:ring-white/10 shrink-0 overflow-hidden flex items-center justify-center p-1.5">
+                              <img src="/zyro-logo.webp" alt="ZYR0 logo" className="w-full h-full object-contain" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-base font-bold text-slate-900 dark:text-white">{t.name}</p>
+                              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{t.role}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </BlobCard>
+                    </MotionDiv>
+                  );
+                }
                 return (
                   <MotionDiv
                     isMobile={isMobile}
@@ -857,144 +933,111 @@ export default function Landing() {
                       { opacity: 1, y: 0 },
                       { duration: 0.5, delay: i * 0.1 }
                     )}
-                    className="md:col-span-12 group h-full transition-all duration-300 hover:-translate-y-1"
+                    className="md:col-span-6 lg:col-span-3 group h-full transition-all duration-300 hover:-translate-y-1"
                   >
-                    <BlobCard
-                      accent={accent}
-                      className="w-full h-full min-h-[880px] md:min-h-[440px]"
-                      contentClassName="grid md:grid-cols-[5fr_6fr] w-full h-full"
-                    >
-                      <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden bg-slate-50 dark:bg-slate-800/40">
-                        <img
-                          src={t.image}
-                          alt={`${t.name} review`}
-                          width="1200"
-                          height="1600"
-                          loading="lazy"
-                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="p-6 md:p-8 flex flex-col justify-center">
-                        <span className={`inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
-                          {label.label}
-                        </span>
-                        <Quote className="mt-4 w-9 h-9 text-blue-600/30 dark:text-sky-400/30" />
-                        <p className="mt-3 text-base md:text-lg leading-relaxed font-normal text-slate-700 dark:text-slate-200">&ldquo;{t.quote}&rdquo;</p>
-                        <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-sm font-bold ring-2 ring-white/10 shrink-0">
-                            {testimonialInitials(t.name)}
+                    <BlobCard accent={accent} className="w-full h-full min-h-[560px]" contentClassName="!items-start !justify-start w-full h-full">
+                      {/* Photo */}
+                      {t.image ? (
+                        <div className="relative h-60 w-full shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800/40">
+                          <img
+                            src={t.image}
+                            alt={`${t.name}`}
+                            width="600"
+                            height="800"
+                            loading="lazy"
+                            className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+                        </div>
+                      ) : (
+                        <div className="relative h-60 w-full shrink-0 overflow-hidden flex items-center justify-center" style={{ background: `${accent}1a` }}>
+                          <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${accent}, #6366f1)` }}>
+                            <Users className="w-8 h-8 text-white" />
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-base font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
+                        </div>
+                      )}
+
+                      {/* Content */}
+                      <div className="p-5 pb-3 flex flex-col flex-1 w-full">
+                        <div className="flex-1">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
+                            {label.label}
+                          </span>
+                          <Quote className="mt-3 w-6 h-6 text-blue-500/20 dark:text-sky-400/20" />
+                          <p className="mt-2 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-300">{t.quote}</p>
+                        </div>
+                        <div className="mt-5 pt-5 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3.5 px-1">
+                          <div className="w-11 h-11 rounded-full ring-2 ring-slate-200 dark:ring-white/15 shrink-0 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                            {t.image ? (
+                              <img
+                                src={t.image}
+                                alt={t.name}
+                                width="44"
+                                height="44"
+                                className="w-full h-full object-cover object-[center_15%]"
+                              />
+                            ) : (
+                              <span className="text-xs text-white font-bold select-none">{testimonialInitials(t.name)}</span>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-[15px] font-bold leading-tight text-slate-900 dark:text-white">{t.name}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-snug">{t.role}</p>
                           </div>
                         </div>
                       </div>
                     </BlobCard>
                   </MotionDiv>
                 );
-              }
-              return (
-                <MotionDiv
-                  isMobile={isMobile}
-                  key={i}
-                  role="article"
-                  {...viewProps(
-                    { opacity: 0, y: 30 },
-                    { opacity: 1, y: 0 },
-                    { duration: 0.5, delay: i * 0.1 }
-                  )}
-                  className="md:col-span-6 lg:col-span-4 xl:col-span-3 group h-full transition-all duration-300 hover:-translate-y-1"
-                >
-                  <BlobCard accent={accent} className="w-full h-full min-h-[520px]" contentClassName="w-full h-full">
-                    {t.image ? (
-                      <div className="relative h-56 w-full shrink-0 overflow-hidden bg-slate-50 dark:bg-slate-800/40">
-                        <img
-                          src={t.image}
-                          alt={`${t.name} review`}
-                          width="1200"
-                          height="1600"
-                          loading="lazy"
-                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                    ) : (
-                      <div className="relative h-56 w-full shrink-0 overflow-hidden flex items-center justify-center" style={{ background: `${accent}1a` }}>
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${accent}, #6366f1)` }}>
-                          <Users className="w-8 h-8 text-white" />
-                        </div>
-                      </div>
-                    )}
-                    <div className="p-6 flex flex-col flex-1 w-full">
-                      <div className="flex-1">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
-                          {label.label}
-                        </span>
-                        <Quote className="mt-4 w-7 h-7 text-blue-600/30 dark:text-sky-400/30" />
-                        <p className="mt-2 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-300">&ldquo;{t.quote}&rdquo;</p>
-                      </div>
-                      <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                        <div className="w-10 h-10 text-xs rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold ring-2 ring-white/10 shrink-0">
-                          {testimonialInitials(t.name)}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </BlobCard>
-                </MotionDiv>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Banner */}
-      <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
-        <div className="max-w-5xl mx-auto">
-          <MotionDiv
-            isMobile={isMobile}
-            {...viewProps(
-              { opacity: 0, scale: 0.95 },
-              { opacity: 1, scale: 1 },
-              { duration: 0.6 }
-            )}
-            className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-blue-600/20 text-white"
-          >
-            {/* Ambient Lighting Orbs */}
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-violet-400/25 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="relative z-10 space-y-6">
-              <span className="inline-block px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30">
-                Get Started Today
-              </span>
-              <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white max-w-2xl mx-auto">
-                Ready to transform <span className="font-accent text-sky-100">how internships work?</span>
-              </h2>
-              <p className="text-white/90 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-                Join thousands of students, companies, mentors, and universities building Pakistan's structured internship ecosystem.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-                <Link
-                  to="/register"
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                >
-                  Create Free Account
-                </Link>
-                <Link
-                  to="/internships"
-                  className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-slate-900/40 hover:bg-slate-900/60 text-white border border-white/30 backdrop-blur-sm transition-all"
-                >
-                  Explore Opportunities
-                </Link>
-              </div>
+              })}
             </div>
-          </MotionDiv>
-        </div>
-      </section>
+          </div>
+        </section>
+
+        {/* CTA Banner */}
+        <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
+          <div className="max-w-5xl mx-auto">
+            <MotionDiv
+              isMobile={isMobile}
+              {...viewProps(
+                { opacity: 0, scale: 0.95 },
+                { opacity: 1, scale: 1 },
+                { duration: 0.6 }
+              )}
+              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-blue-600/20 text-white"
+            >
+              {/* Ambient Lighting Orbs */}
+              <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-violet-400/25 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 space-y-6">
+                <span className="inline-block px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30">
+                  Get Started Today
+                </span>
+                <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white max-w-2xl mx-auto">
+                  Ready to transform <span className="font-accent text-sky-100">how internships work?</span>
+                </h2>
+                <p className="text-white/90 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+                  Join thousands of students, companies, mentors, and universities building Pakistan's structured internship ecosystem.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                  <Link
+                    to="/register"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                  >
+                    Create Free Account
+                  </Link>
+                  <Link
+                    to="/internships"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-slate-900/40 hover:bg-slate-900/60 text-white border border-white/30 backdrop-blur-sm transition-all"
+                  >
+                    Explore Opportunities
+                  </Link>
+                </div>
+              </div>
+            </MotionDiv>
+          </div>
+        </section>
       </div>
     </div>
   );
