@@ -1030,3 +1030,62 @@
     backface-visibility: hidden;
   }
 }
+
+/* ==========================================================================
+   V5 LANDING TOKENS — "Precision Engineering Console" (dark-only page)
+   Additive only. Do not reuse outside landing-v5 sections.
+   ========================================================================== */
+@layer base {
+  :root {
+    --v5-canvas: #08090a;
+    --v5-surface: #0f1117;
+    --v5-surface-hover: #161922;
+    --v5-snuff: #2a2522;
+    --v5-hairline: rgba(255, 255, 255, 0.08);
+    --v5-border-active: rgba(56, 189, 248, 0.3);
+    --v5-sky: #0284c7;
+    --v5-sky-bright: #38bdf8;
+    --v5-emerald: #10b981;
+    --v5-emerald-bright: #34d399;
+    --v5-indigo: #6366f1;
+    --v5-text-dim: #a2a2c3;
+    --v5-glow-emerald: 0 0 25px rgba(16, 185, 129, 0.15);
+    --v5-glow-indigo: 0 0 35px rgba(99, 102, 241, 0.2);
+  }
+}
+
+@layer utilities {
+  .v5-mono {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+  }
+
+  .v5-card {
+    background: var(--v5-surface);
+    border: 1px solid var(--v5-hairline);
+  }
+
+  .v5-grid-overlay {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+
+  .v5-dotted-grid {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .v5-laser {
+    background: linear-gradient(90deg, transparent, var(--v5-sky-bright), transparent);
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.6);
+  }
+
+  .v5-eyebrow {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+}

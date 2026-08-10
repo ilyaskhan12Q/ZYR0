@@ -9,6 +9,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 
 // Public Pages
 const Landing = lazy(() => import('@/pages/public/Landing'));
+const LandingV5 = lazy(() => import('@/pages/public/LandingV5'));
 const BrowseInternships = lazy(() => import('@/pages/public/BrowseInternships'));
 const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
 const Companies = lazy(() => import('@/pages/public/Companies'));
@@ -51,6 +52,7 @@ function App() {
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Landing />} />
+            <Route path="/v5" element={<LandingV5 />} />
             <Route path="/internships" element={<BrowseInternships />} />
             <Route path="/internships/:id" element={<InternshipDetail />} />
             <Route path="/companies" element={<Companies />} />
