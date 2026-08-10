@@ -4,7 +4,7 @@ import { m } from 'framer-motion';
 import {
   Search, FileCheck, ClipboardList, Users, Award, Briefcase,
   UserPlus, Send, BookOpen, CheckCircle2, Building2, GraduationCap,
-  ArrowRight, Star, Quote, TrendingUp, Globe, Zap, Target, Sparkles
+  ArrowRight, Quote, TrendingUp, Globe, Zap, Target, Sparkles
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
@@ -79,10 +79,44 @@ const steps = [
 ];
 
 const testimonials = [
-  { name: 'Akbar Ali', role: 'Student', image: '/reviews/akbar-review.jpeg' },
-  { name: 'Amir Jawad', role: 'Student', image: '/reviews/jawad-review.jpeg' },
-  { name: 'ZYRO Interns', role: 'Employer Partner', quote: 'Using ZYR0 to hire and manage our interns has streamlined our entire process. The quality of candidate tracking and verification has been exceptional.', avatar: '/zyro-logo.png' },
+  {
+    kind: 'featured',
+    name: 'Akbar Ali',
+    role: 'Company Official, Zyroo.org',
+    quote: 'Zyroo provides an ecosystem for building intelligent systems and driving technical impact. Through multi-agent AI research, community leadership, and real-world ML engineering, I turn complex data into actionable solutions.',
+    image: '/reviews/akbar-review.jpeg',
+  },
+  {
+    kind: 'student',
+    name: 'Atta',
+    role: 'Student',
+    quote: 'The mentorship and real-world tasks at ZYRO pushed me to build skills I could not have learned in a classroom.',
+    image: '/reviews/atta-review.jpeg',
+  },
+  {
+    kind: 'student',
+    name: 'Amir Jawad',
+    role: 'Student',
+    quote: 'ZYRO gave me the opportunity to learn through real work, not just theory. The guidance and feedback along the way helped me grow, improve my skills, and feel more confident in what I do.',
+    image: '/reviews/jawad-review.jpeg',
+  },
+  {
+    kind: 'mentor',
+    name: 'Michael Rodriguez',
+    role: 'Senior Engineer & Mentor',
+    quote: 'As a mentor, ZYR0 gives me a structured framework to evaluate work, track multiple interns, and provide actionable feedback without administrative overhead.',
+  },
 ];
+
+function testimonialInitials(name: string) {
+  return name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+const testimonialKindLabel: Record<string, { label: string; className: string }> = {
+  featured: { label: 'Company Official', className: 'bg-blue-600/10 text-blue-600 dark:text-sky-400 border-blue-600/20' },
+  student: { label: 'Student', className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
+  mentor: { label: 'Mentor', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+};
 
 const roles = [
   {
@@ -791,47 +825,98 @@ export default function Landing() {
             </h2>
           </MotionDiv>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <MotionDiv
-                isMobile={isMobile}
-                key={i}
-                role="article"
-                {...viewProps(
-                  { opacity: 0, y: 30 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: i * 0.1 }
-                )}
-                className="glass-card-v3 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 flex flex-col justify-between"
-              >
-                <div className="space-y-4">
-                  {t.image ? (
-                    <div className="-m-6 mb-0 overflow-hidden rounded-t-2xl">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+            {testimonials.map((t, i) => {
+              const label = testimonialKindLabel[t.kind];
+              if (t.kind === 'featured') {
+                return (
+                  <MotionDiv
+                    isMobile={isMobile}
+                    key={i}
+                    role="article"
+                    {...viewProps(
+                      { opacity: 0, y: 30 },
+                      { opacity: 1, y: 0 },
+                      { duration: 0.5, delay: i * 0.1 }
+                    )}
+                    className="md:col-span-8 md:row-span-3 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 grid md:grid-cols-[5fr_6fr]"
+                  >
+                    <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden">
                       <img
                         src={t.image}
                         alt={`${t.name} review`}
                         width="1200"
                         height="1600"
                         loading="lazy"
-                        className="w-full h-auto"
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent md:bg-gradient-to-r pointer-events-none" />
                     </div>
-                  ) : (
-                    <>
-                      <Quote className="w-8 h-8 text-blue-600/40 dark:text-sky-400/40" />
-                      <p className="text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
-                    </>
+                    <div className="p-6 md:p-8 flex flex-col justify-center">
+                      <span className={`inline-flex self-start items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
+                        {label.label}
+                      </span>
+                      <Quote className="mt-4 w-9 h-9 text-blue-600/30 dark:text-sky-400/30" />
+                      <p className="mt-3 text-base md:text-lg leading-relaxed font-normal text-slate-700 dark:text-slate-200">&ldquo;{t.quote}&rdquo;</p>
+                      <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-sm font-bold ring-2 ring-white/10 shrink-0">
+                          {testimonialInitials(t.name)}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-base font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </MotionDiv>
+                );
+              }
+              return (
+                <MotionDiv
+                  isMobile={isMobile}
+                  key={i}
+                  role="article"
+                  {...viewProps(
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0 },
+                    { duration: 0.5, delay: i * 0.1 }
                   )}
-                </div>
-                <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                  <img src={t.avatar ?? t.image} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover border border-white/10" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{t.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{t.role}</p>
+                  className="md:col-span-4 group glass-card-v3 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 flex flex-col"
+                >
+                  {t.image && (
+                    <div className="relative aspect-[3/4] shrink-0 overflow-hidden">
+                      <img
+                        src={t.image}
+                        alt={`${t.name} review`}
+                        width="1200"
+                        height="1600"
+                        loading="lazy"
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
+                    </div>
+                  )}
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex-1">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
+                        {label.label}
+                      </span>
+                      <Quote className="mt-4 w-7 h-7 text-blue-600/30 dark:text-sky-400/30" />
+                      <p className="mt-2 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-300">&ldquo;{t.quote}&rdquo;</p>
+                    </div>
+                    <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
+                      <div className="w-10 h-10 text-xs rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold ring-2 ring-white/10 shrink-0">
+                        {testimonialInitials(t.name)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{t.name}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{t.role}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </MotionDiv>
-            ))}
+                </MotionDiv>
+              );
+            })}
           </div>
         </div>
       </section>
