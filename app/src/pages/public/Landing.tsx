@@ -518,22 +518,6 @@ export default function Landing() {
                 </MotionDiv>
               </div>
 
-              {/* Supporting Value Proposition */}
-              <MotionP
-                isMobile={isMobile}
-                {...animProps(
-                  { opacity: 0, y: 20 },
-                  { opacity: 1, y: 0 },
-                  { duration: 0.5, delay: 0.4 }
-                )}
-                className="text-base sm:text-lg text-slate-600 dark:text-slate-300/80 max-w-xl leading-relaxed font-normal"
-              >
-                Free for students · Paid internships. ZYR0 bridges
-                academic learning with real-world industry demands — structured milestone
-                tasks, 1-on-1 mentor guidance, and employer-verified certificates that
-                accelerate your hiring pipeline.
-              </MotionP>
-
               {/* Right Column: Animated Search Mockup */}
               <div className="lg:col-span-5 relative w-full h-[420px] sm:h-[470px] lg:h-[520px] flex items-center justify-center">
                 {/* Glowing gradients */}
