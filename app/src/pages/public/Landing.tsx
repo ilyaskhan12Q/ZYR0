@@ -79,9 +79,9 @@ const steps = [
 ];
 
 const testimonials = [
-  { name: 'Sarah Chen', role: 'Computer Science Student', quote: 'The structured task progress and mentor feedback helped me grow far faster than a standard internship. Having a clear roadmap kept me aligned.', avatar: 'https://i.pravatar.cc/150?u=sarah' },
-  { name: 'Michael Rodriguez', role: 'Senior Engineer & Mentor', quote: 'As a mentor, ZYR0 gives me a structured framework to evaluate work, track multiple interns, and provide actionable feedback without administrative overhead.', avatar: 'https://i.pravatar.cc/150?u=michael' },
-  { name: 'TechFlow Inc.', role: 'Employer Partner', quote: 'Using ZYR0 to hire and manage our interns has streamlined our entire process. The quality of candidate tracking and verification has been exceptional.', avatar: 'https://ui-avatars.com/api/?name=TechFlow&background=3B82F6&color=fff' },
+  { name: 'Akbar Ali', role: 'Student', image: '/reviews/akbar-review.jpeg' },
+  { name: 'Amir Jawad', role: 'Student', image: '/reviews/jawad-review.jpeg' },
+  { name: 'ZYRO Interns', role: 'Employer Partner', quote: 'Using ZYR0 to hire and manage our interns has streamlined our entire process. The quality of candidate tracking and verification has been exceptional.', avatar: '/zyro-logo.png' },
 ];
 
 const roles = [
@@ -805,11 +805,26 @@ export default function Landing() {
                 className="glass-card-v3 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:shadow-blue-600/15 dark:hover:shadow-sky-500/10 flex flex-col justify-between"
               >
                 <div className="space-y-4">
-                  <Quote className="w-8 h-8 text-blue-600/40 dark:text-sky-400/40" />
-                  <p className="text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
+                  {t.image ? (
+                    <div className="-m-6 mb-0 overflow-hidden rounded-t-2xl">
+                      <img
+                        src={t.image}
+                        alt={`${t.name} review`}
+                        width="1200"
+                        height="1600"
+                        loading="lazy"
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <Quote className="w-8 h-8 text-blue-600/40 dark:text-sky-400/40" />
+                      <p className="text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed font-normal">&ldquo;{t.quote}&rdquo;</p>
+                    </>
+                  )}
                 </div>
                 <div className="mt-6 pt-4 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-                  <img src={t.avatar} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                  <img src={t.avatar ?? t.image} alt={`${t.name} avatar`} width="40" height="40" loading="lazy" className="w-10 h-10 rounded-full object-cover border border-white/10" />
                   <div>
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">{t.name}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{t.role}</p>
