@@ -51,7 +51,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route element={<PublicLayout />}>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<LandingV5 />} />
             <Route path="/v5" element={<LandingV5 />} />
             <Route path="/internships" element={<BrowseInternships />} />
             <Route path="/internships/:id" element={<InternshipDetail />} />
