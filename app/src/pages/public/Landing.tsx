@@ -102,10 +102,11 @@ const testimonials = [
     image: '/reviews/jawad-review.jpeg',
   },
   {
-    kind: 'mentor',
-    name: 'Michael Rodriguez',
-    role: 'AI/ML Engineer & Mentor',
-    quote: 'Zyroo lets me evaluate work against clear criteria, track every intern\u2019s progress, and deliver actionable feedback — without the administrative overhead I have dealt with elsewhere. Mentoring has never been this consistent.',
+    kind: 'intern',
+    name: 'Bibi Tabassum',
+    role: 'Intern',
+    quote: 'Zyroo gave me a structured way to learn through real projects. The clarity of the workflow and the quality of the mentor feedback made my internship genuinely effective.',
+    image: '/reviews/bibi-tabassum-review.jpeg',
   },
   {
     kind: 'mentor',
@@ -123,12 +124,14 @@ function testimonialInitials(name: string) {
 const testimonialKindLabel: Record<string, { label: string; className: string }> = {
   featured: { label: 'Company Official', className: 'bg-blue-600/10 text-blue-600 dark:text-sky-400 border-blue-600/20' },
   student: { label: 'Student', className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
+  intern: { label: 'Intern', className: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20' },
   mentor: { label: 'Mentor', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
 };
 
 const testimonialKindAccent: Record<string, string> = {
   featured: '#3b82f6',
   student: '#10b981',
+  intern: '#8b5cf6',
   mentor: '#f59e0b',
 };
 
@@ -868,7 +871,7 @@ export default function Landing() {
                           width="1200"
                           height="1600"
                           loading="lazy"
-                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
                       <div className="p-6 md:p-8 flex flex-col justify-center">
@@ -912,7 +915,7 @@ export default function Landing() {
                           width="1200"
                           height="1600"
                           loading="lazy"
-                          className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.02]"
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
                     ) : (
