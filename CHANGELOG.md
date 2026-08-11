@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.1] - 2026-08-11
+
+### Added
+- **Real Student Review Images (`app/public/reviews/`)**: Added cropped portrait images for the landing testimonials (Akbar, Atta, Jawad, Bibi Tabassum, Saba) to give the section authentic, human faces.
+
+### Changed
+- **Landing Testimonials Redesign — V3 (`app/src/pages/public/Landing.tsx`, `app/src/components/landing/`)**:
+  - Replaced the placeholder review cards with a full-width featured company card plus a 3-card student/mentor row layout.
+  - Wrapped testimonials in animated blob cards for a softer, more premium visual treatment.
+  - Added Saba Iftikhar (AI/ML Engineer & Mentor) review and Bibi Tabassum intern card; renamed Michael to AI/ML Engineer & Mentor.
+  - Professionalized testimonial quotes for clarity and impact.
+  - Removed the duplicate hero paragraph from conflict resolution.
+
+### Fixed
+- **Reviewer Name Correction (`app/src/pages/public/Landing.tsx`)**: Corrected the student reviewer name from "Atta" to "Attaullah" in the testimonials data.
+
 ## [0.36.0] - 2026-08-09
 
 ### Changed
