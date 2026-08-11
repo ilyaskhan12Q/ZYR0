@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Rocket, Sparkles, ShieldCheck, Zap, X, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Rocket, Sparkles, ShieldCheck, Zap, X, CheckCircle2, Compass } from 'lucide-react';
 import type { UserRole } from '@/lib/database.types';
 
 interface LoginWelcomeModalProps {
@@ -7,6 +7,7 @@ interface LoginWelcomeModalProps {
   role: UserRole;
   firstName?: string;
   onAction: (path: string) => void;
+  onStartTour?: () => void;
   onDismiss: () => void;
 }
 
@@ -67,7 +68,7 @@ function roleCopy(role: UserRole, firstName?: string) {
   };
 }
 
-export default function LoginWelcomeModal({ open, role, firstName, onAction, onDismiss }: LoginWelcomeModalProps) {
+export default function LoginWelcomeModal({ open, role, firstName, onAction, onStartTour, onDismiss }: LoginWelcomeModalProps) {
   if (!open) return null;
   const copy = roleCopy(role, firstName);
 
@@ -132,6 +133,16 @@ export default function LoginWelcomeModal({ open, role, firstName, onAction, onD
 
           {/* Action Buttons */}
           <div className="space-y-3 pt-1">
+            {onStartTour && (
+              <button
+                onClick={onStartTour}
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-accent to-blue-600 hover:from-accent/90 hover:to-blue-600/90 text-white px-4 py-3.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-accent/20 cursor-pointer"
+              >
+                <Compass className="w-4 h-4" />
+                Start Guided Tour
+              </button>
+            )}
+
             <button
               onClick={() => onAction(copy.primary.path)}
               className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent/90 text-white px-4 py-3.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-accent/20 cursor-pointer"
