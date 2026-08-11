@@ -334,7 +334,7 @@ export default function StudentWorkspace() {
   return (
     <div className="space-y-6">
       {/* Workspace Header Panel */}
-      <div className="bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div data-tour="workspace-internship-header" className="bg-card rounded-2xl border border-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 bg-muted rounded-xl flex items-center justify-center overflow-hidden border border-border">
             {company?.logo_url ? (
@@ -377,7 +377,7 @@ export default function StudentWorkspace() {
       </div>
 
       {/* Tabs navigation list */}
-      <div className="flex border-b border-border bg-card/45 backdrop-blur-md rounded-xl p-1 border border-border shadow-sm overflow-x-auto gap-1">
+      <div data-tour="workspace-tabs" className="flex border-b border-border bg-card/45 backdrop-blur-md rounded-xl p-1 border border-border shadow-sm overflow-x-auto gap-1">
         {(['overview', 'tasks', 'submissions', 'certificate'] as const).map((tab) => {
           const isActive = activeTab === tab;
           const labels: Record<WorkspaceTab, string> = {
@@ -621,7 +621,7 @@ export default function StudentWorkspace() {
                   </div>
 
                   {/* Mentor details widget */}
-                  <div className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4">
+                  <div data-tour="workspace-support-card" className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4">
                     <h3 className="font-bold text-md text-foreground">Support & Mentor</h3>
                     <p className="text-xs text-muted-foreground">
                       If you have questions regarding tasks, timeline schedules, or submissions, message your assigned company coordinators.
@@ -643,7 +643,7 @@ export default function StudentWorkspace() {
             {activeTab === 'tasks' && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left: Tasks List */}
-                <div className="lg:col-span-1 bg-card rounded-2xl border border-border p-4 shadow-sm h-[600px] overflow-y-auto space-y-3">
+                <div data-tour="workspace-task-list" className="lg:col-span-1 bg-card rounded-2xl border border-border p-4 shadow-sm h-[600px] overflow-y-auto space-y-3">
                   <div className="pb-3 border-b border-border mb-2">
                     <h3 className="font-bold text-foreground">Assigned Tasks</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">Select a task row to review or submit credentials</p>

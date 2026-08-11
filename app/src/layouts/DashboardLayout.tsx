@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -6,7 +6,7 @@ import {
   Home, FolderOpen, FileCheck, FileText, ClipboardList, CheckSquare, Award,
   Briefcase, BarChart3, Users, UserCog, Shield, MessageSquare,
   Building2, ChevronLeft, ChevronRight,
-  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone
+  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone, Compass
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -14,8 +14,11 @@ import { SEO } from '@/components/SEO';
 import type { UserRole } from '@/lib/database.types';
 import { supabase } from '@/lib/supabase';
 import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
+import { updateMyProfile } from '@/services/users';
 import LoginWelcomeModal from '@/components/onboarding/LoginWelcomeModal';
 import ThemeToggle from '@/components/ThemeToggle';
+import { TourProvider, useTour } from '@/components/onboarding/tour/TourProvider';
+import { TourSpotlight } from '@/components/onboarding/tour/TourSpotlight';
 
 interface NavItem {
   label: string;
@@ -111,7 +114,22 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [tourSignal, setTourSignal] = useState<string | null>(null);
   const welcomeShown = useRef(false);
+
+  const handleTourEnd = useCallback((tourId: string, _completed: boolean) => {
+    if (!profile) return;
+    const existing = profile.onboarding_tours ?? [];
+    if (existing.includes(tourId)) return;
+    updateMyProfile({ onboarding_tours: [...existing, tourId] }).catch((err) =>
+      console.error('Failed to persist onboarding tour:', err)
+    );
+  }, [profile]);
+
+  const handleStartTour = () => {
+    handleCloseWelcome();
+    setTourSignal('student-workspace');
+  };
 
   useEffect(() => {
     if (profile && !profileCompleted && profile.role !== 'admin') {
@@ -286,8 +304,10 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const sidebarWidth = collapsed ? 'w-[72px]' : 'w-[260px]';
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <SEO title="Dashboard" description="ZYR0 Platform dashboard and user portal." noIndex={true} />
+    <TourProvider onTourEnd={handleTourEnd}>
+      <DashboardOnboarding startTourSignal={tourSignal} onTourConsumed={() => setTourSignal(null)} />
+      <div className="min-h-screen bg-background flex">
+        <SEO title="Dashboard" description="ZYR0 Platform dashboard and user portal." noIndex={true} />
       {/* Mobile Overlay */}
       <AnimatePresence>
         {mobileOpen && (
@@ -335,7 +355,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        <nav data-tour="sidebar-nav" className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/');
             const hasChildren = item.children && item.children.length > 0;
@@ -463,13 +483,17 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <ThemeToggle />
+            <span data-tour="header-theme-toggle">
+              <ThemeToggle />
+            </span>
+            <TourHelpButton />
             <button className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
               <Search className="w-5 h-5" />
             </button>
             <div className="relative">
               <button
                 onClick={() => { setNotificationsOpen(!notificationsOpen); setProfileOpen(false); }}
+                data-tour="header-notifications"
                 className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
               >
                 <Bell className="w-5 h-5" />
@@ -732,8 +756,74 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         role={profile?.role ?? 'student'}
         firstName={user?.user_metadata?.full_name?.split(' ')[0]}
         onAction={handleWelcomeAction}
+        onStartTour={handleStartTour}
         onDismiss={handleCloseWelcome}
       />
-    </div>
+
+      <TourSpotlight />
+      </div>
+    </TourProvider>
+  );
+}
+
+// ── Onboarding tour wiring ─────────────────────────────────────────────────────
+
+function DashboardOnboarding({ startTourSignal, onTourConsumed }: {
+  startTourSignal: string | null;
+  onTourConsumed: () => void;
+}) {
+  const { profile, profileCompleted } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { start } = useTour();
+  const autoTriggered = useRef(false);
+  const pending = useRef<string | null>(null);
+  const [pendingVersion, setPendingVersion] = useState(0);
+
+  const setPending = (tourId: string) => {
+    pending.current = tourId;
+    setPendingVersion((v) => v + 1);
+  };
+
+  useEffect(() => {
+    if (!startTourSignal) return;
+    onTourConsumed();
+    setPending(startTourSignal);
+  }, [startTourSignal, onTourConsumed]);
+
+  useEffect(() => {
+    if (!pending.current) return;
+    if (!location.pathname.startsWith('/student/workspace')) {
+      navigate('/student/workspace');
+      return;
+    }
+    const tourId = pending.current;
+    pending.current = null;
+    const timer = setTimeout(() => start(tourId), 400);
+    return () => clearTimeout(timer);
+  }, [location.pathname, pendingVersion, navigate, start]);
+
+  useEffect(() => {
+    if (autoTriggered.current) return;
+    if (!profile || profile.role !== 'student' || !profileCompleted) return;
+    if ((profile.onboarding_tours ?? []).includes('student-workspace')) return;
+    autoTriggered.current = true;
+    setPending('student-workspace');
+  }, [profile, profileCompleted]);
+
+  return null;
+}
+
+function TourHelpButton() {
+  const { start } = useTour();
+  return (
+    <button
+      onClick={() => start('student-workspace')}
+      title="Guided tour"
+      aria-label="Start guided tour"
+      className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+    >
+      <Compass className="w-5 h-5" />
+    </button>
   );
 }
