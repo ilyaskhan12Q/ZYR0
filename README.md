@@ -145,69 +145,18 @@ zyro-kim/
 
 ---
 
-## Quick Start
+## Getting Access
 
-### Prerequisites
+ZYR0 is a **proprietary product** and is **not open source**. This repository is published for visibility, evaluation, and collaboration with approved partners only — the setup, build, and deployment instructions are intentionally not published.
 
-Ensure your environment meets the following requirements:
-- **Node.js**: `v18.0.0` or higher (v20+ recommended)
-- **npm**: `v9.0.0` or higher
-- **Git**: `v2.30.0` or higher
+To request access — a product demo, a partnership, or an invitation to collaborate — reach out through any of the following channels:
 
-### Installation
+- **Email**: [support@zyroo.org](mailto:support@zyroo.org)
+- **Partnerships**: [partnerships@zyroo.org](mailto:partnerships@zyroo.org)
+- **LinkedIn**: [ZYR0 Company Profile](https://linkedin.com/company/zyr0-co)
+- **WhatsApp Channel**: [ZYR0 WhatsApp Channel](https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F)
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/ilyaskhan12Q/ZYR0.git
-   cd ZYR0
-   ```
-
-2. **Install project dependencies**:
-   ```bash
-   cd app
-   npm install
-   ```
-
-### Environment Configuration
-
-Create a `.env` file in the `app/` directory by copying the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-Configure your Supabase URL, Anonymous Key, and optional social links in `app/.env`:
-
-```env
-VITE_SUPABASE_URL=https://your-supabase-instance.supabase.co
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_LINKEDIN_COMPANY_URL=https://linkedin.com/company/zyr0-co
-VITE_WHATSAPP_CHANNEL_URL=https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F
-```
-
-### Development Server
-
-Start the local Vite development server with Hot Module Replacement (HMR):
-
-```bash
-npm run dev
-```
-
-The application will be accessible at `http://localhost:5173`.
-
-### Production Build & Pre-Rendering
-
-To compile TypeScript code, generate optimized production assets, and execute the static SEO pre-rendering pipeline:
-
-```bash
-npm run build
-```
-
-To preview the production build locally:
-
-```bash
-npm run preview
-```
+Access to the environment configuration, database schema migrations, and deployment pipeline is granted only to approved collaborators under the terms of the [LICENSE](./LICENSE).
 
 ---
 
@@ -230,9 +179,11 @@ For technical details, architectural blueprints, and engineering standards, expl
 
 ## Contributing
 
-We welcome contributions from the developer community! Whether fixing a bug, enhancing UI accessibility, or proposing a new feature, your help is appreciated.
+ZYR0 is developed by the core team and approved collaborators. **External contributions are not accepted** for the main repository due to the project's proprietary license.
 
-Please review **[CONTRIBUTING.md](./CONTRIBUTING.md)** before opening a pull request to ensure adherence to our branching conventions, commit standards, and code formatting rules.
+Contributors who have been granted access should review **[CONTRIBUTING.md](./CONTRIBUTING.md)** before opening a pull request to ensure adherence to our branching conventions, commit standards, and code formatting rules.
+
+Interested in collaborating? Reach out through the [Getting Access](#getting-access) channels.
 
 ---
 
