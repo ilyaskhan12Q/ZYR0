@@ -81,6 +81,17 @@ export function TourSpotlight() {
   }, [recompute]);
 
   useEffect(() => {
+    if (!step?.activateTab) return;
+    const tabsEl = document.querySelector<HTMLElement>('[data-tour="workspace-tabs"]');
+    const match = Array.from(tabsEl?.querySelectorAll('button') ?? []).find((btn) =>
+      btn.textContent?.trim().toLowerCase().includes(step.activateTab!.toLowerCase())
+    );
+    match?.click();
+    const timer = setTimeout(recompute, 450);
+    return () => clearTimeout(timer);
+  }, [step?.id, step?.activateTab, recompute]);
+
+  useEffect(() => {
     if (!tour || isMobile) return;
     const onScroll = () => recompute();
     const onResize = () => recompute();
@@ -117,7 +128,7 @@ export function TourSpotlight() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-40 bg-black/50"
+        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px]"
         aria-hidden="true"
       />
 
@@ -125,9 +136,10 @@ export function TourSpotlight() {
         <motion.div
           key={`ring-${step.id}`}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: [1, 0.85, 1], scale: [1, 1.02, 1] }}
           exit={{ opacity: 0 }}
-          className="fixed z-40 pointer-events-none rounded-xl border-2 border-accent shadow-[0_0_0_4px_rgba(59,130,246,0.25),0_0_40px_rgba(59,130,246,0.35)]"
+          transition={{ opacity: { duration: 0.25 }, scale: { duration: 1.6, repeat: Infinity, ease: 'easeInOut' } }}
+          className="fixed z-40 pointer-events-none rounded-xl border-[2.5px] border-accent shadow-[0_0_0_6px_rgba(59,130,246,0.28),0_0_60px_rgba(59,130,246,0.45)]"
           style={{
             left: rect.left - pad,
             top: rect.top - pad,
