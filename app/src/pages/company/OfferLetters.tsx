@@ -329,83 +329,98 @@ export default function CompanyOfferLetters() {
   });
 
   // ── Generate + PDF ────────────────────────────────────────────────────────────
+  /** Shared single-student pipeline: insert record, render PDF, upload, email, notify. */
+  async function generateAndSendOffer(application: any): Promise<{ ok: boolean; message: string }> {
+    const student    = Array.isArray(application.student)    ? application.student[0]    : application.student;
+    const internship = Array.isArray(application.internship) ? application.internship[0] : application.internship;
+    if (!student || !internship) throw new Error('Missing student or internship data');
+
+    // 1. Check for duplicates
+    const { data: existing } = await getOfferLetterByApplication(application.id);
+    if (existing) {
+      return { ok: false, message: 'An offer letter already exists for this application.' };
+    }
+
+    // 2. Insert offer letter record
+    const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: newOffer, error: insertErr } = await generateOfferLetter({
+      internship_id:  internship.id,
+      application_id: application.id,
+      student_id:     student.id,
+      company_id:     company.id,
+      expires_at:     expiresAt,
+    });
+    if (insertErr) {
+      // Unique constraint race: another flow created the offer in the meantime.
+      if (/duplicate|unique/i.test(insertErr.message ?? '')) {
+        return { ok: false, message: 'An offer letter already exists for this application.' };
+      }
+      throw insertErr;
+    }
+
+    // 3. Generate PDF
+    const fullOffer: OfferLetter = {
+      ...newOffer!,
+      student,
+      company,
+      internship,
+    };
+    const pdfBlob = await generateOfferLetterPdf({
+      offer: fullOffer,
+      verificationUrl: `${window.location.origin}/verify-offer/${newOffer!.id}`,
+    });
+
+    // 4. Upload to Storage
+    const pdfUrl = await uploadOfferLetterPdf(newOffer!.id, student.id, pdfBlob);
+
+    // 5. Update record with PDF URL
+    await attachOfferLetterPdf(newOffer!.id, pdfUrl);
+
+    // Send actual offer letter email via custom SMTP (send-email Edge Function)
+    try {
+      await sendOfferLetterEmail({
+        student,
+        company,
+        internship,
+        offerId: newOffer!.id,
+        offerCode: newOffer!.offer_code,
+        expiresAt: newOffer!.expires_at,
+      });
+      console.log('Offer letter email sent successfully');
+    } catch (emailErr) {
+      console.error('Failed to send actual offer letter email:', emailErr);
+      throw new Error(`Offer letter generated, but email delivery failed: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`);
+    }
+
+    // Trigger simulation notification
+    try {
+      await dispatchNotificationWithSimulation({
+        userId: student.id,
+        title: 'Offer Letter Received',
+        message: `Congratulations! ${company.name} has extended an internship offer: "${internship.title}".`,
+        type: 'application',
+        actionUrl: '/student/offer-letters',
+        studentEmail: student.email,
+      });
+    } catch (notifErr) {
+      console.error('Failed to trigger offer letter notification simulation:', notifErr);
+    }
+
+    return { ok: true, message: `Offer letter generated and sent to ${student.full_name}!` };
+  }
+
   async function handleGenerate(application: any) {
     setGenerating(application.id);
     setError(null);
     setSuccessMsg(null);
 
     try {
-      // 1. Check for duplicates
-      const { data: existing } = await getOfferLetterByApplication(application.id);
-      if (existing) {
-        setError('An offer letter already exists for this application.');
+      const result = await generateAndSendOffer(application);
+      if (!result.ok) {
+        setError(result.message);
         return;
       }
-
-      const student    = Array.isArray(application.student)    ? application.student[0]    : application.student;
-      const internship = Array.isArray(application.internship) ? application.internship[0] : application.internship;
-      if (!student || !internship) throw new Error('Missing student or internship data');
-
-      // 2. Insert offer letter record
-      const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: newOffer, error: insertErr } = await generateOfferLetter({
-        internship_id:  internship.id,
-        application_id: application.id,
-        student_id:     student.id,
-        company_id:     company.id,
-        expires_at:     expiresAt,
-      });
-      if (insertErr) throw insertErr;
-
-      // 3. Generate PDF
-      const fullOffer: OfferLetter = {
-        ...newOffer!,
-        student,
-        company,
-        internship,
-      };
-      const pdfBlob = await generateOfferLetterPdf({
-        offer: fullOffer,
-        verificationUrl: `${window.location.origin}/verify-offer/${newOffer!.id}`,
-      });
-
-      // 4. Upload to Storage
-      const pdfUrl = await uploadOfferLetterPdf(newOffer!.id, student.id, pdfBlob);
-
-      // 5. Update record with PDF URL
-      await attachOfferLetterPdf(newOffer!.id, pdfUrl);
-
-      // Send actual offer letter email via custom SMTP (send-email Edge Function)
-      try {
-        await sendOfferLetterEmail({
-          student,
-          company,
-          internship,
-          offerId: newOffer!.id,
-          offerCode: newOffer!.offer_code,
-          expiresAt: newOffer!.expires_at,
-        });
-        console.log('Offer letter email sent successfully');
-      } catch (emailErr) {
-        console.error('Failed to send actual offer letter email:', emailErr);
-        throw new Error(`Offer letter generated, but email delivery failed: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`);
-      }
-
-      // Trigger simulation notification
-      try {
-        await dispatchNotificationWithSimulation({
-          userId: student.id,
-          title: 'Offer Letter Received',
-          message: `Congratulations! ${company.name} has extended an internship offer: "${internship.title}".`,
-          type: 'application',
-          actionUrl: '/student/offer-letters',
-          studentEmail: student.email,
-        });
-      } catch (notifErr) {
-        console.error('Failed to trigger offer letter notification simulation:', notifErr);
-      }
-
-      setSuccessMsg(`Offer letter generated and sent to ${student.full_name}!`);
+      setSuccessMsg(result.message);
       await load();
     } catch (e: unknown) {
       setError((e as Error).message ?? 'Failed to generate offer letter.');
