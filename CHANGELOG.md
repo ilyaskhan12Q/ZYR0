@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.2] - 2026-08-11
+
+### Added
+- **Student Workspace Guided Tour (`app/src/components/onboarding/tour/`, `app/src/layouts/DashboardLayout.tsx`)**:
+  - **Custom Spotlight Tour Engine**: Lightweight zero-dependency tour engine with a `TourProvider` state machine (start/next/back/skip/finish) and a `TourSpotlight` overlay that dims the page, renders a pulsing accent ring around the target, and shows a numbered step card with progress dots, Back/Skip/Next/Finish controls.
+  - **Step-by-Step Task Submission Walkthrough (`tours/studentWorkspace.ts`, `app/src/pages/student/Workspace.tsx`)**: 8-step guided flow that walks students through submitting a task — active internship context → auto-switches to the Tasks & Submission tab → pick an assigned task → read the brief/objectives/criteria → paste GitHub URL → optional live demo URL → submission notes → Submit Solution.
+  - **`activateTab` Step Support (`TourStep.ts`, `TourSpotlight.tsx`)**: steps can auto-click the matching workspace tab before being shown, so form steps always have a visible target.
+  - **Entry Points**: "Start Guided Tour" button on the post-login welcome modal (`LoginWelcomeModal.tsx`) and a Compass replay button in the dashboard header.
+  - **First-Run Auto-Start**: the tour launches automatically once for first-time students with a completed profile; completion is persisted to `profiles.onboarding_tours` (`supabase/migrations/038_onboarding_tours.sql`, `updateMyProfile`).
+  - **Tour Anchors**: `data-tour` attributes on sidebar nav, theme toggle, notifications bell, and workspace panels (internship header, tabs, task cards, detail panel, form fields, submit button).
+
+### Changed
+- **Spotlight Visibility**: darkened the tour overlay with a backdrop blur and thickened the target ring with a pulsing glow for maximum popup visibility.
+
 ## [0.36.1] - 2026-08-11
 
 ### Added

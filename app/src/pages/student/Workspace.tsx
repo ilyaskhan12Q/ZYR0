@@ -667,6 +667,7 @@ export default function StudentWorkspace() {
                       return (
                         <button
                           key={t.id}
+                          data-tour="workspace-task-item"
                           onClick={() => {
                             setSelectedTask(t);
                             // Clear form values
@@ -708,6 +709,7 @@ export default function StudentWorkspace() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
+                      data-tour="workspace-task-details"
                       className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-6"
                     >
                       {/* Task Info row */}
@@ -867,7 +869,7 @@ export default function StudentWorkspace() {
                             )}
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="space-y-1.5">
+                              <div data-tour="workspace-submission-github" className="space-y-1.5">
                                 <label htmlFor="submission-github-url" className="text-xs font-semibold text-muted-foreground block">
                                   GitHub Repository URL <span className="text-red-500">*</span>
                                 </label>
@@ -881,7 +883,7 @@ export default function StudentWorkspace() {
                                   className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
                                 />
                               </div>
-                              <div className="space-y-1.5">
+                              <div data-tour="workspace-submission-demo" className="space-y-1.5">
                                 <label htmlFor="submission-demo-url" className="text-xs font-semibold text-muted-foreground block">
                                   Live Demo URL <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
                                 </label>
@@ -896,7 +898,7 @@ export default function StudentWorkspace() {
                               </div>
                             </div>
 
-                            <div className="space-y-1.5">
+                            <div data-tour="workspace-submission-notes" className="space-y-1.5">
                               <label htmlFor="submission-notes" className="text-xs font-semibold text-muted-foreground block">
                                 Submission Notes <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
                               </label>
@@ -912,6 +914,7 @@ export default function StudentWorkspace() {
 
                             <button
                               type="submit"
+                              data-tour="workspace-submission-submit"
                               disabled={submitting}
                               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
                             >
