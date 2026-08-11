@@ -45,6 +45,7 @@ export interface Profile {
   linkedin?: string | null;
   github?: string | null;
   role_interest?: string | null;
+  onboarding_tours: string[];
   created_at: string;
   updated_at: string;
   company?: Company | null;
