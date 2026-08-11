@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText, Send, Download, Eye, XCircle, Search, Clock,
   CheckCircle2, AlertTriangle, Loader2, RotateCcw, Building2,
-  Calendar, Users, Plus, ExternalLink, RefreshCw, FileCode
+  Calendar, Users, Plus, ExternalLink, RefreshCw, FileCode, Mail
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -23,6 +23,10 @@ import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
 import { SITE_CONFIG } from '@/config/site';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -286,6 +290,13 @@ export default function CompanyOfferLetters() {
   const [error, setError]               = useState<string | null>(null);
   const [successMsg, setSuccessMsg]     = useState<string | null>(null);
 
+  // ── Bulk selection state ─────────────────────────────────────────────────────
+  const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy]         = useState(false);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
+  const [bulkResults, setBulkResults]   = useState<{ ok: boolean; name: string; message: string }[]>([]);
+  const [confirmBulk, setConfirmBulk]   = useState(false);
+
   // ── Load ─────────────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
     setLoading(true);
@@ -329,88 +340,160 @@ export default function CompanyOfferLetters() {
   });
 
   // ── Generate + PDF ────────────────────────────────────────────────────────────
+  /** Shared single-student pipeline: insert record, render PDF, upload, email, notify. */
+  async function generateAndSendOffer(application: any): Promise<{ ok: boolean; message: string }> {
+    const student    = Array.isArray(application.student)    ? application.student[0]    : application.student;
+    const internship = Array.isArray(application.internship) ? application.internship[0] : application.internship;
+    if (!student || !internship) throw new Error('Missing student or internship data');
+
+    // 1. Check for duplicates
+    const { data: existing } = await getOfferLetterByApplication(application.id);
+    if (existing) {
+      return { ok: false, message: 'An offer letter already exists for this application.' };
+    }
+
+    // 2. Insert offer letter record
+    const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: newOffer, error: insertErr } = await generateOfferLetter({
+      internship_id:  internship.id,
+      application_id: application.id,
+      student_id:     student.id,
+      company_id:     company.id,
+      expires_at:     expiresAt,
+    });
+    if (insertErr) {
+      // Unique constraint race: another flow created the offer in the meantime.
+      if (/duplicate|unique/i.test(insertErr.message ?? '')) {
+        return { ok: false, message: 'An offer letter already exists for this application.' };
+      }
+      throw insertErr;
+    }
+
+    // 3. Generate PDF
+    const fullOffer: OfferLetter = {
+      ...newOffer!,
+      student,
+      company,
+      internship,
+    };
+    const pdfBlob = await generateOfferLetterPdf({
+      offer: fullOffer,
+      verificationUrl: `${window.location.origin}/verify-offer/${newOffer!.id}`,
+    });
+
+    // 4. Upload to Storage
+    const pdfUrl = await uploadOfferLetterPdf(newOffer!.id, student.id, pdfBlob);
+
+    // 5. Update record with PDF URL
+    await attachOfferLetterPdf(newOffer!.id, pdfUrl);
+
+    // Send actual offer letter email via custom SMTP (send-email Edge Function)
+    try {
+      await sendOfferLetterEmail({
+        student,
+        company,
+        internship,
+        offerId: newOffer!.id,
+        offerCode: newOffer!.offer_code,
+        expiresAt: newOffer!.expires_at,
+      });
+      console.log('Offer letter email sent successfully');
+    } catch (emailErr) {
+      console.error('Failed to send actual offer letter email:', emailErr);
+      throw new Error(`Offer letter generated, but email delivery failed: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`);
+    }
+
+    // Trigger simulation notification
+    try {
+      await dispatchNotificationWithSimulation({
+        userId: student.id,
+        title: 'Offer Letter Received',
+        message: `Congratulations! ${company.name} has extended an internship offer: "${internship.title}".`,
+        type: 'application',
+        actionUrl: '/student/offer-letters',
+        studentEmail: student.email,
+      });
+    } catch (notifErr) {
+      console.error('Failed to trigger offer letter notification simulation:', notifErr);
+    }
+
+    return { ok: true, message: `Offer letter generated and sent to ${student.full_name}!` };
+  }
+
   async function handleGenerate(application: any) {
     setGenerating(application.id);
     setError(null);
     setSuccessMsg(null);
 
     try {
-      // 1. Check for duplicates
-      const { data: existing } = await getOfferLetterByApplication(application.id);
-      if (existing) {
-        setError('An offer letter already exists for this application.');
+      const result = await generateAndSendOffer(application);
+      if (!result.ok) {
+        setError(result.message);
         return;
       }
-
-      const student    = Array.isArray(application.student)    ? application.student[0]    : application.student;
-      const internship = Array.isArray(application.internship) ? application.internship[0] : application.internship;
-      if (!student || !internship) throw new Error('Missing student or internship data');
-
-      // 2. Insert offer letter record
-      const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: newOffer, error: insertErr } = await generateOfferLetter({
-        internship_id:  internship.id,
-        application_id: application.id,
-        student_id:     student.id,
-        company_id:     company.id,
-        expires_at:     expiresAt,
-      });
-      if (insertErr) throw insertErr;
-
-      // 3. Generate PDF
-      const fullOffer: OfferLetter = {
-        ...newOffer!,
-        student,
-        company,
-        internship,
-      };
-      const pdfBlob = await generateOfferLetterPdf({
-        offer: fullOffer,
-        verificationUrl: `${window.location.origin}/verify-offer/${newOffer!.id}`,
-      });
-
-      // 4. Upload to Storage
-      const pdfUrl = await uploadOfferLetterPdf(newOffer!.id, student.id, pdfBlob);
-
-      // 5. Update record with PDF URL
-      await attachOfferLetterPdf(newOffer!.id, pdfUrl);
-
-      // Send actual offer letter email via custom SMTP (send-email Edge Function)
-      try {
-        await sendOfferLetterEmail({
-          student,
-          company,
-          internship,
-          offerId: newOffer!.id,
-          offerCode: newOffer!.offer_code,
-          expiresAt: newOffer!.expires_at,
-        });
-        console.log('Offer letter email sent successfully');
-      } catch (emailErr) {
-        console.error('Failed to send actual offer letter email:', emailErr);
-        throw new Error(`Offer letter generated, but email delivery failed: ${emailErr instanceof Error ? emailErr.message : String(emailErr)}`);
-      }
-
-      // Trigger simulation notification
-      try {
-        await dispatchNotificationWithSimulation({
-          userId: student.id,
-          title: 'Offer Letter Received',
-          message: `Congratulations! ${company.name} has extended an internship offer: "${internship.title}".`,
-          type: 'application',
-          actionUrl: '/student/offer-letters',
-          studentEmail: student.email,
-        });
-      } catch (notifErr) {
-        console.error('Failed to trigger offer letter notification simulation:', notifErr);
-      }
-
-      setSuccessMsg(`Offer letter generated and sent to ${student.full_name}!`);
+      setSuccessMsg(result.message);
       await load();
     } catch (e: unknown) {
       setError((e as Error).message ?? 'Failed to generate offer letter.');
     } finally {
       setGenerating(null);
+    }
+  }
+
+  // ── Bulk generate & send ─────────────────────────────────────────────────────
+  const toggleOne = (id: string) => {
+    setBulkSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllEligible = () => {
+    setBulkSelected((prev) => {
+      const allChecked = acceptedApps.length > 0 && acceptedApps.every((a) => prev.has(a.id));
+      if (allChecked) return new Set();
+      return new Set(acceptedApps.map((a) => a.id));
+    });
+  };
+
+  async function handleBulkGenerate() {
+    const targets = acceptedApps.filter((a) => bulkSelected.has(a.id));
+    if (targets.length === 0) return;
+
+    setConfirmBulk(false);
+    setBulkBusy(true);
+    setBulkResults([]);
+    setError(null);
+    setSuccessMsg(null);
+    setBulkProgress({ done: 0, total: targets.length });
+
+    const results: { ok: boolean; name: string; message: string }[] = [];
+    for (const app of targets) {
+      const student = Array.isArray(app.student) ? app.student[0] : app.student;
+      const name = student?.full_name ?? 'Unknown student';
+      try {
+        const res = await generateAndSendOffer(app);
+        results.push({ ok: res.ok, name, message: res.message });
+      } catch (e: unknown) {
+        results.push({ ok: false, name, message: (e as Error).message ?? 'Failed to generate offer letter.' });
+      }
+      setBulkProgress({ done: results.length, total: targets.length });
+      setBulkResults([...results]);
+    }
+
+    setBulkSelected(new Set());
+    setBulkBusy(false);
+    setBulkProgress(null);
+    await load();
+
+    const okCount = results.filter((r) => r.ok).length;
+    const failed = results.filter((r) => !r.ok);
+    if (failed.length === 0) {
+      setSuccessMsg(`Offer letters generated and sent to ${okCount} student${okCount === 1 ? '' : 's'}!`);
+    } else {
+      setError(`${okCount} sent, ${failed.length} failed. Failed: ${failed.map((r) => r.name).join(', ')}`);
     }
   }
 
@@ -554,32 +637,61 @@ export default function CompanyOfferLetters() {
       {/* Eligible Applications to Generate Offers */}
       {acceptedApps.length > 0 && (
         <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-border flex items-center gap-2">
+          <div className="px-5 py-4 border-b border-border flex items-center gap-3 flex-wrap">
+            <input
+              type="checkbox"
+              checked={acceptedApps.length > 0 && acceptedApps.every((a) => bulkSelected.has(a.id))}
+              onChange={toggleAllEligible}
+              aria-label="Select all eligible applications"
+              className="accent-blue-600 w-4 h-4 rounded shrink-0"
+            />
             <Plus className="w-4 h-4 text-accent" />
             <h2 className="font-semibold text-sm">Generate New Offer Letters</h2>
-            <span className="ml-auto text-xs text-muted-foreground">{acceptedApps.length} pending</span>
+            <span className="text-xs text-muted-foreground">{acceptedApps.length} pending</span>
+            <div className="ml-auto flex items-center gap-3">
+              <span className="text-xs text-muted-foreground">{bulkSelected.size} selected</span>
+              <button
+                onClick={() => setConfirmBulk(true)}
+                disabled={bulkSelected.size === 0 || bulkBusy}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {bulkBusy ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Mail className="w-3.5 h-3.5" />
+                )}
+                {bulkBusy ? 'Sending…' : `Generate & Send Selected (${bulkSelected.size})`}
+              </button>
+            </div>
           </div>
-          <div className="divide-y divide-border">
-            {acceptedApps.slice(0, 5).map((app) => {
+          <div className="max-h-80 overflow-y-auto divide-y divide-border">
+            {acceptedApps.map((app) => {
               const student    = Array.isArray(app.student)    ? app.student[0]    : app.student;
               const internship = Array.isArray(app.internship) ? app.internship[0] : app.internship;
               return (
                 <div key={app.id} className="flex items-center justify-between px-5 py-3 gap-4">
-                  <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={bulkSelected.has(app.id)}
+                      onChange={() => toggleOne(app.id)}
+                      aria-label={`Select ${student?.full_name ?? 'student'}`}
+                      className="accent-blue-600 w-4 h-4 rounded shrink-0"
+                    />
                     <img
                       src={student?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(student?.full_name ?? 'S')}&background=3B82F6&color=fff`}
                       alt=""
                       className="w-8 h-8 rounded-full object-cover"
                     />
-                    <div>
-                      <p className="text-sm font-medium">{student?.full_name ?? '—'}</p>
-                      <p className="text-xs text-muted-foreground">{internship?.title ?? '—'}</p>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{student?.full_name ?? '—'}</p>
+                      <p className="text-xs text-muted-foreground truncate">{internship?.title ?? '—'}</p>
                     </div>
-                  </div>
+                  </label>
                   <button
                     onClick={() => handleGenerate(app)}
                     disabled={generating === app.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium hover:bg-accent/90 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white text-xs font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 shrink-0"
                   >
                     {generating === app.id ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -592,6 +704,42 @@ export default function CompanyOfferLetters() {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Bulk progress & results */}
+      {(bulkBusy || bulkResults.length > 0) && (
+        <div className="bg-card rounded-xl border border-border shadow-sm p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            {bulkBusy ? (
+              <Loader2 className="w-4 h-4 animate-spin text-accent" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            )}
+            <p className="text-sm font-medium">
+              {bulkBusy && bulkProgress
+                ? `Generating & sending ${bulkProgress.done} of ${bulkProgress.total}…`
+                : `Bulk results: ${bulkResults.filter((r) => r.ok).length} sent, ${bulkResults.filter((r) => !r.ok).length} failed`}
+            </p>
+          </div>
+          {bulkBusy && bulkProgress && (
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full bg-blue-600 transition-all duration-300"
+                style={{ width: `${(bulkProgress.done / bulkProgress.total) * 100}%` }}
+              />
+            </div>
+          )}
+          {!bulkBusy && bulkResults.some((r) => !r.ok) && (
+            <ul className="space-y-1.5 text-xs">
+              {bulkResults.filter((r) => !r.ok).map((r, i) => (
+                <li key={i} className="flex items-start gap-2 text-red-600 dark:text-red-400">
+                  <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  <span><strong>{r.name}:</strong> {r.message}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -754,6 +902,39 @@ export default function CompanyOfferLetters() {
           />
         )}
       </AnimatePresence>
+
+      {/* Bulk Confirm Dialog */}
+      <AlertDialog open={confirmBulk} onOpenChange={setConfirmBulk}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Generate & send offer letters to {bulkSelected.size} selected student{bulkSelected.size === 1 ? '' : 's'}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will create the official PDF document, upload it to storage, and email it to every
+              selected student. Offer letters cannot be un-sent — they can only be revoked.
+              <span className="block mt-2 font-medium text-foreground">
+                {acceptedApps.filter((a) => bulkSelected.has(a.id)).slice(0, 6).map((a) => {
+                  const s = Array.isArray(a.student) ? a.student[0] : a.student;
+                  return (s?.full_name ?? 'Student');
+                }).join(', ')}
+                {bulkSelected.size > 6 ? `… +${bulkSelected.size - 6} more` : ''}
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkBusy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleBulkGenerate(); }}
+              disabled={bulkBusy}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              {bulkBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+              Generate & Send
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
