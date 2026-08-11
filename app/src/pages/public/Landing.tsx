@@ -89,7 +89,7 @@ const testimonials = [
   },
   {
     kind: 'student',
-    name: 'Atta',
+    name: 'Attaullah',
     role: 'Student',
     quote: 'Zyroo turned my internship into a guided, hands-on experience. Clear milestones and regular mentor feedback helped me build practical skills and real confidence for my career.',
     image: '/reviews/atta-review.jpeg',
