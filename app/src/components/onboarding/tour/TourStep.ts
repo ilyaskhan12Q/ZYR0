@@ -7,8 +7,9 @@ export type TourStepVariant = 'spotlight' | 'center';
 
 export interface TourStep {
   id: string;
-  title: string;
-  body: string;
+  /** Required for spotlight steps; center steps use the tour summary instead. */
+  title?: string;
+  body?: string;
   /** Small lucide icon shown beside the title for scannability. */
   icon?: LucideIcon;
   /** Value of the `data-tour` attribute on the target element. */
