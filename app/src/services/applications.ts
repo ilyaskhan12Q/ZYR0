@@ -12,6 +12,67 @@ export const APPLICATION_STATUSES: ApplicationStatus[] = [
   'Withdrawn',
 ];
 
+/** Statuses that still count as an in-progress application for sidebar badges. */
+export const ACTIVE_APPLICATION_STATUSES: ApplicationStatus[] = [
+  'Applied',
+  'Under Review',
+  'Shortlisted',
+];
+
+/** Count the current student's active (in-progress) applications. */
+export async function getMyActiveApplicationsCount(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const cacheKey = `my_active_applications_count_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<number>(cacheKey);
+    if (cached !== null) return cached;
+  }
+
+  const fetchFn = () =>
+    supabase
+      .from('applications')
+      .select('*', { count: 'exact', head: true })
+      .in('status', ACTIVE_APPLICATION_STATUSES);
+
+  const { count } = await dedupRequest(cacheKey, fetchFn);
+  const result = count ?? 0;
+  setCachedData(cacheKey, result);
+  return result;
+}
+
+/** Count a company's active (in-progress) applications across its internships. */
+export async function getCompanyActiveApplicationsCount(company_id: string, useCache = true) {
+  const cacheKey = `company_active_applications_count_${company_id}`;
+  if (useCache) {
+    const cached = getCachedData<number>(cacheKey);
+    if (cached !== null) return cached;
+  }
+
+  const fetchFn = async () => {
+    const { data: internships } = await supabase
+      .from('internships')
+      .select('id')
+      .eq('company_id', company_id);
+
+    if (!internships?.length) return 0;
+
+    const internshipIds = internships.map((i) => i.id);
+    const { count } = await supabase
+      .from('applications')
+      .select('*', { count: 'exact', head: true })
+      .in('internship_id', internshipIds)
+      .in('status', ACTIVE_APPLICATION_STATUSES);
+
+    return count ?? 0;
+  };
+
+  const result = await dedupRequest(cacheKey, fetchFn);
+  setCachedData(cacheKey, result);
+  return result;
+}
+
 /** Get applications for the current student */
 export async function getMyApplications(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
