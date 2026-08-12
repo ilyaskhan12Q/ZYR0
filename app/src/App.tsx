@@ -26,6 +26,7 @@ const Careers = lazy(() => import('@/pages/public/Careers'));
 const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const CompleteProfileRedirect = lazy(() => import('@/pages/public/CompleteProfileRedirect'));
+const AcceptInvite = lazy(() => import('@/pages/public/AcceptInvite'));
 
 // Auth Pages
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
@@ -80,6 +81,7 @@ function App() {
           <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
+          <Route path="/accept-invite" element={<AcceptInvite />} />
 
           {/* Student Routes */}
           <Route path="/student/*" element={<ProtectedRoute role="student"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="student" /></Suspense></ProtectedRoute>}>

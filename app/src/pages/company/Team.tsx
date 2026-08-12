@@ -1,27 +1,30 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Plus, Mail, Shield, X, UserCog, Trash2, Loader2, Send } from 'lucide-react';
+import { Plus, Mail, Shield, X, Trash2, Loader2, Send, RefreshCw, CheckCircle2, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMyCompany } from '@/services/companies';
-import { getCompanyTeam, addTeamMember, updateTeamMember, removeTeamMember } from '@/services/companyTeam';
+import { getMyCompanyMembership, getCompanyTeam, addTeamMember, updateTeamMember, removeTeamMember, resendTeamInvite, COMPANY_TEAM_ROLES, teamRoleLabel } from '@/services/companyTeam';
+import { toast } from 'sonner';
+import type { CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
 
 export default function CompanyTeam() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [companyId, setCompanyId] = useState<string | null>(null);
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<CompanyTeamMember[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newName, setNewName] = useState('');
-  const [newRole, setNewRole] = useState('Mentor');
+  const [newRole, setNewRole] = useState<CompanyTeamRole>('mentor');
   const [submitting, setSubmitting] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+  const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const { data: co } = await getMyCompany();
-      if (co) {
-        setCompanyId(co.id);
-        const { data } = await getCompanyTeam(co.id);
+      const { data: membership } = await getMyCompanyMembership();
+      if (membership?.company) {
+        setCompanyId(membership.company.id);
+        const { data } = await getCompanyTeam(membership.company.id);
         if (data) setMembers(data);
       }
       setLoading(false);
@@ -32,18 +35,57 @@ export default function CompanyTeam() {
   async function handleAdd() {
     if (!companyId || !newEmail.trim()) return;
     setSubmitting(true);
-    const name = newName.trim() || newEmail.split('@')[0];
-    const { data } = await addTeamMember({ company_id: companyId, name, role: newRole, email: newEmail });
-    if (data) setMembers((prev) => [...prev, data]);
-    setSubmitting(false);
-    setShowAdd(false);
-    setNewEmail('');
-    setNewName('');
+    try {
+      await addTeamMember({ company_id: companyId, name: newName, role: newRole, email: newEmail });
+      toast.success(`Invitation sent to ${newEmail.trim()}`);
+      setShowAdd(false);
+      setNewEmail('');
+      setNewName('');
+      const { data } = await getCompanyTeam(companyId);
+      if (data) setMembers(data);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to add member');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
-  async function handleRemove(id: string) {
-    await removeTeamMember(id);
-    setMembers((prev) => prev.filter((m) => m.id !== id));
+  async function handleRemove(member: CompanyTeamMember) {
+    if (!window.confirm(`Remove ${member.name} from the team?`)) return;
+    try {
+      await removeTeamMember(member.id);
+      toast.success('Member removed');
+      setMembers((prev) => prev.filter((m) => m.id !== member.id));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to remove member');
+    }
+  }
+
+  async function handleRoleChange(member: CompanyTeamMember, role: CompanyTeamRole) {
+    if (role === member.role) return;
+    setUpdatingRole(member.id);
+    try {
+      const { data, error } = await updateTeamMember(member.id, { role });
+      if (error) throw error;
+      toast.success(`${member.name} is now ${teamRoleLabel(role)}`);
+      setMembers((prev) => prev.map((m) => (m.id === member.id ? data : m)));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update role');
+    } finally {
+      setUpdatingRole(null);
+    }
+  }
+
+  async function handleResend(member: CompanyTeamMember) {
+    setResendingId(member.id);
+    try {
+      await resendTeamInvite(member.id);
+      toast.success('Invitation email re-sent');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to resend invitation');
+    } finally {
+      setResendingId(null);
+    }
   }
 
   if (loading) {
@@ -59,18 +101,29 @@ export default function CompanyTeam() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Team Management</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage your team members and their roles</p>
+          <p className="text-sm text-muted-foreground mt-1">Invite team members and control what they can access</p>
         </div>
         <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90">
-          <Plus className="w-4 h-4" /> Add Member
+          <Plus className="w-4 h-4" /> Invite Member
         </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {COMPANY_TEAM_ROLES.map((r) => (
+          <div key={r.value} className="bg-card rounded-xl border border-border p-4">
+            <p className="text-sm font-semibold">{r.label}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {members.filter((m) => m.role === r.value).length} member{members.filter((m) => m.role === r.value).length === 1 ? '' : 's'}
+            </p>
+          </div>
+        ))}
       </div>
 
       {showAdd && (
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl border border-border p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold">Add Team Member</h3>
+            <h3 className="font-semibold">Invite Team Member</h3>
             <button onClick={() => setShowAdd(false)} className="p-1 hover:bg-muted rounded-lg"><X className="w-4 h-4" /></button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
@@ -86,22 +139,22 @@ export default function CompanyTeam() {
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Role</label>
-              <select value={newRole} onChange={(e) => setNewRole(e.target.value)}
+              <select value={newRole} onChange={(e) => setNewRole(e.target.value as CompanyTeamRole)}
                 className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20">
-                <option>Admin</option>
-                <option>HR Manager</option>
-                <option>Mentor</option>
-                <option>Reviewer</option>
+                {COMPANY_TEAM_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
             <div className="flex items-end">
               <button onClick={handleAdd} disabled={submitting || !newEmail.trim()}
                 className="w-full py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 disabled:opacity-50 flex items-center justify-center gap-2">
                 {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                {submitting ? 'Adding...' : 'Add Member'}
+                {submitting ? 'Sending...' : 'Send Invite'}
               </button>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground mt-3">
+            They'll receive an email with a secure link. After signing in, they can access only the tabs their role allows.
+          </p>
         </motion.div>
       )}
 
@@ -112,14 +165,15 @@ export default function CompanyTeam() {
               <tr className="bg-muted/50 border-b border-border">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Member</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Role</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Status</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                    No team members yet. Add members to manage your internship program.
+                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
+                    No team members yet. Invite members to manage your internship program.
                   </td>
                 </tr>
               ) : (
@@ -127,21 +181,52 @@ export default function CompanyTeam() {
                   <motion.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <img src={member.avatar_url || `https://ui-avatars.com/api/?name=${member.name}`} alt="" className="w-9 h-9 rounded-full" />
+                        <img
+                          src={member.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}`}
+                          alt="" className="w-9 h-9 rounded-full" />
                         <div>
                           <p className="text-sm font-medium">{member.name}</p>
-                          {member.email && <p className="text-xs text-muted-foreground">{member.email}</p>}
+                          {member.email && <p className="text-xs text-muted-foreground flex items-center gap-1"><Mail className="w-3 h-3" /> {member.email}</p>}
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-accent/10 text-accent text-xs rounded-full font-medium">
-                        <Shield className="w-3 h-3" /> {member.role}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-accent/10 text-accent text-xs rounded-full font-medium">
+                          <Shield className="w-3 h-3" /> {teamRoleLabel(member.role)}
+                        </span>
+                        <select
+                          value={member.role}
+                          disabled={updatingRole === member.id || member.user_id === user?.id}
+                          onChange={(e) => handleRoleChange(member, e.target.value as CompanyTeamRole)}
+                          title={member.user_id === user?.id ? 'You cannot change your own role' : 'Change role'}
+                          className="px-2 py-1 text-xs bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:opacity-40">
+                          {COMPANY_TEAM_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                        </select>
+                        {updatingRole === member.id && <Loader2 className="w-3 h-3 animate-spin text-accent" />}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {member.status === 'accepted' ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs rounded-full font-medium">
+                          <CheckCircle2 className="w-3 h-3" /> Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-xs rounded-full font-medium">
+                          <Clock className="w-3 h-3" /> Invited
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <button onClick={() => handleRemove(member.id)} className="p-1.5 hover:bg-red-50 rounded-lg" title="Remove">
+                        {member.status !== 'accepted' && (
+                          <button onClick={() => handleResend(member)} disabled={resendingId === member.id}
+                            className="p-1.5 hover:bg-muted rounded-lg disabled:opacity-50" title="Resend invitation">
+                            {resendingId === member.id ? <Loader2 className="w-4 h-4 text-accent animate-spin" /> : <RefreshCw className="w-4 h-4 text-accent" />}
+                          </button>
+                        )}
+                        <button onClick={() => handleRemove(member)}
+                          className="p-1.5 hover:bg-red-50 rounded-lg disabled:opacity-50" title="Remove">
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
                       </div>
