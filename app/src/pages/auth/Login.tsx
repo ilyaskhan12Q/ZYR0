@@ -54,7 +54,13 @@ export default function Login() {
   };
 
   const handleOAuth = async (provider: 'google' | 'linkedin_oidc') => {
-    const { error } = provider === 'google' ? await signInWithGoogle() : await signInWithLinkedIn();
+    const oauthOptions = {
+      redirect: postAuthTarget || undefined,
+      apply: searchParams.get('apply') || undefined,
+    };
+    const { error } = provider === 'google'
+      ? await signInWithGoogle(undefined, oauthOptions)
+      : await signInWithLinkedIn(undefined, oauthOptions);
     if (error) {
       setLocalError(error.message);
     }
@@ -230,7 +236,13 @@ export default function Login() {
           </div>
 
           <p className="text-center mt-6 text-sm text-muted-foreground">
-            Don&apos;t have an account? <Link to="/register" className="text-accent font-medium hover:underline focus-visible-ring rounded-sm">Register</Link>
+            Don&apos;t have an account?{" "}
+            <Link
+              to={postAuthTarget ? `/register?redirect=${encodeURIComponent(postAuthTarget)}` : '/register'}
+              className="text-accent font-medium hover:underline focus-visible-ring rounded-sm"
+            >
+              Register
+            </Link>
           </p>
         </motion.div>
       </div>
