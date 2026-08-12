@@ -3,6 +3,7 @@ import type { Company } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 import { createNotification } from './notifications';
+import { getMyCompanyMembership } from './companyTeam';
 
 /** Get all active companies (public) */
 export async function getCompanies(opts: {
@@ -67,31 +68,11 @@ export async function getCompanyById(id: string, useCache = true) {
   return res;
 }
 
-/** Get company owned by current user */
+/** Get the company the current user belongs to (owner or accepted team member) */
 export async function getMyCompany(useCache = true) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: new Error('Not authenticated') };
-
-  const cacheKey = createRequestKey('my_company', user.id);
-  if (useCache) {
-    const cached = getCachedData<any>(cacheKey);
-    if (cached) return cached;
-  }
-
-  const fetchFn = () => supabase
-    .from('companies')
-    .select(`
-      *, 
-      team:company_team_members(*),
-      owner:profiles!owner_id (id, full_name, title, department)
-    `)
-    .eq('owner_id', user.id)
-    .single();
-
-  const res = await dedupRequest(cacheKey, fetchFn);
-
-  if (!res.error) setCachedData(cacheKey, res);
-  return res;
+  const { data: membership, error } = await getMyCompanyMembership(useCache);
+  if (error) return { data: null, error };
+  return { data: membership?.company ?? null, error: null };
 }
 
 /** Create a company */

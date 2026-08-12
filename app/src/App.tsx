@@ -3,6 +3,8 @@ import { lazy, Suspense } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
+import { CompanyAccessRoute } from '@/components/CompanyAccessRoute';
+import { CompanyAccessProvider } from '@/contexts/CompanyAccessContext';
 import { Toaster } from '@/components/ui/sonner';
 import { RouteLoading } from '@/components/RouteLoading';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -26,6 +28,7 @@ const Careers = lazy(() => import('@/pages/public/Careers'));
 const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const CompleteProfileRedirect = lazy(() => import('@/pages/public/CompleteProfileRedirect'));
+const AcceptInvite = lazy(() => import('@/pages/public/AcceptInvite'));
 
 // Auth Pages
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
@@ -80,14 +83,21 @@ function App() {
           <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
+          <Route path="/accept-invite" element={<AcceptInvite />} />
 
           {/* Student Routes */}
           <Route path="/student/*" element={<ProtectedRoute role="student"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="student" /></Suspense></ProtectedRoute>}>
             <Route path="*" element={<Suspense fallback={<RouteLoading />}><StudentPortal /></Suspense>} />
           </Route>
 
-          {/* Company Routes */}
-          <Route path="/company/*" element={<ProtectedRoute role="company"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="company" /></Suspense></ProtectedRoute>}>
+          {/* Company Routes — owners and accepted team members, tabs gated by role */}
+          <Route path="/company/*" element={
+            <CompanyAccessProvider>
+              <CompanyAccessRoute>
+                <Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="company" /></Suspense>
+              </CompanyAccessRoute>
+            </CompanyAccessProvider>
+          }>
             <Route path="*" element={<Suspense fallback={<RouteLoading />}><CompanyPortal /></Suspense>} />
           </Route>
 

@@ -374,6 +374,13 @@ serve(async (req) => {
             const { data: profile } = await adminClient
               .from('profiles').select('role').eq('id', user.id).single();
             jwtOk = profile?.role === 'admin' || profile?.role === 'company';
+            if (!jwtOk) {
+              // Accepted company team members (admin/hr/mentor/reviewer) may also
+              // send workflow emails such as team invitations.
+              const { data: member } = await adminClient
+                .from('company_team_members').select('id').eq('user_id', user.id).eq('status', 'accepted').limit(1);
+              jwtOk = !!member && member.length > 0;
+            }
           }
         } catch (authErr) {
           console.warn('[send-email] JWT auth check failed:', authErr);

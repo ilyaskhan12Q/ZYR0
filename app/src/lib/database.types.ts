@@ -81,15 +81,28 @@ export interface Company {
   owner?: Profile;
 }
 
+export type CompanyTeamRole = 'admin' | 'hr' | 'mentor' | 'reviewer';
+export type CompanyTeamStatus = 'invited' | 'accepted';
+
 export interface CompanyTeamMember {
   id: string;
   company_id: string;
   user_id: string | null;
   name: string;
-  role: string;
+  role: CompanyTeamRole;
   avatar_url: string | null;
   email: string | null;
+  status?: CompanyTeamStatus;
+  invite_token?: string | null;
+  invited_by?: string | null;
+  invited_at?: string | null;
+  accepted_at?: string | null;
   created_at: string;
+}
+
+export interface CompanyMembership {
+  company: Company;
+  member: CompanyTeamMember;
 }
 
 export interface Internship {

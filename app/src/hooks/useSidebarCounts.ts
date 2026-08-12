@@ -21,10 +21,10 @@ export interface SidebarCounts {
  * change, and keeps them in sync via Supabase realtime `postgres_changes`
  * subscriptions scoped by the same RLS policies the services rely on.
  */
-export function useSidebarCounts(): SidebarCounts {
+export function useSidebarCounts(companyIdOverride?: string | null): SidebarCounts {
   const { user, profile } = useAuth();
   const role = profile?.role;
-  const companyId = profile?.company_id;
+  const companyId = companyIdOverride ?? profile?.company_id ?? null;
   const location = useLocation();
   const [counts, setCounts] = useState<SidebarCounts>({});
 
