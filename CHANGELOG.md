@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.37.0] - 2026-08-12
+
+### Added
+- **Company Team Management, Invites & Role-Based Portal Access (`supabase/migrations/039_company_team_roles_rls.sql`, `app/src/services/companyTeam.ts`, `app/src/pages/company/Team.tsx`, `app/src/pages/public/AcceptInvite.tsx`, `app/src/contexts/CompanyAccessContext.tsx`, `app/src/components/CompanyAccessRoute.tsx`, `app/src/components/TabGate.tsx`)**:
+  - **Team Roles & Invite Flow**: company owners invite members by email with a role (`admin` / `hr` / `mentor` / `reviewer`); each invite carries a token and links to the recipient's account on acceptance. The Team page supports role editing, resend-invite, status badges (Invited/Active), confirm-before-remove, duplicate-email guards, and error toasts.
+  - **`/accept-invite` Page**: token-based acceptance with login redirection for signed-out users (works for brand-new accounts and existing student/mentor accounts alike — the token, not the email, is the credential).
+  - **Role-Scoped RLS**: internships, certificates, and offer letters are scoped to owner + admin/hr; applications to owner + admin/hr/reviewer; tasks/submissions to admin/mentor/reviewer; team management to owner + admin; company reads to owners and accepted members; messaging extended to accepted admin/hr/mentor members. New helpers: `is_company_member`, `is_company_member_with_role`, `accept_company_invite`.
+  - **Portal Access Gate**: `CompanyAccessRoute` admits owners **and** accepted team members (any profile role) into `/company/*`; `CompanyAccessProvider` + `useCompanyAccess` resolve company + member role once (cached under the `my_company` key family); `getMyCompany` delegates to the membership resolver so every company page works for members.
+  - **Tab Permission Matrix**: `DashboardLayout` filters the company nav by the role matrix (`useCompanyNavItems`), sidebar counts resolve via membership, and `CompanyPortal` wraps every route in `TabGate` (hard redirect) — roles can see exactly their tabs, no more, no less.
+  - **send-email Edge Function**: authenticated accepted company team members may now send workflow emails (e.g. invitations).
+
+### Changed
+- **Login Redirect Preservation (`app/src/pages/auth/Login.tsx`)**: the Register link and Google/LinkedIn OAuth buttons now forward the `?redirect=` param, so invited users return to `/accept-invite` (and complete acceptance) after signing up or signing in via any method.
+
+### Deployment Notes
+- Apply `supabase/migrations/039_company_team_roles_rls.sql` and re-deploy the `send-email` Edge Function.
+
 ## [0.36.4] - 2026-08-12
 
 ### Added

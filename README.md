@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.36.1-blue.svg" alt="Version" /></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.37.0-blue.svg" alt="Version" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Proprietary-red.svg" alt="License" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19-61dafb.svg?logo=react" alt="React" /></a>
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178c6.svg?logo=typescript" alt="TypeScript" /></a>
@@ -49,6 +49,11 @@ ZYR0 solves this challenge by delivering a centralized ecosystem where companies
 - **Advanced Multi-Criterion Filtering**: Filter by search terms, task status, priority levels, and sort orders with instant grid/table view toggles.
 - **Single & Bulk Task Delegation**: Delegate assignments to individual interns or bulk-assign to all active interns with automated notifications.
 - **PR-Style Split-Pane Review Drawer**: Dedicated evaluation interface for mentors featuring rubric-based scoring, inline code review, and structured feedback templates.
+
+### Company Team Roles & Access Control (RBAC)
+- **Role-Based Portal Access**: team members are invited by email, accept a tokenized invitation, and are assigned a role — `admin`, `hr`, `mentor`, or `reviewer`.
+- **Exact Tab Permissions**: every role sees precisely the dashboard tabs its role allows; enforced in three layers (sidebar filtering, route-level redirects, and per-role Supabase RLS policies) so access is never more or less than the matrix defines.
+- **Invite Lifecycle**: email invitations with resend support, Invited/Active status tracking, role editing, and secure token-based acceptance for both new and existing accounts.
 
 ### Offer Letter Management & High-Fidelity Printing
 - **High-Fidelity Document Rendering**: Automated generation of official offer letters complete with company branding, security seals, and owner signatures.
