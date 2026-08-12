@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.3] - 2026-08-12
+
+### Added
+- **Student Dashboard Journey Tour (`app/src/components/onboarding/tour/tours/studentJourney.ts`, `app/src/components/onboarding/tour/TourStep.ts`, `app/src/layouts/DashboardLayout.tsx`)**:
+  - **Journey-Based First-Run Tour**: new 7-step `student-journey` tour that teaches the internship flow — dashboard → internships → applications → workspace → tasks → progress → certificates — by spotlighting the matching sidebar nav item instead of explaining every section; previously onboarded students (`student-workspace` recorded) are not re-annoyed.
+  - **Closing Summary Card**: non-spotlight "There's more to explore" card listing Saved, Messages, Offer Letters, Portfolio, and Profile with one-liners (via a new `summary` field on `TourDefinition`).
+  - **Sidebar Nav Anchors**: `data-tour` targets (`nav-*`) added to the seven student nav links through a `tourTarget` nav config field; the tour now runs in place on any dashboard page with no forced navigation.
+  - **Welcome Modal Redesign (`app/src/components/onboarding/LoginWelcomeModal.tsx`)**: minimal journey-first student welcome ("Welcome to your ZYR0 workspace.") with a subtle Explore → Apply → Build → Complete strip and two CTAs — "Show me around" (starts the tour in place) and "Skip for now".
+
+### Changed
+- **Tour Popover & Spotlight Visuals (`app/src/components/onboarding/tour/TourSpotlight.tsx`)**:
+  - Replaced the pulsing glow ring and glowing blue halo with a restrained static accent ring plus faint halo.
+  - Lightened the dim overlay (`bg-black/35`, no backdrop blur) for a subtle focus effect.
+  - Compacted the step card: step icon beside the title, optional chip note under the body, smaller progress dots, pointer notch pointing at the highlighted target, refined spacing, and subtle one-shot motion (single rise + fade, no looping animations).
+  - Mobile bottom-sheet presentation preserved with safe-area padding and touch-friendly buttons.
+
 ## [0.36.2] - 2026-08-11
 
 ### Added

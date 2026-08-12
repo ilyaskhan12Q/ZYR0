@@ -26,20 +26,22 @@ interface NavItem {
   icon: React.ElementType;
   badge?: number;
   children?: { label: string; href: string }[];
+  /** data-tour anchor used by the onboarding tour to highlight this nav item. */
+  tourTarget?: string;
 }
 
 const navConfig: Record<UserRole, NavItem[]> = {
   student: [
-    { label: 'Dashboard', href: '/student/dashboard', icon: Home },
-    { label: 'Workspace', href: '/student/workspace', icon: Briefcase },
-    { label: 'Internships', href: '/student/internships', icon: FolderOpen },
+    { label: 'Dashboard', href: '/student/dashboard', icon: Home, tourTarget: 'nav-dashboard' },
+    { label: 'Workspace', href: '/student/workspace', icon: Briefcase, tourTarget: 'nav-workspace' },
+    { label: 'Internships', href: '/student/internships', icon: FolderOpen, tourTarget: 'nav-internships' },
     { label: 'Saved', href: '/student/saved', icon: Bookmark },
-    { label: 'Applications', href: '/student/applications', icon: FileCheck, badge: 4 },
+    { label: 'Applications', href: '/student/applications', icon: FileCheck, tourTarget: 'nav-applications', badge: 4 },
     { label: 'Team Applications', href: '/student/team-applications', icon: Rocket },
-    { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, badge: 3 },
-    { label: 'Progress', href: '/student/progress', icon: TrendingUp },
+    { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, tourTarget: 'nav-tasks', badge: 3 },
+    { label: 'Progress', href: '/student/progress', icon: TrendingUp, tourTarget: 'nav-progress' },
     { label: 'Messages', href: '/student/messages', icon: MessageSquare, badge: 3 },
-    { label: 'Certificates', href: '/student/certificates', icon: Award },
+    { label: 'Certificates', href: '/student/certificates', icon: Award, tourTarget: 'nav-certificates' },
     { label: 'Offer Letters', href: '/student/offer-letters', icon: FileText },
     { label: 'Portfolio', href: '/student/portfolio', icon: User },
     { label: 'Profile', href: '/student/profile', icon: UserCog },
@@ -128,7 +130,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
   const handleStartTour = () => {
     handleCloseWelcome();
-    setTourSignal('student-workspace');
+    setTourSignal('student-journey');
   };
 
   useEffect(() => {
@@ -369,6 +371,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
               <div key={item.href}>
                 <Link
                   to={item.href}
+                  data-tour={item.tourTarget}
                   onClick={(e) => {
                     if (hasChildren) {
                       e.preventDefault();
@@ -773,8 +776,6 @@ function DashboardOnboarding({ startTourSignal, onTourConsumed }: {
   onTourConsumed: () => void;
 }) {
   const { profile, profileCompleted } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
   const { start } = useTour();
   const autoTriggered = useRef(false);
   const pending = useRef<string | null>(null);
@@ -793,22 +794,23 @@ function DashboardOnboarding({ startTourSignal, onTourConsumed }: {
 
   useEffect(() => {
     if (!pending.current) return;
-    if (!location.pathname.startsWith('/student/workspace')) {
-      navigate('/student/workspace');
-      return;
-    }
     const tourId = pending.current;
     pending.current = null;
+    // The journey tour targets sidebar nav items, which exist on every
+    // dashboard page, so it can start in place without navigation.
     const timer = setTimeout(() => start(tourId), 400);
     return () => clearTimeout(timer);
-  }, [location.pathname, pendingVersion, navigate, start]);
+  }, [pendingVersion, start]);
 
   useEffect(() => {
     if (autoTriggered.current) return;
     if (!profile || profile.role !== 'student' || !profileCompleted) return;
-    if ((profile.onboarding_tours ?? []).includes('student-workspace')) return;
+    // Treat both tour ids as "has seen onboarding" so students who
+    // completed the earlier workspace tour are not re-onboarded.
+    const seen = profile.onboarding_tours ?? [];
+    if (seen.includes('student-journey') || seen.includes('student-workspace')) return;
     autoTriggered.current = true;
-    setPending('student-workspace');
+    setPending('student-journey');
   }, [profile, profileCompleted]);
 
   return null;
@@ -818,7 +820,7 @@ function TourHelpButton() {
   const { start } = useTour();
   return (
     <button
-      onClick={() => start('student-workspace')}
+      onClick={() => start('student-journey')}
       title="Guided tour"
       aria-label="Start guided tour"
       className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"

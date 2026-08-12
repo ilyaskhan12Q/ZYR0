@@ -1,4 +1,5 @@
 import type { TourDefinition } from '../TourStep';
+import { studentJourneyTour } from './studentJourney';
 
 /**
  * First-run guided tour for the student Workspace.
@@ -70,4 +71,5 @@ export const studentWorkspaceTour: TourDefinition = {
 
 export const TOUR_REGISTRY: Record<string, TourDefinition> = {
   'student-workspace': studentWorkspaceTour,
+  'student-journey': studentJourneyTour,
 };
