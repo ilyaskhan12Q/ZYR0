@@ -3,6 +3,8 @@ import { lazy, Suspense } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
+import { CompanyAccessRoute } from '@/components/CompanyAccessRoute';
+import { CompanyAccessProvider } from '@/contexts/CompanyAccessContext';
 import { Toaster } from '@/components/ui/sonner';
 import { RouteLoading } from '@/components/RouteLoading';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -88,8 +90,14 @@ function App() {
             <Route path="*" element={<Suspense fallback={<RouteLoading />}><StudentPortal /></Suspense>} />
           </Route>
 
-          {/* Company Routes */}
-          <Route path="/company/*" element={<ProtectedRoute role="company"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="company" /></Suspense></ProtectedRoute>}>
+          {/* Company Routes — owners and accepted team members, tabs gated by role */}
+          <Route path="/company/*" element={
+            <CompanyAccessProvider>
+              <CompanyAccessRoute>
+                <Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="company" /></Suspense>
+              </CompanyAccessRoute>
+            </CompanyAccessProvider>
+          }>
             <Route path="*" element={<Suspense fallback={<RouteLoading />}><CompanyPortal /></Suspense>} />
           </Route>
 

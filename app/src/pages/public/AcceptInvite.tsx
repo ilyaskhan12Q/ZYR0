@@ -33,7 +33,7 @@ export default function AcceptInvite() {
     async function run() {
       setState('working');
       try {
-        const ok = await acceptTeamInvite(token);
+        const ok = await acceptTeamInvite(token ?? '');
         if (ok) {
           setState('success');
         } else {

@@ -14,6 +14,39 @@ export function teamRoleLabel(role: string): string {
   return COMPANY_TEAM_ROLES.find((r) => r.value === role)?.label ?? role;
 }
 
+/** Canonical company portal tab keys (path segment after /company/). */
+export const COMPANY_TAB_KEYS = [
+  'dashboard',
+  'profile',
+  'internships',
+  'applications',
+  'interns',
+  'tasks',
+  'messages',
+  'analytics',
+  'certificates',
+  'offer-letters',
+  'team',
+  'settings',
+] as const;
+export type CompanyTabKey = (typeof COMPANY_TAB_KEYS)[number];
+
+const ALL_TABS: CompanyTabKey[] = [...COMPANY_TAB_KEYS];
+
+/** Tab access per team role. Owned companies can access everything. */
+export const COMPANY_ROLE_PERMISSIONS: Record<CompanyTeamRole, CompanyTabKey[]> = {
+  admin: ALL_TABS.filter((t) => t !== 'settings'),
+  hr: ['dashboard', 'profile', 'internships', 'applications', 'interns', 'messages', 'certificates', 'offer-letters'],
+  mentor: ['dashboard', 'profile', 'interns', 'tasks', 'messages'],
+  reviewer: ['dashboard', 'profile', 'applications', 'interns', 'tasks'],
+};
+
+export function canAccessCompanyTab(role: CompanyTeamRole | null, isOwner: boolean, tab: CompanyTabKey): boolean {
+  if (isOwner) return true;
+  if (!role) return false;
+  return (COMPANY_ROLE_PERMISSIONS[role] ?? []).includes(tab);
+}
+
 const SITE_URL = 'https://zyroo.org';
 
 async function sendInviteEmail(member: CompanyTeamMember, companyName: string) {
@@ -237,8 +270,12 @@ export async function removeTeamMember(id: string) {
 
 /** Accept a pending invite for the currently authenticated user. */
 export async function acceptTeamInvite(token: string) {
+  const { data: { user } } = await supabase.auth.getUser();
   const { data, error } = await supabase.rpc('accept_company_invite', { p_token: token });
   if (error) throw error;
+  if (data === true && user) {
+    clearCache(createRequestKey('my_company', user.id));
+  }
   return data === true;
 }
 
@@ -260,7 +297,7 @@ export async function getMyCompanyMembership(useCache = true) {
   const fetchFn = async () => {
     const { data: ownerCompany } = await supabase
       .from('companies')
-      .select('*, team:company_team_members(*)')
+      .select('*, team:company_team_members(*), owner:profiles!owner_id (id, full_name, title, department)')
       .eq('owner_id', user.id)
       .maybeSingle();
 
@@ -270,7 +307,7 @@ export async function getMyCompanyMembership(useCache = true) {
 
     const { data: member, error } = await supabase
       .from('company_team_members')
-      .select('*, company:companies(*, team:company_team_members(*))')
+      .select('*, company:companies(*, team:company_team_members(*), owner:profiles!owner_id (id, full_name, title, department))')
       .eq('user_id', user.id)
       .eq('status', 'accepted')
       .maybeSingle();

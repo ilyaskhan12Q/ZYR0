@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import CompanyVerificationGate from '@/components/CompanyVerificationGate';
+import TabGate from '@/components/TabGate';
 import { RouteLoading } from '@/components/RouteLoading';
 
 const CompanyDashboard = lazy(() => import('./Dashboard'));
@@ -22,109 +23,133 @@ export default function CompanyPortal() {
     <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route index element={<Navigate to="dashboard" replace />} />
-      
-      {/* Dashboard gets a warning banner if unverified, but remains accessible */}
-      <Route 
-        path="dashboard" 
-        element={
-          <CompanyVerificationGate mode="banner">
-            <CompanyDashboard />
-          </CompanyVerificationGate>
-        } 
-      />
-      
-      {/* Profile and Settings are accessible so they can update info or appeal */}
-      <Route path="profile" element={<CompanyProfile />} />
-      <Route path="settings" element={<CompanySettings />} />
 
-      {/* Blocked actions/views requiring full approval status */}
-      <Route 
-        path="internships" 
+      {/* Dashboard gets a warning banner if unverified, but remains accessible */}
+      <Route
+        path="dashboard"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyInternships />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="dashboard">
+            <CompanyVerificationGate mode="banner">
+              <CompanyDashboard />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="internships/new" 
+
+      {/* Profile tab — every role; Settings — owner only */}
+      <Route path="profile" element={<TabGate tab="profile"><CompanyProfile /></TabGate>} />
+      <Route path="settings" element={<TabGate tab="settings"><CompanySettings /></TabGate>} />
+
+      {/* Blocked actions/views requiring full approval status, gated by role */}
+      <Route
+        path="internships"
         element={
-          <CompanyVerificationGate mode="block">
-            <PostInternship />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="internships">
+            <CompanyVerificationGate mode="block">
+              <CompanyInternships />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="internships/:id" 
+      <Route
+        path="internships/new"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyInternships />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="internships">
+            <CompanyVerificationGate mode="block">
+              <PostInternship />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="applications" 
+      <Route
+        path="internships/:id"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyApplications />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="internships">
+            <CompanyVerificationGate mode="block">
+              <CompanyInternships />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="interns" 
+      <Route
+        path="applications"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyInterns />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="applications">
+            <CompanyVerificationGate mode="block">
+              <CompanyApplications />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="tasks" 
+      <Route
+        path="interns"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyTasks />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="interns">
+            <CompanyVerificationGate mode="block">
+              <CompanyInterns />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="analytics" 
+      <Route
+        path="tasks"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyAnalytics />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="tasks">
+            <CompanyVerificationGate mode="block">
+              <CompanyTasks />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="certificates" 
+      <Route
+        path="analytics"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyCertificates />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="analytics">
+            <CompanyVerificationGate mode="block">
+              <CompanyAnalytics />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="offer-letters" 
+      <Route
+        path="certificates"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyOfferLetters />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="certificates">
+            <CompanyVerificationGate mode="block">
+              <CompanyCertificates />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="team" 
+      <Route
+        path="offer-letters"
         element={
-          <CompanyVerificationGate mode="block">
-            <CompanyTeam />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="offer-letters">
+            <CompanyVerificationGate mode="block">
+              <CompanyOfferLetters />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
-      <Route 
-        path="messages" 
+      <Route
+        path="team"
         element={
-          <CompanyVerificationGate mode="block">
-            <MentorMessages />
-          </CompanyVerificationGate>
-        } 
+          <TabGate tab="team">
+            <CompanyVerificationGate mode="block">
+              <CompanyTeam />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
+      />
+      <Route
+        path="messages"
+        element={
+          <TabGate tab="messages">
+            <CompanyVerificationGate mode="block">
+              <MentorMessages />
+            </CompanyVerificationGate>
+          </TabGate>
+        }
       />
     </Routes>
     </Suspense>

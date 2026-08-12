@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,9 +9,11 @@ import {
   TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone, Compass
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOptionalCompanyAccess, type CompanyAccessValue } from '@/contexts/CompanyAccessContext';
 import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import type { UserRole } from '@/lib/database.types';
+import type { CompanyTabKey } from '@/services/companyTeam';
 import { supabase } from '@/lib/supabase';
 import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
 import { updateMyProfile } from '@/services/users';
@@ -96,6 +98,33 @@ const RESTRICTED_ROUTES: Record<string, string[]> = {
   mentor: ['/mentor/tasks', '/mentor/evaluations']
 };
 
+/** Map a nav href to its company tab key (path segment after /company/). */
+function companyTabKeyFromHref(href: string): CompanyTabKey {
+  const segment = href.replace(/^\//, '').split('/')[1] as CompanyTabKey;
+  return segment || 'dashboard';
+}
+
+/**
+ * For the company portal only: filter the static nav to the tabs the
+ * current member's role is allowed to see. Other roles pass through.
+ */
+function useCompanyNavItems(role: UserRole, access: CompanyAccessValue | undefined): NavItem[] {
+  return useMemo(() => {
+    const items = navConfig[role] || [];
+    if (role !== 'company' || !access) return items;
+
+    return items
+      .filter((item) => access.canAccessTab(companyTabKeyFromHref(item.href)))
+      .map((item) => {
+        if (!item.children) return item;
+        const children = item.children.filter((child) =>
+          access.canAccessTab(companyTabKeyFromHref(child.href))
+        );
+        return children.length ? { ...item, children } : item;
+      });
+  }, [role, access]);
+}
+
 const ROLE_SPECIFIC_ITEMS: Record<string, string[]> = {
   student: ['Resume', 'Skills', 'Education', 'Basic profile'],
   company: ['Company details', 'Logo', 'Organization information'],
@@ -104,6 +133,7 @@ const ROLE_SPECIFIC_ITEMS: Record<string, string[]> = {
 
 export default function DashboardLayout({ role }: { role: UserRole }) {
   const { user, signOut, profile, profileCompleted, profileCompletionPercentage, profileCompletionRequirements } = useAuth();
+  const companyAccess = useOptionalCompanyAccess();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -113,8 +143,8 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
-  const navItems = navConfig[role] || [];
-  const sidebarCounts = useSidebarCounts();
+  const navItems = useCompanyNavItems(role, companyAccess);
+  const sidebarCounts = useSidebarCounts(role === 'company' ? companyAccess?.company?.id ?? null : null);
 
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -137,23 +167,23 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   };
 
   useEffect(() => {
-    if (profile && !profileCompleted && profile.role !== 'admin') {
+    if (profile && !profileCompleted && profile.role !== 'admin' && profile.role === role) {
       const dismissed = sessionStorage.getItem('profile_modal_dismissed_session');
       if (!dismissed && !welcomeShown.current && !sessionStorage.getItem('login_welcome_dismissed_session')) {
         setShowModal(true);
       }
     }
-  }, [profile, profileCompleted, showWelcome]);
+  }, [profile, profileCompleted, showWelcome, role]);
 
   useEffect(() => {
-    if (profile && profile.role === 'student' && !profileCompleted) {
+    if (profile && profile.role === 'student' && !profileCompleted && role === 'student') {
       const dismissed = sessionStorage.getItem('login_welcome_dismissed_session');
       if (!dismissed && !welcomeShown.current) {
         welcomeShown.current = true;
         setShowWelcome(true);
       }
     }
-  }, [profile, profileCompleted]);
+  }, [profile, profileCompleted, role]);
 
   useEffect(() => {
     if (showWelcome) setShowModal(false);
@@ -180,7 +210,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   };
 
   useEffect(() => {
-    if (profile && !profileCompleted && profile.role !== 'admin') {
+    if (profile && !profileCompleted && profile.role !== 'admin' && profile.role === role) {
       const restricted = RESTRICTED_ROUTES[profile.role] || [];
       const isRestricted = restricted.some(route => 
         location.pathname === route || location.pathname.startsWith(route + '/')
@@ -190,7 +220,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         toast.error("Please complete your profile before using this feature.");
       }
     }
-  }, [location.pathname, profile, profileCompleted, navigate]);
+  }, [location.pathname, profile, profileCompleted, navigate, role]);
 
   const getRequirementStatus = (reqName: string) => {
     if (!profile) return false;
