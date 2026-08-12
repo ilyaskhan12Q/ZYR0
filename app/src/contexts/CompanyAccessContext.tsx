@@ -31,9 +31,11 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    const { data } = await getMyCompanyMembership();
-    setCompany(data?.company ?? null);
-    setMember(data?.member ?? null);
+    const res = await getMyCompanyMembership();
+    const comp = res?.company ?? res?.data?.company ?? null;
+    const mem = res?.member ?? res?.data?.member ?? null;
+    setCompany(comp);
+    setMember(mem);
     setLoading(false);
   }, [user]);
 
@@ -52,7 +54,12 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
       hasAccess: !!company,
       loading,
       refresh: load,
-      canAccessTab: (tab: CompanyTabKey) => canAccessCompanyTab(memberRole, isOwner, tab),
+      canAccessTab: (tab: CompanyTabKey) => {
+        if (loading) return true;
+        if (isOwner) return true;
+        if (!memberRole) return true;
+        return canAccessCompanyTab(memberRole, isOwner, tab);
+      },
     };
   }, [company, member, loading, load]);
 

@@ -8,8 +8,8 @@ Only the latest release on the `main` branch is actively supported with security
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.16.x  | Yes                |
-| < 0.16  | No                 |
+| 0.37.x  | Yes                |
+| < 0.37  | No                 |
 
 ## Reporting a Vulnerability
 
@@ -30,6 +30,8 @@ Please include the following information in your report:
 ZYR0 enforces a defense-in-depth security model:
 
 - **Row Level Security (RLS)**: Enforced on all Supabase PostgreSQL tables. Database queries verify user role and identity at the database level.
+- **Role-Scoped Company Data**: company team members (`admin`, `hr`, `mentor`, `reviewer`) are authorized per-role for internships, applications, tasks, certificates, offer letters, and messaging via dedicated SECURITY DEFINER helpers (`is_company_member`, `is_company_member_with_role`) — no role can read or write data outside its dashboard's scope.
+- **Tokenized Team Invitations**: membership is granted only through single-use invite tokens accepted by an authenticated user; invites are enforced end-to-end by the `accept_company_invite` RPC.
 - **Environment Isolation**: Secret keys (such as `SUPABASE_SERVICE_ROLE_KEY`) are kept on server environments and never exposed to client-side bundles.
 - **Input Sanitization**: All user inputs, task submissions, and URLs are validated before processing.
 - **Authentication**: Handled via Supabase Auth using secure JWTs and HTTPS-only cookie sessions.

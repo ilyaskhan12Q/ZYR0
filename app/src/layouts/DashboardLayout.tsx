@@ -107,13 +107,19 @@ function companyTabKeyFromHref(href: string): CompanyTabKey {
 /**
  * For the company portal only: filter the static nav to the tabs the
  * current member's role is allowed to see. Other roles pass through.
+ *
+ * Filtering only applies once access has RESOLVED and the user has a
+ * company; while loading (or when resolution is empty) the full nav is
+ * shown instead of an empty sidebar — route-level TabGate + RLS still
+ * enforce the matrix.
  */
 function useCompanyNavItems(role: UserRole, access: CompanyAccessValue | undefined): NavItem[] {
   return useMemo(() => {
     const items = navConfig[role] || [];
     if (role !== 'company' || !access) return items;
+    if (access.loading || !access.hasAccess || (!access.isOwner && !access.memberRole)) return items;
 
-    return items
+    const filtered = items
       .filter((item) => access.canAccessTab(companyTabKeyFromHref(item.href)))
       .map((item) => {
         if (!item.children) return item;
@@ -122,6 +128,8 @@ function useCompanyNavItems(role: UserRole, access: CompanyAccessValue | undefin
         );
         return children.length ? { ...item, children } : item;
       });
+
+    return filtered.length > 0 ? filtered : items;
   }, [role, access]);
 }
 
