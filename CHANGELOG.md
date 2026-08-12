@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Company Portal Sidebar Navigation Gating (`app/src/layouts/DashboardLayout.tsx`, `app/src/contexts/CompanyAccessContext.tsx`, `app/src/services/companyTeam.ts`)**:
+  - Resolved bug where `useCompanyNavItems` filtered all sidebar navigation links to empty during `access.loading` or when team membership role resolution was unresolved.
+  - Added navigation fallback to show full static navigation items if filtering yields empty results or while access resolution is in progress.
+  - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
+  - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
+
 ## [0.37.0] - 2026-08-12
 
 ### Added

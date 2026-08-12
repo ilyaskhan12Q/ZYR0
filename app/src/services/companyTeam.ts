@@ -286,12 +286,31 @@ export async function acceptTeamInvite(token: string) {
  */
 export async function getMyCompanyMembership(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: new Error('Not authenticated') as unknown };
+  if (!user) return { company: null, member: null, data: null, error: new Error('Not authenticated') };
 
   const cacheKey = createRequestKey('my_company', user.id);
   if (useCache) {
     const cached = getCachedData<any>(cacheKey);
-    if (cached) return cached;
+    if (cached) {
+      // If cached entry comes from old getMyCompany ({ data: company, error }), migrate it to membership shape
+      if (cached.data && !('company' in cached)) {
+        const comp = cached.data;
+        return {
+          company: comp,
+          member: null,
+          data: { company: comp, member: null },
+          error: cached.error ?? null,
+        };
+      }
+      // If cached is new shape, ensure data alias is attached for compatibility with destructuring { data }
+      if ('company' in cached) {
+        return {
+          ...cached,
+          data: cached.data ?? { company: cached.company, member: cached.member ?? null },
+        };
+      }
+      return cached;
+    }
   }
 
   const fetchFn = async () => {
@@ -302,7 +321,8 @@ export async function getMyCompanyMembership(useCache = true) {
       .maybeSingle();
 
     if (ownerCompany) {
-      return { company: ownerCompany, member: null, error: null };
+      const payload = { company: ownerCompany, member: null };
+      return { ...payload, data: payload, error: null };
     }
 
     const { data: member, error } = await supabase
@@ -312,10 +332,18 @@ export async function getMyCompanyMembership(useCache = true) {
       .eq('status', 'accepted')
       .maybeSingle();
 
-    if (error) return { company: null, member: null, error };
-    if (!member) return { company: null, member: null, error: null };
+    if (error) {
+      const payload = { company: null, member: null };
+      return { ...payload, data: payload, error };
+    }
+    if (!member) {
+      const payload = { company: null, member: null };
+      return { ...payload, data: payload, error: null };
+    }
 
-    return { company: member.company ?? null, member, error: null };
+    const comp = (member.company as unknown as import('@/lib/database.types').Company) ?? null;
+    const payload = { company: comp, member };
+    return { ...payload, data: payload, error: null };
   };
 
   const result = await dedupRequest(cacheKey, fetchFn);
