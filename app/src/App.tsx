@@ -48,74 +48,74 @@ const LazyDashboardLayout = lazy(() => import('@/layouts/DashboardLayout'));
 function App() {
   return (
     <LazyMotion features={domAnimation}>
-      <ScrollToTop />
-      <Suspense fallback={<RouteLoading />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Landing />} />
-            <Route path="/internships" element={<BrowseInternships />} />
-            <Route path="/internships/:id" element={<InternshipDetail />} />
-            <Route path="/companies" element={<Companies />} />
-            <Route path="/companies/:id" element={<CompanyDetail />} />
-            <Route path="/verify" element={<Verify />} />
-            <Route path="/verify/:code" element={<Verify />} />
-            <Route path="/verify-certificate" element={<Verify />} />
-            <Route path="/verify-certificate/:code" element={<Verify />} />
-            <Route path="/verify-offer" element={<VerifyOffer />} />
-            <Route path="/verify-offer/:id" element={<VerifyOffer />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/cookies" element={<CookiePolicy />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/help" element={<HelpCenter />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/careers/apply" element={<TeamApply />} />
-          </Route>
+      <CompanyAccessProvider>
+        <ScrollToTop />
+        <Suspense fallback={<RouteLoading />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Landing />} />
+              <Route path="/internships" element={<BrowseInternships />} />
+              <Route path="/internships/:id" element={<InternshipDetail />} />
+              <Route path="/companies" element={<Companies />} />
+              <Route path="/companies/:id" element={<CompanyDetail />} />
+              <Route path="/verify" element={<Verify />} />
+              <Route path="/verify/:code" element={<Verify />} />
+              <Route path="/verify-certificate" element={<Verify />} />
+              <Route path="/verify-certificate/:code" element={<Verify />} />
+              <Route path="/verify-offer" element={<VerifyOffer />} />
+              <Route path="/verify-offer/:id" element={<VerifyOffer />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/cookies" element={<CookiePolicy />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/help" element={<HelpCenter />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/careers/apply" element={<TeamApply />} />
+            </Route>
 
-          {/* Auth Routes — redirect to dashboard if already logged in */}
-          <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-          <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
-          <Route path="/register/:role" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
-          <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
-          <Route path="/accept-invite" element={<AcceptInvite />} />
+            {/* Auth Routes — redirect to dashboard if already logged in */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+            <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+            <Route path="/register/:role" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+            <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
+            <Route path="/accept-invite" element={<AcceptInvite />} />
 
-          {/* Student Routes */}
-          <Route path="/student/*" element={<ProtectedRoute role="student"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="student" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><StudentPortal /></Suspense>} />
-          </Route>
+            {/* Student Routes */}
+            <Route path="/student/*" element={<ProtectedRoute role="student"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="student" /></Suspense></ProtectedRoute>}>
+              <Route path="*" element={<Suspense fallback={<RouteLoading />}><StudentPortal /></Suspense>} />
+            </Route>
 
-          {/* Company Routes — owners and accepted team members, tabs gated by role */}
-          <Route path="/company/*" element={
-            <CompanyAccessProvider>
+            {/* Company Routes — owners and accepted team members, tabs gated by role */}
+            <Route path="/company/*" element={
               <CompanyAccessRoute>
                 <Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="company" /></Suspense>
               </CompanyAccessRoute>
-            </CompanyAccessProvider>
-          }>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><CompanyPortal /></Suspense>} />
-          </Route>
+            }>
+              <Route path="*" element={<Suspense fallback={<RouteLoading />}><CompanyPortal /></Suspense>} />
+            </Route>
 
-          {/* Mentor Routes */}
-          <Route path="/mentor/*" element={<ProtectedRoute role="mentor"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="mentor" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><MentorPortal /></Suspense>} />
-          </Route>
+            {/* Mentor Routes */}
+            <Route path="/mentor/*" element={<ProtectedRoute role="mentor"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="mentor" /></Suspense></ProtectedRoute>}>
+              <Route path="*" element={<Suspense fallback={<RouteLoading />}><MentorPortal /></Suspense>} />
+            </Route>
 
-          {/* Admin Routes */}
-          <Route path="/admin/*" element={<ProtectedRoute role="admin"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="admin" /></Suspense></ProtectedRoute>}>
-            <Route path="*" element={<Suspense fallback={<RouteLoading />}><AdminPortal /></Suspense>} />
-          </Route>
+            {/* Admin Routes */}
+            <Route path="/admin/*" element={<ProtectedRoute role="admin"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="admin" /></Suspense></ProtectedRoute>}>
+              <Route path="*" element={<Suspense fallback={<RouteLoading />}><AdminPortal /></Suspense>} />
+            </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
-      </Suspense>
+            {/* Fallback */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </Suspense>
+      </CompanyAccessProvider>
     </LazyMotion>
   );
 }

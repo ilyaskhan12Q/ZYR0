@@ -5,9 +5,10 @@ import { useTheme } from 'next-themes';
 import {
   Menu, X, Bell, ChevronDown, LogOut, User, LayoutDashboard,
   Briefcase, Settings, Mail, Sun, Moon,
-  Linkedin, Github
+  Linkedin, Github, Building2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
 import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
 import { SiteBannerBar } from '@/components/SiteBannerBar';
 import { SITE_CONFIG } from '@/config/site';
@@ -22,6 +23,7 @@ const navLinks = [
 
 export default function PublicLayout() {
   const { user, profile, signOut } = useAuth();
+  const companyAccess = useOptionalCompanyAccess();
   const effectiveRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -143,20 +145,25 @@ export default function PublicLayout() {
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
-                          className="absolute right-0 mt-2 w-56 bg-card rounded-xl border border-border shadow-lg py-2 z-50"
+                          className="absolute right-0 mt-2 w-60 bg-card rounded-xl border border-border shadow-lg py-2 z-50"
                         >
                           <div className="px-4 py-3 border-b border-border">
                             <p className="text-sm font-medium">{user.user_metadata?.full_name || 'User'}</p>
                             <p className="text-xs text-muted-foreground">{user.email}</p>
                           </div>
                           <div className="py-1">
-                            <button onClick={() => navigate(`/${effectiveRole}/dashboard`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <LayoutDashboard className="w-4 h-4" /> Dashboard
                             </button>
-                            <button onClick={() => navigate(`/${effectiveRole}/profile`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                              <button onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-b border-border my-1 py-2">
+                                <Building2 className="w-4 h-4 text-accent" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
+                              </button>
+                            )}
+                            <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <User className="w-4 h-4" /> Profile
                             </button>
-                            <button onClick={() => navigate(`/${effectiveRole}/settings`)} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                            <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
                               <Settings className="w-4 h-4" /> Settings
                             </button>
                           </div>
@@ -223,14 +230,24 @@ export default function PublicLayout() {
                   <CommunitySocialNav mobile />
                 </div>
 
-                <div className="pt-3 border-t border-border flex gap-3">
+                <div className="pt-3 border-t border-border flex flex-col gap-2">
                   {user ? (
-                    <Link
-                      to={`/${effectiveRole}/dashboard`}
-                      className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
-                    >
-                      Go to Dashboard
-                    </Link>
+                    <>
+                      <Link
+                        to={`/${effectiveRole}/dashboard`}
+                        className="w-full text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
+                      >
+                        Go to Dashboard
+                      </Link>
+                      {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                        <Link
+                          to="/company/dashboard"
+                          className="w-full text-center py-2.5 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
+                        </Link>
+                      )}
+                    </>
                   ) : (
                     <>
                       <Link to="/login" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors">
