@@ -642,6 +642,22 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       <button onClick={() => { setProfileOpen(false); navigate(`/${role}/settings`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-muted transition-colors">
                         <Settings className="w-4 h-4" /> Settings
                       </button>
+                      {companyAccess?.hasAccess && role !== 'company' && (
+                        <button
+                          onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2"
+                        >
+                          <Building2 className="w-4 h-4 text-accent" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
+                        </button>
+                      )}
+                      {role === 'company' && profile?.role && profile.role !== 'company' && (
+                        <button
+                          onClick={() => { setProfileOpen(false); navigate(`/${profile.role}/dashboard`); }}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2"
+                        >
+                          <User className="w-4 h-4 text-accent" /> Switch to {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Workspace
+                        </button>
+                      )}
                     </div>
                     <div className="border-t border-border pt-1">
                       <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
