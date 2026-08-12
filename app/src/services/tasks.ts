@@ -33,6 +33,54 @@ export async function getMyTasks(useCache = true) {
   return res;
 }
 
+/** Count tasks assigned to the current student that still need a submission. */
+export async function getMyPendingTasksCount(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const cacheKey = `my_pending_tasks_count_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<number>(cacheKey);
+    if (cached !== null) return cached;
+  }
+
+  const fetchFn = () =>
+    supabase
+      .from('tasks')
+      .select('*', { count: 'exact', head: true })
+      .eq('assigned_to', user.id)
+      .eq('status', 'Pending');
+
+  const { count } = await dedupRequest(cacheKey, fetchFn);
+  const result = count ?? 0;
+  setCachedData(cacheKey, result);
+  return result;
+}
+
+/** Count tasks assigned by the current user that await review (mentor). */
+export async function getTasksToReviewCount(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const cacheKey = `tasks_to_review_count_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<number>(cacheKey);
+    if (cached !== null) return cached;
+  }
+
+  const fetchFn = () =>
+    supabase
+      .from('tasks')
+      .select('*', { count: 'exact', head: true })
+      .eq('assigned_by', user.id)
+      .in('status', ['Submitted', 'Under Review']);
+
+  const { count } = await dedupRequest(cacheKey, fetchFn);
+  const result = count ?? 0;
+  setCachedData(cacheKey, result);
+  return result;
+}
+
 /** Get tasks assigned by current user (mentor/company) */
 export async function getTasksAssignedByMe(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
