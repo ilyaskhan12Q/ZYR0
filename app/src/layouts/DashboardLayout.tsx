@@ -19,12 +19,14 @@ import LoginWelcomeModal from '@/components/onboarding/LoginWelcomeModal';
 import ThemeToggle from '@/components/ThemeToggle';
 import { TourProvider, useTour } from '@/components/onboarding/tour/TourProvider';
 import { TourSpotlight } from '@/components/onboarding/tour/TourSpotlight';
+import { useSidebarCounts } from '@/hooks/useSidebarCounts';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
-  badge?: number;
+  /** Count shown in the sidebar pill, keyed into the live useSidebarCounts data. */
+  badgeKey?: 'applications' | 'tasks' | 'messages';
   children?: { label: string; href: string }[];
   /** data-tour anchor used by the onboarding tour to highlight this nav item. */
   tourTarget?: string;
@@ -36,11 +38,11 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Workspace', href: '/student/workspace', icon: Briefcase, tourTarget: 'nav-workspace' },
     { label: 'Internships', href: '/student/internships', icon: FolderOpen, tourTarget: 'nav-internships' },
     { label: 'Saved', href: '/student/saved', icon: Bookmark },
-    { label: 'Applications', href: '/student/applications', icon: FileCheck, tourTarget: 'nav-applications', badge: 4 },
+    { label: 'Applications', href: '/student/applications', icon: FileCheck, tourTarget: 'nav-applications', badgeKey: 'applications' },
     { label: 'Team Applications', href: '/student/team-applications', icon: Rocket },
-    { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, tourTarget: 'nav-tasks', badge: 3 },
+    { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, tourTarget: 'nav-tasks', badgeKey: 'tasks' },
     { label: 'Progress', href: '/student/progress', icon: TrendingUp, tourTarget: 'nav-progress' },
-    { label: 'Messages', href: '/student/messages', icon: MessageSquare, badge: 3 },
+    { label: 'Messages', href: '/student/messages', icon: MessageSquare, badgeKey: 'messages' },
     { label: 'Certificates', href: '/student/certificates', icon: Award, tourTarget: 'nav-certificates' },
     { label: 'Offer Letters', href: '/student/offer-letters', icon: FileText },
     { label: 'Portfolio', href: '/student/portfolio', icon: User },
@@ -53,7 +55,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
       { label: 'All Internships', href: '/company/internships' },
       { label: 'Post New', href: '/company/internships/new' },
     ]},
-    { label: 'Applications', href: '/company/applications', icon: FileCheck, badge: 12 },
+    { label: 'Applications', href: '/company/applications', icon: FileCheck, badgeKey: 'applications' },
     { label: 'Interns', href: '/company/interns', icon: Users },
     { label: 'Tasks', href: '/company/tasks', icon: ClipboardList },
     { label: 'Messages', href: '/company/messages', icon: MessageSquare },
@@ -65,7 +67,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
   mentor: [
     { label: 'Dashboard', href: '/mentor/dashboard', icon: Home },
     { label: 'My Interns', href: '/mentor/interns', icon: Users },
-    { label: 'Tasks', href: '/mentor/tasks', icon: ClipboardList, badge: 3 },
+    { label: 'Tasks', href: '/mentor/tasks', icon: ClipboardList, badgeKey: 'tasks' },
     { label: 'Evaluations', href: '/mentor/evaluations', icon: CheckSquare },
     { label: 'Messages', href: '/mentor/messages', icon: MessageSquare },
     { label: 'Profile', href: '/mentor/profile', icon: User },
@@ -112,6 +114,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const location = useLocation();
   const navigate = useNavigate();
   const navItems = navConfig[role] || [];
+  const sidebarCounts = useSidebarCounts();
 
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -391,9 +394,9 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                   {!collapsed && (
                     <>
                       <span className="flex-1 whitespace-nowrap">{item.label}</span>
-                      {item.badge && !isItemRestricted && (
+                      {item.badgeKey && sidebarCounts[item.badgeKey] && !isItemRestricted && (
                         <span className="min-w-[20px] h-5 px-1.5 bg-accent text-white text-xs rounded-full flex items-center justify-center">
-                          {item.badge}
+                          {sidebarCounts[item.badgeKey]}
                         </span>
                       )}
                       {isItemRestricted && (
@@ -404,7 +407,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       )}
                     </>
                   )}
-                  {collapsed && item.badge && !isItemRestricted && (
+                  {collapsed && item.badgeKey && sidebarCounts[item.badgeKey] && !isItemRestricted && (
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
                   )}
                   {collapsed && isItemRestricted && (

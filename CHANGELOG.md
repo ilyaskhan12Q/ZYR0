@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.4] - 2026-08-12
+
+### Added
+- **Real Sidebar Badges (`app/src/hooks/useSidebarCounts.ts`, `app/src/services/applications.ts`, `app/src/services/tasks.ts`, `app/src/layouts/DashboardLayout.tsx`)**:
+  - **Live Count Services**: `getMyActiveApplicationsCount` / `getCompanyActiveApplicationsCount` (status in Applied, Under Review, Shortlisted), `getMyPendingTasksCount` (status Pending), `getTasksToReviewCount` (status in Submitted, Under Review) — lightweight `head: true` count queries reusing the existing cache + dedup pattern.
+  - **`useSidebarCounts` Hook**: per-role fetching (student: applications + tasks + messages; company: applications + messages; mentor: tasks + messages), refresh on every route change, and Supabase realtime `postgres_changes` subscriptions (RLS-scoped) that refetch on any insert/update.
+
+### Changed
+- **Sidebar Badges Now Show Real Data (`app/src/layouts/DashboardLayout.tsx`)**: removed the hardcoded placeholder counts (`Applications 4`, `Tasks 3`, `Messages 3`, company `Applications 12`, mentor `Tasks 3`) from `navConfig`; nav items now reference a `badgeKey` resolved from the live counts hook. Badges hide when the count is zero and respect the restricted-item lock state.
+
 ## [0.36.3] - 2026-08-12
 
 ### Added
