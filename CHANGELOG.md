@@ -20,14 +20,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
-## [0.37.7] - 2026-08-13
+## [0.38.2] - 2026-08-13
+
+### Fixed
+- **Mentors Could Not See Their Interns (`supabase/migrations/042_mentor_read_company_applications.sql`)**:
+  - `/company/interns` lists interns from the company's accepted applications, but the applications SELECT policy only granted company read access to owner/admin/hr/reviewer roles — `mentor` was missing, so a mentor's query returned zero rows and the page always showed "No active interns found".
+  - Migration 042 extends the read policy to include the `mentor` role (the interns tab is granted to mentors in the tab matrix). Mentors gain read-only access; they still cannot modify application status.
+  - Also corrects the release numbering: the previous two releases were renumbered per GIT_WORKFLOW (patch series caps at 5, then the minor bumps — 0.37.6 → 0.38.0, 0.37.7 → 0.38.1).
+
+## [0.38.1] - 2026-08-13
 
 ### Security
 - **Guaranteed RLS on `applications` Table (`supabase/migrations/041_enforce_applications_rls.sql`)**:
   - The `applications` table can predate migration 004 (which enables row-level security); if the table was created outside the migration history, RLS may stay disabled while later migrations silently succeed — letting any authenticated student read every application.
   - Migration 041 unconditionally `ENABLE ROW LEVEL SECURITY` on `public.applications` and re-creates the canonical read policy (applicant sees own, verified-company owner / team admin·hr·reviewer, or platform admin) so the table is locked down regardless of history.
 
-## [0.37.6] - 2026-08-13
+## [0.38.0] - 2026-08-13
 
 ### Fixed
 - **Student Applications Queries No Longer Rely on RLS Alone (`app/src/services/applications.ts`)**:
