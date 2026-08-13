@@ -20,6 +20,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.7] - 2026-08-13
+
+### Security
+- **Guaranteed RLS on `applications` Table (`supabase/migrations/041_enforce_applications_rls.sql`)**:
+  - The `applications` table can predate migration 004 (which enables row-level security); if the table was created outside the migration history, RLS may stay disabled while later migrations silently succeed — letting any authenticated student read every application.
+  - Migration 041 unconditionally `ENABLE ROW LEVEL SECURITY` on `public.applications` and re-creates the canonical read policy (applicant sees own, verified-company owner / team admin·hr·reviewer, or platform admin) so the table is locked down regardless of history.
+
+## [0.37.6] - 2026-08-13
+
+### Fixed
+- **Student Applications Queries No Longer Rely on RLS Alone (`app/src/services/applications.ts`)**:
+  - `getMyApplications` and `getMyActiveApplicationsCount` fetched `applications` without a `student_id` filter, relying entirely on database RLS to hide other students' rows — if RLS is ever disabled or missing, `/student/applications` shows every applicant's data to any student.
+  - Both queries now filter `.eq('student_id', user.id)` so a student can never fetch another student's applications, even if the database layer is misconfigured.
+
 ## [0.37.5] - 2026-08-13
 
 ### Fixed

@@ -34,6 +34,7 @@ export async function getMyActiveApplicationsCount(useCache = true) {
     supabase
       .from('applications')
       .select('*', { count: 'exact', head: true })
+      .eq('student_id', user.id)
       .in('status', ACTIVE_APPLICATION_STATUSES);
 
   const { count } = await dedupRequest(cacheKey, fetchFn);
@@ -93,6 +94,7 @@ export async function getMyApplications(useCache = true) {
         company:companies!company_id (id, name, logo_url, owner_id)
       )
     `)
+    .eq('student_id', user.id)
     .order('applied_at', { ascending: false });
 
   const res = await dedupRequest(cacheKey, fetchFn);
