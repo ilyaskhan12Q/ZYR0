@@ -20,6 +20,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.5] - 2026-08-13
+
+### Fixed
+- **Workspace Switcher Missing on Mobile Dashboard (`app/src/layouts/DashboardLayout.tsx`)**:
+  - The "Switch to Company/Student Workspace" entries only lived in the header avatar dropdown, which mobile users rarely open — the mobile sidebar drawer (hamburger menu) offered no way to switch workspaces even for accepted team members.
+  - Added mobile-only (`lg:hidden`) **"Switch to {Company} Workspace"** and reciprocal **"Switch to {Role} Workspace"** entries to the sidebar footer, visible in the mobile drawer, which close the drawer on navigation.
+
+## [0.37.4] - 2026-08-13
+
+### Fixed
+- **Membership Re-Resolved When Tab Regains Focus (`app/src/contexts/CompanyAccessContext.tsx`)**:
+  - The `CompanyAccessProvider` previously loaded membership exactly once per signed-in user, so role edits or removals made by an owner were invisible to the member until a full page reload (cached `my_company` entries also masked them for up to 300s).
+  - The provider now subscribes to `visibilitychange` and re-resolves membership (cache-bypassing) whenever the tab becomes visible again — sidebar tabs and route guards reflect the latest role/removal state on return to the tab.
+
+## [0.37.3] - 2026-08-13
+
+### Fixed
+- **Multi-Company Membership No Longer Breaks Access Resolution (`app/src/services/companyTeam.ts`)**:
+  - `getMyCompanyMembership` queried `company_team_members` with `.maybeSingle()`, so a user accepted into more than one company hit a PostgREST "multiple rows" error that resolved to `company: null` — locking the member out of every company workspace.
+  - The member query now orders by `accepted_at` and applies `.limit(1)` before `.maybeSingle()`, deterministically resolving to the earliest accepted membership (single active workspace per the switcher).
+
+## [0.37.2] - 2026-08-13
+
+### Security
+- **Company Team Rows No Longer Publicly Readable (`supabase/migrations/040_company_team_member_read_rls.sql`)**:
+  - Removed the legacy `Team: company members read` policy (`USING (true)` from migration 011) which let every authenticated user read all companies' `company_team_members` rows — including other companies' pending invites, member emails, and `invite_token`s.
+  - Added `Team: members read own row` (`auth.uid() = user_id`) so membership resolution still works, and `Team: public read accepted` (`status = 'accepted'`) so the public CompanyDetail team section keeps listing active members while pending invite credentials stay hidden. Owners / admin-role members / platform admins keep full team access through the existing `Team: owner or admin manage` FOR ALL policy.
+
+## [0.37.1] - 2026-08-13
+
+### Fixed
+- **Company Access Refreshed After Invite Acceptance (`app/src/pages/public/AcceptInvite.tsx`)**:
+  - `/accept-invite` now calls the `CompanyAccessProvider`'s `refresh()` immediately after a successful acceptance, so the cached `company: null` membership is replaced with the real accepted membership before the user clicks "Go to Company Dashboard". Previously the stale provider state bounced already-logged-in invitees back to their own dashboard (or hid the workspace switch button) until a full page reload.
+
 ## [0.37.0] - 2026-08-12
 
 ### Added

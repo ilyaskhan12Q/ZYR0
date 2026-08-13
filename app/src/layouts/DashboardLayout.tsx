@@ -489,6 +489,27 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
         {/* Sidebar Footer */}
         <div className="border-t border-border p-3 space-y-1 flex-shrink-0">
+          {/* Workspace switcher — shown in the mobile drawer (desktop keeps the header avatar menu) */}
+          {companyAccess?.hasAccess && role !== 'company' && (
+            <Link
+              to="/company/dashboard"
+              onClick={() => setMobileOpen(false)}
+              className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
+            >
+              <Building2 className="w-5 h-5 flex-shrink-0" />
+              <span>Switch to {companyAccess.company?.name || 'Company'} Workspace</span>
+            </Link>
+          )}
+          {role === 'company' && profile?.role && profile.role !== 'company' && (
+            <Link
+              to={`/${profile.role}/dashboard`}
+              onClick={() => setMobileOpen(false)}
+              className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
+            >
+              <User className="w-5 h-5 flex-shrink-0" />
+              <span>Switch to {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Workspace</span>
+            </Link>
+          )}
           <Link
             to={`/${role}/settings`}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${

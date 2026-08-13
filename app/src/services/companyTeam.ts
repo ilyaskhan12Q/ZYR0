@@ -283,6 +283,10 @@ export async function acceptTeamInvite(token: string) {
  * Resolve the current user's company + team role.
  * Owner (profile role "company") resolves through companies.owner_id;
  * everyone else resolves through their accepted company_team_members row.
+ *
+ * A user accepted into multiple companies resolves to their earliest
+ * accepted membership (single active workspace; the switcher targets
+ * one company at a time).
  */
 export async function getMyCompanyMembership(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -330,6 +334,8 @@ export async function getMyCompanyMembership(useCache = true) {
       .select('*, company:companies(*, team:company_team_members(*), owner:profiles!owner_id (id, full_name, title, department))')
       .eq('user_id', user.id)
       .eq('status', 'accepted')
+      .order('accepted_at', { ascending: true })
+      .limit(1)
       .maybeSingle();
 
     if (error) {
