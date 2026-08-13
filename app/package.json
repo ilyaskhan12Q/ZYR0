@@ -1,7 +1,7 @@
 {
   "name": "my-app",
   "private": true,
-  "version": "0.37.5",
+  "version": "0.37.6",
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
