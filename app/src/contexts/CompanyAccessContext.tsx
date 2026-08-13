@@ -24,14 +24,14 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
   const [member, setMember] = useState<CompanyTeamMember | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (useCache = true) => {
     if (!user) {
       setCompany(null);
       setMember(null);
       setLoading(false);
       return;
     }
-    const res = await getMyCompanyMembership();
+    const res = await getMyCompanyMembership(useCache);
     const comp = res?.company ?? res?.data?.company ?? null;
     const mem = res?.member ?? res?.data?.member ?? null;
     setCompany(comp);
@@ -41,6 +41,20 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     load();
+  }, [load]);
+
+  // Re-resolve membership when the tab regains focus so role changes,
+  // removals, or new acceptances made elsewhere take effect instead of
+  // rendering a stale sidebar/access state until reload. Bypasses the
+  // 300s my_company cache so the freshest state is always read.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        load(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
   }, [load]);
 
   const value = useMemo<CompanyAccessValue>(() => {

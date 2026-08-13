@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.4] - 2026-08-13
+
+### Fixed
+- **Membership Re-Resolved When Tab Regains Focus (`app/src/contexts/CompanyAccessContext.tsx`)**:
+  - The `CompanyAccessProvider` previously loaded membership exactly once per signed-in user, so role edits or removals made by an owner were invisible to the member until a full page reload (cached `my_company` entries also masked them for up to 300s).
+  - The provider now subscribes to `visibilitychange` and re-resolves membership (cache-bypassing) whenever the tab becomes visible again — sidebar tabs and route guards reflect the latest role/removal state on return to the tab.
+
 ## [0.37.3] - 2026-08-13
 
 ### Fixed
