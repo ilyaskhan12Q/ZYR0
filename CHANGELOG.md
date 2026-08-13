@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.2] - 2026-08-13
+
+### Security
+- **Company Team Rows No Longer Publicly Readable (`supabase/migrations/040_company_team_member_read_rls.sql`)**:
+  - Removed the legacy `Team: company members read` policy (`USING (true)` from migration 011) which let every authenticated user read all companies' `company_team_members` rows — including other companies' pending invites, member emails, and `invite_token`s.
+  - Added `Team: members read own row` (`auth.uid() = user_id`) so membership resolution still works, and `Team: public read accepted` (`status = 'accepted'`) so the public CompanyDetail team section keeps listing active members while pending invite credentials stay hidden. Owners / admin-role members / platform admins keep full team access through the existing `Team: owner or admin manage` FOR ALL policy.
+
 ## [0.37.1] - 2026-08-13
 
 ### Fixed
