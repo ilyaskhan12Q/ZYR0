@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.3] - 2026-08-13
+
+### Fixed
+- **Multi-Company Membership No Longer Breaks Access Resolution (`app/src/services/companyTeam.ts`)**:
+  - `getMyCompanyMembership` queried `company_team_members` with `.maybeSingle()`, so a user accepted into more than one company hit a PostgREST "multiple rows" error that resolved to `company: null` — locking the member out of every company workspace.
+  - The member query now orders by `accepted_at` and applies `.limit(1)` before `.maybeSingle()`, deterministically resolving to the earliest accepted membership (single active workspace per the switcher).
+
 ## [0.37.2] - 2026-08-13
 
 ### Security
