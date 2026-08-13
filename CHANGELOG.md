@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.1] - 2026-08-13
+
+### Fixed
+- **Company Access Refreshed After Invite Acceptance (`app/src/pages/public/AcceptInvite.tsx`)**:
+  - `/accept-invite` now calls the `CompanyAccessProvider`'s `refresh()` immediately after a successful acceptance, so the cached `company: null` membership is replaced with the real accepted membership before the user clicks "Go to Company Dashboard". Previously the stale provider state bounced already-logged-in invitees back to their own dashboard (or hid the workspace switch button) until a full page reload.
+
 ## [0.37.0] - 2026-08-12
 
 ### Added

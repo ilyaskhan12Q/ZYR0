@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCompanyAccess } from '@/contexts/CompanyAccessContext';
 import { acceptTeamInvite } from '@/services/companyTeam';
 import { SEO } from '@/components/SEO';
 
@@ -10,6 +11,7 @@ export default function AcceptInvite() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
+  const { refresh } = useCompanyAccess();
   const token = searchParams.get('token');
   const [state, setState] = useState<'idle' | 'working' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -35,6 +37,10 @@ export default function AcceptInvite() {
       try {
         const ok = await acceptTeamInvite(token ?? '');
         if (ok) {
+          // The provider's cached membership is stale (null) from before
+          // acceptance; refetch now so "Go to Company Dashboard" doesn't
+          // bounce through CompanyAccessRoute.
+          await refresh();
           setState('success');
         } else {
           setState('error');
@@ -46,7 +52,7 @@ export default function AcceptInvite() {
       }
     }
     run();
-  }, [loading, user, token, navigate]);
+  }, [loading, user, token, navigate, refresh]);
 
   if (loading || state === 'working') {
     return (
