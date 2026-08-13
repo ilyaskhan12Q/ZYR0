@@ -20,6 +20,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+## [0.37.5] - 2026-08-13
+
+### Fixed
+- **Workspace Switcher Missing on Mobile Dashboard (`app/src/layouts/DashboardLayout.tsx`)**:
+  - The "Switch to Company/Student Workspace" entries only lived in the header avatar dropdown, which mobile users rarely open — the mobile sidebar drawer (hamburger menu) offered no way to switch workspaces even for accepted team members.
+  - Added mobile-only (`lg:hidden`) **"Switch to {Company} Workspace"** and reciprocal **"Switch to {Role} Workspace"** entries to the sidebar footer, visible in the mobile drawer, which close the drawer on navigation.
+
 ## [0.37.4] - 2026-08-13
 
 ### Fixed
