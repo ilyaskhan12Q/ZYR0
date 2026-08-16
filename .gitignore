@@ -50,3 +50,6 @@ offer-letter&certificate/
 
 # Playwright CLI session artifacts
 .playwright-cli/
+
+# Private working docs (0-AI architecture — not for the repo)
+docs/0-AI_ARCHITECTURE.md
