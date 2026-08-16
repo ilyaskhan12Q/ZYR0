@@ -10,13 +10,17 @@ import { TelemetryStage } from '@/components/zeroai/TelemetryStage';
 import { ReportCanvas } from '@/components/zeroai/ReportCanvas';
 import { ByokSettingsModal } from '@/components/zeroai/ByokSettingsModal';
 import { JsonInspectDialog } from '@/components/zeroai/JsonInspectDialog';
+import { ChatStage } from '@/components/zeroai/ChatStage';
+import { ResearchPromptDialog } from '@/components/zeroai/ResearchPromptDialog';
 import { useZeroAiKeys } from '@/hooks/useZeroAiKeys';
 import { useZeroAiHistory, titleFromPrompt } from '@/hooks/useZeroAiHistory';
 import { REPORT_FIXTURE, type Depth, type ResearchReport } from '@/data/zeroAiFixtures';
 import type { DecompositionResult } from '@/data/zeroAiTypes';
 import { decompose } from '@/lib/zeroai/planner';
+import { classifyIntent, wantsConfirm, type ComposerMode } from '@/lib/zeroai/intent';
+import { chatReply, type ChatTurn } from '@/lib/zeroai/chat';
 
-type Phase = 'idle' | 'planning' | 'processing' | 'completed';
+type Phase = 'idle' | 'planning' | 'processing' | 'chatting' | 'completed';
 
 export default function ZeroAIWorkspace() {
   const [phase, setPhase] = useState<Phase>('idle');
@@ -25,6 +29,11 @@ export default function ZeroAIWorkspace() {
   const [report, setReport] = useState<ResearchReport | null>(null);
   const [decomposition, setDecomposition] = useState<DecompositionResult | null>(null);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
+  const [composerMode, setComposerMode] = useState<ComposerMode>('auto');
+  const [chatTurns, setChatTurns] = useState<ChatTurn[]>([]);
+  const [chatTyping, setChatTyping] = useState(false);
+  const [routing, setRouting] = useState(false);
+  const [popupPrompt, setPopupPrompt] = useState<string | null>(null);
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileHistoryOpen, setMobileHistoryOpen] = useState(false);
@@ -36,7 +45,30 @@ export default function ZeroAIWorkspace() {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const runIdRef = useRef(0);
+  const chatTurnsRef = useRef<ChatTurn[]>([]);
   const [lastPrompt, setLastPrompt] = useState('');
+
+  const appendChat = useCallback((turn: Omit<ChatTurn, 'id'>) => {
+    const next = [...chatTurnsRef.current, { ...turn, id: `c-${Date.now()}-${chatTurnsRef.current.length}` }];
+    chatTurnsRef.current = next;
+    setChatTurns(next);
+  }, []);
+
+  const startChat = useCallback(
+    (prompt: string) => {
+      const runId = ++runIdRef.current;
+      setPopupPrompt(null);
+      setPhase('chatting');
+      appendChat({ role: 'user', text: prompt });
+      setChatTyping(true);
+      void chatReply(chatTurnsRef.current, keys).then((reply) => {
+        if (runIdRef.current !== runId) return;
+        appendChat({ role: 'assistant', text: reply.text });
+        setChatTyping(false);
+      });
+    },
+    [appendChat, keys]
+  );
 
   const startResearch = useCallback(
     (prompt: string) => {
@@ -64,6 +96,48 @@ export default function ZeroAIWorkspace() {
     [addItem, depth, keys]
   );
 
+  const handleSubmit = useCallback(
+    (raw: string) => {
+      const prompt = raw.trim();
+      if (composerMode === 'research') {
+        startResearch(prompt);
+        return;
+      }
+      if (composerMode === 'chat') {
+        startChat(prompt);
+        return;
+      }
+      const runId = runIdRef.current;
+      setRouting(true);
+      void classifyIntent(prompt, keys).then((decision) => {
+        setRouting(false);
+        if (runIdRef.current !== runId) return;
+        if (decision.mode === 'research') {
+          startResearch(prompt);
+          return;
+        }
+        if (wantsConfirm(decision, prompt)) {
+          setPopupPrompt(prompt);
+          return;
+        }
+        startChat(prompt);
+      });
+    },
+    [composerMode, keys, startChat, startResearch]
+  );
+
+  const handleQuickAnswer = useCallback(() => {
+    const pending = popupPrompt;
+    setPopupPrompt(null);
+    if (pending) startChat(pending);
+  }, [popupPrompt, startChat]);
+
+  const handleResearchInstead = useCallback(() => {
+    const pending = popupPrompt;
+    setPopupPrompt(null);
+    if (pending) startResearch(pending);
+  }, [popupPrompt, startResearch]);
+
   const handleComplete = useCallback(
     (result: ResearchReport) => {
       setReport(result);
@@ -81,6 +155,11 @@ export default function ZeroAIWorkspace() {
     setReport(null);
     setDecomposition(null);
     setActiveHistoryId(null);
+    setChatTurns([]);
+    chatTurnsRef.current = [];
+    setChatTyping(false);
+    setRouting(false);
+    setPopupPrompt(null);
   }, []);
 
   const selectHistory = useCallback(
@@ -99,7 +178,7 @@ export default function ZeroAIWorkspace() {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [phase, report]);
+  }, [phase, report, chatTurns, chatTyping]);
 
   return (
     <div className="zeroai-root flex h-dvh flex-col overflow-hidden bg-background text-foreground">
@@ -145,7 +224,21 @@ export default function ZeroAIWorkspace() {
                 onDepthChange={setDepth}
                 sources={sources}
                 onSourceToggle={(key) => setSources((prev) => ({ ...prev, [key]: !prev[key] }))}
-                onStart={startResearch}
+                mode={composerMode}
+                onModeChange={setComposerMode}
+                busy={routing}
+                onSubmit={handleSubmit}
+              />
+            )}
+            {phase === 'chatting' && (
+              <ChatStage
+                turns={chatTurns}
+                typing={chatTyping}
+                busy={routing}
+                mode={composerMode}
+                onModeChange={setComposerMode}
+                onSend={handleSubmit}
+                onNewResearch={newResearch}
               />
             )}
             {phase === 'planning' && (
@@ -198,6 +291,11 @@ export default function ZeroAIWorkspace() {
         masked={masked}
         onSave={setProviderKey}
         onClearAll={clearKeys}
+      />
+      <ResearchPromptDialog
+        prompt={popupPrompt}
+        onQuickAnswer={handleQuickAnswer}
+        onResearchInstead={handleResearchInstead}
       />
       {report && <JsonInspectDialog report={report} open={jsonOpen} onOpenChange={setJsonOpen} />}
     </div>
