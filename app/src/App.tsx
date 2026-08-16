@@ -37,6 +37,9 @@ const Register = lazy(() => import('@/pages/auth/Register'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
 
+// 0-AI Deep Research Workspace (isolated experimental surface, no public chrome)
+const ZeroAIWorkspace = lazy(() => import('@/pages/zeroai/ZeroAIWorkspace'));
+
 // Role-Based Portals (Each is its own dynamically-loaded bundle containing statically-loaded pages)
 const StudentPortal = lazy(() => import('@/pages/student/StudentPortal'));
 const CompanyPortal = lazy(() => import('@/pages/company/CompanyPortal'));
@@ -85,6 +88,9 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/complete-profile" element={<CompleteProfileRedirect />} />
             <Route path="/accept-invite" element={<AcceptInvite />} />
+
+            {/* 0-AI Deep Research Workspace — isolated, outside PublicLayout */}
+            <Route path="/0-ai" element={<ZeroAIWorkspace />} />
 
             {/* Student Routes */}
             <Route path="/student/*" element={<ProtectedRoute role="student"><Suspense fallback={<RouteLoading />}><LazyDashboardLayout role="student" /></Suspense></ProtectedRoute>}>
