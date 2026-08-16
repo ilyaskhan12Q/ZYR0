@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { ArrowUp, Check, Globe, LibraryBig } from 'lucide-react';
+import { ArrowUp, Globe, LibraryBig } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -31,10 +32,13 @@ export function HeroInput({ depth, onDepthChange, sources, onSourceToggle, onSta
   const [focused, setFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const canSubmit = prompt.trim().length >= 10;
+  const canSubmit = prompt.trim().length >= 2;
 
   const submit = () => {
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      toast.info('Type at least 2 characters to start research.');
+      return;
+    }
     onStart(prompt.trim());
   };
 
@@ -164,7 +168,7 @@ export function HeroInput({ depth, onDepthChange, sources, onSourceToggle, onSta
                 aria-label="Submit research question"
                 className="rounded-lg"
               >
-                {canSubmit ? <ArrowUp className="size-4" /> : <Check className="size-4" />}
+                <ArrowUp className="size-4" />
               </Button>
             </div>
           </div>
