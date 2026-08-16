@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import type { Depth } from '@/data/zeroAiFixtures';
+import type { ComposerMode } from '@/lib/zeroai/intent';
+import { ModeSegment } from '@/components/zeroai/ModeSegment';
 
 export interface ComposerSources {
   academic: boolean;
@@ -17,7 +19,10 @@ interface HeroInputProps {
   onDepthChange: (depth: Depth) => void;
   sources: ComposerSources;
   onSourceToggle: (key: keyof ComposerSources) => void;
-  onStart: (prompt: string) => void;
+  mode: ComposerMode;
+  onModeChange: (mode: ComposerMode) => void;
+  busy: boolean;
+  onSubmit: (prompt: string) => void;
 }
 
 const SUGGESTIONS = [
@@ -27,19 +32,29 @@ const SUGGESTIONS = [
   'What design factors make remote-first internship programs succeed in emerging markets?',
 ];
 
-export function HeroInput({ depth, onDepthChange, sources, onSourceToggle, onStart }: HeroInputProps) {
+export function HeroInput({
+  depth,
+  onDepthChange,
+  sources,
+  onSourceToggle,
+  mode,
+  onModeChange,
+  busy,
+  onSubmit,
+}: HeroInputProps) {
   const [prompt, setPrompt] = useState('');
   const [focused, setFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const canSubmit = prompt.trim().length >= 2;
+  const canSubmit = prompt.trim().length >= 2 && !busy;
 
   const submit = () => {
-    if (!canSubmit) {
+    if (busy) return;
+    if (prompt.trim().length < 2) {
       toast.info('Type at least 2 characters to start research.');
       return;
     }
-    onStart(prompt.trim());
+    onSubmit(prompt.trim());
   };
 
   const autoGrow = () => {
@@ -115,6 +130,9 @@ export function HeroInput({ depth, onDepthChange, sources, onSourceToggle, onSta
             aria-label="Research question"
           />
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-2 pb-1 pt-2">
+            {/* Mode segmented control (auto / chat / research) */}
+            <ModeSegment mode={mode} onModeChange={onModeChange} />
+
             {/* Depth segmented control */}
             <div className="flex items-center gap-0.5 rounded-lg bg-secondary p-0.5" role="group" aria-label="Depth">
               {(['STANDARD', 'EXHAUSTIVE'] as const).map((option) => (
@@ -159,7 +177,7 @@ export function HeroInput({ depth, onDepthChange, sources, onSourceToggle, onSta
 
             <div className="ml-auto flex items-center gap-3">
               <span className="za-mono text-[10px] tracking-wide text-muted-foreground/70">
-                QUOTA 12,000 / 20,000
+                {busy ? 'ROUTING…' : 'AUTO ROUTES CHAT VS RESEARCH'}
               </span>
               <Button
                 size="icon-sm"
@@ -174,7 +192,7 @@ export function HeroInput({ depth, onDepthChange, sources, onSourceToggle, onSta
           </div>
         </div>
         <p className="mx-auto mt-2 max-w-2xl text-center text-[10px] text-muted-foreground/60">
-          Phase 1 mock — results are simulated locally. No data leaves your browser.
+          Quick chat keeps answers conversational — research questions run the full citation-grade pipeline.
         </p>
       </div>
     </div>

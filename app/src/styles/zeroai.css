@@ -141,10 +141,42 @@
   animation: za-breathe 1.6s ease-in-out infinite;
 }
 
+/* Ambiguity popup rises with a springy settle */
+@keyframes za-pop-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.za-pop-rise {
+  animation: za-pop-rise 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Popup backdrop fades in gently */
+@keyframes za-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.za-fade-in {
+  animation: za-fade-in 0.2s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .za-pulse-dot,
   .za-log-in,
-  .za-breathe {
+  .za-breathe,
+  .za-pop-rise,
+  .za-fade-in {
     animation: none !important;
   }
 }
