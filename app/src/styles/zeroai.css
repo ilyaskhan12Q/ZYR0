@@ -1,0 +1,150 @@
+/* ============================================================
+   0-AI Deep Research Workspace — scoped theme (dark, isolated)
+   Imported ONLY by the ZeroAIWorkspace route chunk.
+   Nothing here leaks into the rest of the app: every rule is
+   namespaced under `.zeroai-root` or the `za-*` utility set.
+   ============================================================ */
+
+/* Unlayered so these beat any Tailwind utility with the same name.
+   (Tailwind v4 legacy mode requires @layer utilities to live in the same
+   file as a @tailwind utilities directive, which we can't touch.) */
+.za-serif {
+    font-family: Georgia, 'Times New Roman', ui-serif, serif;
+  }
+
+  .za-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .za-whitespace-pre-wrap {
+    white-space: pre-wrap;
+  }
+
+  .border-z-edge-strong {
+    border-color: var(--z-edge-strong);
+  }
+
+  .bg-z-hover {
+  background-color: var(--z-hover);
+}
+
+/* Scoped palette — redefines the shadcn HSL vars under .zeroai-root
+   so every existing Radix primitive (dialog, popover, switch, select…)
+   renders the 0-AI dark look without touching src/index.css. */
+.zeroai-root {
+  --background: 240 10% 4%;
+  --foreground: 0 0% 92%;
+  --card: 240 7% 8%;
+  --card-foreground: 0 0% 92%;
+  --popover: 240 7% 9%;
+  --popover-foreground: 0 0% 92%;
+  --primary: 243 75% 62%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 6% 12%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 240 6% 12%;
+  --muted-foreground: 240 5% 55%;
+  --accent: 240 6% 14%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 72% 51%;
+  --border: 240 6% 15%;
+  --input: 240 6% 15%;
+  --ring: 243 75% 60%;
+  --radius: 0.75rem;
+
+  /* 0-AI specific tokens */
+  --z-edge: rgba(255, 255, 255, 0.08);
+  --z-edge-strong: rgba(255, 255, 255, 0.14);
+  --z-elevated: #16161b;
+  --z-hover: rgba(255, 255, 255, 0.05);
+  --z-indigo: #818cf8;
+  --z-emerald: #34d399;
+  --z-amber: #fbbf24;
+
+  color-scheme: dark;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.zeroai-root *,
+.zeroai-root *::before,
+.zeroai-root *::after {
+  border-color: var(--z-edge);
+}
+
+/* Step chip states */
+.za-step-done {
+  color: var(--z-emerald);
+}
+
+.za-step-active {
+  color: var(--z-amber);
+}
+
+.za-step-queued {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Thinking indicator dots */
+@keyframes za-pulse-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.za-pulse-dot {
+  animation: za-pulse-dot 1.2s ease-in-out infinite;
+}
+
+.za-pulse-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.za-pulse-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Telemetry log lines stream in */
+@keyframes za-log-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.za-log-in {
+  animation: za-log-in 0.25s ease-out both;
+}
+
+/* Subtle glow for active step chip */
+@keyframes za-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px var(--z-amber), 0 0 18px rgba(251, 191, 36, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 1px var(--z-amber), 0 0 28px rgba(251, 191, 36, 0.18);
+  }
+}
+
+.za-breathe {
+  animation: za-breathe 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .za-pulse-dot,
+  .za-log-in,
+  .za-breathe {
+    animation: none !important;
+  }
+}
