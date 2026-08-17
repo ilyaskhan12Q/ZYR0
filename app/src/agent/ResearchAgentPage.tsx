@@ -103,7 +103,9 @@ export default function ResearchAgentPage() {
                     message={pipeline.message}
                     detail={pipeline.detail}
                     evidence={pipeline.evidence}
+                    ledger={pipeline.ledger}
                     errors={pipeline.errors}
+                    workerProgress={pipeline.workerProgress}
                     running={pipeline.running}
                     onRun={pipeline.run}
                     onStop={pipeline.abort}

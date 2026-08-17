@@ -55,6 +55,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Pipeline now pauses at a new `review` stage after planning: 4 contract cards (2×2) with dimension badges, editable focus areas and sub-questions, expandable keywords/boundaries/output-fields.
   - Actions: "Approve & research" (workers start with the edited agenda), "Regenerate plan" (re-decompose), "Cancel"; "Skip review next time" persisted in localStorage makes future runs flow straight through.
   - Planner fallback/errors surfaced inline on the review screen.
+- **Pipeline view polish (`PipelineView` rewrite)**:
+  - Planning phase shows a 4-slot contract skeleton while the planner works.
+  - Working phase shows per-source status rows (OpenAlex/arXiv/Semantic Scholar/Jina Web): spinner while active, checkmark + per-source "N found" counts when done.
+  - Evidence chips get title/year tooltips and a green checkmark once the verifier confirms the link.
+  - Worker/verifier notes condensed into one collapsible amber panel instead of stacked error boxes.
 
 ## [0.38.3] - 2026-08-17
 

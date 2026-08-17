@@ -21,6 +21,11 @@ export interface ResearchHistoryItem {
   report_md?: string | null;
 }
 
+export interface WorkerProgress {
+  active: string[];
+  counts: Record<string, number>;
+}
+
 export interface ReviewPlan {
   contracts: SubTaskContract[];
   provider: string;
@@ -60,6 +65,7 @@ export function useResearchPipeline() {
   const [review, setReview] = useState<ReviewPlan | null>(null);
   const [skipReview, setSkipReview] = useState<boolean>(() => localStorage.getItem(SKIP_REVIEW_KEY) === '1');
   const [running, setRunning] = useState(false);
+  const [workerProgress, setWorkerProgress] = useState<WorkerProgress>({ active: [], counts: {} });
   const abortRef = useRef<AbortController | null>(null);
   const lastTopicRef = useRef('');
 
@@ -139,12 +145,20 @@ export function useResearchPipeline() {
           message: 'Gathering evidence',
           detail: `${approved.length} worker contracts dispatched`,
         });
+        setWorkerProgress({ active: ['academic', 'web'], counts: {} });
         const gathered = await runWorkers(
           approved,
           () => undefined,
-          (item) => setEvidence((prev) => [...prev, item]),
+          (item) => {
+            setEvidence((prev) => [...prev, item]);
+            setWorkerProgress((prev) => ({
+              ...prev,
+              counts: { ...prev.counts, [item.sourceName]: (prev.counts[item.sourceName] ?? 0) + 1 },
+            }));
+          },
         );
         if (controller.signal.aborted) return;
+        setWorkerProgress((prev) => ({ ...prev, active: [] }));
         if (gathered.errors.length > 0) setErrors((prev) => [...prev, ...gathered.errors]);
 
         emit({
@@ -208,6 +222,7 @@ export function useResearchPipeline() {
       setLedger([]);
       setErrors([]);
       setReview(null);
+      setWorkerProgress({ active: [], counts: {} });
 
       const started = performance.now();
 
@@ -307,6 +322,7 @@ export function useResearchPipeline() {
     setLedger([]);
     setErrors([]);
     setReview(null);
+    setWorkerProgress({ active: [], counts: {} });
   }, []);
 
   return {
@@ -321,6 +337,7 @@ export function useResearchPipeline() {
     history,
     review,
     skipReview,
+    workerProgress,
     running,
     run,
     approvePlan,
