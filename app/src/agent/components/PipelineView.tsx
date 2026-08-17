@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import type { CitationLedgerEntry, EvidenceItem, PipelineStage } from '@/agent/research/types';
 import type { WorkerProgress } from '@/agent/hooks/useResearchPipeline';
@@ -21,6 +21,7 @@ interface PipelineViewProps {
   errors: string[];
   workerProgress: WorkerProgress;
   running: boolean;
+  prefill?: { topic: string; seq: number } | null;
   onRun: (topic: string) => void;
   onStop: () => void;
 }
@@ -34,11 +35,16 @@ export function PipelineView({
   errors,
   workerProgress,
   running,
+  prefill,
   onRun,
   onStop,
 }: PipelineViewProps) {
   const [value, setValue] = useState('');
   const [errorsOpen, setErrorsOpen] = useState(false);
+
+  useEffect(() => {
+    if (prefill) setValue(prefill.topic);
+  }, [prefill]);
   const active =
     running && (stage === 'planning' || stage === 'working' || stage === 'verifying' || stage === 'writing');
   const verifiedUrls = new Set(ledger.map((entry) => entry.url));

@@ -7,9 +7,12 @@ import type { CitationLedgerEntry, ResearchReport } from '@/agent/research/types
 
 interface ReportViewProps {
   report: ResearchReport;
+  onFollowUp: (report: ResearchReport) => void;
+  onNewResearch: (topic: string) => void;
+  onRegenerate: (topic: string) => void;
 }
 
-export function ReportView({ report }: ReportViewProps) {
+export function ReportView({ report, onFollowUp, onNewResearch, onRegenerate }: ReportViewProps) {
   const [highlightKey, setHighlightKey] = useState<number | null>(null);
   const [modalEntry, setModalEntry] = useState<CitationLedgerEntry | null>(null);
   const elapsed = report.elapsedMs >= 60_000 ? `${(report.elapsedMs / 60_000).toFixed(1)} min` : `${report.elapsedMs}s`;
@@ -27,11 +30,24 @@ export function ReportView({ report }: ReportViewProps) {
   return (
     <ScrollArea className="flex-1">
       <div className="mx-auto max-w-3xl px-4 py-6">
-        <div className="mb-4 rounded-xl border border-border bg-card/60 p-4">
-          <h2 className="text-base font-semibold">{report.topic}</h2>
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {report.model || '—'} · {elapsed} · {report.ledger.length} verified sources
-          </p>
+        <div className="mb-4 flex items-start justify-between gap-3 rounded-xl border border-border bg-card/60 p-4">
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold">{report.topic}</h2>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {report.model || '—'} · {elapsed} · {report.ledger.length} verified sources
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => onFollowUp(report)}>
+              Ask follow-up
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => onNewResearch(report.topic)}>
+              New research
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => onRegenerate(report.topic)}>
+              Regenerate
+            </Button>
+          </div>
         </div>
 
         <div className="rounded-xl border border-border bg-card/60 p-5 text-sm text-foreground">

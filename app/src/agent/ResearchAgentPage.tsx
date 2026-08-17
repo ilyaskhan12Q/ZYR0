@@ -12,6 +12,7 @@ import { PlanReview } from '@/agent/components/PlanReview';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
+import type { ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
 import '@/styles/agent.css';
 
@@ -19,6 +20,21 @@ const SYSTEM_PROMPT = `You are ZYR0's Research Agent: a precise, honest research
 - Answer from first principles; when uncertain, say so and explain what is known.
 - Keep answers well-structured with markdown when it helps clarity.
 - Never fabricate sources or facts.`;
+
+function buildFollowUpPrompt(report: ResearchReport): string {
+  const sources = report.ledger
+    .map((entry) => `[${entry.key}] ${entry.title} — ${entry.sourceName} — ${entry.url}`)
+    .join('\n');
+  return `${SYSTEM_PROMPT}
+
+You have a completed deep-research report on "${report.topic}" (below). Answer follow-up questions using this report and its citation ledger first; cite claims with the same [n] keys. If a question goes beyond the report's scope, say so and answer from first principles.
+
+--- REPORT ---
+${report.markdown}
+
+--- CITATION LEDGER ---
+${sources}`;
+}
 
 export default function ResearchAgentPage() {
   const { user } = useAuth();
@@ -28,12 +44,30 @@ export default function ResearchAgentPage() {
   const { loadHistory } = pipeline;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
+  const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
+  const [prefill, setPrefill] = useState<{ topic: string; seq: number } | null>(null);
 
   useEffect(() => {
     if (mode === 'research') loadHistory();
   }, [mode, loadHistory]);
 
   const handleSelect = (id: string) => setSelected(id === 'auto' ? null : id);
+
+  const handleFollowUp = (report: ResearchReport) => {
+    setChatSystem(buildFollowUpPrompt(report));
+    setMode('chat');
+  };
+
+  const handleNewResearch = (topic: string) => {
+    pipeline.clear();
+    setMode('research');
+    setPrefill({ topic, seq: Date.now() });
+  };
+
+  const handleRegenerate = (topic: string) => {
+    setMode('research');
+    void pipeline.run(topic);
+  };
 
   return (
     <div className="agent-root flex h-screen flex-col overflow-hidden">
@@ -82,7 +116,12 @@ export default function ResearchAgentPage() {
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               {pipeline.report ? (
-                <ReportView report={pipeline.report} />
+                <ReportView
+                  report={pipeline.report}
+                  onFollowUp={handleFollowUp}
+                  onNewResearch={handleNewResearch}
+                  onRegenerate={handleRegenerate}
+                />
               ) : pipeline.review && pipeline.stage === 'review' ? (
                 <PlanReview
                   contracts={pipeline.review.contracts}
@@ -107,30 +146,13 @@ export default function ResearchAgentPage() {
                     errors={pipeline.errors}
                     workerProgress={pipeline.workerProgress}
                     running={pipeline.running}
+                    prefill={prefill}
                     onRun={pipeline.run}
                     onStop={pipeline.abort}
                   />
                 </div>
               )}
             </div>
-            {pipeline.report && (
-              <div className="border-t border-border bg-card/60 p-4">
-                <div className="mx-auto flex max-w-3xl justify-between">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      pipeline.clear();
-                    }}
-                  >
-                    New research
-                  </Button>
-                  <p className="text-[11px] text-muted-foreground">
-                    Run persisted to your research history.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
           <HistoryPanel
             items={pipeline.history}
@@ -153,7 +175,7 @@ export default function ResearchAgentPage() {
           </ScrollArea>
 
           {/* Composer */}
-          <Composer streaming={streaming} onSend={(text) => send(text, SYSTEM_PROMPT)} onStop={abort} />
+          <Composer streaming={streaming} onSend={(text) => send(text, chatSystem)} onStop={abort} />
         </>
       )}
 

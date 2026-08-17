@@ -60,6 +60,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Working phase shows per-source status rows (OpenAlex/arXiv/Semantic Scholar/Jina Web): spinner while active, checkmark + per-source "N found" counts when done.
   - Evidence chips get title/year tooltips and a green checkmark once the verifier confirms the link.
   - Worker/verifier notes condensed into one collapsible amber panel instead of stacked error boxes.
+- **Continue from report (`ReportView` actions, `ResearchAgentPage`)**:
+  - "Ask follow-up" switches to chat with the report + its citation ledger loaded as the system prompt (answers cite the same [n] keys).
+  - "New research" resets the pipeline and pre-fills the topic input.
+  - "Regenerate" re-runs the pipeline on the same topic (straight through when "skip review" is set).
 
 ## [0.38.3] - 2026-08-17
 
