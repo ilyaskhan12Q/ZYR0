@@ -45,6 +45,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Pipeline view: topic input, animated stage progress (planning → working → verifying → writing), live evidence chips, worker/verifier error surface.
   - Report view: publication report rendered as grounded text + full verified citation ledger (verified/unverified badges, authors, years, DOI links).
   - History panel: last 20 deep-research runs, reopen any report, "New research" reset.
+- **Report rendering (`app/src/agent/render/renderReportMarkdown.ts`, `ReportView` rewrite)**:
+  - Dependency-free, XSS-safe markdown renderer (React-escaped, no dangerouslySetInnerHTML): headings, bold, bullet lists.
+  - Inline `[n]` citations become clickable anchors — emerald when verified, amber when unverified — that scroll to and flash-highlight the matching ledger card.
+  - Ledger cards sorted verified-first with consistent verified/unverified color language (left border, badge).
 
 ## [0.38.3] - 2026-08-17
 
