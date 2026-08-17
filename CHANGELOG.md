@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Gateway `/v1/verify` action (`supabase/functions/ai-gateway/index.ts`)**:
   - Server-side URL/DOI liveness checks for the research pipeline verifier (browsers cannot read cross-origin status codes): HEAD request with ranged-GET fallback, 5s timeout each, bounded concurrency 5, max 25 URLs per call, JWT-gated like chat.
+- **Research engine contracts (`app/src/agent/research/types.ts`, `app/src/agent/research/planner.ts`)**:
+  - Isolated pipeline types: `SubTaskContract` (4 dimensions), `EvidenceItem`, `CitationLedgerEntry` with deterministic `[1]..[N]` keys, `ResearchReport`, `PipelineStage`.
+  - `decompose()` planner: decomposes a topic into 4 sub-task worker contracts through the gateway chat (free-tier models), with strict schema validation and rule-based `fallbackContracts` when model output is malformed (pattern isolated from the legacy zeroai planner).
 
 ## [0.38.3] - 2026-08-17
 
