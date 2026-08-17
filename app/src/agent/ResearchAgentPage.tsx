@@ -8,6 +8,7 @@ import { AgentSettingsModal } from '@/agent/components/AgentSettingsModal';
 import { PipelineView } from '@/agent/components/PipelineView';
 import { ReportView } from '@/agent/components/ReportView';
 import { HistoryPanel } from '@/agent/components/HistoryPanel';
+import { PlanReview } from '@/agent/components/PlanReview';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
@@ -82,6 +83,19 @@ export default function ResearchAgentPage() {
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               {pipeline.report ? (
                 <ReportView report={pipeline.report} />
+              ) : pipeline.review && pipeline.stage === 'review' ? (
+                <PlanReview
+                  contracts={pipeline.review.contracts}
+                  provider={pipeline.review.provider}
+                  error={pipeline.review.error}
+                  skipReview={pipeline.skipReview}
+                  running={pipeline.running}
+                  onApprove={pipeline.approvePlan}
+                  onUpdate={pipeline.updatePlan}
+                  onRegenerate={() => void pipeline.regeneratePlan()}
+                  onSkipReviewChange={pipeline.setSkipReviewPreference}
+                  onCancel={pipeline.abort}
+                />
               ) : (
                 <div className="flex-1">
                   <PipelineView

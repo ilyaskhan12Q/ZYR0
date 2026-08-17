@@ -51,6 +51,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Ledger cards sorted verified-first with consistent verified/unverified color language (left border, badge).
 - **Source modal (`app/src/agent/components/SourceModal.tsx`)**:
   - "Details" on any ledger card opens a dialog with the full source record: title, verified status, source, year, authors, DOI, snippet, and "Open source" external link; unverified entries show an explicit notice.
+- **Plan review gate (`app/src/agent/components/PlanReview.tsx`, `useResearchPipeline` split)**:
+  - Pipeline now pauses at a new `review` stage after planning: 4 contract cards (2×2) with dimension badges, editable focus areas and sub-questions, expandable keywords/boundaries/output-fields.
+  - Actions: "Approve & research" (workers start with the edited agenda), "Regenerate plan" (re-decompose), "Cancel"; "Skip review next time" persisted in localStorage makes future runs flow straight through.
+  - Planner fallback/errors surfaced inline on the review screen.
 
 ## [0.38.3] - 2026-08-17
 
