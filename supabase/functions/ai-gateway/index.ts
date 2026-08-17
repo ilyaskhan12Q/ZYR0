@@ -374,9 +374,9 @@ async function chatStream(admin: ReturnType<typeof createClient>, userId: string
 
           const latencyMs = Date.now() - started;
           const inputTokens = usage?.prompt_tokens ?? estimateTokens(JSON.stringify(req.messages));
-          const outputTokens = usage?.completion_tokens ?? estimateTokens(
+          const outputTokens = (usage?.completion_tokens ?? estimateTokens(
             estimatedOutput > 0 ? String(estimatedOutput) : '',
-          ) || Math.max(1, Math.ceil(estimatedOutput / 4));
+          )) || Math.max(1, Math.ceil(estimatedOutput / 4));
 
           await recordUsage(admin, userId, entry, inputTokens, outputTokens, latencyMs);
 
@@ -398,7 +398,7 @@ async function chatStream(admin: ReturnType<typeof createClient>, userId: string
           ...corsHeaders,
         },
       });
-    } catch (err) {
+    } catch {
       cooldowns.set(entry.id, Date.now() + 30_000);
     }
   }
