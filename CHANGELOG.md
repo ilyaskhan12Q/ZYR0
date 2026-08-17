@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Research engine contracts (`app/src/agent/research/types.ts`, `app/src/agent/research/planner.ts`)**:
   - Isolated pipeline types: `SubTaskContract` (4 dimensions), `EvidenceItem`, `CitationLedgerEntry` with deterministic `[1]..[N]` keys, `ResearchReport`, `PipelineStage`.
   - `decompose()` planner: decomposes a topic into 4 sub-task worker contracts through the gateway chat (free-tier models), with strict schema validation and rule-based `fallbackContracts` when model output is malformed (pattern isolated from the legacy zeroai planner).
+- **Research workers (`app/src/agent/research/workers.ts`)**:
+  - Worker A (academic): OpenAlex, arXiv (Atom RSS), and Semantic Scholar graph search — all keyless, CORS-friendly; abstract inversion and author extraction included.
+  - Worker B (web): Jina `s.jina.ai` search + `r.jina.ai` content fetch for snippets (keyless free tier).
+  - Bounded concurrency 2 with hard 12s per-worker deadlines, `Promise.allSettled` isolation (one worker failing never blocks the other), URL dedupe, target 8–12 evidence items.
 
 ## [0.38.3] - 2026-08-17
 
