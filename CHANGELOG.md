@@ -40,6 +40,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Research pipeline state machine (`app/src/agent/hooks/useResearchPipeline.ts`, migration `044_research_report_data.sql`)**:
   - `idle → planning → working → verifying → writing → done/failed` with live stage + evidence streaming.
   - Persists completed/failed runs to `agent_researches` (new `report_data` jsonb payload: contracts, ledger, model, timings) + a user message to `agent_messages`; history panel reads back via `loadHistory`/`loadReport` (migration applied to production).
+- **Research workspace UI (`PipelineView`, `ReportView`, `HistoryPanel`, `ResearchAgentPage`)**:
+  - Research mode enabled (previously "Research · Phase 2" disabled tab).
+  - Pipeline view: topic input, animated stage progress (planning → working → verifying → writing), live evidence chips, worker/verifier error surface.
+  - Report view: publication report rendered as grounded text + full verified citation ledger (verified/unverified badges, authors, years, DOI links).
+  - History panel: last 20 deep-research runs, reopen any report, "New research" reset.
 
 ## [0.38.3] - 2026-08-17
 
