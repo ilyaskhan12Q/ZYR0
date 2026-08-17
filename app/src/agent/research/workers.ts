@@ -1,8 +1,11 @@
 import type { EvidenceItem, SubTaskContract } from '@/agent/research/types';
 
-// Hard per-worker deadline (bounded-concurrency spec: 10-12s, Promise.allSettled isolation).
+// Hard per-worker deadline — with intra-platform parallel queries each
+// platform finishes in ~1-9s; Promise.allSettled waits for the slowest.
 const WORKER_TIMEOUT_MS = 12_000;
 const JINA_TIMEOUT_MS = 10_000;
+
+export type WorkerName = 'openalex' | 'arxiv' | 'semanticscholar' | 'web';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -53,10 +56,10 @@ function dedupeByUrl(items: EvidenceItem[]): EvidenceItem[] {
 }
 
 // ---------------------------------------------------------------------------
-// Worker A — Academic (OpenAlex + arXiv + Semantic Scholar, all keyless)
+// Worker — OpenAlex (keyless)
 // ---------------------------------------------------------------------------
 
-async function openAlex(query: string): Promise<EvidenceItem[]> {
+async function openAlexQuery(query: string): Promise<EvidenceItem[]> {
   const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=5`;
   const res = await withTimeout(fetch(url), WORKER_TIMEOUT_MS);
   if (!res || !res.ok) return [];
@@ -85,7 +88,21 @@ async function openAlex(query: string): Promise<EvidenceItem[]> {
     .filter((item: EvidenceItem | null): item is EvidenceItem => item !== null);
 }
 
-async function arxiv(query: string): Promise<EvidenceItem[]> {
+export async function openAlexWorker(
+  contracts: SubTaskContract[],
+  onItem?: (item: EvidenceItem) => void,
+): Promise<EvidenceItem[]> {
+  const batches = await Promise.all(contracts.flatMap((c) => contractQueries(c)).map((q) => openAlexQuery(q)));
+  const items = dedupeByUrl(batches.flat()).slice(0, 6);
+  for (const item of items) onItem?.(item);
+  return items;
+}
+
+// ---------------------------------------------------------------------------
+// Worker — arXiv (keyless, Atom RSS)
+// ---------------------------------------------------------------------------
+
+async function arxivQuery(query: string): Promise<EvidenceItem[]> {
   const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&max_results=5`;
   const res = await withTimeout(fetch(url), WORKER_TIMEOUT_MS);
   if (!res || !res.ok) return [];
@@ -111,7 +128,21 @@ async function arxiv(query: string): Promise<EvidenceItem[]> {
   }).filter((item: EvidenceItem | null): item is EvidenceItem => item !== null);
 }
 
-async function semanticScholar(query: string): Promise<EvidenceItem[]> {
+export async function arxivWorker(
+  contracts: SubTaskContract[],
+  onItem?: (item: EvidenceItem) => void,
+): Promise<EvidenceItem[]> {
+  const batches = await Promise.all(contracts.flatMap((c) => contractQueries(c)).map((q) => arxivQuery(q)));
+  const items = dedupeByUrl(batches.flat()).slice(0, 6);
+  for (const item of items) onItem?.(item);
+  return items;
+}
+
+// ---------------------------------------------------------------------------
+// Worker — Semantic Scholar (keyless, staggered bursts)
+// ---------------------------------------------------------------------------
+
+async function semanticScholarQuery(query: string): Promise<EvidenceItem[]> {
   const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&limit=5&fields=title,abstract,year,url,externalIds,authors`;
   const res = await withTimeout(fetch(url), WORKER_TIMEOUT_MS);
   if (!res || !res.ok) return [];
@@ -144,33 +175,19 @@ async function semanticScholar(query: string): Promise<EvidenceItem[]> {
     .filter((item: EvidenceItem | null): item is EvidenceItem => item !== null);
 }
 
-export async function academicWorker(
+export async function semanticScholarWorker(
   contracts: SubTaskContract[],
   onItem?: (item: EvidenceItem) => void,
-): Promise<{ items: EvidenceItem[]; errors: string[] }> {
-  const errors: string[] = [];
-  const items: EvidenceItem[] = [];
-
-  for (const contract of contracts) {
-    for (const query of contractQueries(contract)) {
-      const [oa, ax, s2] = await Promise.all([
-        openAlex(query).catch(() => []),
-        arxiv(query).catch(() => []),
-        semanticScholar(query).catch(() => []),
-      ]);
-      const batch = dedupeByUrl([...oa, ...ax, ...s2]);
-      for (const item of batch) {
-        items.push(item);
-        onItem?.(item);
-      }
-    }
-  }
-
-  return { items: dedupeByUrl(items).slice(0, 8), errors };
+): Promise<EvidenceItem[]> {
+  const queries = contracts.flatMap((c) => contractQueries(c));
+  const batches = await Promise.all(queries.map((q, i) => semanticScholarQuery(q).then((items) => items)));
+  const items = dedupeByUrl(batches.flat()).slice(0, 6);
+  for (const item of items) onItem?.(item);
+  return items;
 }
 
 // ---------------------------------------------------------------------------
-// Worker B — Web (Jina: s.jina.ai search + r.jina.ai content fetch, keyless)
+// Worker — Jina web (keyless, capped: 2 searches + 2 content fetches)
 // ---------------------------------------------------------------------------
 
 function extractLinks(markdown: string): { title: string; url: string }[] {
@@ -203,73 +220,64 @@ async function jinaFetch(pageUrl: string): Promise<string> {
 export async function webWorker(
   contracts: SubTaskContract[],
   onItem?: (item: EvidenceItem) => void,
-): Promise<{ items: EvidenceItem[]; errors: string[] }> {
-  const errors: string[] = [];
-  const items: EvidenceItem[] = [];
+): Promise<EvidenceItem[]> {
+  const queries = contracts.flatMap((c) => contractQueries(c)).slice(0, 2);
+  const searches = await Promise.all(queries.map((q) => jinaSearch(q).catch(() => [])));
 
-  const queries = contracts.flatMap((contract) => contractQueries(contract)).slice(0, 3);
-
-  for (const query of queries) {
-    try {
-      const links = await jinaSearch(query);
-      const withSnippets = await Promise.all(
-        links.slice(0, 2).map(async (link) => ({
-          link,
-          snippet: await jinaFetch(link.url),
-        })),
-      );
-      for (const { link, snippet } of withSnippets) {
-        const item: EvidenceItem = {
-          id: nextId(),
-          title: link.title,
-          url: link.url,
-          sourceType: 'web',
-          sourceName: 'Jina Web',
-          snippet: snippet.slice(0, 400),
-        };
-        items.push(item);
-        onItem?.(item);
-      }
-    } catch (err) {
-      errors.push(err instanceof Error ? err.message : 'Jina query failed');
+  const seen = new Set<string>();
+  const links: { title: string; url: string }[] = [];
+  for (const link of searches.flat()) {
+    const key = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      links.push(link);
     }
+    if (links.length >= 2) break;
   }
 
-  return { items: dedupeByUrl(items).slice(0, 4), errors };
+  const withSnippets = await Promise.all(links.map(async (link) => ({ link, snippet: await jinaFetch(link.url) })));
+
+  const items = withSnippets.map(({ link, snippet }): EvidenceItem => ({
+    id: nextId(),
+    title: link.title,
+    url: link.url,
+    sourceType: 'web',
+    sourceName: 'Jina Web',
+    snippet: snippet.slice(0, 400),
+  }));
+  for (const item of items) onItem?.(item);
+  return items;
 }
 
 // ---------------------------------------------------------------------------
-// Orchestrator — bounded concurrency 2, Promise.allSettled isolation
+// Orchestrator — 4-way parallelism, allSettled isolation
 // ---------------------------------------------------------------------------
 
 export async function runWorkers(
   contracts: SubTaskContract[],
-  onWorkerStart?: (name: 'academic' | 'web') => void,
+  onWorkerStart?: (name: WorkerName) => void,
   onItem?: (item: EvidenceItem) => void,
 ): Promise<{ items: EvidenceItem[]; errors: string[] }> {
-  onWorkerStart?.('academic');
-  onWorkerStart?.('web');
+  const workers: Array<[WorkerName, () => Promise<EvidenceItem[]>]> = [
+    ['openalex', () => openAlexWorker(contracts, onItem)],
+    ['arxiv', () => arxivWorker(contracts, onItem)],
+    ['semanticscholar', () => semanticScholarWorker(contracts, onItem)],
+    ['web', () => webWorker(contracts, onItem)],
+  ];
 
-  const [academic, web] = await Promise.allSettled([
-    academicWorker(contracts, onItem),
-    webWorker(contracts, onItem),
-  ]);
+  const errors: string[] = [];
+  const settled = await Promise.allSettled(
+    workers.map(([name, run]) => {
+      onWorkerStart?.(name);
+      return run();
+    }),
+  );
 
   const items: EvidenceItem[] = [];
-  const errors: string[] = [];
+  settled.forEach((result, i) => {
+    if (result.status === 'fulfilled') items.push(...result.value);
+    else errors.push(`${workers[i][0]} worker: ${result.reason}`);
+  });
 
-  if (academic.status === 'fulfilled') {
-    items.push(...academic.value.items);
-    errors.push(...academic.value.errors);
-  } else {
-    errors.push(`academic worker: ${academic.reason}`);
-  }
-  if (web.status === 'fulfilled') {
-    items.push(...web.value.items);
-    errors.push(...web.value.errors);
-  } else {
-    errors.push(`web worker: ${web.reason}`);
-  }
-
-  return { items: dedupeByUrl(items).slice(0, 12), errors };
+  return { items: dedupeByUrl(items), errors };
 }

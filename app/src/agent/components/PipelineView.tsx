@@ -142,7 +142,7 @@ export function PipelineView({
           <div className="flex flex-col gap-1.5">
             {SOURCE_NAMES.map((name) => {
               const count = workerProgress.counts[name] ?? 0;
-              const done = !workerProgress.active.includes('academic') && !workerProgress.active.includes('web');
+              const done = workerProgress.active.length === 0;
               return (
                 <div key={name} className="flex items-center gap-2 text-xs">
                   {done ? (

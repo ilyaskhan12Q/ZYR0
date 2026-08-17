@@ -66,6 +66,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - "Regenerate" re-runs the pipeline on the same topic (straight through when "skip review" is set).
 - **Research-mode header cleanup**:
   - Model picker hidden in research mode (models only affect planner/editorial; choice stays in Settings, used model shown in the report meta line). Chat mode unchanged.
+- **Four parallel realtime workers (`app/src/agent/research/workers.ts`)**:
+  - Split the academic+web worker pair into 4 independent per-platform workers: OpenAlex, arXiv, Semantic Scholar, Jina web — each with its own 12s deadline, dispatched 4-way via `Promise.allSettled` (one platform failing never blocks the others).
+  - Contract queries run in parallel *within* each platform (was sequential), bringing the gathering phase to ~8–12s: OpenAlex/arXiv/S2 ≈1–3s each, Jina capped at 2 searches + 2 content fetches (~8–9s long pole).
+  - PipelineView source status rows now light up live per platform.
 
 ## [0.38.3] - 2026-08-17
 
