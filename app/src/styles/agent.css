@@ -1,0 +1,78 @@
+/* ============================================================
+   Research Agent workspace — scoped theme (dark, isolated)
+   Imported ONLY by the ResearchAgentPage route chunk.
+   Mirrors the 0-AI pattern: redefines shadcn HSL vars under
+   `.agent-root` so every Radix primitive renders the agent
+   look without touching src/index.css.
+   ============================================================ */
+
+.agent-serif {
+  font-family: Georgia, 'Times New Roman', ui-serif, serif;
+}
+
+.agent-whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.agent-root {
+  --background: 240 10% 4%;
+  --foreground: 0 0% 92%;
+  --card: 240 7% 8%;
+  --card-foreground: 0 0% 92%;
+  --popover: 240 7% 9%;
+  --popover-foreground: 0 0% 92%;
+  --primary: 243 75% 62%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 6% 12%;
+  --secondary-foreground: 0 0% 88%;
+  --muted: 240 6% 12%;
+  --muted-foreground: 240 5% 55%;
+  --accent: 240 6% 14%;
+  --accent-foreground: 0 0% 95%;
+  --destructive: 0 72% 51%;
+  --border: 240 6% 15%;
+  --input: 240 6% 15%;
+  --ring: 243 75% 60%;
+  --radius: 0.75rem;
+
+  color-scheme: dark;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.agent-logo-ring {
+  background: linear-gradient(135deg, hsl(243 75% 62%), hsl(280 60% 55%));
+  color: #fff;
+  box-shadow: 0 0 24px rgba(129, 140, 248, 0.25);
+}
+
+/* Thinking dots */
+@keyframes agent-pulse-dot {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.agent-pulse-dot {
+  animation: agent-pulse-dot 1.2s ease-in-out infinite;
+}
+
+.agent-pulse-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.agent-pulse-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-pulse-dot {
+    animation: none !important;
+  }
+}
