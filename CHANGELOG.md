@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Worker A (academic): OpenAlex, arXiv (Atom RSS), and Semantic Scholar graph search — all keyless, CORS-friendly; abstract inversion and author extraction included.
   - Worker B (web): Jina `s.jina.ai` search + `r.jina.ai` content fetch for snippets (keyless free tier).
   - Bounded concurrency 2 with hard 12s per-worker deadlines, `Promise.allSettled` isolation (one worker failing never blocks the other), URL dedupe, target 8–12 evidence items.
+- **Research verifier (`app/src/agent/research/verifier.ts`, gateway client `verifyUrls`)**:
+  - Dedupes evidence by normalized URL and fuzzy title.
+  - Server-side liveness pass via the gateway `verify` action: dead links (HTTP ≥ 400) dropped, transient/unknown kept but flagged unverified.
+  - Deterministic citation keys `[1]..[N]` assigned in ledger order — the editorial stage may only cite ledger keys.
 
 ## [0.38.3] - 2026-08-17
 
