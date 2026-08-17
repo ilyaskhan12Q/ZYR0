@@ -74,6 +74,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Per-platform caps: OpenAlex/arXiv/Semantic Scholar ≤6 each, Jina web ≤4, hard aggregate cap 16 — matching the approved "8–16" target.
   - Semantic Scholar queries run in staggered waves of 3 with 150ms spacing (unauthenticated ~1 rps) to avoid 429 bursts while staying parallel.
   - Jina expanded to 4 content fetches (2 per search) so web coverage matches the cap without blowing the 12s budget.
+- **PDF export (`app/src/agent/lib/reportPdf.ts`, `ReportView` "Export PDF")**:
+  - Client-side multi-page A4 PDF on the existing `jspdf` dependency (no new deps): topic + meta header, full report sections, then a complete citation-ledger appendix (`[n]`, title, source, year, authors, URL, verified/unverified).
+  - Direct browser download (`zyro-research-<slug>.pdf`), page-numbered footer; no storage writes.
 
 ## [0.38.3] - 2026-08-17
 

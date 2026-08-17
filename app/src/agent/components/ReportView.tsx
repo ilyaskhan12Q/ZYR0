@@ -3,6 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { renderReportMarkdown } from '@/agent/render/renderReportMarkdown';
 import { SourceModal } from '@/agent/components/SourceModal';
+import { generateReportPdf } from '@/agent/lib/reportPdf';
 import type { CitationLedgerEntry, ResearchReport } from '@/agent/research/types';
 
 interface ReportViewProps {
@@ -15,6 +16,7 @@ interface ReportViewProps {
 export function ReportView({ report, onFollowUp, onNewResearch, onRegenerate }: ReportViewProps) {
   const [highlightKey, setHighlightKey] = useState<number | null>(null);
   const [modalEntry, setModalEntry] = useState<CitationLedgerEntry | null>(null);
+  const [exporting, setExporting] = useState(false);
   const elapsed = report.elapsedMs >= 60_000 ? `${(report.elapsedMs / 60_000).toFixed(1)} min` : `${report.elapsedMs}s`;
   const verifiedByKey = new Map(report.ledger.map((entry) => [entry.key, entry.verified]));
   const sorted = [...report.ledger].sort((a, b) => Number(b.verified) - Number(a.verified) || a.key - b.key);
@@ -38,6 +40,20 @@ export function ReportView({ report, onFollowUp, onNewResearch, onRegenerate }: 
             </p>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={exporting}
+              onClick={() => {
+                setExporting(true);
+                window.setTimeout(() => {
+                  generateReportPdf(report);
+                  setExporting(false);
+                }, 0);
+              }}
+            >
+              {exporting ? 'Exporting…' : 'Export PDF'}
+            </Button>
             <Button variant="outline" size="sm" onClick={() => onFollowUp(report)}>
               Ask follow-up
             </Button>
