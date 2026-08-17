@@ -24,12 +24,13 @@ export default function ResearchAgentPage() {
   const { models, selected, setSelected, loading } = useAgentModels();
   const { messages, streaming, error, send, abort } = useAgentChat(selected);
   const pipeline = useResearchPipeline();
+  const { loadHistory } = pipeline;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
 
   useEffect(() => {
-    if (mode === 'research') pipeline.loadHistory();
-  }, [mode]);
+    if (mode === 'research') loadHistory();
+  }, [mode, loadHistory]);
 
   const handleSelect = (id: string) => setSelected(id === 'auto' ? null : id);
 
