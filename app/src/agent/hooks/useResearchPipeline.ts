@@ -21,6 +21,19 @@ export interface ResearchHistoryItem {
   report_md?: string | null;
 }
 
+export interface WorkerProgress {
+  active: string[];
+  counts: Record<string, number>;
+}
+
+export interface ReviewPlan {
+  contracts: SubTaskContract[];
+  provider: string;
+  error?: string;
+}
+
+const SKIP_REVIEW_KEY = 'zyro-research-skip-review';
+
 interface ReportPayload {
   contracts: SubTaskContract[];
   ledger: CitationLedgerEntry[];
@@ -49,8 +62,12 @@ export function useResearchPipeline() {
   const [report, setReport] = useState<ResearchReport | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [history, setHistory] = useState<ResearchHistoryItem[]>([]);
+  const [review, setReview] = useState<ReviewPlan | null>(null);
+  const [skipReview, setSkipReview] = useState<boolean>(() => localStorage.getItem(SKIP_REVIEW_KEY) === '1');
   const [running, setRunning] = useState(false);
+  const [workerProgress, setWorkerProgress] = useState<WorkerProgress>({ active: [], counts: {} });
   const abortRef = useRef<AbortController | null>(null);
+  const lastTopicRef = useRef('');
 
   const emit = useCallback((update: PipelineStageUpdate) => {
     setStage(update.stage);
@@ -119,92 +136,177 @@ export function useResearchPipeline() {
     research.researchId = data.id;
   }, []);
 
-  const run = useCallback(async (topic: string) => {
-    const text = topic.trim();
-    if (!text || running) return;
+  const continueFromReview = useCallback(
+    async (topic: string, approved: SubTaskContract[], started: number, controller: AbortController) => {
+      setReview(null);
+      try {
+        emit({
+          stage: 'working',
+          message: 'Gathering evidence',
+          detail: `${approved.length} worker contracts dispatched`,
+        });
+        setWorkerProgress({ active: ['academic', 'web'], counts: {} });
+        const gathered = await runWorkers(
+          approved,
+          () => undefined,
+          (item) => {
+            setEvidence((prev) => [...prev, item]);
+            setWorkerProgress((prev) => ({
+              ...prev,
+              counts: { ...prev.counts, [item.sourceName]: (prev.counts[item.sourceName] ?? 0) + 1 },
+            }));
+          },
+        );
+        if (controller.signal.aborted) return;
+        setWorkerProgress((prev) => ({ ...prev, active: [] }));
+        if (gathered.errors.length > 0) setErrors((prev) => [...prev, ...gathered.errors]);
 
-    const controller = new AbortController();
-    abortRef.current = controller;
-    setRunning(true);
-    setReport(null);
-    setContracts([]);
-    setEvidence([]);
-    setLedger([]);
-    setErrors([]);
+        emit({
+          stage: 'verifying',
+          message: 'Verifying sources',
+          detail: `${gathered.items.length} candidates found`,
+        });
+        const { ledger: finalLedger, dropped } = await verifyAndBuildLedger(gathered.items);
+        if (controller.signal.aborted) return;
+        setLedger(finalLedger);
+        if (dropped > 0) setErrors((prev) => [...prev, `verifier: dropped ${dropped} duplicate/dead links`]);
 
-    const started = performance.now();
-    let research: ResearchReport | null = null;
+        emit({
+          stage: 'writing',
+          message: 'Writing the report',
+          detail: `${finalLedger.length} verified sources in the citation ledger`,
+        });
+        const editorial = await synthesizeReport(topic, approved, finalLedger, () => undefined);
+        if (controller.signal.aborted) return;
 
-    try {
-      emit({ stage: 'planning', message: 'Planning the research agenda' });
-      const decomposed = await decompose(text);
-      if (controller.signal.aborted) return;
-      setContracts(decomposed.contracts);
-      if (decomposed.error) setErrors((prev) => [...prev, `planner: ${decomposed.error}`]);
+        const research: ResearchReport = {
+          topic,
+          contracts: approved,
+          evidence: gathered.items,
+          ledger: finalLedger,
+          markdown: editorial.markdown,
+          model: editorial.model,
+          elapsedMs: Math.round(performance.now() - started),
+          created_at: new Date().toISOString(),
+        };
+        if (editorial.error) setErrors((prev) => [...prev, `editorial: ${editorial.error}`]);
 
-      emit({
-        stage: 'working',
-        message: 'Gathering evidence',
-        detail: `${decomposed.contracts.length} worker contracts dispatched`,
-      });
-      const gathered = await runWorkers(
-        decomposed.contracts,
-        () => undefined,
-        (item) => setEvidence((prev) => [...prev, item]),
-      );
-      if (controller.signal.aborted) return;
-      if (gathered.errors.length > 0) setErrors((prev) => [...prev, ...gathered.errors]);
-
-      emit({
-        stage: 'verifying',
-        message: 'Verifying sources',
-        detail: `${gathered.items.length} candidates found`,
-      });
-      const { ledger: finalLedger, dropped } = await verifyAndBuildLedger(gathered.items);
-      if (controller.signal.aborted) return;
-      setLedger(finalLedger);
-      if (dropped > 0) setErrors((prev) => [...prev, `verifier: dropped ${dropped} duplicate/dead links`]);
-
-      emit({
-        stage: 'writing',
-        message: 'Writing the report',
-        detail: `${finalLedger.length} verified sources in the citation ledger`,
-      });
-      const editorial = await synthesizeReport(text, decomposed.contracts, finalLedger, () => undefined);
-      if (controller.signal.aborted) return;
-
-      research = {
-        topic: text,
-        contracts: decomposed.contracts,
-        evidence: gathered.items,
-        ledger: finalLedger,
-        markdown: editorial.markdown,
-        model: editorial.model,
-        elapsedMs: Math.round(performance.now() - started),
-        created_at: new Date().toISOString(),
-      };
-      if (editorial.error) setErrors((prev) => [...prev, `editorial: ${editorial.error}`]);
-
-      emit({ stage: 'done', message: 'Research complete' });
-      setReport(research);
-      await persist(research, 'completed');
-      await loadHistory();
-    } catch (err) {
-      const failure = err instanceof Error ? err.message : 'Research pipeline failed';
-      setErrors((prev) => [...prev, failure]);
-      if (research) {
-        await persist(research, 'failed');
+        emit({ stage: 'done', message: 'Research complete' });
+        setReport(research);
+        await persist(research, 'completed');
+        await loadHistory();
+      } catch (err) {
+        const failure = err instanceof Error ? err.message : 'Research pipeline failed';
+        setErrors((prev) => [...prev, failure]);
+        emit({ stage: 'failed', message: 'Research failed', detail: failure });
+      } finally {
+        setRunning(false);
+        abortRef.current = null;
       }
-      emit({ stage: 'failed', message: 'Research failed', detail: failure });
-    } finally {
-      setRunning(false);
-      abortRef.current = null;
-    }
-  }, [emit, loadHistory, persist, running]);
+    },
+    [emit, loadHistory, persist],
+  );
+
+  const run = useCallback(
+    async (topic: string) => {
+      const text = topic.trim();
+      if (!text || running) return;
+
+      const controller = new AbortController();
+      abortRef.current = controller;
+      lastTopicRef.current = text;
+      setRunning(true);
+      setReport(null);
+      setContracts([]);
+      setEvidence([]);
+      setLedger([]);
+      setErrors([]);
+      setReview(null);
+      setWorkerProgress({ active: [], counts: {} });
+
+      const started = performance.now();
+
+      try {
+        emit({ stage: 'planning', message: 'Planning the research agenda' });
+        const decomposed = await decompose(text);
+        if (controller.signal.aborted) {
+          setRunning(false);
+          abortRef.current = null;
+          return;
+        }
+        setContracts(decomposed.contracts);
+        if (decomposed.error) setErrors((prev) => [...prev, `planner: ${decomposed.error}`]);
+
+        if (skipReview) {
+          await continueFromReview(text, decomposed.contracts, started, controller);
+          return;
+        }
+
+        setReview({
+          contracts: decomposed.contracts,
+          provider: decomposed.provider,
+          error: decomposed.error,
+        });
+        emit({
+          stage: 'review',
+          message: 'Review the research plan',
+          detail: 'Approve to start gathering evidence, or edit the agenda first.',
+        });
+      } catch (err) {
+        const failure = err instanceof Error ? err.message : 'Research pipeline failed';
+        setErrors((prev) => [...prev, failure]);
+        emit({ stage: 'failed', message: 'Research failed', detail: failure });
+        setRunning(false);
+        abortRef.current = null;
+      }
+    },
+    [continueFromReview, emit, running, skipReview],
+  );
+
+  const approvePlan = useCallback(() => {
+    if (!review || !running) return;
+    void continueFromReview(
+      lastTopicRef.current,
+      review.contracts,
+      performance.now(),
+      abortRef.current ?? new AbortController(),
+    );
+  }, [continueFromReview, review, running]);
+
+  const updatePlan = useCallback((updated: SubTaskContract[]) => {
+    setReview((prev) => (prev ? { ...prev, contracts: updated } : prev));
+    setContracts(updated);
+  }, []);
+
+  const regeneratePlan = useCallback(async () => {
+    if (!running) return;
+    const controller = abortRef.current;
+    if (!controller) return;
+    emit({ stage: 'planning', message: 'Regenerating the research plan' });
+    const decomposed = await decompose(lastTopicRef.current);
+    if (controller.signal.aborted) return;
+    setContracts(decomposed.contracts);
+    setReview({
+      contracts: decomposed.contracts,
+      provider: decomposed.provider,
+      error: decomposed.error,
+    });
+    emit({
+      stage: 'review',
+      message: 'Review the research plan',
+      detail: 'Regenerated — approve to start gathering evidence, or regenerate again.',
+    });
+  }, [emit, running]);
+
+  const setSkipReviewPreference = useCallback((value: boolean) => {
+    localStorage.setItem(SKIP_REVIEW_KEY, value ? '1' : '0');
+    setSkipReview(value);
+  }, []);
 
   const abort = useCallback(() => {
     abortRef.current?.abort();
     setRunning(false);
+    setReview(null);
     emit({ stage: 'failed', message: 'Research cancelled' });
   }, [emit]);
 
@@ -219,6 +321,8 @@ export function useResearchPipeline() {
     setEvidence([]);
     setLedger([]);
     setErrors([]);
+    setReview(null);
+    setWorkerProgress({ active: [], counts: {} });
   }, []);
 
   return {
@@ -231,8 +335,15 @@ export function useResearchPipeline() {
     report,
     errors,
     history,
+    review,
+    skipReview,
+    workerProgress,
     running,
     run,
+    approvePlan,
+    updatePlan,
+    regeneratePlan,
+    setSkipReviewPreference,
     abort,
     clear,
     loadHistory,

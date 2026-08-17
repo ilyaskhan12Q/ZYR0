@@ -74,6 +74,7 @@ export interface ResearchReport {
 export type PipelineStage =
   | 'idle'
   | 'planning'
+  | 'review'
   | 'working'
   | 'verifying'
   | 'writing'

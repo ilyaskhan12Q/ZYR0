@@ -45,6 +45,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Pipeline view: topic input, animated stage progress (planning → working → verifying → writing), live evidence chips, worker/verifier error surface.
   - Report view: publication report rendered as grounded text + full verified citation ledger (verified/unverified badges, authors, years, DOI links).
   - History panel: last 20 deep-research runs, reopen any report, "New research" reset.
+- **Report rendering (`app/src/agent/render/renderReportMarkdown.tsx`, `ReportView` rewrite)**:
+  - Dependency-free, XSS-safe markdown renderer (React-escaped, no dangerouslySetInnerHTML): headings, bold, bullet lists.
+  - Inline `[n]` citations become clickable anchors — emerald when verified, amber when unverified — that scroll to and flash-highlight the matching ledger card.
+  - Ledger cards sorted verified-first with consistent verified/unverified color language (left border, badge).
+- **Source modal (`app/src/agent/components/SourceModal.tsx`)**:
+  - "Details" on any ledger card opens a dialog with the full source record: title, verified status, source, year, authors, DOI, snippet, and "Open source" external link; unverified entries show an explicit notice.
+- **Plan review gate (`app/src/agent/components/PlanReview.tsx`, `useResearchPipeline` split)**:
+  - Pipeline now pauses at a new `review` stage after planning: 4 contract cards (2×2) with dimension badges, editable focus areas and sub-questions, expandable keywords/boundaries/output-fields.
+  - Actions: "Approve & research" (workers start with the edited agenda), "Regenerate plan" (re-decompose), "Cancel"; "Skip review next time" persisted in localStorage makes future runs flow straight through.
+  - Planner fallback/errors surfaced inline on the review screen.
+- **Pipeline view polish (`PipelineView` rewrite)**:
+  - Planning phase shows a 4-slot contract skeleton while the planner works.
+  - Working phase shows per-source status rows (OpenAlex/arXiv/Semantic Scholar/Jina Web): spinner while active, checkmark + per-source "N found" counts when done.
+  - Evidence chips get title/year tooltips and a green checkmark once the verifier confirms the link.
+  - Worker/verifier notes condensed into one collapsible amber panel instead of stacked error boxes.
+- **Continue from report (`ReportView` actions, `ResearchAgentPage`)**:
+  - "Ask follow-up" switches to chat with the report + its citation ledger loaded as the system prompt (answers cite the same [n] keys).
+  - "New research" resets the pipeline and pre-fills the topic input.
+  - "Regenerate" re-runs the pipeline on the same topic (straight through when "skip review" is set).
+- **Research-mode header cleanup**:
+  - Model picker hidden in research mode (models only affect planner/editorial; choice stays in Settings, used model shown in the report meta line). Chat mode unchanged.
 
 ## [0.38.3] - 2026-08-17
 
