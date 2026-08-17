@@ -188,6 +188,49 @@ async function recordUsage(
 }
 
 // ---------------------------------------------------------------------------
+// URL liveness checks (research pipeline verifier)
+// ---------------------------------------------------------------------------
+
+const VERIFY_TIMEOUT_MS = 5_000;
+const VERIFY_CONCURRENCY = 5;
+const VERIFY_MAX_URLS = 25;
+
+async function checkOneUrl(url: string): Promise<{ url: string; ok: boolean; status: number }> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), VERIFY_TIMEOUT_MS);
+  try {
+    try {
+      const res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
+      return { url, ok: res.ok, status: res.status };
+    } catch {
+      // Some servers reject HEAD — fall back to a ranged GET.
+      const res = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: controller.signal });
+      return { url, ok: res.ok, status: res.status };
+    }
+  } catch {
+    return { url, ok: false, status: 0 };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function verifyUrls(urls: string[]): Promise<{ url: string; ok: boolean; status: number }[]> {
+  const results: { url: string; ok: boolean; status: number }[] = [];
+  const queue = [...urls];
+  const workers = Array.from(
+    { length: Math.min(VERIFY_CONCURRENCY, Math.max(urls.length, 1)) },
+    async () => {
+      while (queue.length > 0) {
+        const url = queue.shift();
+        if (url) results.push(await checkOneUrl(url));
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
+}
+
+// ---------------------------------------------------------------------------
 // Chat
 // ---------------------------------------------------------------------------
 
@@ -198,6 +241,7 @@ interface ChatRequest {
   messages: { role: 'user' | 'assistant' | 'system'; content: string }[];
   maxTokens?: number;
   stream?: boolean;
+  urls?: string[];
 }
 
 function buildUpstreamBody(req: ChatRequest, entry: RegistryEntry, withUsage: boolean) {
@@ -464,6 +508,24 @@ serve(async (req) => {
     } catch {
       return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
         status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Action: verify — server-side URL/DOI liveness for the research verifier.
+    if (chatReq.action === 'verify') {
+      const urls = Array.isArray(chatReq.urls)
+        ? chatReq.urls.filter((u) => typeof u === 'string' && /^https?:\/\//i.test(u)).slice(0, VERIFY_MAX_URLS)
+        : [];
+      if (urls.length === 0) {
+        return new Response(JSON.stringify({ error: 'urls is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const results = await verifyUrls(urls);
+      return new Response(JSON.stringify({ ok: true, results }), {
+        status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

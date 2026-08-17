@@ -20,6 +20,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+### Added
+- **Gateway `/v1/verify` action (`supabase/functions/ai-gateway/index.ts`)**:
+  - Server-side URL/DOI liveness checks for the research pipeline verifier (browsers cannot read cross-origin status codes): HEAD request with ranged-GET fallback, 5s timeout each, bounded concurrency 5, max 25 URLs per call, JWT-gated like chat.
+- **Research engine contracts (`app/src/agent/research/types.ts`, `app/src/agent/research/planner.ts`)**:
+  - Isolated pipeline types: `SubTaskContract` (4 dimensions), `EvidenceItem`, `CitationLedgerEntry` with deterministic `[1]..[N]` keys, `ResearchReport`, `PipelineStage`.
+  - `decompose()` planner: decomposes a topic into 4 sub-task worker contracts through the gateway chat (free-tier models), with strict schema validation and rule-based `fallbackContracts` when model output is malformed (pattern isolated from the legacy zeroai planner).
+- **Research workers (`app/src/agent/research/workers.ts`)**:
+  - Worker A (academic): OpenAlex, arXiv (Atom RSS), and Semantic Scholar graph search — all keyless, CORS-friendly; abstract inversion and author extraction included.
+  - Worker B (web): Jina `s.jina.ai` search + `r.jina.ai` content fetch for snippets (keyless free tier).
+  - Bounded concurrency 2 with hard 12s per-worker deadlines, `Promise.allSettled` isolation (one worker failing never blocks the other), URL dedupe, target 8–12 evidence items.
+- **Research verifier (`app/src/agent/research/verifier.ts`, gateway client `verifyUrls`)**:
+  - Dedupes evidence by normalized URL and fuzzy title.
+  - Server-side liveness pass via the gateway `verify` action: dead links (HTTP ≥ 400) dropped, transient/unknown kept but flagged unverified.
+  - Deterministic citation keys `[1]..[N]` assigned in ledger order — the editorial stage may only cite ledger keys.
+- **Research editorial (`app/src/agent/research/editorial.ts`)**:
+  - `synthesizeReport()`: streams the final report through the gateway chat with the verified citation ledger in context.
+  - Grounds every factual claim in ledger keys `[n]`; hard ban on AI clichés; fixed four-section structure ending with a Sources list; only ledger keys may be referenced.
+- **Research pipeline state machine (`app/src/agent/hooks/useResearchPipeline.ts`, migration `044_research_report_data.sql`)**:
+  - `idle → planning → working → verifying → writing → done/failed` with live stage + evidence streaming.
+  - Persists completed/failed runs to `agent_researches` (new `report_data` jsonb payload: contracts, ledger, model, timings) + a user message to `agent_messages`; history panel reads back via `loadHistory`/`loadReport` (migration applied to production).
+- **Research workspace UI (`PipelineView`, `ReportView`, `HistoryPanel`, `ResearchAgentPage`)**:
+  - Research mode enabled (previously "Research · Phase 2" disabled tab).
+  - Pipeline view: topic input, animated stage progress (planning → working → verifying → writing), live evidence chips, worker/verifier error surface.
+  - Report view: publication report rendered as grounded text + full verified citation ledger (verified/unverified badges, authors, years, DOI links).
+  - History panel: last 20 deep-research runs, reopen any report, "New research" reset.
+
 ## [0.38.3] - 2026-08-17
 
 ### Added

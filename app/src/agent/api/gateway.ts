@@ -24,6 +24,22 @@ export async function fetchAgentModels(): Promise<AgentModelsResponse> {
   return data ?? { models: [] };
 }
 
+export interface UrlVerificationResult {
+  url: string;
+  ok: boolean;
+  status: number;
+}
+
+/** Server-side liveness checks (browsers can't read cross-origin status codes). */
+export async function verifyUrls(urls: string[]): Promise<UrlVerificationResult[]> {
+  const { data, error } = await supabase.functions.invoke<{ results: UrlVerificationResult[] }>(
+    FUNCTION,
+    { body: { action: 'verify', urls } },
+  );
+  if (error) throw error;
+  return data?.results ?? [];
+}
+
 export interface StreamChatOptions {
   system?: string;
   model?: string;

@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { AgentChat } from '@/agent/components/AgentChat';
 import { Composer } from '@/agent/components/Composer';
 import { ModelPill } from '@/agent/components/ModelPill';
 import { AgentSettingsModal } from '@/agent/components/AgentSettingsModal';
+import { PipelineView } from '@/agent/components/PipelineView';
+import { ReportView } from '@/agent/components/ReportView';
+import { HistoryPanel } from '@/agent/components/HistoryPanel';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
+import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
 import { useAuth } from '@/contexts/AuthContext';
 import '@/styles/agent.css';
 
@@ -14,15 +18,19 @@ const SYSTEM_PROMPT = `You are ZYR0's Research Agent: a precise, honest research
 - Answer from first principles; when uncertain, say so and explain what is known.
 - Keep answers well-structured with markdown when it helps clarity.
 - Never fabricate sources or facts.`;
-// ^ future phases: grounded research pipeline replaces this with planner +
-//   worker + verifier output (see docs/0-AI_ARCHITECTURE.md)
 
 export default function ResearchAgentPage() {
   const { user } = useAuth();
   const { models, selected, setSelected, loading } = useAgentModels();
   const { messages, streaming, error, send, abort } = useAgentChat(selected);
+  const pipeline = useResearchPipeline();
+  const { loadHistory } = pipeline;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
+
+  useEffect(() => {
+    if (mode === 'research') loadHistory();
+  }, [mode, loadHistory]);
 
   const handleSelect = (id: string) => setSelected(id === 'auto' ? null : id);
 
@@ -54,11 +62,11 @@ export default function ResearchAgentPage() {
             </button>
             <button
               onClick={() => setMode('research')}
-              disabled
-              className="cursor-not-allowed rounded-full px-3 py-1 text-muted-foreground opacity-50"
-              title="Deep research pipeline arrives in Phase 2"
+              className={`rounded-full px-3 py-1 transition ${
+                mode === 'research' ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground'
+              }`}
             >
-              Research · Phase 2
+              Research
             </button>
           </div>
           <ModelPill models={models} selectedId={selected} onSelect={handleSelect} disabled={loading} />
@@ -68,20 +76,70 @@ export default function ResearchAgentPage() {
         </div>
       </header>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1">
-        <div className="mx-auto flex min-h-full max-w-3xl flex-col justify-end px-4 py-6">
-          {error && (
-            <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {error}
+      {mode === 'research' ? (
+        <div className="flex min-h-0 flex-1">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+              {pipeline.report ? (
+                <ReportView report={pipeline.report} />
+              ) : (
+                <div className="flex-1">
+                  <PipelineView
+                    stage={pipeline.stage}
+                    message={pipeline.message}
+                    detail={pipeline.detail}
+                    evidence={pipeline.evidence}
+                    errors={pipeline.errors}
+                    running={pipeline.running}
+                    onRun={pipeline.run}
+                    onStop={pipeline.abort}
+                  />
+                </div>
+              )}
             </div>
-          )}
-          <AgentChat messages={messages} />
+            {pipeline.report && (
+              <div className="border-t border-border bg-card/60 p-4">
+                <div className="mx-auto flex max-w-3xl justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      pipeline.clear();
+                    }}
+                  >
+                    New research
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground">
+                    Run persisted to your research history.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+          <HistoryPanel
+            items={pipeline.history}
+            activeId={pipeline.report?.researchId}
+            onSelect={(id) => pipeline.loadReport(id)}
+          />
         </div>
-      </ScrollArea>
+      ) : (
+        <>
+          {/* Messages */}
+          <ScrollArea className="flex-1">
+            <div className="mx-auto flex min-h-full max-w-3xl flex-col justify-end px-4 py-6">
+              {error && (
+                <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                  {error}
+                </div>
+              )}
+              <AgentChat messages={messages} />
+            </div>
+          </ScrollArea>
 
-      {/* Composer */}
-      <Composer streaming={streaming} onSend={(text) => send(text, SYSTEM_PROMPT)} onStop={abort} />
+          {/* Composer */}
+          <Composer streaming={streaming} onSend={(text) => send(text, SYSTEM_PROMPT)} onStop={abort} />
+        </>
+      )}
 
       <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />
     </div>
