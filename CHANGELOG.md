@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
   - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
 
+### Added
+- **Gateway `/v1/verify` action (`supabase/functions/ai-gateway/index.ts`)**:
+  - Server-side URL/DOI liveness checks for the research pipeline verifier (browsers cannot read cross-origin status codes): HEAD request with ranged-GET fallback, 5s timeout each, bounded concurrency 5, max 25 URLs per call, JWT-gated like chat.
+
 ## [0.38.3] - 2026-08-17
 
 ### Added
