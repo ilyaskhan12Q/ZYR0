@@ -64,6 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - "Ask follow-up" switches to chat with the report + its citation ledger loaded as the system prompt (answers cite the same [n] keys).
   - "New research" resets the pipeline and pre-fills the topic input.
   - "Regenerate" re-runs the pipeline on the same topic (straight through when "skip review" is set).
+- **Research-mode header cleanup**:
+  - Model picker hidden in research mode (models only affect planner/editorial; choice stays in Settings, used model shown in the report meta line). Chat mode unchanged.
 
 ## [0.38.3] - 2026-08-17
 

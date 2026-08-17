@@ -104,7 +104,9 @@ export default function ResearchAgentPage() {
               Research
             </button>
           </div>
-          <ModelPill models={models} selectedId={selected} onSelect={handleSelect} disabled={loading} />
+          {mode === 'chat' && (
+            <ModelPill models={models} selectedId={selected} onSelect={handleSelect} disabled={loading} />
+          )}
           <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
             Settings
           </Button>
