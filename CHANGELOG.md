@@ -70,6 +70,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Split the academic+web worker pair into 4 independent per-platform workers: OpenAlex, arXiv, Semantic Scholar, Jina web — each with its own 12s deadline, dispatched 4-way via `Promise.allSettled` (one platform failing never blocks the others).
   - Contract queries run in parallel *within* each platform (was sequential), bringing the gathering phase to ~8–12s: OpenAlex/arXiv/S2 ≈1–3s each, Jina capped at 2 searches + 2 content fetches (~8–9s long pole).
   - PipelineView source status rows now light up live per platform.
+- **Gathering volume 8–16 (`workers.ts` caps)**:
+  - Per-platform caps: OpenAlex/arXiv/Semantic Scholar ≤6 each, Jina web ≤4, hard aggregate cap 16 — matching the approved "8–16" target.
+  - Semantic Scholar queries run in staggered waves of 3 with 150ms spacing (unauthenticated ~1 rps) to avoid 429 bursts while staying parallel.
+  - Jina expanded to 4 content fetches (2 per search) so web coverage matches the cap without blowing the 12s budget.
 
 ## [0.38.3] - 2026-08-17
 

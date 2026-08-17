@@ -5,6 +5,16 @@ import type { EvidenceItem, SubTaskContract } from '@/agent/research/types';
 const WORKER_TIMEOUT_MS = 12_000;
 const JINA_TIMEOUT_MS = 10_000;
 
+// Gathering volume: target 8-16 evidence items.
+const PLATFORM_CAP = 6; // per academic platform
+const WEB_CAP = 4; // max Jina items (2 searches + 2 fetches)
+const TOTAL_CAP = 16; // hard aggregate cap
+
+// Semantic Scholar unauthenticated rate limit ~1 rps — burst queries in
+// waves of 3 with a 150ms stagger to stay under it.
+const S2_WAVE_SIZE = 3;
+const S2_STAGGER_MS = 150;
+
 export type WorkerName = 'openalex' | 'arxiv' | 'semanticscholar' | 'web';
 
 // ---------------------------------------------------------------------------
@@ -93,7 +103,7 @@ export async function openAlexWorker(
   onItem?: (item: EvidenceItem) => void,
 ): Promise<EvidenceItem[]> {
   const batches = await Promise.all(contracts.flatMap((c) => contractQueries(c)).map((q) => openAlexQuery(q)));
-  const items = dedupeByUrl(batches.flat()).slice(0, 6);
+  const items = dedupeByUrl(batches.flat()).slice(0, PLATFORM_CAP);
   for (const item of items) onItem?.(item);
   return items;
 }
@@ -133,7 +143,7 @@ export async function arxivWorker(
   onItem?: (item: EvidenceItem) => void,
 ): Promise<EvidenceItem[]> {
   const batches = await Promise.all(contracts.flatMap((c) => contractQueries(c)).map((q) => arxivQuery(q)));
-  const items = dedupeByUrl(batches.flat()).slice(0, 6);
+  const items = dedupeByUrl(batches.flat()).slice(0, PLATFORM_CAP);
   for (const item of items) onItem?.(item);
   return items;
 }
@@ -180,8 +190,17 @@ export async function semanticScholarWorker(
   onItem?: (item: EvidenceItem) => void,
 ): Promise<EvidenceItem[]> {
   const queries = contracts.flatMap((c) => contractQueries(c));
-  const batches = await Promise.all(queries.map((q, i) => semanticScholarQuery(q).then((items) => items)));
-  const items = dedupeByUrl(batches.flat()).slice(0, 6);
+  const results: EvidenceItem[][] = [];
+
+  for (let i = 0; i < queries.length; i += S2_WAVE_SIZE) {
+    const wave = queries.slice(i, i + S2_WAVE_SIZE);
+    results.push(...(await Promise.all(wave.map((q) => semanticScholarQuery(q).catch(() => [])))));
+    if (i + S2_WAVE_SIZE < queries.length) {
+      await new Promise((resolve) => setTimeout(resolve, S2_STAGGER_MS));
+    }
+  }
+
+  const items = dedupeByUrl(results.flat()).slice(0, PLATFORM_CAP);
   for (const item of items) onItem?.(item);
   return items;
 }
@@ -232,7 +251,7 @@ export async function webWorker(
       seen.add(key);
       links.push(link);
     }
-    if (links.length >= 2) break;
+    if (links.length >= WEB_CAP) break;
   }
 
   const withSnippets = await Promise.all(links.map(async (link) => ({ link, snippet: await jinaFetch(link.url) })));
@@ -279,5 +298,5 @@ export async function runWorkers(
     else errors.push(`${workers[i][0]} worker: ${result.reason}`);
   });
 
-  return { items: dedupeByUrl(items), errors };
+  return { items: dedupeByUrl(items).slice(0, TOTAL_CAP), errors };
 }
