@@ -37,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Research editorial (`app/src/agent/research/editorial.ts`)**:
   - `synthesizeReport()`: streams the final report through the gateway chat with the verified citation ledger in context.
   - Grounds every factual claim in ledger keys `[n]`; hard ban on AI clichés; fixed four-section structure ending with a Sources list; only ledger keys may be referenced.
+- **Research pipeline state machine (`app/src/agent/hooks/useResearchPipeline.ts`, migration `044_research_report_data.sql`)**:
+  - `idle → planning → working → verifying → writing → done/failed` with live stage + evidence streaming.
+  - Persists completed/failed runs to `agent_researches` (new `report_data` jsonb payload: contracts, ledger, model, timings) + a user message to `agent_messages`; history panel reads back via `loadHistory`/`loadReport` (migration applied to production).
 
 ## [0.38.3] - 2026-08-17
 
