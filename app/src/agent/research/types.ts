@@ -1,5 +1,7 @@
 // Research pipeline contracts — isolated from the legacy zeroai module.
 
+export type ResearchDepth = 'quick' | 'standard' | 'deep';
+
 export type DimensionId = 'foundations' | 'technical' | 'benchmarks' | 'constraints';
 
 export const DIMENSION_ORDER: readonly DimensionId[] = [

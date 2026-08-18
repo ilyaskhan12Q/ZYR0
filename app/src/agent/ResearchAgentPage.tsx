@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 import { AgentChat } from '@/agent/components/AgentChat';
 import { Composer } from '@/agent/components/Composer';
 import { ModelPill } from '@/agent/components/ModelPill';
@@ -58,10 +59,10 @@ export default function ResearchAgentPage() {
     setMode('chat');
   };
 
-  const handleNewResearch = (topic: string) => {
+  const handleNewResearch = (topic = '') => {
     pipeline.clear();
     setMode('research');
-    setPrefill({ topic, seq: Date.now() });
+    if (topic) setPrefill({ topic, seq: Date.now() });
   };
 
   const handleRegenerate = (topic: string) => {
@@ -71,45 +72,88 @@ export default function ResearchAgentPage() {
 
   return (
     <div className="agent-root flex h-screen flex-col overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between border-b border-border bg-card/60 px-4 py-2.5">
-        <div className="flex items-center gap-3">
-          <div className="agent-logo-ring flex size-8 items-center justify-center rounded-lg text-sm font-bold">
-            Z
+      {/* Top navigation bar */}
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
+        <div className="flex h-full items-center gap-8">
+          <div className="flex items-center gap-2.5">
+            <div className="agent-logo-ring flex size-7 items-center justify-center rounded text-[13px] font-bold">
+              Z
+            </div>
+            <span className="agent-serif text-lg font-semibold tracking-tight">ZYROO</span>
           </div>
-          <div>
-            <h1 className="text-sm font-semibold leading-tight">Research Agent</h1>
-            <p className="text-[11px] leading-tight text-muted-foreground">
-              {user ? `Signed in — metered per user` : 'Sign in required'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-full border border-border bg-card p-0.5 text-xs">
+          <nav className="hidden h-full items-center gap-7 sm:flex">
             <button
+              type="button"
               onClick={() => setMode('chat')}
-              className={`rounded-full px-3 py-1 transition ${
-                mode === 'chat' ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground'
+              className={`flex h-full items-center border-b-2 text-sm transition ${
+                mode === 'chat'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               Chat
             </button>
             <button
+              type="button"
               onClick={() => setMode('research')}
-              className={`rounded-full px-3 py-1 transition ${
-                mode === 'research' ? 'bg-accent text-foreground' : 'text-muted-foreground hover:text-foreground'
+              className={`flex h-full items-center border-b-2 text-sm transition ${
+                mode === 'research'
+                  ? 'border-primary text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Research
+            </button>
+          </nav>
+          <div className="flex rounded-[2px] border border-border text-xs sm:hidden">
+            <button
+              type="button"
+              onClick={() => setMode('chat')}
+              className={`px-3 py-1.5 transition ${
+                mode === 'chat' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
+              }`}
+            >
+              Chat
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('research')}
+              className={`px-3 py-1.5 transition ${
+                mode === 'research' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
               }`}
             >
               Research
             </button>
           </div>
+        </div>
+
+        <div className="flex items-center gap-3">
           {mode === 'chat' && (
             <ModelPill models={models} selectedId={selected} onSelect={handleSelect} disabled={loading} />
           )}
-          <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
-            Settings
+          <Button
+            size="sm"
+            className="rounded-[2px] bg-foreground text-background hover:bg-foreground/90"
+            disabled={pipeline.running}
+            onClick={() => handleNewResearch()}
+          >
+            New Research
           </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8 rounded-[2px]"
+            onClick={() => setSettingsOpen(true)}
+            aria-label="Settings"
+          >
+            <Settings className="size-4" />
+          </Button>
+          <div
+            title={user?.email ?? 'Signed in'}
+            className="flex size-8 items-center justify-center rounded-full bg-[#4f46e5] text-xs font-semibold text-white"
+          >
+            {(user?.email ?? 'Z').charAt(0).toUpperCase()}
+          </div>
         </div>
       </header>
 
