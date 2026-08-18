@@ -145,7 +145,7 @@ export function useResearchPipeline() {
           message: 'Gathering evidence',
           detail: `${approved.length} worker contracts dispatched`,
         });
-        setWorkerProgress({ active: ['openalex', 'arxiv', 'semanticscholar', 'web'], counts: {} });
+        setWorkerProgress({ active: ['openalex', 'arxiv', 'gateway', 'web'], counts: {} });
         const gathered = await runWorkers(
           approved,
           () => undefined,
@@ -156,6 +156,7 @@ export function useResearchPipeline() {
               counts: { ...prev.counts, [item.sourceName]: (prev.counts[item.sourceName] ?? 0) + 1 },
             }));
           },
+          (note) => setErrors((prev) => [...prev, note]),
         );
         if (controller.signal.aborted) return;
         setWorkerProgress((prev) => ({ ...prev, active: [] }));

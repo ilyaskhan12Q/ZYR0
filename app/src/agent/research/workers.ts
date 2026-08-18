@@ -1,21 +1,19 @@
 import type { EvidenceItem, SubTaskContract } from '@/agent/research/types';
+import { searchPlatforms, type GatewayPlatform } from '@/agent/api/gateway';
 
 // Hard per-worker deadline — with intra-platform parallel queries each
 // platform finishes in ~1-9s; Promise.allSettled waits for the slowest.
 const WORKER_TIMEOUT_MS = 12_000;
 const JINA_TIMEOUT_MS = 10_000;
+const GATEWAY_TIMEOUT_MS = 15_000;
 
 // Gathering volume: target 8-16 evidence items.
 const PLATFORM_CAP = 6; // per academic platform
 const WEB_CAP = 4; // max Jina items (2 searches + 2 fetches)
+const GATEWAY_PLATFORM_CAP = 6; // per gateway platform (S2 / PubMed / CORE)
 const TOTAL_CAP = 16; // hard aggregate cap
 
-// Semantic Scholar unauthenticated rate limit ~1 rps — burst queries in
-// waves of 3 with a 150ms stagger to stay under it.
-const S2_WAVE_SIZE = 3;
-const S2_STAGGER_MS = 150;
-
-export type WorkerName = 'openalex' | 'arxiv' | 'semanticscholar' | 'web';
+export type WorkerName = 'openalex' | 'arxiv' | 'gateway' | 'web';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -149,58 +147,25 @@ export async function arxivWorker(
 }
 
 // ---------------------------------------------------------------------------
-// Worker — Semantic Scholar (keyless, staggered bursts)
+// Worker — Gateway academic search (S2 + PubMed + CORE, server-side,
+// keyless-first; CORE skipped when no API key is configured)
 // ---------------------------------------------------------------------------
 
-async function semanticScholarQuery(query: string): Promise<EvidenceItem[]> {
-  const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&limit=5&fields=title,abstract,year,url,externalIds,authors`;
-  const res = await withTimeout(fetch(url), WORKER_TIMEOUT_MS);
-  if (!res || !res.ok) return [];
-  const json = await res.json().catch(() => null);
-  if (!json?.data || !Array.isArray(json.data)) return [];
+const GATEWAY_PLATFORMS: GatewayPlatform[] = ['semanticscholar', 'pubmed', 'core'];
 
-  return json.data
-    .slice(0, 5)
-    .map((p: Record<string, unknown>): EvidenceItem | null => {
-      const title = String(p.title ?? '').trim();
-      const external = p.externalIds as Record<string, unknown> | undefined;
-      const doi = typeof external?.DOI === 'string' ? external.DOI : undefined;
-      const url = String(p.url ?? '').trim() || (doi ? `https://doi.org/${doi}` : '');
-      if (!title || !url) return null;
-      const authors = Array.isArray(p.authors)
-        ? (p.authors as { name?: string }[]).map((a) => a.name ?? '').filter(Boolean).slice(0, 5)
-        : undefined;
-      return {
-        id: nextId(),
-        title,
-        url,
-        sourceType: 'academic',
-        sourceName: 'Semantic Scholar',
-        year: typeof p.year === 'number' ? p.year : undefined,
-        doi,
-        authors,
-        snippet: String(p.abstract ?? '').slice(0, 400),
-      };
-    })
-    .filter((item: EvidenceItem | null): item is EvidenceItem => item !== null);
-}
-
-export async function semanticScholarWorker(
+export async function gatewayAcademicWorker(
   contracts: SubTaskContract[],
   onItem?: (item: EvidenceItem) => void,
+  onSkipped?: (platform: string) => void,
 ): Promise<EvidenceItem[]> {
-  const queries = contracts.flatMap((c) => contractQueries(c));
-  const results: EvidenceItem[][] = [];
+  const queries = contracts.flatMap((c) => contractQueries(c)).slice(0, 12);
+  const gateway = await withTimeout(searchPlatforms(queries, GATEWAY_PLATFORMS), GATEWAY_TIMEOUT_MS);
+  if (!gateway) return [];
+  for (const platform of gateway.skipped) onSkipped?.(platform);
 
-  for (let i = 0; i < queries.length; i += S2_WAVE_SIZE) {
-    const wave = queries.slice(i, i + S2_WAVE_SIZE);
-    results.push(...(await Promise.all(wave.map((q) => semanticScholarQuery(q).catch(() => [])))));
-    if (i + S2_WAVE_SIZE < queries.length) {
-      await new Promise((resolve) => setTimeout(resolve, S2_STAGGER_MS));
-    }
-  }
-
-  const items = dedupeByUrl(results.flat()).slice(0, PLATFORM_CAP);
+  const items = dedupeByUrl(
+    Object.values(gateway.results).filter((v): v is EvidenceItem[] => Boolean(v)).flat(),
+  ).slice(0, GATEWAY_PLATFORM_CAP * 3);
   for (const item of items) onItem?.(item);
   return items;
 }
@@ -276,11 +241,18 @@ export async function runWorkers(
   contracts: SubTaskContract[],
   onWorkerStart?: (name: WorkerName) => void,
   onItem?: (item: EvidenceItem) => void,
+  onNote?: (note: string) => void,
 ): Promise<{ items: EvidenceItem[]; errors: string[] }> {
   const workers: Array<[WorkerName, () => Promise<EvidenceItem[]>]> = [
     ['openalex', () => openAlexWorker(contracts, onItem)],
     ['arxiv', () => arxivWorker(contracts, onItem)],
-    ['semanticscholar', () => semanticScholarWorker(contracts, onItem)],
+    [
+      'gateway',
+      () =>
+        gatewayAcademicWorker(contracts, onItem, (platform) =>
+          onNote?.(`${platform}: no API key configured — skipped (keyless-first)`),
+        ),
+    ],
     ['web', () => webWorker(contracts, onItem)],
   ];
 
