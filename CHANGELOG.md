@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Stale JWT → "Unauthorized" from gateway (`app/src/agent/api/gateway.ts`)**:
+  - `accessToken()` now refreshes the Supabase session when the access token is expired (or expiring within 60s) instead of shipping the stale token to the gateway; all `functions.invoke` calls (`fetchAgentModels`, `verifyUrls`, `searchPlatforms`) retry once after `supabase.auth.refreshSession()` on a 401, and `streamChat` refreshes + re-sends once on 401. Session is no longer silently broken after long idle.
+
 ### Added
 - **Gateway `/v1/search` action (`supabase/functions/ai-gateway/index.ts`)**:
   - Server-side platform search for the research pipeline gather phase — keyless-first: Semantic Scholar (optional `SEMANTIC_SCHOLAR_API_KEY` env secret) and PubMed/E-utilities (optional `PUBMED_API_KEY`) run on free tiers; CORE requires `CORE_API_KEY` and is skipped (reported in `skipped`) when absent, so adding keys later needs no code change.
