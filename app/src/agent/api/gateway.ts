@@ -10,17 +10,52 @@ const FUNCTION = 'ai-gateway';
 
 const GATEWAY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${FUNCTION}`;
 
+interface InvokeErrorLike {
+  context?: { status?: number };
+}
+
+function isAuthError(error: unknown): boolean {
+  return Boolean(
+    error &&
+      typeof error === 'object' &&
+      (error as InvokeErrorLike).context?.status === 401,
+  );
+}
+
+async function invokeWithRetry<T>(
+  body?: unknown,
+  init?: { method?: 'GET' | 'POST' },
+): Promise<{ data: T | null; error: unknown }> {
+  const opts: { method?: 'GET' | 'POST'; body?: Record<string, unknown> } = {
+    ...(body !== undefined ? { body: body as Record<string, unknown> } : {}),
+    ...init,
+  };
+  const first = await supabase.functions.invoke<T>(FUNCTION, opts);
+  if (!isAuthError(first.error)) return first;
+  await supabase.auth.refreshSession();
+  return supabase.functions.invoke<T>(FUNCTION, opts);
+}
+
 async function accessToken(): Promise<string> {
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
+  const { data: { session } } = await supabase.auth.getSession();
+  let current = session;
+
+  const expiring = (s: typeof session): boolean => {
+    if (!s?.expires_at) return !s;
+    return s.expires_at - 60 < Date.now() / 1000;
+  };
+  if (expiring(current)) {
+    const { data } = await supabase.auth.refreshSession();
+    current = data.session;
+  }
+
+  const token = current?.access_token;
   if (!token) throw new Error('Not signed in');
   return token;
 }
 
 export async function fetchAgentModels(): Promise<AgentModelsResponse> {
-  const { data, error } = await supabase.functions.invoke<AgentModelsResponse>(FUNCTION, {
-    method: 'GET',
-  });
+  const { data, error } = await invokeWithRetry<AgentModelsResponse>(undefined, { method: 'GET' });
   if (error) throw error;
   return data ?? { models: [] };
 }
@@ -33,10 +68,10 @@ export interface UrlVerificationResult {
 
 /** Server-side liveness checks (browsers can't read cross-origin status codes). */
 export async function verifyUrls(urls: string[]): Promise<UrlVerificationResult[]> {
-  const { data, error } = await supabase.functions.invoke<{ results: UrlVerificationResult[] }>(
-    FUNCTION,
-    { body: { action: 'verify', urls } },
-  );
+  const { data, error } = await invokeWithRetry<{ results: UrlVerificationResult[] }>({
+    action: 'verify',
+    urls,
+  });
   if (error) throw error;
   return data?.results ?? [];
 }
@@ -53,8 +88,10 @@ export async function searchPlatforms(
   queries: string[],
   platforms: GatewayPlatform[],
 ): Promise<GatewaySearchResult> {
-  const { data, error } = await supabase.functions.invoke<GatewaySearchResult>(FUNCTION, {
-    body: { action: 'search', queries, platforms },
+  const { data, error } = await invokeWithRetry<GatewaySearchResult>({
+    action: 'search',
+    queries,
+    platforms,
   });
   if (error) throw error;
   return { results: data?.results ?? {}, skipped: data?.skipped ?? [] };
@@ -78,22 +115,41 @@ export async function streamChat(
   options: StreamChatOptions,
 ): Promise<AgentChatResponse> {
   const token = await accessToken();
-  const res = await fetch(`${GATEWAY_URL}`, {
+  const payload = JSON.stringify({
+    action: 'chat',
+    stream: true,
+    model: options.model,
+    system: options.system,
+    maxTokens: options.maxTokens,
+    messages,
+  });
+  let res = await fetch(`${GATEWAY_URL}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      action: 'chat',
-      stream: true,
-      model: options.model,
-      system: options.system,
-      maxTokens: options.maxTokens,
-      messages,
-    }),
+    body: payload,
     signal: options.signal,
   });
+
+  if (res.status === 401) {
+    // Stale access token — refresh once and retry.
+    await supabase.auth.refreshSession();
+    const { data } = await supabase.auth.getSession();
+    const freshToken = data.session?.access_token;
+    if (freshToken) {
+      res = await fetch(`${GATEWAY_URL}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${freshToken}`,
+        },
+        body: payload,
+        signal: options.signal,
+      });
+    }
+  }
 
   if (!res.ok) {
     let detail = `Gateway error (HTTP ${res.status})`;
