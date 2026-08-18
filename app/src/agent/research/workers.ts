@@ -7,7 +7,6 @@ import { searchPlatforms, type GatewayPlatform } from '@/agent/api/gateway';
 const GATEWAY_TIMEOUT_MS = 90_000;
 
 // Gathering volume: target 8-16 evidence items.
-const GATEWAY_PLATFORM_CAP = 6; // per platform
 const TOTAL_CAP = 16; // hard aggregate cap
 
 export type WorkerName = 'gateway';
@@ -45,12 +44,10 @@ export async function runWorkers(
     onNote?.(`${platform}: 0 results — possibly rate-limited or blocked`);
   }
 
-  const deduped = dedupeByUrl(
-    Object.values(gateway.results).filter((v): v is EvidenceItem[] => Boolean(v)).flat(),
-  ).slice(0, TOTAL_CAP);
+  const interleaved = interleaveByPlatform(gateway.results, TOTAL_CAP);
 
-  for (const item of deduped) onItem?.(item);
-  return { items: deduped, errors };
+  for (const item of interleaved) onItem?.(item);
+  return { items: interleaved, errors };
 }
 
 // ---------------------------------------------------------------------------
@@ -82,6 +79,29 @@ function dedupeByUrl(items: EvidenceItem[]): EvidenceItem[] {
       seen.add(key);
       out.push(item);
     }
+  }
+  return out;
+}
+
+// Round-robin across platforms so one prolific platform (e.g. OpenAlex)
+// cannot fill the cap before others are represented.
+function interleaveByPlatform(results: Record<string, EvidenceItem[]>, cap: number): EvidenceItem[] {
+  const queues = Object.entries(results)
+    .map(([platform, items]) => ({ platform, items: dedupeByUrl(items) }))
+    .filter((q) => q.items.length > 0);
+  const out: EvidenceItem[] = [];
+  let idx = 0;
+  let added = true;
+  while (added && out.length < cap) {
+    added = false;
+    for (const q of queues) {
+      if (out.length >= cap) break;
+      if (idx < q.items.length) {
+        out.push(q.items[idx]);
+        added = true;
+      }
+    }
+    idx += 1;
   }
   return out;
 }
