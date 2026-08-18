@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Academic Precision UI/UX redesign of the Research Agent (`app/src/styles/agent.css`, `app/src/agent/components/LandingView.tsx`, `PipelineView.tsx`, `ResearchAgentPage.tsx`, `PlanReview.tsx`, `HistoryPanel.tsx`)**:
+  - Agent workspace restyled to the "Academic Precision" design system: light theme (surface `#f9f9f9`, on-surface `#1a1c1c`, primary `#3525cd`, 1px borders, 4px radii, flat — no shadows), **Source Serif 4** serif headlines + **Geist** body (loaded via Google Fonts), scoped under `.agent-root` so the rest of the app is untouched.
+  - **Research Home landing** (`LandingView.tsx`): centered ZYROO wordmark + "Research anything. Understand everything." tagline, underline-only research input with hover/focus actions, **Quick / Standard / Deep** mode selectors (persisted to the `depth` column), and three Suggested Research cards with the design's exact copy.
+  - **Researching… progress view** (`PipelineView.tsx`): vertical five-step tracker — Understanding question → Building plan → Searching academic sources → Verifying evidence → Writing report — with completed/active (pulsing dot grid)/pending markers, per-platform live counts, and **Live Evidence Discovered** cards with verified badges; idle/failed states show a slim error banner above the landing.
+  - Top navigation bar: ZYROO wordmark, nav-style Chat/Research toggle (mobile segmented fallback), dark "New Research" action, settings icon, avatar chip.
+  - `run(topic, depth)` now accepts the mode selector's `ResearchDepth` ('quick' | 'standard' | 'deep'); defaults to `'standard'` so existing callers are unaffected.
+- **Report workspace + source panel (`app/src/agent/components/ReportView.tsx`, `SourceModal.tsx`)**:
+  - Report screen becomes a workspace with tabs **Overview | Findings | Evidence | Sources** (top bar on desktop, bottom navigation on mobile); article header shows the final-report eyebrow, serif display title, and researcher meta row.
+  - **Overview** renders Executive Summary (primary rule, per design), numbered Key Findings, Conclusion, and dimension sections; **Findings** numbers the four dimension sections 01–04; **Evidence** shows excerpt cards with verification state; **Sources** lists the ledger with verified/DOI chips.
+  - Citations `[n]` now open the **Source panel** instead of scrolling the ledger: a slide-up sheet (bottom on mobile, 400px right panel on desktop) with the Source-1 style header, Verified / DOI verified / Evidence verified checklist, evidence blockquote, and the bordered "Open original source" action.
+  - Old reports without Executive Summary/Key Findings/Conclusion sections degrade gracefully (first section becomes the lead block).
+- **Editorial report structure (`app/src/agent/research/editorial.ts`)**:
+  - Editorial prompt now asks for `## Executive Summary`, `## Key Findings` (bolded one-line findings with citations), the four dimension sections, `## Conclusion`, then `## Sources`. PDF export needs no change (renders headings generically).
 - **Jina web search via gateway (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/research/workers.ts`, `app/src/agent/api/gateway.ts`)**:
   - `/v1/search` gains a `'web'` platform: 2 × `s.jina.ai` searches + up to 4 × `r.jina.ai` content fetches authenticated with `JINA_API_KEY` (env secret, never in the client bundle); skipped and reported when the key is absent, same keyless-first pattern as CORE.
   - `webWorker` now dispatches through the gateway instead of the browser (key stays server-side); 4-stream parallelism and `WEB_CAP = 4` unchanged.
