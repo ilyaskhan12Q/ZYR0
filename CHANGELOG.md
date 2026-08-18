@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Gateway `/v1/search` action (`supabase/functions/ai-gateway/index.ts`)**:
+  - Server-side platform search for the research pipeline gather phase — keyless-first: Semantic Scholar (optional `SEMANTIC_SCHOLAR_API_KEY` env secret) and PubMed/E-utilities (optional `PUBMED_API_KEY`) run on free tiers; CORE requires `CORE_API_KEY` and is skipped (reported in `skipped`) when absent, so adding keys later needs no code change.
+  - PubMed: wave-parallel `esearch` (3 at a time + 150ms stagger) with a single batched `esummary` for all PMIDs; Semantic Scholar: wave-parallel Graph v1 search with `x-api-key` when configured; CORE: v3 `/search/works` with Bearer token.
+  - Returns normalized `SearchEvidence[]` per platform (id, title, url, sourceName, year, doi, authors, snippet), max 12 queries / 5 results each, 10s per-fetch timeout, JWT-gated like chat.
 - **Dynamic Company Workspace Switcher (`app/src/App.tsx`, `app/src/layouts/PublicLayout.tsx`, `app/src/layouts/DashboardLayout.tsx`)**:
   - Globalized `CompanyAccessProvider` across the application router to enable seamless, zero-cost access checking for dual-role users (e.g. Students holding accepted Company Team Memberships).
   - Implemented dynamic **"Switch to Company Workspace"** button in `PublicLayout` and `DashboardLayout` profile dropdowns & mobile navigation drawers when an accepted company membership is detected.

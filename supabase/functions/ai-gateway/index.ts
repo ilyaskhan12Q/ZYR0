@@ -217,6 +217,7 @@ async function checkOneUrl(url: string): Promise<{ url: string; ok: boolean; sta
 async function verifyUrls(urls: string[]): Promise<{ url: string; ok: boolean; status: number }[]> {
   const results: { url: string; ok: boolean; status: number }[] = [];
   const queue = [...urls];
+
   const workers = Array.from(
     { length: Math.min(VERIFY_CONCURRENCY, Math.max(urls.length, 1)) },
     async () => {
@@ -231,6 +232,213 @@ async function verifyUrls(urls: string[]): Promise<{ url: string; ok: boolean; s
 }
 
 // ---------------------------------------------------------------------------
+// Platform search (research pipeline gather — keyless-first)
+//
+// Keyless by default (Semantic Scholar + PubMed free tiers). When the user
+// later supplies free API keys they arrive as env secrets and are used to
+// raise rate ceilings — code path is identical either way.
+// CORE requires a key: the platform is skipped (and reported) when absent.
+// ---------------------------------------------------------------------------
+
+const SEARCH_TIMEOUT_MS = 10_000;
+const SEARCH_QUERY_LIMIT = 5;
+const SEARCH_MAX_QUERIES = 12;
+const SEARCH_WAVE_SIZE = 3;
+const SEARCH_STAGGER_MS = 150;
+
+interface SearchEvidence {
+  id: string;
+  title: string;
+  url: string;
+  sourceType: 'academic';
+  sourceName: string;
+  year?: number;
+  doi?: string;
+  authors?: string[];
+  snippet?: string;
+}
+
+const SUPPORTED_PLATFORMS = ['semanticscholar', 'pubmed', 'core'];
+
+let searchCounter = 0;
+const nextSearchId = () => `gw-${crypto.randomUUID().slice(0, 8)}-${searchCounter++}`;
+
+async function searchFetch(url: string, headers?: Record<string, string>): Promise<Response | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SEARCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { headers, signal: controller.signal });
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function searchSemanticScholar(queries: string[]): Promise<SearchEvidence[]> {
+  const apiKey = Deno.env.get('SEMANTIC_SCHOLAR_API_KEY');
+  const headers = apiKey ? { 'x-api-key': apiKey } : undefined;
+  const items: SearchEvidence[] = [];
+
+  for (let i = 0; i < queries.length; i += SEARCH_WAVE_SIZE) {
+    const wave = queries.slice(i, i + SEARCH_WAVE_SIZE);
+    const batches = await Promise.all(
+      wave.map(async (query): Promise<SearchEvidence[]> => {
+        const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&limit=${SEARCH_QUERY_LIMIT}&fields=title,abstract,year,url,externalIds,authors`;
+        const res = await searchFetch(url, headers);
+        if (!res || !res.ok) return [];
+        const json = await res.json().catch(() => null);
+        if (!json?.data || !Array.isArray(json.data)) return [];
+        return json.data
+          .slice(0, SEARCH_QUERY_LIMIT)
+          .map((p: Record<string, unknown>): SearchEvidence | null => {
+            const title = String(p.title ?? '').trim();
+            const external = p.externalIds as Record<string, unknown> | undefined;
+            const doi = typeof external?.DOI === 'string' ? external.DOI : undefined;
+            const url = String(p.url ?? '').trim() || (doi ? `https://doi.org/${doi}` : '');
+            if (!title || !url) return null;
+            const authors = Array.isArray(p.authors)
+              ? (p.authors as { name?: string }[]).map((a) => a.name ?? '').filter(Boolean).slice(0, 5)
+              : undefined;
+            return {
+              id: nextSearchId(),
+              title,
+              url,
+              sourceType: 'academic',
+              sourceName: 'Semantic Scholar',
+              year: typeof p.year === 'number' ? p.year : undefined,
+              doi,
+              authors,
+              snippet: String(p.abstract ?? '').slice(0, 400),
+            };
+          })
+          .filter((item: SearchEvidence | null): item is SearchEvidence => item !== null);
+      }),
+    );
+    items.push(...batches.flat());
+    if (i + SEARCH_WAVE_SIZE < queries.length) {
+      await new Promise((resolve) => setTimeout(resolve, SEARCH_STAGGER_MS));
+    }
+  }
+  return items;
+}
+
+async function searchPubmed(queries: string[]): Promise<SearchEvidence[]> {
+  const apiKey = Deno.env.get('PUBMED_API_KEY');
+  const keyParam = apiKey ? `&api_key=${apiKey}` : '';
+  const ids: string[] = [];
+
+  for (let i = 0; i < queries.length; i += SEARCH_WAVE_SIZE) {
+    const wave = queries.slice(i, i + SEARCH_WAVE_SIZE);
+    const batches = await Promise.all(
+      wave.map(async (query): Promise<string[]> => {
+        const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmode=json&retmax=${SEARCH_QUERY_LIMIT}${keyParam}`;
+        const res = await searchFetch(url);
+        if (!res || !res.ok) return [];
+        const json = await res.json().catch(() => null);
+        const list = json?.esearchresult?.idlist;
+        return Array.isArray(list) ? (list as string[]).slice(0, SEARCH_QUERY_LIMIT) : [];
+      }),
+    );
+    for (const id of batches.flat()) {
+      if (!ids.includes(id)) ids.push(id);
+    }
+    if (i + SEARCH_WAVE_SIZE < queries.length) {
+      await new Promise((resolve) => setTimeout(resolve, SEARCH_STAGGER_MS));
+    }
+  }
+
+  if (ids.length === 0) return [];
+
+  // Batch summary for all PMIDs in one call
+  const url = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${ids.slice(0, 50).join(',')}&retmode=json${keyParam}`;
+  const res = await searchFetch(url);
+  if (!res || !res.ok) return [];
+  const json = await res.json().catch(() => null);
+  const result = json?.result as Record<string, Record<string, unknown>> | undefined;
+  if (!result) return [];
+
+  return ids
+    .slice(0, 50)
+    .map((id): SearchEvidence | null => {
+      const rec = result[id] as Record<string, unknown> | undefined;
+      if (!rec) return null;
+      const title = String(rec.title ?? '').trim();
+      if (!title) return null;
+      const pubdate = String(rec.pubdate ?? '');
+      const year = /(19|20)\d{2}/.exec(pubdate);
+      const authors = Array.isArray(rec.authors)
+        ? (rec.authors as { name?: string }[]).map((a) => a.name ?? '').filter(Boolean).slice(0, 5)
+        : undefined;
+      return {
+        id: nextSearchId(),
+        title,
+        url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`,
+        sourceType: 'academic',
+        sourceName: 'PubMed',
+        year: year ? Number(year[0]) : undefined,
+        authors,
+        snippet: String(rec.source ?? '').slice(0, 200),
+      };
+    })
+    .filter((item: SearchEvidence | null): item is SearchEvidence => item !== null);
+}
+
+async function searchCore(queries: string[]): Promise<SearchEvidence[] | null> {
+  const apiKey = Deno.env.get('CORE_API_KEY');
+  if (!apiKey) return null; // CORE requires a key — caller reports it skipped
+
+  const items: SearchEvidence[] = [];
+  for (const query of queries) {
+    const url = `https://api.core.ac.uk/v3/search/works?q=${encodeURIComponent(query)}&limit=${SEARCH_QUERY_LIMIT}`;
+    const res = await searchFetch(url, { Authorization: `Bearer ${apiKey}` });
+    if (!res || !res.ok) continue;
+    const json = await res.json().catch(() => null);
+    const results = json?.results;
+    if (!Array.isArray(results)) continue;
+    for (const r of results.slice(0, SEARCH_QUERY_LIMIT)) {
+      const title = String(r.title ?? '').trim();
+      const doi = typeof r.doi === 'string' && r.doi ? r.doi.replace('https://doi.org/', '') : undefined;
+      const url = doi ? `https://doi.org/${doi}` : String(r.downloadUrl ?? '').trim();
+      if (!title || !url) continue;
+      items.push({
+        id: nextSearchId(),
+        title,
+        url,
+        sourceType: 'academic',
+        sourceName: 'CORE',
+        year: typeof r.yearPublished === 'number' ? r.yearPublished : undefined,
+        doi,
+        snippet: String(r.abstract ?? '').slice(0, 400),
+      });
+    }
+  }
+  return items;
+}
+
+async function searchPlatforms(
+  queries: string[],
+  platforms: string[],
+): Promise<{ results: Record<string, SearchEvidence[]>; skipped: string[] }> {
+  const wanted = platforms.filter((p) => (SUPPORTED_PLATFORMS as readonly string[]).includes(p));
+  const results: Record<string, SearchEvidence[]> = {};
+  const skipped: string[] = [];
+
+  for (const platform of wanted) {
+    if (platform === 'semanticscholar') {
+      results[platform] = await searchSemanticScholar(queries).catch(() => []);
+    } else if (platform === 'pubmed') {
+      results[platform] = await searchPubmed(queries).catch(() => []);
+    } else if (platform === 'core') {
+      const items = await searchCore(queries).catch(() => null);
+      if (items === null) skipped.push('core');
+      else results[platform] = items;
+    }
+  }
+  return { results, skipped };
+}
+
+// ---------------------------------------------------------------------------
 // Chat
 // ---------------------------------------------------------------------------
 
@@ -242,6 +450,8 @@ interface ChatRequest {
   maxTokens?: number;
   stream?: boolean;
   urls?: string[];
+  queries?: string[];
+  platforms?: string[];
 }
 
 function buildUpstreamBody(req: ChatRequest, entry: RegistryEntry, withUsage: boolean) {
@@ -525,6 +735,28 @@ serve(async (req) => {
       }
       const results = await verifyUrls(urls);
       return new Response(JSON.stringify({ ok: true, results }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Action: search — server-side platform search for the research gather
+    // phase (keyless-first; CORE skipped when no key is configured).
+    if (chatReq.action === 'search') {
+      const queries = Array.isArray(chatReq.queries)
+        ? (chatReq.queries as unknown[]).filter((q): q is string => typeof q === 'string' && q.trim().length > 0).slice(0, SEARCH_MAX_QUERIES)
+        : [];
+      const platforms = Array.isArray(chatReq.platforms)
+        ? (chatReq.platforms as unknown[]).filter((p): p is string => typeof p === 'string').slice(0, SUPPORTED_PLATFORMS.length)
+        : SUPPORTED_PLATFORMS;
+      if (queries.length === 0) {
+        return new Response(JSON.stringify({ error: 'queries is required' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      const { results, skipped } = await searchPlatforms(queries, platforms);
+      return new Response(JSON.stringify({ ok: true, results, skipped }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
