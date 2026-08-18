@@ -10,7 +10,7 @@ const STAGE_LABELS: Record<string, string> = {
   writing: 'Writing',
 };
 
-const SOURCE_NAMES = ['OpenAlex', 'arXiv', 'Semantic Scholar', 'Jina Web'] as const;
+const SOURCE_NAMES = ['OpenAlex', 'arXiv', 'Semantic Scholar', 'PubMed', 'CORE', 'Jina Web'] as const;
 
 interface PipelineViewProps {
   stage: PipelineStage;

@@ -4,6 +4,7 @@ import type {
   AgentChatStreamEvent,
   AgentModelsResponse,
 } from '@/agent/core/types';
+import type { EvidenceItem } from '@/agent/research/types';
 
 const FUNCTION = 'ai-gateway';
 
@@ -38,6 +39,25 @@ export async function verifyUrls(urls: string[]): Promise<UrlVerificationResult[
   );
   if (error) throw error;
   return data?.results ?? [];
+}
+
+export type GatewayPlatform = 'semanticscholar' | 'pubmed' | 'core';
+
+export interface GatewaySearchResult {
+  results: Partial<Record<GatewayPlatform, EvidenceItem[]>>;
+  skipped: string[];
+}
+
+/** Server-side platform search (S2 + PubMed + CORE) for the gather phase. */
+export async function searchPlatforms(
+  queries: string[],
+  platforms: GatewayPlatform[],
+): Promise<GatewaySearchResult> {
+  const { data, error } = await supabase.functions.invoke<GatewaySearchResult>(FUNCTION, {
+    body: { action: 'search', queries, platforms },
+  });
+  if (error) throw error;
+  return { results: data?.results ?? {}, skipped: data?.skipped ?? [] };
 }
 
 export interface StreamChatOptions {
