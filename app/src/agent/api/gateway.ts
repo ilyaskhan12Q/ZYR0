@@ -76,7 +76,7 @@ export async function verifyUrls(urls: string[]): Promise<UrlVerificationResult[
   return data?.results ?? [];
 }
 
-export type GatewayPlatform = 'semanticscholar' | 'pubmed' | 'core' | 'web';
+export type GatewayPlatform = 'openalex' | 'arxiv' | 'semanticscholar' | 'pubmed' | 'core' | 'web';
 
 export interface GatewaySearchResult {
   results: Partial<Record<GatewayPlatform, EvidenceItem[]>>;
@@ -169,6 +169,7 @@ export async function streamChat(
   const decoder = new TextDecoder();
   let buffer = '';
   let text = '';
+  let streamError: string | null = null;
 
   try {
     while (true) {
@@ -211,7 +212,8 @@ export async function streamChat(
             options.onEvent({ type: 'done' });
             break;
           case 'error':
-            options.onEvent({ type: 'error', message: String(json.message ?? 'Stream error') });
+            streamError = String(json.message ?? 'Stream error');
+            options.onEvent({ type: 'error', message: streamError });
             break;
           default:
             // Plain upstream chunk (provider streamed without the wrapper
@@ -232,6 +234,8 @@ export async function streamChat(
     }
     return { ok: false, error: err instanceof Error ? err.message : 'Stream read failed' };
   }
+
+  if (streamError) return { ok: false, error: streamError };
 
   return { ok: true, text };
 }
