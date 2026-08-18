@@ -170,7 +170,9 @@ export function fallbackContracts(topic: string): SubTaskContract[] {
 
 /**
  * Decompose a topic through the ai-gateway chat (free-tier models).
- * Falls back to rule-built contracts when the model output is invalid.
+ * Retries once when the model output is invalid (free-tier providers
+ * occasionally return short degraded responses), then falls back to
+ * rule-built contracts.
  */
 export async function decompose(topic: string): Promise<DecompositionResult> {
   const started = performance.now();
@@ -188,6 +190,20 @@ export async function decompose(topic: string): Promise<DecompositionResult> {
     if (contracts) {
       return { contracts, provider: 'gateway', elapsedMs };
     }
+
+    // One retry for degraded free-tier output before falling back.
+    let retryText = '';
+    const retry = await streamChat([{ role: 'user', content: buildUserPrompt(topic) }], {
+      system: SYSTEM_PROMPT,
+      onEvent: (event) => {
+        if (event.type === 'delta') retryText += event.text;
+      },
+    });
+    const retryContracts = retry.ok && retryText.trim() ? validateContracts(extractJson(retryText)) : null;
+    if (retryContracts) {
+      return { contracts: retryContracts, provider: 'gateway', elapsedMs };
+    }
+
     return {
       contracts: fallbackContracts(topic),
       provider: 'fallback',

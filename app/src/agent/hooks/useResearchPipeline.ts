@@ -156,7 +156,7 @@ export function useResearchPipeline() {
           message: 'Gathering evidence',
           detail: `${approved.length} worker contracts dispatched`,
         });
-        setWorkerProgress({ active: ['openalex', 'arxiv', 'gateway', 'web'], counts: {} });
+        setWorkerProgress({ active: ['gateway'], counts: {} });
         const gathered = await runWorkers(
           approved,
           () => undefined,

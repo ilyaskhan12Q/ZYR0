@@ -263,7 +263,7 @@ interface SearchEvidence {
   snippet?: string;
 }
 
-const SUPPORTED_PLATFORMS = ['semanticscholar', 'pubmed', 'core', 'web'];
+const SUPPORTED_PLATFORMS = ['openalex', 'arxiv', 'semanticscholar', 'pubmed', 'core', 'web'];
 
 let searchCounter = 0;
 const nextSearchId = () => `gw-${crypto.randomUUID().slice(0, 8)}-${searchCounter++}`;
@@ -508,26 +508,139 @@ async function searchWeb(queries: string[]): Promise<SearchEvidence[] | null> {
   return withSnippets;
 }
 
+async function searchOpenAlex(queries: string[]): Promise<SearchEvidence[]> {
+  const items: SearchEvidence[] = [];
+  for (let i = 0; i < queries.length; i += SEARCH_WAVE_SIZE) {
+    const wave = queries.slice(i, i + SEARCH_WAVE_SIZE);
+    const batches = await Promise.all(
+      wave.map(async (query): Promise<SearchEvidence[]> => {
+        const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=${SEARCH_QUERY_LIMIT}`;
+        const res = await searchFetch(url, undefined, SEARCH_TIMEOUT_WEB_MS);
+        if (!res || !res.ok) return [];
+        const json = await res.json().catch(() => null);
+        const results = json?.results as Record<string, unknown>[] | undefined;
+        if (!Array.isArray(results)) return [];
+        return results.slice(0, SEARCH_QUERY_LIMIT).map((r) => {
+          const title = String(r.title ?? '').trim();
+          const doi = typeof r.doi === 'string' ? r.doi.replace('https://doi.org/', '') : undefined;
+          const landing = (r.primary_location as { landing_page_url?: string } | null)?.landing_page_url;
+          const url = landing || (doi ? `https://doi.org/${doi}` : '');
+          const authors = Array.isArray(r.authorships)
+            ? (r.authorships as { author?: { display_name?: string } }[])
+                .map((a) => a.author?.display_name ?? '')
+                .filter(Boolean)
+                .slice(0, 5)
+            : undefined;
+          const abstract = (r.abstract_inverted_index as Record<string, number[]> | undefined) ?? undefined;
+          const snippet = abstract
+            ? Object.entries(abstract)
+                .flatMap(([word, positions]) => (positions ?? []).map((pos) => [pos, word] as const))
+                .sort((a, b) => a[0] - b[0])
+                .map(([, word]) => word)
+                .join(' ')
+                .slice(0, 400)
+            : '';
+          return {
+            id: nextSearchId(),
+            title,
+            url,
+            sourceType: 'academic',
+            sourceName: 'OpenAlex',
+            year: typeof r.publication_year === 'number' ? r.publication_year : undefined,
+            doi,
+            authors,
+            snippet,
+          };
+        });
+      }),
+    );
+    items.push(...batches.flat());
+    if (i + SEARCH_WAVE_SIZE < queries.length) {
+      await new Promise((resolve) => setTimeout(resolve, SEARCH_STAGGER_MS));
+    }
+  }
+  return items;
+}
+
+async function searchArxiv(queries: string[]): Promise<SearchEvidence[]> {
+  const items: SearchEvidence[] = [];
+  for (let i = 0; i < queries.length; i += SEARCH_WAVE_SIZE) {
+    const wave = queries.slice(i, i + SEARCH_WAVE_SIZE);
+    const batches = await Promise.all(
+      wave.map(async (query): Promise<SearchEvidence[]> => {
+        const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&max_results=${SEARCH_QUERY_LIMIT}`;
+        const res = await searchFetch(url, undefined, SEARCH_TIMEOUT_WEB_MS);
+        if (!res || !res.ok) return [];
+        const xml = await res.text().catch(() => '');
+        const entries = [...xml.matchAll(/<entry>[\s\S]*?<\/entry>/g)].slice(0, SEARCH_QUERY_LIMIT).map((m) => {
+          const title = m[0].match(/<title>(.*?)<\/title>/s)?.[1] ?? '';
+          const summary = m[0].match(/<summary>(.*?)<\/summary>/s)?.[1] ?? '';
+          const id = m[0].match(/<id>(.*?)<\/id>/s)?.[1] ?? '';
+          const published = m[0].match(/<published>(.*?)<\/published>/s)?.[1] ?? '';
+          return {
+            title: title.replace(/\s+/g, ' ').trim(),
+            summary: summary.replace(/\s+/g, ' ').trim(),
+            url: id.trim(),
+            year: published ? new Date(published).getFullYear() : undefined,
+          };
+        });
+        return entries
+          .filter((e) => e.title && e.url)
+          .map((e): SearchEvidence => ({
+            id: nextSearchId(),
+            title: e.title,
+            url: e.url,
+            sourceType: 'academic',
+            sourceName: 'arXiv',
+            year: e.year,
+            snippet: e.summary.slice(0, 400),
+          }));
+      }),
+    );
+    items.push(...batches.flat());
+    if (i + SEARCH_WAVE_SIZE < queries.length) {
+      await new Promise((resolve) => setTimeout(resolve, SEARCH_STAGGER_MS));
+    }
+  }
+  return items;
+}
+
 async function searchPlatforms(
   queries: string[],
   platforms: string[],
 ): Promise<{ results: Record<string, SearchEvidence[]>; skipped: string[]; empty: string[] }> {
   const wanted = platforms.filter((p) => (SUPPORTED_PLATFORMS as readonly string[]).includes(p));
+
+  const runPlatform = async (platform: string): Promise<{ platform: string; items: SearchEvidence[] | null }> => {
+    if (platform === 'openalex') {
+      return { platform, items: await searchOpenAlex(queries).catch(() => []) };
+    }
+    if (platform === 'arxiv') {
+      return { platform, items: await searchArxiv(queries).catch(() => []) };
+    }
+    if (platform === 'semanticscholar') {
+      return { platform, items: await searchSemanticScholar(queries).catch(() => []) };
+    }
+    if (platform === 'pubmed') {
+      return { platform, items: await searchPubmed(queries).catch(() => []) };
+    }
+    if (platform === 'core') {
+      return { platform, items: await searchCore(queries).catch(() => null) };
+    }
+    return { platform, items: await searchWeb(queries).catch(() => null) };
+  };
+
+  const settled = await Promise.allSettled(wanted.map(runPlatform));
   const results: Record<string, SearchEvidence[]> = {};
   const skipped: string[] = [];
   const empty: string[] = [];
 
-  for (const platform of wanted) {
-    let items: SearchEvidence[] | null;
-    if (platform === 'semanticscholar') {
-      items = await searchSemanticScholar(queries).catch(() => []);
-    } else if (platform === 'pubmed') {
-      items = await searchPubmed(queries).catch(() => []);
-    } else if (platform === 'core') {
-      items = await searchCore(queries).catch(() => null);
-    } else {
-      items = await searchWeb(queries).catch(() => null);
+  for (const outcome of settled) {
+    if (outcome.status === 'rejected') {
+      skipped.push(outcome.reason?.platform ?? 'unknown');
+      continue;
     }
+    const { platform, items } = outcome.value;
     if (items === null) skipped.push(platform);
     else {
       results[platform] = items;
