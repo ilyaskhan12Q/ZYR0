@@ -30,7 +30,7 @@ function inline(text: string, options: RenderOptions): ReactNode[] {
           onClick={() => options.onCitationClick?.(citationKey)}
           title={verified ? `Source [${citationKey}] — verified` : `Source [${citationKey}] — link not confirmed`}
           className={`align-super text-[11px] font-semibold underline decoration-dotted underline-offset-2 transition hover:opacity-70 ${
-            verified ? 'text-emerald-400' : 'text-amber-400'
+            verified ? 'text-primary' : 'text-amber-600'
           }`}
         >
           [{citationKey}]

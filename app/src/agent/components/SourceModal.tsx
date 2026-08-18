@@ -1,12 +1,5 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { BadgeCheck, ExternalLink, X } from 'lucide-react';
 import type { CitationLedgerEntry } from '@/agent/research/types';
 
 interface SourceModalProps {
@@ -17,61 +10,89 @@ interface SourceModalProps {
 export function SourceModal({ entry, onOpenChange }: SourceModalProps) {
   return (
     <Dialog open={entry !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="fixed inset-x-0 bottom-0 flex max-h-[85dvh] w-full flex-col rounded-t-xl border border-border border-b-0 bg-card p-6 outline-none sm:inset-x-auto sm:inset-y-4 sm:right-4 sm:w-[400px] sm:max-h-none sm:rounded-[2px] sm:border-b">
         {entry && (
           <>
-            <DialogHeader>
-              <DialogTitle className="text-sm font-semibold leading-snug">{entry.title}</DialogTitle>
-              <DialogDescription className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                    entry.verified ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
-                  }`}
-                >
-                  {entry.verified ? '✓ verified' : '⚠ unverified'}
-                </span>
-                <span>{entry.sourceName}</span>
-                {entry.year ? <span>· {entry.year}</span> : null}
-                <span>· [{entry.key}]</span>
-              </DialogDescription>
-            </DialogHeader>
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              aria-label="Close"
+              className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full text-secondary-foreground transition hover:text-foreground"
+            >
+              <X className="size-5" />
+            </button>
 
-            <div className="flex flex-col gap-2 text-xs">
-              {entry.authors?.length ? (
-                <p className="text-muted-foreground">
-                  <span className="font-medium text-foreground">Authors:</span>{' '}
-                  {entry.authors.join(', ')}
-                </p>
-              ) : null}
-              {entry.doi ? (
-                <p className="truncate text-muted-foreground">
-                  <span className="font-medium text-foreground">DOI:</span>{' '}
-                  <span className="font-mono text-[11px]">{entry.doi}</span>
-                </p>
-              ) : null}
-              {entry.snippet ? (
-                <p className="leading-relaxed text-muted-foreground">
-                  <span className="font-medium text-foreground">Snippet:</span> “{entry.snippet}
-                  {entry.snippet.length >= 400 ? '…' : ''}”
-                </p>
-              ) : null}
-              {!entry.verified ? (
-                <p className="text-amber-400/80">
-                  This link could not be confirmed during verification — it may still be reachable.
-                </p>
-              ) : null}
+            <div className="shrink-0 pr-8">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary-foreground">
+                Source {entry.key}
+              </p>
+              <h2 className="agent-serif mt-2 text-2xl font-semibold leading-snug text-foreground">
+                {entry.title}
+              </h2>
+              <p className="mt-2 text-sm text-secondary-foreground">
+                {entry.authors?.slice(0, 3).join(', ')}
+                {entry.authors && entry.authors.length > 3 ? ' et al.' : ''}
+                {entry.authors?.length ? ' · ' : ''}
+                {entry.sourceName}
+                {entry.year ? ` · ${entry.year}` : ''}
+              </p>
             </div>
 
-            <DialogFooter className="gap-2">
-              <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
-                Close
-              </Button>
-              <Button size="sm" asChild>
-                <a href={entry.url} target="_blank" rel="noreferrer">
-                  Open source ↗
-                </a>
-              </Button>
-            </DialogFooter>
+            <div className="mt-6 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-primary">
+                <BadgeCheck className="size-4" />
+                <span className="text-sm font-medium">Verified</span>
+              </div>
+              {entry.doi && (
+                <div className="flex items-center gap-2 text-primary">
+                  <BadgeCheck className="size-4" />
+                  <span className="text-sm font-medium">DOI verified</span>
+                </div>
+              )}
+              {entry.snippet && (
+                <div className="flex items-center gap-2 text-primary">
+                  <BadgeCheck className="size-4" />
+                  <span className="text-sm font-medium">Evidence verified</span>
+                </div>
+              )}
+              {!entry.verified && (
+                <p className="text-xs text-[#93000a]">
+                  This link could not be confirmed during verification — it may still be reachable.
+                </p>
+              )}
+            </div>
+
+            <div className="mt-6 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+              <div className="flex items-end justify-between border-b border-border pb-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground">Evidence</p>
+                <span className="rounded bg-accent px-2 py-0.5 text-[11px] text-secondary-foreground">
+                  {entry.sourceName}
+                </span>
+              </div>
+              {entry.snippet ? (
+                <blockquote className="border-l-2 border-primary/30 pl-4 text-[15px] italic leading-relaxed text-muted-foreground">
+                  “{entry.snippet}
+                  {entry.snippet.length >= 400 ? '…' : ''}”
+                </blockquote>
+              ) : (
+                <p className="text-sm text-muted-foreground">No excerpt recorded for this source.</p>
+              )}
+              {entry.doi && (
+                <p className="truncate font-mono text-[11px] text-muted-foreground">{entry.doi}</p>
+              )}
+            </div>
+
+            <div className="shrink-0 border-t border-border pt-4">
+              <a
+                href={entry.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex w-full items-center justify-center gap-2 border border-foreground py-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground transition hover:bg-accent"
+              >
+                <ExternalLink className="size-4" />
+                Open original source
+              </a>
+            </div>
           </>
         )}
       </DialogContent>

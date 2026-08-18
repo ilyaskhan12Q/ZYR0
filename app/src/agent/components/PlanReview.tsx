@@ -50,15 +50,15 @@ export function PlanReview({
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6">
-      <div className="mb-4 flex items-start justify-between gap-3">
+    <div className="mx-auto max-w-3xl px-6 py-10">
+      <div className="mb-6 flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold">Review the research plan</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="agent-serif text-3xl font-semibold text-foreground">Review the research plan</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
             {contracts.length} worker contracts · {provider === 'gateway' ? 'planned by the model' : 'fallback structure'}
             {provider === 'fallback' ? ' (model output was malformed — standard structure used)' : ''}
           </p>
-          {error && <p className="mt-1 text-[11px] text-amber-400">{error}</p>}
+          {error && <p className="mt-1 text-[11px] text-[#92400e]">{error}</p>}
         </div>
       </div>
 
@@ -66,24 +66,21 @@ export function PlanReview({
         {editable.map((contract) => {
           const isOpen = expanded.has(contract.taskId);
           return (
-            <div
-              key={contract.taskId}
-              className="rounded-xl border border-border bg-card/60 p-3"
-            >
+            <div key={contract.taskId} className="rounded-[2px] border border-border bg-card p-4">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="shrink-0 rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
-                      {contract.taskId}
+                  <div className="flex items-center gap-2.5">
+                    <span className="agent-serif text-lg font-semibold text-primary/60">
+                      {String(contract.taskId).padStart(2, '0')}
                     </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                       {DIMENSION_LABELS[contract.dimension]}
                     </span>
                   </div>
                   <input
                     value={contract.focusArea}
                     onChange={(e) => patch(contract.taskId, (c) => ({ ...c, focusArea: e.target.value }))}
-                    className="mt-2 w-full rounded-md border border-transparent bg-transparent text-sm font-medium outline-none focus:border-ring focus:bg-background focus:px-2"
+                    className="mt-2 w-full rounded-[2px] border border-transparent bg-transparent text-sm font-medium outline-none focus:border-ring focus:bg-background focus:px-2"
                   />
                 </div>
                 <button
@@ -100,7 +97,7 @@ export function PlanReview({
               {isOpen && (
                 <div className="mt-3 flex flex-col gap-2 border-t border-border pt-2 text-xs">
                   <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                       Sub-questions
                     </p>
                     {contract.subQuestions.map((q, i) => (
@@ -113,18 +110,18 @@ export function PlanReview({
                             subQuestions: c.subQuestions.map((sq, j) => (j === i ? e.target.value : sq)),
                           }))
                         }
-                        className="mb-1 w-full rounded-md border border-border bg-background px-2 py-1 outline-none focus:border-ring"
+                        className="mb-1 w-full rounded-[2px] border border-border bg-background px-2 py-1 outline-none focus:border-ring"
                       />
                     ))}
                   </div>
                   <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                       Keywords
                     </p>
                     <p className="text-muted-foreground">{contract.keywords.join(', ')}</p>
                   </div>
                   <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                       Boundaries
                     </p>
                     <p className="text-muted-foreground">
@@ -135,7 +132,7 @@ export function PlanReview({
                     </p>
                   </div>
                   <div>
-                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                       Output fields
                     </p>
                     <p className="text-muted-foreground">{contract.outputFields.join(', ')}</p>
@@ -147,14 +144,14 @@ export function PlanReview({
         })}
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <Button onClick={onApprove} disabled={!running || editable.length === 0}>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <Button className="rounded-[2px]" onClick={onApprove} disabled={!running || editable.length === 0}>
           Approve & research
         </Button>
-        <Button variant="outline" onClick={onRegenerate} disabled={!running}>
+        <Button variant="outline" className="rounded-[2px]" onClick={onRegenerate} disabled={!running}>
           Regenerate plan
         </Button>
-        <Button variant="ghost" onClick={onCancel} disabled={!running}>
+        <Button variant="ghost" className="rounded-[2px]" onClick={onCancel} disabled={!running}>
           Cancel
         </Button>
         <label className="ml-auto flex cursor-pointer items-center gap-1.5 text-[11px] text-muted-foreground">

@@ -9,6 +9,7 @@ import type {
   EvidenceItem,
   PipelineStage,
   PipelineStageUpdate,
+  ResearchDepth,
   ResearchReport,
   SubTaskContract,
 } from '@/agent/research/types';
@@ -68,6 +69,7 @@ export function useResearchPipeline() {
   const [workerProgress, setWorkerProgress] = useState<WorkerProgress>({ active: [], counts: {} });
   const abortRef = useRef<AbortController | null>(null);
   const lastTopicRef = useRef('');
+  const depthRef = useRef<ResearchDepth>('standard');
 
   const emit = useCallback((update: PipelineStageUpdate) => {
     setStage(update.stage);
@@ -118,7 +120,7 @@ export function useResearchPipeline() {
       .insert({
         prompt: research.topic,
         mode: 'research',
-        depth: 'standard',
+        depth: depthRef.current,
         status,
         report_md: research.markdown,
         report_data: toReportData(research),
@@ -209,13 +211,14 @@ export function useResearchPipeline() {
   );
 
   const run = useCallback(
-    async (topic: string) => {
+    async (topic: string, depth: ResearchDepth = 'standard') => {
       const text = topic.trim();
       if (!text || running) return;
 
       const controller = new AbortController();
       abortRef.current = controller;
       lastTopicRef.current = text;
+      depthRef.current = depth;
       setRunning(true);
       setReport(null);
       setContracts([]);

@@ -8,7 +8,7 @@ Style rules:
 - Banned AI clichés (never use): "delve", "in today's fast-paced world", "unlock", "landscape", "game-changer", "it is important to note", "in conclusion,", "furthermore,", "dive into", "robust", "leverage", "seamless", "cutting-edge".
 - Ground EVERY factual claim in the citation ledger: append the matching citation key as an inline reference like [1], [2], ... [N].
 - You may ONLY reference keys that exist in the ledger. If the ledger does not support a claim, omit the claim.
-- Structure the report with a markdown title and exactly four ## sections: Foundations & Baseline, Technical Architecture & Mechanics, Benchmarks & Empirical Data, Constraints, Economics & Outlook.
+- Structure the report as: a markdown title, then "## Executive Summary" (a 3–5 sentence high-signal overview, each sentence cited), then "## Key Findings" (4–6 bolded one-line findings, each with citations), then the four dimension sections: "## Foundations & Baseline", "## Technical Architecture & Mechanics", "## Benchmarks & Empirical Data", "## Constraints, Economics & Outlook", then "## Conclusion" (a short synthesis), and finally "## Sources".
 - End with a "## Sources" section listing every cited source as "- [n] Title — Source (Year)" with the URL.
 - Write in full sentences and paragraphs; use short bullet lists only where they genuinely aid clarity.
 - Output ONLY the markdown report, no commentary before or after.`;
