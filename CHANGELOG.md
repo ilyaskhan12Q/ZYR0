@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Research Agent — broken research runs producing "title only, 0 verified sources, 0 evidence items"** (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/hooks/useResearchPipeline.ts`, `app/src/agent/research/workers.ts`, `app/src/agent/research/editorial.ts`, `app/src/agent/components/ReportView.tsx`):
+  - **RLS-blocked persistence**: `agent_researches`/`agent_messages` inserts never set `user_id` (policies require `user_id = auth.uid()`), so every run hit "new row violates row-level security policy" — history was silently empty. Client now resolves the session user and writes `user_id` on both inserts; persistence failures are surfaced in the report's pipeline notes instead of silently dropped.
+  - **Dead gateway search on the Supabase edge**: Semantic Scholar keyless tier 429s datacenter IPs (now retried once after 1s backoff), PubMed rejected edge requests without a descriptive User-Agent, and Jina web search's ~12s latency blew the 10s search timeout. Gateway now sends `ZYROO-Research-Agent` User-Agent on all search calls, uses a dedicated 30s web-search timeout, and logs non-OK/failed upstream statuses.
+  - **Truncated editorial reports**: free models capped at 8192 output tokens; two editorial calls hit the cap exactly. Editorial prompt now constrains the report (Exec Summary ≤120 words, Key Findings ≤25 words each, dimension sections ≤350 words, Conclusion ≤120 words — full report ~6,000 tokens) so complete, well-formed reports fit comfortably.
+  - **Silent worker failures**: OpenAlex/arXiv worker fetch failures now surface as pipeline notes (`onNote`) instead of silently returning empty results.
+  - **ReportView pipeline notes**: collapsible amber banner on the report screen shows pipeline errors (worker/source/platform failures, history-save failures) so failures are visible after the run.
+
 ### Added
 - **Academic Precision UI/UX redesign of the Research Agent (`app/src/styles/agent.css`, `app/src/agent/components/LandingView.tsx`, `PipelineView.tsx`, `ResearchAgentPage.tsx`, `PlanReview.tsx`, `HistoryPanel.tsx`)**:
   - Agent workspace restyled to the "Academic Precision" design system: light theme (surface `#f9f9f9`, on-surface `#1a1c1c`, primary `#3525cd`, 1px borders, 4px radii, flat — no shadows), **Source Serif 4** serif headlines + **Geist** body (loaded via Google Fonts), scoped under `.agent-root` so the rest of the app is untouched.

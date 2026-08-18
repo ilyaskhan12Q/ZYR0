@@ -164,6 +164,7 @@ export default function ResearchAgentPage() {
               {pipeline.report ? (
                 <ReportView
                   report={pipeline.report}
+                  errors={pipeline.errors}
                   onFollowUp={handleFollowUp}
                   onNewResearch={handleNewResearch}
                   onRegenerate={handleRegenerate}

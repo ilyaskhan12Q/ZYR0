@@ -114,10 +114,16 @@ export function useResearchPipeline() {
     return loaded;
   }, []);
 
-  const persist = useCallback(async (research: ResearchReport, status: 'completed' | 'failed') => {
+  const persist = useCallback(async (research: ResearchReport, status: 'completed' | 'failed'): Promise<boolean> => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user?.id) return false;
+
     const { data, error } = await supabase
       .from('agent_researches')
       .insert({
+        user_id: user.id,
         prompt: research.topic,
         mode: 'research',
         depth: depthRef.current,
@@ -127,15 +133,18 @@ export function useResearchPipeline() {
       })
       .select('id')
       .single();
-    if (error || !data) return;
+    if (error || !data) return false;
 
-    await supabase.from('agent_messages').insert({
+    const messageResult = await supabase.from('agent_messages').insert({
+      user_id: user.id,
       research_id: data.id,
       role: 'user',
       content: research.topic,
       model: research.model,
     });
+    if (messageResult.error) setErrors((prev) => [...prev, `history: ${messageResult.error.message}`]);
     research.researchId = data.id;
+    return true;
   }, []);
 
   const continueFromReview = useCallback(
@@ -196,7 +205,10 @@ export function useResearchPipeline() {
 
         emit({ stage: 'done', message: 'Research complete' });
         setReport(research);
-        await persist(research, 'completed');
+        const saved = await persist(research, 'completed');
+        if (!saved) {
+          setErrors((prev) => [...prev, 'history: could not save this run to your research history']);
+        }
         await loadHistory();
       } catch (err) {
         const failure = err instanceof Error ? err.message : 'Research pipeline failed';

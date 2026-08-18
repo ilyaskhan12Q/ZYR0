@@ -67,10 +67,17 @@ function dedupeByUrl(items: EvidenceItem[]): EvidenceItem[] {
 // Worker — OpenAlex (keyless)
 // ---------------------------------------------------------------------------
 
-async function openAlexQuery(query: string): Promise<EvidenceItem[]> {
+async function openAlexQuery(query: string, onNote?: (note: string) => void): Promise<EvidenceItem[]> {
   const url = `https://api.openalex.org/works?search=${encodeURIComponent(query)}&per-page=5`;
   const res = await withTimeout(fetch(url), WORKER_TIMEOUT_MS);
-  if (!res || !res.ok) return [];
+  if (!res) {
+    onNote?.('openalex: request failed or timed out — skipping');
+    return [];
+  }
+  if (!res.ok) {
+    onNote?.(`openalex: HTTP ${res.status} — skipping`);
+    return [];
+  }
   const json = await res.json().catch(() => null);
   if (!json?.results || !Array.isArray(json.results)) return [];
 
@@ -99,8 +106,11 @@ async function openAlexQuery(query: string): Promise<EvidenceItem[]> {
 export async function openAlexWorker(
   contracts: SubTaskContract[],
   onItem?: (item: EvidenceItem) => void,
+  onNote?: (note: string) => void,
 ): Promise<EvidenceItem[]> {
-  const batches = await Promise.all(contracts.flatMap((c) => contractQueries(c)).map((q) => openAlexQuery(q)));
+  const batches = await Promise.all(
+    contracts.flatMap((c) => contractQueries(c)).map((q) => openAlexQuery(q, onNote)),
+  );
   const items = dedupeByUrl(batches.flat()).slice(0, PLATFORM_CAP);
   for (const item of items) onItem?.(item);
   return items;
@@ -110,10 +120,17 @@ export async function openAlexWorker(
 // Worker — arXiv (keyless, Atom RSS)
 // ---------------------------------------------------------------------------
 
-async function arxivQuery(query: string): Promise<EvidenceItem[]> {
+async function arxivQuery(query: string, onNote?: (note: string) => void): Promise<EvidenceItem[]> {
   const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&max_results=5`;
   const res = await withTimeout(fetch(url), WORKER_TIMEOUT_MS);
-  if (!res || !res.ok) return [];
+  if (!res) {
+    onNote?.('arxiv: request failed or timed out — skipping');
+    return [];
+  }
+  if (!res.ok) {
+    onNote?.(`arxiv: HTTP ${res.status} — skipping`);
+    return [];
+  }
   const xml = await res.text();
   const doc = new DOMParser().parseFromString(xml, 'application/xml');
   const entries = Array.from(doc.getElementsByTagName('entry'));
@@ -139,8 +156,11 @@ async function arxivQuery(query: string): Promise<EvidenceItem[]> {
 export async function arxivWorker(
   contracts: SubTaskContract[],
   onItem?: (item: EvidenceItem) => void,
+  onNote?: (note: string) => void,
 ): Promise<EvidenceItem[]> {
-  const batches = await Promise.all(contracts.flatMap((c) => contractQueries(c)).map((q) => arxivQuery(q)));
+  const batches = await Promise.all(
+    contracts.flatMap((c) => contractQueries(c)).map((q) => arxivQuery(q, onNote)),
+  );
   const items = dedupeByUrl(batches.flat()).slice(0, PLATFORM_CAP);
   for (const item of items) onItem?.(item);
   return items;
@@ -204,8 +224,8 @@ export async function runWorkers(
   onNote?: (note: string) => void,
 ): Promise<{ items: EvidenceItem[]; errors: string[] }> {
   const workers: Array<[WorkerName, () => Promise<EvidenceItem[]>]> = [
-    ['openalex', () => openAlexWorker(contracts, onItem)],
-    ['arxiv', () => arxivWorker(contracts, onItem)],
+    ['openalex', () => openAlexWorker(contracts, onItem, onNote)],
+    ['arxiv', () => arxivWorker(contracts, onItem, onNote)],
     [
       'gateway',
       () =>

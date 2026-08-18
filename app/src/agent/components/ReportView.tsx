@@ -9,6 +9,7 @@ import type { CitationLedgerEntry, EvidenceItem, ResearchReport } from '@/agent/
 
 interface ReportViewProps {
   report: ResearchReport;
+  errors?: string[];
   onFollowUp: (report: ResearchReport) => void;
   onNewResearch: (topic: string) => void;
   onRegenerate: (topic: string) => void;
@@ -45,10 +46,11 @@ const TABS: { id: TabId; label: string; icon: typeof BookOpen }[] = [
   { id: 'sources', label: 'Sources', icon: Link2 },
 ];
 
-export function ReportView({ report, onFollowUp, onNewResearch, onRegenerate }: ReportViewProps) {
+export function ReportView({ report, errors = [], onFollowUp, onNewResearch, onRegenerate }: ReportViewProps) {
   const [tab, setTab] = useState<TabId>('overview');
   const [modalEntry, setModalEntry] = useState<CitationLedgerEntry | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const elapsed = report.elapsedMs >= 60_000 ? `${(report.elapsedMs / 60_000).toFixed(1)} min` : `${report.elapsedMs}s`;
   const verifiedByKey = new Map(report.ledger.map((entry) => [entry.key, entry.verified]));
   const sorted = [...report.ledger].sort((a, b) => Number(b.verified) - Number(a.verified) || a.key - b.key);
@@ -177,6 +179,30 @@ export function ReportView({ report, onFollowUp, onNewResearch, onRegenerate }: 
       {/* Article */}
       <ScrollArea className="flex-1">
         <article className="mx-auto max-w-3xl px-6 pb-24 pt-10">
+          {errors.length > 0 && (
+            <div className="mb-8 rounded-[2px] border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              <button
+                type="button"
+                onClick={() => setNotesOpen((prev) => !prev)}
+                className="flex w-full items-center justify-between font-medium"
+              >
+                <span>
+                  {errors.length} pipeline note{errors.length > 1 ? 's' : ''} — sources / workers
+                </span>
+                <span>{notesOpen ? '▲' : '▼'}</span>
+              </button>
+              {notesOpen && (
+                <div className="mt-2 flex flex-col gap-1">
+                  {errors.map((err, i) => (
+                    <p key={i} className="text-[11px] opacity-80">
+                      {err}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary-foreground">
             Final report · {dateLabel}
           </p>

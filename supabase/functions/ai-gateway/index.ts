@@ -241,10 +241,15 @@ async function verifyUrls(urls: string[]): Promise<{ url: string; ok: boolean; s
 // ---------------------------------------------------------------------------
 
 const SEARCH_TIMEOUT_MS = 10_000;
+const SEARCH_TIMEOUT_WEB_MS = 30_000;
 const SEARCH_QUERY_LIMIT = 5;
 const SEARCH_MAX_QUERIES = 12;
 const SEARCH_WAVE_SIZE = 3;
 const SEARCH_STAGGER_MS = 150;
+
+// NCBI E-utilities and several academic APIs reject requests without a
+// descriptive User-Agent; Deno's default UA is routinely blocked.
+const SEARCH_USER_AGENT = 'ZYROO-Research-Agent/0.2 (academic search; contact: research@zyroo.org)';
 
 interface SearchEvidence {
   id: string;
@@ -263,12 +268,24 @@ const SUPPORTED_PLATFORMS = ['semanticscholar', 'pubmed', 'core', 'web'];
 let searchCounter = 0;
 const nextSearchId = () => `gw-${crypto.randomUUID().slice(0, 8)}-${searchCounter++}`;
 
-async function searchFetch(url: string, headers?: Record<string, string>): Promise<Response | null> {
+async function searchFetch(
+  url: string,
+  headers?: Record<string, string>,
+  timeoutMs: number = SEARCH_TIMEOUT_MS,
+): Promise<Response | null> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), SEARCH_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    return await fetch(url, { headers, signal: controller.signal });
-  } catch {
+    const res = await fetch(url, {
+      headers: { ...headers, 'User-Agent': SEARCH_USER_AGENT },
+      signal: controller.signal,
+    });
+    if (!res.ok) {
+      console.warn(`[ai-gateway] search fetch ${res.status} ${res.statusText} — ${url.slice(0, 120)}`);
+    }
+    return res;
+  } catch (err) {
+    console.warn(`[ai-gateway] search fetch failed — ${url.slice(0, 120)}: ${err?.name ?? 'error'}`);
     return null;
   } finally {
     clearTimeout(timer);
@@ -286,33 +303,16 @@ async function searchSemanticScholar(queries: string[]): Promise<SearchEvidence[
       wave.map(async (query): Promise<SearchEvidence[]> => {
         const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(query)}&limit=${SEARCH_QUERY_LIMIT}&fields=title,abstract,year,url,externalIds,authors`;
         const res = await searchFetch(url, headers);
-        if (!res || !res.ok) return [];
-        const json = await res.json().catch(() => null);
-        if (!json?.data || !Array.isArray(json.data)) return [];
-        return json.data
-          .slice(0, SEARCH_QUERY_LIMIT)
-          .map((p: Record<string, unknown>): SearchEvidence | null => {
-            const title = String(p.title ?? '').trim();
-            const external = p.externalIds as Record<string, unknown> | undefined;
-            const doi = typeof external?.DOI === 'string' ? external.DOI : undefined;
-            const url = String(p.url ?? '').trim() || (doi ? `https://doi.org/${doi}` : '');
-            if (!title || !url) return null;
-            const authors = Array.isArray(p.authors)
-              ? (p.authors as { name?: string }[]).map((a) => a.name ?? '').filter(Boolean).slice(0, 5)
-              : undefined;
-            return {
-              id: nextSearchId(),
-              title,
-              url,
-              sourceType: 'academic',
-              sourceName: 'Semantic Scholar',
-              year: typeof p.year === 'number' ? p.year : undefined,
-              doi,
-              authors,
-              snippet: String(p.abstract ?? '').slice(0, 400),
-            };
-          })
-          .filter((item: SearchEvidence | null): item is SearchEvidence => item !== null);
+        if (!res) return [];
+        if (res.status === 429 || res.status >= 500) {
+          // Keyless tier is aggressively rate-limited on datacenter IPs —
+          // one backoff retry before reporting the platform as empty.
+          await new Promise((resolve) => setTimeout(resolve, 1_000));
+          const retry = await searchFetch(url, headers);
+          if (!retry || !retry.ok) return [];
+          return parseS2Batch(await retry.json().catch(() => null));
+        }
+        return parseS2Batch(await res.json().catch(() => null));
       }),
     );
     items.push(...batches.flat());
@@ -321,6 +321,36 @@ async function searchSemanticScholar(queries: string[]): Promise<SearchEvidence[
     }
   }
   return items;
+}
+
+function parseS2Batch(json: unknown): SearchEvidence[] {
+  if (!json || typeof json !== 'object') return [];
+  const data = (json as { data?: unknown }).data;
+  if (!Array.isArray(data)) return [];
+  return data
+    .slice(0, SEARCH_QUERY_LIMIT)
+    .map((p: Record<string, unknown>): SearchEvidence | null => {
+      const title = String(p.title ?? '').trim();
+      const external = p.externalIds as Record<string, unknown> | undefined;
+      const doi = typeof external?.DOI === 'string' ? external.DOI : undefined;
+      const url = String(p.url ?? '').trim() || (doi ? `https://doi.org/${doi}` : '');
+      if (!title || !url) return null;
+      const authors = Array.isArray(p.authors)
+        ? (p.authors as { name?: string }[]).map((a) => a.name ?? '').filter(Boolean).slice(0, 5)
+        : undefined;
+      return {
+        id: nextSearchId(),
+        title,
+        url,
+        sourceType: 'academic',
+        sourceName: 'Semantic Scholar',
+        year: typeof p.year === 'number' ? p.year : undefined,
+        doi,
+        authors,
+        snippet: String(p.abstract ?? '').slice(0, 400),
+      };
+    })
+    .filter((item: SearchEvidence | null): item is SearchEvidence => item !== null);
 }
 
 async function searchPubmed(queries: string[]): Promise<SearchEvidence[]> {
@@ -425,9 +455,11 @@ function extractLinks(markdown: string): { title: string; url: string }[] {
   const re = /\[([^\]]{4,120})\]\((https?:\/\/[^)\s]+)\)/g;
   let match: RegExpExecArray | null;
   while ((match = re.exec(markdown)) !== null) {
+    const title = match[1].replace(/\s+/g, ' ').trim();
     const url = match[2];
+    if (!title || /^(image|icon|img)\s+\d*:?/i.test(title)) continue;
     if (/jina\.ai|semanticscholar\.org|openalex\.org|arxiv\.org\/(abs|pdf)|pubmed\.ncbi|doi\.org/i.test(url)) continue;
-    links.push({ title: match[1], url });
+    links.push({ title, url });
     if (links.length >= 10) break;
   }
   return links;
@@ -442,7 +474,7 @@ async function searchWeb(queries: string[]): Promise<SearchEvidence[] | null> {
 
   const searches = await Promise.all(
     searchQueries.map(async (query): Promise<{ title: string; url: string }[]> => {
-      const res = await searchFetch(`https://s.jina.ai/?q=${encodeURIComponent(query)}`, headers);
+      const res = await searchFetch(`https://s.jina.ai/?q=${encodeURIComponent(query)}`, headers, SEARCH_TIMEOUT_WEB_MS);
       if (!res || !res.ok) return [];
       return extractLinks(await res.text()).slice(0, 6);
     }),
@@ -461,7 +493,7 @@ async function searchWeb(queries: string[]): Promise<SearchEvidence[] | null> {
 
   const withSnippets = await Promise.all(
     links.map(async (link): Promise<SearchEvidence> => {
-      const res = await searchFetch(`https://r.jina.ai/${encodeURIComponent(link.url)}`, headers);
+      const res = await searchFetch(`https://r.jina.ai/${encodeURIComponent(link.url)}`, headers, SEARCH_TIMEOUT_WEB_MS);
       const text = res && res.ok ? await res.text() : '';
       return {
         id: nextSearchId(),
