@@ -76,14 +76,15 @@ export async function verifyUrls(urls: string[]): Promise<UrlVerificationResult[
   return data?.results ?? [];
 }
 
-export type GatewayPlatform = 'semanticscholar' | 'pubmed' | 'core';
+export type GatewayPlatform = 'semanticscholar' | 'pubmed' | 'core' | 'web';
 
 export interface GatewaySearchResult {
   results: Partial<Record<GatewayPlatform, EvidenceItem[]>>;
   skipped: string[];
+  empty: string[];
 }
 
-/** Server-side platform search (S2 + PubMed + CORE) for the gather phase. */
+/** Server-side platform search (S2 + PubMed + CORE + Jina web) for the gather phase. */
 export async function searchPlatforms(
   queries: string[],
   platforms: GatewayPlatform[],
@@ -94,7 +95,7 @@ export async function searchPlatforms(
     platforms,
   });
   if (error) throw error;
-  return { results: data?.results ?? {}, skipped: data?.skipped ?? [] };
+  return { results: data?.results ?? {}, skipped: data?.skipped ?? [], empty: data?.empty ?? [] };
 }
 
 export interface StreamChatOptions {

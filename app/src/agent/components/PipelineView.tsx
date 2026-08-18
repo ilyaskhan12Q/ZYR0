@@ -153,7 +153,7 @@ export function PipelineView({
                     <span className="agent-pulse-dot size-1.5 shrink-0 rounded-full bg-primary" />
                   )}
                   <span className="text-muted-foreground">{name}</span>
-                  {count > 0 && <span className="ml-auto text-[11px] text-muted-foreground">{count} found</span>}
+                  <span className="ml-auto text-[11px] text-muted-foreground">{count > 0 ? `${count} found` : '0 found'}</span>
                 </div>
               );
             })}

@@ -250,7 +250,7 @@ interface SearchEvidence {
   id: string;
   title: string;
   url: string;
-  sourceType: 'academic';
+  sourceType: 'academic' | 'web';
   sourceName: string;
   year?: number;
   doi?: string;
@@ -258,7 +258,7 @@ interface SearchEvidence {
   snippet?: string;
 }
 
-const SUPPORTED_PLATFORMS = ['semanticscholar', 'pubmed', 'core'];
+const SUPPORTED_PLATFORMS = ['semanticscholar', 'pubmed', 'core', 'web'];
 
 let searchCounter = 0;
 const nextSearchId = () => `gw-${crypto.randomUUID().slice(0, 8)}-${searchCounter++}`;
@@ -416,26 +416,93 @@ async function searchCore(queries: string[]): Promise<SearchEvidence[] | null> {
   return items;
 }
 
+// Jina web search — requires JINA_API_KEY; skipped when absent.
+const WEB_SEARCHES = 2;
+const WEB_FETCHES = 4;
+
+function extractLinks(markdown: string): { title: string; url: string }[] {
+  const links: { title: string; url: string }[] = [];
+  const re = /\[([^\]]{4,120})\]\((https?:\/\/[^)\s]+)\)/g;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(markdown)) !== null) {
+    const url = match[2];
+    if (/jina\.ai|semanticscholar\.org|openalex\.org|arxiv\.org\/(abs|pdf)|pubmed\.ncbi|doi\.org/i.test(url)) continue;
+    links.push({ title: match[1], url });
+    if (links.length >= 10) break;
+  }
+  return links;
+}
+
+async function searchWeb(queries: string[]): Promise<SearchEvidence[] | null> {
+  const apiKey = Deno.env.get('JINA_API_KEY');
+  if (!apiKey) return null; // Jina requires a key — caller reports it skipped
+
+  const headers = { Authorization: `Bearer ${apiKey}` };
+  const searchQueries = queries.slice(0, WEB_SEARCHES);
+
+  const searches = await Promise.all(
+    searchQueries.map(async (query): Promise<{ title: string; url: string }[]> => {
+      const res = await searchFetch(`https://s.jina.ai/?q=${encodeURIComponent(query)}`, headers);
+      if (!res || !res.ok) return [];
+      return extractLinks(await res.text()).slice(0, 6);
+    }),
+  );
+
+  const seen = new Set<string>();
+  const links: { title: string; url: string }[] = [];
+  for (const link of searches.flat()) {
+    const key = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      links.push(link);
+    }
+    if (links.length >= WEB_FETCHES) break;
+  }
+
+  const withSnippets = await Promise.all(
+    links.map(async (link): Promise<SearchEvidence> => {
+      const res = await searchFetch(`https://r.jina.ai/${encodeURIComponent(link.url)}`, headers);
+      const text = res && res.ok ? await res.text() : '';
+      return {
+        id: nextSearchId(),
+        title: link.title,
+        url: link.url,
+        sourceType: 'web',
+        sourceName: 'Jina Web',
+        snippet: text.slice(0, 400),
+      };
+    }),
+  );
+  return withSnippets;
+}
+
 async function searchPlatforms(
   queries: string[],
   platforms: string[],
-): Promise<{ results: Record<string, SearchEvidence[]>; skipped: string[] }> {
+): Promise<{ results: Record<string, SearchEvidence[]>; skipped: string[]; empty: string[] }> {
   const wanted = platforms.filter((p) => (SUPPORTED_PLATFORMS as readonly string[]).includes(p));
   const results: Record<string, SearchEvidence[]> = {};
   const skipped: string[] = [];
+  const empty: string[] = [];
 
   for (const platform of wanted) {
+    let items: SearchEvidence[] | null;
     if (platform === 'semanticscholar') {
-      results[platform] = await searchSemanticScholar(queries).catch(() => []);
+      items = await searchSemanticScholar(queries).catch(() => []);
     } else if (platform === 'pubmed') {
-      results[platform] = await searchPubmed(queries).catch(() => []);
+      items = await searchPubmed(queries).catch(() => []);
     } else if (platform === 'core') {
-      const items = await searchCore(queries).catch(() => null);
-      if (items === null) skipped.push('core');
-      else results[platform] = items;
+      items = await searchCore(queries).catch(() => null);
+    } else {
+      items = await searchWeb(queries).catch(() => null);
+    }
+    if (items === null) skipped.push(platform);
+    else {
+      results[platform] = items;
+      if (items.length === 0) empty.push(platform);
     }
   }
-  return { results, skipped };
+  return { results, skipped, empty };
 }
 
 // ---------------------------------------------------------------------------
@@ -755,8 +822,8 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      const { results, skipped } = await searchPlatforms(queries, platforms);
-      return new Response(JSON.stringify({ ok: true, results, skipped }), {
+      const { results, skipped, empty } = await searchPlatforms(queries, platforms);
+      return new Response(JSON.stringify({ ok: true, results, skipped, empty }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
