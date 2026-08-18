@@ -8,7 +8,7 @@ interface HistoryPanelProps {
 
 export function HistoryPanel({ items, activeId, onSelect }: HistoryPanelProps) {
   return (
-    <aside className="hidden w-64 shrink-0 border-l border-border bg-card p-3 md:block">
+    <aside className="hidden min-h-0 w-64 shrink-0 overflow-y-auto border-l border-border bg-card p-3 md:block">
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         Research history
       </p>
