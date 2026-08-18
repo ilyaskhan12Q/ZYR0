@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Jina web search via gateway (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/research/workers.ts`, `app/src/agent/api/gateway.ts`)**:
+  - `/v1/search` gains a `'web'` platform: 2 × `s.jina.ai` searches + up to 4 × `r.jina.ai` content fetches authenticated with `JINA_API_KEY` (env secret, never in the client bundle); skipped and reported when the key is absent, same keyless-first pattern as CORE.
+  - `webWorker` now dispatches through the gateway instead of the browser (key stays server-side); 4-stream parallelism and `WEB_CAP = 4` unchanged.
+- **Empty-platform visibility (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/components/PipelineView.tsx`)**:
+  - Gateway `search` response now includes `empty: string[]`; the pipeline surfaces "0 results — possibly rate-limited" notes (e.g. for Semantic Scholar) in the errors panel instead of failing silently.
+  - PipelineView source rows always show a count — empty platforms display "0 found" instead of no label.
+
 ### Fixed
 - **Stale JWT → "Unauthorized" from gateway (`app/src/agent/api/gateway.ts`)**:
   - `accessToken()` now refreshes the Supabase session when the access token is expired (or expiring within 60s) instead of shipping the stale token to the gateway; all `functions.invoke` calls (`fetchAgentModels`, `verifyUrls`, `searchPlatforms`) retry once after `supabase.auth.refreshSession()` on a 401, and `streamChat` refreshes + re-sends once on 401. Session is no longer silently broken after long idle.

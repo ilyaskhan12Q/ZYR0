@@ -4,12 +4,12 @@ import { searchPlatforms, type GatewayPlatform } from '@/agent/api/gateway';
 // Hard per-worker deadline — with intra-platform parallel queries each
 // platform finishes in ~1-9s; Promise.allSettled waits for the slowest.
 const WORKER_TIMEOUT_MS = 12_000;
-const JINA_TIMEOUT_MS = 10_000;
 const GATEWAY_TIMEOUT_MS = 15_000;
+const WEB_TIMEOUT_MS = 12_000;
 
 // Gathering volume: target 8-16 evidence items.
-const PLATFORM_CAP = 6; // per academic platform
-const WEB_CAP = 4; // max Jina items (2 searches + 2 fetches)
+const PLATFORM_CAP = 6; // per browser-direct academic platform
+const WEB_CAP = 4; // max Jina items (gateway caps the same)
 const GATEWAY_PLATFORM_CAP = 6; // per gateway platform (S2 / PubMed / CORE)
 const TOTAL_CAP = 16; // hard aggregate cap
 
@@ -147,21 +147,25 @@ export async function arxivWorker(
 }
 
 // ---------------------------------------------------------------------------
-// Worker — Gateway academic search (S2 + PubMed + CORE, server-side,
-// keyless-first; CORE skipped when no API key is configured)
+// Worker — Gateway search (server-side; keyless-first: S2 + PubMed keyless,
+// CORE and Jina web skipped when their API keys are not configured)
 // ---------------------------------------------------------------------------
 
-const GATEWAY_PLATFORMS: GatewayPlatform[] = ['semanticscholar', 'pubmed', 'core'];
+const ACADEMIC_GATEWAY_PLATFORMS: GatewayPlatform[] = ['semanticscholar', 'pubmed', 'core'];
 
-export async function gatewayAcademicWorker(
+async function gatewayPlatformWorker(
   contracts: SubTaskContract[],
+  platforms: GatewayPlatform[],
+  timeoutMs: number,
   onItem?: (item: EvidenceItem) => void,
   onSkipped?: (platform: string) => void,
+  onEmpty?: (platform: string) => void,
 ): Promise<EvidenceItem[]> {
   const queries = contracts.flatMap((c) => contractQueries(c)).slice(0, 12);
-  const gateway = await withTimeout(searchPlatforms(queries, GATEWAY_PLATFORMS), GATEWAY_TIMEOUT_MS);
+  const gateway = await withTimeout(searchPlatforms(queries, platforms), timeoutMs);
   if (!gateway) return [];
   for (const platform of gateway.skipped) onSkipped?.(platform);
+  for (const platform of gateway.empty) onEmpty?.(platform);
 
   const items = dedupeByUrl(
     Object.values(gateway.results).filter((v): v is EvidenceItem[] => Boolean(v)).flat(),
@@ -170,67 +174,23 @@ export async function gatewayAcademicWorker(
   return items;
 }
 
-// ---------------------------------------------------------------------------
-// Worker — Jina web (keyless, capped: 2 searches + 2 content fetches)
-// ---------------------------------------------------------------------------
-
-function extractLinks(markdown: string): { title: string; url: string }[] {
-  const links: { title: string; url: string }[] = [];
-  const re = /\[([^\]]{4,120})\]\((https?:\/\/[^)\s]+)\)/g;
-  let match: RegExpExecArray | null;
-  while ((match = re.exec(markdown)) !== null) {
-    const url = match[2];
-    if (/jina\.ai|semanticscholar\.org|openalex\.org|arxiv\.org\/(abs|pdf)/i.test(url)) continue;
-    links.push({ title: match[1], url });
-    if (links.length >= 10) break;
-  }
-  return links;
-}
-
-async function jinaSearch(query: string): Promise<{ title: string; url: string }[]> {
-  const url = `https://s.jina.ai/?q=${encodeURIComponent(query)}`;
-  const res = await withTimeout(fetch(url), JINA_TIMEOUT_MS);
-  if (!res || !res.ok) return [];
-  const text = await res.text();
-  return extractLinks(text).slice(0, 6);
-}
-
-async function jinaFetch(pageUrl: string): Promise<string> {
-  const res = await withTimeout(fetch(`https://r.jina.ai/${encodeURIComponent(pageUrl)}`), JINA_TIMEOUT_MS);
-  if (!res || !res.ok) return '';
-  return (await res.text()).slice(0, 1200);
+export async function gatewayAcademicWorker(
+  contracts: SubTaskContract[],
+  onItem?: (item: EvidenceItem) => void,
+  onSkipped?: (platform: string) => void,
+  onEmpty?: (platform: string) => void,
+): Promise<EvidenceItem[]> {
+  return gatewayPlatformWorker(contracts, ACADEMIC_GATEWAY_PLATFORMS, GATEWAY_TIMEOUT_MS, onItem, onSkipped, onEmpty);
 }
 
 export async function webWorker(
   contracts: SubTaskContract[],
   onItem?: (item: EvidenceItem) => void,
+  onSkipped?: (platform: string) => void,
+  onEmpty?: (platform: string) => void,
 ): Promise<EvidenceItem[]> {
-  const queries = contracts.flatMap((c) => contractQueries(c)).slice(0, 2);
-  const searches = await Promise.all(queries.map((q) => jinaSearch(q).catch(() => [])));
-
-  const seen = new Set<string>();
-  const links: { title: string; url: string }[] = [];
-  for (const link of searches.flat()) {
-    const key = link.url.replace(/^https?:\/\//, '').replace(/\/$/, '').toLowerCase();
-    if (!seen.has(key)) {
-      seen.add(key);
-      links.push(link);
-    }
-    if (links.length >= WEB_CAP) break;
-  }
-
-  const withSnippets = await Promise.all(links.map(async (link) => ({ link, snippet: await jinaFetch(link.url) })));
-
-  const items = withSnippets.map(({ link, snippet }): EvidenceItem => ({
-    id: nextId(),
-    title: link.title,
-    url: link.url,
-    sourceType: 'web',
-    sourceName: 'Jina Web',
-    snippet: snippet.slice(0, 400),
-  }));
-  for (const item of items) onItem?.(item);
-  return items;
+  const items = await gatewayPlatformWorker(contracts, ['web'], WEB_TIMEOUT_MS, onItem, onSkipped, onEmpty);
+  return items.slice(0, WEB_CAP);
 }
 
 // ---------------------------------------------------------------------------
@@ -249,11 +209,23 @@ export async function runWorkers(
     [
       'gateway',
       () =>
-        gatewayAcademicWorker(contracts, onItem, (platform) =>
-          onNote?.(`${platform}: no API key configured — skipped (keyless-first)`),
+        gatewayAcademicWorker(
+          contracts,
+          onItem,
+          (platform) => onNote?.(`${platform}: no API key configured — skipped (keyless-first)`),
+          (platform) => onNote?.(`${platform}: 0 results — possibly rate-limited`),
         ),
     ],
-    ['web', () => webWorker(contracts, onItem)],
+    [
+      'web',
+      () =>
+        webWorker(
+          contracts,
+          onItem,
+          (platform) => onNote?.(`${platform}: no API key configured — skipped (keyless-first)`),
+          (platform) => onNote?.(`${platform}: 0 results — search returned nothing`),
+        ),
+    ],
   ];
 
   const errors: string[] = [];
