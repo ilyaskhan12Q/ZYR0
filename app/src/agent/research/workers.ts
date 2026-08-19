@@ -6,8 +6,8 @@ import { searchPlatforms, type GatewayPlatform } from '@/agent/api/gateway';
 // and slow Jina web responses blew the old 12-15s browser timeouts silently).
 const GATEWAY_TIMEOUT_MS = 90_000;
 
-// Gathering volume: target 8-16 evidence items.
-const TOTAL_CAP = 16; // hard aggregate cap
+// Gathering volume: up to 24 candidates (fits the gateway verify ceiling).
+const TOTAL_CAP = 24; // hard aggregate cap
 
 export type WorkerName = 'gateway';
 

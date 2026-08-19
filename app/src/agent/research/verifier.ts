@@ -30,8 +30,9 @@ function dedupe(items: EvidenceItem[]): EvidenceItem[] {
  * Verify + normalize evidence into a deterministic citation ledger.
  * - Dedupes by normalized URL and fuzzy title.
  * - Drops dead links (HTTP >= 400); network-timeout/unknown (status 0) are kept
- *   but flagged `verified: false`.
- * - Assigns citation keys [1]..[N] in ledger order.
+ *   but flagged `verified: false` with `key: 0` (kept out of citations).
+ * - Assigns citation keys [1]..[N] to verified entries only, so every [n]
+ *   cited by the report points to a live-confirmed source.
  */
 export async function verifyAndBuildLedger(
   items: EvidenceItem[],
@@ -47,6 +48,7 @@ export async function verifyAndBuildLedger(
 
   const ledger: CitationLedgerEntry[] = [];
   let dropped = items.length - unique.length;
+  let verifiedKey = 0;
 
   for (let i = 0; i < unique.length; i++) {
     const item = unique[i];
@@ -55,13 +57,20 @@ export async function verifyAndBuildLedger(
       dropped += 1; // dead link — exclude from the ledger
       continue;
     }
+    const verified = status > 0 && status < 400;
     ledger.push({
       ...item,
-      key: ledger.length + 1, // deterministic [1]..[N] in ledger order
-      verified: status > 0 && status < 400,
+      key: verified ? verifiedKey + 1 : 0, // deterministic [1]..[N] for verified only
+      verified,
       status,
     });
+    if (verified) verifiedKey += 1;
   }
 
   return { ledger, dropped };
+}
+
+/** Verified entries only, in ledger order — the citation set for the report. */
+export function verifiedOnly(ledger: CitationLedgerEntry[]): CitationLedgerEntry[] {
+  return ledger.filter((entry) => entry.verified);
 }

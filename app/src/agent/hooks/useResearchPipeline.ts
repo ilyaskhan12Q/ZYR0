@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import supabase from '@/lib/supabase';
 import { decompose } from '@/agent/research/planner';
 import { runWorkers } from '@/agent/research/workers';
-import { verifyAndBuildLedger } from '@/agent/research/verifier';
+import { verifyAndBuildLedger, verifiedOnly } from '@/agent/research/verifier';
 import { synthesizeReport } from '@/agent/research/editorial';
 import type {
   CitationLedgerEntry,
@@ -186,9 +186,9 @@ export function useResearchPipeline() {
         emit({
           stage: 'writing',
           message: 'Writing the report',
-          detail: `${finalLedger.length} verified sources in the citation ledger`,
+          detail: `${verifiedOnly(finalLedger).length} verified sources · ${finalLedger.length - verifiedOnly(finalLedger).length} pending verification`,
         });
-        const editorial = await synthesizeReport(topic, approved, finalLedger, () => undefined);
+        const editorial = await synthesizeReport(topic, approved, verifiedOnly(finalLedger), () => undefined);
         if (controller.signal.aborted) return;
 
         const research: ResearchReport = {
