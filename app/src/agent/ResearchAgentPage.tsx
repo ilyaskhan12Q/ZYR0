@@ -159,7 +159,7 @@ export default function ResearchAgentPage() {
 
       {mode === 'research' ? (
         <div className="flex min-h-0 flex-1">
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div className="agent-thread flex min-h-0 flex-1 flex-col">
             <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
               {pipeline.report ? (
                 <ReportView
@@ -210,7 +210,7 @@ export default function ResearchAgentPage() {
       ) : (
         <>
           {/* Messages */}
-          <ScrollArea className="min-h-0 flex-1">
+          <ScrollArea className="agent-thread min-h-0 flex-1">
             <div className="mx-auto flex min-h-full max-w-3xl flex-col justify-end px-4 py-6">
               {error && (
                 <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
