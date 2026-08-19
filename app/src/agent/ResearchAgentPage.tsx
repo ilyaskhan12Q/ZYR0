@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { Settings } from 'lucide-react';
+import { Menu, Settings } from 'lucide-react';
 import { AgentChat } from '@/agent/components/AgentChat';
 import { Composer } from '@/agent/components/Composer';
 import { ModelPill } from '@/agent/components/ModelPill';
 import { AgentSettingsModal } from '@/agent/components/AgentSettingsModal';
 import { PipelineView } from '@/agent/components/PipelineView';
 import { ReportView } from '@/agent/components/ReportView';
-import { HistoryPanel } from '@/agent/components/HistoryPanel';
+import { AgentSidebar } from '@/agent/components/AgentSidebar';
 import { PlanReview } from '@/agent/components/PlanReview';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
+import { useAgentLibrary } from '@/agent/hooks/useAgentLibrary';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
 import type { ResearchReport } from '@/agent/research/types';
@@ -40,17 +41,24 @@ ${sources}`;
 export default function ResearchAgentPage() {
   const { user } = useAuth();
   const { models, selected, setSelected, loading } = useAgentModels();
-  const { messages, streaming, error, send, abort } = useAgentChat(selected);
+  const { messages, streaming, error, sessionId, send, abort, resetSession, loadSession } = useAgentChat(selected);
   const pipeline = useResearchPipeline();
+  const library = useAgentLibrary();
+  const { refetch: refetchLibrary } = library;
   const { loadHistory } = pipeline;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
   const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
   const [prefill, setPrefill] = useState<{ topic: string; seq: number } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (mode === 'research') loadHistory();
   }, [mode, loadHistory]);
+
+  useEffect(() => {
+    void refetchLibrary();
+  }, [sessionId, pipeline.report?.researchId, refetchLibrary]);
 
   const handleSelect = (id: string) => setSelected(id === 'auto' ? null : id);
 
@@ -70,10 +78,44 @@ export default function ResearchAgentPage() {
     void pipeline.run(topic);
   };
 
+  const handleNewSession = () => {
+    resetSession();
+    pipeline.clear();
+    setChatSystem(SYSTEM_PROMPT);
+    setPrefill(null);
+    setMode('chat');
+  };
+
+  const handleSelectChat = (id: string) => {
+    setChatSystem(SYSTEM_PROMPT);
+    setMode('chat');
+    void loadSession(id);
+  };
+
+  const handleSelectResearch = (id: string) => {
+    setMode('research');
+    void pipeline.loadReport(id);
+  };
+
   return (
     <div className="agent-root flex h-screen flex-col overflow-hidden">
-      {/* Top navigation bar */}
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
+      <div className="flex min-h-0 flex-1">
+        <AgentSidebar
+          chats={library.chats}
+          research={library.research}
+          activeId={mode === 'chat' ? (sessionId ?? undefined) : pipeline.report?.researchId}
+          onNewSession={handleNewSession}
+          onSelectChat={handleSelectChat}
+          onSelectResearch={handleSelectResearch}
+          onOpenSettings={() => setSettingsOpen(true)}
+          userEmail={user?.email}
+          mobileOpen={sidebarOpen}
+          onToggleMobile={() => setSidebarOpen((v) => !v)}
+        />
+
+        <div className="flex min-h-0 flex-1 flex-col">
+          {/* Top navigation bar */}
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
         <div className="flex h-full items-center gap-8">
           <div className="flex items-center gap-2.5">
             <div className="agent-logo-ring flex size-7 items-center justify-center rounded text-[13px] font-bold">
@@ -133,7 +175,7 @@ export default function ResearchAgentPage() {
           )}
           <Button
             size="sm"
-            className="rounded-[2px] bg-foreground text-background hover:bg-foreground/90"
+            className="hidden rounded-[2px] bg-foreground text-background hover:bg-foreground/90 sm:inline-flex"
             disabled={pipeline.running}
             onClick={() => handleNewResearch()}
           >
@@ -148,6 +190,15 @@ export default function ResearchAgentPage() {
           >
             <Settings className="size-4" />
           </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-8 rounded-[2px] lg:hidden"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label="Toggle sidebar"
+          >
+            <Menu className="size-4" />
+          </Button>
           <div
             title={user?.email ?? 'Signed in'}
             className="flex size-8 items-center justify-center rounded-full bg-[#4f46e5] text-xs font-semibold text-white"
@@ -158,54 +209,47 @@ export default function ResearchAgentPage() {
       </header>
 
       {mode === 'research' ? (
-        <div className="flex min-h-0 flex-1">
-          <div className="agent-thread flex min-h-0 flex-1 flex-col">
-            <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-              {pipeline.report ? (
-                <ReportView
-                  report={pipeline.report}
+        <div className="agent-thread flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            {pipeline.report ? (
+              <ReportView
+                report={pipeline.report}
+                errors={pipeline.errors}
+                onFollowUp={handleFollowUp}
+                onNewResearch={handleNewResearch}
+                onRegenerate={handleRegenerate}
+              />
+            ) : pipeline.review && pipeline.stage === 'review' ? (
+              <PlanReview
+                contracts={pipeline.review.contracts}
+                provider={pipeline.review.provider}
+                error={pipeline.review.error}
+                skipReview={pipeline.skipReview}
+                running={pipeline.running}
+                onApprove={pipeline.approvePlan}
+                onUpdate={pipeline.updatePlan}
+                onRegenerate={() => void pipeline.regeneratePlan()}
+                onSkipReviewChange={pipeline.setSkipReviewPreference}
+                onCancel={pipeline.abort}
+              />
+            ) : (
+              <div className="flex-1">
+                <PipelineView
+                  stage={pipeline.stage}
+                  message={pipeline.message}
+                  detail={pipeline.detail}
+                  evidence={pipeline.evidence}
+                  ledger={pipeline.ledger}
                   errors={pipeline.errors}
-                  onFollowUp={handleFollowUp}
-                  onNewResearch={handleNewResearch}
-                  onRegenerate={handleRegenerate}
-                />
-              ) : pipeline.review && pipeline.stage === 'review' ? (
-                <PlanReview
-                  contracts={pipeline.review.contracts}
-                  provider={pipeline.review.provider}
-                  error={pipeline.review.error}
-                  skipReview={pipeline.skipReview}
+                  workerProgress={pipeline.workerProgress}
                   running={pipeline.running}
-                  onApprove={pipeline.approvePlan}
-                  onUpdate={pipeline.updatePlan}
-                  onRegenerate={() => void pipeline.regeneratePlan()}
-                  onSkipReviewChange={pipeline.setSkipReviewPreference}
-                  onCancel={pipeline.abort}
+                  prefill={prefill}
+                  onRun={pipeline.run}
+                  onStop={pipeline.abort}
                 />
-              ) : (
-                <div className="flex-1">
-                  <PipelineView
-                    stage={pipeline.stage}
-                    message={pipeline.message}
-                    detail={pipeline.detail}
-                    evidence={pipeline.evidence}
-                    ledger={pipeline.ledger}
-                    errors={pipeline.errors}
-                    workerProgress={pipeline.workerProgress}
-                    running={pipeline.running}
-                    prefill={prefill}
-                    onRun={pipeline.run}
-                    onStop={pipeline.abort}
-                  />
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-          <HistoryPanel
-            items={pipeline.history}
-            activeId={pipeline.report?.researchId}
-            onSelect={(id) => pipeline.loadReport(id)}
-          />
         </div>
       ) : (
         <>
@@ -227,6 +271,8 @@ export default function ResearchAgentPage() {
       )}
 
       <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />
+      </div>
+      </div>
     </div>
   );
 }
