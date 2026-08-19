@@ -51,8 +51,10 @@ export default function ResearchAgentPage() {
   const [depth, setDepth] = useState<ResearchDepth>('standard');
   const [runTopic, setRunTopic] = useState('');
 
-  const runVisible =
-    prefill !== null || pipeline.stage !== 'idle' || pipeline.review !== null || pipeline.report !== null;
+  const runActive =
+    pipeline.stage !== 'idle' || pipeline.review !== null || pipeline.report !== null;
+  const runVisible = runActive || prefill !== null;
+  const isEmpty = messages.length === 0 && !runActive;
 
   useEffect(() => {
     void refetchLibrary();
@@ -106,8 +108,6 @@ export default function ResearchAgentPage() {
     setMode('research');
     void pipeline.loadReport(id);
   };
-
-  const isEmpty = messages.length === 0 && !runVisible;
 
   return (
     <div className="agent-root flex h-screen flex-col overflow-hidden">
