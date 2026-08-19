@@ -127,6 +127,42 @@
   animation-delay: 0.4s;
 }
 
+/* Conversation thread backdrop — landing-style pentagon motif.
+   Scoped to the thread area only (sidebar stays solid). */
+.agent-thread {
+  position: relative;
+  isolation: isolate;
+}
+
+.agent-thread::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/svgs/parabolic-pentagon.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.agent-thread::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    rgba(249, 249, 249, 0.4) 0%,
+    transparent 35%,
+    transparent 80%,
+    rgba(249, 249, 249, 0.92) 100%
+  );
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .agent-pulse-dot,
   .agent-fade-up,
