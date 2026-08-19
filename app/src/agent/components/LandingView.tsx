@@ -6,6 +6,8 @@ interface LandingViewProps {
   prefill?: { topic: string; seq: number } | null;
   running: boolean;
   onRun: (topic: string, depth: ResearchDepth) => void;
+  mode?: 'chat' | 'research';
+  onChatSend?: (text: string) => void;
 }
 
 const DEPTHS: { id: ResearchDepth; label: string; hint: string }[] = [
@@ -35,7 +37,7 @@ const SUGGESTIONS = [
   },
 ];
 
-export function LandingView({ prefill, running, onRun }: LandingViewProps) {
+export function LandingView({ prefill, running, onRun, mode = 'research', onChatSend }: LandingViewProps) {
   const [value, setValue] = useState('');
   const [depth, setDepth] = useState<ResearchDepth>('standard');
 
@@ -46,7 +48,11 @@ export function LandingView({ prefill, running, onRun }: LandingViewProps) {
   const submit = () => {
     const text = value.trim();
     if (!text || running) return;
-    onRun(text, depth);
+    if (mode === 'chat') {
+      onChatSend?.(text);
+    } else {
+      onRun(text, depth);
+    }
     setValue('');
   };
 
@@ -58,26 +64,36 @@ export function LandingView({ prefill, running, onRun }: LandingViewProps) {
   };
 
   return (
-    <div className="flex h-full flex-col items-center justify-center px-6 py-10">
+    <div className="agent-fade-up flex h-full flex-col items-center justify-center px-6 py-10">
       <div className="w-full max-w-3xl">
         <div className="text-center">
-          <h1 className="agent-serif text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            Deep Research · Verified Sources · Precision Editorial
+          </p>
+          <h1 className="agent-serif mt-8 text-5xl font-semibold tracking-[-0.03em] text-foreground sm:text-6xl">
             ZYROO
           </h1>
-          <p className="agent-serif mt-3 text-2xl font-medium text-muted-foreground sm:text-3xl">
-            Research anything. Understand everything.
+          <p className="agent-serif mt-5 text-2xl font-medium tracking-[-0.01em] text-foreground sm:text-3xl">
+            Research anything.
+          </p>
+          <p className="agent-serif text-2xl font-medium tracking-[-0.01em] text-muted-foreground sm:text-3xl">
+            Understand everything.
           </p>
         </div>
 
-        <div className="group mt-12">
+        <div className="group mt-14">
           <textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={onKeyDown}
             rows={2}
-            placeholder="Enter your research query, hypothesis, or topic..."
+            placeholder={
+              mode === 'chat'
+                ? 'Ask anything — Shift+Enter for newlines'
+                : 'Enter your research question or topic…'
+            }
             disabled={running}
-            className="w-full resize-none border-0 border-b border-border bg-transparent pb-4 pt-1 text-lg text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary disabled:opacity-60"
+            className="w-full resize-none border-0 border-b border-border bg-transparent pb-4 pt-1 text-xl text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary disabled:opacity-60"
           />
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1 opacity-0 transition group-focus-within:opacity-100">
@@ -100,13 +116,15 @@ export function LandingView({ prefill, running, onRun }: LandingViewProps) {
             </div>
             <div className="flex items-center gap-1 opacity-0 transition group-focus-within:opacity-100 group-hover:opacity-100">
               {running ? (
-                <span className="text-xs text-muted-foreground">Research in progress…</span>
+                <span className="text-xs text-muted-foreground">
+                  {mode === 'chat' ? 'Thinking…' : 'Research in progress…'}
+                </span>
               ) : (
                 <button
                   type="button"
                   onClick={submit}
                   disabled={!value.trim()}
-                  title="Run research (Enter)"
+                  title={mode === 'chat' ? 'Send (Enter)' : 'Run research (Enter)'}
                   className="flex size-11 items-center justify-center rounded-full bg-foreground text-background transition hover:bg-primary disabled:opacity-30"
                 >
                   <ArrowUp className="size-5" />
@@ -116,7 +134,8 @@ export function LandingView({ prefill, running, onRun }: LandingViewProps) {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        {mode === 'research' && (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           {DEPTHS.map((mode) => (
             <button
               key={mode.id}
@@ -132,7 +151,8 @@ export function LandingView({ prefill, running, onRun }: LandingViewProps) {
               {mode.label}
             </button>
           ))}
-        </div>
+          </div>
+        )}
 
         <div className="mt-16">
           <p className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
