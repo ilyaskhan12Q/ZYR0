@@ -3,8 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Menu, Settings } from 'lucide-react';
 import { AgentChat } from '@/agent/components/AgentChat';
-import { Composer } from '@/agent/components/Composer';
-import { ModelPill } from '@/agent/components/ModelPill';
+import { ComposerDock } from '@/agent/components/ComposerDock';
 import { AgentSettingsModal } from '@/agent/components/AgentSettingsModal';
 import { PipelineView } from '@/agent/components/PipelineView';
 import { ReportView } from '@/agent/components/ReportView';
@@ -14,7 +13,7 @@ import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentLibrary } from '@/agent/hooks/useAgentLibrary';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
-import type { ResearchReport } from '@/agent/research/types';
+import type { ResearchDepth, ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
 import '@/styles/agent.css';
 
@@ -51,6 +50,7 @@ export default function ResearchAgentPage() {
   const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
   const [prefill, setPrefill] = useState<{ topic: string; seq: number } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [depth, setDepth] = useState<ResearchDepth>('standard');
 
   useEffect(() => {
     if (mode === 'research') loadHistory();
@@ -71,6 +71,11 @@ export default function ResearchAgentPage() {
     pipeline.clear();
     setMode('research');
     if (topic) setPrefill({ topic, seq: Date.now() });
+  };
+
+  const handleResearchSend = (topic: string) => {
+    setMode('research');
+    void pipeline.run(topic, depth);
   };
 
   const handleRegenerate = (topic: string) => {
@@ -114,99 +119,44 @@ export default function ResearchAgentPage() {
         />
 
         <div className="flex min-h-0 flex-1 flex-col">
-          {/* Top navigation bar */}
-          <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
-        <div className="flex h-full items-center gap-8">
-          <div className="flex items-center gap-2.5">
-            <div className="agent-logo-ring flex size-7 items-center justify-center rounded text-[13px] font-bold">
-              Z
+          {/* Slim top bar — modes live in the composer dock */}
+          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 rounded-[2px] lg:hidden"
+                onClick={() => setSidebarOpen((v) => !v)}
+                aria-label="Toggle sidebar"
+              >
+                <Menu className="size-4" />
+              </Button>
+              <div className="flex items-center gap-2.5">
+                <div className="agent-logo-ring flex size-7 items-center justify-center rounded text-[13px] font-bold">
+                  Z
+                </div>
+                <span className="agent-serif text-lg font-semibold tracking-tight">ZYROO</span>
+              </div>
             </div>
-            <span className="agent-serif text-lg font-semibold tracking-tight">ZYROO</span>
-          </div>
-          <nav className="hidden h-full items-center gap-7 sm:flex">
-            <button
-              type="button"
-              onClick={() => setMode('chat')}
-              className={`flex h-full items-center border-b-2 text-sm transition ${
-                mode === 'chat'
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Chat
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('research')}
-              className={`flex h-full items-center border-b-2 text-sm transition ${
-                mode === 'research'
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              Research
-            </button>
-          </nav>
-          <div className="flex rounded-[2px] border border-border text-xs sm:hidden">
-            <button
-              type="button"
-              onClick={() => setMode('chat')}
-              className={`px-3 py-1.5 transition ${
-                mode === 'chat' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              Chat
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('research')}
-              className={`px-3 py-1.5 transition ${
-                mode === 'research' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              Research
-            </button>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-3">
-          {mode === 'chat' && (
-            <ModelPill models={models} selectedId={selected} onSelect={handleSelect} disabled={loading} />
-          )}
-          <Button
-            size="sm"
-            className="hidden rounded-[2px] bg-foreground text-background hover:bg-foreground/90 sm:inline-flex"
-            disabled={pipeline.running}
-            onClick={() => handleNewResearch()}
-          >
-            New Research
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8 rounded-[2px]"
-            onClick={() => setSettingsOpen(true)}
-            aria-label="Settings"
-          >
-            <Settings className="size-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8 rounded-[2px] lg:hidden"
-            onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Toggle sidebar"
-          >
-            <Menu className="size-4" />
-          </Button>
-          <div
-            title={user?.email ?? 'Signed in'}
-            className="flex size-8 items-center justify-center rounded-full bg-[#4f46e5] text-xs font-semibold text-white"
-          >
-            {(user?.email ?? 'Z').charAt(0).toUpperCase()}
-          </div>
-        </div>
-      </header>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 rounded-[2px]"
+                onClick={() => setSettingsOpen(true)}
+                aria-label="Settings"
+              >
+                <Settings className="size-4" />
+              </Button>
+              <div
+                title={user?.email ?? 'Signed in'}
+                className="flex size-8 items-center justify-center rounded-full bg-[#4f46e5] text-xs font-semibold text-white"
+              >
+                {(user?.email ?? 'Z').charAt(0).toUpperCase()}
+              </div>
+            </div>
+          </header>
 
       {mode === 'research' ? (
         <div className="agent-thread flex min-h-0 flex-1 flex-col">
@@ -264,11 +214,25 @@ export default function ResearchAgentPage() {
               <AgentChat messages={messages} />
             </div>
           </ScrollArea>
-
-          {/* Composer */}
-          <Composer streaming={streaming} onSend={(text) => send(text, chatSystem)} onStop={abort} />
         </>
       )}
+
+      <ComposerDock
+        mode={mode}
+        onModeChange={setMode}
+        chatStreaming={streaming}
+        onChatSend={(text) => send(text, chatSystem)}
+        onChatStop={abort}
+        researchRunning={pipeline.running}
+        onResearchSend={handleResearchSend}
+        onResearchStop={pipeline.abort}
+        models={models}
+        selectedModel={selected}
+        onSelectModel={handleSelect}
+        modelsLoading={loading}
+        depth={depth}
+        onDepthChange={setDepth}
+      />
 
       <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />
       </div>
