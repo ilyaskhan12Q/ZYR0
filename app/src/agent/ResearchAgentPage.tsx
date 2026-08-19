@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Menu, Settings } from 'lucide-react';
 import { AgentChat } from '@/agent/components/AgentChat';
 import { ComposerDock } from '@/agent/components/ComposerDock';
 import { AgentSettingsModal } from '@/agent/components/AgentSettingsModal';
@@ -9,6 +7,7 @@ import { PipelineView } from '@/agent/components/PipelineView';
 import { ReportView } from '@/agent/components/ReportView';
 import { AgentSidebar } from '@/agent/components/AgentSidebar';
 import { PlanReview } from '@/agent/components/PlanReview';
+import { LandingView } from '@/agent/components/LandingView';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentLibrary } from '@/agent/hooks/useAgentLibrary';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
@@ -44,17 +43,16 @@ export default function ResearchAgentPage() {
   const pipeline = useResearchPipeline();
   const library = useAgentLibrary();
   const { refetch: refetchLibrary } = library;
-  const { loadHistory } = pipeline;
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
   const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
   const [prefill, setPrefill] = useState<{ topic: string; seq: number } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [depth, setDepth] = useState<ResearchDepth>('standard');
+  const [runTopic, setRunTopic] = useState('');
 
-  useEffect(() => {
-    if (mode === 'research') loadHistory();
-  }, [mode, loadHistory]);
+  const runVisible =
+    prefill !== null || pipeline.stage !== 'idle' || pipeline.review !== null || pipeline.report !== null;
 
   useEffect(() => {
     void refetchLibrary();
@@ -70,16 +68,22 @@ export default function ResearchAgentPage() {
   const handleNewResearch = (topic = '') => {
     pipeline.clear();
     setMode('research');
-    if (topic) setPrefill({ topic, seq: Date.now() });
+    if (topic) {
+      setPrefill({ topic, seq: Date.now() });
+      setRunTopic(topic);
+    }
   };
 
-  const handleResearchSend = (topic: string) => {
+  const handleResearchSend = (topic: string, runDepth: ResearchDepth = depth) => {
     setMode('research');
-    void pipeline.run(topic, depth);
+    setPrefill(null);
+    setRunTopic(topic);
+    void pipeline.run(topic, runDepth);
   };
 
   const handleRegenerate = (topic: string) => {
     setMode('research');
+    setRunTopic(topic);
     void pipeline.run(topic);
   };
 
@@ -88,6 +92,7 @@ export default function ResearchAgentPage() {
     pipeline.clear();
     setChatSystem(SYSTEM_PROMPT);
     setPrefill(null);
+    setRunTopic('');
     setMode('chat');
   };
 
@@ -101,6 +106,8 @@ export default function ResearchAgentPage() {
     setMode('research');
     void pipeline.loadReport(id);
   };
+
+  const isEmpty = messages.length === 0 && !runVisible;
 
   return (
     <div className="agent-root flex h-screen flex-col overflow-hidden">
@@ -119,123 +126,96 @@ export default function ResearchAgentPage() {
         />
 
         <div className="flex min-h-0 flex-1 flex-col">
-          {/* Slim top bar — modes live in the composer dock */}
-          <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4 sm:px-6">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="icon"
-                className="size-8 rounded-[2px] lg:hidden"
-                onClick={() => setSidebarOpen((v) => !v)}
-                aria-label="Toggle sidebar"
-              >
-                <Menu className="size-4" />
-              </Button>
-              <div className="flex items-center gap-2.5">
-                <div className="agent-logo-ring flex size-7 items-center justify-center rounded text-[13px] font-bold">
-                  Z
-                </div>
-                <span className="agent-serif text-lg font-semibold tracking-tight">ZYROO</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="icon"
-                className="size-8 rounded-[2px]"
-                onClick={() => setSettingsOpen(true)}
-                aria-label="Settings"
-              >
-                <Settings className="size-4" />
-              </Button>
-              <div
-                title={user?.email ?? 'Signed in'}
-                className="flex size-8 items-center justify-center rounded-full bg-[#4f46e5] text-xs font-semibold text-white"
-              >
-                {(user?.email ?? 'Z').charAt(0).toUpperCase()}
-              </div>
-            </div>
-          </header>
-
-      {mode === 'research' ? (
-        <div className="agent-thread flex min-h-0 flex-1 flex-col">
-          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-            {pipeline.report ? (
-              <ReportView
-                report={pipeline.report}
-                errors={pipeline.errors}
-                onFollowUp={handleFollowUp}
-                onNewResearch={handleNewResearch}
-                onRegenerate={handleRegenerate}
-              />
-            ) : pipeline.review && pipeline.stage === 'review' ? (
-              <PlanReview
-                contracts={pipeline.review.contracts}
-                provider={pipeline.review.provider}
-                error={pipeline.review.error}
-                skipReview={pipeline.skipReview}
-                running={pipeline.running}
-                onApprove={pipeline.approvePlan}
-                onUpdate={pipeline.updatePlan}
-                onRegenerate={() => void pipeline.regeneratePlan()}
-                onSkipReviewChange={pipeline.setSkipReviewPreference}
-                onCancel={pipeline.abort}
-              />
-            ) : (
-              <div className="flex-1">
-                <PipelineView
-                  stage={pipeline.stage}
-                  message={pipeline.message}
-                  detail={pipeline.detail}
-                  evidence={pipeline.evidence}
-                  ledger={pipeline.ledger}
-                  errors={pipeline.errors}
-                  workerProgress={pipeline.workerProgress}
-                  running={pipeline.running}
-                  prefill={prefill}
-                  onRun={pipeline.run}
-                  onStop={pipeline.abort}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* Messages */}
+          {/* Unified thread */}
           <ScrollArea className="agent-thread min-h-0 flex-1">
-            <div className="mx-auto flex min-h-full max-w-3xl flex-col justify-end px-4 py-6">
+            <div className="mx-auto flex min-h-full max-w-4xl flex-col px-4 py-6">
               {error && (
                 <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
                   {error}
                 </div>
               )}
-              <AgentChat messages={messages} />
+
+              {isEmpty ? (
+                <div className="flex flex-1 flex-col justify-center">
+                  <LandingView prefill={prefill} running={pipeline.running} onRun={handleResearchSend} />
+                </div>
+              ) : (
+                <>
+                  <AgentChat messages={messages} />
+
+                  {runVisible && (
+                    <div className="mt-6 flex flex-col gap-4">
+                      {runTopic && (
+                        <div className="flex justify-end">
+                          <div className="agent-whitespace-pre-wrap max-w-[85%] rounded-2xl bg-primary px-4 py-3 text-sm leading-relaxed text-primary-foreground">
+                            {runTopic}
+                          </div>
+                        </div>
+                      )}
+
+                      {pipeline.report ? (
+                        <ReportView
+                          report={pipeline.report}
+                          errors={pipeline.errors}
+                          onFollowUp={handleFollowUp}
+                          onNewResearch={handleNewResearch}
+                          onRegenerate={handleRegenerate}
+                        />
+                      ) : pipeline.review && pipeline.stage === 'review' ? (
+                        <PlanReview
+                          contracts={pipeline.review.contracts}
+                          provider={pipeline.review.provider}
+                          error={pipeline.review.error}
+                          skipReview={pipeline.skipReview}
+                          running={pipeline.running}
+                          onApprove={pipeline.approvePlan}
+                          onUpdate={pipeline.updatePlan}
+                          onRegenerate={() => void pipeline.regeneratePlan()}
+                          onSkipReviewChange={pipeline.setSkipReviewPreference}
+                          onCancel={pipeline.abort}
+                        />
+                      ) : (
+                        <PipelineView
+                          stage={pipeline.stage}
+                          message={pipeline.message}
+                          detail={pipeline.detail}
+                          evidence={pipeline.evidence}
+                          ledger={pipeline.ledger}
+                          errors={pipeline.errors}
+                          workerProgress={pipeline.workerProgress}
+                          running={pipeline.running}
+                          prefill={prefill}
+                          onRun={handleResearchSend}
+                          onStop={pipeline.abort}
+                        />
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </ScrollArea>
-        </>
-      )}
 
-      <ComposerDock
-        mode={mode}
-        onModeChange={setMode}
-        chatStreaming={streaming}
-        onChatSend={(text) => send(text, chatSystem)}
-        onChatStop={abort}
-        researchRunning={pipeline.running}
-        onResearchSend={handleResearchSend}
-        onResearchStop={pipeline.abort}
-        models={models}
-        selectedModel={selected}
-        onSelectModel={handleSelect}
-        modelsLoading={loading}
-        depth={depth}
-        onDepthChange={setDepth}
-      />
+          <ComposerDock
+            mode={mode}
+            onModeChange={setMode}
+            chatStreaming={streaming}
+            onChatSend={(text) => send(text, chatSystem)}
+            onChatStop={abort}
+            researchRunning={pipeline.running}
+            onResearchSend={(topic) => handleResearchSend(topic)}
+            onResearchStop={pipeline.abort}
+            models={models}
+            selectedModel={selected}
+            onSelectModel={handleSelect}
+            modelsLoading={loading}
+            depth={depth}
+            onDepthChange={setDepth}
+            onToggleSidebar={() => setSidebarOpen((v) => !v)}
+          />
 
-      <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />
-      </div>
+          <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />
+        </div>
       </div>
     </div>
   );

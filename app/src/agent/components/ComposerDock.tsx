@@ -1,4 +1,5 @@
 import { useState, type KeyboardEvent } from 'react';
+import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ModelPill } from '@/agent/components/ModelPill';
 import type { AgentModelInfo } from '@/agent/core/types';
@@ -25,6 +26,7 @@ interface ComposerDockProps {
   modelsLoading?: boolean;
   depth: ResearchDepth;
   onDepthChange: (depth: ResearchDepth) => void;
+  onToggleSidebar?: () => void;
 }
 
 export function ComposerDock({
@@ -42,6 +44,7 @@ export function ComposerDock({
   modelsLoading,
   depth,
   onDepthChange,
+  onToggleSidebar,
 }: ComposerDockProps) {
   const [value, setValue] = useState('');
   const running = mode === 'chat' ? chatStreaming : researchRunning;
@@ -66,6 +69,17 @@ export function ComposerDock({
       <div className="mx-auto flex max-w-3xl flex-col gap-2.5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
+            {onToggleSidebar && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-7 rounded-[2px] lg:hidden"
+                onClick={onToggleSidebar}
+                aria-label="Toggle sidebar"
+              >
+                <Menu className="size-4" />
+              </Button>
+            )}
             <div className="flex rounded-[2px] border border-border text-xs">
               <button
                 type="button"
