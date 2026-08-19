@@ -52,7 +52,7 @@ export function PipelineView({
   const active =
     running && (stage === 'planning' || stage === 'working' || stage === 'verifying' || stage === 'writing');
   const failed = stage === 'failed';
-  const verifiedUrls = new Set(ledger.map((entry) => entry.url));
+  const verifiedByUrl = new Map(ledger.map((entry) => [entry.url, entry.verified]));
   const activeStep = ACTIVE_STEP[stage];
 
   if (!active) {
@@ -176,7 +176,7 @@ export function PipelineView({
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {evidence.map((item) => {
-              const verified = verifiedUrls.has(item.url);
+              const verified = verifiedByUrl.get(item.url) === true;
               return (
                 <a
                   key={item.id}
@@ -194,6 +194,11 @@ export function PipelineView({
                     <span className="mt-2 inline-flex items-center gap-1 rounded bg-[#dcfce7] px-2 py-0.5 text-[11px] font-medium text-[#166534]">
                       <Check className="size-3" strokeWidth={3} />
                       Verified
+                    </span>
+                  )}
+                  {!verified && ledger.some((e) => e.url === item.url) && (
+                    <span className="mt-2 inline-flex items-center gap-1 rounded bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-[#92400e]">
+                      Pending verification
                     </span>
                   )}
                 </a>

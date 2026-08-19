@@ -85,8 +85,10 @@ export function generateReportPdf(report: ResearchReport): void {
   doc.setFontSize(9);
   doc.setTextColor(110, 110, 110);
   const elapsed = report.elapsedMs >= 60_000 ? `${(report.elapsedMs / 60_000).toFixed(1)} min` : `${report.elapsedMs}s`;
+  const verified = report.ledger.filter((entry) => entry.verified).length;
+  const pending = report.ledger.length - verified;
   doc.text(
-    `${report.model || '—'} · ${elapsed} · ${report.ledger.length} sources · ${new Date(report.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+    `${report.model || '—'} · ${elapsed} · ${verified} verified${pending > 0 ? ` · ${pending} additional` : ''} · ${new Date(report.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
     MARGIN,
     y,
   );
@@ -141,7 +143,7 @@ export function generateReportPdf(report: ResearchReport): void {
     }
     doc.setFont(FONT_BODY, 'bold');
     doc.setFontSize(9);
-    doc.text(`[${entry.key}] ${entry.title}`, MARGIN, y);
+    doc.text(`${entry.key > 0 ? `[${entry.key}]` : '•'} ${entry.title}`, MARGIN, y);
     y += 12;
 
     doc.setFont(FONT_BODY, 'normal');

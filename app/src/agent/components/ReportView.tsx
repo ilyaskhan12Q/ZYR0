@@ -53,7 +53,8 @@ export function ReportView({ report, errors = [], onFollowUp, onNewResearch, onR
   const [notesOpen, setNotesOpen] = useState(false);
   const elapsed = report.elapsedMs >= 60_000 ? `${(report.elapsedMs / 60_000).toFixed(1)} min` : `${report.elapsedMs}s`;
   const verifiedByKey = new Map(report.ledger.map((entry) => [entry.key, entry.verified]));
-  const sorted = [...report.ledger].sort((a, b) => Number(b.verified) - Number(a.verified) || a.key - b.key);
+  const verifiedEntries = report.ledger.filter((entry) => entry.verified).sort((a, b) => a.key - b.key);
+  const pendingEntries = report.ledger.filter((entry) => !entry.verified);
 
   const sections = useMemo(() => extractSections(report.markdown), [report.markdown]);
   const byHeading = useMemo(() => new Map(sections.map((s) => [s.heading, s])), [sections]);
@@ -216,8 +217,11 @@ export function ReportView({ report, errors = [], onFollowUp, onNewResearch, onR
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">{report.model || 'Research Agent'}</p>
               <p className="text-xs text-secondary-foreground">
-                {elapsed} · {report.ledger.length} verified source{report.ledger.length === 1 ? '' : 's'} ·{' '}
-                {report.evidence.length} evidence item{report.evidence.length === 1 ? '' : 's'}
+                {elapsed} · {verifiedEntries.length} verified source{verifiedEntries.length === 1 ? '' : 's'}
+                {pendingEntries.length > 0
+                  ? ` · ${pendingEntries.length} additional`
+                  : ''}{' '}
+                · {report.evidence.length} evidence item{report.evidence.length === 1 ? '' : 's'}
               </p>
             </div>
           </div>
@@ -302,6 +306,11 @@ export function ReportView({ report, errors = [], onFollowUp, onNewResearch, onR
                           {entry?.verified && (
                             <BadgeCheck className="size-4 shrink-0 text-[#166534]" />
                           )}
+                          {entry && !entry.verified && (
+                            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-[#92400e]">
+                              pending
+                            </span>
+                          )}
                         </div>
                         <p className="mt-2 line-clamp-2 text-sm font-medium leading-snug text-foreground">
                           {item.title}
@@ -321,17 +330,55 @@ export function ReportView({ report, errors = [], onFollowUp, onNewResearch, onR
           )}
 
           {tab === 'sources' && (
-            <div className="mt-12 flex flex-col gap-3">
-              {sorted.length === 0 ? (
+            <div className="mt-12 flex flex-col gap-10">
+              {verifiedEntries.length === 0 && pendingEntries.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No sources in the citation ledger.</p>
               ) : (
-                sorted.map((entry) => (
-                  <SourceCard
-                    key={entry.key}
-                    entry={entry}
-                    onDetails={() => setModalEntry(entry)}
-                  />
-                ))
+                <>
+                  <section>
+                    <h2 className="agent-serif mb-4 border-b border-border pb-3 text-xl font-semibold text-foreground">
+                      Verified sources
+                      <span className="ml-2 align-middle text-xs font-normal text-muted-foreground">
+                        {verifiedEntries.length}
+                      </span>
+                    </h2>
+                    {verifiedEntries.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">No sources could be confirmed as reachable.</p>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        {verifiedEntries.map((entry) => (
+                          <SourceCard
+                            key={entry.key}
+                            entry={entry}
+                            onDetails={() => setModalEntry(entry)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                  {pendingEntries.length > 0 && (
+                    <section>
+                      <h2 className="agent-serif mb-4 border-b border-border pb-3 text-xl font-semibold text-foreground">
+                        Additional sources
+                        <span className="ml-2 align-middle text-xs font-normal text-muted-foreground">
+                          {pendingEntries.length}
+                        </span>
+                      </h2>
+                      <p className="mb-4 text-xs text-muted-foreground">
+                        Found during research but liveness could not be confirmed — they may still be reachable.
+                      </p>
+                      <div className="flex flex-col gap-3">
+                        {pendingEntries.map((entry) => (
+                          <SourceCard
+                            key={`${entry.url}-${entry.id}`}
+                            entry={entry}
+                            onDetails={() => setModalEntry(entry)}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -374,7 +421,7 @@ function SourceCard({
       className="group flex items-start gap-3 rounded-[2px] border border-border bg-card p-4 text-left transition hover:border-primary"
     >
       <span className="agent-serif mt-0.5 shrink-0 text-lg font-semibold text-primary/60">
-        [{entry.key}]
+        {entry.key > 0 ? `[${entry.key}]` : '\u00A0'}
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium leading-snug text-foreground group-hover:text-primary">
