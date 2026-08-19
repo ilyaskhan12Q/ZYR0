@@ -27,6 +27,7 @@ interface ComposerDockProps {
   depth: ResearchDepth;
   onDepthChange: (depth: ResearchDepth) => void;
   onToggleSidebar?: () => void;
+  hideInput?: boolean;
 }
 
 export function ComposerDock({
@@ -45,6 +46,7 @@ export function ComposerDock({
   depth,
   onDepthChange,
   onToggleSidebar,
+  hideInput,
 }: ComposerDockProps) {
   const [value, setValue] = useState('');
   const running = mode === 'chat' ? chatStreaming : researchRunning;
@@ -102,7 +104,7 @@ export function ComposerDock({
                 Research
               </button>
             </div>
-            {mode === 'research' && (
+            {mode === 'research' && !hideInput && (
               <div className="flex rounded-[2px] border border-border text-xs">
                 {DEPTHS.map((d, i) => (
                   <button
@@ -127,14 +129,15 @@ export function ComposerDock({
           />
         </div>
 
-        <div className="flex items-end gap-3">
-          <textarea
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={onKeyDown}
-            rows={1}
-            placeholder={
-              running
+        {!hideInput && (
+          <div className="flex items-end gap-3">
+            <textarea
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={onKeyDown}
+              rows={1}
+              placeholder={
+                running
                 ? mode === 'research'
                   ? 'Researching…'
                   : 'Generating…'
@@ -155,10 +158,13 @@ export function ComposerDock({
             </Button>
           )}
         </div>
+        )}
       </div>
-      <p className="mx-auto mt-2 max-w-3xl text-center text-[11px] text-muted-foreground">
-        Free-tier models are shared and rate-limited — the gateway falls back automatically when one is throttled.
-      </p>
+      {!hideInput && (
+        <p className="mx-auto mt-2 max-w-3xl text-center text-[11px] text-muted-foreground">
+          Free-tier models are shared and rate-limited — the gateway falls back automatically when one is throttled.
+        </p>
+      )}
     </div>
   );
 }

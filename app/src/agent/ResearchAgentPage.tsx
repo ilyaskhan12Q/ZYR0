@@ -137,7 +137,13 @@ export default function ResearchAgentPage() {
 
               {isEmpty ? (
                 <div className="flex flex-1 flex-col justify-center">
-                  <LandingView prefill={prefill} running={pipeline.running} onRun={handleResearchSend} />
+                  <LandingView
+                    prefill={prefill}
+                    running={pipeline.running}
+                    onRun={handleResearchSend}
+                    mode={mode}
+                    onChatSend={(text) => send(text, chatSystem)}
+                  />
                 </div>
               ) : (
                 <>
@@ -212,6 +218,7 @@ export default function ResearchAgentPage() {
             depth={depth}
             onDepthChange={setDepth}
             onToggleSidebar={() => setSidebarOpen((v) => !v)}
+            hideInput={isEmpty}
           />
 
           <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />

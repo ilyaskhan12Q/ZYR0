@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Composer dock** replaces the header navigation: `[Chat | Research]` segmented toggle, always-visible model picker, Quick/Standard/Deep depth pills in research mode, single input with Send/Stop. The top bar now only carries the mobile menu trigger, settings and avatar.
   - **Chat sessions persist** (`mode='chat'`): lazy session creation on the first message, user/assistant messages stored with model + token usage, latest chat auto-restored on reload, `loadSession(id)`/`resetSession()` powering the library.
   - **Conversation backdrop**: the landing's parabolic-pentagon motif at ~15% opacity (multiply blend) behind the thread only; the sidebar stays solid.
+  - **Single input on a new session**: the composer dock collapses to its top strip (mode toggle + model picker + mobile sidebar trigger) while the thread is empty — the landing hero is the only input; sending a query reveals the dock input at the bottom. The hero respects the strip's mode (chat sends a message, research runs the pipeline) and was polished with an editorial eyebrow (`Deep Research · Verified Sources · Precision Editorial`), larger wordmark, two-line tagline and a refined underline input.
 
 ### Added
 - **Academic Precision UI/UX redesign of the Research Agent (`app/src/styles/agent.css`, `app/src/agent/components/LandingView.tsx`, `PipelineView.tsx`, `ResearchAgentPage.tsx`, `PlanReview.tsx`, `HistoryPanel.tsx`)**:
