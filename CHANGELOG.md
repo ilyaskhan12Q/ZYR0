@@ -27,6 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Silent worker failures**: OpenAlex/arXiv worker fetch failures now surface as pipeline notes (`onNote`) instead of silently returning empty results.
   - **ReportView pipeline notes**: collapsible amber banner on the report screen shows pipeline errors (worker/source/platform failures, history-save failures) so failures are visible after the run.
 
+### Changed
+- **Research Agent — single-page conversation workspace** (`app/src/agent/ResearchAgentPage.tsx`, `app/src/agent/components/AgentSidebar.tsx`, `ComposerDock.tsx`, `app/src/agent/hooks/useAgentChat.ts`, `useAgentLibrary.ts`, `app/src/styles/agent.css`):
+  - Chat and deep research now share **one unified thread** (ChatGPT-style): landing hero on an empty session, assistant/user bubbles, and research runs inline (topic bubble → live five-step progress with evidence cards → inline plan review → full report), with follow-up chat continuing below the report.
+  - **Left sidebar library** replaces the right-hand history panel: ZYROO wordmark, New session, **Chats** and **Research** sections (both from `agent_researches`, live-refreshed), Settings + profile chip pinned at the bottom; slide-over drawer on mobile.
+  - **Composer dock** replaces the header navigation: `[Chat | Research]` segmented toggle, always-visible model picker, Quick/Standard/Deep depth pills in research mode, single input with Send/Stop. The top bar now only carries the mobile menu trigger, settings and avatar.
+  - **Chat sessions persist** (`mode='chat'`): lazy session creation on the first message, user/assistant messages stored with model + token usage, latest chat auto-restored on reload, `loadSession(id)`/`resetSession()` powering the library.
+  - **Conversation backdrop**: the landing's parabolic-pentagon motif at ~15% opacity (multiply blend) behind the thread only; the sidebar stays solid.
+
 ### Added
 - **Academic Precision UI/UX redesign of the Research Agent (`app/src/styles/agent.css`, `app/src/agent/components/LandingView.tsx`, `PipelineView.tsx`, `ResearchAgentPage.tsx`, `PlanReview.tsx`, `HistoryPanel.tsx`)**:
   - Agent workspace restyled to the "Academic Precision" design system: light theme (surface `#f9f9f9`, on-surface `#1a1c1c`, primary `#3525cd`, 1px borders, 4px radii, flat — no shadows), **Source Serif 4** serif headlines + **Geist** body (loaded via Google Fonts), scoped under `.agent-root` so the rest of the app is untouched.
