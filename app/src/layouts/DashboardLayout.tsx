@@ -197,6 +197,13 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
     if (showWelcome) setShowModal(false);
   }, [showWelcome]);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [mobileOpen]);
+
   const handleCloseWelcome = () => {
     sessionStorage.setItem('login_welcome_dismissed_session', 'true');
     setShowWelcome(false);
@@ -392,7 +399,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
-          <button onClick={() => setMobileOpen(false)} className="lg:hidden p-1.5 rounded-md hover:bg-muted">
+          <button onClick={() => setMobileOpen(false)} aria-label="Close navigation menu" className="lg:hidden inline-flex items-center justify-center min-w-11 min-h-11 rounded-md hover:bg-muted">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -469,7 +476,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                           key={child.href}
                           to={child.href}
                           onClick={() => setMobileOpen(false)}
-                          className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
+                          className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors ${
                             location.pathname === child.href
                               ? 'text-accent font-medium'
                               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
@@ -540,7 +547,8 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+              aria-label="Open navigation menu"
+              className="lg:hidden inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg hover:bg-muted transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -552,14 +560,14 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
               <ThemeToggle />
             </span>
             <TourHelpButton />
-            <button className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+            <button className="relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
               <Search className="w-5 h-5" />
             </button>
             <div className="relative">
               <button
                 onClick={() => { setNotificationsOpen(!notificationsOpen); setProfileOpen(false); }}
                 data-tour="header-notifications"
-                className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                className="relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
@@ -573,7 +581,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className="absolute right-0 mt-2 w-80 bg-card rounded-xl border border-border shadow-lg py-2 z-50 overflow-hidden"
+                    className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-1.5rem)] bg-card rounded-xl border border-border shadow-lg py-2 z-50 overflow-hidden"
                   >
                     <div className="px-4 py-3 border-b border-border flex justify-between items-center bg-muted/20">
                       <p className="text-sm font-semibold">Notifications</p>
@@ -723,7 +731,8 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
               </Link>
               <button 
                 onClick={() => setBannerDismissed(true)} 
-                className="p-1 rounded-md hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
+                aria-label="Dismiss banner"
+                className="inline-flex items-center justify-center min-w-9 min-h-9 rounded-md hover:bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -901,7 +910,7 @@ function TourHelpButton() {
       onClick={() => start('student-journey')}
       title="Guided tour"
       aria-label="Start guided tour"
-      className="relative p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+      className="relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
     >
       <Compass className="w-5 h-5" />
     </button>
