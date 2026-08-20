@@ -118,20 +118,20 @@ export default function PublicLayout() {
               <button
                 aria-label="Toggle color theme"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}
+                className={`relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}
               >
                 {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
               {user ? (
                 <>
-                  <button className={`hidden md:block relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}>
+                  <button className={`hidden md:block relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}>
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
                   </button>
                   <div className="relative hidden md:block">
                     <button
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-slate-900/10 dark:hover:bg-white/10'}`}
+                      className={`flex items-center gap-2 min-h-11 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-slate-900/10 dark:hover:bg-white/10'}`}
                     >
                       <img src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />
                       <span className={`text-sm font-medium ${scrolled ? 'text-foreground' : 'text-slate-900 dark:text-white'}`}>
@@ -181,13 +181,13 @@ export default function PublicLayout() {
                 <>
                   <Link
                     to="/login"
-                    className="text-sm font-medium text-foreground hover:text-accent transition-colors"
+                    className="hidden sm:inline-flex items-center text-sm font-medium text-foreground hover:text-accent transition-colors"
                   >
                     Log in
                   </Link>
                   <Link
                     to="/register"
-                    className="text-sm font-medium bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+                    className="hidden sm:inline-flex items-center text-sm font-medium bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
                   >
                     Get Started
                   </Link>
@@ -198,7 +198,8 @@ export default function PublicLayout() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              className="md:hidden inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -235,18 +236,38 @@ export default function PublicLayout() {
                     <>
                       <Link
                         to={`/${effectiveRole}/dashboard`}
-                        className="w-full text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
+                        className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex items-center justify-center"
                       >
                         Go to Dashboard
                       </Link>
                       {companyAccess?.hasAccess && effectiveRole !== 'company' && (
                         <Link
                           to="/company/dashboard"
-                          className="w-full text-center py-2.5 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
+                          className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
                         >
                           <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
                         </Link>
                       )}
+                      <div className="pt-2 border-t border-border flex flex-col gap-1">
+                        <Link
+                          to={`/${effectiveRole}/profile`}
+                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                        >
+                          <User className="w-4 h-4 text-muted-foreground" /> Profile
+                        </Link>
+                        <Link
+                          to={`/${effectiveRole}/settings`}
+                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                        >
+                          <Settings className="w-4 h-4 text-muted-foreground" /> Settings
+                        </Link>
+                        <button
+                          onClick={async () => { await signOut(); navigate('/'); }}
+                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </div>
                     </>
                   ) : (
                     <>
