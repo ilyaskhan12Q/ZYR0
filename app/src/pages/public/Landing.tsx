@@ -864,7 +864,7 @@ export default function Landing() {
                     >
                       <BlobCard
                         accent={accent}
-                        className="w-full h-full min-h-[820px] md:min-h-[460px]"
+                        className="w-full h-full min-h-[700px] xs:min-h-[820px] md:min-h-[460px]"
                         contentClassName="grid md:grid-cols-[5fr_7fr] w-full h-full"
                       >
                         {/* Photo with gradient overlay for depth */}
@@ -919,7 +919,7 @@ export default function Landing() {
                     )}
                     className="md:col-span-6 lg:col-span-3 group h-full transition-all duration-300 hover:-translate-y-1"
                   >
-                    <BlobCard accent={accent} className="w-full h-full min-h-[560px]" contentClassName="!items-start !justify-start w-full h-full">
+                    <BlobCard accent={accent} className="w-full h-full min-h-[480px] xs:min-h-[560px]" contentClassName="!items-start !justify-start w-full h-full">
                       {/* Photo */}
                       {t.image ? (
                         <div className="relative h-60 w-full shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800/40">
