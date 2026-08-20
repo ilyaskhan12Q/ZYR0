@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Banknote, Star } from 'lucide-react';
-import { signIn, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
+import { signIn, signInWithGoogle, signInWithLinkedIn, rememberEmail, getLastEmail } from '../../lib/auth';
 import type { UserRole } from '../../lib/database.types';
 import { SEO } from '@/components/SEO';
 import { postAuthRedirect } from '@/components/ProtectedRoute';
@@ -14,11 +14,17 @@ export default function Login() {
   const { profile, user } = useAuth();
   const postAuthTarget = postAuthRedirect(searchParams);
 
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => searchParams.get('email') || getLastEmail() || '');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+
+  // Remember this device's last-used email once mounted (used by the navbar "Continue as" flow)
+  useEffect(() => {
+    const paramEmail = searchParams.get('email');
+    if (paramEmail) rememberEmail(paramEmail);
+  }, [searchParams]);
 
   // Prefetch dashboard portals in the background once the login page loads
   useEffect(() => {
@@ -47,6 +53,7 @@ export default function Login() {
       setLocalError(msg);
       setLoading(false);
     } else {
+      rememberEmail(email);
       const role = profile?.role || (signInData?.user?.user_metadata?.role as UserRole) || (user?.user_metadata?.role as UserRole) || 'student';
       const target = postAuthTarget || `/${role}/dashboard`;
       navigate(target, { replace: true });

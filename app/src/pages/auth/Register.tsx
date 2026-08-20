@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion';
 import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, CheckCircle2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
-import { signUp, signInWithGoogle, signInWithLinkedIn } from '../../lib/auth';
+import { signUp, signInWithGoogle, signInWithLinkedIn, rememberEmail } from '../../lib/auth';
 import type { UserRole } from '../../lib/database.types';
 import { supabase } from '../../lib/supabase';
 import { SEO } from '@/components/SEO';
@@ -77,6 +77,7 @@ export default function Register() {
       setLocalError(msg);
       setLoading(false);
     } else {
+      rememberEmail(form.email);
       setLoading(false);
       setStep('otp');
     }
