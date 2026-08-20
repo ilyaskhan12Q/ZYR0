@@ -6,6 +6,7 @@ import type { UserRole } from '@/lib/database.types';
 import { postAuthRedirect } from '@/components/ProtectedRoute';
 import { SEO } from '@/components/SEO';
 import { Loader } from '@/components/common/Loader';
+import { rememberEmail } from '@/lib/auth';
 
 /**
  * OAuth Callback Page
@@ -28,6 +29,7 @@ export default function AuthCallback() {
 
       if (session?.user) {
         const user = session.user;
+        rememberEmail(user.email);
         const typeParam = searchParams.get('type');
 
         if (typeParam === 'recovery') {

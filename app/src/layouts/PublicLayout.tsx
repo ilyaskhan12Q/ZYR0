@@ -3,9 +3,9 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import {
-  Menu, X, Bell, ChevronDown, LogOut, User, LayoutDashboard,
+  Menu, X, ChevronDown, LogOut, User, LayoutDashboard,
   Briefcase, Settings, Mail, Sun, Moon,
-  Linkedin, Github, Building2
+  Linkedin, Github, Building2, LogIn, ArrowRight
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
@@ -13,6 +13,7 @@ import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
 import { SiteBannerBar } from '@/components/SiteBannerBar';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
+import { getLastEmail } from '@/lib/auth';
 const navLinks = [
   { label: 'Internships', href: '/internships' },
   { label: 'Companies', href: '/companies' },
@@ -27,6 +28,8 @@ export default function PublicLayout() {
   const effectiveRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [lastEmail, setLastEmail] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -67,7 +70,17 @@ export default function PublicLayout() {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setAccountOpen(false);
+    setProfileOpen(false);
   }, [location.pathname]);
+
+  // Lock body scroll while a full-screen mobile sheet is open
+  useEffect(() => {
+    if (!mobileMenuOpen && !accountOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [mobileMenuOpen, accountOpen]);
 
   if (isAuthPage) {
     return <div className="min-h-screen bg-transparent"><Outlet /></div>;
@@ -118,26 +131,24 @@ export default function PublicLayout() {
               <button
                 aria-label="Toggle color theme"
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className={`relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}
+                className={`relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}
               >
                 {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
               </button>
               {user ? (
                 <>
-                  <button className={`hidden md:block relative p-2 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted text-foreground' : 'hover:bg-slate-900/10 text-slate-900 dark:hover:bg-white/10 dark:text-white'}`}>
-                    <Bell className="w-5 h-5" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-                  </button>
-                  <div className="relative hidden md:block">
+                  <div className="relative">
                     <button
                       onClick={() => setProfileOpen(!profileOpen)}
-                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-slate-900/10 dark:hover:bg-white/10'}`}
+                      aria-haspopup="true"
+                      aria-expanded={profileOpen}
+                      className={`flex items-center gap-2 min-h-11 rounded-lg transition-colors ${scrolled ? 'hover:bg-muted' : 'hover:bg-slate-900/10 dark:hover:bg-white/10'}`}
                     >
                       <img src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'} alt="" className="w-8 h-8 rounded-full object-cover" />
-                      <span className={`text-sm font-medium ${scrolled ? 'text-foreground' : 'text-slate-900 dark:text-white'}`}>
+                      <span className={`hidden sm:inline text-sm font-medium ${scrolled ? 'text-foreground' : 'text-slate-900 dark:text-white'}`}>
                         {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
                       </span>
-                      <ChevronDown className={`w-4 h-4 ${scrolled ? 'text-muted-foreground' : 'text-slate-900/70 dark:text-white/70'}`} />
+                      <ChevronDown className={`hidden sm:block w-4 h-4 ${scrolled ? 'text-muted-foreground' : 'text-slate-900/70 dark:text-white/70'}`} />
                     </button>
                     <AnimatePresence>
                       {profileOpen && (
@@ -145,7 +156,7 @@ export default function PublicLayout() {
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
-                          className="absolute right-0 mt-2 w-60 bg-card rounded-xl border border-border shadow-lg py-2 z-50"
+                          className="absolute right-0 mt-2 w-60 max-w-[calc(100vw-1.5rem)] bg-card rounded-xl border border-border shadow-lg py-2 z-50"
                         >
                           <div className="px-4 py-3 border-b border-border">
                             <p className="text-sm font-medium">{user.user_metadata?.full_name || 'User'}</p>
@@ -181,16 +192,25 @@ export default function PublicLayout() {
                 <>
                   <Link
                     to="/login"
-                    className="text-sm font-medium text-foreground hover:text-accent transition-colors"
+                    className="hidden sm:inline-flex items-center text-sm font-medium text-foreground hover:text-accent transition-colors"
                   >
                     Log in
                   </Link>
                   <Link
                     to="/register"
-                    className="text-sm font-medium bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+                    className="hidden sm:inline-flex items-center text-sm font-medium bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
                   >
                     Get Started
                   </Link>
+                  <button
+                    onClick={() => { setLastEmail(getLastEmail()); setAccountOpen(true); }}
+                    aria-haspopup="true"
+                    aria-expanded={accountOpen}
+                    className="md:hidden inline-flex items-center gap-1.5 min-h-11 px-3 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Log in
+                  </button>
                 </>
               )}
             </div>
@@ -198,62 +218,128 @@ export default function PublicLayout() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-haspopup="true"
+              aria-expanded={mobileMenuOpen}
+              className="md:hidden inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
+        </nav>
+      </header>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
+      {/* Full-screen mobile menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] md:hidden"
+          >
+            <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden bg-card border-t border-border overflow-hidden"
+              initial={{ y: '-100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '-100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+              className="absolute top-0 inset-x-0 max-h-[100dvh] overflow-y-auto bg-card border-b border-border shadow-xl"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Main menu"
             >
-              <div className="px-4 py-4 space-y-3">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    className="block px-4 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              <div className="flex items-center justify-between px-4 h-16">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 shrink-0">
+                  <div className="w-8 h-8 flex items-center justify-center">
+                    <img src="/zyro-logo.webp" alt="ZYR0 Logo" width="32" height="32" className="w-8 h-8 object-contain rounded-md" />
+                  </div>
+                  <span className="text-xl font-bold text-foreground">ZYR0</span>
+                </Link>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                  className="inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-foreground hover:bg-muted transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
-                {/* Mobile Community CTA Slot */}
-                <div id="mobile-community-cta-slot" className="pt-2 border-t border-border">
+              <div className="px-4 pb-8">
+                <nav className="flex flex-col">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center min-h-12 px-4 rounded-lg text-base font-medium transition-colors ${location.pathname === link.href ? 'text-accent bg-accent/5' : 'text-foreground hover:bg-muted'}`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div id="mobile-community-cta-slot" className="pt-3 mt-3 border-t border-border">
                   <CommunitySocialNav mobile />
                 </div>
 
-                <div className="pt-3 border-t border-border flex flex-col gap-2">
+                <div className="pt-3 mt-3 border-t border-border flex flex-col gap-2">
                   {user ? (
                     <>
                       <Link
                         to={`/${effectiveRole}/dashboard`}
-                        className="w-full text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
                       >
-                        Go to Dashboard
+                        <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
                       </Link>
                       {companyAccess?.hasAccess && effectiveRole !== 'company' && (
                         <Link
                           to="/company/dashboard"
-                          className="w-full text-center py-2.5 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
                         >
                           <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
                         </Link>
                       )}
+                      <div className="pt-2 border-t border-border flex flex-col gap-1">
+                        <Link
+                          to={`/${effectiveRole}/profile`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                        >
+                          <User className="w-4 h-4 text-muted-foreground" /> Profile
+                        </Link>
+                        <Link
+                          to={`/${effectiveRole}/settings`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                        >
+                          <Settings className="w-4 h-4 text-muted-foreground" /> Settings
+                        </Link>
+                        <button
+                          onClick={async () => { await signOut(); navigate('/'); }}
+                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <Link to="/login" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors">
-                        Log in
+                      <Link
+                        to="/login"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex-1 text-center py-2.5 min-h-11 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors flex items-center justify-center gap-2"
+                      >
+                        <LogIn className="w-4 h-4" /> Log in
                       </Link>
-                      <Link to="/register" className="flex-1 text-center py-2.5 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors">
+                      <Link
+                        to="/register"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="flex-1 text-center py-2.5 min-h-11 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex items-center justify-center"
+                      >
                         Get Started
                       </Link>
                     </>
@@ -261,10 +347,81 @@ export default function PublicLayout() {
                 </div>
               </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-        </nav>
-      </header>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-screen mobile account sheet (logged out) */}
+      <AnimatePresence>
+        {accountOpen && !user && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] md:hidden"
+          >
+            <div className="absolute inset-0 bg-black/50" onClick={() => setAccountOpen(false)} />
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="absolute bottom-0 inset-x-0 max-h-[85vh] overflow-y-auto bg-card rounded-t-2xl border-t border-border shadow-2xl p-6 pb-8"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Sign in"
+            >
+              <div className="flex items-start justify-between mb-1">
+                <h2 className="text-xl font-bold text-foreground">Welcome back</h2>
+                <button
+                  onClick={() => setAccountOpen(false)}
+                  aria-label="Close"
+                  className="inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-foreground hover:bg-muted transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">Sign in to your account or create a new one.</p>
+
+              {lastEmail && (
+                <>
+                  <button
+                    onClick={() => navigate(`/login?email=${encodeURIComponent(lastEmail)}`)}
+                    className="w-full flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/40 hover:bg-muted transition-colors text-left"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                      <Mail className="w-5 h-5 text-accent" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-muted-foreground">Continue as</p>
+                      <p className="text-sm font-medium text-foreground truncate">{lastEmail}</p>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                  </button>
+                  <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex-1 h-px bg-border" />
+                    or
+                    <div className="flex-1 h-px bg-border" />
+                  </div>
+                </>
+              )}
+
+              <Link
+                to="/login"
+                className="w-full flex items-center justify-center gap-2 min-h-12 rounded-xl border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground"
+              >
+                <LogIn className="w-4 h-4" /> Use another account
+              </Link>
+              <Link
+                to="/register"
+                className="mt-3 w-full flex items-center justify-center gap-2 min-h-12 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors"
+              >
+                Create a new account
+              </Link>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <main
