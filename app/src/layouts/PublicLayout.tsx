@@ -213,18 +213,18 @@ export default function PublicLayout() {
                   </button>
                 </>
               )}
-            </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-              aria-haspopup="true"
-              aria-expanded={mobileMenuOpen}
-              className="md:hidden inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-haspopup="true"
+                aria-expanded={mobileMenuOpen}
+                className="md:hidden inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-foreground hover:bg-slate-200/60 dark:hover:bg-white/10 transition-colors"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
         </nav>
