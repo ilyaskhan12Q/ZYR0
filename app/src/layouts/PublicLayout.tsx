@@ -372,7 +372,7 @@ export default function PublicLayout() {
               aria-label="Sign in"
             >
               <div className="flex items-start justify-between mb-1">
-                <h2 className="text-xl font-bold text-foreground">Welcome back</h2>
+                <h2 className="text-xl font-bold text-foreground">{lastEmail ? 'Welcome back' : 'Sign in to ZYR0'}</h2>
                 <button
                   onClick={() => setAccountOpen(false)}
                   aria-label="Close"
@@ -387,16 +387,16 @@ export default function PublicLayout() {
                 <>
                   <button
                     onClick={() => navigate(`/login?email=${encodeURIComponent(lastEmail)}`)}
-                    className="w-full flex items-center gap-3 p-4 rounded-xl border border-border bg-muted/40 hover:bg-muted transition-colors text-left"
+                    className="w-full flex items-center gap-3 p-4 rounded-xl bg-accent text-white hover:bg-accent/90 transition-colors text-left"
                   >
-                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                      <Mail className="w-5 h-5 text-accent" />
+                    <div className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center shrink-0">
+                      <Mail className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-muted-foreground">Continue as</p>
-                      <p className="text-sm font-medium text-foreground truncate">{lastEmail}</p>
+                      <p className="text-xs text-white/80">Continue as</p>
+                      <p className="text-sm font-semibold truncate">{lastEmail}</p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <ArrowRight className="w-4 h-4 shrink-0" />
                   </button>
                   <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
                     <div className="flex-1 h-px bg-border" />
@@ -408,13 +408,13 @@ export default function PublicLayout() {
 
               <Link
                 to="/login"
-                className="w-full flex items-center justify-center gap-2 min-h-12 rounded-xl border border-border hover:bg-muted transition-colors text-sm font-medium text-foreground"
+                className={`w-full flex items-center justify-center gap-2 min-h-12 rounded-xl text-sm font-medium transition-colors ${lastEmail ? 'border border-border hover:bg-muted text-foreground' : 'bg-accent text-white font-semibold hover:bg-accent/90'}`}
               >
-                <LogIn className="w-4 h-4" /> Use another account
+                <LogIn className="w-4 h-4" /> {lastEmail ? 'Use another account' : 'Log in'}
               </Link>
               <Link
                 to="/register"
-                className="mt-3 w-full flex items-center justify-center gap-2 min-h-12 rounded-xl bg-accent text-white text-sm font-semibold hover:bg-accent/90 transition-colors"
+                className={`mt-3 w-full flex items-center justify-center gap-2 min-h-12 rounded-xl text-sm font-medium transition-colors ${lastEmail ? 'bg-accent text-white font-semibold hover:bg-accent/90' : 'border border-border hover:bg-muted text-foreground'}`}
               >
                 Create a new account
               </Link>
