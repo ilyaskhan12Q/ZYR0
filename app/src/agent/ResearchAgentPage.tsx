@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { AgentHero } from '@/agent/components/AgentHero';
 import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
+import { ThreadInput } from '@/agent/components/ThreadInput';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
@@ -300,40 +301,18 @@ export default function ResearchAgentPage() {
           </div>
 
           {/* Bottom input */}
-          <div className="shrink-0 border-t border-white/5 p-4">
-            <div className="mx-auto max-w-3xl">
-              <div className="relative">
-                <textarea
-                  value=""
-                  onChange={(e) => {
-                    if (e.target.value.trim()) {
-                      handleSend(e.target.value);
-                      e.target.value = '';
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      const target = e.target as HTMLTextAreaElement;
-                      if (target.value.trim()) {
-                        handleSend(target.value);
-                        target.value = '';
-                      }
-                    }
-                  }}
-                  placeholder={
-                    pipeline.running
-                      ? 'Researching...'
-                      : streaming
-                      ? 'Generating...'
-                      : 'Ask a follow-up...'
-                  }
-                  disabled={pipeline.running || streaming}
-                  className="w-full resize-none bg-[#1e1e22] text-[15px] text-white placeholder-[#5a5a5f] px-4 py-3 rounded-xl ring-1 ring-white/[0.08] focus:outline-none focus:ring-white/[0.15] min-h-[48px] max-h-[120px] disabled:opacity-50"
-                />
-              </div>
-            </div>
-          </div>
+          <ThreadInput
+            mode={mode}
+            onModeChange={setMode}
+            models={models}
+            selectedModel={selected}
+            onSelectModel={(id) => setSelected(id === 'auto' ? null : id)}
+            depth={depth}
+            onDepthChange={setDepth}
+            onSend={handleSend}
+            onStop={abort}
+            running={pipeline.running || streaming}
+          />
         </div>
       )}
     </div>
