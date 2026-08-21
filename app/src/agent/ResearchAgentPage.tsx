@@ -191,7 +191,7 @@ export default function ResearchAgentPage() {
           onOpenHistory={() => setHistoryOpen(true)}
         />
       ) : (
-        <div className="flex flex-1 flex-col bg-[#0f0f0f]">
+        <div className="flex min-h-0 flex-1 flex-col bg-[#0f0f0f]">
           {/* Active session header */}
           <div className="shrink-0 border-b border-white/5 px-4 py-3">
             <div className="mx-auto max-w-3xl flex items-center justify-between">
@@ -216,7 +216,7 @@ export default function ResearchAgentPage() {
           </div>
 
           {/* Thread area */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="mx-auto max-w-3xl px-4 py-6 flex flex-col gap-4">
               {/* Messages */}
               {messages.map((msg) => (
