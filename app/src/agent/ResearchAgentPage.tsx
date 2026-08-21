@@ -196,22 +196,33 @@ export default function ResearchAgentPage() {
           {/* Active session header */}
           <div className="shrink-0 border-b border-white/5 px-4 py-3">
             <div className="mx-auto max-w-3xl flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={handleNewSession}
-                  className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-[#8a8a8f] hover:text-white hover:bg-white/5 border border-white/5 transition-all duration-200 active:scale-95"
                 >
-                  + New
+                  <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  <span className="hidden sm:inline">New</span>
                 </button>
                 <button
                   onClick={() => setHistoryOpen(true)}
-                  className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-[#8a8a8f] hover:text-white hover:bg-white/5 border border-white/5 transition-all duration-200 active:scale-95"
                 >
-                  History
+                  <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                    <path d="M12 7v5l4 2" />
+                  </svg>
+                  <span className="hidden sm:inline">History</span>
                 </button>
               </div>
-              <div className="text-xs text-[#5a5a5f]">
-                {pipeline.running ? 'Researching...' : streaming ? 'Generating...' : 'Ready'}
+              <div className="flex items-center gap-2">
+                <div className={`size-1.5 rounded-full ${pipeline.running || streaming ? 'bg-emerald-400 animate-pulse' : 'bg-[#5a5a5f]'}`} />
+                <span className="text-xs text-[#5a5a5f]">
+                  {pipeline.running ? 'Researching...' : streaming ? 'Generating...' : 'Ready'}
+                </span>
               </div>
             </div>
           </div>
