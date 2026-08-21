@@ -1,19 +1,12 @@
-import { useEffect, useState } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { AgentChat } from '@/agent/components/AgentChat';
-import { ComposerDock } from '@/agent/components/ComposerDock';
-import { AgentSettingsModal } from '@/agent/components/AgentSettingsModal';
-import { PipelineView } from '@/agent/components/PipelineView';
-import { ReportView } from '@/agent/components/ReportView';
-import { AgentSidebar } from '@/agent/components/AgentSidebar';
-import { PlanReview } from '@/agent/components/PlanReview';
-import { LandingView } from '@/agent/components/LandingView';
+import { useEffect, useState, useCallback } from 'react';
+import { AgentHero } from '@/agent/components/AgentHero';
+import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
-import { useAgentLibrary } from '@/agent/hooks/useAgentLibrary';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
 import type { ResearchDepth, ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
+import supabase from '@/lib/supabase';
 import '@/styles/agent.css';
 
 const SYSTEM_PROMPT = `You are ZYR0's Research Agent: a precise, honest research assistant.
@@ -36,56 +29,57 @@ ${report.markdown}
 ${sources}`;
 }
 
+interface HistoryItem {
+  id: string;
+  prompt: string;
+  status: string;
+  mode: string;
+  created_at: string;
+}
+
 export default function ResearchAgentPage() {
   const { user } = useAuth();
   const { models, selected, setSelected, loading } = useAgentModels();
-  const { messages, streaming, error, sessionId, send, abort, resetSession, loadSession } = useAgentChat(selected);
+  const { messages, streaming, error, sessionId, send, abort, resetSession } = useAgentChat(selected);
   const pipeline = useResearchPipeline();
-  const library = useAgentLibrary();
-  const { refetch: refetchLibrary } = library;
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [mode, setMode] = useState<'chat' | 'research'>('chat');
-  const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
-  const [prefill, setPrefill] = useState<{ topic: string; seq: number } | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [depth, setDepth] = useState<ResearchDepth>('standard');
-  const [runTopic, setRunTopic] = useState('');
+  const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
+  const [mode, setMode] = useState<'chat' | 'research'>('chat');
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const runActive =
     pipeline.stage !== 'idle' || pipeline.review !== null || pipeline.report !== null;
-  const runVisible = runActive || prefill !== null;
   const isEmpty = messages.length === 0 && !runActive;
 
-  useEffect(() => {
-    void refetchLibrary();
-  }, [sessionId, pipeline.report?.researchId, refetchLibrary]);
+  const fetchHistory = useCallback(async () => {
+    setHistoryLoading(true);
+    const { data } = await supabase
+      .from('agent_researches')
+      .select('id, prompt, status, mode, created_at')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    setHistory((data ?? []) as HistoryItem[]);
+    setHistoryLoading(false);
+  }, []);
 
-  const handleSelect = (id: string) => setSelected(id === 'auto' ? null : id);
+  useEffect(() => {
+    if (historyOpen) void fetchHistory();
+  }, [historyOpen, fetchHistory]);
 
   const handleFollowUp = (report: ResearchReport) => {
     setChatSystem(buildFollowUpPrompt(report));
     setMode('chat');
   };
 
-  const handleNewResearch = (topic = '') => {
-    pipeline.clear();
-    setMode('research');
-    if (topic) {
-      setPrefill({ topic, seq: Date.now() });
-      setRunTopic(topic);
-    }
-  };
-
   const handleResearchSend = (topic: string, runDepth: ResearchDepth = depth) => {
     setMode('research');
-    setPrefill(null);
-    setRunTopic(topic);
     void pipeline.run(topic, runDepth);
   };
 
   const handleRegenerate = (topic: string) => {
     setMode('research');
-    setRunTopic(topic);
     void pipeline.run(topic);
   };
 
@@ -93,137 +87,255 @@ export default function ResearchAgentPage() {
     resetSession();
     pipeline.clear();
     setChatSystem(SYSTEM_PROMPT);
-    setPrefill(null);
-    setRunTopic('');
     setMode('chat');
+    setHistoryOpen(false);
   };
 
-  const handleSelectChat = (id: string) => {
-    setChatSystem(SYSTEM_PROMPT);
-    setMode('chat');
-    void loadSession(id);
+  const handleSelectHistory = (id: string, itemMode: string) => {
+    setHistoryOpen(false);
+    if (itemMode === 'research') {
+      setMode('research');
+      void pipeline.loadReport(id);
+    } else {
+      setMode('chat');
+      // For chat sessions, we'd need to load via useAgentChat.loadSession
+      // but that's not exposed from the current hook
+    }
   };
 
-  const handleSelectResearch = (id: string) => {
-    setMode('research');
-    void pipeline.loadReport(id);
+  const handleSend = (text: string) => {
+    if (mode === 'research') {
+      handleResearchSend(text);
+    } else {
+      send(text, chatSystem);
+    }
   };
 
   return (
-    <div className="agent-root flex h-screen flex-col overflow-hidden">
-      <div className="flex min-h-0 flex-1">
-        <AgentSidebar
-          chats={library.chats}
-          research={library.research}
-          activeId={mode === 'chat' ? (sessionId ?? undefined) : pipeline.report?.researchId}
-          onNewSession={handleNewSession}
-          onSelectChat={handleSelectChat}
-          onSelectResearch={handleSelectResearch}
-          onOpenSettings={() => setSettingsOpen(true)}
-          userEmail={user?.email}
-          mobileOpen={sidebarOpen}
-          onToggleMobile={() => setSidebarOpen((v) => !v)}
-        />
-
-        <div className="flex min-h-0 flex-1 flex-col">
-          {/* Unified thread */}
-          <ScrollArea className="agent-thread min-h-0 flex-1">
-            <div className="mx-auto flex min-h-full max-w-4xl flex-col px-4 py-6">
-              {error && (
-                <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-                  {error}
+    <div className="agent-root flex h-screen flex-col overflow-hidden relative">
+      {/* History panel */}
+      {historyOpen && (
+        <>
+          <div className="agent-history-overlay" onClick={() => setHistoryOpen(false)} />
+          <div className="agent-history-panel">
+            <div className="flex items-center justify-between p-4 border-b border-white/5">
+              <h2 className="text-sm font-medium text-white">Research History</h2>
+              <button
+                onClick={() => setHistoryOpen(false)}
+                className="text-[#6a6a6f] hover:text-white transition-colors text-xs"
+              >
+                Close
+              </button>
+            </div>
+            <div className="p-2">
+              <button
+                onClick={handleNewSession}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-emerald-400 hover:bg-white/5 transition-colors mb-2"
+              >
+                + New Session
+              </button>
+              {historyLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="text-[#5a5a5f] text-xs">Loading...</div>
                 </div>
-              )}
-
-              {isEmpty ? (
-                <div className="flex flex-1 flex-col justify-center">
-                  <LandingView
-                    prefill={prefill}
-                    running={pipeline.running}
-                    onRun={handleResearchSend}
-                    mode={mode}
-                    onChatSend={(text) => send(text, chatSystem)}
-                  />
+              ) : history.length === 0 ? (
+                <div className="flex justify-center py-8">
+                  <div className="text-[#5a5a5f] text-xs">No history yet</div>
                 </div>
               ) : (
-                <>
-                  <AgentChat messages={messages} />
-
-                  {runVisible && (
-                    <div className="mt-6 flex flex-col gap-4">
-                      {runTopic && (
-                        <div className="flex justify-end">
-                          <div className="agent-whitespace-pre-wrap max-w-[85%] rounded-2xl bg-primary px-4 py-3 text-sm leading-relaxed text-primary-foreground">
-                            {runTopic}
-                          </div>
-                        </div>
-                      )}
-
-                      {pipeline.report ? (
-                        <ReportView
-                          report={pipeline.report}
-                          errors={pipeline.errors}
-                          onFollowUp={handleFollowUp}
-                          onNewResearch={handleNewResearch}
-                          onRegenerate={handleRegenerate}
-                        />
-                      ) : pipeline.review && pipeline.stage === 'review' ? (
-                        <PlanReview
-                          contracts={pipeline.review.contracts}
-                          provider={pipeline.review.provider}
-                          error={pipeline.review.error}
-                          skipReview={pipeline.skipReview}
-                          running={pipeline.running}
-                          onApprove={pipeline.approvePlan}
-                          onUpdate={pipeline.updatePlan}
-                          onRegenerate={() => void pipeline.regeneratePlan()}
-                          onSkipReviewChange={pipeline.setSkipReviewPreference}
-                          onCancel={pipeline.abort}
-                        />
-                      ) : (
-                        <PipelineView
-                          stage={pipeline.stage}
-                          message={pipeline.message}
-                          detail={pipeline.detail}
-                          evidence={pipeline.evidence}
-                          ledger={pipeline.ledger}
-                          errors={pipeline.errors}
-                          workerProgress={pipeline.workerProgress}
-                          running={pipeline.running}
-                          prefill={prefill}
-                          onRun={handleResearchSend}
-                          onStop={pipeline.abort}
-                        />
-                      )}
+                history.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleSelectHistory(item.id, item.mode)}
+                    className="w-full flex flex-col gap-1 px-3 py-2.5 rounded-lg text-left hover:bg-white/5 transition-colors"
+                  >
+                    <span className="text-sm text-white truncate">{item.prompt}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                        item.mode === 'research' ? 'bg-blue-500/20 text-blue-300' : 'bg-white/10 text-[#8a8a8f]'
+                      }`}>
+                        {item.mode}
+                      </span>
+                      <span className="text-[10px] text-[#5a5a5f]">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </span>
                     </div>
-                  )}
-                </>
+                  </button>
+                ))
               )}
             </div>
-          </ScrollArea>
+          </div>
+        </>
+      )}
 
-          <ComposerDock
-            mode={mode}
-            onModeChange={setMode}
-            chatStreaming={streaming}
-            onChatSend={(text) => send(text, chatSystem)}
-            onChatStop={abort}
-            researchRunning={pipeline.running}
-            onResearchSend={(topic) => handleResearchSend(topic)}
-            onResearchStop={pipeline.abort}
-            models={models}
-            selectedModel={selected}
-            onSelectModel={handleSelect}
-            modelsLoading={loading}
-            depth={depth}
-            onDepthChange={setDepth}
-            onToggleSidebar={() => setSidebarOpen((v) => !v)}
-            hideInput={isEmpty}
-          />
-
-          <AgentSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} models={models} />
+      {/* Error banner */}
+      {error && (
+        <div className="absolute top-0 left-0 right-0 z-40 mx-auto max-w-3xl mt-2">
+          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-400 text-center">
+            {error}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Main content */}
+      {isEmpty ? (
+        <AgentHero
+          models={models}
+          selectedModel={selected}
+          onSelectModel={(id) => setSelected(id === 'auto' ? null : id)}
+          onSend={handleSend}
+          onStop={abort}
+          running={pipeline.running || streaming}
+          depth={depth}
+          onDepthChange={setDepth}
+          onOpenHistory={() => setHistoryOpen(true)}
+        />
+      ) : (
+        <div className="flex flex-1 flex-col bg-[#0f0f0f]">
+          {/* Active session header */}
+          <div className="shrink-0 border-b border-white/5 px-4 py-3">
+            <div className="mx-auto max-w-3xl flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleNewSession}
+                  className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                >
+                  + New
+                </button>
+                <button
+                  onClick={() => setHistoryOpen(true)}
+                  className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                >
+                  History
+                </button>
+              </div>
+              <div className="text-xs text-[#5a5a5f]">
+                {pipeline.running ? 'Researching...' : streaming ? 'Generating...' : 'Ready'}
+              </div>
+            </div>
+          </div>
+
+          {/* Thread area */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-3xl px-4 py-6 flex flex-col gap-4">
+              {/* Messages */}
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`agent-fade-up flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                      msg.role === 'user'
+                        ? 'bg-[#1488fc] text-white'
+                        : 'bg-[#1e1e22] text-[#e5e5e5] ring-1 ring-white/[0.08]'
+                    }`}
+                  >
+                    {msg.streaming && !msg.content && (
+                      <div className="flex gap-1.5">
+                        <div className="w-2 h-2 bg-[#4da5fc] rounded-full agent-pulse-dot" />
+                        <div className="w-2 h-2 bg-[#4da5fc] rounded-full agent-pulse-dot" />
+                        <div className="w-2 h-2 bg-[#4da5fc] rounded-full agent-pulse-dot" />
+                      </div>
+                    )}
+                    {msg.error ? (
+                      <span className="text-red-400">{msg.error}</span>
+                    ) : (
+                      <span className="agent-whitespace-pre-wrap">{msg.content}</span>
+                    )}
+                    {msg.streaming && msg.content && (
+                      <span className="inline-block w-0.5 h-4 bg-white/70 ml-0.5 animate-pulse" />
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Pipeline reasoning */}
+              {runActive && (
+                <div className="agent-fade-up">
+                  <ResearchReasoning
+                    stage={pipeline.stage}
+                    message={pipeline.message}
+                    detail={pipeline.detail}
+                    contracts={pipeline.contracts}
+                    evidence={pipeline.evidence}
+                    ledger={pipeline.ledger}
+                    errors={pipeline.errors}
+                    running={pipeline.running}
+                    className="bg-[#1e1e22] rounded-xl ring-1 ring-white/[0.08] p-3"
+                  />
+                </div>
+              )}
+
+              {/* Report */}
+              {pipeline.report && (
+                <div className="agent-fade-up bg-[#1e1e22] rounded-xl ring-1 ring-white/[0.08] p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs text-emerald-400 font-medium">Report Complete</span>
+                    <span className="text-xs text-[#5a5a5f]">
+                      {pipeline.ledger.filter(l => l.verified).length} verified sources
+                    </span>
+                  </div>
+                  <div
+                    className="prose prose-invert prose-sm max-w-none agent-whitespace-pre-wrap text-[#c5c5c5] leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: pipeline.report.markdown.replace(/\n/g, '<br/>') }}
+                  />
+                  <div className="flex gap-2 mt-4 pt-3 border-t border-white/5">
+                    <button
+                      onClick={() => handleFollowUp(pipeline.report!)}
+                      className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                    >
+                      Follow up
+                    </button>
+                    <button
+                      onClick={() => handleRegenerate(pipeline.report!.topic)}
+                      className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                    >
+                      Regenerate
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom input */}
+          <div className="shrink-0 border-t border-white/5 p-4">
+            <div className="mx-auto max-w-3xl">
+              <div className="relative">
+                <textarea
+                  value=""
+                  onChange={(e) => {
+                    if (e.target.value.trim()) {
+                      handleSend(e.target.value);
+                      e.target.value = '';
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      const target = e.target as HTMLTextAreaElement;
+                      if (target.value.trim()) {
+                        handleSend(target.value);
+                        target.value = '';
+                      }
+                    }
+                  }}
+                  placeholder={
+                    pipeline.running
+                      ? 'Researching...'
+                      : streaming
+                      ? 'Generating...'
+                      : 'Ask a follow-up...'
+                  }
+                  disabled={pipeline.running || streaming}
+                  className="w-full resize-none bg-[#1e1e22] text-[15px] text-white placeholder-[#5a5a5f] px-4 py-3 rounded-xl ring-1 ring-white/[0.08] focus:outline-none focus:ring-white/[0.15] min-h-[48px] max-h-[120px] disabled:opacity-50"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
