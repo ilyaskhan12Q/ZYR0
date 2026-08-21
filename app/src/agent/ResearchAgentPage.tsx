@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AgentHero } from '@/agent/components/AgentHero';
 import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
 import { ThreadInput } from '@/agent/components/ThreadInput';
@@ -190,7 +191,16 @@ export default function ResearchAgentPage() {
 
       {/* Main content */}
       <div className="flex-1 min-w-0 flex flex-col">
+      <AnimatePresence mode="wait">
       {isEmpty ? (
+        <motion.div
+          key="hero"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.2 }}
+          className="flex-1"
+        >
         <AgentHero
           models={models}
           selectedModel={selected}
@@ -203,8 +213,15 @@ export default function ResearchAgentPage() {
           onOpenHistory={() => setHistoryOpen(true)}
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
         />
+        </motion.div>
       ) : (
-        <div className="flex min-h-0 flex-1 flex-col bg-[#0f0f0f]">
+        <motion.div
+          key="thread"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="flex min-h-0 flex-1 flex-col bg-[#0f0f0f]"
+        >
           {/* Active session header */}
           <div className="shrink-0 border-b border-white/5 px-4 py-3">
             <div className="mx-auto max-w-3xl flex items-center justify-between">
@@ -347,6 +364,9 @@ export default function ResearchAgentPage() {
           />
         </div>
       )}
+      </motion.div>
+      )}
+      </AnimatePresence>
       </div>
     </div>
   );
