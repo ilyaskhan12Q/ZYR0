@@ -1,54 +1,16 @@
 /* ============================================================
-   Research Agent workspace — scoped theme ("Academic Precision",
-   light, isolated)
-   Imported ONLY by the ResearchAgentPage route chunk.
-   Mirrors the 0-AI pattern: redefines shadcn HSL vars under
-   `.agent-root` so every Radix primitive renders the agent
-   look without touching src/index.css.
-
-   Design system: Source Serif 4 (headlines) + Geist (body),
-   surface #f9f9f9, on-surface #1a1c1c, primary #3525cd,
-   outline-variant borders, 4px radii, flat (no shadows).
+   Research Agent workspace — dark theme ("Ray"),
+   imported ONLY by the ResearchAgentPage route chunk.
    ============================================================ */
 
-.agent-serif {
-  font-family: 'Source Serif 4', Georgia, 'Times New Roman', ui-serif, serif;
+.agent-root {
+  background-color: #0f0f0f;
+  color: #e5e5e5;
+  font-family: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 .agent-whitespace-pre-wrap {
   white-space: pre-wrap;
-}
-
-.agent-root {
-  --background: 0 0% 98%;
-  --foreground: 180 4% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 180 4% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 180 4% 11%;
-  --primary: 246 69% 47%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 93%;
-  --secondary-foreground: 240 1% 37%;
-  --muted: 0 0% 95%;
-  --muted-foreground: 244 10% 30%;
-  --accent: 0 0% 91%;
-  --accent-foreground: 180 4% 11%;
-  --destructive: 0 75% 42%;
-  --border: 0 0% 90%;
-  --input: 250 21% 81%;
-  --ring: 246 69% 47%;
-  --radius: 0.25rem;
-
-  color-scheme: light;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
-}
-
-.agent-logo-ring {
-  background: hsl(var(--primary));
-  color: #fff;
 }
 
 /* Thinking dots */
@@ -127,40 +89,26 @@
   animation-delay: 0.4s;
 }
 
-/* Conversation thread backdrop — landing-style pentagon motif.
-   Scoped to the thread area only (sidebar stays solid). */
-.agent-thread {
-  position: relative;
-  isolation: isolate;
+/* History panel overlay */
+.agent-history-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
 }
 
-.agent-thread::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: url('/svgs/parabolic-pentagon.svg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  opacity: 0.15;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
-
-.agent-thread::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    to bottom,
-    rgba(249, 249, 249, 0.4) 0%,
-    transparent 35%,
-    transparent 80%,
-    rgba(249, 249, 249, 0.92) 100%
-  );
-  pointer-events: none;
+.agent-history-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  z-index: 51;
+  background: #1a1a1e;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-y: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Research Agent — Bolt-style workspace redesign** (`app/src/agent/ResearchAgentPage.tsx`, `app/src/agent/components/AgentHero.tsx`, `ResearchReasoning.tsx`, `app/src/styles/agent.css`):
+  - Complete visual overhaul: dark `#0f0f0f` background with blue ray gradient (replaces light academic theme), centered hero input ("What will you research?"), model selector with real agent models, depth pills (Quick/Standard/Deep), and "Research" CTA — matching the Bolt.new chat interface.
+  - `ChatReasoning`-style accordion replaces `PipelineView` for research progress: timeline dots + connecting lines show Understanding → Planning → Evidence → Verifying → Writing stages with real-time status indicators.
+  - History panel accessible via top-right button: lists recent sessions with mode badges (chat/research), quick-access to previous research.
+  - Removed `AgentSidebar`, `ComposerDock`, `LandingView`, `PipelineView`, `PlanReview`, `ReportView`, `AgentChat`, `ModelPill`, `AgentSettingsModal`, `useAgentLibrary` — workspace is now the single BoltStyleChat + reasoning accordion.
+  - `Vercel AI SDK` (`ai`) added as dependency for ChatReasoning type compatibility.
+- **Research Agent landing page** (`app/src/pages/research/ResearchLanding.tsx`, `app/src/styles/research-landing.css`, `app/src/components/research-landing/*`):
+  - Premium editorial landing at `/research`: Instrument Serif + Inter typography, `#F5F5F2` background, `#657C68` green accent, 16 sections (hero, editorial statement, questions, pipeline, live research, sources, evidence, report, features, audience, library, models, pricing with $X placeholders, CTA, footer).
+  - Sticky nav with scroll-blur effect, `Reveal` motion wrapper (reduced-motion-aware), `SectionHeading` shared component.
+  - All visuals CSS/SVG-only — no stock images, no fabricated claims/numbers.
+- **Hostname-aware routing** (`app/src/App.tsx`):
+  - When accessed on `research.zyroo.org`, the subdomain serves ResearchLanding at `/` and ResearchAgentPage at `/research-agent` (with auth). Other paths redirect to `https://zyroo.org`.
+  - Main site: `/research` serves the same landing page for reviewability before DNS is provisioned.
+
+### Added
+- **Vercel AI SDK** (`ai` package) for ChatReasoning type compatibility.
+
 ### Fixed
 - **Research Agent — two-tier source presentation + bigger evidence cap** (`app/src/agent/research/workers.ts`, `app/src/agent/research/verifier.ts`, `app/src/agent/hooks/useResearchPipeline.ts`, `app/src/agent/components/ReportView.tsx`, `PipelineView.tsx`, `app/src/agent/lib/reportPdf.ts`):
   - Gather cap raised 16 → **24 candidates** (round-robin across platforms, fits the gateway verify ceiling of 25 so every candidate is checked in one pass).

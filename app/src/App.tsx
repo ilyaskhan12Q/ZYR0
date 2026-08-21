@@ -1,5 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { lazy, Suspense, useMemo } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
@@ -8,6 +8,15 @@ import { CompanyAccessProvider } from '@/contexts/CompanyAccessContext';
 import { Toaster } from '@/components/ui/sonner';
 import { RouteLoading } from '@/components/RouteLoading';
 import ScrollToTop from '@/components/ScrollToTop';
+
+const AGENT_HOST = 'research.zyroo.org';
+
+function useIsAgentSubdomain() {
+  return useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.location.hostname === AGENT_HOST;
+  }, []);
+}
 
 // Public Pages
 const Landing = lazy(() => import('@/pages/public/Landing'));
@@ -43,6 +52,9 @@ const ZeroAIWorkspace = lazy(() => import('@/pages/zeroai/ZeroAIWorkspace'));
 // Research Agent (Phase 1: gateway chat; isolated module, requires login)
 const ResearchAgentPage = lazy(() => import('@/agent/ResearchAgentPage'));
 
+// Research Landing Page (premium editorial landing for the Research Agent)
+const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
+
 // Role-Based Portals (Each is its own dynamically-loaded bundle containing statically-loaded pages)
 const StudentPortal = lazy(() => import('@/pages/student/StudentPortal'));
 const CompanyPortal = lazy(() => import('@/pages/company/CompanyPortal'));
@@ -51,7 +63,48 @@ const AdminPortal = lazy(() => import('@/pages/admin/AdminPortal'));
 
 const LazyDashboardLayout = lazy(() => import('@/layouts/DashboardLayout'));
 
+function SubdomainRedirect() {
+  const location = useLocation();
+  const target = `https://zyroo.org${location.pathname}${location.search}`;
+  window.location.href = target;
+  return <RouteLoading />;
+}
+
 function App() {
+  const isAgentSubdomain = useIsAgentSubdomain();
+
+  if (isAgentSubdomain) {
+    return (
+      <LazyMotion features={domAnimation}>
+        <CompanyAccessProvider>
+          <ScrollToTop />
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
+              {/* Subdomain: research.zyroo.org — agent-only routes */}
+              <Route path="/" element={<ResearchLanding />} />
+              <Route
+                path="/research-agent"
+                element={
+                  <ProtectedRoute>
+                    <ResearchAgentPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+              <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              {/* Redirect all other paths to main domain */}
+              <Route path="*" element={<SubdomainRedirect />} />
+            </Routes>
+            <Toaster />
+          </Suspense>
+        </CompanyAccessProvider>
+      </LazyMotion>
+    );
+  }
+
   return (
     <LazyMotion features={domAnimation}>
       <CompanyAccessProvider>
@@ -94,6 +147,9 @@ function App() {
 
             {/* 0-AI Deep Research Workspace — isolated, outside PublicLayout */}
             <Route path="/0-ai" element={<ZeroAIWorkspace />} />
+
+            {/* Research Landing — public, outside PublicLayout */}
+            <Route path="/research" element={<ResearchLanding />} />
 
             {/* Research Agent — login required (per-user metering) */}
             <Route
