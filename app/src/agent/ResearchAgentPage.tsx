@@ -126,10 +126,24 @@ export default function ResearchAgentPage() {
       />
 
       {/* History panel (overlay) */}
+      <AnimatePresence>
       {historyOpen && (
         <>
-          <div className="agent-history-overlay" onClick={() => setHistoryOpen(false)} />
-          <div className="agent-history-panel">
+          <motion.div
+            className="agent-history-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setHistoryOpen(false)}
+          />
+          <motion.div
+            className="agent-history-panel"
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          >
             <div className="flex items-center justify-between p-4 border-b border-white/5">
               <h2 className="text-sm font-medium text-white">Research History</h2>
               <button
@@ -176,9 +190,10 @@ export default function ResearchAgentPage() {
                 ))
               )}
             </div>
-          </div>
+          </motion.div>
         </>
       )}
+      </AnimatePresence>
 
       {/* Error banner */}
       {error && (
@@ -362,9 +377,7 @@ export default function ResearchAgentPage() {
             onStop={abort}
             running={pipeline.running || streaming}
           />
-        </div>
-      )}
-      </motion.div>
+        </motion.div>
       )}
       </AnimatePresence>
       </div>
