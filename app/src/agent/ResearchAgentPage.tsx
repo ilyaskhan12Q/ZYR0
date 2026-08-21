@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { AgentHero } from '@/agent/components/AgentHero';
 import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
 import { ThreadInput } from '@/agent/components/ThreadInput';
+import { AgentSidebar } from '@/agent/components/AgentSidebar';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
@@ -47,6 +48,7 @@ export default function ResearchAgentPage() {
   const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -113,8 +115,16 @@ export default function ResearchAgentPage() {
   };
 
   return (
-    <div className="agent-root flex h-screen flex-col overflow-hidden relative">
-      {/* History panel */}
+    <div className="agent-root flex h-screen overflow-hidden relative">
+      {/* Sidebar */}
+      <AgentSidebar
+        open={sidebarOpen}
+        onToggle={() => setSidebarOpen((v) => !v)}
+        onNewSession={handleNewSession}
+        activeId={sessionId ?? undefined}
+      />
+
+      {/* History panel (overlay) */}
       {historyOpen && (
         <>
           <div className="agent-history-overlay" onClick={() => setHistoryOpen(false)} />
@@ -179,6 +189,7 @@ export default function ResearchAgentPage() {
       )}
 
       {/* Main content */}
+      <div className="flex-1 min-w-0 flex flex-col">
       {isEmpty ? (
         <AgentHero
           models={models}
@@ -190,6 +201,7 @@ export default function ResearchAgentPage() {
           depth={depth}
           onDepthChange={setDepth}
           onOpenHistory={() => setHistoryOpen(true)}
+          onToggleSidebar={() => setSidebarOpen((v) => !v)}
         />
       ) : (
         <div className="flex min-h-0 flex-1 flex-col bg-[#0f0f0f]">
@@ -197,6 +209,15 @@ export default function ResearchAgentPage() {
           <div className="shrink-0 border-b border-white/5 px-4 py-3">
             <div className="mx-auto max-w-3xl flex items-center justify-between">
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSidebarOpen((v) => !v)}
+                  className="flex items-center justify-center size-8 rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <path d="M9 3v18" />
+                  </svg>
+                </button>
                 <button
                   onClick={handleNewSession}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-[#8a8a8f] hover:text-white hover:bg-white/5 border border-white/5 transition-all duration-200 active:scale-95"
@@ -326,6 +347,7 @@ export default function ResearchAgentPage() {
           />
         </div>
       )}
+      </div>
     </div>
   );
 }

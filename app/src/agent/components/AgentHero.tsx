@@ -236,6 +236,7 @@ interface AgentHeroProps {
   depth: ResearchDepth
   onDepthChange: (d: ResearchDepth) => void
   onOpenHistory?: () => void
+  onToggleSidebar?: () => void
 }
 
 export function AgentHero({
@@ -248,11 +249,26 @@ export function AgentHero({
   depth,
   onDepthChange,
   onOpenHistory,
+  onToggleSidebar,
 }: AgentHeroProps) {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-[#0f0f0f]">
       <RayBackground />
 
+      {/* Top-left: sidebar toggle */}
+      {onToggleSidebar && (
+        <button
+          onClick={onToggleSidebar}
+          className="absolute top-5 left-5 z-30 flex items-center justify-center size-9 rounded-full text-[#8a8a8f] hover:text-white hover:bg-white/5 transition-all duration-200 active:scale-95"
+        >
+          <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M9 3v18" />
+          </svg>
+        </button>
+      )}
+
+      {/* Top-right: history */}
       {onOpenHistory && (
         <button
           onClick={onOpenHistory}
