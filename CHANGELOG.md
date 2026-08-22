@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.39.0] - 2026-08-20
+
 ### Changed
 - **Research Agent — Bolt-style workspace redesign** (`app/src/agent/ResearchAgentPage.tsx`, `app/src/agent/components/AgentHero.tsx`, `ResearchReasoning.tsx`, `app/src/styles/agent.css`):
   - Complete visual overhaul: dark `#0f0f0f` background with blue ray gradient (replaces light academic theme), centered hero input ("What will you research?"), model selector with real agent models, depth pills (Quick/Standard/Deep), and "Research" CTA — matching the Bolt.new chat interface.
@@ -91,8 +93,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Globalized `CompanyAccessProvider` across the application router to enable seamless, zero-cost access checking for dual-role users (e.g. Students holding accepted Company Team Memberships).
   - Implemented dynamic **"Switch to Company Workspace"** button in `PublicLayout` and `DashboardLayout` profile dropdowns & mobile navigation drawers when an accepted company membership is detected.
   - Added reciprocal **"Switch to Student Workspace"** menu option when an authorized student team member is navigating within the Company Portal.
+- **Last-Used Email One-Tap Sign-In (`app/src/lib/auth.ts`, `app/src/pages/auth/*`)**:
+  - `rememberEmail()` stores the last used email in localStorage (`zyro_last_email`) on login, registration, and OAuth success.
+  - The mobile account sheet offers **"Continue as [email]"** with one tap, plus "Use another account" and "Create a new account" actions; the login form pre-fills from the remembered email or `?email=`.
+
+### Changed
+- **Mobile Navbar Redesign (`app/src/layouts/PublicLayout.tsx`, `app/src/layouts/DashboardLayout.tsx`)**:
+  - Public header: removed the dead notification bell, added a mobile-only **"Log in"** button that opens a full-screen account sheet, replaced the inline mobile menu with a full-screen drawer (nav links, community slot, state-aware auth actions), made the profile avatar visible on mobile (logged-in users), and added `aria-expanded`/`aria-haspopup` plus body scroll-lock while sheets are open.
+  - Dashboard header: 44px touch targets for hamburger/search/bell/tour/theme/sidebar-close, body scroll-lock for the mobile sidebar, notifications panel capped to `calc(100vw - 1.5rem)`, sidebar submenu row heights bumped.
+  - Desktop navbar intentionally unchanged.
+- **Landing & About Pages (`app/src/pages/public/Landing.tsx`, `app/src/pages/public/About.tsx`)**:
+  - Testimonial cards use responsive min-heights (`min-h-[700px] xs:min-h-[820px] md:min-h-[460px]` and `min-h-[480px] xs:min-h-[560px]`).
+  - About page scroll animations moved from x-transforms to y-transforms to eliminate phantom horizontal overflow on phones.
+- **Student Dashboard (`app/src/pages/student/Dashboard.tsx`, `app/src/index.css`)**:
+  - Motion stagger delays zeroed on mobile via `stagger(isMobile, delay)` + `useIsMobile` for instant content, and stat cards use `p-4 sm:p-6`.
 
 ### Fixed
+- **Logged-Out Header Overflow on Phones (`app/src/layouts/PublicLayout.tsx`)**:
+  - The public header measured 379px on a 375px viewport when logged out; auth links are now hidden below the `sm` breakpoint in favor of the mobile "Log in" button, eliminating horizontal scroll on 320–414px screens.
 - **Company Portal Sidebar Navigation Gating (`app/src/layouts/DashboardLayout.tsx`, `app/src/contexts/CompanyAccessContext.tsx`, `app/src/services/companyTeam.ts`)**:
   - Resolved bug where `useCompanyNavItems` filtered all sidebar navigation links to empty during `access.loading` or when team membership role resolution was unresolved.
   - Added navigation fallback to show full static navigation items if filtering yields empty results or while access resolution is in progress.

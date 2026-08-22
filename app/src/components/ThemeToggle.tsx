@@ -19,7 +19,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
       type="button"
       aria-label="Toggle color theme"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className={`relative p-2 rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-muted ${className}`}
+      className={`relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-muted ${className}`}
       title={mounted ? `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode` : 'Toggle theme'}
     >
       {mounted && theme === 'dark' ? (

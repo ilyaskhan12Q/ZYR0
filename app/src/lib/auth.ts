@@ -13,6 +13,28 @@ export interface SignInData {
   password: string;
 }
 
+/** localStorage key that remembers the last email used to sign in on this device. */
+export const LAST_EMAIL_KEY = 'zyro_last_email';
+
+/** Remember the last email used on this device so the navbar can offer one-tap "Continue as". */
+export function rememberEmail(email: string | undefined | null) {
+  if (!email) return;
+  try {
+    localStorage.setItem(LAST_EMAIL_KEY, email.trim().toLowerCase());
+  } catch {
+    // ignore storage errors (private mode etc.)
+  }
+}
+
+/** Read the last email used on this device, if any. */
+export function getLastEmail(): string | null {
+  try {
+    return localStorage.getItem(LAST_EMAIL_KEY);
+  } catch {
+    return null;
+  }
+}
+
 /** Email + password sign up */
 export async function signUp({ email, password, fullName, role }: SignUpData) {
   return supabase.auth.signUp({
