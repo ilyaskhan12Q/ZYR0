@@ -1,6 +1,5 @@
 /* ============================================================
    Research Landing Page — scoped editorial design system
-   Imported ONLY by the ResearchLanding route chunk.
    Palette: #F5F5F2 bg, #FFF surface, #111 ink, #6F6F69 secondary,
    #DCDCD5 border, #657C68 accent, #455A49 dark accent.
    Instrument Serif (display) + Inter (UI).
@@ -23,23 +22,48 @@
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography scale */
+/* ── Typography scale ───────────────────────────────────────── */
+
 .rl-display {
   font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   line-height: 0.95;
   letter-spacing: -0.02em;
+  font-weight: 400;
 }
 
 .rl-eyebrow {
   font-family: 'Inter', sans-serif;
   font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--rl-muted);
 }
 
-/* Hairline dividers */
+/* Responsive type clamp */
+.rl-hero-text {
+  font-size: clamp(3rem, 8vw, 9.375rem);
+  font-weight: 400;
+}
+
+.rl-statement-text {
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  font-weight: 400;
+}
+
+.rl-heading-text {
+  font-size: clamp(2rem, 4vw, 4rem);
+  font-weight: 400;
+}
+
+.rl-subheading {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ── Hairline dividers ──────────────────────────────────────── */
+
 .rl-hairline {
   border-top: 1px solid var(--rl-border);
 }
@@ -48,7 +72,8 @@
   border-bottom: 1px solid var(--rl-border);
 }
 
-/* Buttons */
+/* ── Buttons ────────────────────────────────────────────────── */
+
 .rl-btn-primary {
   display: inline-flex;
   align-items: center;
@@ -59,12 +84,33 @@
   font-size: 0.875rem;
   font-weight: 500;
   border-radius: 9999px;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.rl-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .rl-btn-primary:hover {
   background-color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.rl-btn-primary:hover::after {
+  opacity: 1;
+}
+
+.rl-btn-primary:active {
+  transform: translateY(0);
 }
 
 .rl-btn-secondary {
@@ -78,23 +124,25 @@
   font-weight: 500;
   border: 1px solid var(--rl-border);
   border-radius: 9999px;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
 }
 
 .rl-btn-secondary:hover {
   background-color: var(--rl-surface);
   border-color: var(--rl-ink);
+  transform: translateY(-1px);
 }
 
-/* Verified chip */
+/* ── Verified chip ──────────────────────────────────────────── */
+
 .rl-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   border-radius: 9999px;
   background-color: #e8f0e9;
   color: var(--rl-accent-dark);
@@ -105,7 +153,8 @@
   font-size: 0.625rem;
 }
 
-/* Section container */
+/* ── Section container ──────────────────────────────────────── */
+
 .rl-section {
   padding: 5rem 1.5rem;
   max-width: 1200px;
@@ -118,7 +167,8 @@
   }
 }
 
-/* Nav */
+/* ── Nav ────────────────────────────────────────────────────── */
+
 .rl-nav {
   position: sticky;
   top: 0;
@@ -144,29 +194,38 @@
   }
 }
 
-/* Responsive type clamp */
-.rl-hero-text {
-  font-size: clamp(3rem, 8vw, 9.375rem);
+/* ── Glassmorphism card ─────────────────────────────────────── */
+
+.rl-glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-.rl-statement-text {
-  font-size: clamp(2.5rem, 6vw, 6rem);
+.rl-glass-dark {
+  background: rgba(17, 17, 17, 0.7);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--rl-bg);
 }
 
-.rl-heading-text {
-  font-size: clamp(2rem, 4vw, 4rem);
-}
+/* ── Scroll margin for anchor links ─────────────────────────── */
 
-.rl-subheading {
-  font-size: clamp(1.125rem, 2vw, 1.25rem);
-}
-
-/* Scroll margin for anchor links with sticky nav */
 [id] {
   scroll-margin-top: 80px;
 }
 
-/* Scrollbar styling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Scrollbar styling ──────────────────────────────────────── */
+
 .rl-root ::-webkit-scrollbar {
   width: 6px;
 }
@@ -180,10 +239,106 @@
   border-radius: 3px;
 }
 
-/* Reduced motion */
+/* ── Card hover effects ─────────────────────────────────────── */
+
+.rl-card-hover {
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rl-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border-color: var(--rl-accent);
+}
+
+/* ── Accent underline animation ─────────────────────────────── */
+
+.rl-underline-anim {
+  position: relative;
+  display: inline;
+}
+
+.rl-underline-anim::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--rl-accent);
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rl-underline-anim:hover::after {
+  width: 100%;
+}
+
+/* ── Typing cursor ──────────────────────────────────────────── */
+
+.rl-cursor::after {
+  content: '|';
+  display: inline-block;
+  animation: rl-blink 1s step-end infinite;
+  color: var(--rl-accent);
+  font-weight: 300;
+  margin-left: 2px;
+}
+
+@keyframes rl-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Pulse ring ─────────────────────────────────────────────── */
+
+.rl-pulse-ring {
+  position: relative;
+}
+
+.rl-pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 2px solid var(--rl-accent);
+  animation: rl-pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes rl-pulse-ring {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+/* ── Gradient text ──────────────────────────────────────────── */
+
+.rl-gradient-text {
+  background: linear-gradient(135deg, var(--rl-ink) 0%, var(--rl-accent-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Section divider line ───────────────────────────────────── */
+
+.rl-section-line {
+  width: 48px;
+  height: 2px;
+  background: var(--rl-accent);
+  margin: 0 auto 2rem;
+}
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+
 @media (prefers-reduced-motion: reduce) {
-  .rl-root * {
-    animation: none !important;
+  .rl-root *,
+  .rl-root *::before,
+  .rl-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }

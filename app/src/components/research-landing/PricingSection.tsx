@@ -1,4 +1,4 @@
-import { Reveal } from './Reveal';
+import { Reveal, StaggerContainer, StaggerItem } from './Reveal';
 import { PRICING_PLANS } from '@/data/researchLandingDemo';
 
 export function PricingSection() {
@@ -15,14 +15,14 @@ export function PricingSection() {
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" stagger={0.1}>
           {PRICING_PLANS.map((plan) => (
-            <Reveal key={plan.name}>
+            <StaggerItem key={plan.name} variant="fade-up">
               <div
-                className={`p-6 rounded-xl border h-full flex flex-col ${
+                className={`p-6 rounded-xl border h-full flex flex-col transition-all duration-300 ${
                   plan.highlighted
-                    ? 'border-[var(--rl-accent)] bg-[var(--rl-surface)] shadow-sm'
-                    : 'border-[var(--rl-border)] bg-[var(--rl-surface)]'
+                    ? 'border-[var(--rl-accent)] bg-[var(--rl-surface)] shadow-sm hover:shadow-lg hover:scale-[1.02]'
+                    : 'border-[var(--rl-border)] bg-[var(--rl-surface)] hover:border-[var(--rl-accent)] hover:shadow-sm'
                 }`}
               >
                 {plan.highlighted && (
@@ -49,9 +49,9 @@ export function PricingSection() {
                   {plan.cta}
                 </a>
               </div>
-            </Reveal>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

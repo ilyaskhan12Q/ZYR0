@@ -1,4 +1,4 @@
-import { Reveal } from './Reveal';
+import { Reveal, StaggerContainer, StaggerItem } from './Reveal';
 import { FEATURES } from '@/data/researchLandingDemo';
 
 export function FeaturesSection() {
@@ -12,21 +12,21 @@ export function FeaturesSection() {
           </h2>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map((feature, i) => (
-            <Reveal key={feature.title} delay={i * 0.08}>
-              <div className="p-6 rounded-xl border border-[var(--rl-border)] bg-[var(--rl-surface)] h-full">
-                <div className="w-10 h-10 rounded-full bg-[var(--rl-bg)] border border-[var(--rl-border)] flex items-center justify-center mb-4">
-                  <span className="text-[var(--rl-accent-dark)] text-lg font-bold">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" stagger={0.08}>
+          {FEATURES.map((feature) => (
+            <StaggerItem key={feature.title} variant="fade-up">
+              <div className="p-6 rounded-xl border border-[var(--rl-border)] bg-[var(--rl-surface)] h-full rl-card-hover group">
+                <div className="w-10 h-10 rounded-full bg-[var(--rl-bg)] border border-[var(--rl-border)] flex items-center justify-center mb-4 group-hover:bg-[var(--rl-accent)] group-hover:border-[var(--rl-accent)] transition-colors duration-300">
+                  <span className="text-[var(--rl-accent-dark)] text-lg font-bold group-hover:text-white transition-colors duration-300">
                     {feature.title[0]}
                   </span>
                 </div>
                 <h3 className="text-base font-semibold text-[var(--rl-ink)] mb-2">{feature.title}</h3>
                 <p className="text-sm text-[var(--rl-muted)] leading-relaxed">{feature.description}</p>
               </div>
-            </Reveal>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
