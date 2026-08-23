@@ -36,18 +36,18 @@
 
 .rl-eyebrow {
   font-family: 'Inter', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--rl-muted);
 }
 
 .rl-eyebrow-light {
   font-family: 'Inter', sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--rl-dark-muted);
 }
@@ -180,7 +180,7 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
   border-radius: 9999px;
   background-color: #e8f0e9;
@@ -192,28 +192,45 @@
   font-size: 0.625rem;
 }
 
-/* ── Section container ──────────────────────────────────────── */
+.rl-chip-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: rgba(101, 124, 104, 0.2);
+  color: #8fa692;
+}
+
+.rl-chip-dark::before {
+  content: '✓';
+  font-size: 0.625rem;
+}
+
+/* ── Section container — TIGHTER ────────────────────────────── */
 
 .rl-section {
-  padding: 5rem 1.5rem;
+  padding: 3rem 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .rl-section {
-    padding: 8rem 2rem;
+    padding: 5rem 2rem;
   }
 }
 
 .rl-section-full {
-  padding: 5rem 1.5rem;
+  padding: 3rem 1.5rem;
   width: 100%;
 }
 
 @media (min-width: 768px) {
   .rl-section-full {
-    padding: 8rem 2rem;
+    padding: 5rem 2rem;
   }
 }
 
@@ -385,6 +402,25 @@ html {
   height: 2px;
   background: var(--rl-accent);
   margin: 0 auto 2rem;
+}
+
+/* ── Image placeholder ──────────────────────────────────────── */
+
+.rl-image-placeholder {
+  background: linear-gradient(135deg, #e8e8e4 0%, #d4d4ce 100%);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.rl-image-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(101,124,104,0.08) 0%, rgba(69,90,73,0.04) 100%);
 }
 
 /* ── Reduced motion ─────────────────────────────────────────── */

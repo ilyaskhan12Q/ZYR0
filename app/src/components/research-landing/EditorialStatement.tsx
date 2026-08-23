@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     label: 'DEPTH',
-    text: 'ZYROO digs deeper. Academic papers, web sources, real-time data. Every citation verified. Every claim grounded.',
+    text: 'ZYROO digs deeper. Academic papers, web sources, real-time data. Every citation verified.',
   },
 ];
 
@@ -19,12 +19,12 @@ export function EditorialStatement() {
   return (
     <section className="rl-dark-section rl-section-full">
       <div className="rl-section">
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16" stagger={0.12}>
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12" stagger={0.08}>
           {STEPS.map((step) => (
             <StaggerItem key={step.label} variant="fade-up">
-              <div className="border-t border-[#333] pt-6">
-                <p className="rl-eyebrow-light text-[#657C68] mb-4">{step.label}</p>
-                <p className="text-[#cccccc] text-base leading-relaxed">{step.text}</p>
+              <div className="border-t border-[#333] pt-4">
+                <p className="rl-eyebrow-light text-[#657C68] mb-2">{step.label}</p>
+                <p className="text-[#cccccc] text-sm leading-relaxed">{step.text}</p>
               </div>
             </StaggerItem>
           ))}

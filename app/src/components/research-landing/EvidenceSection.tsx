@@ -15,43 +15,41 @@ const CLAIMS = [
       { id: 4, name: 'Semantic Scholar: 847 citations', type: 'Database' },
     ],
   },
+  {
+    claim: 'First-generation students report 40% lower confidence in AI tool usage.',
+    sources: [
+      { id: 5, name: 'Garcia & Lee (2024)', type: 'arXiv' },
+    ],
+  },
 ];
 
 export function EvidenceSection() {
   return (
-    <section className="rl-section-full" style={{ backgroundColor: 'var(--rl-bg)' }}>
+    <section id="evidence" className="rl-section-full" style={{ backgroundColor: 'var(--rl-bg)' }}>
       <div className="rl-section">
-        <div className="max-w-3xl mb-12">
-          <Reveal variant="fade-up">
-            <p className="rl-eyebrow mb-4">Evidence</p>
-          </Reveal>
-          <Reveal variant="fade-up" delay={0.05}>
-            <h2 className="rl-display rl-heading-text text-[var(--rl-ink)] mb-4">
-              EVERY CLAIM HAS A TRAIL.
-            </h2>
-          </Reveal>
-          <Reveal variant="fade-up" delay={0.1}>
-            <p className="text-[var(--rl-muted)] text-lg leading-relaxed max-w-xl">
-              Each finding in a ZYROO report is backed by numbered citations.
-              Click any claim to see exactly where it came from.
-            </p>
-          </Reveal>
-        </div>
+        <Reveal variant="fade-up">
+          <p className="rl-eyebrow mb-3">Evidence</p>
+        </Reveal>
+        <Reveal variant="fade-up" delay={0.05}>
+          <h2 className="rl-display rl-heading-text text-[var(--rl-ink)] mb-8">
+            EVERY CLAIM<br />HAS A TRAIL.
+          </h2>
+        </Reveal>
 
-        <StaggerContainer className="space-y-6" stagger={0.1}>
+        <StaggerContainer className="space-y-3" stagger={0.06}>
           {CLAIMS.map((item, idx) => (
             <StaggerItem key={idx} variant="fade-up">
-              <div className="border border-[var(--rl-border)] rounded-lg p-6 bg-[var(--rl-surface)] rl-card-hover">
-                <p className="text-[var(--rl-ink)] text-base font-medium leading-relaxed mb-4">
-                  <span className="text-[var(--rl-accent)] font-semibold mr-2">[{idx + 1}]</span>
-                  {item.claim}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {item.sources.map((src) => (
-                    <span key={src.id} className="rl-chip">
-                      {src.name}
-                    </span>
-                  ))}
+              <div className="border border-[var(--rl-border)] rounded-lg bg-[var(--rl-surface)] overflow-hidden rl-card-hover">
+                <div className="flex items-start gap-3 p-4">
+                  <span className="rl-display text-lg text-[var(--rl-accent)] shrink-0 mt-0.5">[{idx + 1}]</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[var(--rl-ink)] leading-snug mb-2">{item.claim}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {item.sources.map((src) => (
+                        <span key={src.id} className="rl-chip">{src.name}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </StaggerItem>
