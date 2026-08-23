@@ -1,22 +1,55 @@
 import { Reveal, StaggerContainer, StaggerItem } from './Reveal';
-import { PRICING_PLANS } from '@/data/researchLandingDemo';
+
+const PLANS = [
+  {
+    name: 'Free',
+    price: '$0',
+    period: '',
+    description: 'Explore the research agent with basic capabilities.',
+    features: ['Quick research mode', 'Basic source verification', '5 research sessions/day', 'Standard report format'],
+    cta: 'Get started',
+    highlighted: false,
+  },
+  {
+    name: 'Pro',
+    price: '$X',
+    period: '/mo',
+    description: 'Full research capabilities for serious work.',
+    features: ['All research depths', 'Full source verification', 'Unlimited sessions', 'Export reports (Markdown)', 'Research history'],
+    cta: 'Start free trial',
+    highlighted: true,
+  },
+  {
+    name: 'Advanced',
+    price: '$X',
+    period: '/mo',
+    description: 'For teams and institutions.',
+    features: ['Everything in Pro', 'Custom source domains', 'API access', 'Priority processing', 'Team collaboration', 'Dedicated support'],
+    cta: 'Contact sales',
+    highlighted: false,
+  },
+];
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="rl-section">
-      <div className="max-w-5xl mx-auto">
-        <Reveal className="text-center mb-16">
-          <span className="rl-eyebrow mb-4 inline-block">Pricing</span>
-          <h2 className="rl-display rl-heading-text text-[var(--rl-ink)]">
+    <section id="pricing-plans" className="rl-section-full" style={{ backgroundColor: 'var(--rl-bg)' }}>
+      <div className="rl-section">
+        <Reveal variant="fade-up">
+          <p className="rl-eyebrow mb-4">Pricing</p>
+        </Reveal>
+        <Reveal variant="fade-up" delay={0.05}>
+          <h2 className="rl-display rl-heading-text text-[var(--rl-ink)] mb-4">
             RESEARCH AT YOUR PACE.
           </h2>
-          <p className="rl-subheading text-[var(--rl-muted)] max-w-lg mt-4">
+        </Reveal>
+        <Reveal variant="fade-up" delay={0.1}>
+          <p className="rl-subheading text-[var(--rl-muted)] max-w-lg mb-12">
             Start for free. Upgrade when you need more depth, more sources, or more sessions.
           </p>
         </Reveal>
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" stagger={0.1}>
-          {PRICING_PLANS.map((plan) => (
+          {PLANS.map((plan) => (
             <StaggerItem key={plan.name} variant="fade-up">
               <div
                 className={`p-6 rounded-xl border h-full flex flex-col transition-all duration-300 ${
@@ -35,10 +68,10 @@ export function PricingSection() {
                 </div>
                 <p className="text-sm text-[var(--rl-muted)] mb-6">{plan.description}</p>
                 <ul className="flex flex-col gap-2 mb-6 flex-1">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-[var(--rl-ink)]">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-[var(--rl-ink)]">
                       <span className="text-[var(--rl-accent)] shrink-0">✓</span>
-                      {feature}
+                      {f}
                     </li>
                   ))}
                 </ul>
