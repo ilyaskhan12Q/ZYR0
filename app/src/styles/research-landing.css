@@ -238,23 +238,32 @@
 
 .rl-nav {
   position: sticky;
-  top: 0.75rem;
+  top: 0;
   z-index: 40;
+  width: 100%;
   height: 64px;
   display: flex;
   align-items: center;
   padding: 0 1.5rem;
-  margin: 0 1.5rem;
   background-color: transparent;
   border-bottom: 1px solid transparent;
   border-radius: 0;
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .rl-nav.scrolled {
   height: 48px;
-  margin: 0 auto;
   max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.25rem;
   background-color: rgba(245, 245, 242, 0.92);
   backdrop-filter: blur(16px) saturate(1.4);
   -webkit-backdrop-filter: blur(16px) saturate(1.4);
@@ -268,11 +277,10 @@
 @media (min-width: 768px) {
   .rl-nav {
     padding: 0 2rem;
-    margin: 0 2rem;
   }
 
   .rl-nav.scrolled {
-    margin: 0 auto;
+    padding: 0 1.5rem;
   }
 }
 
