@@ -1,41 +1,57 @@
-import { Reveal, StaggerContainer, StaggerItem } from './Reveal';
+import { Reveal } from './Reveal';
 
-const models = [
-  { name: 'Quick', description: 'Fast results for simple questions', tag: '' },
-  { name: 'Standard', description: 'Balanced depth and speed', tag: 'Recommended' },
-  { name: 'Deep', description: 'Thorough research for complex topics', tag: '' },
+const DEPTHS = [
+  {
+    name: 'Quick',
+    description: 'Fast surface scan. Best for simple factual questions.',
+    sources: '~10 sources',
+    time: '~2 min',
+  },
+  {
+    name: 'Standard',
+    description: 'Balanced depth. Best for most research questions.',
+    sources: '~20 sources',
+    time: '~5 min',
+  },
+  {
+    name: 'Deep',
+    description: 'Full-depth analysis. Best for complex, multi-faceted topics.',
+    sources: '~50+ sources',
+    time: '~10 min',
+  },
 ];
 
 export function ModelsSection() {
   return (
-    <section className="rl-section" style={{ backgroundColor: 'var(--rl-surface)' }}>
-      <div className="max-w-4xl mx-auto">
-        <Reveal className="text-center mb-12">
-          <span className="rl-eyebrow mb-4 inline-block">Research depth</span>
-          <h2 className="rl-display rl-heading-text text-[var(--rl-ink)]">
-            THE RIGHT DEPTH FOR THE RIGHT QUESTION.
+    <section id="depth" className="rl-section-full" style={{ backgroundColor: 'var(--rl-bg)' }}>
+      <div className="rl-section">
+        <Reveal variant="fade-up">
+          <p className="rl-eyebrow mb-4">Research depth</p>
+        </Reveal>
+        <Reveal variant="fade-up" delay={0.05}>
+          <h2 className="rl-display rl-heading-text text-[var(--rl-ink)] mb-12">
+            CHOOSE HOW DEEP TO GO.
           </h2>
         </Reveal>
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" stagger={0.1}>
-          {models.map((model) => (
-            <StaggerItem key={model.name} variant="fade-up">
-              <div
-                className={`p-6 rounded-xl border text-center transition-all duration-300 group ${
-                  model.tag
-                    ? 'border-[var(--rl-accent)] bg-[var(--rl-bg)] shadow-sm hover:shadow-md hover:scale-[1.02]'
-                    : 'border-[var(--rl-border)] bg-[var(--rl-surface)] hover:border-[var(--rl-accent)] hover:shadow-sm'
-                }`}
-              >
-                {model.tag && <span className="rl-chip mb-3 inline-block">{model.tag}</span>}
-                <h3 className="text-lg font-semibold text-[var(--rl-ink)] mb-2 group-hover:text-[var(--rl-accent-dark)] transition-colors">
-                  {model.name}
-                </h3>
-                <p className="text-sm text-[var(--rl-muted)]">{model.description}</p>
+        <div className="rl-scroll-carousel">
+          {DEPTHS.map((depth) => (
+            <Reveal key={depth.name} variant="fade-up" className="min-w-[280px] md:min-w-0">
+              <div className="border border-[var(--rl-border)] rounded-xl p-6 bg-[var(--rl-surface)] rl-card-hover h-full">
+                <h3 className="text-xl font-semibold text-[var(--rl-ink)] mb-2">{depth.name}</h3>
+                <p className="text-sm text-[var(--rl-muted)] leading-relaxed mb-6">{depth.description}</p>
+                <div className="flex items-center gap-4 text-xs text-[var(--rl-muted)]">
+                  <span className="flex items-center gap-1">
+                    <span className="text-[var(--rl-accent)]">◆</span> {depth.sources}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-[var(--rl-accent)]">○</span> {depth.time}
+                  </span>
+                </div>
               </div>
-            </StaggerItem>
+            </Reveal>
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );
