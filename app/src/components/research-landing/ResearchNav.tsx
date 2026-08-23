@@ -4,6 +4,7 @@ import { Reveal } from './Reveal';
 const NAV_LINKS = [
   { label: 'Research', href: '#research' },
   { label: 'How it works', href: '#how-it-works' },
+  { label: 'Sources', href: '#sources' },
   { label: 'Pricing', href: '#pricing' },
 ];
 

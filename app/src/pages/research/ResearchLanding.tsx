@@ -2,7 +2,6 @@ import { SEO } from '@/components/SEO';
 import { ResearchNav } from '@/components/research-landing/ResearchNav';
 import { HeroSection } from '@/components/research-landing/HeroSection';
 import { EditorialStatement } from '@/components/research-landing/EditorialStatement';
-import { QuestionExploration } from '@/components/research-landing/QuestionExploration';
 import { ResearchEngine } from '@/components/research-landing/ResearchEngine';
 import { LiveResearchSection } from '@/components/research-landing/LiveResearchSection';
 import { SourceUniverse } from '@/components/research-landing/SourceUniverse';
@@ -10,7 +9,6 @@ import { EvidenceSection } from '@/components/research-landing/EvidenceSection';
 import { ReportSection } from '@/components/research-landing/ReportSection';
 import { FeaturesSection } from '@/components/research-landing/FeaturesSection';
 import { AudienceSection } from '@/components/research-landing/AudienceSection';
-import { LibrarySection } from '@/components/research-landing/LibrarySection';
 import { ModelsSection } from '@/components/research-landing/ModelsSection';
 import { PricingSection } from '@/components/research-landing/PricingSection';
 import { FinalCta } from '@/components/research-landing/FinalCta';
@@ -29,7 +27,6 @@ export default function ResearchLanding() {
       <main>
         <HeroSection />
         <EditorialStatement />
-        <QuestionExploration />
         <ResearchEngine />
         <LiveResearchSection />
         <SourceUniverse />
@@ -37,7 +34,6 @@ export default function ResearchLanding() {
         <ReportSection />
         <FeaturesSection />
         <AudienceSection />
-        <LibrarySection />
         <ModelsSection />
         <PricingSection />
         <FinalCta />
