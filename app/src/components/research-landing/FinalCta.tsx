@@ -1,53 +1,46 @@
-import { motion, useReducedMotion } from 'framer-motion';
 import { Reveal } from './Reveal';
 
 export function FinalCta() {
-  const prefersReduced = useReducedMotion();
-
   return (
-    <section className="rl-section relative overflow-hidden" style={{ backgroundColor: 'var(--rl-surface)' }}>
-      {/* Decorative backdrop */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[var(--rl-accent)] opacity-[0.03]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-[var(--rl-accent)] opacity-[0.05]" />
-      </div>
+    <section id="pricing" className="rl-dark-section rl-section-full">
+      <div className="rl-section">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+          {/* Left: CTA */}
+          <Reveal variant="fade-left">
+            <div className="flex flex-col justify-center">
+              <p className="rl-eyebrow-light text-[#657C68] mb-4">Get started</p>
+              <h2 className="rl-display rl-heading-text text-white mb-4">
+                WHAT WILL YOU<br />RESEARCH NEXT?
+              </h2>
+              <p className="text-[#999] text-base leading-relaxed mb-8 max-w-md">
+                Search deeper. Verify faster. Understand more.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a href="/research-agent" className="rl-btn-primary-dark">
+                  Start researching <span aria-hidden="true">&rarr;</span>
+                </a>
+                <a href="#pricing-plans" className="inline-flex items-center gap-2 px-6 py-3.5 text-[0.9375rem] font-medium text-[#999] hover:text-white transition-colors">
+                  View pricing
+                </a>
+              </div>
+            </div>
+          </Reveal>
 
-      <div className="max-w-3xl mx-auto text-center relative z-10">
-        <Reveal variant="scale">
-          <h2 className="rl-display rl-statement-text text-[var(--rl-ink)] mb-4">
-            WHAT WILL YOU<br />RESEARCH NEXT?
-          </h2>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="rl-subheading text-[var(--rl-muted)] mb-8">
-            Search deeper. Verify faster. Understand more.
-          </p>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/research-agent" className="rl-btn-primary text-base">
-              Start researching <span aria-hidden="true">&rarr;</span>
-            </a>
-            <a href="#pricing" className="rl-btn-secondary text-base">
-              View pricing
-            </a>
-          </div>
-        </Reveal>
-
-        {/* Animated concentric rings */}
-        <Reveal delay={0.4} className="mt-16 flex justify-center">
-          <div className="relative w-32 h-32">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                animate={prefersReduced ? {} : { scale: [1, 1.1, 1], opacity: [0.15, 0.05, 0.15] }}
-                transition={{ duration: 3, delay: i * 0.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute inset-0 rounded-full border border-[var(--rl-border)]"
-                style={{ transform: `scale(${1 + i * 0.4})` }}
-              />
-            ))}
-          </div>
-        </Reveal>
+          {/* Right: About */}
+          <Reveal variant="fade-right" delay={0.1}>
+            <div className="border border-[#333] rounded-xl p-8">
+              <p className="rl-eyebrow-light text-[#657C68] mb-4">About ZYROO</p>
+              <h3 className="text-xl font-semibold text-white mb-3">Research without the guesswork.</h3>
+              <p className="text-[#999] text-sm leading-relaxed mb-6">
+                ZYROO is a research agent that explores academic and web sources, verifies every citation,
+                and delivers structured reports — so you can focus on understanding, not searching.
+              </p>
+              <a href="/about" className="inline-block text-sm font-medium text-[#657C68] hover:text-[#8fa692] transition-colors rl-underline-anim">
+                Learn more about ZYROO →
+              </a>
+            </div>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
