@@ -16,14 +16,14 @@ export function ReportSection() {
   return (
     <section id="report" className="rl-dark-section rl-section-full">
       <div className="rl-section">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-          {/* Left: copy (2 cols) */}
-          <Reveal variant="fade-left" className="lg:col-span-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          {/* Left: copy */}
+          <Reveal variant="fade-left">
             <p className="rl-eyebrow-light text-[#657C68] mb-3">Report</p>
-            <h2 className="rl-display rl-heading-text text-white mb-3">
+            <h2 className="rl-display text-[clamp(2rem,3.5vw,3rem)] text-white mb-3 leading-[0.95]">
               FROM RESEARCH<br />TO UNDERSTANDING.
             </h2>
-            <p className="text-[#999] text-sm leading-relaxed mb-6">
+            <p className="text-[#999] text-sm leading-relaxed mb-6 max-w-sm">
               Every report includes executive summary, key findings, and a numbered citation ledger.
               Ready for academic or professional use.
             </p>
@@ -32,8 +32,8 @@ export function ReportSection() {
             </a>
           </Reveal>
 
-          {/* Right: report mockup (3 cols) */}
-          <Reveal variant="fade-right" delay={0.1} className="lg:col-span-3">
+          {/* Right: report mockup */}
+          <Reveal variant="fade-right" delay={0.1}>
             <div className="rounded-xl border border-[#333] bg-[#1a1a1a] overflow-hidden">
               {/* Header */}
               <div className="px-5 py-4 border-b border-[#333] flex items-center justify-between">
