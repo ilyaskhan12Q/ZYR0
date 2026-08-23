@@ -64,7 +64,11 @@ export function useResearchPipeline() {
   const [errors, setErrors] = useState<string[]>([]);
   const [history, setHistory] = useState<ResearchHistoryItem[]>([]);
   const [review, setReview] = useState<ReviewPlan | null>(null);
-  const [skipReview, setSkipReview] = useState<boolean>(() => localStorage.getItem(SKIP_REVIEW_KEY) === '1');
+  const [skipReview, setSkipReview] = useState<boolean>(() => {
+    const stored = localStorage.getItem(SKIP_REVIEW_KEY);
+    // Default to true (auto-approve) unless user explicitly set it to '0'.
+    return stored === null || stored === '1';
+  });
   const [running, setRunning] = useState(false);
   const [workerProgress, setWorkerProgress] = useState<WorkerProgress>({ active: [], counts: {} });
   const abortRef = useRef<AbortController | null>(null);
@@ -188,7 +192,12 @@ export function useResearchPipeline() {
           message: 'Writing the report',
           detail: `${verifiedOnly(finalLedger).length} verified sources · ${finalLedger.length - verifiedOnly(finalLedger).length} pending verification`,
         });
-        const editorial = await synthesizeReport(topic, approved, verifiedOnly(finalLedger), () => undefined);
+        let streamedMarkdown = '';
+        const editorial = await synthesizeReport(topic, approved, verifiedOnly(finalLedger), (delta) => {
+          streamedMarkdown += delta;
+          // Stream partial markdown to the report state for live preview.
+          setReport((prev) => prev ? { ...prev, markdown: streamedMarkdown } : null);
+        });
         if (controller.signal.aborted) return;
 
         const research: ResearchReport = {

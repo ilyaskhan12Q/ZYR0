@@ -9,6 +9,7 @@ import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
 import type { ResearchDepth, ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { classifyLocally } from '@/lib/zeroai/intent';
 import supabase from '@/lib/supabase';
 import '@/styles/agent.css';
 
@@ -109,6 +110,13 @@ export default function ResearchAgentPage() {
 
   const handleSend = (text: string) => {
     if (mode === 'research') {
+      // Smart routing: greetings and casual messages go to chat, not research.
+      const decision = classifyLocally(text);
+      if (decision.mode === 'chat') {
+        send(text, chatSystem);
+        setMode('chat');
+        return;
+      }
       handleResearchSend(text);
     } else {
       send(text, chatSystem);

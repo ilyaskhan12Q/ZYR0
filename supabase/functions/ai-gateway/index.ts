@@ -31,6 +31,7 @@ interface RegistryEntry {
   output: number;
   inputPricePer1M: number; // dollars; 0 for free tier
   outputPricePer1M: number;
+  reasoningEffort?: 'low' | 'medium' | 'high' | 'none'; // Gemini 2.5+ thinking control
 }
 
 const REGISTRY: RegistryEntry[] = [
@@ -70,6 +71,62 @@ const REGISTRY: RegistryEntry[] = [
     inputPricePer1M: 0,
     outputPricePer1M: 0,
   },
+  // Gemini BYOK — user-provided API key (GEMINI_API_KEY).
+  {
+    id: 'google/gemini-3.5-flash-lite',
+    name: 'Gemini 3.5 Flash Lite',
+    provider: 'google',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: null,
+    envKey: 'GEMINI_API_KEY',
+    tier: 'byok',
+    context: 1048576,
+    output: 65536,
+    inputPricePer1M: 0.075,
+    outputPricePer1M: 0.30,
+    reasoningEffort: 'none',
+  },
+  {
+    id: 'google/gemini-2.5-flash',
+    name: 'Gemini 2.5 Flash',
+    provider: 'google',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: null,
+    envKey: 'GEMINI_API_KEY',
+    tier: 'byok',
+    context: 1048576,
+    output: 65536,
+    inputPricePer1M: 0.15,
+    outputPricePer1M: 0.60,
+    reasoningEffort: 'none',
+  },
+  {
+    id: 'google/gemini-3.5-flash',
+    name: 'Gemini 3.5 Flash',
+    provider: 'google',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: null,
+    envKey: 'GEMINI_API_KEY',
+    tier: 'byok',
+    context: 1048576,
+    output: 65536,
+    inputPricePer1M: 0.15,
+    outputPricePer1M: 0.60,
+  },
+  {
+    id: 'google/gemini-3.1-flash-lite',
+    name: 'Gemini 3.1 Flash Lite',
+    provider: 'google',
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+    apiKey: null,
+    envKey: 'GEMINI_API_KEY',
+    tier: 'byok',
+    context: 1048576,
+    output: 65536,
+    inputPricePer1M: 0.075,
+    outputPricePer1M: 0.30,
+    reasoningEffort: 'none',
+  },
   // BYOK entries — dormant until the env secret is configured (Phase 3).
   {
     id: 'openai/gpt-5.4-mini',
@@ -99,10 +156,16 @@ const REGISTRY: RegistryEntry[] = [
   },
 ];
 
-// Default fallback chain: free models first, then any keyed BYOK providers.
+// Default fallback chain: Gemini first (fastest), then free Zen models, then other BYOK.
 const FALLBACK_ORDER = REGISTRY.map((e) => e.id).filter((id) => {
   const e = REGISTRY.find((r) => r.id === id)!;
   return e.tier === 'free' || (e.envKey && Deno.env.get(e.envKey));
+}).sort((a, b) => {
+  const ea = REGISTRY.find((r) => r.id === a)!;
+  const eb = REGISTRY.find((r) => r.id === b)!;
+  // Gemini first, then free, then other BYOK
+  const tierOrder = (t: string) => t === 'google' ? 0 : ea.tier === 'free' ? 1 : 2;
+  return tierOrder(ea.provider) - tierOrder(eb.provider);
 });
 
 const PER_USER_RPM_LIMIT = 20; // requests per minute, DB-backed
@@ -679,6 +742,8 @@ function buildUpstreamBody(req: ChatRequest, entry: RegistryEntry, withUsage: bo
     max_tokens: maxTokens,
     stream: Boolean(req.stream),
   };
+  // Inject reasoning_effort for Gemini 2.5+ models to disable thinking blocks.
+  if (entry.reasoningEffort) body.reasoning_effort = entry.reasoningEffort;
   if (req.stream && withUsage) body.stream_options = { include_usage: true };
   return body;
 }

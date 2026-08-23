@@ -239,3 +239,75 @@ export async function streamChat(
 
   return { ok: true, text };
 }
+
+export interface ChatOnceOptions {
+  system?: string;
+  model?: string;
+  maxTokens?: number;
+  signal?: AbortSignal;
+}
+
+/**
+ * Non-streaming chat completion through the ai-gateway edge function.
+ * Returns the full text response at once — faster for structured output
+ * (planner, editorial) where streaming adds overhead.
+ */
+export async function chatOnce(
+  messages: { role: 'user' | 'assistant'; content: string }[],
+  options: ChatOnceOptions = {},
+): Promise<AgentChatResponse> {
+  const token = await accessToken();
+  const payload = JSON.stringify({
+    action: 'chat',
+    stream: false,
+    model: options.model,
+    system: options.system,
+    maxTokens: options.maxTokens,
+    messages,
+  });
+  let res = await fetch(`${GATEWAY_URL}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: payload,
+    signal: options.signal,
+  });
+
+  if (res.status === 401) {
+    await supabase.auth.refreshSession();
+    const { data } = await supabase.auth.getSession();
+    const freshToken = data.session?.access_token;
+    if (freshToken) {
+      res = await fetch(`${GATEWAY_URL}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${freshToken}`,
+        },
+        body: payload,
+        signal: options.signal,
+      });
+    }
+  }
+
+  if (!res.ok) {
+    let detail = `Gateway error (HTTP ${res.status})`;
+    try {
+      const json = await res.json();
+      if (json.error) detail = String(json.error);
+    } catch {
+      // non-JSON error body — keep default
+    }
+    return { ok: false, error: detail };
+  }
+
+  const json = await res.json().catch(() => null);
+  if (!json) return { ok: false, error: 'Empty response' };
+
+  const text = String(json.text ?? json.choices?.[0]?.message?.content ?? '');
+  if (!text) return { ok: false, error: 'No content in response' };
+
+  return { ok: true, text };
+}

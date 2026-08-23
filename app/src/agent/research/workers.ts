@@ -66,8 +66,24 @@ async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T | null> {
 }
 
 function contractQueries(contract: SubTaskContract): string[] {
-  const queries = [contract.subTopicTitle, ...contract.keywords.slice(0, 2)];
-  return queries.filter((q) => q && q.trim().length > 3).slice(0, 3);
+  // Generate search-optimized queries from the contract.
+  // Priority: subTopicTitle (already a domain label) > keywords joined as phrase.
+  const queries: string[] = [];
+
+  // Query 1: subTopicTitle (the planner already made this searchable)
+  if (contract.subTopicTitle && contract.subTopicTitle.trim().length > 5) {
+    queries.push(contract.subTopicTitle.trim());
+  }
+
+  // Query 2: top keywords joined as a search phrase
+  const keywords = contract.keywords
+    .filter((k) => k.length > 3 && k !== contract.subTopicTitle)
+    .slice(0, 3);
+  if (keywords.length >= 2) {
+    queries.push(keywords.join(' '));
+  }
+
+  return queries.filter((q) => q && q.trim().length > 5).slice(0, 2);
 }
 
 function dedupeByUrl(items: EvidenceItem[]): EvidenceItem[] {
