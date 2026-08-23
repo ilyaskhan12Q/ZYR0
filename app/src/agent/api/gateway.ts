@@ -41,7 +41,8 @@ async function accessToken(): Promise<string> {
   let current = session;
 
   const expiring = (s: typeof session): boolean => {
-    if (!s?.expires_at) return !s;
+    if (!s) return true;
+    if (!s.expires_at) return true;
     return s.expires_at - 60 < Date.now() / 1000;
   };
   if (expiring(current)) {

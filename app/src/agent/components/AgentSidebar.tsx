@@ -1,20 +1,12 @@
 import { useState } from 'react';
 import { History, Plus, Settings, ChevronLeft, Search, MessageSquare, FileText } from 'lucide-react';
 
-interface HistoryItem {
+export interface SidebarHistoryItem {
   id: string;
   title: string;
   mode: 'chat' | 'research';
   time: string;
 }
-
-const DEMO_HISTORY: HistoryItem[] = [
-  { id: '1', title: 'AI impact on university education', mode: 'research', time: '2 hours ago' },
-  { id: '2', title: 'Climate policy frameworks 2024', mode: 'research', time: 'Yesterday' },
-  { id: '3', title: 'Transformer architectures for NLP', mode: 'chat', time: 'Yesterday' },
-  { id: '4', title: 'Quantum computing basics', mode: 'chat', time: '3 days ago' },
-  { id: '5', title: 'Renewable energy storage solutions', mode: 'research', time: '3 days ago' },
-];
 
 export function AgentSidebar({
   open,
@@ -22,16 +14,20 @@ export function AgentSidebar({
   onNewSession,
   onSelectHistory,
   activeId,
+  historyItems,
+  historyLoading,
 }: {
   open: boolean;
   onToggle: () => void;
   onNewSession: () => void;
-  onSelectHistory?: (id: string) => void;
+  onSelectHistory?: (id: string, mode: string) => void;
   activeId?: string;
+  historyItems?: SidebarHistoryItem[];
+  historyLoading?: boolean;
 }) {
   const [search, setSearch] = useState('');
 
-  const filtered = DEMO_HISTORY.filter((item) =>
+  const filtered = (historyItems ?? []).filter((item) =>
     item.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -130,7 +126,11 @@ export function AgentSidebar({
               <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f]">
                 Recent
               </div>
-              {filtered.length === 0 ? (
+              {historyLoading ? (
+                <div className="px-4 py-8 text-center">
+                  <p className="text-xs text-[#5a5a5f]">Loading...</p>
+                </div>
+              ) : filtered.length === 0 ? (
                 <div className="px-4 py-8 text-center">
                   <p className="text-xs text-[#5a5a5f]">No history yet</p>
                 </div>
@@ -139,7 +139,7 @@ export function AgentSidebar({
                   {filtered.map((item) => (
                     <button
                       key={item.id}
-                      onClick={() => onSelectHistory?.(item.id)}
+                      onClick={() => onSelectHistory?.(item.id, item.mode)}
                       className={`w-full flex items-start gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors duration-150 ${
                         activeId === item.id
                           ? 'bg-white/10 text-white'

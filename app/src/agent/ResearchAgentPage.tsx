@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AgentHero } from '@/agent/components/AgentHero';
 import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
 import { ThreadInput } from '@/agent/components/ThreadInput';
-import { AgentSidebar } from '@/agent/components/AgentSidebar';
+import { AgentSidebar, type SidebarHistoryItem } from '@/agent/components/AgentSidebar';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
 import { renderReportMarkdown } from '@/agent/render/renderReportMarkdown';
+import { generateReportPdf } from '@/agent/lib/reportPdf';
 import type { ResearchDepth, ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { classifyLocally } from '@/lib/zeroai/intent';
@@ -42,6 +43,18 @@ interface HistoryItem {
   created_at: string;
 }
 
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return 'Yesterday';
+  return `${days}d ago`;
+}
+
 export default function ResearchAgentPage() {
   const { user } = useAuth();
   const { models, selected, setSelected, loading } = useAgentModels();
@@ -50,10 +63,10 @@ export default function ResearchAgentPage() {
   const [depth, setDepth] = useState<ResearchDepth>('standard');
   const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
   const [mode, setMode] = useState<'chat' | 'research'>('chat');
-  const [historyOpen, setHistoryOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [restoring, setRestoring] = useState(false);
 
   const runActive =
     pipeline.stage !== 'idle' || pipeline.review !== null || pipeline.report !== null;
@@ -71,8 +84,8 @@ export default function ResearchAgentPage() {
   }, []);
 
   useEffect(() => {
-    if (historyOpen) void fetchHistory();
-  }, [historyOpen, fetchHistory]);
+    void fetchHistory();
+  }, [fetchHistory]);
 
   const handleFollowUp = (report: ResearchReport) => {
     setChatSystem(buildFollowUpPrompt(report));
@@ -94,17 +107,20 @@ export default function ResearchAgentPage() {
     pipeline.clear();
     setChatSystem(SYSTEM_PROMPT);
     setMode('chat');
-    setHistoryOpen(false);
   };
 
   const handleSelectHistory = async (id: string, itemMode: string) => {
-    setHistoryOpen(false);
-    if (itemMode === 'research') {
-      setMode('research');
-      void pipeline.loadReport(id);
-    } else {
-      setMode('chat');
-      await loadSession(id);
+    setRestoring(true);
+    try {
+      if (itemMode === 'research') {
+        setMode('research');
+        await pipeline.loadReport(id);
+      } else {
+        setMode('chat');
+        await loadSession(id);
+      }
+    } finally {
+      setRestoring(false);
     }
   };
 
@@ -130,78 +146,16 @@ export default function ResearchAgentPage() {
         open={sidebarOpen}
         onToggle={() => setSidebarOpen((v) => !v)}
         onNewSession={handleNewSession}
-        activeId={sessionId ?? undefined}
+        onSelectHistory={handleSelectHistory}
+        activeId={sessionId ?? pipeline.report?.topic ?? undefined}
+        historyItems={history.map((h) => ({
+          id: h.id,
+          title: h.prompt,
+          mode: h.mode as 'chat' | 'research',
+          time: timeAgo(h.created_at),
+        }))}
+        historyLoading={historyLoading}
       />
-
-      {/* History panel (overlay) */}
-      <AnimatePresence>
-      {historyOpen && (
-        <>
-          <motion.div
-            className="agent-history-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setHistoryOpen(false)}
-          />
-          <motion.div
-            className="agent-history-panel"
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          >
-            <div className="flex items-center justify-between p-4 border-b border-white/5">
-              <h2 className="text-sm font-medium text-white">Research History</h2>
-              <button
-                onClick={() => setHistoryOpen(false)}
-                className="text-[#6a6a6f] hover:text-white transition-colors text-xs"
-              >
-                Close
-              </button>
-            </div>
-            <div className="p-2">
-              <button
-                onClick={handleNewSession}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-emerald-400 hover:bg-white/5 transition-colors mb-2"
-              >
-                + New Session
-              </button>
-              {historyLoading ? (
-                <div className="flex justify-center py-8">
-                  <div className="text-[#5a5a5f] text-xs">Loading...</div>
-                </div>
-              ) : history.length === 0 ? (
-                <div className="flex justify-center py-8">
-                  <div className="text-[#5a5a5f] text-xs">No history yet</div>
-                </div>
-              ) : (
-                history.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => handleSelectHistory(item.id, item.mode)}
-                    className="w-full flex flex-col gap-1 px-3 py-2.5 rounded-lg text-left hover:bg-white/5 transition-colors"
-                  >
-                    <span className="text-sm text-white truncate">{item.prompt}</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                        item.mode === 'research' ? 'bg-blue-500/20 text-blue-300' : 'bg-white/10 text-[#8a8a8f]'
-                      }`}>
-                        {item.mode}
-                      </span>
-                      <span className="text-[10px] text-[#5a5a5f]">
-                        {new Date(item.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          </motion.div>
-        </>
-      )}
-      </AnimatePresence>
 
       {/* Error banner */}
       {error && (
@@ -233,7 +187,7 @@ export default function ResearchAgentPage() {
           running={pipeline.running || streaming}
           depth={depth}
           onDepthChange={setDepth}
-          onOpenHistory={() => setHistoryOpen(true)}
+          onOpenHistory={() => setSidebarOpen(true)}
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
         />
         </motion.div>
@@ -267,17 +221,6 @@ export default function ResearchAgentPage() {
                   </svg>
                   <span className="hidden sm:inline">New</span>
                 </button>
-                <button
-                  onClick={() => setHistoryOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-[#8a8a8f] hover:text-white hover:bg-white/5 border border-white/5 transition-all duration-200 active:scale-95"
-                >
-                  <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                    <path d="M3 3v5h5" />
-                    <path d="M12 7v5l4 2" />
-                  </svg>
-                  <span className="hidden sm:inline">History</span>
-                </button>
               </div>
               <div className="flex items-center gap-2">
                 <div className={`size-1.5 rounded-full ${pipeline.running || streaming ? 'bg-emerald-400 animate-pulse' : 'bg-[#5a5a5f]'}`} />
@@ -291,8 +234,18 @@ export default function ResearchAgentPage() {
           {/* Thread area */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="mx-auto max-w-3xl px-4 py-6 flex flex-col gap-4">
+              {/* Restoring indicator */}
+              {restoring && (
+                <div className="flex justify-center py-8">
+                  <div className="flex items-center gap-2 text-[#5a5a5f] text-xs">
+                    <div className="size-3 border-2 border-[#5a5a5f] border-t-transparent rounded-full animate-spin" />
+                    Loading session...
+                  </div>
+                </div>
+              )}
+
               {/* Messages */}
-              {messages.map((msg) => (
+              {!restoring && messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`agent-fade-up flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -396,6 +349,12 @@ export default function ResearchAgentPage() {
                       className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
                     >
                       Regenerate
+                    </button>
+                    <button
+                      onClick={() => generateReportPdf(pipeline.report!)}
+                      className="text-xs text-[#6a6a6f] hover:text-white transition-colors"
+                    >
+                      Download PDF
                     </button>
                   </div>
                 </div>
