@@ -2,27 +2,66 @@
 
 import React, { useState, useRef, useEffect } from 'react'
 import {
-  Plus, Lightbulb, Paperclip, Image, FileCode,
-  ChevronDown, Check, Sparkles, Zap, Brain, SendHorizontal, History
+  ChevronDown, Check, Zap, SendHorizontal, History
 } from 'lucide-react'
 import type { AgentModelInfo } from '@/agent/core/types'
 import type { ResearchDepth } from '@/agent/research/types'
-
-function ModelIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-      <path d="M2 17l10 5 10-5" />
-      <path d="M2 12l10 5 10-5" />
-    </svg>
-  )
-}
 
 const DEPTHS: { id: ResearchDepth; label: string }[] = [
   { id: 'quick', label: 'Quick' },
   { id: 'standard', label: 'Standard' },
   { id: 'deep', label: 'Deep' },
 ]
+
+function DepthDropdown({
+  depth,
+  onDepthChange,
+}: {
+  depth: ResearchDepth
+  onDepthChange: (d: ResearchDepth) => void
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const selected = DEPTHS.find(d => d.id === depth) ?? DEPTHS[1]
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 text-[#8a8a8f] hover:text-white hover:bg-white/5 active:scale-95"
+      >
+        <span>{selected.label}</span>
+        <ChevronDown className={`size-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="absolute top-full left-0 mt-1 z-50 min-w-[120px] bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+            <div className="p-1">
+              {DEPTHS.map(d => (
+                <button
+                  key={d.id}
+                  onClick={() => {
+                    onDepthChange(d.id)
+                    setIsOpen(false)
+                  }}
+                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-sm transition-all duration-150 ${
+                    depth === d.id
+                      ? 'bg-white/10 text-white'
+                      : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <span>{d.label}</span>
+                  {depth === d.id && <Check className="size-3.5 text-emerald-400 ml-auto shrink-0" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
 
 function ModelSelector({
   models,
@@ -55,9 +94,9 @@ function ModelSelector({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute bottom-full left-0 mb-2 z-50 min-w-[220px] bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="absolute top-full right-0 mt-1 z-50 min-w-[240px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-top-2 duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
             <div className="p-1.5">
-              <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f]">
+              <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
                 Select Model
               </div>
               {models.filter(m => m.enabled).map((model) => (
@@ -156,22 +195,7 @@ function ChatInput({
         <div className="flex items-center justify-between px-3 pb-3 pt-1">
           <div className="flex items-center gap-1">
             {onDepthChange && (
-              <div className="flex items-center rounded-full text-xs">
-                {DEPTHS.map((d) => (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => onDepthChange(d.id)}
-                    className={`px-2.5 py-1.5 rounded-full transition-all duration-150 ${
-                      depth === d.id
-                        ? 'bg-white/10 text-white'
-                        : 'text-[#6a6a6f] hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    {d.label}
-                  </button>
-                ))}
-              </div>
+              <DepthDropdown depth={depth ?? 'standard'} onDepthChange={onDepthChange} />
             )}
           </div>
 
