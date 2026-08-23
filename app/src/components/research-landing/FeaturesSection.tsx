@@ -1,28 +1,46 @@
 import { Reveal, StaggerContainer, StaggerItem } from './Reveal';
-import { FEATURES } from '@/data/researchLandingDemo';
+
+const PILLARS = [
+  {
+    icon: '◆',
+    title: 'Research',
+    description: 'Multi-stage pipeline across academic databases and web sources.',
+    link: '#research',
+    linkText: 'See the research agent →',
+  },
+  {
+    icon: '◇',
+    title: 'Verify',
+    description: 'Every citation checked against the source. Dead links dropped.',
+    link: '#evidence',
+    linkText: 'See how verification works →',
+  },
+  {
+    icon: '○',
+    title: 'Report',
+    description: 'Structured output with numbered citations and executive summaries.',
+    link: '#report',
+    linkText: 'See report structure →',
+  },
+];
 
 export function FeaturesSection() {
   return (
-    <section className="rl-section">
-      <div className="max-w-5xl mx-auto">
-        <Reveal className="text-center mb-16">
-          <span className="rl-eyebrow mb-4 inline-block">Capabilities</span>
-          <h2 className="rl-display rl-heading-text text-[var(--rl-ink)]">
-            BUILT FOR SERIOUS RESEARCH.
-          </h2>
-        </Reveal>
-
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" stagger={0.08}>
-          {FEATURES.map((feature) => (
-            <StaggerItem key={feature.title} variant="fade-up">
-              <div className="p-6 rounded-xl border border-[var(--rl-border)] bg-[var(--rl-surface)] h-full rl-card-hover group">
-                <div className="w-10 h-10 rounded-full bg-[var(--rl-bg)] border border-[var(--rl-border)] flex items-center justify-center mb-4 group-hover:bg-[var(--rl-accent)] group-hover:border-[var(--rl-accent)] transition-colors duration-300">
-                  <span className="text-[var(--rl-accent-dark)] text-lg font-bold group-hover:text-white transition-colors duration-300">
-                    {feature.title[0]}
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-[var(--rl-ink)] mb-2">{feature.title}</h3>
-                <p className="text-sm text-[var(--rl-muted)] leading-relaxed">{feature.description}</p>
+    <section className="rl-section-full" style={{ backgroundColor: 'var(--rl-bg)' }}>
+      <div className="rl-section">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6" stagger={0.08}>
+          {PILLARS.map((pillar) => (
+            <StaggerItem key={pillar.title} variant="fade-up">
+              <div className="border-t border-[var(--rl-border)] pt-4">
+                <span className="text-xl text-[var(--rl-accent)]">{pillar.icon}</span>
+                <h3 className="mt-2 text-base font-semibold text-[var(--rl-ink)]">{pillar.title}</h3>
+                <p className="mt-1 text-sm text-[var(--rl-muted)] leading-relaxed">{pillar.description}</p>
+                <a
+                  href={pillar.link}
+                  className="mt-3 inline-block text-xs font-medium text-[var(--rl-accent-dark)] hover:text-[var(--rl-accent)] transition-colors rl-underline-anim"
+                >
+                  {pillar.linkText}
+                </a>
               </div>
             </StaggerItem>
           ))}
