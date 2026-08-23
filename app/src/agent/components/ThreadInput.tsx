@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { SendHorizontal, ChevronDown, Check, Zap } from 'lucide-react';
 import type { AgentModelInfo } from '@/agent/core/types';
 import type { ResearchDepth } from '@/agent/research/types';
@@ -69,11 +70,28 @@ function ModelSelector({
   onModelChange: (id: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
   const selected = models.find((m) => m.id === selectedModel) ?? models[0];
 
+  const updatePosition = useCallback(() => {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({
+        top: rect.top - 8,
+        left: rect.right,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) updatePosition();
+  }, [isOpen, updatePosition]);
+
   return (
-    <div className="relative">
+    <>
       <button
+        ref={btnRef}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 text-[#8a8a8f] hover:text-white hover:bg-white/5 active:scale-95"
       >
@@ -82,10 +100,13 @@ function ModelSelector({
         <ChevronDown className={`size-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && (
+      {isOpen && createPortal(
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="fixed bottom-20 right-4 z-50 w-[280px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <div className="fixed inset-0 z-[9998]" onClick={() => setIsOpen(false)} />
+          <div
+            className="fixed z-[9999] w-[260px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-left-1 duration-150"
+            style={{ top: pos.top, left: pos.left + 8 }}
+          >
             <div className="p-1.5">
               <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
                 Select Model
@@ -119,9 +140,10 @@ function ModelSelector({
               ))}
             </div>
           </div>
-        </>
+        </>,
+        document.body,
       )}
-    </div>
+    </>
   );
 }
 

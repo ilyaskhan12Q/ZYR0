@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AgentHero } from '@/agent/components/AgentHero';
 import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
@@ -7,6 +7,7 @@ import { AgentSidebar } from '@/agent/components/AgentSidebar';
 import { useAgentChat } from '@/agent/hooks/useAgentChat';
 import { useAgentModels } from '@/agent/hooks/useAgentModels';
 import { useResearchPipeline } from '@/agent/hooks/useResearchPipeline';
+import { renderReportMarkdown } from '@/agent/render/renderReportMarkdown';
 import type { ResearchDepth, ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { classifyLocally } from '@/lib/zeroai/intent';
@@ -348,10 +349,41 @@ export default function ResearchAgentPage() {
                       {pipeline.ledger.filter(l => l.verified).length} verified sources
                     </span>
                   </div>
-                  <div
-                    className="prose prose-invert prose-sm max-w-none agent-whitespace-pre-wrap text-[#c5c5c5] leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: pipeline.report.markdown.replace(/\n/g, '<br/>') }}
-                  />
+                  <div className="prose prose-invert prose-sm max-w-none text-[#c5c5c5] leading-relaxed">
+                    {renderReportMarkdown(pipeline.report.markdown, {
+                      citationVerified: (key) => {
+                        const entry = pipeline.ledger.find(l => l.key === key);
+                        return entry?.verified ?? false;
+                      },
+                      onCitationClick: (key) => {
+                        const sourcesEl = document.getElementById('report-sources');
+                        if (sourcesEl) {
+                          sourcesEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      },
+                    })}
+                  </div>
+                  <div id="report-sources" className="mt-6 pt-3 border-t border-white/5">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] mb-2">Sources</p>
+                    <div className="space-y-1.5">
+                      {pipeline.ledger.map((entry) => (
+                        <div key={entry.key} className="flex items-start gap-2 text-xs">
+                          <span className={`font-mono shrink-0 ${entry.verified ? 'text-emerald-400' : 'text-amber-500'}`}>
+                            [{entry.key}]
+                          </span>
+                          <a
+                            href={entry.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#a0a0a5] hover:text-white transition-colors truncate"
+                          >
+                            {entry.title}
+                          </a>
+                          <span className="text-[#5a5a5f] shrink-0">— {entry.sourceName}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex gap-2 mt-4 pt-3 border-t border-white/5">
                     <button
                       onClick={() => handleFollowUp(pipeline.report!)}
