@@ -44,7 +44,7 @@ interface HistoryItem {
 export default function ResearchAgentPage() {
   const { user } = useAuth();
   const { models, selected, setSelected, loading } = useAgentModels();
-  const { messages, streaming, error, sessionId, send, abort, resetSession } = useAgentChat(selected);
+  const { messages, streaming, error, sessionId, send, abort, resetSession, loadSession } = useAgentChat(selected);
   const pipeline = useResearchPipeline();
   const [depth, setDepth] = useState<ResearchDepth>('standard');
   const [chatSystem, setChatSystem] = useState(SYSTEM_PROMPT);
@@ -96,15 +96,14 @@ export default function ResearchAgentPage() {
     setHistoryOpen(false);
   };
 
-  const handleSelectHistory = (id: string, itemMode: string) => {
+  const handleSelectHistory = async (id: string, itemMode: string) => {
     setHistoryOpen(false);
     if (itemMode === 'research') {
       setMode('research');
       void pipeline.loadReport(id);
     } else {
       setMode('chat');
-      // For chat sessions, we'd need to load via useAgentChat.loadSession
-      // but that's not exposed from the current hook
+      await loadSession(id);
     }
   };
 

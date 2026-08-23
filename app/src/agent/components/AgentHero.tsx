@@ -94,7 +94,7 @@ function ModelSelector({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full right-0 mt-1 z-50 min-w-[240px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-top-2 duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+          <div className="fixed bottom-20 right-4 z-50 w-[280px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-bottom-2 duration-200">
             <div className="p-1.5">
               <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
                 Select Model

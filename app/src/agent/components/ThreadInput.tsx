@@ -32,7 +32,7 @@ function DepthDropdown({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute bottom-full left-0 mb-1 z-50 min-w-[120px] bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-bottom-1 duration-150">
+          <div className="absolute bottom-full left-0 mb-2 z-50 min-w-[120px] bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in slide-in-from-bottom-1 duration-150">
             <div className="p-1">
               {DEPTHS.map((d) => (
                 <button
@@ -85,10 +85,10 @@ function ModelSelector({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute bottom-full right-0 mb-2 z-50 min-w-[240px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-bottom-2 duration-200 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+          <div className="fixed bottom-20 right-4 z-50 w-[280px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in slide-in-from-bottom-2 duration-200">
             <div className="p-1.5">
               <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
-                Model
+                Select Model
               </div>
               {models.filter((m) => m.enabled).map((model) => (
                 <button
@@ -211,7 +211,7 @@ export function ThreadInput({
             />
           </div>
 
-          {/* Controls row: mode toggle + depth + model + send */}
+          {/* Controls row */}
           <div className="flex items-center justify-between gap-2 px-3 pb-3 pt-1">
             <div className="flex items-center gap-2">
               {/* Chat / Research toggle */}
