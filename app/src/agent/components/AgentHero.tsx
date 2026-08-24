@@ -242,12 +242,7 @@ function ChatInput({
 
   useEffect(() => { setContainerHeight(Math.max(116, textareaHeight + 48)); setTimeout(updateFades, 0) }, [textareaHeight])
 
-  useEffect(() => {
-    if (!isModelSelectOpen) return
-    const h = (e: MouseEvent) => { if (internalContainerRef.current && !internalContainerRef.current.contains(e.target as Node)) setIsModelSelectOpen(false) }
-    document.addEventListener('mousedown', h)
-    return () => document.removeEventListener('mousedown', h)
-  }, [isModelSelectOpen])
+
 
   const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
     if (internalContainerRef.current && internalContainerRef.current.contains(e.relatedTarget as Node)) return
@@ -339,7 +334,7 @@ function ChatInput({
             onClick={expand}
             style={{ transition: isSmoothResize ? 'none' : 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
             className={cn(
-              'absolute inset-x-0 top-0 z-[1] cursor-text pl-5 pr-12 py-[19px] text-left text-[15px] font-medium leading-[22px] text-[#5a5a5f] outline-none',
+              'absolute inset-x-0 top-0 z-[1] cursor-text pl-5 pr-12 py-4 text-left text-[15px] font-medium leading-[22px] text-[#5a5a5f] outline-none',
               !expanded ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-105 translate-y-1 pointer-events-none'
             )}
             aria-label="Open prompt input"
@@ -347,66 +342,72 @@ function ChatInput({
             {placeholder}
           </button>
 
-          {/* Bottom Actions */}
-          <div
-            className={cn(
-              'absolute bottom-2 left-3 right-12 z-[10] flex items-center gap-0 transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]',
-              expanded && !isRecording ? 'opacity-100 blur-0 translate-y-0 pointer-events-auto' : 'opacity-0 blur-sm translate-y-2 pointer-events-none'
-            )}
-          >
-            {/* Model Selector */}
-            <div className="relative">
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={(e) => { e.stopPropagation(); setIsModelSelectOpen((prev) => !prev) }}
-                className={cn('group flex items-center gap-1 rounded-full px-2 py-1 text-white/50 transition-all duration-200 outline-none hover:bg-white/5 hover:text-white', isModelSelectOpen && 'bg-white/5 text-white')}
-                aria-label={`Select model. Current: ${selected?.name}`}
-              >
-                <Zap className="size-3.5 text-emerald-400 opacity-70 group-hover:opacity-100 transition-opacity" />
-                <span className="text-xs font-semibold select-none"><MorphingText text={selected?.name ?? 'Model'} /></span>
-              </button>
-
-              {isModelSelectOpen && createPortal(
-                <>
-                  <div className="fixed inset-0 z-[9998]" onClick={() => setIsModelSelectOpen(false)} />
-                  <div
-                    className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
-                    style={{
-                      bottom: window.innerHeight - (internalContainerRef.current?.getBoundingClientRect().top ?? 0) + 8,
-                      left: Math.min(internalContainerRef.current?.getBoundingClientRect().left ?? 16, window.innerWidth - 276),
-                    }}
-                  >
-                    <div className="p-1.5">
-                      <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">Select Model</div>
-                      {models.filter((m) => m.enabled).map((model) => (
-                        <button key={model.id} onClick={(e) => { e.stopPropagation(); onSelectModel(model.id); setIsModelSelectOpen(false) }}
-                          className={cn('w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150', selected?.id === model.id ? 'bg-white/10 text-white' : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white')}>
-                          <Zap className="size-3.5 text-emerald-400 shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm truncate">{model.name}</span>
-                              {model.tier === 'free' && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-emerald-500/20 text-emerald-300 shrink-0">Free</span>}
-                            </div>
-                          </div>
-                          {selected?.id === model.id && <Check className="size-3.5 text-emerald-400 shrink-0" />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>,
-                document.body,
+            {/* Bottom Actions */}
+            <div
+              className={cn(
+                'absolute bottom-2 left-3 right-14 z-[10] flex items-center gap-0 transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]',
+                expanded && !isRecording ? 'opacity-100 blur-0 translate-y-0 pointer-events-auto' : 'opacity-0 blur-sm translate-y-2 pointer-events-none'
               )}
+            >
+              {/* Model Selector */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={(e) => { e.stopPropagation(); setIsModelSelectOpen((prev) => !prev) }}
+                  className={cn('group flex items-center gap-1 rounded-full px-2 py-1 text-white/50 transition-all duration-200 outline-none hover:bg-white/5 hover:text-white', isModelSelectOpen && 'bg-white/5 text-white')}
+                  aria-label={`Select model. Current: ${selected?.name}`}
+                >
+                  <Zap className="size-3.5 text-emerald-400 opacity-70 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-xs font-semibold select-none"><MorphingText text={selected?.name ?? 'Model'} /></span>
+                </button>
+
+                {isModelSelectOpen && createPortal(
+                  <>
+                    <div className="fixed inset-0 z-[9998]" onClick={() => setIsModelSelectOpen(false)} />
+                    <div
+                      className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
+                      style={{
+                        bottom: window.innerHeight - (internalContainerRef.current?.getBoundingClientRect().top ?? 0) + 8,
+                        left: Math.min(internalContainerRef.current?.getBoundingClientRect().left ?? 16, window.innerWidth - 276),
+                      }}
+                    >
+                      <div className="p-1.5">
+                        <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">Select Model</div>
+                        {models.filter((m) => m.enabled).map((model) => (
+                          <button key={model.id} onClick={(e) => { e.stopPropagation(); onSelectModel(model.id); setIsModelSelectOpen(false) }}
+                            className={cn('w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150', selected?.id === model.id ? 'bg-white/10 text-white' : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white')}>
+                            <Zap className="size-3.5 text-emerald-400 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm truncate">{model.name}</span>
+                                {model.tier === 'free' && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-emerald-500/20 text-emerald-300 shrink-0">Free</span>}
+                              </div>
+                            </div>
+                            {selected?.id === model.id && <Check className="size-3.5 text-emerald-400 shrink-0" />}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>,
+                  document.body,
+                )}
+              </div>
+
+              {/* Effort Cycling */}
+              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={cycleEffort}
+                className="group flex items-center gap-1 rounded-full px-2 py-1 text-white/50 transition-all duration-200 hover:bg-white/5 hover:text-white outline-none">
+                <DynamicBarsIcon level={effortLabel} />
+                <span className="text-xs font-semibold select-none hidden sm:inline"><MorphingText text={effortLabel} /></span>
+              </button>
             </div>
 
-            {/* Effort Cycling */}
-            <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={cycleEffort}
-              className="group flex items-center gap-1 rounded-full px-2 py-1 text-white/50 transition-all duration-200 hover:bg-white/5 hover:text-white outline-none">
-              <DynamicBarsIcon level={effortLabel} />
-              <span className="text-xs font-semibold select-none"><MorphingText text={effortLabel} /></span>
-            </button>
-
-            <div className="flex-1" />
+            {/* Audio Wave Visualizer */}
+          <div className={cn('absolute right-14 bottom-2 z-[10] flex h-8 items-center justify-end gap-[3px] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]', isRecording ? 'w-16 opacity-100 translate-x-0' : 'w-0 opacity-0 translate-x-4 pointer-events-none')}>
+            {audioData.map((val, i) => (
+              <div key={i} className="w-1 rounded-full bg-[#1488fc] transition-[height] duration-75 ease-out" style={{ height: `${Math.max(4, val * 24)}px` }} />
+            ))}
+          </div>
 
             {/* Action Button */}
             <button
@@ -415,7 +416,7 @@ function ChatInput({
               onClick={onActionButtonClick}
               aria-label={showArrow ? 'Send prompt' : showStop ? 'Stop recording' : 'Use voice input'}
               style={{ borderRadius: 9999 }}
-              className="flex h-8 w-8 items-center justify-center bg-[#1488fc] text-white transition-all duration-300 hover:bg-[#1a94ff] outline-none shadow-[0_0_20px_rgba(20,136,252,0.3)]"
+              className="absolute right-2 bottom-2 z-[10] flex h-8 w-8 items-center justify-center bg-[#1488fc] text-white transition-all duration-300 hover:bg-[#1a94ff] outline-none focus-visible:ring-2 focus-visible:ring-white/30 shadow-[0_0_20px_rgba(20,136,252,0.3)]"
             >
               <span className="relative flex h-full w-full items-center justify-center">
                 <span className={cn('absolute inset-0 flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]', showArrow ? 'opacity-100 scale-100 rotate-0 blur-none' : 'opacity-0 scale-50 rotate-45 blur-[1px] pointer-events-none')}>
@@ -426,14 +427,6 @@ function ChatInput({
                 </span>
               </span>
             </button>
-          </div>
-
-          {/* Audio Wave Visualizer */}
-          <div className={cn('absolute right-12 bottom-2 z-[10] flex h-8 items-center justify-end gap-[3px] transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]', isRecording ? 'w-16 opacity-100 translate-x-0' : 'w-0 opacity-0 translate-x-4 pointer-events-none')}>
-            {audioData.map((val, i) => (
-              <div key={i} className="w-1 rounded-full bg-[#1488fc] transition-[height] duration-75 ease-out" style={{ height: `${Math.max(4, val * 24)}px` }} />
-            ))}
-          </div>
         </div>
       </div>
     </div>

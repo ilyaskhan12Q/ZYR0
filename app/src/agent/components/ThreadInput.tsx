@@ -489,14 +489,7 @@ export function ThreadInput({
     setTimeout(updateFades, 0)
   }, [textareaHeight])
 
-  useEffect(() => {
-    if (!isModelSelectOpen) return
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (internalContainerRef.current && !internalContainerRef.current.contains(e.target as Node)) setIsModelSelectOpen(false)
-    }
-    document.addEventListener('mousedown', handleOutsideClick)
-    return () => document.removeEventListener('mousedown', handleOutsideClick)
-  }, [isModelSelectOpen])
+
 
   const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
     if (internalContainerRef.current && internalContainerRef.current.contains(e.relatedTarget as Node)) return
@@ -770,7 +763,7 @@ export function ThreadInput({
                   className="group flex items-center gap-1 rounded-full px-2 py-1 text-white/50 transition-all duration-200 hover:bg-white/5 hover:text-white outline-none"
                 >
                   <DynamicBarsIcon level={effortLabel} />
-                  <span className="text-xs font-semibold select-none transition-colors">
+                  <span className="text-xs font-semibold select-none transition-colors hidden sm:inline">
                     <MorphingText text={effortLabel} />
                   </span>
                 </button>
