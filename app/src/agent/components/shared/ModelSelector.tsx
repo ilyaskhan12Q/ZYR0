@@ -22,9 +22,16 @@ export function ModelSelector({
   const updatePosition = useCallback(() => {
     if (btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
+      const dropdownWidth = 260;
+      const padding = 16;
+      let left = rect.left;
+      if (left + dropdownWidth > window.innerWidth - padding) {
+        left = window.innerWidth - dropdownWidth - padding;
+      }
+      if (left < padding) left = padding;
       setPos({
         top: position === 'above' ? rect.top - 8 : rect.bottom + 8,
-        left: position === 'above' ? rect.left : rect.left,
+        left,
       });
     }
   }, [position]);
@@ -33,15 +40,22 @@ export function ModelSelector({
     if (isOpen) updatePosition();
   }, [isOpen, updatePosition]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleResize = () => updatePosition();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isOpen, updatePosition]);
+
   return (
     <>
       <button
         ref={btnRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 text-[#8a8a8f] hover:text-white hover:bg-white/5 active:scale-95"
+        className="flex items-center gap-1.5 px-2.5 py-3 rounded-full text-xs font-medium transition-all duration-200 text-[#8a8a8f] hover:text-white hover:bg-white/5 active:scale-95"
       >
-        <Zap className="size-3.5 text-emerald-400" />
-        <span>{selected?.name ?? 'Model'}</span>
+        <Zap className="size-3.5 text-emerald-400 shrink-0" />
+        <span className="max-w-[120px] truncate">{selected?.name ?? 'Model'}</span>
         <ChevronDown className={`size-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
@@ -50,14 +64,14 @@ export function ModelSelector({
           <>
             <div className="fixed inset-0 z-[9998]" onClick={() => setIsOpen(false)} />
             <div
-              className="fixed z-[9999] w-[260px] max-h-[320px] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
+              className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
               style={{
                 top: position === 'above' ? pos.top - 320 : pos.top,
                 left: pos.left,
               }}
             >
               <div className="p-1.5">
-                <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
+                <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
                   Select Model
                 </div>
                 {models
@@ -69,7 +83,7 @@ export function ModelSelector({
                         onModelChange(model.id);
                         setIsOpen(false);
                       }}
-                      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all duration-150 ${
+                      className={`w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150 ${
                         selected?.id === model.id
                           ? 'bg-white/10 text-white'
                           : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white'
@@ -78,9 +92,9 @@ export function ModelSelector({
                       <Zap className="size-3.5 text-emerald-400 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm">{model.name}</span>
+                          <span className="text-sm truncate">{model.name}</span>
                           {model.tier === 'free' && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-emerald-500/20 text-emerald-300">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-emerald-500/20 text-emerald-300 shrink-0">
                               Free
                             </span>
                           )}

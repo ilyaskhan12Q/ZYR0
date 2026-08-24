@@ -24,7 +24,7 @@ export function DepthDropdown({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 text-[#8a8a8f] hover:text-white hover:bg-white/5 active:scale-95"
+        className="flex items-center gap-1.5 px-2.5 py-3 rounded-full text-xs font-medium transition-all duration-200 text-[#8a8a8f] hover:text-white hover:bg-white/5 active:scale-95"
       >
         <span>{selected.label}</span>
         <ChevronDown className={`size-3 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
@@ -32,9 +32,9 @@ export function DepthDropdown({
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="fixed inset-0 z-[60]" onClick={() => setIsOpen(false)} />
           <div
-            className={`absolute left-0 z-50 min-w-[120px] bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in duration-150 ${
+            className={`absolute left-0 z-[61] min-w-[120px] bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden animate-in fade-in duration-150 ${
               position === 'top'
                 ? 'bottom-full mb-2 slide-in-from-bottom-1'
                 : 'top-full mt-1 slide-in-from-top-1'
@@ -48,7 +48,7 @@ export function DepthDropdown({
                     onDepthChange(d.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-left text-sm transition-all duration-150 ${
+                  className={`w-full flex items-center gap-2 px-2.5 py-2.5 rounded-lg text-left text-sm transition-all duration-150 ${
                     depth === d.id
                       ? 'bg-white/10 text-white'
                       : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white'

@@ -43,7 +43,7 @@ export function AgentSidebar({
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-[#111113] border-r border-white/5 transition-all duration-300 ease-out ${
+        className={`fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-[#111113] border-r border-white/5 transition-all duration-300 ease-out max-w-[85vw] ${
           open
             ? 'w-[280px] translate-x-0'
             : 'w-[280px] -translate-x-full lg:translate-x-0 lg:w-[48px]'
@@ -56,7 +56,7 @@ export function AgentSidebar({
               <span className="text-sm font-semibold text-white tracking-tight">ZYROO</span>
               <button
                 onClick={onToggle}
-                className="size-7 flex items-center justify-center rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors lg:hidden"
+                className="size-10 flex items-center justify-center rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors lg:hidden"
               >
                 <ChevronLeft className="size-4" />
               </button>
@@ -79,14 +79,14 @@ export function AgentSidebar({
           <div className="flex flex-col items-center gap-2 py-3">
             <button
               onClick={onNewSession}
-              className="size-8 flex items-center justify-center rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors"
+              className="size-10 flex items-center justify-center rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors"
               title="New Chat"
             >
               <Plus className="size-4" />
             </button>
             <button
               onClick={onToggle}
-              className="size-8 flex items-center justify-center rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors"
+              className="size-10 flex items-center justify-center rounded-lg text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors"
               title="History"
             >
               <History className="size-4" />
@@ -101,7 +101,7 @@ export function AgentSidebar({
             <div className="p-3">
               <button
                 onClick={onNewSession}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-all duration-150 active:scale-[0.98]"
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-white bg-white/5 hover:bg-white/10 border border-white/5 transition-all duration-150 active:scale-[0.98]"
               >
                 <Plus className="size-4" />
                 New Chat
@@ -110,7 +110,7 @@ export function AgentSidebar({
 
             {/* Search */}
             <div className="px-3 pb-2">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-white/5 border border-white/5">
                 <Search className="size-3.5 text-[#5a5a5f]" />
                 <input
                   value={search}
@@ -140,7 +140,7 @@ export function AgentSidebar({
                     <button
                       key={item.id}
                       onClick={() => onSelectHistory?.(item.id, item.mode)}
-                      className={`w-full flex items-start gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors duration-150 ${
+                      className={`w-full flex items-start gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-colors duration-150 ${
                         activeId === item.id
                           ? 'bg-white/10 text-white'
                           : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white'
@@ -163,7 +163,7 @@ export function AgentSidebar({
 
             {/* Bottom: Settings */}
             <div className="p-3 border-t border-white/5">
-              <button className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors">
+              <button className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-sm text-[#6a6a6f] hover:text-white hover:bg-white/5 transition-colors">
                 <Settings className="size-4" />
                 Settings
               </button>

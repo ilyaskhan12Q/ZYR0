@@ -89,28 +89,6 @@
   animation-delay: 0.4s;
 }
 
-/* History panel overlay */
-.agent-history-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-}
-
-.agent-history-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 320px;
-  max-width: 85vw;
-  z-index: 51;
-  background: #1a1a1e;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  overflow-y: auto;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .agent-pulse-dot,
   .agent-fade-up,

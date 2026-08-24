@@ -92,14 +92,14 @@ export function ThreadInput({
           </div>
 
           {/* Controls row */}
-          <div className="flex items-center justify-between gap-2 px-3 pb-3 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-3 pb-3 pt-1">
             <div className="flex items-center gap-2">
               {/* Chat / Research toggle */}
               <div className="flex rounded-full border border-white/10 text-xs overflow-hidden">
                 <button
                   type="button"
                   onClick={() => onModeChange('chat')}
-                  className={`px-3 py-1.5 transition-all duration-150 ${
+                  className={`px-3 py-2.5 transition-all duration-150 ${
                     mode === 'chat'
                       ? 'bg-white/10 text-white'
                       : 'text-[#6a6a6f] hover:text-white hover:bg-white/5'
@@ -110,7 +110,7 @@ export function ThreadInput({
                 <button
                   type="button"
                   onClick={() => onModeChange('research')}
-                  className={`px-3 py-1.5 transition-all duration-150 ${
+                  className={`px-3 py-2.5 transition-all duration-150 ${
                     mode === 'research'
                       ? 'bg-white/10 text-white'
                       : 'text-[#6a6a6f] hover:text-white hover:bg-white/5'
@@ -138,7 +138,7 @@ export function ThreadInput({
               <button
                 onClick={submit}
                 disabled={!running && !message.trim()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#1488fc] hover:bg-[#1a94ff] text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-full text-xs font-medium bg-[#1488fc] hover:bg-[#1a94ff] text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
               >
                 {running ? (
                   <>
