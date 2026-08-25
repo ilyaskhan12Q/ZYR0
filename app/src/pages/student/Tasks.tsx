@@ -39,8 +39,16 @@ export default function StudentTasks() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewTask, setPreviewTask] = useState<any | null>(null);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+  const [blobLoading, setBlobLoading] = useState(false);
 
-  const closePreview = useCallback(() => setPreviewTask(null), []);
+  const closePreview = useCallback(() => {
+    setPreviewTask(null);
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      setBlobUrl(null);
+    }
+  }, [blobUrl]);
 
   useEffect(() => {
     if (!previewTask) return;
@@ -52,6 +60,41 @@ export default function StudentTasks() {
       document.body.style.overflow = '';
     };
   }, [previewTask, closePreview]);
+
+  // Fetch PDF as blob to bypass X-Frame-Options
+  useEffect(() => {
+    if (!previewTask) return;
+    const att = previewTask.attachments?.[0];
+    if (!att || att.type !== 'application/pdf') return;
+
+    let cancelled = false;
+    setBlobLoading(true);
+
+    // Revoke any previous blob URL
+    setBlobUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+
+    fetch(att.url)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch PDF');
+        return res.blob();
+      })
+      .then((blob) => {
+        if (!cancelled) {
+          setBlobUrl(URL.createObjectURL(blob));
+          setBlobLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBlobLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [previewTask]);
 
   useEffect(() => {
     async function loadTasks() {
@@ -289,13 +332,25 @@ export default function StudentTasks() {
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-auto">
+              <div className="flex-1 overflow-auto flex items-center justify-center">
                 {previewTask.attachments[0].type === 'application/pdf' ? (
-                  <iframe
-                    src={previewTask.attachments[0].url}
-                    className="w-full h-full min-h-[60vh] sm:min-h-0"
-                    title={previewTask.attachments[0].name}
-                  />
+                  blobLoading ? (
+                    <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <span className="text-xs">Loading PDF...</span>
+                    </div>
+                  ) : blobUrl ? (
+                    <iframe
+                      src={blobUrl}
+                      className="w-full h-full min-h-[60vh] sm:min-h-0 border-0"
+                      title={previewTask.attachments[0].name}
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
+                      <AlertCircle className="w-6 h-6" />
+                      <span className="text-xs">Failed to load PDF. Try opening in a new tab.</span>
+                    </div>
+                  )
                 ) : (
                   <div className="p-2 sm:p-4 flex justify-center bg-muted/30 h-full">
                     <img

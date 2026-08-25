@@ -46,6 +46,43 @@ export default function StudentWorkspace() {
   const [submitting, setSubmitting] = useState(false);
   const [submissionFiles, setSubmissionFiles] = useState<TaskAttachment[]>([]);
   const [uploadingSubmissionFile, setUploadingSubmissionFile] = useState(false);
+  const [briefBlobUrl, setBriefBlobUrl] = useState<string | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
+
+  // Fetch task brief PDF as blob to bypass X-Frame-Options
+  useEffect(() => {
+    const att = selectedTask?.attachments?.[0];
+    if (!att || att.type !== 'application/pdf') {
+      setBriefBlobUrl(null);
+      return;
+    }
+
+    let cancelled = false;
+    setBriefLoading(true);
+
+    // Revoke previous
+    setBriefBlobUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+
+    fetch(att.url)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch PDF');
+        return res.blob();
+      })
+      .then((blob) => {
+        if (!cancelled) {
+          setBriefBlobUrl(URL.createObjectURL(blob));
+          setBriefLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBriefLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [selectedTask?.id, selectedTask?.attachments]);
 
   // Load placement information, tasks and certificates
   const loadWorkspaceData = useCallback(async (forceRefresh = false) => {
@@ -803,11 +840,23 @@ export default function StudentWorkspace() {
                             </div>
                             <div className="rounded-xl border border-border overflow-hidden bg-muted/20">
                               {selectedTask.attachments[0].type === 'application/pdf' ? (
-                                <iframe
-                                  src={selectedTask.attachments[0].url}
-                                  className="w-full h-[500px]"
-                                  title={selectedTask.attachments[0].name}
-                                />
+                                briefLoading ? (
+                                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <span className="text-xs">Loading PDF...</span>
+                                  </div>
+                                ) : briefBlobUrl ? (
+                                  <iframe
+                                    src={briefBlobUrl}
+                                    className="w-full h-[500px] border-0"
+                                    title={selectedTask.attachments[0].name}
+                                  />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
+                                    <AlertTriangle className="w-5 h-5" />
+                                    <span className="text-xs">Failed to load PDF. Try opening in a new tab.</span>
+                                  </div>
+                                )
                               ) : (
                                 <div className="p-4 flex justify-center">
                                   <img
