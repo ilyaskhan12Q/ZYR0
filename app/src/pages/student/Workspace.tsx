@@ -897,25 +897,25 @@ export default function StudentWorkspace() {
                                     <ExternalLink className="w-3.5 h-3.5" /> Live Demo Link <ExternalLink className="w-3 h-3" />
                                   </a>
                                 )}
-                              </div>
-                              {selectedTask.submissions[0].attachments && selectedTask.submissions[0].attachments.length > 0 && (
-                                <div className="pt-2 text-xs space-y-1.5">
-                                  <p className="font-medium">Submitted Files:</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {selectedTask.submissions[0].attachments.map((file: any, idx: number) => (
-                                      <a
-                                        key={file.id || idx}
-                                        href={file.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
-                                      >
-                                        <FileText className="w-3.5 h-3.5 text-accent" /> {file.name}
-                                      </a>
-                                    ))}
+                                {selectedTask.submissions[0].attachments && selectedTask.submissions[0].attachments.length > 0 && (
+                                  <div className="pt-2 space-y-1.5">
+                                    <p className="font-medium">Submitted Files:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {selectedTask.submissions[0].attachments.map((file: any, idx: number) => (
+                                        <a
+                                          key={file.id || idx}
+                                          href={file.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
+                                        >
+                                          <FileText className="w-3.5 h-3.5 text-accent" /> {file.name}
+                                        </a>
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
+                                )}
+                              </div>
                             )}
                           </div>
                         ) : (

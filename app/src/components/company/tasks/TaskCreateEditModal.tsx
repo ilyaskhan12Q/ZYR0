@@ -195,7 +195,7 @@ export function TaskCreateEditModal({
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = async (e: React.Form.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
     setSubmitting(true);
