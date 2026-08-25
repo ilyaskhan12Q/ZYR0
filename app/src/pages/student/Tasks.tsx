@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ClipboardList, CheckCircle2, Clock, AlertCircle, Circle, Calendar,
   ChevronRight, Loader2, FileText, BarChart3, Download,
-  ExternalLink, Eye, X,
+  ExternalLink, Eye, MessageCircle,
 } from 'lucide-react';
 import { getMyTasks } from '@/services/tasks';
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,68 +33,13 @@ const priorityConfig: Record<string, { dot: string; text: string; bg: string }> 
   Low: { dot: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/20' },
 };
 
+const WHATSAPP_URL = 'https://wa.me/923279883150';
+
 export default function StudentTasks() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('All');
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [previewTask, setPreviewTask] = useState<any | null>(null);
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-  const [blobLoading, setBlobLoading] = useState(false);
-
-  const closePreview = useCallback(() => {
-    setPreviewTask(null);
-    if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
-      setBlobUrl(null);
-    }
-  }, [blobUrl]);
-
-  useEffect(() => {
-    if (!previewTask) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closePreview(); };
-    document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [previewTask, closePreview]);
-
-  // Fetch PDF as blob to bypass X-Frame-Options
-  useEffect(() => {
-    if (!previewTask) return;
-    const att = previewTask.attachments?.[0];
-    if (!att || att.type !== 'application/pdf') return;
-
-    let cancelled = false;
-    setBlobLoading(true);
-
-    // Revoke any previous blob URL
-    setBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-
-    fetch(att.url)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch PDF');
-        return res.blob();
-      })
-      .then((blob) => {
-        if (!cancelled) {
-          setBlobUrl(URL.createObjectURL(blob));
-          setBlobLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setBlobLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [previewTask]);
 
   useEffect(() => {
     async function loadTasks() {
@@ -125,9 +70,19 @@ export default function StudentTasks() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">My Tasks</h1>
-        <p className="text-sm text-muted-foreground mt-1">Tasks assigned across your active internships</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">My Tasks</h1>
+          <p className="text-sm text-muted-foreground mt-1">Tasks assigned across your active internships</p>
+        </div>
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors shadow-sm flex-shrink-0"
+        >
+          <MessageCircle className="w-4 h-4" /> Need Help?
+        </a>
       </div>
 
       {/* Progress bar */}
@@ -257,12 +212,23 @@ export default function StudentTasks() {
                       {/* Right actions */}
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         {hasDocuments && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setPreviewTask(task); }}
+                          <a
+                            href={task.attachments[0].url}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg text-xs font-medium transition-colors"
                           >
                             <Eye className="w-3.5 h-3.5" /> View Brief
-                          </button>
+                          </a>
+                        )}
+                        {hasDocuments && (
+                          <a
+                            href={task.attachments[0].url}
+                            download={task.attachments[0].name}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" /> Download
+                          </a>
                         )}
                         <Link
                           to={task.internship_id ? `/student/workspace/${task.internship_id}` : '#'}
@@ -280,91 +246,16 @@ export default function StudentTasks() {
         )}
       </div>
 
-      {/* Custom PDF Preview Modal */}
-      <AnimatePresence>
-        {previewTask && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
-            onClick={closePreview}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.15 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative flex flex-col w-full h-full sm:max-w-4xl sm:max-h-[90vh] sm:rounded-xl bg-card sm:border sm:border-border shadow-2xl overflow-hidden"
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3 border-b border-border bg-card flex-shrink-0">
-                <div className="flex items-center gap-2 min-w-0">
-                  <FileText className="w-4 h-4 text-accent flex-shrink-0" />
-                  <h3 className="font-semibold text-sm truncate">{previewTask.title}</h3>
-                </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-                  <a
-                    href={previewTask.attachments[0].url}
-                    download={previewTask.attachments[0].name}
-                    className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-[11px] sm:text-xs font-medium transition-colors"
-                  >
-                    <Download className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Download</span>
-                  </a>
-                  <a
-                    href={previewTask.attachments[0].url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-[11px] sm:text-xs font-medium transition-colors"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Open</span>
-                  </a>
-                  <button
-                    onClick={closePreview}
-                    className="ml-1 p-1.5 hover:bg-muted rounded-lg transition-colors"
-                    aria-label="Close"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 overflow-auto flex items-center justify-center">
-                {previewTask.attachments[0].type === 'application/pdf' ? (
-                  blobLoading ? (
-                    <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                      <span className="text-xs">Loading PDF...</span>
-                    </div>
-                  ) : blobUrl ? (
-                    <iframe
-                      src={blobUrl}
-                      className="w-full h-full min-h-[60vh] sm:min-h-0 border-0"
-                      title={previewTask.attachments[0].name}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
-                      <AlertCircle className="w-6 h-6" />
-                      <span className="text-xs">Failed to load PDF. Try opening in a new tab.</span>
-                    </div>
-                  )
-                ) : (
-                  <div className="p-2 sm:p-4 flex justify-center bg-muted/30 h-full">
-                    <img
-                      src={previewTask.attachments[0].url}
-                      alt={previewTask.attachments[0].name}
-                      className="max-w-full max-h-full object-contain rounded-lg border border-border"
-                    />
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Floating WhatsApp button */}
+      <a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#1fb855] text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+        aria-label="Contact on WhatsApp"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </a>
     </div>
   );
 }

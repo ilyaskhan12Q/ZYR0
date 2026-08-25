@@ -5,7 +5,7 @@ import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
   Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight,
-  Upload, FileText, Trash2, Download, Loader2, BarChart3,
+  Upload, FileText, Trash2, Download, Loader2, BarChart3, MessageCircle,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
 import { getMyActiveInternships } from '@/services/internships';
@@ -21,6 +21,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 type WorkspaceTab = 'overview' | 'tasks' | 'submissions' | 'certificate';
+
+const WHATSAPP_URL = 'https://wa.me/923279883150';
 
 export default function StudentWorkspace() {
   const { internshipId } = useParams<{ internshipId: string }>();
@@ -46,43 +48,6 @@ export default function StudentWorkspace() {
   const [submitting, setSubmitting] = useState(false);
   const [submissionFiles, setSubmissionFiles] = useState<TaskAttachment[]>([]);
   const [uploadingSubmissionFile, setUploadingSubmissionFile] = useState(false);
-  const [briefBlobUrl, setBriefBlobUrl] = useState<string | null>(null);
-  const [briefLoading, setBriefLoading] = useState(false);
-
-  // Fetch task brief PDF as blob to bypass X-Frame-Options
-  useEffect(() => {
-    const att = selectedTask?.attachments?.[0];
-    if (!att || att.type !== 'application/pdf') {
-      setBriefBlobUrl(null);
-      return;
-    }
-
-    let cancelled = false;
-    setBriefLoading(true);
-
-    // Revoke previous
-    setBriefBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-
-    fetch(att.url)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch PDF');
-        return res.blob();
-      })
-      .then((blob) => {
-        if (!cancelled) {
-          setBriefBlobUrl(URL.createObjectURL(blob));
-          setBriefLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setBriefLoading(false);
-      });
-
-    return () => { cancelled = true; };
-  }, [selectedTask?.id, selectedTask?.attachments]);
 
   // Load placement information, tasks and certificates
   const loadWorkspaceData = useCallback(async (forceRefresh = false) => {
@@ -838,34 +803,27 @@ export default function StudentWorkspace() {
                                 </a>
                               </div>
                             </div>
-                            <div className="rounded-xl border border-border overflow-hidden bg-muted/20">
-                              {selectedTask.attachments[0].type === 'application/pdf' ? (
-                                briefLoading ? (
-                                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                    <span className="text-xs">Loading PDF...</span>
-                                  </div>
-                                ) : briefBlobUrl ? (
-                                  <iframe
-                                    src={briefBlobUrl}
-                                    className="w-full h-[500px] border-0"
-                                    title={selectedTask.attachments[0].name}
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-muted-foreground">
-                                    <AlertTriangle className="w-5 h-5" />
-                                    <span className="text-xs">Failed to load PDF. Try opening in a new tab.</span>
-                                  </div>
-                                )
-                              ) : (
-                                <div className="p-4 flex justify-center">
-                                  <img
-                                    src={selectedTask.attachments[0].url}
-                                    alt={selectedTask.attachments[0].name}
-                                    className="max-w-full rounded-lg border border-border"
-                                  />
-                                </div>
-                              )}
+                            {/* Task Brief — Open in new tab */}
+                            <div className="rounded-xl border border-border bg-muted/20 p-6 text-center space-y-3">
+                              <FileText className="w-10 h-10 mx-auto text-accent/60" />
+                              <p className="text-sm font-medium text-foreground">{selectedTask.attachments[0].name}</p>
+                              <div className="flex items-center justify-center gap-2">
+                                <a
+                                  href={selectedTask.attachments[0].url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                                >
+                                  <ExternalLink className="w-4 h-4" /> Open Brief
+                                </a>
+                                <a
+                                  href={selectedTask.attachments[0].url}
+                                  download={selectedTask.attachments[0].name}
+                                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-muted hover:bg-muted/80 border border-border rounded-lg text-sm font-medium transition-colors"
+                                >
+                                  <Download className="w-4 h-4" /> Download
+                                </a>
+                              </div>
                             </div>
                             {selectedTask.attachments.length > 1 && (
                               <div className="flex flex-wrap gap-2">
@@ -1420,6 +1378,17 @@ export default function StudentWorkspace() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Floating WhatsApp button */}
+      <a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#1fb855] text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+        aria-label="Contact on WhatsApp"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </a>
     </div>
   );
 }
