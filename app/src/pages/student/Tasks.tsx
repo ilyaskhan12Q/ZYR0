@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ClipboardList, CheckCircle2, Clock, AlertCircle, Circle, Calendar, Paperclip, ChevronRight, Loader2 } from 'lucide-react';
+import { ClipboardList, CheckCircle2, Clock, AlertCircle, Circle, Calendar, Paperclip, ChevronRight, Loader2, FileText, BarChart3 } from 'lucide-react';
 import { getMyTasks } from '@/services/tasks';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -97,7 +97,12 @@ export default function StudentTasks() {
                       <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{task.description}</p>
                       <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No deadline'}</span>
-                        {task.attachments && task.attachments.length > 0 && <span className="flex items-center gap-1"><Paperclip className="w-3.5 h-3.5" /> {task.attachments.length} files</span>}
+                        {task.attachments && task.attachments.length > 0 && (
+                          <span className="flex items-center gap-1 text-accent"><FileText className="w-3.5 h-3.5" /> {task.attachments.length} document{task.attachments.length !== 1 ? 's' : ''}</span>
+                        )}
+                        {task.difficulty && (
+                          <span className="flex items-center gap-1"><BarChart3 className="w-3.5 h-3.5" /> {task.difficulty}</span>
+                        )}
                       </div>
                     </div>
                   </div>

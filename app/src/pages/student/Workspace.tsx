@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
-  Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight
+  Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight,
+  Upload, FileText, Trash2, Download, Loader2,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
 import { getMyActiveInternships } from '@/services/internships';
-import { getMyTasks, submitTask } from '@/services/tasks';
+import { getMyTasks, submitTask, uploadSubmissionFile } from '@/services/tasks';
+import type { TaskAttachment } from '@/lib/database.types';
 import { getMyCertificates } from '@/services/certificates';
 import { getWorkspaceEvents, clearWorkspaceEventsCache } from '@/services/workspaceEvents';
 import { useRealtimeInsert } from '@/hooks/useRealtime';
@@ -42,6 +44,8 @@ export default function StudentWorkspace() {
   const [demoUrl, setDemoUrl] = useState('');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [submissionFiles, setSubmissionFiles] = useState<TaskAttachment[]>([]);
+  const [uploadingSubmissionFile, setUploadingSubmissionFile] = useState(false);
 
   // Load placement information, tasks and certificates
   const loadWorkspaceData = useCallback(async (forceRefresh = false) => {
@@ -157,6 +161,7 @@ export default function StudentWorkspace() {
         notes: notes.trim() || undefined,
         github_url: githubUrl.trim(),
         live_demo_url: demoUrl.trim() || undefined,
+        attachments: submissionFiles.length > 0 ? submissionFiles : undefined,
       });
 
       if (error) throw error;
@@ -165,6 +170,7 @@ export default function StudentWorkspace() {
       setGithubUrl('');
       setDemoUrl('');
       setNotes('');
+      setSubmissionFiles([]);
 
       // Trigger simulation notification to mentor/company supervisor
       const recipientId = selectedTask.mentor_id || selectedTask.company_id;
@@ -736,6 +742,52 @@ export default function StudentWorkspace() {
                         </div>
                       </div>
 
+                      {/* Task Document Viewer */}
+                      {selectedTask.attachments && selectedTask.attachments.length > 0 && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                              <FileText className="w-4 h-4 text-accent" /> Task Brief
+                            </h4>
+                            <a
+                              href={selectedTask.attachments[0].url}
+                              download={selectedTask.attachments[0].name}
+                              className="flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 font-medium"
+                            >
+                              <Download className="w-3.5 h-3.5" /> Download
+                            </a>
+                          </div>
+                          {selectedTask.attachments[0].type === 'application/pdf' ? (
+                            <iframe
+                              src={selectedTask.attachments[0].url}
+                              className="w-full h-[500px] rounded-xl border border-border"
+                              title={selectedTask.attachments[0].name}
+                            />
+                          ) : (
+                            <img
+                              src={selectedTask.attachments[0].url}
+                              alt={selectedTask.attachments[0].name}
+                              className="max-w-full rounded-xl border border-border"
+                            />
+                          )}
+                          {selectedTask.attachments.length > 1 && (
+                            <div className="flex flex-wrap gap-2">
+                              {selectedTask.attachments.slice(1).map((att: any, idx: number) => (
+                                <a
+                                  key={att.id || idx}
+                                  href={att.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
+                                >
+                                  <FileText className="w-3.5 h-3.5 text-accent" /> {att.name}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
                       {/* Task Description */}
                       <div className="space-y-2">
                         <h4 className="font-semibold text-sm">Description</h4>
@@ -845,6 +897,24 @@ export default function StudentWorkspace() {
                                     <ExternalLink className="w-3.5 h-3.5" /> Live Demo Link <ExternalLink className="w-3 h-3" />
                                   </a>
                                 )}
+                                {selectedTask.submissions[0].attachments && selectedTask.submissions[0].attachments.length > 0 && (
+                                  <div className="pt-2 space-y-1.5">
+                                    <p className="font-medium">Submitted Files:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {selectedTask.submissions[0].attachments.map((file: any, idx: number) => (
+                                        <a
+                                          key={file.id || idx}
+                                          href={file.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
+                                        >
+                                          <FileText className="w-3.5 h-3.5 text-accent" /> {file.name}
+                                        </a>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
@@ -910,6 +980,94 @@ export default function StudentWorkspace() {
                                 placeholder="Explain implementation details, challenges, or assumptions..."
                                 className="w-full text-sm p-3 bg-background border border-border rounded-lg input-focus resize-none focus-visible-ring"
                               />
+                            </div>
+
+                            {/* File Upload Zone */}
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-semibold text-muted-foreground block">
+                                File Attachments <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+                              </label>
+                              <div
+                                onClick={() => !uploadingSubmissionFile && document.getElementById('submission-file-input')?.click()}
+                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                onDrop={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const file = e.dataTransfer.files[0];
+                                  if (file) {
+                                    const input = document.getElementById('submission-file-input') as HTMLInputElement;
+                                    if (input) {
+                                      const dt = new DataTransfer();
+                                      dt.items.add(file);
+                                      input.files = dt.files;
+                                      input.dispatchEvent(new Event('change', { bubbles: true }));
+                                    }
+                                  }
+                                }}
+                                className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
+                                  uploadingSubmissionFile
+                                    ? 'border-accent/40 bg-accent/5'
+                                    : 'border-border hover:border-accent/40 hover:bg-muted/30'
+                                }`}
+                              >
+                                <input
+                                  id="submission-file-input"
+                                  type="file"
+                                  accept=".pdf,.png,.jpg,.jpeg,.webp,.zip"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    if (file.size > 25 * 1024 * 1024) {
+                                      toast.error('File must be under 25MB');
+                                      return;
+                                    }
+                                    setUploadingSubmissionFile(true);
+                                    try {
+                                      const att = await uploadSubmissionFile(file);
+                                      setSubmissionFiles((prev) => [...prev, att]);
+                                      toast.success('File uploaded');
+                                    } catch (err: any) {
+                                      toast.error(err.message || 'Upload failed');
+                                    } finally {
+                                      setUploadingSubmissionFile(false);
+                                      e.target.value = '';
+                                    }
+                                  }}
+                                />
+                                {uploadingSubmissionFile ? (
+                                  <div className="flex items-center justify-center gap-2 text-accent text-sm">
+                                    <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                                    <Upload className="w-5 h-5" />
+                                    <p className="text-xs">
+                                      <span className="font-semibold text-accent">Click to upload</span> or drag & drop
+                                    </p>
+                                    <p className="text-[10px]">PDF, PNG, JPG, ZIP up to 25MB</p>
+                                  </div>
+                                )}
+                              </div>
+                              {submissionFiles.length > 0 && (
+                                <div className="mt-2 space-y-1.5">
+                                  {submissionFiles.map((att) => (
+                                    <div key={att.id} className="flex items-center justify-between p-2 bg-muted/40 rounded-lg border border-border">
+                                      <div className="flex items-center gap-2 text-xs min-w-0">
+                                        <FileText className="w-4 h-4 text-accent flex-shrink-0" />
+                                        <span className="truncate">{att.name}</span>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => setSubmissionFiles((prev) => prev.filter((f) => f.id !== att.id))}
+                                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
 
                             <button
