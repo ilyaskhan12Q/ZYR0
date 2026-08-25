@@ -5,7 +5,7 @@ import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
   Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight,
-  Upload, FileText, Trash2, Download, Loader2,
+  Upload, FileText, Trash2, Download, Loader2, BarChart3,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
 import { getMyActiveInternships } from '@/services/internships';
