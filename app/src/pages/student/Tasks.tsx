@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ClipboardList, CheckCircle2, Clock, AlertCircle, Circle, Calendar,
-  Paperclip, ChevronRight, Loader2, FileText, BarChart3, Download,
-  ExternalLink, Eye,
+  ChevronRight, Loader2, FileText, BarChart3, Download,
+  ExternalLink, Eye, X,
 } from 'lucide-react';
 import { getMyTasks } from '@/services/tasks';
 import { useAuth } from '@/contexts/AuthContext';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 const tabs = ['All', 'Pending', 'Submitted', 'Approved'];
 
@@ -41,6 +39,19 @@ export default function StudentTasks() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewTask, setPreviewTask] = useState<any | null>(null);
+
+  const closePreview = useCallback(() => setPreviewTask(null), []);
+
+  useEffect(() => {
+    if (!previewTask) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closePreview(); };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [previewTask, closePreview]);
 
   useEffect(() => {
     async function loadTasks() {
@@ -162,26 +173,22 @@ export default function StudentTasks() {
 
                         {/* Meta row */}
                         <div className="flex flex-wrap items-center gap-3 mt-3">
-                          {/* Priority */}
                           <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium ${priority.bg} ${priority.text}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${priority.dot}`} />
                             {task.priority}
                           </span>
 
-                          {/* Due date */}
                           <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Calendar className="w-3.5 h-3.5" />
                             {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No deadline'}
                           </span>
 
-                          {/* Difficulty */}
                           {task.difficulty && (
                             <span className="flex items-center gap-1 text-xs text-muted-foreground">
                               <BarChart3 className="w-3.5 h-3.5" /> {task.difficulty}
                             </span>
                           )}
 
-                          {/* Documents badge */}
                           {hasDocuments && (
                             <span className="inline-flex items-center gap-1 text-xs font-medium text-accent">
                               <FileText className="w-3.5 h-3.5" />
@@ -230,53 +237,79 @@ export default function StudentTasks() {
         )}
       </div>
 
-      {/* PDF Preview Dialog */}
-      <Dialog open={!!previewTask} onOpenChange={(open) => { if (!open) setPreviewTask(null); }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 gap-0 overflow-hidden">
-          {previewTask && (
-            <>
-              <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-card">
+      {/* Custom PDF Preview Modal */}
+      <AnimatePresence>
+        {previewTask && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"
+            onClick={closePreview}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative flex flex-col w-full h-full sm:max-w-4xl sm:max-h-[90vh] sm:rounded-xl bg-card sm:border sm:border-border shadow-2xl overflow-hidden"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3 border-b border-border bg-card flex-shrink-0">
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="w-4 h-4 text-accent flex-shrink-0" />
                   <h3 className="font-semibold text-sm truncate">{previewTask.title}</h3>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                   <a
                     href={previewTask.attachments[0].url}
                     download={previewTask.attachments[0].name}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-xs font-medium transition-colors"
+                    className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-[11px] sm:text-xs font-medium transition-colors"
                   >
-                    <Download className="w-3.5 h-3.5" /> Download
+                    <Download className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Download</span>
                   </a>
                   <a
                     href={previewTask.attachments[0].url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-xs font-medium transition-colors"
+                    className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-muted hover:bg-muted/80 rounded-lg text-[11px] sm:text-xs font-medium transition-colors"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> Open
+                    <ExternalLink className="w-3.5 h-3.5" /> <span className="hidden xs:inline">Open</span>
                   </a>
+                  <button
+                    onClick={closePreview}
+                    className="ml-1 p-1.5 hover:bg-muted rounded-lg transition-colors"
+                    aria-label="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-              {previewTask.attachments[0].type === 'application/pdf' ? (
-                <iframe
-                  src={previewTask.attachments[0].url}
-                  className="w-full h-[70vh]"
-                  title={previewTask.attachments[0].name}
-                />
-              ) : (
-                <div className="p-4 flex justify-center bg-muted/30">
-                  <img
+
+              {/* Content */}
+              <div className="flex-1 overflow-auto">
+                {previewTask.attachments[0].type === 'application/pdf' ? (
+                  <iframe
                     src={previewTask.attachments[0].url}
-                    alt={previewTask.attachments[0].name}
-                    className="max-w-full max-h-[70vh] rounded-lg border border-border"
+                    className="w-full h-full min-h-[60vh] sm:min-h-0"
+                    title={previewTask.attachments[0].name}
                   />
-                </div>
-              )}
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+                ) : (
+                  <div className="p-2 sm:p-4 flex justify-center bg-muted/30 h-full">
+                    <img
+                      src={previewTask.attachments[0].url}
+                      alt={previewTask.attachments[0].name}
+                      className="max-w-full max-h-full object-contain rounded-lg border border-border"
+                    />
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
