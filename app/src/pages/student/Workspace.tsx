@@ -173,7 +173,7 @@ export default function StudentWorkspace() {
       setSubmissionFiles([]);
 
       // Trigger simulation notification to mentor/company supervisor
-      const recipientId = selectedTask.mentor_id || selectedTask.company_id;
+      const recipientId = selectedTask.assigned_by;
       if (recipientId) {
         try {
           await dispatchNotificationWithSimulation({
@@ -914,9 +914,9 @@ export default function StudentWorkspace() {
                                 Your solution has been submitted. The coordinator will review your work.
                               </p>
 
-                              {(selectedTask.mentor_id || selectedTask.company_id) && (
+                              {(selectedTask.assigned_by) && (
                                 <Link
-                                  to={`/student/messages?internshipId=${selectedTask.internship_id}&userId=${selectedTask.mentor_id || selectedTask.company_id}`}
+                                  to={`/student/messages?internshipId=${selectedTask.internship_id}&userId=${selectedTask.assigned_by}`}
                                   className="inline-flex w-fit items-center gap-1.5 text-xs text-accent hover:underline font-medium"
                                 >
                                   <MessageSquare className="w-3.5 h-3.5" /> Message Reviewer
