@@ -1,7 +1,65 @@
 import { supabase } from '@/lib/supabase';
-import type { Task, TaskSubmission } from '@/lib/database.types';
+import type { Task, TaskSubmission, TaskAttachment } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+
+function sanitizeFilename(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
+/** Upload a task brief document (PDF/image) to Supabase Storage */
+export async function uploadTaskDocument(file: File): Promise<TaskAttachment> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const safeName = sanitizeFilename(file.name);
+  const path = `task-documents/${user.id}/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from('task-documents')
+    .upload(path, file, { upsert: false, contentType: file.type });
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('task-documents')
+    .getPublicUrl(path);
+
+  return {
+    id: crypto.randomUUID(),
+    name: file.name,
+    url: publicUrl,
+    type: file.type,
+    size: String(file.size),
+  };
+}
+
+/** Upload a student submission file to Supabase Storage */
+export async function uploadSubmissionFile(file: File): Promise<TaskAttachment> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const safeName = sanitizeFilename(file.name);
+  const path = `task-documents/${user.id}/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from('task-documents')
+    .upload(path, file, { upsert: false, contentType: file.type });
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('task-documents')
+    .getPublicUrl(path);
+
+  return {
+    id: crypto.randomUUID(),
+    name: file.name,
+    url: publicUrl,
+    type: file.type,
+    size: String(file.size),
+  };
+}
 
 /** Get tasks assigned to current user */
 export async function getMyTasks(useCache = true) {
