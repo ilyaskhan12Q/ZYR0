@@ -129,8 +129,8 @@ export function ResearchReasoning({
       className={cn("w-full", className)}
     >
       <AccordionItem value="reasoning" className="w-full">
-        <AccordionTrigger className="text-md text-muted-foreground hover:no-underline hover:opacity-70 py-2 w-full">
-          {running ? "Researching..." : `Research ${stage === 'done' ? 'complete' : stage === 'failed' ? 'failed' : 'complete'}.`}
+        <AccordionTrigger className="text-md text-muted-foreground hover:no-underline hover:opacity-70 py-3 w-full">
+          {running ? "Researching..." : `Research ${stage === 'done' ? 'complete' : stage === 'failed' ? 'failed' : stage === 'idle' ? 'complete' : `${stage}...`}.`}
         </AccordionTrigger>
         <AccordionContent className="p-0 -mt-1">
           <div className="flex flex-col gap-0">

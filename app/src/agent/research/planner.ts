@@ -1,4 +1,4 @@
-import { streamChat } from '@/agent/api/gateway';
+import { chatOnce } from '@/agent/api/gateway';
 import {
   DIMENSION_LABELS,
   DIMENSION_ORDER,
@@ -7,21 +7,26 @@ import {
   type SubTaskContract,
 } from '@/agent/research/types';
 
-const SYSTEM_PROMPT = `You are the Planner Agent of a deep-research system. A human researcher does not tackle a paper by searching for its title: they frame hypotheses, establish baselines, gather empirical benchmarks, and identify challenges. You mirror this by decomposing a topic into EXACTLY 4 sub-task worker contracts, one per research dimension:
+const SYSTEM_PROMPT = `You are the Planner Agent of a deep-research system. Decompose a topic into EXACTLY 4 sub-task worker contracts, one per research dimension:
 
-1. Dimension "foundations" — Foundational Context & Definitions. Purpose: establish baseline definitions, underlying scientific or architectural principles, and prior approaches.
-2. Dimension "technical" — Core Mechanism & Deep Architecture. Purpose: investigate the technical components, engineering workflows, algorithms, or chemical/physical processes involved.
-3. Dimension "benchmarks" — State-of-the-Art Benchmarks & Real-World Implementations. Purpose: pull real metrics, case studies, empirical benchmarks, and leading industry/academic implementations.
-4. Dimension "constraints" — Bottlenecks, Trade-offs & Future Challenges. Purpose: identify cost barriers, scalability limitations, security vulnerabilities, or regulatory hurdles.
+1. Dimension "foundations" — Foundational Context & Definitions
+2. Dimension "technical" — Core Mechanism & Deep Architecture
+3. Dimension "benchmarks" — State-of-the-Art Benchmarks & Real-World Implementations
+4. Dimension "constraints" — Bottlenecks, Trade-offs & Future Challenges
 
-Each contract prevents off-track workers by forcing a strict specification. Return ONLY a JSON object shaped exactly like:
+Return ONLY a JSON object:
+{"contracts":[{"taskId":1,"dimension":"foundations","focusArea":"short focus label","subTopicTitle":"searchable domain label","coreObjective":"exactly what question the worker must answer","keywords":["search term 1","search term 2","search term 3"]}],"contracts":[...]}
 
-{"contracts":[{"taskId":1,"dimension":"foundations","focusArea":"short focus label","subQuestions":["q1","q2","q3"],"subTopicTitle":"clear domain of inquiry","coreObjective":"exactly what question the worker must answer","keywords":["entity","term","concept"],"boundaries":{"include":["peer-reviewed papers","official whitepapers"],"exclude":["shallow blog posts","marketing copy"]},"outputFields":["metric","finding","date","full source attribution"],"sourceTypes":["Academic papers","Materials Science journals"]}]}
-
-Constraints: exactly 4 contracts in the order foundations, technical, benchmarks, constraints; taskId 1..4; every string field non-empty; 3-5 keywords; 3-5 subQuestions per contract; include/exclude boundaries 2-4 items each; outputFields 4-6 items; no markdown, no commentary, JSON only.`;
+Rules:
+- subTopicTitle: short, searchable phrase that appears in academic papers (not a sentence)
+- keywords: SPECIFIC SEARCH TERMS that appear in paper titles (not generic like "definition" or "principles")
+- 3 keywords per contract
+- exactly 4 contracts in the order foundations, technical, benchmarks, constraints
+- taskId 1..4
+- JSON only, no markdown, no commentary`;
 
 function buildUserPrompt(topic: string): string {
-  return `Decompose this topic into the 4 sub-task contracts defined by the system:\n\nTopic: "${topic}"\n\nOutput ONLY the JSON object.`;
+  return `Decompose this topic into the 4 sub-task contracts:\n\nTopic: "${topic}"\n\nOutput ONLY the JSON object.`;
 }
 
 export function extractJson(text: string): unknown | null {
@@ -98,7 +103,7 @@ function buildContract(dimension: DimensionId, topic: string): SubTaskContract {
       ],
       subTopicTitle: `Foundational context: ${topic}`,
       coreObjective: 'Establish baseline definitions, underlying principles and prior approaches for the topic.',
-      keywords: ['definition', 'principles', 'prior approaches', topic],
+      keywords: [topic, 'definition', 'overview', 'review'],
       boundaries: {
         include: ['peer-reviewed papers', 'institutional and reference sources'],
         exclude: ['shallow blog posts', 'marketing copy', 'uncredited claims'],
@@ -115,7 +120,7 @@ function buildContract(dimension: DimensionId, topic: string): SubTaskContract {
       ],
       subTopicTitle: `Mechanism & architecture: ${topic}`,
       coreObjective: 'Investigate the technical components, engineering workflows and underlying mechanisms of the topic.',
-      keywords: ['mechanism', 'architecture', 'workflow', 'implementation', topic],
+      keywords: [topic, 'architecture', 'algorithm', 'method', 'framework'],
       boundaries: {
         include: ['peer-reviewed papers', 'technical documentation', 'official whitepapers'],
         exclude: ['marketing copy', 'non-technical summaries'],
@@ -132,7 +137,7 @@ function buildContract(dimension: DimensionId, topic: string): SubTaskContract {
       ],
       subTopicTitle: `Benchmarks & implementations: ${topic}`,
       coreObjective: 'Pull real metrics, case studies, empirical benchmarks and leading industry/academic implementations.',
-      keywords: ['benchmark', 'metric', 'case study', 'evaluation', topic],
+      keywords: [topic, 'benchmark', 'evaluation', 'performance', 'results'],
       boundaries: {
         include: ['peer-reviewed studies', 'empirical benchmarks', 'official case studies'],
         exclude: ['marketing copy', 'unverified claims', 'aggregator summaries'],
@@ -149,7 +154,7 @@ function buildContract(dimension: DimensionId, topic: string): SubTaskContract {
       ],
       subTopicTitle: `Constraints & outlook: ${topic}`,
       coreObjective: 'Identify cost barriers, scalability limitations, security vulnerabilities and regulatory hurdles.',
-      keywords: ['cost', 'scalability', 'regulation', 'supply chain', 'outlook', topic],
+      keywords: [topic, 'challenges', 'limitations', 'future', 'trends'],
       boundaries: {
         include: ['official reports', 'regulatory filings', 'peer-reviewed studies'],
         exclude: ['marketing copy', 'opinion pieces without evidence'],
@@ -169,37 +174,48 @@ export function fallbackContracts(topic: string): SubTaskContract[] {
 }
 
 /**
- * Decompose a topic through the ai-gateway chat (free-tier models).
- * Retries once when the model output is invalid (free-tier providers
- * occasionally return short degraded responses), then falls back to
- * rule-built contracts.
+ * Decompose a topic through the ai-gateway chat (non-streaming for speed).
+ * Uses Gemini by default (fastest). Retries once when the model output is
+ * invalid, then falls back to rule-built contracts.
  */
 export async function decompose(topic: string): Promise<DecompositionResult> {
   const started = performance.now();
-  let text = '';
-  const result = await streamChat([{ role: 'user', content: buildUserPrompt(topic) }], {
-    system: SYSTEM_PROMPT,
-    onEvent: (event) => {
-      if (event.type === 'delta') text += event.text;
-    },
-  });
+
+  // 8-second client-side timeout — never wait longer for the planner.
+  const timeoutMs = 8_000;
+
+  const callLLM = async (prompt: string): Promise<string> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const result = await chatOnce(
+        [{ role: 'user', content: prompt }],
+        {
+          system: SYSTEM_PROMPT,
+          maxTokens: 800,
+          signal: controller.signal,
+        },
+      );
+      return result.ok ? (result.text ?? '') : '';
+    } catch {
+      return '';
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  const text = await callLLM(buildUserPrompt(topic));
   const elapsedMs = Math.round(performance.now() - started);
 
-  if (result.ok && text.trim()) {
+  if (text.trim()) {
     const contracts = validateContracts(extractJson(text));
     if (contracts) {
       return { contracts, provider: 'gateway', elapsedMs };
     }
 
-    // One retry for degraded free-tier output before falling back.
-    let retryText = '';
-    const retry = await streamChat([{ role: 'user', content: buildUserPrompt(topic) }], {
-      system: SYSTEM_PROMPT,
-      onEvent: (event) => {
-        if (event.type === 'delta') retryText += event.text;
-      },
-    });
-    const retryContracts = retry.ok && retryText.trim() ? validateContracts(extractJson(retryText)) : null;
+    // One retry for degraded output before falling back.
+    const retryText = await callLLM(buildUserPrompt(topic));
+    const retryContracts = retryText.trim() ? validateContracts(extractJson(retryText)) : null;
     if (retryContracts) {
       return { contracts: retryContracts, provider: 'gateway', elapsedMs };
     }
@@ -215,6 +231,6 @@ export async function decompose(topic: string): Promise<DecompositionResult> {
     contracts: fallbackContracts(topic),
     provider: 'fallback',
     elapsedMs,
-    error: result.error ?? 'Planner request failed',
+    error: 'Planner request failed or timed out',
   };
 }
