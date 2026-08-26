@@ -26,7 +26,7 @@ export default function PlatformHome() {
     <div
       className="framer-cLVzK framer-UqYjt framer-ViuFf framer-TzYaw framer-kCvBu framer-yTp47 framer-fZtkZ framer-72rtr7"
       data-framer-root
-      style={{ minHeight: '100vh', width: 'auto' }}
+      style={{ minHeight: '100vh', width: 'auto', background: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}
     >
       <SEO
         title="ZYR0 — Internships, Research, and More"
