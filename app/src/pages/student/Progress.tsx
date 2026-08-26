@@ -17,32 +17,40 @@ export default function StudentProgress() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadProgressData() {
       if (!profile) return;
       try {
-        const [certsRes, tasksRes, appsRes, logsRes] = await Promise.all([
-          getMyCertificates(),
-          getMyTasks(),
-          getMyApplications(),
-          supabase
-            .from('activity_logs')
-            .select('*')
-            .eq('user_id', profile.id)
-            .order('created_at', { ascending: false })
-            .limit(5),
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getMyCertificates(),
+            getMyTasks(),
+            getMyApplications(),
+            supabase
+              .from('activity_logs')
+              .select('*')
+              .eq('user_id', profile.id)
+              .order('created_at', { ascending: false })
+              .limit(5),
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Progress load timeout')), 10000))
         ]);
 
-        if (certsRes.data) setCertificates(certsRes.data);
-        if (tasksRes.data) setTasks(tasksRes.data);
-        if (appsRes.data) setApplications(appsRes.data);
-        if (logsRes.data) setActivities(logsRes.data);
+        if (cancelled) return;
+        const [certsRes, tasksRes, appsRes, logsRes] = settled;
+        if (certsRes.status === 'fulfilled' && certsRes.value.data) setCertificates(certsRes.value.data);
+        if (tasksRes.status === 'fulfilled' && tasksRes.value.data) setTasks(tasksRes.value.data);
+        if (appsRes.status === 'fulfilled' && appsRes.value.data) setApplications(appsRes.value.data);
+        if (logsRes.status === 'fulfilled' && logsRes.value.data) setActivities(logsRes.value.data);
       } catch (err) {
         console.error('Error loading progress data:', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadProgressData();
+    return () => { cancelled = true; };
   }, [profile]);
 
   if (loading || !profile) {

@@ -305,17 +305,21 @@ export default function CompanyOfferLetters() {
       if (!co) return;
       setCompany(co);
 
-      const [offersRes, appsRes] = await Promise.all([
-        getCompanyOfferLetters(co.id),
-        getAllCompanyApplications(co.id),
+      const settled = await Promise.race([
+        Promise.allSettled([
+          getCompanyOfferLetters(co.id),
+          getAllCompanyApplications(co.id),
+        ]),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Offer letters timeout')), 10000))
       ]);
 
-      if (offersRes.data) setOffers(offersRes.data as OfferLetter[]);
+      const [offersRes, appsRes] = settled;
 
-      if (appsRes.data) {
-        // Only accepted applications that don't yet have an offer letter
-        const existingAppIds = new Set((offersRes.data ?? []).map((o: any) => o.application_id));
-        const eligible = (appsRes.data as any[]).filter(
+      if (offersRes.status === 'fulfilled' && offersRes.value.data) setOffers(offersRes.value.data as OfferLetter[]);
+
+      if (appsRes.status === 'fulfilled' && appsRes.value.data) {
+        const existingAppIds = new Set((offersRes.status === 'fulfilled' ? (offersRes.value.data ?? []) : []).map((o: any) => o.application_id));
+        const eligible = (appsRes.value.data as any[]).filter(
           (a) => a.status === 'Accepted' && !existingAppIds.has(a.id)
         );
         setAcceptedApps(eligible);

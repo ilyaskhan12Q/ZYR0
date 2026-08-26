@@ -86,27 +86,35 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    let cancelled = false;
     let profileChannel: any;
     let companyChannel: any;
 
     async function loadAdminStats() {
       try {
-        const [profilesRes, companiesRes, internshipsRes, certsRes, appsRes] = await Promise.all([
-          supabase.from('profiles').select('id, role, created_at'),
-          supabase.from('companies').select('id, created_at'),
-          supabase.from('internships').select('id', { count: 'exact' }),
-          supabase.from('certificates').select('id', { count: 'exact' }),
-          supabase.from('applications').select('id', { count: 'exact' }),
+        const settled = await Promise.race([
+          Promise.allSettled([
+            supabase.from('profiles').select('id, role, created_at'),
+            supabase.from('companies').select('id, created_at'),
+            supabase.from('internships').select('id', { count: 'exact' }),
+            supabase.from('certificates').select('id', { count: 'exact' }),
+            supabase.from('applications').select('id', { count: 'exact' }),
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Admin dashboard timeout')), 10000))
         ]);
 
-        const fetchedProfiles = profilesRes.data || [];
-        const fetchedCompanies = companiesRes.data || [];
+        if (cancelled) return;
+
+        const [profilesRes, companiesRes, internshipsRes, certsRes, appsRes] = settled;
+
+        const fetchedProfiles = profilesRes.status === 'fulfilled' ? (profilesRes.value.data || []) : [];
+        const fetchedCompanies = companiesRes.status === 'fulfilled' ? (companiesRes.value.data || []) : [];
 
         setProfiles(fetchedProfiles);
         setCompanies(fetchedCompanies);
-        setInternshipsCount(internshipsRes.count || 0);
-        setCertsCount(certsRes.count || 0);
-        setAppsCount(appsRes.count || 0);
+        setInternshipsCount(internshipsRes.status === 'fulfilled' ? (internshipsRes.value.count || 0) : 0);
+        setCertsCount(certsRes.status === 'fulfilled' ? (certsRes.value.count || 0) : 0);
+        setAppsCount(appsRes.status === 'fulfilled' ? (appsRes.value.count || 0) : 0);
 
         // Fetch recent activity logs
         const { data: logs } = await supabase
@@ -160,12 +168,13 @@ export default function AdminDashboard() {
       } catch (err) {
         console.error('Error loading admin dashboard stats:', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadAdminStats();
 
     return () => {
+      cancelled = true;
       if (profileChannel) supabase.removeChannel(profileChannel);
       if (companyChannel) supabase.removeChannel(companyChannel);
       if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);

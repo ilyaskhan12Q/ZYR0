@@ -16,34 +16,42 @@ export default function CompanyInterns() {
   const [tasks, setTasks] = useState<any[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadData() {
       try {
         const { data: co } = await getMyCompany();
         if (co) {
           setCompany(co);
-          const [appsRes, tasksRes] = await Promise.all([
-            getAllCompanyApplications(co.id),
-            getTasksAssignedByMe(),
+          const settled = await Promise.race([
+            Promise.allSettled([
+              getAllCompanyApplications(co.id),
+              getTasksAssignedByMe(),
+            ]),
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Interns load timeout')), 10000))
           ]);
 
-          if (appsRes.data) {
-            // Find all accepted applications - these are our active interns
-            const activeApplicants = appsRes.data.filter((app: any) => app.status === 'Accepted');
+          if (cancelled) return;
+          const [appsRes, tasksRes] = settled;
+
+          if (appsRes.status === 'fulfilled' && appsRes.value.data) {
+            const activeApplicants = appsRes.value.data.filter((app: any) => app.status === 'Accepted');
             setInterns(activeApplicants);
           }
-          if (tasksRes.data) {
-            setTasks(tasksRes.data);
+          if (tasksRes.status === 'fulfilled' && tasksRes.value.data) {
+            setTasks(tasksRes.value.data);
           }
         }
       } catch (err) {
         console.error('Failed to load interns data', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     if (user) {
       loadData();
     }
+    return () => { cancelled = true; };
   }, [user]);
 
   if (loading) {
