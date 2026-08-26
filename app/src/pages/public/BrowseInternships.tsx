@@ -25,22 +25,34 @@ export default function BrowseInternships() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadData() {
-      setLoading(true);
-      const [internshipsRes, domainsRes] = await Promise.all([
-        getInternships(),
-        getInternshipDomains()
-      ]);
-      
-      if (internshipsRes.data) {
-        setInternships(internshipsRes.data);
+      try {
+        setLoading(true);
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getInternships(),
+            getInternshipDomains()
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Browse internships timeout')), 10000))
+        ]);
+        if (cancelled) return;
+        const [internshipsRes, domainsRes] = settled;
+        if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) {
+          setInternships(internshipsRes.value.data);
+        }
+        if (domainsRes.status === 'fulfilled' && domainsRes.value) {
+          setDomains(['All', ...domainsRes.value]);
+        }
+      } catch (error) {
+        console.error('Failed to load internships:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      if (domainsRes) {
-        setDomains(['All', ...domainsRes]);
-      }
-      setLoading(false);
     }
     loadData();
+    return () => { cancelled = true; };
   }, []);
 
   const filtered = internships.filter((i) => {
