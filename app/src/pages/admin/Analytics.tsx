@@ -57,17 +57,22 @@ export default function AdminAnalytics() {
     else setLoading(true);
     
     try {
-      const [profilesRes, internshipsRes, appsRes, certsRes] = await Promise.all([
-        supabase.from('profiles').select('id, role, created_at'),
-        supabase.from('internships').select('id, title, domain, status, created_at, company:companies(name)'),
-        supabase.from('applications').select('id, internship_id, status, created_at'),
-        supabase.from('certificates').select('id, created_at'),
+      const settled = await Promise.race([
+        Promise.allSettled([
+          supabase.from('profiles').select('id, role, created_at'),
+          supabase.from('internships').select('id, title, domain, status, created_at, company:companies(name)'),
+          supabase.from('applications').select('id, internship_id, status, created_at'),
+          supabase.from('certificates').select('id, created_at'),
+        ]),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Analytics timeout')), 10000))
       ]);
 
-      setRawProfiles(profilesRes.data || []);
-      setRawInternships(internshipsRes.data || []);
-      setRawApplications(appsRes.data || []);
-      setRawCertificates(certsRes.data || []);
+      const [profilesRes, internshipsRes, appsRes, certsRes] = settled;
+
+      setRawProfiles(profilesRes.status === 'fulfilled' ? (profilesRes.value.data || []) : []);
+      setRawInternships(internshipsRes.status === 'fulfilled' ? (internshipsRes.value.data || []) : []);
+      setRawApplications(appsRes.status === 'fulfilled' ? (appsRes.value.data || []) : []);
+      setRawCertificates(certsRes.status === 'fulfilled' ? (certsRes.value.data || []) : []);
     } catch (err) {
       console.error('Error loading analytics:', err);
     } finally {
