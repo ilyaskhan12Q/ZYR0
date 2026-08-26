@@ -7,12 +7,12 @@ export default function BenefitsSection() {
       {/* Video Container */}
       <div className="framer-v8c9yh" data-framer-name="Video Container">
         <div className="ssr-variant hidden-jueq9p">
-          <div className="framer-8go5sv-container" style={{willChange:'transform',opacity:0,transform:'translateX(-50%) translateY(-30px) scale(0.8)'}}>
+          <div className="framer-8go5sv-container" style={{willChange:'transform',opacity:1,transform:'translateX(-50%) translateY(-30px) scale(0.8)'}}>
             <video src="https://framerusercontent.com/assets/vdo7vl69SSTV5arCTIp5d25ciuQ.mp4" loop preload="none" muted playsInline style={{cursor:'auto',width:'100%',height:'100%',borderRadius:'0px',display:'block',objectFit:'fill',backgroundColor:'rgb(0, 0, 0)',objectPosition:'50% 50%'}} />
           </div>
         </div>
         <div className="ssr-variant hidden-19w5p2z hidden-72rtr7">
-          <div className="framer-8go5sv-container" style={{willChange:'transform',opacity:0,transform:'translateY(-30px) scale(0.8)'}}>
+          <div className="framer-8go5sv-container" style={{willChange:'transform',opacity:1,transform:'translateY(-30px) scale(0.8)'}}>
             <video src="https://framerusercontent.com/assets/vdo7vl69SSTV5arCTIp5d25ciuQ.mp4" loop preload="none" muted playsInline style={{cursor:'auto',width:'100%',height:'100%',borderRadius:'0px',display:'block',objectFit:'fill',backgroundColor:'rgb(0, 0, 0)',objectPosition:'50% 50%'}} />
           </div>
         </div>
@@ -21,7 +21,7 @@ export default function BenefitsSection() {
 
       {/* Main Container */}
       <div className="framer-z7ypqn" data-framer-name="Main Container">
-        <div className="framer-6ar3wa" data-framer-name="Container" style={{willChange:'transform',opacity:0,transform:'translateY(50px)'}}>
+        <div className="framer-6ar3wa" data-framer-name="Container" style={{willChange:'transform',opacity:1,transform:'translateY(50px)'}}>
           {/* Tag */}
           <div className="framer-81wl5o-container">
             <div className="framer-PBbng framer-kCvBu framer-d61g4f framer-v-d61g4f" data-framer-name="Tag">
@@ -48,7 +48,7 @@ export default function BenefitsSection() {
             { number: '12M+', label: 'Tasks Organized' },
             { number: '600+', label: 'Team Members' },
           ].map((stat, i) => (
-            <div key={i} className="framer-840l9" data-framer-name="Sub Container" style={{willChange:'transform',opacity:0,transform:'translateY(50px)'}}>
+            <div key={i} className="framer-840l9" data-framer-name="Sub Container" style={{willChange:'transform',opacity:1,transform:'translateY(50px)'}}>
               <div className="framer-1ofbbuw" data-framer-name="Number" style={{outline:'none',display:'flex',flexDirection:'column',justifyContent:'flex-start',flexShrink:0,transform:'none'}}>
                 <h2 className="framer-text framer-styles-preset-1bwurf2" style={{"--framer-text-color":"rgb(0, 0, 0)"}}>
                   <span data-text-fill="true" style={{backgroundImage:'linear-gradient(498deg, rgb(255, 255, 255) 0%, rgba(255, 255, 255, 0.5) 100%)'}} className="framer-text">{stat.number}</span>
