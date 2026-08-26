@@ -37,7 +37,7 @@ export default function BenefitsSection() {
           </div>
           {/* Paragraph */}
           <div className="framer-qa9ccd" data-framer-name="Paragraph" style={{outline:'none',display:'flex',flexDirection:'column',justifyContent:'flex-start',flexShrink:0,transform:'none'}}>
-            <p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment":"center"}}>Maximize efficiency, enhance collaboration, and achieve project goals with Suprema&apos;s powerful management tools.</p>
+            <p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment":"center"}}>Maximize efficiency, enhance collaboration, and achieve project goals with ZYR0&apos;s powerful management tools.</p>
           </div>
         </div>
 
