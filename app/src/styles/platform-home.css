@@ -1,0 +1,442 @@
+/* ============================================================
+   Platform Home — Stripe/hybrid layout
+   Dark hero → Light product grid → Dark trust → Light CTA
+   Reuses research-landing design tokens for brand consistency.
+   ============================================================ */
+
+.platform-root {
+  --ph-bg: #F5F5F2;
+  --ph-surface: #FFFFFF;
+  --ph-ink: #111111;
+  --ph-muted: #6F6F69;
+  --ph-border: #DCDCD5;
+  --ph-accent: #657C68;
+  --ph-dark: #111111;
+  --ph-dark-muted: #999999;
+
+  background-color: var(--ph-bg);
+  color: var(--ph-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography ─────────────────────────────────────────── */
+
+.platform-display {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+.platform-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ph-dark-muted);
+}
+
+.platform-eyebrow-dark {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ph-muted);
+}
+
+/* ── Hero (dark) ────────────────────────────────────────── */
+
+.platform-hero {
+  position: relative;
+  background-color: var(--ph-dark);
+  overflow: hidden;
+}
+
+.platform-hero-inner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 85vh;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.platform-hero-text {
+  font-size: clamp(3rem, 8vw, 9.375rem);
+  font-weight: 400;
+  color: #fff;
+  max-width: 56rem;
+  line-height: 0.9;
+  margin-top: 1rem;
+}
+
+.platform-subtitle {
+  margin-top: 1.5rem;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--ph-dark-muted);
+  max-width: 32rem;
+  line-height: 1.6;
+}
+
+.platform-hero-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .platform-hero-actions {
+    flex-direction: row;
+  }
+}
+
+.platform-hero-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 6rem;
+  background: linear-gradient(to top, var(--ph-bg), transparent);
+  pointer-events: none;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+
+.platform-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--ph-dark);
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s, transform 0.2s;
+  min-height: 44px;
+}
+
+.platform-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.platform-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ph-dark-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+  min-height: 44px;
+}
+
+.platform-btn-ghost:hover {
+  color: #fff;
+}
+
+.platform-btn-ghost-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ph-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+  min-height: 44px;
+}
+
+.platform-btn-ghost-dark:hover {
+  color: var(--ph-ink);
+}
+
+/* ── Sections ───────────────────────────────────────────── */
+
+.platform-section {
+  padding: 6rem 1rem;
+}
+
+.platform-container {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.platform-section-header {
+  text-align: center;
+  margin-bottom: 3.5rem;
+}
+
+.platform-section-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--ph-ink);
+  margin-top: 0.75rem;
+}
+
+.platform-section-title-light {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: #fff;
+  margin-top: 0.75rem;
+}
+
+/* ── Product Grid ───────────────────────────────────────── */
+
+.platform-product-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .platform-product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.platform-product-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.75rem;
+  background: var(--ph-surface);
+  border: 1px solid var(--ph-border);
+  border-radius: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  min-height: 420px;
+}
+
+.platform-product-card:hover {
+  border-color: var(--ph-muted);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.platform-product-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.platform-product-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.platform-product-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ph-ink);
+  margin-bottom: 0.5rem;
+}
+
+.platform-product-desc {
+  font-size: 0.875rem;
+  color: var(--ph-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.platform-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  background: var(--ph-bg);
+  color: var(--ph-muted);
+  border: 1px solid var(--ph-border);
+}
+
+/* ── Product Mockups ────────────────────────────────────── */
+
+.platform-mockup {
+  flex: 1;
+  background: var(--ph-bg);
+  border: 1px solid var(--ph-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  min-height: 160px;
+}
+
+.mockup-bar {
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--ph-border);
+}
+
+.mockup-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--ph-border);
+}
+
+.mockup-content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.mockup-row {
+  border-radius: 3px;
+}
+
+.mockup-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mockup-card {
+  height: 3rem;
+  background: var(--ph-surface);
+  border: 1px solid var(--ph-border);
+  border-radius: 0.375rem;
+}
+
+.mockup-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mockup-msg {
+  height: 0.75rem;
+  border-radius: 3px;
+}
+
+.mockup-msg-user {
+  width: 45%;
+  background: #3b82f6;
+  opacity: 0.25;
+  align-self: flex-end;
+}
+
+.mockup-msg-agent {
+  width: 70%;
+  background: var(--ph-border);
+}
+
+.mockup-msg-agent.short {
+  width: 40%;
+}
+
+.mockup-canvas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.mockup-block {
+  background: var(--ph-surface);
+  border: 1px solid var(--ph-border);
+  border-radius: 0.375rem;
+}
+
+/* ── Trust (dark) ───────────────────────────────────────── */
+
+.platform-dark-section {
+  background: var(--ph-dark);
+  padding: 6rem 1rem;
+}
+
+.platform-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  .platform-trust-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.platform-trust-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+}
+
+/* ── CTA ────────────────────────────────────────────────── */
+
+.platform-cta-section {
+  padding: 8rem 1rem;
+}
+
+.platform-cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.platform-cta-title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--ph-ink);
+}
+
+.platform-cta-subtitle {
+  margin-top: 1rem;
+  font-size: 1.0625rem;
+  color: var(--ph-muted);
+  max-width: 28rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.platform-cta-actions {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .platform-cta-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+}

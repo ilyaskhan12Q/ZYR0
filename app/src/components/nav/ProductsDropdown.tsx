@@ -7,7 +7,7 @@ const products = [
   {
     label: 'Internships',
     description: 'Find and manage structured internships with verified companies.',
-    href: '/internships',
+    href: '/internships/browse',
     icon: Briefcase,
     color: 'text-emerald-600 dark:text-emerald-400',
     bg: 'bg-emerald-50 dark:bg-emerald-500/10',

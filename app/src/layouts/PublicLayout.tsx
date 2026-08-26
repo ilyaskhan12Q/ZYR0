@@ -18,8 +18,8 @@ import ProductsDropdown from '@/components/nav/ProductsDropdown';
 import ResourcesDropdown from '@/components/nav/ResourcesDropdown';
 
 const mobileNavLinks = [
-  { label: 'Products', href: '/internships' },
-  { label: 'Research Agent', href: '/research' },
+  { label: 'Internships', href: '/internships' },
+  { label: 'Research', href: '/research' },
   { label: 'About', href: '/about' },
   { label: 'Careers', href: '/careers' },
 ];

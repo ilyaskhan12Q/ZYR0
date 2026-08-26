@@ -19,6 +19,7 @@ function useIsAgentSubdomain() {
 }
 
 // Public Pages
+const PlatformHome = lazy(() => import('@/pages/public/PlatformHome'));
 const Landing = lazy(() => import('@/pages/public/Landing'));
 const BrowseInternships = lazy(() => import('@/pages/public/BrowseInternships'));
 const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
@@ -113,8 +114,9 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route element={<PublicLayout />}>
-              <Route path="/" element={<Landing />} />
-              <Route path="/internships" element={<BrowseInternships />} />
+              <Route path="/" element={<PlatformHome />} />
+              <Route path="/internships" element={<Landing />} />
+              <Route path="/internships/browse" element={<BrowseInternships />} />
               <Route path="/internships/:id" element={<InternshipDetail />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/companies/:id" element={<CompanyDetail />} />
