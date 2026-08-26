@@ -47,21 +47,26 @@ export default function CompanyTasks() {
       const { data: co } = await getMyCompany();
       if (co) {
         setCompany(co);
-        const [tasksRes, appsRes, internshipsRes] = await Promise.all([
-          getTasksAssignedByMe(),
-          getAllCompanyApplications(co.id),
-          getInternships({ company_id: co.id, status: 'Active' }),
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getTasksAssignedByMe(),
+            getAllCompanyApplications(co.id),
+            getInternships({ company_id: co.id, status: 'Active' }),
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Company tasks timeout')), 10000))
         ]);
 
-        if (tasksRes.data) {
-          setTasks(tasksRes.data);
+        const [tasksRes, appsRes, internshipsRes] = settled;
+
+        if (tasksRes.status === 'fulfilled' && tasksRes.value.data) {
+          setTasks(tasksRes.value.data);
         }
-        if (appsRes.data) {
-          const activeInterns = appsRes.data.filter((app: any) => app.status === 'Accepted');
+        if (appsRes.status === 'fulfilled' && appsRes.value.data) {
+          const activeInterns = appsRes.value.data.filter((app: any) => app.status === 'Accepted');
           setInterns(activeInterns);
         }
-        if (internshipsRes.data) {
-          setInternships(internshipsRes.data);
+        if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) {
+          setInternships(internshipsRes.value.data);
         }
       }
     } catch (err) {
