@@ -28,31 +28,40 @@ export default function StudentDashboard() {
   const [teamApplications, setTeamApplications] = useState<any[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadDashboard() {
       try {
-        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.all([
-          getMyApplications(),
-          getMyTasks(),
-          getUnreadCount(),
-          getMyConversations(),
-          getMyCertificates(),
-          getMyTeamApplications()
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getMyApplications(),
+            getMyTasks(),
+            getUnreadCount(),
+            getMyConversations(),
+            getMyCertificates(),
+            getMyTeamApplications()
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Dashboard load timeout')), 10000))
         ]);
-        
-        setApplications(apps?.data || []);
-        setTasks(myTasks?.data || []);
-        setUnreadMessages(unread || 0);
-        setConversations(convos?.data || []);
-        setCertificates(certs?.data || []);
-        setTeamApplications(teamApps?.data || []);
+
+        if (cancelled) return;
+
+        const [apps, myTasks, unread, convos, certs, teamApps] = settled;
+        setApplications(apps.status === 'fulfilled' ? (apps.value?.data || []) : []);
+        setTasks(myTasks.status === 'fulfilled' ? (myTasks.value?.data || []) : []);
+        setUnreadMessages(unread.status === 'fulfilled' ? (unread.value || 0) : 0);
+        setConversations(convos.status === 'fulfilled' ? (convos.value?.data || []) : []);
+        setCertificates(certs.status === 'fulfilled' ? (certs.value?.data || []) : []);
+        setTeamApplications(teamApps.status === 'fulfilled' ? (teamApps.value?.data || []) : []);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    
+
     loadDashboard();
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) {
