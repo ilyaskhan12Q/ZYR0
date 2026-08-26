@@ -14,6 +14,8 @@ export default function MentorInterns() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchInternsData() {
       if (!profile?.company_id) {
         setLoading(false);
@@ -43,71 +45,81 @@ export default function MentorInterns() {
           .eq('status', 'Accepted');
 
         if (appsErr) throw appsErr;
+        if (cancelled) return;
 
         // Filter applications for the mentor's company
         const filteredApps = (apps || []).filter(
           (app: any) => app.internship?.company_id === profile.company_id
         );
 
-        // 2. Fetch tasks and evaluations for all filtered students to compute stats
-        const internsList = await Promise.all(
-          filteredApps.map(async (app: any) => {
-            const studentId = app.student?.id;
-            if (!studentId) return null;
+        // 2. Fetch tasks and evaluations for all filtered students — batched concurrency
+        const BATCH_SIZE = 3;
+        const internsList: any[] = [];
 
-            // Fetch tasks
-            const { data: tasks } = await supabase
-              .from('tasks')
-              .select('id, status')
-              .eq('assigned_to', studentId);
+        for (let i = 0; i < filteredApps.length; i += BATCH_SIZE) {
+          if (cancelled) return;
+          const batch = filteredApps.slice(i, i + BATCH_SIZE);
+          const batchResults = await Promise.allSettled(
+            batch.map(async (app: any) => {
+              const studentId = app.student?.id;
+              if (!studentId) return null;
 
-            // Fetch average evaluation rating
-            const { data: evals } = await supabase
-              .from('evaluations')
-              .select('overall_rating')
-              .eq('intern_id', studentId);
+              const { data: tasks } = await supabase
+                .from('tasks')
+                .select('id, status')
+                .eq('assigned_to', studentId);
 
-            const totalTasks = tasks?.length || 0;
-            const completedTasks = tasks?.filter((t: any) => t.status === 'Approved').length || 0;
-            const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+              const { data: evals } = await supabase
+                .from('evaluations')
+                .select('overall_rating')
+                .eq('intern_id', studentId);
 
-            const ratings = evals?.map((e: any) => e.overall_rating) || [];
-            const avgRating = ratings.length > 0
-              ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
-              : 'N/A';
+              const totalTasks = tasks?.length || 0;
+              const completedTasks = tasks?.filter((t: any) => t.status === 'Approved').length || 0;
+              const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-            // Determine status
-            let status = 'On Track';
-            if (progress < 40 && totalTasks > 0) status = 'Needs Attention';
-            else if (progress >= 85 && totalTasks > 0) status = 'Exceeding';
+              const ratings = evals?.map((e: any) => e.overall_rating) || [];
+              const avgRating = ratings.length > 0
+                ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
+                : 'N/A';
 
-            return {
-              id: studentId,
-              internship_id: app.internship?.id,
-              name: app.student?.full_name || 'Anonymous Student',
-              avatar: app.student?.avatar_url,
-              role: app.internship?.title || 'Intern',
-              company: app.internship?.company?.name || 'Your Company',
-              university: app.student?.university || 'University Not Listed',
-              progress,
-              tasksCompleted: completedTasks,
-              totalTasks,
-              rating: avgRating,
-              status,
-            };
-          })
-        );
+              let status = 'On Track';
+              if (progress < 40 && totalTasks > 0) status = 'Needs Attention';
+              else if (progress >= 85 && totalTasks > 0) status = 'Exceeding';
 
-        setInterns(internsList.filter(Boolean));
+              return {
+                id: studentId,
+                internship_id: app.internship?.id,
+                name: app.student?.full_name || 'Anonymous Student',
+                avatar: app.student?.avatar_url,
+                role: app.internship?.title || 'Intern',
+                company: app.internship?.company?.name || 'Your Company',
+                university: app.student?.university || 'University Not Listed',
+                progress,
+                tasksCompleted: completedTasks,
+                totalTasks,
+                rating: avgRating,
+                status,
+              };
+            })
+          );
+
+          for (const r of batchResults) {
+            if (r.status === 'fulfilled' && r.value) internsList.push(r.value);
+          }
+        }
+
+        setInterns(internsList);
       } catch (err: any) {
         console.error('Error fetching interns data:', err);
         toast.error('Failed to load interns list');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     fetchInternsData();
+    return () => { cancelled = true; };
   }, [profile]);
 
   if (loading) {
