@@ -17,27 +17,29 @@ import '@/styles/platform-home.css';
 
 export default function PlatformHome() {
   return (
-    <div className="ph-root">
+    <div
+      className="framer-cLVzK framer-UqYjt framer-ViuFf framer-TzYaw framer-kCvBu framer-yTp47 framer-fZtkZ framer-72rtr7"
+      data-framer-root
+      style={{ minHeight: '100vh', width: 'auto' }}
+    >
       <SEO
         title="ZYR0 — Internships, Research, and More"
         description="A platform built for students, researchers, and the modern workforce. Find internships, conduct deep research, and build your career."
         path="/"
       />
       <PlatformNavbar />
-      <main>
-        <HeroSection />
-        <ProductOverview />
-        <BenefitsSection />
-        <ProgressSection />
-        <ToolsSection />
-        <PricingSection />
-        <BlogSection />
-        <TeamSection />
-        <GlobalSection />
-        <TestimonialsSection />
-        <FAQSection />
-        <CTASection />
-      </main>
+      <HeroSection />
+      <ProductOverview />
+      <BenefitsSection />
+      <ProgressSection />
+      <ToolsSection />
+      <PricingSection />
+      <BlogSection />
+      <TeamSection />
+      <GlobalSection />
+      <TestimonialsSection />
+      <FAQSection />
+      <CTASection />
       <PlatformFooter />
     </div>
   );
