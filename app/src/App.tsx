@@ -112,9 +112,11 @@ function App() {
         <ScrollToTop />
         <Suspense fallback={<RouteLoading />}>
           <Routes>
+            {/* Platform Homepage — own navbar/footer, outside PublicLayout */}
+            <Route path="/" element={<PlatformHome />} />
+
             {/* Public Routes */}
             <Route element={<PublicLayout />}>
-              <Route path="/" element={<PlatformHome />} />
               <Route path="/internships" element={<Landing />} />
               <Route path="/internships/browse" element={<BrowseInternships />} />
               <Route path="/internships/:id" element={<InternshipDetail />} />
