@@ -2,62 +2,42 @@ import { lazy, Suspense } from 'react';
 import { SEO } from '@/components/SEO';
 import PlatformNavbar from '@/components/platform-home/PlatformNavbar';
 import HeroSection from '@/components/platform-home/HeroSection';
-import ProductOverview from '@/components/platform-home/ProductOverview';
-import BenefitsSection from '@/components/platform-home/BenefitsSection';
-import ProgressSection from '@/components/platform-home/ProgressSection';
-import ToolsSection from '@/components/platform-home/ToolsSection';
+import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
+import SolutionsSection from '@/components/platform-home/SolutionsSection';
 import CTASection from '@/components/platform-home/CTASection';
 import PlatformFooter from '@/components/platform-home/PlatformFooter';
 import '@/styles/platform-home.css';
 
 const PricingSection = lazy(() => import('@/components/platform-home/PricingSection'));
-const BlogSection = lazy(() => import('@/components/platform-home/BlogSection'));
-const TeamSection = lazy(() => import('@/components/platform-home/TeamSection'));
-const GlobalSection = lazy(() => import('@/components/platform-home/GlobalSection'));
-const TestimonialsSection = lazy(() => import('@/components/platform-home/TestimonialsSection'));
 const FAQSection = lazy(() => import('@/components/platform-home/FAQSection'));
 
 function SectionFallback() {
-  return <div style={{ minHeight: '200px' }} />;
+  return <div className="min-h-[200px] flex items-center justify-center text-neutral-600 text-xs font-mono">Loading section...</div>;
 }
 
 export default function PlatformHome() {
   return (
     <div
-      className="framer-cLVzK framer-UqYjt framer-ViuFf framer-TzYaw framer-kCvBu framer-yTp47 framer-fZtkZ framer-72rtr7"
-      data-framer-root
-      style={{ minHeight: '100vh', width: 'auto', background: 'rgb(0, 0, 0)', color: 'rgb(255, 255, 255)' }}
+      className="min-h-screen bg-black text-white selection:bg-cyan-500 selection:text-black font-sans antialiased overflow-x-hidden"
     >
       <SEO
-        title="ZYR0 — Internships, Research, and More"
-        description="A platform built for students, researchers, and the modern workforce. Find internships, conduct deep research, and build your career."
+        title="ZYR0 — The Multi-Product AI & SaaS Ecosystem"
+        description="Build full-stack apps with ZYR0 Studio, manage educational institutions with School OS, run autonomous deep research with 0-AI, and gain verified work experience with ZYR0 Work."
         path="/"
       />
       <PlatformNavbar />
-      <HeroSection />
-      <ProductOverview />
-      <BenefitsSection />
-      <ProgressSection />
-      <ToolsSection />
-      <Suspense fallback={<SectionFallback />}>
-        <PricingSection />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <BlogSection />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <TeamSection />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <GlobalSection />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <TestimonialsSection />
-      </Suspense>
-      <Suspense fallback={<SectionFallback />}>
-        <FAQSection />
-      </Suspense>
-      <CTASection />
+      <main>
+        <HeroSection />
+        <BentoProductGrid />
+        <SolutionsSection />
+        <Suspense fallback={<SectionFallback />}>
+          <PricingSection />
+        </Suspense>
+        <Suspense fallback={<SectionFallback />}>
+          <FAQSection />
+        </Suspense>
+        <CTASection />
+      </main>
       <PlatformFooter />
     </div>
   );
