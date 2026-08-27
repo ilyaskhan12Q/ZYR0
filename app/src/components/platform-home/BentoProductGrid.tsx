@@ -283,7 +283,7 @@ export default function BentoProductGrid() {
                   <h3 className="text-xl font-bold text-white font-mono flex items-center gap-2">
                     0-AI Research
                     <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                      AI Agent
+                      Deep AI Agent
                     </span>
                   </h3>
                   <p className="text-xs text-neutral-400">Autonomous Deep Research</p>
