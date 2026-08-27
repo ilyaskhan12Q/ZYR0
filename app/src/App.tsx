@@ -30,8 +30,21 @@ function useProductSubdomain(): ProductSubdomain {
   }, []);
 }
 
-// Public Pages
+// Master Platform Homepage
 const PlatformHome = lazy(() => import('@/pages/public/PlatformHome'));
+
+// ZYR0 Studio Surface
+const StudioLanding = lazy(() => import('@/pages/studio/StudioLanding'));
+
+// ZYR0 Edu / School OS Surface
+const SchoolOSLanding = lazy(() => import('@/pages/edu/SchoolOSLanding'));
+
+// 0-AI Deep Research Workspace & Landing
+const ZeroAIWorkspace = lazy(() => import('@/pages/zeroai/ZeroAIWorkspace'));
+const ResearchAgentPage = lazy(() => import('@/agent/ResearchAgentPage'));
+const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
+
+// ZYR0 Work / Internship Public Pages
 const Landing = lazy(() => import('@/pages/public/Landing'));
 const BrowseInternships = lazy(() => import('@/pages/public/BrowseInternships'));
 const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
@@ -58,17 +71,6 @@ const Login = lazy(() => import('@/pages/auth/Login'));
 const Register = lazy(() => import('@/pages/auth/Register'));
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
-
-// ZYR0 Studio Surface
-const StudioLanding = lazy(() => import('@/pages/studio/StudioLanding'));
-
-// ZYR0 Edu / School OS Surface
-const SchoolOSLanding = lazy(() => import('@/pages/edu/SchoolOSLanding'));
-
-// 0-AI Deep Research Workspace & Landing
-const ZeroAIWorkspace = lazy(() => import('@/pages/zeroai/ZeroAIWorkspace'));
-const ResearchAgentPage = lazy(() => import('@/agent/ResearchAgentPage'));
-const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
 
 // Role-Based Portals
 const StudentPortal = lazy(() => import('@/pages/student/StudentPortal'));
@@ -173,7 +175,7 @@ export default function App() {
         <ScrollToTop />
         <Suspense fallback={<RouteLoading />}>
           <Routes>
-            {/* Platform Master Homepage */}
+            {/* Platform Master Homepage (Bento Grid SaaS Ecosystem) */}
             <Route path="/" element={<PlatformHome />} />
 
             {/* ZYR0 Studio Dedicated Product Route */}
@@ -195,7 +197,7 @@ export default function App() {
               }
             />
 
-            {/* ZYR0 Work / Internships Dedicated Routes & Public Portal */}
+            {/* ZYR0 Work / Internships Dedicated Routes & Public Portal with PublicLayout */}
             <Route element={<PublicLayout />}>
               {/* /internships is the ZYR0 Work overview/landing page */}
               <Route path="/internships" element={<Landing />} />
