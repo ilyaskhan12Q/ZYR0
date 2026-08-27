@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, FileText, ExternalLink, Github } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTasksAssignedByMe, reviewSubmission, updateTask } from '@/services/tasks';
+import { getCompanyTasks, reviewSubmission, updateTask } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 const tabs = ['To Review', 'Reviewed'];
@@ -27,7 +27,8 @@ export default function MentorTasks() {
 
   async function loadTasks() {
     try {
-      const res = await getTasksAssignedByMe();
+      if (!profile?.company_id) return;
+      const res = await getCompanyTasks(profile.company_id);
       if (res.data) {
         setTasks(res.data);
       }

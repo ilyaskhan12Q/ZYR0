@@ -7,7 +7,7 @@ import {
   FilterX,
   User,
 } from 'lucide-react';
-import { getTasksAssignedByMe } from '@/services/tasks';
+import { getCompanyTasks } from '@/services/tasks';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
 import { getInternships } from '@/services/internships';
@@ -49,7 +49,7 @@ export default function CompanyTasks() {
         setCompany(co);
         const settled = await Promise.race([
           Promise.allSettled([
-            getTasksAssignedByMe(),
+            getCompanyTasks(co.id),
             getAllCompanyApplications(co.id),
             getInternships({ company_id: co.id, status: 'Active' }),
           ]),

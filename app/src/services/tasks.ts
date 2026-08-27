@@ -169,6 +169,47 @@ export async function getTasksAssignedByMe(useCache = true) {
   return res;
 }
 
+/** Get tasks for the user's company (all tasks across all team members) */
+export async function getCompanyTasks(companyId: string, useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: null, error: new Error('Not authenticated') };
+
+  const cacheKey = `company_tasks_${companyId}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const { data: internships, error: intErr } = await supabase
+    .from('internships')
+    .select('id')
+    .eq('company_id', companyId);
+
+  if (intErr || !internships?.length) {
+    return { data: [], error: intErr };
+  }
+
+  const internshipIds = internships.map((i) => i.id);
+
+  const fetchFn = () => supabase
+    .from('tasks')
+    .select(`
+      *,
+      internship:internships!internship_id (id, title),
+      assignee:profiles!assigned_to (id, full_name, avatar_url, email),
+      submissions:task_submissions (*)
+    `)
+    .in('internship_id', internshipIds)
+    .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
+}
+
 /** Get a single task with full details */
 export async function getTaskById(id: string, useCache = true) {
   const cacheKey = `task_${id}`;

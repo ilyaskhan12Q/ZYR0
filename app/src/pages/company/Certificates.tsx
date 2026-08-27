@@ -4,7 +4,7 @@ import { Search, CheckCircle2, XCircle, Send, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
-import { getTasksAssignedByMe } from '@/services/tasks';
+import { getCompanyTasks } from '@/services/tasks';
 import { getCompanyCertificates, issueCertificate, resendCertificateEmail } from '@/services/certificates';
 import { createWorkspaceEvent } from '@/services/workspaceEvents';
 import { clearCache } from '@/lib/cache';
@@ -30,7 +30,7 @@ export default function CompanyCertificates() {
         const settled = await Promise.race([
           Promise.allSettled([
             getAllCompanyApplications(co.id),
-            getTasksAssignedByMe(),
+            getCompanyTasks(co.id),
             getCompanyCertificates(co.id)
           ]),
           new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Certificates load timeout')), 10000))
