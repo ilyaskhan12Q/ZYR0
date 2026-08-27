@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { SEO } from '@/components/SEO';
-import PlatformNav from '@/components/nav/PlatformNav';
+import Header from '@/components/nav/Header';
 import HeroSection from '@/components/platform-home/HeroSection';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
 import SolutionsSection from '@/components/platform-home/SolutionsSection';
@@ -24,7 +24,7 @@ export default function PlatformHome() {
         description="Build full-stack apps with ZYR0 Studio, manage educational institutions with School OS, run autonomous deep research with 0-AI, and gain verified work experience with ZYR0 Work."
         path="/"
       />
-      <PlatformNav />
+      <Header />
       <main>
         <HeroSection />
         <BentoProductGrid />

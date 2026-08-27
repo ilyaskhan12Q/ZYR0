@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
-import PlatformNav from '@/components/nav/PlatformNav';
+import Header from '@/components/nav/Header';
 import PlatformFooter from '@/components/nav/PlatformFooter';
 import SchoolPerspectiveSwitcher from '@/components/products/edu/SchoolPerspectiveSwitcher';
 import { submitProductLead } from '@/services/leadService';
@@ -97,7 +97,7 @@ export default function SchoolOSLanding() {
         description="The modern, all-in-one operating system for K-12 schools, colleges, and educational institutions. Attendance, fee invoicing, exams, and timetables."
         path="/school"
       />
-      <PlatformNav />
+      <Header />
 
       <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero */}

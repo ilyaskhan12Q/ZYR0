@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
-import PlatformNav from '@/components/nav/PlatformNav';
+import Header from '@/components/nav/Header';
 import PlatformFooter from '@/components/nav/PlatformFooter';
 import StudioPromptSimulator from '@/components/products/studio/StudioPromptSimulator';
 import { submitProductLead } from '@/services/leadService';
@@ -79,7 +79,7 @@ export default function StudioLanding() {
         description="Build and deploy full-stack React web applications at the speed of thought with autonomous AI agents and zero vendor lock-in."
         path="/studio"
       />
-      <PlatformNav />
+      <Header />
 
       <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero */}
