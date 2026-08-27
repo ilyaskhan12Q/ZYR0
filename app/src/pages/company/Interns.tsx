@@ -5,7 +5,7 @@ import { Star, ClipboardList, MessageSquare, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
-import { getTasksAssignedByMe } from '@/services/tasks';
+import { getCompanyTasks } from '@/services/tasks';
 
 export default function CompanyInterns() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export default function CompanyInterns() {
           const settled = await Promise.race([
             Promise.allSettled([
               getAllCompanyApplications(co.id),
-              getTasksAssignedByMe(),
+              getCompanyTasks(co.id),
             ]),
             new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Interns load timeout')), 10000))
           ]);
