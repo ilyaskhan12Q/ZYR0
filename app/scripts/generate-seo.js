@@ -58,8 +58,13 @@ console.log(`[SEO Generate] Using domain: ${SITE_URL}`);
 // Public pages list — static routes with honest lastmod dates
 // (update these only when the page's content genuinely changes)
 const pages = [
-  { path: '', lastmod: '2026-08-06' },
-  { path: 'internships', lastmod: '2026-08-06' },
+  { path: '', lastmod: '2026-08-27' },
+  { path: 'studio', lastmod: '2026-08-27' },
+  { path: 'school', lastmod: '2026-08-27' },
+  { path: 'edu', lastmod: '2026-08-27' },
+  { path: 'research', lastmod: '2026-08-27' },
+  { path: 'internships', lastmod: '2026-08-27' },
+  { path: 'internships/browse', lastmod: '2026-08-27' },
   { path: 'companies', lastmod: '2026-08-06' },
   { path: 'careers', lastmod: '2026-08-06' },
   { path: 'careers/apply', lastmod: '2026-08-06' },
