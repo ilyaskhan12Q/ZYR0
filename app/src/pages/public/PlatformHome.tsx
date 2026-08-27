@@ -1,12 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { SEO } from '@/components/SEO';
-import PlatformNavbar from '@/components/platform-home/PlatformNavbar';
+import PlatformNav from '@/components/nav/PlatformNav';
 import HeroSection from '@/components/platform-home/HeroSection';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
 import SolutionsSection from '@/components/platform-home/SolutionsSection';
 import CTASection from '@/components/platform-home/CTASection';
-import PlatformFooter from '@/components/platform-home/PlatformFooter';
-import '@/styles/platform-home.css';
+import PlatformFooter from '@/components/nav/PlatformFooter';
 
 const PricingSection = lazy(() => import('@/components/platform-home/PricingSection'));
 const FAQSection = lazy(() => import('@/components/platform-home/FAQSection'));
@@ -25,7 +24,7 @@ export default function PlatformHome() {
         description="Build full-stack apps with ZYR0 Studio, manage educational institutions with School OS, run autonomous deep research with 0-AI, and gain verified work experience with ZYR0 Work."
         path="/"
       />
-      <PlatformNavbar />
+      <PlatformNav />
       <main>
         <HeroSection />
         <BentoProductGrid />
