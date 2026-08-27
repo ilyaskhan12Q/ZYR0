@@ -14,7 +14,6 @@ export interface ProductItem {
   href: string;
   icon: any;
   color: string;
-  accentGradient: string;
   features: string[];
 }
 
@@ -27,8 +26,7 @@ export const productsList: ProductItem[] = [
     description: 'Autonomous AI website and full-stack application builder with visual canvas, live preview, and 1-click cloud deployment.',
     href: '/studio',
     icon: Code,
-    color: 'rgb(56, 189, 248)', // sky-400
-    accentGradient: 'from-sky-500/20 via-cyan-500/10 to-transparent',
+    color: 'rgb(56, 189, 248)',
     features: ['Natural language prompt-to-app', 'React 19 + Tailwind component stack', 'Instant Cloudflare/Vercel deploy', 'Full code export & Git sync']
   },
   {
@@ -39,8 +37,7 @@ export const productsList: ProductItem[] = [
     description: 'Unified educational administration platform managing admissions, biometric attendance, smart fee invoicing, grading, and timetables.',
     href: '/school',
     icon: School,
-    color: 'rgb(129, 140, 248)', // indigo-400
-    accentGradient: 'from-indigo-500/20 via-purple-500/10 to-transparent',
+    color: 'rgb(129, 140, 248)',
     features: ['Multi-role portals (Admin, Teacher, Parent, Student)', 'Automated fee collections & receipting', 'AI timetable scheduler & substitutions', 'Live academic & attendance telemetry']
   },
   {
@@ -51,8 +48,7 @@ export const productsList: ProductItem[] = [
     description: 'Agentic intelligence engine that plans, executes, cross-verifies, and synthesizes exhaustive industry and academic reports.',
     href: '/research',
     icon: BrainCircuit,
-    color: 'rgb(244, 63, 94)', // rose-500
-    accentGradient: 'from-rose-500/20 via-pink-500/10 to-transparent',
+    color: 'rgb(244, 63, 94)',
     features: ['Multi-agent recursive search loops', 'Verifiable source citations', 'LaTeX mathematical rendering', 'Export to PDF & Markdown']
   },
   {
@@ -63,36 +59,9 @@ export const productsList: ProductItem[] = [
     description: 'Connect top student engineering talent with fast-growing companies through structured assignments and cryptographically verifiable certificates.',
     href: '/internships',
     icon: Briefcase,
-    color: 'rgb(52, 211, 153)', // emerald-400
-    accentGradient: 'from-emerald-500/20 via-teal-500/10 to-transparent',
+    color: 'rgb(52, 211, 153)',
     features: ['GitHub-backed project delegations', 'PR-style split-pane review drawer', 'Cryptographic certificate verification', 'End-to-end talent pipeline']
   }
-];
-
-export const navLinks = [
-  { label: 'Products', href: '#products-suite', hasDropdown: true },
-  { label: 'Solutions', href: '#solutions' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
-];
-
-export const navCta = { label: 'Explore Products', href: '#products-suite' };
-export const navSignIn = { label: 'Sign in', href: '/login' };
-
-export const hero = {
-  tag: 'The Next-Gen SaaS Ecosystem',
-  heading: 'Build, Learn, Research, and Work with AI.',
-  subtitle: 'ZYR0 is the unified multi-product technology suite powering builders with AI Studio, educational institutions with School OS, researchers with 0-AI, and talent with verified work experience.',
-  cta: { label: 'Get Started Free', href: '/register' },
-  secondaryCta: { label: 'Explore Ecosystem', href: '#products-suite' },
-  trustText: 'Trusted by 10,000+ builders, students, schools, and growing engineering teams.',
-};
-
-export const clientLogos = [
-  'Google', 'Microsoft', 'Apple', 'Amazon', 'Meta',
-  'Netflix', 'Spotify', 'Stripe', 'Shopify', 'Slack',
-  'Notion', 'Figma', 'Vercel', 'Cloudflare',
 ];
 
 export const stats = [
