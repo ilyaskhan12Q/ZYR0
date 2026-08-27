@@ -168,7 +168,42 @@ export default function App() {
     );
   }
 
-  // 4. Main Domain Ecosystem Router (zyroo.org, localhost, Vercel deployments)
+  // 4. Work Subdomain Gateway (work.zyroo.org)
+  if (productSubdomain === 'work') {
+    return (
+      <LazyMotion features={domAnimation}>
+        <CompanyAccessProvider>
+          <ScrollToTop />
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<Landing />} />
+                <Route path="/browse" element={<BrowseInternships />} />
+                <Route path="/:id" element={<InternshipDetail />} />
+                <Route path="/companies" element={<Companies />} />
+                <Route path="/companies/:id" element={<CompanyDetail />} />
+                <Route path="/verify" element={<Verify />} />
+                <Route path="/verify/:code" element={<Verify />} />
+                <Route path="/verify-certificate" element={<Verify />} />
+                <Route path="/verify-certificate/:code" element={<Verify />} />
+                <Route path="/verify-offer" element={<VerifyOffer />} />
+                <Route path="/verify-offer/:id" element={<VerifyOffer />} />
+              </Route>
+              <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+              <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="*" element={<SubdomainRedirect />} />
+            </Routes>
+            <Toaster />
+          </Suspense>
+        </CompanyAccessProvider>
+      </LazyMotion>
+    );
+  }
+
+  // 5. Main Domain Ecosystem Router (zyroo.org, localhost, Vercel deployments)
   return (
     <LazyMotion features={domAnimation}>
       <CompanyAccessProvider>

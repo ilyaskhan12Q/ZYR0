@@ -26,7 +26,10 @@ const homepageStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` }],
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'ZYR0 Work', item: `${BASE_URL}/internships` },
+    ],
   },
   {
     '@context': 'https://schema.org',
@@ -357,7 +360,7 @@ export default function Landing() {
       <SEO
         title="ZYR0 — Structured Internship Platform for Students & Employers"
         description="ZYR0 is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform."
-        path="/"
+        path="/internships"
         keywords="internship platform, internship management, student internships, internships in Pakistan, internship tracking, internship certificates, mentor feedback, internship workflow, companies hiring interns"
         structuredData={homepageStructuredData}
       />
