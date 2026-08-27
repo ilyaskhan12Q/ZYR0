@@ -47,7 +47,7 @@ export const JOURNEY_CARDS: JourneyCardItem[] = [
     ],
     previewType: "filter_drops",
     ctaText: "Explore Opportunities",
-    ctaHref: "/internships"
+    ctaHref: "/internships/browse"
   },
   {
     id: "apply",

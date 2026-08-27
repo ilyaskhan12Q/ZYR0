@@ -43,18 +43,23 @@ export default function BrowseInternships() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const [internshipsRes, domainsRes] = await Promise.all([
-        getInternships(),
-        getInternshipDomains()
-      ]);
-      
-      if (internshipsRes.data) {
-        setInternships(internshipsRes.data);
+      try {
+        const [internshipsRes, domainsRes] = await Promise.all([
+          getInternships(),
+          getInternshipDomains()
+        ]);
+        
+        if (internshipsRes?.data) {
+          setInternships(internshipsRes.data);
+        }
+        if (domainsRes && Array.isArray(domainsRes)) {
+          setDomains(['All', ...domainsRes]);
+        }
+      } catch (err) {
+        console.error('Error loading internships:', err);
+      } finally {
+        setLoading(false);
       }
-      if (domainsRes) {
-        setDomains(['All', ...domainsRes]);
-      }
-      setLoading(false);
     }
     loadData();
   }, []);
@@ -84,7 +89,7 @@ export default function BrowseInternships() {
       <SEO
         title="Browse Internships — Find Your Perfect Opportunity"
         description="Explore hundreds of verified internship opportunities across technology, design, data science, and more. Filter by domain, location, and type to find the internship that fits your career goals."
-        path="/internships"
+        path="/internships/browse"
         keywords="browse internships, internship opportunities, student jobs, career internship, remote internship, technology internship"
       />
       <div className="max-w-7xl mx-auto">

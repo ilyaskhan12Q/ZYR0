@@ -36,7 +36,7 @@ const CARDS = [
     checkBg: 'bg-sky-400/15',
     checkColor: 'text-blue-600 dark:text-sky-400',
     items: STUDENT_CHECKLIST,
-    cta: { label: 'Find an Internship', to: '/internships', className: 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-600/25 hover:shadow-blue-500/40', text: 'text-white' },
+    cta: { label: 'Find an Internship', to: '/internships/browse', className: 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-600/25 hover:shadow-blue-500/40', text: 'text-white' },
   },
   {
     key: 'employers',

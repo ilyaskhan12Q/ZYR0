@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, ArrowRight, Zap, MapPin } from 'lucide-react';
 
 const ROLES = [
@@ -103,13 +104,13 @@ export default function AnimatedSearchMockup() {
           ))}
         </div>
 
-        <button
-          type="button"
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 font-display font-semibold text-slate-900 dark:text-white text-sm shadow-lg shadow-blue-600/25 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+        <Link
+          to={typed ? `/internships/browse?search=${encodeURIComponent(typed)}` : '/internships/browse'}
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 font-display font-semibold text-white text-sm shadow-lg shadow-blue-600/25 transition-transform hover:scale-[1.02] active:scale-[0.98]"
         >
           Find Internships
           <ArrowRight className="w-4 h-4" />
-        </button>
+        </Link>
 
         <p className="mt-3 text-center text-[10px] text-slate-500 dark:text-slate-400">
           Live internships · Updated 2 min ago

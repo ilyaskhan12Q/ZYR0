@@ -497,7 +497,7 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">For Students</h4>
                 <ul className="space-y-2.5">
-                  <li><Link to="/internships" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Browse Internships</Link></li>
+                  <li><Link to="/internships/browse" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Browse Internships</Link></li>
                   <li><Link to="/student/applications" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">My Applications</Link></li>
                   <li><Link to="/student/workspace" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Workspace</Link></li>
                   <li><Link to="/student/certificates" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Certificates</Link></li>

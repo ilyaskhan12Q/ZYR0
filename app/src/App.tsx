@@ -197,9 +197,10 @@ export default function App() {
 
             {/* ZYR0 Work / Internships Dedicated Routes & Public Portal */}
             <Route element={<PublicLayout />}>
-              <Route path="/internships" element={<BrowseInternships />} />
+              {/* /internships is the ZYR0 Work overview/landing page */}
+              <Route path="/internships" element={<Landing />} />
+              {/* /internships/browse is the uploaded internships searchable catalog */}
               <Route path="/internships/browse" element={<BrowseInternships />} />
-              <Route path="/internships/overview" element={<Landing />} />
               <Route path="/internships/:id" element={<InternshipDetail />} />
               <Route path="/companies" element={<Companies />} />
               <Route path="/companies/:id" element={<CompanyDetail />} />
