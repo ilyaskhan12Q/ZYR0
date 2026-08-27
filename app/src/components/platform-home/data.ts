@@ -1,229 +1,238 @@
 import {
-  Briefcase, FlaskConical, Users, Shield, CheckCircle, Globe,
-  BarChart3, Bell, Search, FileText, Award, Zap, TrendingUp,
-  Clock, MessageSquare, Lock, Star, ArrowRight
+  Code, GraduationCap, Sparkles, Briefcase,
+  Shield, Zap, Globe, Layers, BarChart3, Users,
+  ArrowRight, Check, CheckCircle2, ChevronRight, FileCode,
+  School, BrainCircuit, Rocket, Lock, Laptop
 } from 'lucide-react';
 
-export const navLinks = [
-  { label: 'Internships', href: '/internships' },
-  { label: 'Research', href: '/research' },
-  { label: 'About', href: '/about' },
-  { label: 'Help', href: '/help' },
+export interface ProductItem {
+  id: string;
+  name: string;
+  badge?: string;
+  headline: string;
+  description: string;
+  href: string;
+  icon: any;
+  color: string;
+  accentGradient: string;
+  features: string[];
+}
+
+export const productsList: ProductItem[] = [
+  {
+    id: 'studio',
+    name: 'ZYR0 Studio',
+    badge: 'AI Builder',
+    headline: 'Prompt-to-production web apps in seconds',
+    description: 'Autonomous AI website and full-stack application builder with visual canvas, live preview, and 1-click cloud deployment.',
+    href: '/studio',
+    icon: Code,
+    color: 'rgb(56, 189, 248)', // sky-400
+    accentGradient: 'from-sky-500/20 via-cyan-500/10 to-transparent',
+    features: ['Natural language prompt-to-app', 'React 19 + Tailwind component stack', 'Instant Cloudflare/Vercel deploy', 'Full code export & Git sync']
+  },
+  {
+    id: 'edu',
+    name: 'ZYR0 Edu (School OS)',
+    badge: 'Institution SaaS',
+    headline: 'Modern operating system for schools & colleges',
+    description: 'Unified educational administration platform managing admissions, biometric attendance, smart fee invoicing, grading, and timetables.',
+    href: '/school',
+    icon: School,
+    color: 'rgb(129, 140, 248)', // indigo-400
+    accentGradient: 'from-indigo-500/20 via-purple-500/10 to-transparent',
+    features: ['Multi-role portals (Admin, Teacher, Parent, Student)', 'Automated fee collections & receipting', 'AI timetable scheduler & substitutions', 'Live academic & attendance telemetry']
+  },
+  {
+    id: 'research',
+    name: 'ZYR0 Research (0-AI)',
+    badge: 'Deep AI Agent',
+    headline: 'Autonomous multi-step research with verified citations',
+    description: 'Agentic intelligence engine that plans, executes, cross-verifies, and synthesizes exhaustive industry and academic reports.',
+    href: '/research',
+    icon: BrainCircuit,
+    color: 'rgb(244, 63, 94)', // rose-500
+    accentGradient: 'from-rose-500/20 via-pink-500/10 to-transparent',
+    features: ['Multi-agent recursive search loops', 'Verifiable source citations', 'LaTeX mathematical rendering', 'Export to PDF & Markdown']
+  },
+  {
+    id: 'work',
+    name: 'ZYR0 Work',
+    badge: 'Internship Engine',
+    headline: 'Project-driven internships & verifiable proof-of-work',
+    description: 'Connect top student engineering talent with fast-growing companies through structured assignments and cryptographically verifiable certificates.',
+    href: '/internships',
+    icon: Briefcase,
+    color: 'rgb(52, 211, 153)', // emerald-400
+    accentGradient: 'from-emerald-500/20 via-teal-500/10 to-transparent',
+    features: ['GitHub-backed project delegations', 'PR-style split-pane review drawer', 'Cryptographic certificate verification', 'End-to-end talent pipeline']
+  }
 ];
 
-export const navCta = { label: 'Get started free', href: '/register' };
+export const navLinks = [
+  { label: 'Products', href: '#products-suite', hasDropdown: true },
+  { label: 'Solutions', href: '#solutions' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+];
+
+export const navCta = { label: 'Explore Products', href: '#products-suite' };
 export const navSignIn = { label: 'Sign in', href: '/login' };
 
 export const hero = {
-  tag: 'A ZYR0 Product',
-  heading: 'Find internships that matter.',
-  subtitle: 'Connect with verified companies, track your applications, and launch your career — all in one place.',
-  cta: { label: 'Get started free', href: '/register' },
-  secondaryCta: { label: 'Browse internships', href: '/internships' },
-  trustText: 'Free for students. No credit card required.',
+  tag: 'The Next-Gen SaaS Ecosystem',
+  heading: 'Build, Learn, Research, and Work with AI.',
+  subtitle: 'ZYR0 is the unified multi-product technology suite powering builders with AI Studio, educational institutions with School OS, researchers with 0-AI, and talent with verified work experience.',
+  cta: { label: 'Get Started Free', href: '/register' },
+  secondaryCta: { label: 'Explore Ecosystem', href: '#products-suite' },
+  trustText: 'Trusted by 10,000+ builders, students, schools, and growing engineering teams.',
 };
 
 export const clientLogos = [
   'Google', 'Microsoft', 'Apple', 'Amazon', 'Meta',
   'Netflix', 'Spotify', 'Stripe', 'Shopify', 'Slack',
-  'Notion', 'Figma', 'Vercel', 'Linear',
-];
-
-export const features = [
-  { title: 'Browse Internships', description: 'Explore verified internship opportunities from top companies across industries.', icon: Briefcase },
-  { title: 'Track Applications', description: 'Monitor your application status in real-time with a visual pipeline.', icon: BarChart3 },
-  { title: 'Company Profiles', description: 'Research companies, read reviews, and understand their culture before applying.', icon: Users },
-  { title: 'Certificate Verification', description: 'Employers can verify your internship certificate with a unique code.', icon: Shield },
-  { title: 'Mentor Connect', description: 'Get guidance from experienced professionals in your field of interest.', icon: MessageSquare },
-  { title: 'Smart Matching', description: 'Our algorithm matches you with internships based on your skills and interests.', icon: Zap },
-  { title: 'Real-time Notifications', description: 'Get instant updates on application status, new opportunities, and messages.', icon: Bell },
-  { title: 'Secure Platform', description: 'Your data is encrypted and protected with industry-standard security.', icon: Lock },
-];
-
-export const benefits = [
-  {
-    title: 'For Students',
-    description: 'Find verified internships, track applications, and build your career with structured programs and mentorship.',
-    items: ['Browse 500+ verified internships', 'Track application status in real-time', 'Connect with industry mentors', 'Earn verified certificates'],
-  },
-  {
-    title: 'For Companies',
-    description: 'Post internships, review applicants, and manage your internship program with powerful tools.',
-    items: ['Post unlimited internships', 'AI-powered applicant matching', 'Structured evaluation system', 'Team collaboration tools'],
-  },
-  {
-    title: 'For Mentors',
-    description: 'Guide the next generation of professionals and track their progress through structured programs.',
-    items: ['Monitor mentee progress', 'Provide structured feedback', 'Build your professional profile', 'Connect with top talent'],
-  },
-  {
-    title: 'Verified Listings',
-    description: 'Every company and internship on ZYR0 is verified for authenticity and quality.',
-    items: ['100% verified companies', 'Authentic internship listings', 'Quality assurance process', 'Regular platform audits'],
-  },
-  {
-    title: 'Career Tracking',
-    description: 'Visualize your career journey from first application to landing your dream role.',
-    items: ['Application pipeline view', 'Progress analytics', 'Skill gap analysis', 'Career milestone tracking'],
-  },
-  {
-    title: 'Structured Programs',
-    description: 'Internships with clear goals, mentorship, and evaluation — not just coffee runs.',
-    items: ['Defined learning objectives', 'Regular check-ins', 'Performance evaluations', 'Certificate upon completion'],
-  },
+  'Notion', 'Figma', 'Vercel', 'Cloudflare',
 ];
 
 export const stats = [
-  { number: '500+', label: 'Verified Internships' },
-  { number: '120+', label: 'Partner Companies' },
-  { number: '10K+', label: 'Students Registered' },
-  { number: '95%', label: 'Satisfaction Rate' },
+  { number: '4', label: 'Flagship SaaS Products' },
+  { number: '10K+', label: 'Active Users & Builders' },
+  { number: '120+', label: 'Partner Companies & Schools' },
+  { number: '99.9%', label: 'Platform Uptime' },
+];
+
+export const ecosystemSolutions = [
+  {
+    category: 'For Builders & Developers',
+    title: 'From idea to live full-stack app in minutes.',
+    description: 'Use ZYR0 Studio to generate clean, production-ready React apps with zero boilerplate and one-click cloud hosting.',
+    icon: Rocket,
+    href: '/studio',
+  },
+  {
+    category: 'For Educational Institutions',
+    title: 'Transform school management with intelligent automation.',
+    description: 'Streamline attendance, fee collection, examinations, and communication with ZYR0 Edu/School OS.',
+    icon: School,
+    href: '/school',
+  },
+  {
+    category: 'For Researchers & Analysts',
+    title: 'Autonomous deep intelligence at your fingertips.',
+    description: 'Conduct deep literature reviews, market intelligence, and code audits in minutes with 0-AI Research Agent.',
+    icon: BrainCircuit,
+    href: '/research',
+  },
+  {
+    category: 'For Students & Companies',
+    title: 'Bridge academic theory with real engineering experience.',
+    description: 'Gain verifiable proof-of-work credentials and hire evaluated engineering interns with ZYR0 Work.',
+    icon: Briefcase,
+    href: '/internships',
+  },
 ];
 
 export const pricing = [
   {
-    name: 'Student',
+    name: 'Starter / Student',
     price: '$0',
-    period: 'forever',
-    description: 'Free for students',
+    period: 'free forever',
+    description: 'Essential access across the ZYR0 ecosystem.',
     popular: false,
     features: [
-      { text: 'Browse all internships', included: true },
-      { text: 'Track applications', included: true },
-      { text: 'Company profiles', included: true },
-      { text: 'Certificate verification', included: true },
-      { text: 'Mentor access', included: false },
-      { text: 'Priority support', included: false },
+      { text: 'Full access to ZYR0 Work & Internships', included: true },
+      { text: 'Standard 0-AI Research queries', included: true },
+      { text: 'ZYR0 Studio free tier (2 projects)', included: true },
+      { text: 'Verifiable digital credentials', included: true },
+      { text: 'Community support', included: true },
+      { text: 'Custom domains & SLA', included: false },
     ],
   },
   {
-    name: 'Company',
-    price: '$29',
+    name: 'Builder Pro',
+    price: '$24',
     period: '/month',
-    description: 'For companies hiring interns',
+    description: 'For power users, creators, and developers.',
     popular: true,
     features: [
-      { text: 'Post unlimited internships', included: true },
-      { text: 'Applicant tracking', included: true },
-      { text: 'AI-powered matching', included: true },
-      { text: 'Team collaboration', included: true },
-      { text: 'Analytics dashboard', included: true },
-      { text: 'Priority support', included: true },
+      { text: 'Unlimited ZYR0 Studio web apps & code export', included: true },
+      { text: 'High-depth 0-AI Deep Research agent runs', included: true },
+      { text: 'Custom domains & instant CDN deployment', included: true },
+      { text: 'Priority API & GPU processing', included: true },
+      { text: 'Priority 24/7 developer support', included: true },
+      { text: 'Institution-wide multi-tenancy', included: false },
     ],
   },
   {
-    name: 'Mentor',
-    price: '$9',
-    period: '/month',
-    description: 'For professional mentors',
+    name: 'Enterprise / School OS',
+    price: 'Custom',
+    period: 'annual license',
+    description: 'For schools, universities, and enterprises.',
     popular: false,
     features: [
-      { text: 'Mentor dashboard', included: true },
-      { text: 'Track mentee progress', included: true },
-      { text: 'Structured feedback tools', included: true },
-      { text: 'Professional profile', included: true },
-      { text: 'Priority matching', included: true },
-      { text: 'Priority support', included: false },
+      { text: 'Full ZYR0 Edu / School OS deployment', included: true },
+      { text: 'Unlimited students, teachers & parent accounts', included: true },
+      { text: 'Biometric & fee gateway integrations', included: true },
+      { text: 'Dedicated company internship portal & ATS', included: true },
+      { text: 'Custom SLA, dedicated onboarding & support', included: true },
+      { text: 'SOC 2 compliant security & dedicated cloud', included: true },
     ],
   },
-];
-
-export const tools = [
-  'Sort internships by category, location, and duration',
-  'Filter by company rating and stipend range',
-  'Save favorite internships for later',
-  'Apply with one-click using your profile',
-  'Track multiple applications simultaneously',
-  'Receive email notifications for new matches',
-  'Download verified completion certificates',
-  'Share your profile with potential employers',
-  'Access internship resources and guides',
-  'Connect with peers in your field',
-  'Get personalized recommendations',
-  'Export your career portfolio as PDF',
-];
-
-export const blogPosts = [
-  {
-    tag: 'Career Tips',
-    date: 'Mar 15, 2026',
-    title: 'How to Write a Standout Internship Application',
-    excerpt: 'Tips and tricks to make your application shine in a competitive market.',
-  },
-  {
-    tag: 'Platform',
-    date: 'Mar 10, 2026',
-    title: 'Introducing Smart Matching: Find Your Perfect Internship',
-    excerpt: 'Our new algorithm matches you with internships based on skills and interests.',
-  },
-  {
-    tag: 'Guides',
-    date: 'Mar 5, 2026',
-    title: 'The Complete Guide to Remote Internships in 2026',
-    excerpt: 'Everything you need to know about landing and succeeding in a remote internship.',
-  },
-  {
-    tag: 'Success Stories',
-    date: 'Feb 28, 2026',
-    title: 'From Intern to Full-Time: Real Stories from ZYR0 Students',
-    excerpt: 'How our students turned internships into career opportunities.',
-  },
-];
-
-export const teamMembers = [
-  { name: 'Ilyas Khan', role: 'Founder & CEO', image: '/zyro-logo.webp' },
-  { name: 'Sarah Chen', role: 'Head of Product', image: '/zyro-logo.webp' },
-  { name: 'Marcus Johnson', role: 'Lead Engineer', image: '/zyro-logo.webp' },
-  { name: 'Priya Patel', role: 'Design Lead', image: '/zyro-logo.webp' },
-  { name: 'Alex Rivera', role: 'Head of Growth', image: '/zyro-logo.webp' },
-  { name: 'Emma Wilson', role: 'Community Manager', image: '/zyro-logo.webp' },
-];
-
-export const globalStats = [
-  { number: '15+', label: 'Countries' },
-  { number: '120+', label: 'Partner Companies' },
-  { number: '95%', label: 'Satisfaction Rate' },
-];
-
-export const testimonials = [
-  { quote: 'ZYR0 made finding my dream internship so much easier. The application tracking feature is a game-changer.', name: 'Aisha Rahman', role: 'CS Student, NUST' },
-  { quote: 'We\'ve hired 12 interns through ZYR0 this semester alone. The quality of candidates is outstanding.', name: 'Omar Farooq', role: 'HR Director, TechCorp' },
-  { quote: 'The mentorship program connected me with industry experts who helped shape my career path.', name: 'Zara Khan', role: 'Business Student, LUMS' },
-  { quote: 'Finally, a platform that takes internships seriously. Structured programs, real mentorship, verified certificates.', name: 'David Park', role: 'Career Services, FAST' },
-  { quote: 'As a mentor, I can track my mentees\' progress and provide meaningful feedback. The tools are excellent.', name: 'Fatima Ali', role: 'Senior Engineer, dax' },
 ];
 
 export const faqItems = [
-  { question: 'What is ZYR0?', answer: 'ZYR0 is a platform connecting students with verified internship opportunities, mentors, and companies. We provide tools for career tracking, application management, and professional growth.' },
-  { question: 'Is ZYR0 free for students?', answer: 'Yes, ZYR0 is completely free for students. You can browse internships, track applications, and access all core features without any cost.' },
-  { question: 'How are companies verified?', answer: 'Every company on ZYR0 goes through a verification process including business registration checks, review of their internship program, and ongoing quality monitoring.' },
-  { question: 'Can I apply to multiple internships?', answer: 'Yes, you can apply to as many internships as you want. Our application tracker helps you manage all your applications in one place.' },
-  { question: 'How does the mentor program work?', answer: 'Mentors are experienced professionals who provide guidance to students. You can request a mentor based on your field of interest and get personalized career advice.' },
-  { question: 'What certificates do I receive?', answer: 'Upon completing an internship, you receive a verified digital certificate with a unique verification code that employers can check on our platform.' },
-  { question: 'How do I contact support?', answer: 'You can reach our support team through the contact page, email us at support@zyroo.org, or use the live chat feature on our platform.' },
-  { question: 'Can companies post internships for free?', answer: 'Companies can post their first internship for free. Our paid plans start at $29/month for unlimited postings and advanced features.' },
-  { question: 'Is my data secure?', answer: 'Yes, we use industry-standard encryption and security measures to protect your personal information. We never share your data with third parties without consent.' },
-  { question: 'How do I get started?', answer: 'Simply click "Get started free" to create your account. You can complete your profile in minutes and start browsing internships right away.' },
+  {
+    question: 'What is the ZYR0 platform?',
+    answer: 'ZYR0 is a multi-product AI and SaaS company providing four interconnected solutions: ZYR0 Studio (AI website/app builder), ZYR0 Edu / School OS (educational institution management), ZYR0 Research / 0-AI (autonomous deep research agent), and ZYR0 Work (project-based internships and verified credentials).'
+  },
+  {
+    question: 'Can I use ZYR0 products individually?',
+    answer: 'Yes! Each ZYR0 product (Studio, School OS, Research Agent, and Work) functions both as a standalone powerhouse and as part of the interconnected ZYR0 ecosystem.'
+  },
+  {
+    question: 'How do I get started with ZYR0 Studio?',
+    answer: 'Visit the ZYR0 Studio page (/studio) to try the interactive prompt builder, view sample generated web applications, and join the builder waitlist for immediate early access.'
+  },
+  {
+    question: 'How does School OS onboarding work for institutions?',
+    answer: 'Schools, colleges, and academies can book an institutional walkthrough through /school. Our team configures your custom domain, imports student/staff data, and provides end-to-end training.'
+  },
+  {
+    question: 'Is ZYR0 Work still available for students and companies?',
+    answer: 'Absolutely. ZYR0 Work remains the premier project-driven internship platform with verified GitHub task workflows, mentor code reviews, and tamper-proof digital certificates.'
+  },
+  {
+    question: 'How do I contact the team or book a custom enterprise demo?',
+    answer: 'You can reach us at support@zyroo.org or visit our Contact page (/contact) to book a live demo with our product architects.'
+  }
 ];
 
 export const footerNav = {
-  quickLinks: [
-    { label: 'Internships', href: '/internships' },
-    { label: 'Research Agent', href: '/research' },
-    { label: 'About', href: '/about' },
+  products: [
+    { label: 'ZYR0 Studio (AI Builder)', href: '/studio' },
+    { label: 'ZYR0 Edu (School OS)', href: '/school' },
+    { label: 'ZYR0 Research (0-AI)', href: '/research' },
+    { label: 'ZYR0 Work (Internships)', href: '/internships' },
+    { label: 'Browse Internships', href: '/internships/browse' },
+  ],
+  solutions: [
+    { label: 'For Developers & Builders', href: '/studio' },
+    { label: 'For K-12 & Higher Ed', href: '/school' },
+    { label: 'For Students & Graduates', href: '/internships' },
+    { label: 'For Hiring Companies', href: '/companies' },
+  ],
+  company: [
+    { label: 'About Us', href: '/about' },
+    { label: 'Careers', href: '/careers' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Contact', href: '/contact' },
+    { label: 'Verify Certificate', href: '/verify' },
   ],
-  pages: [
-    { label: 'Home', href: '/' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Help Center', href: '/help' },
+  legal: [
     { label: 'Privacy Policy', href: '/privacy' },
     { label: 'Terms of Service', href: '/terms' },
-  ],
-  social: [
-    { label: 'LinkedIn', href: '#', icon: 'linkedin' },
-    { label: 'X', href: '#', icon: 'twitter' },
-    { label: 'GitHub', href: '#', icon: 'github' },
-  ],
+    { label: 'Cookie Policy', href: '/cookies' },
+    { label: 'Security', href: '/contact' },
+  ]
 };

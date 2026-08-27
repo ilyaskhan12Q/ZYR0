@@ -1,8 +1,167 @@
-// @ts-nocheck
 import React from 'react';
+import { Link } from 'react-router-dom';
+import {
+  Code, School, BrainCircuit, Briefcase,
+  ShieldCheck, ArrowUpRight, Heart, Globe
+} from 'lucide-react';
+import { footerNav } from './data';
 
 export default function PlatformFooter() {
   return (
-    <footer className="framer-CChNV framer-ViuFf framer-Y7CAN framer-kCvBu framer-zEpix framer-TzYaw framer-19sxh8b framer-v-19sxh8b" data-framer-name="Desktop" style={{"background": "radial-gradient(38% 63% at 49.99999581357515% 1.9984014443252818e-13%, rgba(14, 14, 15, 1) 0%, rgba(0, 0, 0, 0) 100%)", "width": "100%"}}><div className="framer-1i0wgu3" data-framer-name="Main Container"><div className="framer-zxvy4z" data-framer-name="Container"><div className="framer-gjk1lt" data-framer-name="Sub Container"><div className="framer-1mnz5bp" data-framer-name="Sub Container"><a className="framer-1qx9b5f framer-afdeei" data-framer-name="Logo" href="/"><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="155" height="50" src="/images/qJq5ZSP2HO25rZ37xIGJRtU7y3Q.2fa88.svg" alt="Logo" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "cover"}} /></div></a><div className="framer-7s4fjk" data-framer-name="Heading" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-1foppa">Plan and navigate from idea to launch.</p></div></div><div className="framer-1hjbm1y" data-framer-name="Sub Container"><div className="framer-196c23f" data-framer-name="Button Container"><div className="framer-5grua1-container"><div style={{"display": "contents"}}></div></div><div className="framer-11p2rem-container"><a className="framer-PkdrX framer-kCvBu framer-1ivxuew framer-v-1ivxuew framer-j255z7" data-framer-name="Text Link Button" style={{"--1jo1md0": "6"}} href="mailto:support@zyroo.org" rel="noopener"><div className="framer-jkdysi" data-framer-name="Text" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--variable-reference-sUEf2TREN-Y0iXsNkIH)", "--framer-paragraph-spacing": "0px", "--variable-reference-sUEf2TREN-Y0iXsNkIH": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--variable-reference-sUEf2TREN-Y0iXsNkIH))"}}>support@zyroo.org</p></div><div className="framer-k4hh8y" data-framer-name="Sub Container"><div className="framer-nmipuf-container"><div style={{"display": "contents"}}></div></div></div></a></div></div><div className="framer-1dxopf8-container"><div className="framer-wql0C framer-TzYaw framer-lgfmly framer-v-lgfmly" data-framer-name="Label Dot Text"><div className="framer-7375wy" data-framer-name="Sub Container" style={{"backgroundColor": "rgba(96, 201, 79, 0.2)", "borderBottomLeftRadius": "100px", "borderBottomRightRadius": "100px", "borderTopLeftRadius": "100px", "borderTopRightRadius": "100px"}}><div className="framer-1lvw7p0" data-framer-name="Shape" style={{"backgroundColor": "rgb(96, 201, 79)", "borderBottomLeftRadius": "100%", "borderBottomRightRadius": "100%", "borderTopLeftRadius": "100%", "borderTopRightRadius": "100%"}}></div></div><div className="framer-1ca4p1g" data-framer-name="Text" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--variable-reference-PgdulH8hd-imQPLM0Nu)", "--framer-paragraph-spacing": "0px", "--variable-reference-PgdulH8hd-imQPLM0Nu": "var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159))", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--variable-reference-PgdulH8hd-imQPLM0Nu))"}}>All Systems Operational</p></div></div></div></div></div><div className="framer-ts2ahp" data-framer-name="Sub Container"><div className="framer-1yv08qg" data-framer-name="Sub Container"><div className="framer-zrkqsg" data-framer-name="Container"><div className="framer-rv3qw5" data-framer-name="Heading" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-33eovn" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255)))"}}>Quick Navigation</p></div><div className="framer-17klb28" data-framer-name="Links Container"><div className="framer-o2qigj" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/">Product Overview</a></p></div><div className="framer-15rpixn" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/">Features</a></p></div><div className="framer-1gbdzjr" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/">Pricing</a></p></div><div className="framer-14est2v" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/">Testimonials</a></p></div><div className="framer-3sc6h2" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/">FAQ&rsquo;s</a></p></div></div></div><div className="framer-bhgerj" data-framer-name="Container"><div className="framer-16r5upe" data-framer-name="Heading" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-33eovn" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255)))"}}>All Pages</p></div><div className="framer-1w9rupt" data-framer-name="Links Container"><div className="framer-1dt3zxg" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/">Home</a></p></div><div className="framer-1pqtkqd" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/waitlist">Waitlist</a></p></div><div className="framer-eatxh" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/contact">Contact</a></p></div><div className="framer-txnkyi" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/internships">Blogs</a></p></div><div className="framer-1xl64zx" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/about">Changelog</a></p></div><div className="framer-vxl5bh" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/privacy">Privacy Policy</a></p></div><div className="framer-1pstv3w" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-jycf3n" style={{"--framer-text-alignment": "left", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-8d7e0ee3-cbeb-4f0c-8fae-b1180c2c0a4a, rgb(173, 176, 183)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/404">404</a></p></div></div></div></div><div className="framer-17540ud" data-framer-name="Socials Container"><div className="framer-1mutkv9" data-framer-name="Heading" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-33eovn" style={{"--framer-text-alignment": "left"}}>Social Handles</p></div><div className="framer-11lallt" data-framer-name="Sub Container"><div className="framer-h8jwd1-container" data-framer-name="LinkedIn"><a name="LinkedIn" aria-label="Link" className="framer-Ts8ES framer-1rngdfz framer-v-1rngdfz framer-k59o3t" data-framer-name="Social Button" style={{"backgroundColor": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px"}} href="https://linkedin.com" target="_blank" rel="noopener"><div className="framer-13x6bo1-container"><div style={{"display": "contents"}}></div></div></a></div><div className="framer-lex981-container" data-framer-name="X"><a name="X" aria-label="Link" className="framer-Ts8ES framer-1rngdfz framer-v-1rngdfz framer-k59o3t" data-framer-name="Social Button" style={{"backgroundColor": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px"}} href="https://twitter.com" target="_blank" rel="noopener"><div className="framer-13x6bo1-container"><div style={{"display": "contents"}}></div></div></a></div><div className="framer-1xkatpk-container" data-framer-name="Instagram"><a name="Instagram" aria-label="Link" className="framer-Ts8ES framer-1rngdfz framer-v-1rngdfz framer-k59o3t" data-framer-name="Social Button" style={{"backgroundColor": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px"}} href="https://instagram.com" target="_blank" rel="noopener"><div className="framer-13x6bo1-container"><div style={{"display": "contents"}}></div></div></a></div></div></div></div></div><div className="framer-182qqi2" data-framer-name="Container" style={{"--border-bottom-width": "0px", "--border-color": "rgb(28, 30, 32)", "--border-left-width": "0px", "--border-right-width": "0px", "--border-style": "solid", "--border-top-width": "1px"}}><div className="framer-19q25rq" data-framer-name="Text" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-bda9c04e-b509-4c72-9c7b-cb1a648c7f32, rgb(107, 112, 122))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-bda9c04e-b509-4c72-9c7b-cb1a648c7f32, rgb(107, 112, 122)))"}}>&copy; 2024 All rights reserved.</p></div><div className="framer-svgqxm" data-framer-name="Sub Container" style={{"--border-bottom-width": "1px", "--border-color": "rgb(23, 25, 27)", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "borderBottomLeftRadius": "100px", "borderBottomRightRadius": "100px", "borderTopLeftRadius": "100px", "borderTopRightRadius": "100px"}}><div className="framer-1qtjis6" data-framer-name="Text" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-1w3ko1f": "var(--token-bda9c04e-b509-4c72-9c7b-cb1a648c7f32, rgb(107, 112, 122))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2"><span style={{"--framer-text-color": "var(--extracted-1w3ko1f, var(--token-bda9c04e-b509-4c72-9c7b-cb1a648c7f32, rgb(107, 112, 122)))"}} className="framer-text">Powered by</span> <a className="framer-text framer-styles-preset-18oiu5j" href="https://framer.com" target="_blank" rel="noopener">Framer</a> </p></div></div><div className="framer-7npij6" data-framer-name="Link" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-bda9c04e-b509-4c72-9c7b-cb1a648c7f32, rgb(107, 112, 122))", "--framer-paragraph-spacing": "0px", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-alignment": "right", "--framer-text-color": "var(--extracted-r6o4lv, var(--token-bda9c04e-b509-4c72-9c7b-cb1a648c7f32, rgb(107, 112, 122)))"}}><a className="framer-text framer-styles-preset-18oiu5j" href="/privacy">Privacy Policy</a></p></div><div className="framer-pg8c0t" data-framer-name="Top Light"><div className="framer-ganuj9-container" style={{"transform": "translateX(-50%)"}}><div className="framer-mPJc1 framer-1kkswow framer-v-1kkswow" data-framer-name="Variant 1" style={{"--yktru8": "center", "width": "100%"}}><div className="framer-15izuku"><div className="framer-bgfoxe" data-framer-name="Light Line" style={{"backgroundColor": "rgb(255, 255, 255)", "borderBottomLeftRadius": "1px", "borderBottomRightRadius": "1px", "borderTopLeftRadius": "1px", "borderTopRightRadius": "1px"}}></div></div></div></div><div className="framer-1leosy7" data-framer-name="Light Rays" style={{"transform": "translateX(-50%)"}}><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="722" height="181" sizes="(min-width: 1200px) max(227px, 650px, 300px), (min-width: 810px) and (max-width: 1199px) max(227px, 650px, 300px), (max-width: 809px) max(227px, 650px, 300px)" srcSet="/images/hIDqfiTbY3IysibAQMXdLAh3FIg.991fa.svg 512w, /images/hIDqfiTbY3IysibAQMXdLAh3FIg.2fa88.svg 722w" src="/images/hIDqfiTbY3IysibAQMXdLAh3FIg.2fa88.svg" alt="" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center top", "objectFit": "fill"}} data-framer-original-sizes="300px" /></div></div></div></div><div className="framer-cpfzqv" data-framer-name="Left Light" style={{"--border-bottom-width": "1px", "--border-color": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "--border-left-width": "0px", "--border-right-width": "0px", "--border-style": "solid", "--border-top-width": "0px", "borderBottomRightRadius": "30px"}}><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="372" height="1921" sizes="(min-width: 1200px) 93px" srcSet="/images/HCZjQc7lLsn2riEarMNNIDMfuGE.2fa88.png 372w" src="/images/HCZjQc7lLsn2riEarMNNIDMfuGE.2fa88.png" alt="Abstract Image" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "cover"}} data-framer-original-sizes="93px" /></div><div className="framer-1v44bou-container" style={{"transform": "rotate(42deg)"}}><div style={{"width": "100%", "height": "100%", "overflow": "hidden", "backgroundColor": "rgba(0, 0, 0, 0)", "transform": "translateZ(0)", "borderRadius": "0", "position": "relative"}}><div id="FooterLeft2"><canvas style={{"width": "100%", "height": "100%", "position": "absolute"}}></canvas></div></div></div><div className="framer-1359bj2" data-framer-name="Light"><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="93" height="217" src="/images/AK29gH5L0J9sCE64UYDBwf1P4.2fa88.svg" alt="" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "contain"}} /></div></div></div><div className="framer-1c6u5ir" data-framer-name="Right Light" style={{"--border-bottom-width": "1px", "--border-color": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "--border-left-width": "0px", "--border-right-width": "0px", "--border-style": "solid", "--border-top-width": "0px", "borderBottomLeftRadius": "30px"}}><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="373" height="1921" sizes="(min-width: 1200px) 93px" srcSet="/images/1Tf6fjkAqjtPFlnFvGiThI4gko.2fa88.png 373w" src="/images/1Tf6fjkAqjtPFlnFvGiThI4gko.2fa88.png" alt="Abstract Image" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "cover"}} data-framer-original-sizes="93px" /></div><div className="framer-1te2p5r-container" style={{"transform": "rotate(-42deg)"}}><div style={{"width": "100%", "height": "100%", "overflow": "hidden", "backgroundColor": "rgba(0, 0, 0, 0)", "transform": "translateZ(0)", "borderRadius": "0", "position": "relative"}}><div id="Footerright"><canvas style={{"width": "100%", "height": "100%", "position": "absolute"}}></canvas></div></div></div><div className="framer-m2hgfm" data-framer-name="Light" style={{"transform": "rotate(180deg)"}}><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="93" height="217" src="/images/AK29gH5L0J9sCE64UYDBwf1P4.2fa88.svg" alt="" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "contain"}} /></div></div></div></div></footer>
+    <footer className="w-full bg-neutral-950 border-t border-white/10 pt-16 pb-12 px-4 sm:px-6 lg:px-8 text-neutral-400">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 pb-12 border-b border-white/10">
+          {/* Brand Col */}
+          <div className="lg:col-span-2 flex flex-col items-start gap-4">
+            <Link to="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 via-cyan-500 to-indigo-600 p-[1px] flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+                <div className="w-full h-full bg-black rounded-[7px] flex items-center justify-center">
+                  <span className="text-white font-bold text-sm font-mono">Z0</span>
+                </div>
+              </div>
+              <span className="text-xl font-bold tracking-tight text-white font-mono">
+                ZYR0
+              </span>
+            </Link>
+            <p className="text-sm text-neutral-400 max-w-sm leading-relaxed">
+              The unified AI & SaaS ecosystem power-charging builders with Studio, institutions with School OS, researchers with 0-AI, and talent with verified work experience.
+            </p>
+
+            {/* System Status */}
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>All Systems & API Nodes Operational</span>
+            </div>
+
+            {/* Official Support */}
+            <a
+              href="mailto:support@zyroo.org"
+              className="text-xs text-neutral-400 hover:text-white transition-colors"
+            >
+              Direct Support: <span className="text-neutral-200 underline">support@zyroo.org</span>
+            </a>
+          </div>
+
+          {/* Products Col */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+              Products
+            </h4>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {footerNav.products.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="hover:text-white transition-colors flex items-center gap-1 group"
+                  >
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Solutions Col */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+              Solutions
+            </h4>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {footerNav.solutions.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="hover:text-white transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company Col */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+              Company
+            </h4>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {footerNav.company.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="hover:text-white transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Legal Col */}
+          <div className="flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white font-mono">
+              Legal & Trust
+            </h4>
+            <ul className="flex flex-col gap-2.5 text-sm">
+              {footerNav.legal.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.href}
+                    className="hover:text-white transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
+          <p>© {new Date().getFullYear()} ZYR0 Co. All rights reserved.</p>
+
+          <div className="flex items-center gap-6">
+            <a
+              href="https://linkedin.com/company/zyr0-co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://x.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              X (Twitter)
+            </a>
+            <a
+              href="https://whatsapp.com/channel/0029Vb8m3OK5Ui2W8xNLgy0F"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              WhatsApp
+            </a>
+            <a
+              href="https://github.com/ilyaskhan12Q/ZYR0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-neutral-300 transition-colors"
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }

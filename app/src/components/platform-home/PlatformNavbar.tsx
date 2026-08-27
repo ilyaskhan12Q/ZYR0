@@ -1,11 +1,280 @@
-// @ts-nocheck
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  ChevronDown, Menu, X, Sparkles, Code, School,
+  BrainCircuit, Briefcase, ArrowRight, ExternalLink
+} from 'lucide-react';
+import { productsList } from './data';
 
 export default function PlatformNavbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isProductsOpen, setIsProductsOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProductsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Close menus on route change
+  useEffect(() => {
+    setIsProductsOpen(false);
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   return (
-    <>
-      <nav className="framer-JNcZY framer-1ef8ldt framer-v-1ef8ldt" data-framer-name="Desktop" style={{"--border-bottom-width": "1px", "--border-color": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "backgroundColor": "var(--token-6983c6fb-b015-43ea-b1f0-cc4b720dc51e, rgb(0, 0, 0))", "borderBottomLeftRadius": "16px", "borderBottomRightRadius": "16px", "borderTopLeftRadius": "16px", "borderTopRightRadius": "16px", "boxShadow": "0px 16px 30px 0px rgba(0, 0, 0, 0.5), 0px 2px 2px 0px rgba(0, 0, 0, 0.5)", "maxWidth": "100%"}}><div className="framer-o51wab" data-framer-name="Logo"><a aria-label="Logo Link" className="framer-gcqxwl framer-19kp5gl" data-framer-name="Logo" href="/"><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="155" height="50" src="/images/qJq5ZSP2HO25rZ37xIGJRtU7y3Q.2fa88.svg" alt="" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "cover"}} /></div></a></div><div className="framer-14r2n9h" data-framer-name="Links Container"><div className="framer-5opdtm-container" data-framer-name="Home"><a name="Home" className="framer-Hd8xr framer-TzYaw framer-zm5oft framer-v-zm5oft framer-y1gq4s" data-framer-name="Active" style={{"--border-bottom-width": "1px", "--border-color": "var(--token-8440ea11-aa1f-45b8-8841-ac0e829a648f, rgb(28, 30, 32))", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "backgroundColor": "var(--token-01526063-22e0-41e6-9449-953f948a186a, rgb(19, 19, 21))", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px", "height": "100%"}} href="/" tabIndex="0"><div className="framer-13wmqmg" data-framer-name="Content"><div className="framer-151p152" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "--framer-paragraph-spacing": "0px", "opacity": "1", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255)))"}}>Home</p></div></div></a></div><div className="framer-1acgllw-container" data-framer-name="Blogs"><a name="Blogs" className="framer-Hd8xr framer-TzYaw framer-zm5oft framer-v-5vbmov framer-y1gq4s" data-framer-name="Non Active" style={{"--border-bottom-width": "1px", "--border-color": "rgba(29, 31, 33, 0)", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "backgroundColor": "rgba(0, 0, 0, 0)", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px", "height": "100%"}} href="/internships" tabIndex="0"><div className="framer-13wmqmg" data-framer-name="Content"><div className="framer-151p152" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159))", "--framer-paragraph-spacing": "0px", "opacity": "1", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159)))"}}>Blogs</p></div><div className="framer-1uq5a4q" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "--framer-paragraph-spacing": "0px", "transform": "translateX(-50%)"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255)))"}}>Blogs</p></div></div></a></div><div className="framer-18sa1sw-container" data-framer-name="Changelog"><a name="Changelog" className="framer-Hd8xr framer-TzYaw framer-zm5oft framer-v-5vbmov framer-y1gq4s" data-framer-name="Non Active" style={{"--border-bottom-width": "1px", "--border-color": "rgba(29, 31, 33, 0)", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "backgroundColor": "rgba(0, 0, 0, 0)", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px", "height": "100%"}} href="/about" tabIndex="0"><div className="framer-13wmqmg" data-framer-name="Content"><div className="framer-151p152" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159))", "--framer-paragraph-spacing": "0px", "opacity": "1", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159)))"}}>Changelog</p></div><div className="framer-1uq5a4q" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "--framer-paragraph-spacing": "0px", "transform": "translateX(-50%)"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255)))"}}>Changelog</p></div></div></a></div><div className="framer-1g2i5pc-container" data-framer-name="Features"><a name="Features" className="framer-Hd8xr framer-TzYaw framer-zm5oft framer-v-5vbmov framer-y1gq4s" data-framer-name="Non Active" style={{"--border-bottom-width": "1px", "--border-color": "rgba(29, 31, 33, 0)", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "backgroundColor": "rgba(0, 0, 0, 0)", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px", "height": "100%"}} href="/waitlist" tabIndex="0"><div className="framer-13wmqmg" data-framer-name="Content"><div className="framer-151p152" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159))", "--framer-paragraph-spacing": "0px", "opacity": "1", "transform": "none"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-b180feb0-2545-4848-a97b-fd8cf92292c7, rgb(146, 150, 159)))"}}>Waitlist</p></div><div className="framer-1uq5a4q" data-framer-name="Home" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-r6o4lv": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "--framer-paragraph-spacing": "0px", "transform": "translateX(-50%)"}}><p className="framer-text framer-styles-preset-1aqdup2" style={{"--framer-text-color": "var(--extracted-r6o4lv, var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255)))"}}>Waitlist</p></div></div></a></div></div><div className="framer-676p5w-container"><a className="framer-dYsUN framer-Y7CAN framer-zrvi27 framer-v-zrvi27 framer-10mls0p" data-framer-name="Button" style={{"--1q9ii2v": "16px 30px 16px 30px", "backgroundColor": "var(--token-c40dec17-ad9b-478b-a7f0-e25384b15814, rgb(255, 255, 255))", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px"}} href="/contact"><div className="framer-umc593" data-framer-name="Text Container"><div className="framer-1u5fjs8" data-framer-name="Text" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-1w1cjl5": "var(--variable-reference-nu2ZHEw0K-tN130ckQB)", "--framer-paragraph-spacing": "0px", "--variable-reference-nu2ZHEw0K-tN130ckQB": "var(--token-6983c6fb-b015-43ea-b1f0-cc4b720dc51e, rgb(0, 0, 0))", "opacity": "1", "transform": "none"}}><h6 className="framer-text framer-styles-preset-33eovn" style={{"--framer-text-color": "var(--extracted-1w1cjl5, var(--variable-reference-nu2ZHEw0K-tN130ckQB))"}}>Contact us</h6></div><div className="framer-1y17c9" data-framer-name="Text" style={{"outline": "none", "display": "flex", "flexDirection": "column", "justifyContent": "flex-start", "flexShrink": "0", "--extracted-1w1cjl5": "var(--variable-reference-nu2ZHEw0K-tN130ckQB)", "--framer-paragraph-spacing": "0px", "--variable-reference-nu2ZHEw0K-tN130ckQB": "var(--token-6983c6fb-b015-43ea-b1f0-cc4b720dc51e, rgb(0, 0, 0))", "transform": "translateX(-50%)"}}><h6 className="framer-text framer-styles-preset-33eovn" style={{"--framer-text-color": "var(--extracted-1w1cjl5, var(--variable-reference-nu2ZHEw0K-tN130ckQB))"}}>Contact us</h6></div></div></a></div></nav>
-      <nav className="framer-JNcZY framer-1ef8ldt framer-v-18it3nv" data-framer-name="Phone" style={{"--border-bottom-width": "1px", "--border-color": "var(--token-2b6a96af-8d2f-4024-85fc-877d4ce5bb0f, rgb(23, 25, 27))", "--border-left-width": "1px", "--border-right-width": "1px", "--border-style": "solid", "--border-top-width": "1px", "backgroundColor": "var(--token-6983c6fb-b015-43ea-b1f0-cc4b720dc51e, rgb(0, 0, 0))", "borderBottomLeftRadius": "16px", "borderBottomRightRadius": "16px", "borderTopLeftRadius": "16px", "borderTopRightRadius": "16px", "boxShadow": "0px 16px 30px 0px rgba(0, 0, 0, 0.5), 0px 2px 2px 0px rgba(0, 0, 0, 0.5)", "maxWidth": "100%", "width": "100%"}}><div className="framer-o51wab" data-framer-name="Logo"><a aria-label="Logo Link" className="framer-gcqxwl framer-19kp5gl" data-framer-name="Logo" href="/"><div style={{"position": "absolute", "borderRadius": "inherit", "top": "0", "right": "0", "bottom": "0", "left": "0"}} data-framer-background-image-wrapper="true"><img decoding="async" width="155" height="50" src="/images/qJq5ZSP2HO25rZ37xIGJRtU7y3Q.2fa88.svg" alt="" style={{"display": "block", "width": "100%", "height": "100%", "borderRadius": "inherit", "objectPosition": "center", "objectFit": "cover"}} /></div></a><div className="framer-1uwymoi" data-framer-name="Button/Humburger Menu" id="undefined-1uwymoi" style={{"backgroundColor": "rgb(255, 255, 255)", "borderBottomLeftRadius": "12px", "borderBottomRightRadius": "12px", "borderTopLeftRadius": "12px", "borderTopRightRadius": "12px"}} tabIndex="0"><div className="framer-rtuxh5" data-framer-name="Sub Container"><div className="framer-bzv35k" style={{"backgroundColor": "var(--token-aa01f5ac-e7a3-48ec-91e4-9174d5af3cf2, rgb(12, 12, 13))", "borderBottomLeftRadius": "298px", "borderBottomRightRadius": "298px", "borderTopLeftRadius": "298px", "borderTopRightRadius": "298px"}}></div><div className="framer-lkzdbj" style={{"backgroundColor": "var(--token-aa01f5ac-e7a3-48ec-91e4-9174d5af3cf2, rgb(12, 12, 13))", "borderBottomLeftRadius": "298px", "borderBottomRightRadius": "298px", "borderTopLeftRadius": "298px", "borderTopRightRadius": "298px"}}></div><div className="framer-16v91by" style={{"backgroundColor": "var(--token-aa01f5ac-e7a3-48ec-91e4-9174d5af3cf2, rgb(12, 12, 13))", "borderBottomLeftRadius": "298px", "borderBottomRightRadius": "298px", "borderTopLeftRadius": "298px", "borderTopRightRadius": "298px"}}></div></div></div></div></nav>
-    </>
+    <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pt-4 transition-all duration-300">
+      <div
+        className={`max-w-7xl mx-auto rounded-2xl transition-all duration-300 border ${
+          isScrolled
+            ? 'bg-black/85 backdrop-blur-xl border-white/15 shadow-2xl shadow-black/80 py-3 px-5 sm:px-6'
+            : 'bg-black/60 backdrop-blur-md border-white/10 py-3.5 px-5 sm:px-6'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 via-cyan-500 to-indigo-600 p-[1px] flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+              <div className="w-full h-full bg-black rounded-[7px] flex items-center justify-center">
+                <span className="text-white font-bold text-sm tracking-wider font-mono">Z0</span>
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-1.5">
+                ZYR0
+                <span className="px-1.5 py-0.2 text-[9px] font-semibold uppercase tracking-wider bg-white/10 text-emerald-400 border border-emerald-500/20 rounded">
+                  SaaS Suite
+                </span>
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-1">
+            {/* Products Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsProductsOpen(!isProductsOpen)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
+                  isProductsOpen
+                    ? 'text-white bg-white/10'
+                    : 'text-neutral-300 hover:text-white hover:bg-white/5'
+                }`}
+                aria-expanded={isProductsOpen}
+              >
+                <span>Products</span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isProductsOpen ? 'rotate-180 text-cyan-400' : 'text-neutral-400'
+                  }`}
+                />
+              </button>
+
+              {/* Mega-Dropdown Menu */}
+              {isProductsOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[560px] p-3 rounded-2xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 grid grid-cols-2 gap-2 animate-in fade-in zoom-in-95 duration-150">
+                  {productsList.map((product) => {
+                    const Icon = product.icon;
+                    return (
+                      <Link
+                        key={product.id}
+                        to={product.href}
+                        onClick={() => setIsProductsOpen(false)}
+                        className="group flex flex-col p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 group-hover:scale-105 transition-transform"
+                              style={{ color: product.color }}
+                            >
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <span className="font-semibold text-sm text-white group-hover:text-cyan-400 transition-colors">
+                              {product.name}
+                            </span>
+                          </div>
+                          {product.badge && (
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 border border-white/10">
+                              {product.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed">
+                          {product.description}
+                        </p>
+                      </Link>
+                    );
+                  })}
+                  <div className="col-span-2 mt-1 pt-2 border-t border-white/10 px-2 flex items-center justify-between text-xs text-neutral-400">
+                    <span>Explore all ecosystem tools & integrations</span>
+                    <a
+                      href="#products-suite"
+                      onClick={() => setIsProductsOpen(false)}
+                      className="text-cyan-400 hover:underline flex items-center gap-1 font-medium"
+                    >
+                      Compare all products <ArrowRight className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <a
+              href="#solutions"
+              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              Solutions
+            </a>
+            <a
+              href="#pricing"
+              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              Pricing
+            </a>
+            <Link
+              to="/about"
+              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              About
+            </Link>
+            <Link
+              to="/contact"
+              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              Contact
+            </Link>
+          </nav>
+
+          {/* Desktop Right CTAs */}
+          <div className="hidden md:flex items-center gap-3">
+            <Link
+              to="/login"
+              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/register"
+              className="px-4 py-2 text-sm font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-md shadow-white/10 hover:shadow-white/20 active:scale-95"
+            >
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-2">
+            <Link
+              to="/login"
+              className="px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-white"
+            >
+              Sign In
+            </Link>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-neutral-300 hover:text-white rounded-lg bg-white/5 border border-white/10"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pt-4 border-t border-white/10 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2">
+            <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500 px-1">
+              Products
+            </div>
+            <div className="grid grid-cols-1 gap-1.5">
+              {productsList.map((product) => {
+                const Icon = product.icon;
+                return (
+                  <Link
+                    key={product.id}
+                    to={product.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/15"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5"
+                        style={{ color: product.color }}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-white">{product.name}</div>
+                        <div className="text-[11px] text-neutral-400">{product.badge}</div>
+                      </div>
+                    </div>
+                    <ChevronDown className="w-4 h-4 -rotate-90 text-neutral-500" />
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="h-[1px] bg-white/10 my-1" />
+
+            <div className="flex flex-col gap-1 text-sm font-medium text-neutral-300">
+              <a
+                href="#solutions"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2 py-2 hover:text-white"
+              >
+                Solutions
+              </a>
+              <a
+                href="#pricing"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2 py-2 hover:text-white"
+              >
+                Pricing
+              </a>
+              <Link
+                to="/about"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2 py-2 hover:text-white"
+              >
+                About Us
+              </Link>
+              <Link
+                to="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-2 py-2 hover:text-white"
+              >
+                Contact
+              </Link>
+            </div>
+
+            <Link
+              to="/register"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mt-2 w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl shadow-lg"
+            >
+              Get Started Free
+            </Link>
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
