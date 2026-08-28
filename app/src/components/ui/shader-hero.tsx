@@ -9,7 +9,7 @@ import { Link } from "react-router-dom"
 
 const letterAnimation = {
   hidden: { opacity: 0, y: 40, filter: "blur(8px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const } },
 }
 
 const containerAnimation = {
@@ -71,14 +71,13 @@ export const ShaderHero = () => {
         className="absolute inset-0 w-full h-full"
         colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
         speed={0.25}
-        backgroundColor="#000000"
       />
       <MeshGradient
         className="absolute inset-0 w-full h-full opacity-50"
         colors={["#000000", "#ffffff", "#3a3a3a"]}
         speed={0.15}
-        wireframe="true"
-        backgroundColor="transparent"
+        distortion={0.8}
+        swirl={0.2}
       />
 
       {/* Radial spotlight following mouse */}
