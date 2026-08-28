@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { SEO } from '@/components/SEO';
 import Header from '@/components/nav/Header';
-import HeroSection from '@/components/platform-home/HeroSection';
+import { ShaderHero } from '@/components/ui/shader-hero';
 import LogoWall from '@/components/platform-home/LogoWall';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
 import DeepDiveSection from '@/components/platform-home/DeepDiveSection';
@@ -33,7 +33,7 @@ export default function PlatformHome() {
       />
       <Header />
       <main>
-        <HeroSection />
+        <ShaderHero />
         <LogoWall />
         <BentoProductGrid />
         <DeepDiveSection />

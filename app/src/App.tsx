@@ -36,6 +36,9 @@ const PlatformHome = lazy(() => import('@/pages/public/PlatformHome'));
 // ZYR0 Studio Surface
 const StudioLanding = lazy(() => import('@/pages/studio/StudioLanding'));
 
+// Demo Pages
+const ShaderHeroDemo = lazy(() => import('@/pages/demo/ShaderHeroDemo'));
+
 // ZYR0 Edu / School OS Surface
 const SchoolOSLanding = lazy(() => import('@/pages/edu/SchoolOSLanding'));
 
@@ -213,6 +216,9 @@ export default function App() {
 
             {/* ZYR0 Studio Dedicated Product Route */}
             <Route path="/studio" element={<StudioLanding />} />
+
+            {/* Demo Routes */}
+            <Route path="/demo/shader-hero" element={<ShaderHeroDemo />} />
 
             {/* ZYR0 Edu / School OS Dedicated Product Routes */}
             <Route path="/school" element={<SchoolOSLanding />} />
