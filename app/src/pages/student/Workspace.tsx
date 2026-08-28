@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
@@ -26,6 +26,7 @@ const WHATSAPP_URL = 'https://wa.me/923279883150';
 
 export default function StudentWorkspace() {
   const { internshipId } = useParams<{ internshipId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -38,7 +39,9 @@ export default function StudentWorkspace() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('overview');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(
+    (searchParams.get('tab') as WorkspaceTab) || 'overview'
+  );
 
   // Task detail and submission states
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
@@ -129,6 +132,21 @@ export default function StudentWorkspace() {
   useEffect(() => {
     loadWorkspaceData();
   }, [loadWorkspaceData]);
+
+  // Auto-select task from URL ?taskId= after tasks load
+  useEffect(() => {
+    const taskIdParam = searchParams.get('taskId');
+    if (taskIdParam && tasks.length > 0 && activeTab === 'tasks') {
+      const match = tasks.find((t: any) => t.id === taskIdParam);
+      if (match) {
+        setSelectedTask(match);
+        // Clean taskId from URL after selecting
+        const next = new URLSearchParams(searchParams);
+        next.delete('taskId');
+        setSearchParams(next, { replace: true });
+      }
+    }
+  }, [tasks, activeTab, searchParams, setSearchParams]);
 
   // Subscribe to real-time updates for timeline events
   const activeInternshipId = (activePlacement?.internship as any)?.id;
@@ -407,8 +425,12 @@ export default function StudentWorkspace() {
               key={tab}
               onClick={() => {
                 setActiveTab(tab);
-                // Reset selected task if changing tab
                 if (tab !== 'tasks') setSelectedTask(null);
+                // Sync tab to URL
+                const next = new URLSearchParams(searchParams);
+                next.set('tab', tab);
+                next.delete('taskId');
+                setSearchParams(next, { replace: true });
               }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                 isActive
