@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, FlaskConical, Palette, ChevronRight } from 'lucide-react';
+import { Briefcase, FlaskConical, Palette, GraduationCap, ChevronRight } from 'lucide-react';
 
 const products = [
   {
@@ -19,6 +19,14 @@ const products = [
     icon: FlaskConical,
     color: 'text-blue-600 dark:text-blue-400',
     bg: 'bg-blue-50 dark:bg-blue-500/10',
+  },
+  {
+    label: 'ZYR0 Edu',
+    description: 'Modern operating system for schools and colleges.',
+    href: '/school',
+    icon: GraduationCap,
+    color: 'text-indigo-600 dark:text-indigo-400',
+    bg: 'bg-indigo-50 dark:bg-indigo-500/10',
   },
   {
     label: 'ZYRO Studio',

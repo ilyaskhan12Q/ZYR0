@@ -16,12 +16,14 @@ import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 import { getLastEmail } from '@/lib/auth';
 import ProductsDropdown from '@/components/nav/ProductsDropdown';
 import ResourcesDropdown from '@/components/nav/ResourcesDropdown';
+import CompanyDropdown from '@/components/nav/CompanyDropdown';
 
 const mobileNavLinks = [
-  { label: 'Internships', href: '/internships' },
   { label: 'Research', href: '/research' },
   { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
   { label: 'Careers', href: '/careers' },
+  { label: 'Verify Certificate', href: '/verify' },
 ];
 
 export default function PublicLayout() {
@@ -118,12 +120,7 @@ export default function PublicLayout() {
               >
                 Research
               </Link>
-              <Link
-                to="/about"
-                className={`text-sm font-medium transition-colors hover:text-accent text-foreground/90 dark:text-white/90 ${location.pathname === '/about' ? 'text-accent font-semibold' : ''}`}
-              >
-                About
-              </Link>
+              <CompanyDropdown scrolled={scrolled} />
               <ResourcesDropdown scrolled={scrolled} />
 
               {/* Community Slot */}

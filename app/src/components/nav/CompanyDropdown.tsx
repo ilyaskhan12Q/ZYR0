@@ -1,20 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle, FileText, BookOpen, MessageCircle, Shield, BadgeCheck, Cookie, ChevronRight } from 'lucide-react';
+import { Building2, Mail, Briefcase, BadgeCheck, ChevronRight } from 'lucide-react';
 
-const resources = [
-  { label: 'Help Center', href: '/help', icon: HelpCircle },
-  { label: 'FAQ', href: '/faq', icon: MessageCircle },
+const company = [
+  { label: 'About', href: '/about', icon: Building2 },
+  { label: 'Contact', href: '/contact', icon: Mail },
+  { label: 'Careers', href: '/careers', icon: Briefcase },
   { label: 'Verify Certificate', href: '/verify', icon: BadgeCheck },
-  { label: 'Blog', href: '/blog', icon: BookOpen, badge: 'Soon' },
-  { label: 'Privacy Policy', href: '/privacy', icon: Shield },
-  { label: 'Terms of Service', href: '/terms', icon: FileText },
-  { label: 'Cookie Policy', href: '/cookie', icon: Cookie },
 ];
 
-export default function ResourcesDropdown({ scrolled }: { scrolled: boolean }) {
+export default function CompanyDropdown({ scrolled }: { scrolled: boolean }) {
   const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -34,6 +32,7 @@ export default function ResourcesDropdown({ scrolled }: { scrolled: boolean }) {
 
   return (
     <div
+      ref={ref}
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -46,7 +45,7 @@ export default function ResourcesDropdown({ scrolled }: { scrolled: boolean }) {
             : 'text-slate-900/90 dark:text-white/90 hover:text-slate-900 dark:hover:text-white'
         }`}
       >
-        Resources
+        Company
         <svg
           className={`w-3.5 h-3.5 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           fill="none"
@@ -65,9 +64,9 @@ export default function ResourcesDropdown({ scrolled }: { scrolled: boolean }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute right-0 top-full mt-2 w-[220px] bg-card rounded-xl border border-border shadow-xl py-1.5 z-50"
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[200px] bg-card rounded-xl border border-border shadow-xl py-1.5 z-50"
           >
-            {resources.map((item) => (
+            {company.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
@@ -76,11 +75,6 @@ export default function ResourcesDropdown({ scrolled }: { scrolled: boolean }) {
               >
                 <item.icon className="w-4 h-4 text-muted-foreground" />
                 <span className="flex-1">{item.label}</span>
-                {item.badge && (
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                    {item.badge}
-                  </span>
-                )}
                 <ChevronRight className="w-3 h-3 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
               </Link>
             ))}
