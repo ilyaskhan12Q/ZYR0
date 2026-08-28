@@ -1,20 +1,30 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronDown, Code, School, BrainCircuit, Briefcase,
-  ArrowRight, LogOut, User, LayoutDashboard, Settings,
-  Building2, Sun, Moon
+  ChevronDown, LogOut, User, LayoutDashboard, Settings,
+  Building2, Sun, Moon, HelpCircle, MessageCircle, BookOpen,
+  Shield, FileText, Cookie, BadgeCheck
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
 import { productsList } from '@/components/platform-home/data';
-import { MenuToggleIcon } from '@/components/ui/menu-toggle-icon';
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Code, School, BrainCircuit, Briefcase,
-};
+const resources = [
+  { label: 'Help Center', href: '/help', icon: HelpCircle },
+  { label: 'FAQ', href: '/faq', icon: MessageCircle },
+  { label: 'Blog', href: '/blog', icon: BookOpen, badge: 'Soon' },
+  { label: 'Verify Certificate', href: '/verify', icon: BadgeCheck },
+  { label: 'Privacy Policy', href: '/privacy', icon: Shield },
+  { label: 'Terms of Service', href: '/terms', icon: FileText },
+  { label: 'Cookie Policy', href: '/cookies', icon: Cookie },
+];
+
+const company = [
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+  { label: 'Careers', href: '/careers' },
+];
 
 export default function Header() {
   const { user, profile, signOut } = useAuth();
@@ -22,379 +32,596 @@ export default function Header() {
   const effectiveRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const productsRef = useRef<HTMLDivElement>(null);
+  const resourcesRef = useRef<HTMLDivElement>(null);
+  const companyRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+    const onClickOutside = (e: MouseEvent) => {
+      if (productsRef.current && !productsRef.current.contains(e.target as Node)) {
         setProductsOpen(false);
       }
+      if (resourcesRef.current && !resourcesRef.current.contains(e.target as Node)) {
+        setResourcesOpen(false);
+      }
+      if (companyRef.current && !companyRef.current.contains(e.target as Node)) {
+        setCompanyOpen(false);
+      }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
   }, []);
 
   useEffect(() => {
     setProductsOpen(false);
-    setMobileMenuOpen(false);
+    setResourcesOpen(false);
+    setCompanyOpen(false);
+    setMobileOpen(false);
     setProfileOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
-    if (!mobileMenuOpen && !profileOpen) return;
+    if (!mobileOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = prev; };
-  }, [mobileMenuOpen, profileOpen]);
+  }, [mobileOpen]);
 
-  const handleAnchorClick = (href: string) => {
-    if (href.startsWith('#')) {
-      if (location.pathname !== '/') {
-        navigate(`/${href}`);
-      } else {
-        document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-      }
+  const scrollTo = (hash: string) => {
+    if (location.pathname !== '/') {
+      navigate(`/${hash}`);
+    } else {
+      document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 pt-4 transition-all duration-300">
-      <div
-        className={`max-w-7xl mx-auto rounded-2xl transition-all duration-300 border ${
-          isScrolled
-            ? 'bg-black/85 backdrop-blur-xl border-white/15 shadow-2xl shadow-black/80 py-3 px-5 sm:px-6'
-            : 'bg-black/60 backdrop-blur-md border-white/10 py-3.5 px-5 sm:px-6'
-        }`}
-      >
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 via-cyan-500 to-indigo-600 p-[1px] flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-black rounded-[7px] flex items-center justify-center">
-                <span className="text-white font-bold text-sm tracking-wider font-mono">Z0</span>
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight text-white font-mono flex items-center gap-1.5">
-                ZYR0
-                <span className="px-1.5 py-0.2 text-[9px] font-semibold uppercase tracking-wider bg-white/10 text-emerald-400 border border-emerald-500/20 rounded">
-                  SaaS Suite
-                </span>
-              </span>
-            </div>
-          </Link>
+    <header
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-200"
+      style={{
+        background: scrolled ? 'var(--zyro-bg)' : 'transparent',
+        borderBottom: scrolled ? '1px solid var(--zyro-border)' : '1px solid transparent',
+      }}
+    >
+      <div className="max-w-[1264px] mx-auto px-6 md:px-16 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 shrink-0">
+          <span
+            className="text-xl font-display tracking-tight"
+            style={{ color: 'var(--zyro-text)' }}
+          >
+            ZYR0
+          </span>
+        </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {/* Products Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                onClick={() => setProductsOpen(!productsOpen)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
-                  productsOpen
-                    ? 'text-white bg-white/10'
-                    : 'text-neutral-300 hover:text-white hover:bg-white/5'
-                }`}
-                aria-expanded={productsOpen}
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-1">
+          {/* Products */}
+          <div className="relative" ref={productsRef}>
+            <button
+              type="button"
+              onClick={() => { setProductsOpen(!productsOpen); setResourcesOpen(false); setCompanyOpen(false); }}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150"
+              style={{ color: productsOpen ? 'var(--zyro-text)' : 'var(--zyro-text-secondary)' }}
+            >
+              Products
+              <ChevronDown
+                className="w-3.5 h-3.5 transition-transform duration-200"
+                style={{
+                  transform: productsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  color: 'var(--zyro-text-muted)',
+                }}
+              />
+            </button>
+
+            {productsOpen && (
+              <div
+                className="absolute top-full left-0 mt-2 w-[480px] p-2 rounded-xl border shadow-lg"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                }}
               >
-                <span>Products</span>
+                {productsList.map((product) => (
+                  <Link
+                    key={product.id}
+                    to={product.href}
+                    onClick={() => setProductsOpen(false)}
+                    className="flex items-start gap-3 p-3 rounded-lg transition-colors duration-150"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                      style={{ background: 'var(--zyro-accent-muted)' }}
+                    >
+                      <span
+                        className="font-display text-sm"
+                        style={{ color: 'var(--zyro-accent)' }}
+                      >
+                        {product.name.charAt(4)}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-sm font-medium">{product.name}</span>
+                        {product.badge && (
+                          <span
+                            className="font-label text-[9px] tracking-[0.1em] px-1.5 py-0.5 rounded"
+                            style={{
+                              background: 'var(--zyro-elevated)',
+                              color: 'var(--zyro-text-muted)',
+                            }}
+                          >
+                            {product.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p
+                        className="text-xs leading-relaxed line-clamp-2"
+                        style={{ color: 'var(--zyro-text-muted)' }}
+                      >
+                        {product.description}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Pricing */}
+          <button
+            type="button"
+            onClick={() => scrollTo('#pricing')}
+            className="px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150"
+            style={{ color: 'var(--zyro-text-secondary)' }}
+          >
+            Pricing
+          </button>
+
+          {/* Resources */}
+          <div className="relative" ref={resourcesRef}>
+            <button
+              type="button"
+              onClick={() => { setResourcesOpen(!resourcesOpen); setProductsOpen(false); setCompanyOpen(false); }}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150"
+              style={{ color: resourcesOpen ? 'var(--zyro-text)' : 'var(--zyro-text-secondary)' }}
+            >
+              Resources
+              <ChevronDown
+                className="w-3.5 h-3.5 transition-transform duration-200"
+                style={{
+                  transform: resourcesOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  color: 'var(--zyro-text-muted)',
+                }}
+              />
+            </button>
+
+            {resourcesOpen && (
+              <div
+                className="absolute top-full left-0 mt-2 w-[220px] p-1.5 rounded-xl border shadow-lg"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
+                {resources.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setResourcesOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    <item.icon className="w-4 h-4" style={{ color: 'var(--zyro-text-muted)' }} />
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge && (
+                      <span
+                        className="font-label text-[9px] tracking-[0.1em] px-1.5 py-0.5 rounded"
+                        style={{
+                          background: 'var(--zyro-elevated)',
+                          color: 'var(--zyro-text-muted)',
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Company */}
+          <div className="relative" ref={companyRef}>
+            <button
+              type="button"
+              onClick={() => { setCompanyOpen(!companyOpen); setProductsOpen(false); setResourcesOpen(false); }}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-150"
+              style={{ color: companyOpen ? 'var(--zyro-text)' : 'var(--zyro-text-secondary)' }}
+            >
+              Company
+              <ChevronDown
+                className="w-3.5 h-3.5 transition-transform duration-200"
+                style={{
+                  transform: companyOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  color: 'var(--zyro-text-muted)',
+                }}
+              />
+            </button>
+
+            {companyOpen && (
+              <div
+                className="absolute top-full left-0 mt-2 w-[180px] p-1.5 rounded-xl border shadow-lg"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
+                {company.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setCompanyOpen(false)}
+                    className="block px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Desktop Right */}
+        <div className="hidden md:flex items-center gap-2">
+          <button
+            aria-label="Toggle theme"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-lg transition-colors duration-150"
+            style={{ color: 'var(--zyro-text-muted)' }}
+          >
+            {mounted && theme === 'dark' ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </button>
+
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 px-2 py-1.5 rounded-lg transition-colors duration-150"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
+                <img
+                  src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'}
+                  alt=""
+                  className="w-7 h-7 rounded-full object-cover"
+                />
+                <span className="hidden lg:inline text-sm">
+                  {user.user_metadata?.full_name?.split(' ')[0] || 'User'}
+                </span>
                 <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    productsOpen ? 'rotate-180 text-cyan-400' : 'text-neutral-400'
-                  }`}
+                  className="w-3.5 h-3.5 transition-transform duration-200"
+                  style={{ transform: profileOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                 />
               </button>
 
-              <AnimatePresence>
-                {productsOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[560px] p-3 rounded-2xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 grid grid-cols-2 gap-2"
+              {profileOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-56 rounded-xl border shadow-lg py-1"
+                  style={{
+                    background: 'var(--zyro-surface)',
+                    borderColor: 'var(--zyro-border)',
+                  }}
+                >
+                  <div
+                    className="px-4 py-3 border-b"
+                    style={{ borderColor: 'var(--zyro-border)' }}
                   >
-                    {productsList.map((product) => {
-                      const Icon = iconMap[product.icon?.name] || product.icon;
-                      return (
-                        <Link
-                          key={product.id}
-                          to={product.href}
-                          onClick={() => setProductsOpen(false)}
-                          className="group flex flex-col p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
-                        >
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 group-hover:scale-105 transition-transform"
-                                style={{ color: product.color }}
-                              >
-                                <Icon className="w-4 h-4" />
-                              </div>
-                              <span className="font-semibold text-sm text-white group-hover:text-cyan-400 transition-colors">
-                                {product.name}
-                              </span>
-                            </div>
-                            {product.badge && (
-                              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 border border-white/10">
-                                {product.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-xs text-neutral-400 line-clamp-2 leading-relaxed">
-                            {product.description}
-                          </p>
-                        </Link>
-                      );
-                    })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <a
-              href="#solutions"
-              onClick={(e) => { e.preventDefault(); handleAnchorClick('#solutions'); }}
-              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-            >
-              Solutions
-            </a>
-            <a
-              href="#pricing"
-              onClick={(e) => { e.preventDefault(); handleAnchorClick('#pricing'); }}
-              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-            >
-              Pricing
-            </a>
-            <Link
-              to="/about"
-              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-            >
-              Contact
-            </Link>
-          </nav>
-
-          {/* Desktop Right */}
-          <div className="hidden md:flex items-center gap-3">
-            <button
-              aria-label="Toggle color theme"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-            >
-              {mounted && theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
-                >
-                  <img
-                    src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'}
-                    alt=""
-                    className="w-7 h-7 rounded-full object-cover"
-                  />
-                  <span className="hidden lg:inline">{user.user_metadata?.full_name?.split(' ')[0] || 'User'}</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                <AnimatePresence>
-                  {profileOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      className="absolute right-0 mt-2 w-60 bg-neutral-950/95 border border-white/15 backdrop-blur-2xl rounded-xl shadow-2xl py-2 z-50"
+                    <p className="text-sm font-medium" style={{ color: 'var(--zyro-text)' }}>
+                      {user.user_metadata?.full_name || 'User'}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--zyro-text-muted)' }}>
+                      {user.email}
+                    </p>
+                  </div>
+                  <div className="py-1">
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors duration-150"
+                      style={{ color: 'var(--zyro-text-secondary)' }}
                     >
-                      <div className="px-4 py-3 border-b border-white/10">
-                        <p className="text-sm font-medium text-white">{user.user_metadata?.full_name || 'User'}</p>
-                        <p className="text-xs text-neutral-400">{user.email}</p>
-                      </div>
-                      <div className="py-1">
-                        <button
-                          onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <LayoutDashboard className="w-4 h-4" /> Dashboard
-                        </button>
-                        {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                          <button
-                            onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
-                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-cyan-400 hover:bg-white/5 font-medium transition-colors border-t border-b border-white/10 my-1 py-2"
-                          >
-                            <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
-                          </button>
-                        )}
-                        <button
-                          onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <User className="w-4 h-4" /> Profile
-                        </button>
-                        <button
-                          onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <Settings className="w-4 h-4" /> Settings
-                        </button>
-                      </div>
-                      <div className="border-t border-white/10 pt-1">
-                        <button
-                          onClick={async () => { await signOut(); navigate('/'); }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
-                        >
-                          <LogOut className="w-4 h-4" /> Sign Out
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 text-sm font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-md shadow-white/10 hover:shadow-white/20 active:scale-95"
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
-
-            {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center gap-2">
-              {!user && (
-                <Link
-                  to="/login"
-                  className="px-3 py-1.5 text-xs font-medium text-neutral-300 hover:text-white"
-                >
-                  Sign In
-                </Link>
+                      <LayoutDashboard className="w-4 h-4" /> Dashboard
+                    </button>
+                    {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                      <button
+                        onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-sm font-medium transition-colors duration-150"
+                        style={{ color: 'var(--zyro-accent)' }}
+                      >
+                        <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors duration-150"
+                      style={{ color: 'var(--zyro-text-secondary)' }}
+                    >
+                      <User className="w-4 h-4" /> Profile
+                    </button>
+                    <button
+                      onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors duration-150"
+                      style={{ color: 'var(--zyro-text-secondary)' }}
+                    >
+                      <Settings className="w-4 h-4" /> Settings
+                    </button>
+                  </div>
+                  <div className="border-t pt-1" style={{ borderColor: 'var(--zyro-border)' }}>
+                    <button
+                      onClick={async () => { await signOut(); navigate('/'); }}
+                      className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-red-500 hover:bg-red-500/5 transition-colors duration-150"
+                    >
+                      <LogOut className="w-4 h-4" /> Sign Out
+                    </button>
+                  </div>
+                </div>
               )}
-              <MenuToggleIcon
-                isOpen={mobileMenuOpen}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="text-neutral-300 hover:text-white"
-              />
             </div>
-          </div>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="px-3 py-2 text-sm font-medium transition-colors duration-150"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                style={{
+                  background: 'var(--zyro-accent)',
+                  color: '#FFFFFF',
+                }}
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden mt-4 pt-4 border-t border-white/10 overflow-hidden"
-            >
-              <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500 px-1 mb-2">
+        {/* Mobile — theme toggle + hamburger */}
+        <div className="md:hidden flex items-center gap-1">
+          <button
+            aria-label="Toggle theme"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-lg"
+            style={{ color: 'var(--zyro-text-muted)' }}
+          >
+            {mounted && theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-2 rounded-lg"
+            style={{ color: 'var(--zyro-text-secondary)' }}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          >
+            <div className="w-5 h-5 flex flex-col justify-center gap-1">
+              <span
+                className="block h-[1.5px] rounded-full transition-all duration-200"
+                style={{
+                  background: 'currentColor',
+                  transform: mobileOpen ? 'rotate(45deg) translateY(0)' : 'none',
+                }}
+              />
+              <span
+                className="block h-[1.5px] rounded-full transition-all duration-200"
+                style={{
+                  background: 'currentColor',
+                  opacity: mobileOpen ? 0 : 1,
+                }}
+              />
+              <span
+                className="block h-[1.5px] rounded-full transition-all duration-200"
+                style={{
+                  background: 'currentColor',
+                  transform: mobileOpen ? 'rotate(-45deg) translateY(0)' : 'none',
+                }}
+              />
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileOpen && (
+        <div
+          className="md:hidden border-t"
+          style={{
+            background: 'var(--zyro-bg)',
+            borderColor: 'var(--zyro-border)',
+          }}
+        >
+          <div className="max-w-[1264px] mx-auto px-6 py-6 space-y-6">
+            {/* Products */}
+            <div>
+              <p
+                className="font-label text-[10px] tracking-[0.2em] uppercase mb-3"
+                style={{ color: 'var(--zyro-text-muted)' }}
+              >
                 Products
-              </div>
-              <div className="grid grid-cols-1 gap-1.5 mb-3">
-                {productsList.map((product) => {
-                  const Icon = iconMap[product.icon?.name] || product.icon;
-                  return (
-                    <Link
-                      key={product.id}
-                      to={product.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
-                    >
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5"
-                          style={{ color: product.color }}
-                        >
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-white">{product.name}</div>
-                          <div className="text-[11px] text-neutral-400">{product.badge}</div>
-                        </div>
-                      </div>
-                      <ChevronDown className="w-4 h-4 -rotate-90 text-neutral-500" />
-                    </Link>
-                  );
-                })}
-              </div>
-
-              <div className="h-[1px] bg-white/10 my-1" />
-
-              <div className="flex flex-col gap-1 text-sm font-medium text-neutral-300 py-2">
-                <a href="#solutions" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); handleAnchorClick('#solutions'); }} className="px-2 py-2 hover:text-white">Solutions</a>
-                <a href="#pricing" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); handleAnchorClick('#pricing'); }} className="px-2 py-2 hover:text-white">Pricing</a>
-                <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 hover:text-white">About Us</Link>
-                <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 hover:text-white">Contact</Link>
-              </div>
-
-              {user ? (
-                <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
+              </p>
+              <div className="space-y-1">
+                {productsList.map((product) => (
                   <Link
-                    to={`/${effectiveRole}/dashboard`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full py-2.5 text-center text-sm font-semibold text-white bg-white/10 rounded-xl flex items-center justify-center gap-2"
+                    key={product.id}
+                    to={product.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg transition-colors duration-150"
+                    style={{ color: 'var(--zyro-text)' }}
                   >
-                    <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                  </Link>
-                  {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                    <Link
-                      to="/company/dashboard"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-full py-2.5 text-center text-sm font-medium border border-white/20 text-white rounded-xl flex items-center justify-center gap-2"
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: 'var(--zyro-accent-muted)' }}
                     >
-                      <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
-                    </Link>
-                  )}
-                  <button
-                    onClick={async () => { await signOut(); setMobileMenuOpen(false); navigate('/'); }}
-                    className="w-full py-2.5 text-center text-sm font-medium text-red-400 hover:bg-red-500/10 rounded-xl flex items-center justify-center gap-2"
+                      <span
+                        className="font-display text-sm"
+                        style={{ color: 'var(--zyro-accent)' }}
+                      >
+                        {product.name.charAt(4)}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-sm font-medium">{product.name}</div>
+                      <div className="text-xs" style={{ color: 'var(--zyro-text-muted)' }}>
+                        {product.badge}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Pricing */}
+            <button
+              onClick={() => { setMobileOpen(false); scrollTo('#pricing'); }}
+              className="block w-full text-left px-3 py-2 text-sm font-medium rounded-lg"
+              style={{ color: 'var(--zyro-text-secondary)' }}
+            >
+              Pricing
+            </button>
+
+            {/* Resources */}
+            <div>
+              <p
+                className="font-label text-[10px] tracking-[0.2em] uppercase mb-3"
+                style={{ color: 'var(--zyro-text-muted)' }}
+              >
+                Resources
+              </p>
+              <div className="space-y-1">
+                {resources.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
                   >
-                    <LogOut className="w-4 h-4" /> Sign Out
-                  </button>
-                </div>
-              ) : (
+                    <item.icon className="w-4 h-4" style={{ color: 'var(--zyro-text-muted)' }} />
+                    <span className="flex-1">{item.label}</span>
+                    {item.badge && (
+                      <span
+                        className="font-label text-[9px] tracking-[0.1em] px-1.5 py-0.5 rounded"
+                        style={{
+                          background: 'var(--zyro-elevated)',
+                          color: 'var(--zyro-text-muted)',
+                        }}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Company */}
+            <div>
+              <p
+                className="font-label text-[10px] tracking-[0.2em] uppercase mb-3"
+                style={{ color: 'var(--zyro-text-muted)' }}
+              >
+                Company
+              </p>
+              <div className="space-y-1">
+                {company.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="block px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Auth */}
+            {user ? (
+              <div className="space-y-2 pt-4 border-t" style={{ borderColor: 'var(--zyro-border)' }}>
+                <Link
+                  to={`/${effectiveRole}/dashboard`}
+                  onClick={() => setMobileOpen(false)}
+                  className="block w-full py-2.5 text-center text-sm font-medium rounded-lg"
+                  style={{ background: 'var(--zyro-accent)', color: '#FFFFFF' }}
+                >
+                  Go to Dashboard
+                </Link>
+                {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                  <Link
+                    to="/company/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="block w-full py-2.5 text-center text-sm font-medium rounded-lg border"
+                    style={{ borderColor: 'var(--zyro-border)', color: 'var(--zyro-text-secondary)' }}
+                  >
+                    Switch to {companyAccess.company?.name || 'Company'}
+                  </Link>
+                )}
+                <button
+                  onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
+                  className="w-full py-2.5 text-center text-sm font-medium text-red-500 rounded-lg"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2 pt-4 border-t" style={{ borderColor: 'var(--zyro-border)' }}>
                 <Link
                   to="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="mt-2 w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl shadow-lg"
+                  onClick={() => setMobileOpen(false)}
+                  className="block w-full py-2.5 text-center text-sm font-medium rounded-lg"
+                  style={{ background: 'var(--zyro-accent)', color: '#FFFFFF' }}
                 >
                   Get Started Free
                 </Link>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="block w-full py-2.5 text-center text-sm font-medium rounded-lg border"
+                  style={{ borderColor: 'var(--zyro-border)', color: 'var(--zyro-text-secondary)' }}
+                >
+                  Sign In
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

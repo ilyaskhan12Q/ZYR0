@@ -1,125 +1,176 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import { pricing } from './data';
 
 export default function PricingSection() {
   const [annualBilling, setAnnualBilling] = useState(false);
 
   return (
-    <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
-      {/* Header */}
-      <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4">
-          Transparent Pricing
-        </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-mono mb-4">
-          Predictable Plans for Every Stage
-        </h2>
-        <p className="text-sm sm:text-base text-neutral-400 mb-8">
-          Start for free, scale as your projects, research, or institution expands.
-        </p>
-
-        {/* Billing Toggle */}
-        <div className="inline-flex items-center gap-3 p-1 rounded-xl bg-neutral-900 border border-white/10 text-xs">
-          <button
-            type="button"
-            onClick={() => setAnnualBilling(false)}
-            className={`px-3 py-1.5 rounded-lg transition-all ${
-              !annualBilling ? 'bg-white text-black font-semibold shadow' : 'text-neutral-400 hover:text-white'
-            }`}
+    <section id="pricing" className="py-20 md:py-28">
+      <div className="max-w-[1264px] mx-auto px-6 md:px-16">
+        {/* Header */}
+        <div className="max-w-2xl mb-12 md:mb-16">
+          <p
+            className="font-label text-[11px] tracking-[0.2em] uppercase mb-4"
+            style={{ color: 'var(--zyro-accent)' }}
           >
-            Monthly Billing
-          </button>
-          <button
-            type="button"
-            onClick={() => setAnnualBilling(true)}
-            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              annualBilling ? 'bg-white text-black font-semibold shadow' : 'text-neutral-400 hover:text-white'
-            }`}
+            Pricing
+          </p>
+          <h2
+            className="text-4xl md:text-5xl font-display mb-4"
+            style={{ color: 'var(--zyro-text)', letterSpacing: '-0.02em' }}
           >
-            <span>Annual Billing</span>
-            <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded font-semibold">
-              Save 20%
-            </span>
-          </button>
-        </div>
-      </div>
+            Predictable plans.
+          </h2>
+          <p
+            className="text-lg mb-8"
+            style={{ color: 'var(--zyro-text-secondary)' }}
+          >
+            Start for free, scale as your projects, research, or institution expands.
+          </p>
 
-      {/* Pricing Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {pricing.map((tier) => {
-          const isPro = tier.popular;
-          return (
-            <div
-              key={tier.name}
-              className={`rounded-3xl p-8 flex flex-col justify-between relative transition-all ${
-                isPro
-                  ? 'bg-gradient-to-b from-neutral-900 to-neutral-950 border-2 border-cyan-500/50 shadow-2xl shadow-cyan-500/10 scale-100 lg:-translate-y-2'
-                  : 'bg-neutral-900/60 border border-white/10 hover:border-white/20'
-              }`}
+          {/* Billing Toggle */}
+          <div
+            className="inline-flex items-center gap-1 p-1 rounded-lg border"
+            style={{
+              background: 'var(--zyro-surface)',
+              borderColor: 'var(--zyro-border)',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setAnnualBilling(false)}
+              className="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
+              style={{
+                background: !annualBilling ? 'var(--zyro-accent-muted)' : 'transparent',
+                color: !annualBilling ? 'var(--zyro-accent)' : 'var(--zyro-text-muted)',
+              }}
             >
-              {isPro && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-cyan-500 text-black text-xs font-bold font-mono tracking-wide uppercase shadow-md flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  Most Popular
-                </div>
-              )}
+              Monthly
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnnualBilling(true)}
+              className="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1.5"
+              style={{
+                background: annualBilling ? 'var(--zyro-accent-muted)' : 'transparent',
+                color: annualBilling ? 'var(--zyro-accent)' : 'var(--zyro-text-muted)',
+              }}
+            >
+              Annual
+              <span
+                className="text-[10px] px-1.5 py-0.5 rounded font-medium"
+                style={{
+                  background: 'var(--zyro-accent-muted)',
+                  color: 'var(--zyro-accent)',
+                }}
+              >
+                -20%
+              </span>
+            </button>
+          </div>
+        </div>
 
-              <div>
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-white font-mono mb-2">{tier.name}</h3>
-                  <p className="text-xs text-neutral-400">{tier.description}</p>
-                </div>
-
-                <div className="mb-8 flex items-baseline gap-1.5">
-                  <span className="text-4xl sm:text-5xl font-black text-white font-mono">
-                    {annualBilling && tier.price.startsWith('$')
-                      ? `$${Math.round(parseInt(tier.price.slice(1)) * 0.8)}`
-                      : tier.price}
-                  </span>
-                  <span className="text-xs text-neutral-400">{tier.period}</span>
-                </div>
-
-                <div className="space-y-3 mb-8">
-                  <div className="text-xs font-mono font-semibold uppercase tracking-wider text-neutral-500">
-                    Features Included:
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
+          {pricing.map((tier) => {
+            const isPro = tier.popular;
+            return (
+              <div
+                key={tier.name}
+                className="relative rounded-2xl border p-6 md:p-8 flex flex-col justify-between transition-all duration-300"
+                style={{
+                  background: isPro ? 'var(--zyro-surface)' : 'var(--zyro-bg)',
+                  borderColor: isPro ? 'var(--zyro-accent)' : 'var(--zyro-border)',
+                }}
+              >
+                {isPro && (
+                  <div
+                    className="absolute -top-3 left-6 px-3 py-1 rounded-full text-xs font-medium"
+                    style={{
+                      background: 'var(--zyro-accent)',
+                      color: '#FFFFFF',
+                    }}
+                  >
+                    Most Popular
                   </div>
-                  {tier.features.map((feature) => (
-                    <div key={feature.text} className="flex items-start gap-2.5 text-xs">
-                      <div
-                        className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                          feature.included
-                            ? 'bg-emerald-500/10 text-emerald-400'
-                            : 'bg-neutral-800 text-neutral-600'
-                        }`}
-                      >
-                        <Check className="w-3 h-3" />
-                      </div>
-                      <span className={feature.included ? 'text-neutral-300' : 'text-neutral-600 line-through'}>
-                        {feature.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                )}
 
-              <div>
+                <div>
+                  <h3
+                    className="text-lg font-semibold mb-1"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
+                    {tier.name}
+                  </h3>
+                  <p
+                    className="text-sm mb-6"
+                    style={{ color: 'var(--zyro-text-muted)' }}
+                  >
+                    {tier.description}
+                  </p>
+
+                  <div className="flex items-baseline gap-1.5 mb-8">
+                    <span
+                      className="text-4xl md:text-5xl font-display"
+                      style={{ color: 'var(--zyro-text)' }}
+                    >
+                      {annualBilling && tier.price.startsWith('$')
+                        ? `$${Math.round(parseInt(tier.price.slice(1)) * 0.8)}`
+                        : tier.price}
+                    </span>
+                    <span
+                      className="text-sm"
+                      style={{ color: 'var(--zyro-text-muted)' }}
+                    >
+                      {tier.period}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {tier.features.map((feature) => (
+                      <div key={feature.text} className="flex items-start gap-2.5 text-sm">
+                        <Check
+                          className="w-4 h-4 mt-0.5 shrink-0"
+                          style={{
+                            color: feature.included
+                              ? 'var(--zyro-accent)'
+                              : 'var(--zyro-text-muted)',
+                          }}
+                        />
+                        <span
+                          style={{
+                            color: feature.included
+                              ? 'var(--zyro-text-secondary)'
+                              : 'var(--zyro-text-muted)',
+                            opacity: feature.included ? 1 : 0.5,
+                            textDecoration: feature.included ? 'none' : 'line-through',
+                          }}
+                        >
+                          {feature.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <Link
                   to={tier.price === 'Custom' ? '/contact' : '/register'}
-                  className={`w-full py-3 rounded-xl font-semibold text-xs transition-all flex items-center justify-center gap-2 ${
-                    isPro
-                      ? 'bg-cyan-500 hover:bg-cyan-400 text-black shadow-lg shadow-cyan-500/20'
-                      : 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
-                  }`}
+                  className="mt-8 w-full py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
+                  style={{
+                    background: isPro ? 'var(--zyro-accent)' : 'transparent',
+                    color: isPro ? '#FFFFFF' : 'var(--zyro-text-secondary)',
+                    border: isPro ? 'none' : '1px solid var(--zyro-border)',
+                  }}
                 >
-                  <span>{tier.price === 'Custom' ? 'Contact Sales / Book Demo' : 'Get Started'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  {tier.price === 'Custom' ? 'Contact Sales' : 'Get Started'}
+                  <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

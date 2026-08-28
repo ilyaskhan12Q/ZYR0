@@ -179,29 +179,29 @@ export const faqItems = [
 
 export const footerNav = {
   products: [
-    { label: 'ZYR0 Studio (AI Builder)', href: '/studio' },
-    { label: 'ZYR0 Edu (School OS)', href: '/school' },
-    { label: 'ZYR0 Research (0-AI)', href: '/research' },
-    { label: 'ZYR0 Work (Internships)', href: '/internships' },
+    { label: 'ZYR0 Studio', href: '/studio' },
+    { label: 'ZYR0 Edu', href: '/school' },
+    { label: 'ZYR0 Research', href: '/research' },
+    { label: 'ZYR0 Work', href: '/internships' },
     { label: 'Browse Internships', href: '/internships/browse' },
   ],
-  solutions: [
-    { label: 'For Developers & Builders', href: '/studio' },
-    { label: 'For K-12 & Higher Ed', href: '/school' },
-    { label: 'For Students & Graduates', href: '/internships' },
-    { label: 'For Hiring Companies', href: '/companies' },
+  resources: [
+    { label: 'Help Center', href: '/help' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Blog', href: '/blog', badge: 'Soon' },
+    { label: 'Verify Certificate', href: '/verify' },
+    { label: 'Privacy Policy', href: '/privacy' },
+    { label: 'Terms of Service', href: '/terms' },
+    { label: 'Cookie Policy', href: '/cookies' },
   ],
   company: [
-    { label: 'About Us', href: '/about' },
-    { label: 'Careers', href: '/careers' },
-    { label: 'FAQ', href: '/faq' },
+    { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Verify Certificate', href: '/verify' },
+    { label: 'Careers', href: '/careers' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },
     { label: 'Terms of Service', href: '/terms' },
     { label: 'Cookie Policy', href: '/cookies' },
-    { label: 'Security', href: '/contact' },
   ]
 };

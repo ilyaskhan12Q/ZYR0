@@ -1,63 +1,80 @@
-import React, { useState } from 'react';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { faqItems } from './data';
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
-
   return (
-    <section id="faq" className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-white/5">
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-4">
-          <HelpCircle className="w-3.5 h-3.5" />
-          Got Questions?
+    <section id="faq" className="py-20 md:py-28">
+      <div className="max-w-[720px] mx-auto px-6 md:px-16">
+        {/* Header */}
+        <div className="text-center mb-12 md:mb-16">
+          <p
+            className="font-label text-[11px] tracking-[0.2em] uppercase mb-4"
+            style={{ color: 'var(--zyro-accent)' }}
+          >
+            FAQ
+          </p>
+          <h2
+            className="text-4xl md:text-5xl font-display mb-4"
+            style={{ color: 'var(--zyro-text)', letterSpacing: '-0.02em' }}
+          >
+            Common questions.
+          </h2>
+          <p
+            className="text-lg"
+            style={{ color: 'var(--zyro-text-secondary)' }}
+          >
+            Everything you need to know about ZYR0's products, pricing, and architecture.
+          </p>
         </div>
-        <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-mono mb-4">
-          Frequently Asked Questions
-        </h2>
-        <p className="text-sm sm:text-base text-neutral-400">
-          Everything you need to know about ZYR0's products, pricing, and architecture.
-        </p>
-      </div>
 
-      <div className="space-y-3">
-        {faqItems.map((faq, idx) => {
-          const isOpen = openIndex === idx;
-          return (
-            <div
-              key={faq.question}
-              className="rounded-2xl bg-neutral-900/60 border border-white/10 overflow-hidden transition-all"
-            >
-              <button
-                type="button"
-                onClick={() => toggleFAQ(idx)}
-                className="w-full p-5 text-left flex items-center justify-between gap-4 text-white hover:text-cyan-400 transition-colors"
-                aria-expanded={isOpen}
+        {/* Accordion */}
+        <div className="space-y-2">
+          {faqItems.map((faq, idx) => {
+            const isOpen = openIndex === idx;
+            return (
+              <div
+                key={faq.question}
+                className="rounded-xl border overflow-hidden transition-all duration-200"
+                style={{
+                  background: isOpen ? 'var(--zyro-surface)' : 'transparent',
+                  borderColor: 'var(--zyro-border)',
+                }}
               >
-                <span className="font-semibold text-sm sm:text-base font-mono">
-                  {faq.question}
-                </span>
-                <div
-                  className={`w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 transition-transform duration-200 ${
-                    isOpen ? 'rotate-180 text-cyan-400 bg-cyan-500/10 border-cyan-500/20' : 'text-neutral-400'
-                  }`}
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 transition-colors duration-200"
+                  style={{ color: 'var(--zyro-text)' }}
+                  aria-expanded={isOpen}
                 >
-                  <ChevronDown className="w-4 h-4" />
-                </div>
-              </button>
+                  <span className="text-sm font-medium">{faq.question}</span>
+                  <div
+                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200"
+                    style={{
+                      background: isOpen ? 'var(--zyro-accent-muted)' : 'var(--zyro-elevated)',
+                      color: isOpen ? 'var(--zyro-accent)' : 'var(--zyro-text-muted)',
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </button>
 
-              {isOpen && (
-                <div className="px-5 pb-5 text-xs sm:text-sm text-neutral-300 leading-relaxed border-t border-white/5 pt-3 animate-in fade-in duration-150">
-                  {faq.answer}
-                </div>
-              )}
-            </div>
-          );
-        })}
+                {isOpen && (
+                  <div
+                    className="px-5 pb-5 text-sm leading-relaxed"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

@@ -1,58 +1,86 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { ecosystemSolutions } from './data';
 
 export default function SolutionsSection() {
   return (
-    <section id="solutions" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/5">
-      <div className="text-center max-w-3xl mx-auto mb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
-          Tailored Solutions
+    <section id="solutions" className="py-20 md:py-28">
+      <div className="max-w-[1264px] mx-auto px-6 md:px-16">
+        {/* Section header */}
+        <div className="max-w-2xl mb-12 md:mb-16">
+          <p
+            className="font-label text-[11px] tracking-[0.2em] uppercase mb-4"
+            style={{ color: 'var(--zyro-accent)' }}
+          >
+            Solutions
+          </p>
+          <h2
+            className="text-4xl md:text-5xl font-display mb-4"
+            style={{ color: 'var(--zyro-text)', letterSpacing: '-0.02em' }}
+          >
+            Built for every step.
+          </h2>
+          <p
+            className="text-lg"
+            style={{ color: 'var(--zyro-text-secondary)' }}
+          >
+            From first prototype to school management, academic research, and
+            workforce entry.
+          </p>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-mono mb-4">
-          Built for Every Step of the Lifecycle
-        </h2>
-        <p className="text-sm sm:text-base text-neutral-400">
-          From first prototype to school management, academic research, and workforce entry.
-        </p>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {ecosystemSolutions.map((solution) => {
-          const Icon = solution.icon;
-          return (
-            <div
-              key={solution.category}
-              className="p-6 sm:p-8 rounded-3xl bg-neutral-900/60 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
-                    <Icon className="w-5 h-5" />
-                  </div>
-                  <span className="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400">
-                    {solution.category}
-                  </span>
+        {/* Solution cards — single row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {ecosystemSolutions.map((solution) => {
+            const Icon = solution.icon;
+            return (
+              <Link
+                key={solution.category}
+                to={solution.href}
+                className="group p-5 md:p-6 rounded-2xl border transition-all duration-300"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-colors duration-200"
+                  style={{
+                    background: 'var(--zyro-accent-muted)',
+                    color: 'var(--zyro-accent)',
+                  }}
+                >
+                  <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white font-mono mb-2">
+                <p
+                  className="font-label text-[10px] tracking-[0.15em] uppercase mb-2"
+                  style={{ color: 'var(--zyro-text-muted)' }}
+                >
+                  {solution.category}
+                </p>
+                <h3
+                  className="text-base font-semibold mb-2"
+                  style={{ color: 'var(--zyro-text)' }}
+                >
                   {solution.title}
                 </h3>
-                <p className="text-sm text-neutral-400 leading-relaxed mb-6">
+                <p
+                  className="text-sm leading-relaxed mb-4"
+                  style={{ color: 'var(--zyro-text-secondary)' }}
+                >
                   {solution.description}
                 </p>
-              </div>
-
-              <Link
-                to={solution.href}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-white group-hover:text-cyan-400 transition-colors"
-              >
-                <span>Learn more</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                <span
+                  className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-200"
+                  style={{ color: 'var(--zyro-accent)' }}
+                >
+                  Learn more
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
               </Link>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );
