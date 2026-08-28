@@ -11,7 +11,7 @@ import { renderReportMarkdown } from '@/agent/render/renderReportMarkdown';
 import { generateReportPdf } from '@/agent/lib/reportPdf';
 import type { ResearchDepth, ResearchReport } from '@/agent/research/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { classifyLocally } from '@/lib/zeroai/intent';
+import { classifyLocally } from '@/agent/classifyLocally';
 import supabase from '@/lib/supabase';
 import '@/styles/agent.css';
 

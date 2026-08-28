@@ -39,8 +39,7 @@ const StudioLanding = lazy(() => import('@/pages/studio/StudioLanding'));
 // ZYR0 Edu / School OS Surface
 const SchoolOSLanding = lazy(() => import('@/pages/edu/SchoolOSLanding'));
 
-// 0-AI Deep Research Workspace & Landing
-const ZeroAIWorkspace = lazy(() => import('@/pages/zeroai/ZeroAIWorkspace'));
+// ZYR0 Research Routes
 const ResearchAgentPage = lazy(() => import('@/agent/ResearchAgentPage'));
 const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
 
@@ -107,7 +106,6 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/0-ai" element={<ZeroAIWorkspace />} />
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -220,9 +218,8 @@ export default function App() {
             <Route path="/school" element={<SchoolOSLanding />} />
             <Route path="/edu" element={<SchoolOSLanding />} />
 
-            {/* ZYR0 Research / 0-AI Routes */}
+            {/* ZYR0 Research Routes */}
             <Route path="/research" element={<ResearchLanding />} />
-            <Route path="/0-ai" element={<ZeroAIWorkspace />} />
             <Route
               path="/research-agent"
               element={

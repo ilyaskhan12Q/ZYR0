@@ -28,7 +28,7 @@ export default function PlatformHome() {
     <div className="min-h-screen overflow-x-hidden">
       <SEO
         title="ZYR0 — The Multi-Product AI & SaaS Ecosystem"
-        description="Build full-stack apps with ZYR0 Studio, manage educational institutions with School OS, run autonomous deep research with 0-AI, and gain verified work experience with ZYR0 Work."
+        description="Build full-stack apps with ZYR0 Studio, manage educational institutions with School OS, run autonomous deep research with the Research Agent, and gain verified work experience with ZYR0 Work."
         path="/"
       />
       <Header />

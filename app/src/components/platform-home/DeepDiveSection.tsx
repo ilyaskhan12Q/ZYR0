@@ -34,7 +34,7 @@ const deepDiveContent = [
     figureLabel: 'FIG 0.3',
     headline: 'Autonomous deep research, verified.',
     description:
-      'The 0-AI Research Agent plans, executes, cross-verifies, and synthesizes exhaustive reports. Every claim backed by a verifiable citation.',
+      'The Research Agent plans, executes, cross-verifies, and synthesizes exhaustive reports. Every claim backed by a verifiable citation.',
     features: [
       'Multi-agent recursive search loops',
       'Verifiable source citations',

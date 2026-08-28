@@ -42,7 +42,7 @@ export const productsList: ProductItem[] = [
   },
   {
     id: 'research',
-    name: 'ZYR0 Research (0-AI)',
+    name: 'ZYR0 Research',
     badge: 'Deep AI Agent',
     headline: 'Autonomous multi-step research with verified citations',
     description: 'Agentic intelligence engine that plans, executes, cross-verifies, and synthesizes exhaustive industry and academic reports.',
@@ -89,7 +89,7 @@ export const ecosystemSolutions = [
   {
     category: 'For Researchers & Analysts',
     title: 'Autonomous deep intelligence at your fingertips.',
-    description: 'Conduct deep literature reviews, market intelligence, and code audits in minutes with 0-AI Research Agent.',
+    description: 'Conduct deep literature reviews, market intelligence, and code audits in minutes with the Research Agent.',
     icon: BrainCircuit,
     href: '/research',
   },
@@ -111,7 +111,7 @@ export const pricing = [
     popular: false,
     features: [
       { text: 'Full access to ZYR0 Work & Internships', included: true },
-      { text: 'Standard 0-AI Research queries', included: true },
+      { text: 'Standard Research queries', included: true },
       { text: 'ZYR0 Studio free tier (2 projects)', included: true },
       { text: 'Verifiable digital credentials', included: true },
       { text: 'Community support', included: true },
@@ -126,7 +126,7 @@ export const pricing = [
     popular: true,
     features: [
       { text: 'Unlimited ZYR0 Studio web apps & code export', included: true },
-      { text: 'High-depth 0-AI Deep Research agent runs', included: true },
+      { text: 'High-depth Deep Research agent runs', included: true },
       { text: 'Custom domains & instant CDN deployment', included: true },
       { text: 'Priority API & GPU processing', included: true },
       { text: 'Priority 24/7 developer support', included: true },
@@ -153,7 +153,7 @@ export const pricing = [
 export const faqItems = [
   {
     question: 'What is the ZYR0 platform?',
-    answer: 'ZYR0 is a multi-product AI and SaaS company providing four interconnected solutions: ZYR0 Studio (AI website/app builder), ZYR0 Edu / School OS (educational institution management), ZYR0 Research / 0-AI (autonomous deep research agent), and ZYR0 Work (project-based internships and verified credentials).'
+    answer: 'ZYR0 is a multi-product AI and SaaS company providing four interconnected solutions: ZYR0 Studio (AI website/app builder), ZYR0 Edu / School OS (educational institution management), ZYR0 Research (autonomous deep research agent), and ZYR0 Work (project-based internships and verified credentials).'
   },
   {
     question: 'Can I use ZYR0 products individually?',
