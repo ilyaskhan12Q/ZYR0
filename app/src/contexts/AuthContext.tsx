@@ -16,6 +16,7 @@ interface AuthContextValue {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  profileLoaded: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   profileCompleted: boolean;
@@ -30,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   async function fetchProfile(userId: string) {
     const { data } = await supabase
@@ -60,14 +62,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session — resolve loading as soon as session is known,
+    // then fetch profile in background so the UI isn't blocked.
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
       if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false));
+        fetchProfile(session.user.id).finally(() => setProfileLoaded(true));
       } else {
-        setLoading(false);
+        setProfileLoaded(true);
       }
     });
 
@@ -77,11 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          setProfileLoaded(false);
           await fetchProfile(session.user.id);
+          setProfileLoaded(true);
         } else {
           setProfile(null);
+          setProfileLoaded(true);
         }
-        setLoading(false);
       }
     );
 
@@ -107,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         profile,
         loading,
+        profileLoaded,
         signOut,
         refreshProfile,
         profileCompleted,

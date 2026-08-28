@@ -17,7 +17,7 @@ const dashboardMap: Record<string, string> = {
  * their profile role. Everyone else is redirected to their own dashboard.
  */
 export function CompanyAccessRoute({ children }: { children: ReactNode }) {
-  const { session, profile, loading } = useAuth();
+  const { session, profile, loading, profileLoaded } = useAuth();
   const { company, loading: accessLoading } = useCompanyAccess();
   const location = useLocation();
 
@@ -29,8 +29,17 @@ export function CompanyAccessRoute({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!session || !profile) {
+  if (!session) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Session exists but profile still loading
+  if (!profileLoaded || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader variant="page" label="Loading profile..." />
+      </div>
+    );
   }
 
   const granted = profile.role === 'company' || !!company;

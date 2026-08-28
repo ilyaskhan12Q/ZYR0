@@ -26,17 +26,6 @@ export default function Login() {
     if (paramEmail) rememberEmail(paramEmail);
   }, [searchParams]);
 
-  // Prefetch dashboard portals in the background once the login page loads
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      import('@/pages/student/StudentPortal').catch(() => {});
-      import('@/pages/company/CompanyPortal').catch(() => {});
-      import('@/pages/mentor/MentorPortal').catch(() => {});
-      import('@/pages/admin/AdminPortal').catch(() => {});
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
