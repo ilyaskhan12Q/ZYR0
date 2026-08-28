@@ -726,16 +726,17 @@ export default function StudentWorkspace() {
                                   setShowTaskList(false);
                                   setExpandedSections({ brief: false, description: false, objectives: false });
                                 }}
-                                className={`w-full text-left p-3.5 rounded-xl border transition-all ${
+                                className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
                                   isSelected
                                     ? 'border-accent bg-accent/5 shadow-sm ring-1 ring-accent/20'
-                                    : 'border-border hover:bg-muted/40 hover:border-border/80'
+                                    : 'border-border hover:bg-muted/40 hover:border-border/80 active:bg-muted/60 active:scale-[0.98]'
                                 }`}
                               >
                                 <div className="flex items-center gap-2 mb-1.5">
                                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot[t.status] || 'bg-slate-400'}`} />
                                   <span className="font-semibold text-sm line-clamp-1 flex-1">{t.title}</span>
                                   {hasDocs && <FileText className="w-3.5 h-3.5 text-accent flex-shrink-0" />}
+                                  {!isSelected && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />}
                                 </div>
 
                                 <div className="flex items-center gap-2 flex-wrap">
