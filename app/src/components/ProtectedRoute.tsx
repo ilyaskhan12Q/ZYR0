@@ -31,7 +31,7 @@ interface ProtectedRouteProps {
  * Wrong-role users are redirected to their dashboard.
  */
 export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
-  const { session, profile, loading } = useAuth();
+  const { session, profile, loading, profileLoaded } = useAuth();
   const location = useLocation();
 
   // Still loading session — show unified Loader
@@ -44,8 +44,17 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
   }
 
   // Not logged in
-  if (!session || !profile) {
+  if (!session) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Session exists but profile still loading — brief loader, not a redirect
+  if (!profileLoaded || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader variant="page" label="Loading profile..." />
+      </div>
+    );
   }
 
   // Wrong role

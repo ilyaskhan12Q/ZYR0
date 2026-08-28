@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveApplicationsCount, getCompanyActiveApplicationsCount } from '@/services/applications';
@@ -15,17 +14,16 @@ export interface SidebarCounts {
 /**
  * Live real counts for the sidebar nav badges.
  *
- * Fetches role-appropriate counts (student: active applications + pending
- * tasks + unread messages; company: active applications + unread messages;
- * mentor: to-review tasks + unread messages), refreshes them on every route
- * change, and keeps them in sync via Supabase realtime `postgres_changes`
- * subscriptions scoped by the same RLS policies the services rely on.
+ * Fetches role-appropriate counts once on mount (student: active applications +
+ * pending tasks + unread messages; company: active applications + unread
+ * messages; mentor: to-review tasks + unread messages), and keeps them in sync
+ * via Supabase realtime `postgres_changes` subscriptions scoped by the same RLS
+ * policies the services rely on.
  */
 export function useSidebarCounts(companyIdOverride?: string | null): SidebarCounts {
   const { user, profile } = useAuth();
   const role = profile?.role;
   const companyId = companyIdOverride ?? profile?.company_id ?? null;
-  const location = useLocation();
   const [counts, setCounts] = useState<SidebarCounts>({});
 
   const refresh = useCallback(async (useCache = true) => {
@@ -53,10 +51,10 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
     }
   }, [role, companyId]);
 
-  // Initial load + refresh whenever the user navigates between tabs.
+  // Initial load only — realtime subscriptions keep counts fresh.
   useEffect(() => {
     refresh(false);
-  }, [refresh, location.pathname]);
+  }, [refresh]);
 
   // Realtime: refetch (bypassing cache) when relevant rows change.
   useEffect(() => {
