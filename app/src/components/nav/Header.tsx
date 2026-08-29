@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   ChevronDown, LogOut, User, LayoutDashboard, Settings,
   Building2, Sun, Moon, HelpCircle, MessageCircle, BookOpen,
@@ -380,114 +381,169 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="md:hidden mt-4 pt-4 border-t border-white/10">
-            {/* Products */}
-            <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500 px-1 mb-2">
-              Products
-            </div>
-            <div className="grid grid-cols-1 gap-1.5 mb-3">
-              {productsList.map((product) => (
-                <Link
-                  key={product.id}
-                  to={product.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/5 border border-white/10">
-                      <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-white">{product.name}</div>
-                      <div className="text-[11px] text-neutral-400">{product.badge}</div>
-                    </div>
-                  </div>
-                  <ChevronDown className="w-4 h-4 -rotate-90 text-neutral-500" />
+          <div className="fixed inset-0 z-[60] md:hidden">
+            <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
+            <motion.div
+              initial={{ y: '-100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '-100%' }}
+              transition={{ type: 'spring', damping: 32, stiffness: 320 }}
+              className="absolute top-0 inset-x-0 max-h-[100dvh] overflow-y-auto bg-neutral-950 border-b border-white/10 shadow-2xl"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Main menu"
+            >
+              <div className="flex items-center justify-between px-5 h-16">
+                <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 shrink-0">
+                  <span className="text-xl font-display tracking-tight text-white">ZYR0</span>
                 </Link>
-              ))}
-            </div>
-
-            <div className="h-[1px] bg-white/10 my-1" />
-
-            <div className="flex flex-col gap-1 text-sm font-medium text-neutral-300 py-2">
-              <button
-                onClick={() => { setMobileOpen(false); scrollTo('#pricing'); }}
-                className="px-2 py-2 text-left hover:text-white transition-colors"
-              >
-                Pricing
-              </button>
-              {resources.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2.5 px-2 py-2 hover:text-white transition-colors"
-                >
-                  <item.icon className="w-4 h-4 text-neutral-400" />
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-            </div>
-
-            <div className="h-[1px] bg-white/10 my-1" />
-
-            <div className="flex flex-col gap-1 text-sm font-medium text-neutral-300 py-2">
-              {company.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="px-2 py-2 hover:text-white transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-
-            {/* Auth */}
-            {user ? (
-              <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
-                <Link
-                  to={`/${effectiveRole}/dashboard`}
-                  onClick={() => setMobileOpen(false)}
-                  className="w-full py-2.5 text-center text-sm font-semibold text-white bg-white/10 rounded-xl flex items-center justify-center gap-2"
-                >
-                  <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                </Link>
-                {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                  <Link
-                    to="/company/dashboard"
-                    onClick={() => setMobileOpen(false)}
-                    className="w-full py-2.5 text-center text-sm font-medium border border-white/20 text-white rounded-xl flex items-center justify-center gap-2"
-                  >
-                    <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
-                  </Link>
-                )}
                 <button
-                  onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
-                  className="w-full py-2.5 text-center text-sm font-medium text-red-400 hover:bg-red-500/10 rounded-xl flex items-center justify-center gap-2"
+                  onClick={() => setMobileOpen(false)}
+                  aria-label="Close menu"
+                  className="inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg text-neutral-300 hover:text-white hover:bg-white/10 transition-colors"
                 >
-                  <LogOut className="w-4 h-4" /> Sign Out
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
-            ) : (
-              <div className="flex flex-col gap-2 pt-2 border-t border-white/10">
-                <Link
-                  to="/register"
-                  onClick={() => setMobileOpen(false)}
-                  className="w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl shadow-lg"
-                >
-                  Get Started Free
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="w-full py-2.5 text-center text-sm font-medium text-neutral-300 hover:text-white border border-white/10 rounded-xl"
-                >
-                  Sign In
-                </Link>
+
+              <div className="px-5 pb-8">
+                {/* Products */}
+                <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2">
+                  Products
+                </div>
+                <div className="grid grid-cols-1 gap-1.5 mb-4">
+                  {productsList.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={product.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10">
+                          <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-white">{product.name}</div>
+                          <div className="text-[11px] text-neutral-400">{product.badge}</div>
+                        </div>
+                      </div>
+                      <ChevronDown className="w-4 h-4 -rotate-90 text-neutral-500" />
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="h-px bg-white/10" />
+
+                {/* Nav links */}
+                <nav className="flex flex-col py-3 gap-0.5">
+                  <button
+                    onClick={() => { setMobileOpen(false); scrollTo('#pricing'); }}
+                    className="flex items-center min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors text-left"
+                  >
+                    Pricing
+                  </button>
+                  {resources.map((item) => (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      <item.icon className="w-4 h-4 text-neutral-400" />
+                      <span className="flex-1">{item.label}</span>
+                      {item.badge && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 border border-white/10">
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="h-px bg-white/10" />
+
+                <nav className="flex flex-col py-3 gap-0.5">
+                  {company.map((item) => (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="h-px bg-white/10" />
+
+                {/* Auth */}
+                <div className="pt-4 flex flex-col gap-2">
+                  {user ? (
+                    <>
+                      <Link
+                        to={`/${effectiveRole}/dashboard`}
+                        onClick={() => setMobileOpen(false)}
+                        className="w-full py-3 text-center text-sm font-semibold text-white bg-white/10 rounded-xl flex items-center justify-center gap-2"
+                      >
+                        <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
+                      </Link>
+                      {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                        <Link
+                          to="/company/dashboard"
+                          onClick={() => setMobileOpen(false)}
+                          className="w-full py-3 text-center text-sm font-medium border border-white/20 text-white rounded-xl flex items-center justify-center gap-2"
+                        >
+                          <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
+                        </Link>
+                      )}
+                      <div className="mt-2 flex flex-col gap-0.5">
+                        <Link
+                          to={`/${effectiveRole}/profile`}
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <User className="w-4 h-4" /> Profile
+                        </Link>
+                        <Link
+                          to={`/${effectiveRole}/settings`}
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          <Settings className="w-4 h-4" /> Settings
+                        </Link>
+                        <button
+                          onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
+                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/register"
+                        onClick={() => setMobileOpen(false)}
+                        className="w-full py-3 text-center text-sm font-semibold text-black bg-white rounded-xl shadow-lg"
+                      >
+                        Get Started Free
+                      </Link>
+                      <Link
+                        to="/login"
+                        onClick={() => setMobileOpen(false)}
+                        className="w-full py-3 text-center text-sm font-medium text-neutral-300 hover:text-white border border-white/10 rounded-xl"
+                      >
+                        Sign In
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
-            )}
+            </motion.div>
           </div>
         )}
       </div>
