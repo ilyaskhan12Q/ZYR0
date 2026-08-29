@@ -19,7 +19,10 @@ export default function ForgotPassword() {
     const { error } = await resetPassword(email);
     setLoading(false);
     if (error) {
-      setLocalError(error.message);
+      const msg = error.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      setLocalError(msg === '{}' || !msg
+        ? 'Unable to send reset link. Please try again in a few minutes or contact support.'
+        : msg);
     } else {
       setSubmitted(true);
     }

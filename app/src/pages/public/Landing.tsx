@@ -26,7 +26,10 @@ const homepageStructuredData = [
   {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
-    itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` }],
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${BASE_URL}/` },
+      { '@type': 'ListItem', position: 2, name: 'ZYR0 Work', item: `${BASE_URL}/internships` },
+    ],
   },
   {
     '@context': 'https://schema.org',
@@ -38,7 +41,7 @@ const homepageStructuredData = [
       '@type': 'SearchAction',
       'target': {
         '@type': 'EntryPoint',
-        'urlTemplate': `${BASE_URL}/internships?search={search_term_string}`
+        'urlTemplate': `${BASE_URL}/internships/browse?search={search_term_string}`
       },
       'query-input': 'required name=search_term_string'
     }
@@ -357,7 +360,7 @@ export default function Landing() {
       <SEO
         title="ZYR0 — Structured Internship Platform for Students & Employers"
         description="ZYR0 is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform."
-        path="/"
+        path="/internships"
         keywords="internship platform, internship management, student internships, internships in Pakistan, internship tracking, internship certificates, mentor feedback, internship workflow, companies hiring interns"
         structuredData={homepageStructuredData}
       />
@@ -489,7 +492,7 @@ export default function Landing() {
                   className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-1"
                 >
                   <Link
-                    to="/internships"
+                    to="/internships/browse"
                     className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
                   >
                     Find an Internship
@@ -1012,7 +1015,7 @@ export default function Landing() {
                     Create Free Account
                   </Link>
                   <Link
-                    to="/internships"
+                    to="/internships/browse"
                     className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-slate-900/40 hover:bg-slate-900/60 text-white border border-white/30 backdrop-blur-sm transition-all"
                   >
                     Explore Opportunities

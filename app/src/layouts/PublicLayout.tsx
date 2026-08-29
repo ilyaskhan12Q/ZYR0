@@ -14,12 +14,16 @@ import { SiteBannerBar } from '@/components/SiteBannerBar';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 import { getLastEmail } from '@/lib/auth';
-const navLinks = [
-  { label: 'Internships', href: '/internships' },
-  { label: 'Companies', href: '/companies' },
-  { label: 'Verify', href: '/verify' },
+import ProductsDropdown from '@/components/nav/ProductsDropdown';
+import ResourcesDropdown from '@/components/nav/ResourcesDropdown';
+import CompanyDropdown from '@/components/nav/CompanyDropdown';
+
+const mobileNavLinks = [
+  { label: 'Research', href: '/research' },
   { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
   { label: 'Careers', href: '/careers' },
+  { label: 'Verify Certificate', href: '/verify' },
 ];
 
 export default function PublicLayout() {
@@ -107,20 +111,19 @@ export default function PublicLayout() {
               </span>
             </Link>
 
-            {/* Desktop Center Navigation & Community Slot */}
+            {/* Desktop Center Navigation */}
             <div className="hidden md:flex items-center gap-6 lg:gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={`text-sm font-medium transition-colors hover:text-accent relative group text-foreground/90 dark:text-white/90 ${location.pathname === link.href ? 'text-accent font-semibold' : ''}`}
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-200 group-hover:w-full" />
-                </Link>
-              ))}
+              <ProductsDropdown scrolled={scrolled} />
+              <Link
+                to="/research"
+                className={`text-sm font-medium transition-colors hover:text-accent text-foreground/90 dark:text-white/90 ${location.pathname === '/research' ? 'text-accent font-semibold' : ''}`}
+              >
+                Research
+              </Link>
+              <CompanyDropdown scrolled={scrolled} />
+              <ResourcesDropdown scrolled={scrolled} />
 
-              {/* Reserved Community/Social CTA Container Slot */}
+              {/* Community Slot */}
               <div id="header-community-cta-slot" className="hidden lg:flex items-center gap-2 pl-4 border-l border-border/20">
                 <CommunitySocialNav scrolled={scrolled} />
               </div>
@@ -268,7 +271,7 @@ export default function PublicLayout() {
 
               <div className="px-4 pb-8">
                 <nav className="flex flex-col">
-                  {navLinks.map((link) => (
+                  {mobileNavLinks.map((link) => (
                     <Link
                       key={link.href}
                       to={link.href}
@@ -491,7 +494,7 @@ export default function PublicLayout() {
               <div>
                 <h4 className="font-semibold mb-4">For Students</h4>
                 <ul className="space-y-2.5">
-                  <li><Link to="/internships" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Browse Internships</Link></li>
+                  <li><Link to="/internships/browse" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Browse Internships</Link></li>
                   <li><Link to="/student/applications" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">My Applications</Link></li>
                   <li><Link to="/student/workspace" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Workspace</Link></li>
                   <li><Link to="/student/certificates" className="text-slate-600 dark:text-white/60 text-sm hover:text-slate-900 dark:hover:text-white transition-colors">Certificates</Link></li>

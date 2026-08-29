@@ -9,10 +9,11 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Sora', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        heading: ['Sora', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        accent: ['Fraunces', 'Georgia', 'serif'],
-        label: ['Space Grotesk', 'Inter', 'sans-serif'],
+        display: ['DM Serif Display', 'Georgia', 'serif'],
+        heading: ['DM Serif Display', 'Georgia', 'serif'],
+        serif: ['DM Serif Display', 'Georgia', 'serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
+        label: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

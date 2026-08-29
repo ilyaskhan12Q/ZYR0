@@ -58,8 +58,13 @@ console.log(`[SEO Generate] Using domain: ${SITE_URL}`);
 // Public pages list — static routes with honest lastmod dates
 // (update these only when the page's content genuinely changes)
 const pages = [
-  { path: '', lastmod: '2026-08-06' },
-  { path: 'internships', lastmod: '2026-08-06' },
+  { path: '', lastmod: '2026-08-27' },
+  { path: 'studio', lastmod: '2026-08-27' },
+  { path: 'school', lastmod: '2026-08-27' },
+  { path: 'edu', lastmod: '2026-08-27' },
+  { path: 'research', lastmod: '2026-08-27' },
+  { path: 'internships', lastmod: '2026-08-27' },
+  { path: 'internships/browse', lastmod: '2026-08-27' },
   { path: 'companies', lastmod: '2026-08-06' },
   { path: 'careers', lastmod: '2026-08-06' },
   { path: 'careers/apply', lastmod: '2026-08-06' },
@@ -527,97 +532,9 @@ function generateBodyHtml(routePath, data = {}) {
   let contentHtml = '';
 
   if (routePath === '') {
-    contentHtml = `
-      <section style="text-align: center; padding: 5rem 2rem; background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%); font-family: sans-serif;">
-        <h1 style="font-size: 3rem; font-weight: 800; color: #1e293b; line-height: 1.2; margin-bottom: 1.5rem;">Build Your Professional Career with Structured Internships</h1>
-        <p style="font-size: 1.25rem; color: #475569; max-width: 800px; margin: 0 auto 2rem auto; line-height: 1.6;">ZYR0 connects students, industry mentors, universities, and employer partners in a single integrated portal. Track applications, collaborate on real milestone tasks, and earn blockchain-verified digital certificates.</p>
-        <div style="display: flex; gap: 1rem; justify-content: center;">
-          <a href="/register" style="background: #2563eb; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600;">Get Started</a>
-          <a href="/internships" style="border: 1px solid #cbd5e1; color: #475569; padding: 0.75rem 1.5rem; border-radius: 0.375rem; text-decoration: none; font-weight: 600;">Browse Internships</a>
-        </div>
-      </section>
-      
-      <section style="padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: center; font-family: sans-serif;">
-        <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: #ffffff;">
-          <div style="font-size: 2.5rem; font-weight: 800; color: #2563eb; margin-bottom: 0.5rem;">10,000+</div>
-          <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Active Students</h3>
-          <p style="color: #64748b; font-size: 0.875rem;">Building experience that top employers recognize and value.</p>
-        </div>
-        <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: #ffffff;">
-          <div style="font-size: 2.5rem; font-weight: 800; color: #059669; margin-bottom: 0.5rem;">500+</div>
-          <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Partner Companies</h3>
-          <p style="color: #64748b; font-size: 0.875rem;">Providing high-quality structured training cohorts in Pakistan.</p>
-        </div>
-        <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: #ffffff;">
-          <div style="font-size: 2.5rem; font-weight: 800; color: #7c3aed; margin-bottom: 0.5rem;">50+</div>
-          <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Universities</h3>
-          <p style="color: #64748b; font-size: 0.875rem;">Partnering to bridge academic standards with industrial practices.</p>
-        </div>
-        <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: #ffffff;">
-          <div style="font-size: 2.5rem; font-weight: 800; color: #d97706; margin-bottom: 0.5rem;">25,000+</div>
-          <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Completed Tasks</h3>
-          <p style="color: #64748b; font-size: 0.875rem;">Documented project deliverables verified by professional supervisors.</p>
-        </div>
-      </section>
+    // Homepage: React app takes over completely, return minimal placeholder
+    return '<div style="min-height:100vh;background:#000;"></div>';
 
-      <section style="padding: 4rem 2rem; background-color: #f8fafc; font-family: sans-serif;">
-        <div style="max-width: 1200px; margin: 0 auto;">
-          <h2 style="font-size: 2rem; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 3rem;">Core Platform Features</h2>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-            <div>
-              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Curated Sourcing</h3>
-              <p style="color: #475569; line-height: 1.6;">Find verified internship opportunities across Pakistan that match your educational background, skills, and long-term career aspirations. Never deal with spam listings again.</p>
-            </div>
-            <div>
-              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Application Transparency</h3>
-              <p style="color: #475569; line-height: 1.6;">Track application updates in real time. From initial review to interviews, feedback, offer letter issuance, and final onboarding, know exactly where you stand.</p>
-            </div>
-            <div>
-              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Milestone Coordination</h3>
-              <p style="color: #475569; line-height: 1.6;">Manage assigned tasks using an interactive timeline. Submit code repository links, UI design links, or documents, and receive supervisor ratings directly on the platform.</p>
-            </div>
-            <div>
-              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Professional Mentorship</h3>
-              <p style="color: #475569; line-height: 1.6;">Get paired with an industry expert. Mentors conduct regular review calls, sign off on completed projects, and provide constructive critiques to guide your development.</p>
-            </div>
-            <div>
-              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Verified Achievements</h3>
-              <p style="color: #475569; line-height: 1.6;">Earn digitally signed certificates of completion backed by unique IDs. Anyone can instantly authenticate your credentials on our public verification portal.</p>
-            </div>
-            <div>
-              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Interactive Portfolios</h3>
-              <p style="color: #475569; line-height: 1.6;">Your ZYR0 profile is a living portfolio. Showcase verified milestones, manager ratings, completed internship tracks, and mentor recommendations directly to employers.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section style="padding: 4rem 2rem; max-width: 1200px; margin: 0 auto; font-family: sans-serif;">
-        <h2 style="font-size: 2rem; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 3rem;">How ZYR0 Works</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
-          <div>
-            <div style="width: 48px; height: 48px; background: #ebf5ff; color: #2563eb; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 1rem auto;">1</div>
-            <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Set Up Your Profile</h3>
-            <p style="color: #64748b; font-size: 0.875rem;">Highlight your technical skills, portfolio links, GPA, and career goals.</p>
-          </div>
-          <div>
-            <div style="width: 48px; height: 48px; background: #eefdf6; color: #059669; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 1rem auto;">2</div>
-            <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Apply to Positions</h3>
-            <p style="color: #64748b; font-size: 0.875rem;">Browse vetted company roles and apply directly with one-click submissions.</p>
-          </div>
-          <div>
-            <div style="width: 48px; height: 48px; background: #fbf7ff; color: #7c3aed; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 1rem auto;">3</div>
-            <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Complete Milestones</h3>
-            <p style="color: #64748b; font-size: 0.875rem;">Work on task tracks, submit deliverables, and obtain feedback from your mentor.</p>
-          </div>
-          <div>
-            <div style="width: 48px; height: 48px; background: #fffbeb; color: #d97706; font-weight: 800; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 1rem auto;">4</div>
-            <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">Verify Credentials</h3>
-            <p style="color: #64748b; font-size: 0.875rem;">Claim your digital certificate, share your link, and showcase verified work.</p>
-          </div>
-        </div>
-      </section>
-    `;
   } else if (routePath === 'about') {
     contentHtml = `
       <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">

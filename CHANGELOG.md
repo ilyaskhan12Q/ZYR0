@@ -7,36 +7,179 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.39.0] - 2026-08-20
+All 136 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 0.61.0).
 
-### Added
-- **Dynamic Company Workspace Switcher (`app/src/App.tsx`, `app/src/layouts/PublicLayout.tsx`, `app/src/layouts/DashboardLayout.tsx`)**:
-  - Globalized `CompanyAccessProvider` across the application router to enable seamless, zero-cost access checking for dual-role users (e.g. Students holding accepted Company Team Memberships).
-  - Implemented dynamic **"Switch to Company Workspace"** button in `PublicLayout` and `DashboardLayout` profile dropdowns & mobile navigation drawers when an accepted company membership is detected.
-  - Added reciprocal **"Switch to Student Workspace"** menu option when an authorized student team member is navigating within the Company Portal.
-- **Last-Used Email One-Tap Sign-In (`app/src/lib/auth.ts`, `app/src/pages/auth/*`)**:
-  - `rememberEmail()` stores the last used email in localStorage (`zyro_last_email`) on login, registration, and OAuth success.
-  - The mobile account sheet offers **"Continue as [email]"** with one tap, plus "Use another account" and "Create a new account" actions; the login form pre-fills from the remembered email or `?email=`.
+### 2026-08-29
 
-### Changed
-- **Mobile Navbar Redesign (`app/src/layouts/PublicLayout.tsx`, `app/src/layouts/DashboardLayout.tsx`)**:
-  - Public header: removed the dead notification bell, added a mobile-only **"Log in"** button that opens a full-screen account sheet, replaced the inline mobile menu with a full-screen drawer (nav links, community slot, state-aware auth actions), made the profile avatar visible on mobile (logged-in users), and added `aria-expanded`/`aria-haspopup` plus body scroll-lock while sheets are open.
-  - Dashboard header: 44px touch targets for hamburger/search/bell/tour/theme/sidebar-close, body scroll-lock for the mobile sidebar, notifications panel capped to `calc(100vw - 1.5rem)`, sidebar submenu row heights bumped.
-  - Desktop navbar intentionally unchanged.
-- **Landing & About Pages (`app/src/pages/public/Landing.tsx`, `app/src/pages/public/About.tsx`)**:
-  - Testimonial cards use responsive min-heights (`min-h-[700px] xs:min-h-[820px] md:min-h-[460px]` and `min-h-[480px] xs:min-h-[560px]`).
-  - About page scroll animations moved from x-transforms to y-transforms to eliminate phantom horizontal overflow on phones.
-- **Student Dashboard (`app/src/pages/student/Dashboard.tsx`, `app/src/index.css`)**:
-  - Motion stagger delays zeroed on mobile via `stagger(isMobile, delay)` + `useIsMobile` for instant content, and stat cards use `p-4 sm:p-6`.
+- **`fc06a8b`** 0.61.0 — feat: SaaS ecosystem rebrand — homepage redesign, animations, nav update
 
-### Fixed
-- **Logged-Out Header Overflow on Phones (`app/src/layouts/PublicLayout.tsx`)**:
-  - The public header measured 379px on a 375px viewport when logged out; auth links are now hidden below the `sm` breakpoint in favor of the mobile "Log in" button, eliminating horizontal scroll on 320–414px screens.
-- **Company Portal Sidebar Navigation Gating (`app/src/layouts/DashboardLayout.tsx`, `app/src/contexts/CompanyAccessContext.tsx`, `app/src/services/companyTeam.ts`)**:
-  - Resolved bug where `useCompanyNavItems` filtered all sidebar navigation links to empty during `access.loading` or when team membership role resolution was unresolved.
-  - Added navigation fallback to show full static navigation items if filtering yields empty results or while access resolution is in progress.
-  - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
-  - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
+### 2026-08-28
+
+- **`3f4684d`** 0.60.5 — fix: resolve TypeScript build errors in shader hero
+- **`7af5f22`** 0.60.4 — feat(hero): integrate shader hero with MeshGradient background
+- **`e987dc4`** 0.60.3 — feat(homepage): add scroll animations and smooth scroll
+- **`3837e31`** 0.60.2 — feat(nav): add Company dropdown and update Products/Resources dropdowns
+- **`d599bea`** 0.60.1 — chore: remove /0-ai route and ZeroAI module completely
+- **`96af704`** 0.60.0 — feat: redesign homepage with Dovetail-inspired design system
+
+### 2026-08-27
+
+- **`57b9ed1`** 0.59.5 — feat(nav): add Header component for product landing pages, restore original PublicLayout
+- **`2278e6a`** 0.59.4 — fix(consistency): align BentoProductGrid product badge with data.ts
+- **`e9ae0fc`** 0.59.3 — chore(cleanup): remove dead Framer components, legacy CSS, unused data
+- **`3e66dff`** 0.59.2 — fix(routing): add work.zyroo.org gateway, fix Landing SEO path
+- **`cdba79d`** 0.59.1 — feat(nav): unify navigation and footer across all pages
+- **`5cce4cc`** 0.59.0 — fix(router): route / to PlatformHome, /internships to Landing, and /internships/browse to BrowseInternships
+- **`59c974b`** 0.58.5 — fix(internships): correctly route /internships to Landing and /internships/browse to BrowseInternships with full link integration
+- **`e20e859`** 0.58.4 — fix(internships): restore BrowseInternships at /internships and /internships/browse with URL query sync
+- **`902437f`** 0.58.3 — fix(router): nest /internships route in PublicLayout to retain dedicated navbar
+- **`085550f`** 0.58.2 — feat(routing): integrate subdomain resolution and multi-product routes in App.tsx and SEO generator
+- **`73660f8`** 0.58.1 — feat(edu): add school os product surface, perspective switcher, and roi calculator
+- **`0c3673d`** 0.58.0 — feat(studio): add zyr0 studio product surface, interactive ai prompt simulator, and lead service
+- **`d9751eb`** 0.57.5 — feat(home): add bento-grid product showcase, solutions, and streamlined sections
+- **`d1e4413`** 0.57.4 — feat(nav): modernize platform navbar and footer with multi-product SaaS dropdown
+- **`c387610`** 0.57.3 — docs: add SaaS transition phases tracker
+
+### 2026-08-26
+
+- **`008a4bb`** 0.55.5 — Merge pull request #120 from ilyaskhan12Q/fix/agent-pipeline-optimizations
+- **`d2c51ac`** 0.57.2 — fix(homepage): strip all Framer Motion animation states that hide content
+- **`07102dc`** 0.57.1 — fix(homepage): responsive variants, Suprema branding, footer links
+- **`9b96e5c`** 0.57.0 — fix(homepage): fix React console warnings - srcSet, alt, webkit styles
+- **`3da5ae0`** 0.56.5 — fix(homepage): fix blank page - CSS background, pre-render, srcset paths
+- **`e6a2ae1`** 0.56.4 — fix(homepage): reduce PlatformHome chunk size below 600KB CI limit
+- **`c654be7`** 0.56.3 — feat(homepage): literal Suprema template conversion to React
+- **`53fc71c`** 0.56.2 — feat(homepage): rebuild PlatformHome as Suprema-inspired React homepage
+- **`2d1e06e`** 0.56.1 — feat(homepage): add platform homepage with product grid
+- **`0732004`** 0.56.0 — feat(nav): add multi-product dropdown navigation
+
+### 2026-08-24
+
+- **`66360c2`** 0.55.4 — fix(agent): fix model switching, button positions, placeholder alignment, mobile layout
+- **`aa55ec2`** 0.55.3 — feat(agent): replace input with polished PromptInput pattern
+- **`2514d6a`** 0.55.2 — fix(agent): mobile responsiveness — touch targets, layout, dropdown positioning
+
+### 2026-08-23
+
+- **`1cefa68`** 0.54.1 — Merge pull request #118 from ilyaskhan12Q/feature/dayos-style-landing
+- **`3a7911c`** 0.55.1 — feat(agent): sidebar history, PDF export, shared components, bug fixes
+- **`2819d0b`** 0.55.0 — fix(agent): model dropdown via Portal, clickable citations in reports
+- **`5d92338`** 0.54.5 — fix(agent): model dropdown uses fixed positioning, chat history loading
+- **`380a0d6`** 0.54.4 — fix(agent): depth dropdown opens upward to stay visible
+- **`aa2b381`** 0.54.3 — feat(agent): depth dropdown, scrollable model selector, floating input
+- **`c668edd`** 0.54.2 — feat(agent): add Gemini models, optimize planner pipeline
+- **`1937815`** 0.54.0 — fix(landing): increase scrolled nav height 48px → 54px
+- **`f13ff84`** 0.53.5 — fix(landing): morphing navbar — remove Reveal wrapper, fix sticky
+- **`6103e79`** 0.53.4 — feat(landing): morphing navbar — shrinks to pill on scroll
+- **`9ec7783`** 0.53.3 — fix(landing): ReportSection heading overflow — use 2-col grid + smaller clamp
+- **`e28a8e8`** 0.53.2 — feat(landing): complete visual overhaul — tighter density, Dayos-level design
+- **`683a283`** 0.53.1 — feat(landing): self-contained Report, Audience, Pricing sections
+- **`2d2ed5f`** 0.53.0 — feat(landing): update composition, nav, delete unused sections
+- **`1ed4c94`** 0.52.5 — feat(landing): Dayos-style multi-column footer
+- **`b6efe4f`** 0.52.4 — feat(landing): two-column CTA section on dark bg
+- **`3c3a9c7`** 0.52.3 — feat(landing): horizontal scroll depth cards
+- **`685fb74`** 0.52.2 — feat(landing): 3-pillar feature section
+- **`218ad2a`** 0.52.1 — feat(landing): claim trail feature detail section
+- **`45b5728`** 0.52.0 — feat(landing): source logos bar + stats section on dark bg
+- **`83f39fe`** 0.51.5 — feat(landing): revolution statement + product showcase sections
+- **`f17eaa8`** 0.51.4 — feat(landing): dark hero + problem arc sections
+- **`43484cf`** 0.51.3 — style(landing): update CSS for Dayos-inspired design system
+
+### 2026-08-22
+
+- **`789173b`** 0.51.2 — Merge remote-tracking branch 'origin/main' into develop
+- **`3457785`** 0.51.1 — feat(landing): redesign with rich animations, glassmorphism, and scroll effects
+
+### 2026-08-21
+
+- **`7fee8e7`** 0.49.5 — Merge feature/agent-bolt-redesign: Bolt-style workspace + premium editorial landing + subdomain routing
+- **`755c066`** 0.51.0 — feat(agent): add slide-in animation for history panel
+- **`084e46a`** 0.50.5 — feat(agent): add AnimatePresence transition for hero→thread switch
+- **`82b3307`** 0.50.4 — feat(agent): add persistent sidebar with demo history, new chat, settings
+- **`f50bad7`** 0.50.3 — feat(agent): replace header text links with proper pill buttons
+- **`ac65f11`** 0.50.2 — feat(agent): add ThreadInput with mode toggle, depth pills, model selector
+- **`1aadb14`** 0.50.1 — fix(agent): add min-h-0 to thread area for proper overflow scrolling
+- **`6dfc49f`** 0.50.0 — fix(vercel): remove ignoreCommand to enable Vercel auto-deploy from develop
+- **`d138bf8`** 0.49.4 — feat(agent+landing): Bolt-style workspace + premium editorial landing
+
+### 2026-08-19
+
+- **`be2f21f`** 0.49.3 — Merge feature/agent-single-page: hero-only input + mode-aware landing
+- **`8fcbd5f`** 0.49.1 — Merge feature/agent-single-page: polish, changelog, empty-thread fix
+- **`f0fbce7`** 0.48.5 — Merge feature/agent-single-page: unified single-page thread
+- **`c988968`** 0.48.3 — Merge feature/agent-single-page: composer dock
+- **`2cad0ff`** 0.48.1 — Merge feature/agent-single-page: left AgentSidebar with library
+- **`94aedea`** 0.47.5 — Merge feature/agent-single-page: chat session persistence
+- **`2a0a643`** 0.47.2 — Merge feature/agent-single-page: conversation thread backdrop
+- **`27c3d59`** 0.47.0 — Merge fix/research-pipeline: 24-candidate gather, verified-only citations, two-tier sources
+- **`8032444`** 0.49.2 — feat(agent): single input on new sessions — hero-only, mode-aware
+- **`2fbb2fb`** 0.49.0 — docs(changelog): single-page Research Agent workspace; fix empty-thread hero when prefilled
+- **`6d2a585`** 0.48.4 — feat(agent): unified single-page thread with inline research runs
+- **`816afd5`** 0.48.2 — feat(agent): composer dock with mode toggle, model picker, depth pills
+- **`31c334b`** 0.48.0 — feat(agent): left AgentSidebar with chat + research library
+- **`ececcfd`** 0.47.4 — feat(agent): persist chat sessions and messages (mode='chat')
+- **`1cf6ce4`** 0.47.3 — feat(agent): persist chat sessions and messages (mode='chat')
+- **`781932c`** 0.47.1 — feat(agent): conversation thread backdrop with landing pentagon motif
+- **`4160f61`** 0.46.5 — feat(research-agent): 24-candidate gather, verified-only citations, two-tier source sections
+
+### 2026-08-18
+
+- **`c5d2b83`** 0.46.4 — Merge fix/research-pipeline: round-robin evidence selection
+- **`06bae78`** 0.46.2 — Merge fix/research-pipeline: server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry
+- **`5edfd73`** 0.46.0 — Merge fix/research-pipeline: scroll fixes for generated text and history
+- **`7f109c5`** 0.45.4 — Merge fix/research-pipeline: restore research pipeline (search, persistence, editorial)
+- **`3678381`** 0.45.1 — Merge feature/agent-ux-redesign: Academic Precision UI/UX redesign
+- **`6303cdb`** 0.44.4 — Merge feature/jina-gateway: Jina web via gateway + empty-platform visibility
+- **`a5680c3`** 0.44.2 — Merge fix/session-refresh: stale JWT refresh — gateway Unauthorized fix
+- **`6f5f1da`** 0.44.0 — Merge feature/gateway-search: Phase 3.5 — keyless-first gateway search (S2 + PubMed + CORE)
+- **`ea37067`** 0.46.3 — fix(research-agent): round-robin evidence selection so one platform can't fill the cap
+- **`77e835b`** 0.46.1 — fix(research-agent): server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry
+- **`8a64723`** 0.45.5 — fix(research-agent): restore scrolling for generated text and history
+- **`71d8943`** 0.45.3 — fix(research-agent): persist runs under user_id (RLS), surface pipeline errors
+- **`9e4ad9a`** 0.45.2 — fix(gateway): restore search on edge — UA header, 30s web timeout, S2 retry, status logging
+- **`8da0b2b`** 0.45.0 — ui: report workspace tabs + source verification panel + editorial structure
+- **`4c563cb`** 0.44.5 — ui: Academic Precision design system — light theme, landing, research progress timeline
+- **`8800599`** 0.44.3 — research: Jina web via gateway (JINA_API_KEY secret) + empty-platform visibility
+- **`fc216f2`** 0.44.1 — fix: refresh stale session before gateway calls — no more silent Unauthorized after idle
+- **`c2cd069`** 0.43.5 — research: gateway search worker — S2 server-side + PubMed + CORE (keyless-first), 6-platform UI
+- **`8d332c3`** 0.43.4 — gateway: /v1/search action — keyless-first S2 + PubMed, CORE env-gated
+
+### 2026-08-17
+
+- **`1458ae0`** 0.43.3 — Merge feature/research-phase3: Phase 3 — 4 parallel realtime workers (8-12s gathering), volume 8-16, PDF export
+- **`7888e1e`** 0.42.5 — Merge feature/research-ux: Phase 3 pre-work — research UX bundle (report rendering, source modal, plan review gate, pipeline polish, continue-from-report, research-mode cleanup)
+- **`8e9961f`** 0.41.4 — Merge feature/research-agent-pipeline: Phase 2 — deep research pipeline (planner, workers, verifier, editorial, workspace UI, migration 044)
+- **`56fb086`** 0.43.2 — feat(agent): PDF export — multi-page A4 report + citation ledger appendix via jsPDF (direct download)
+- **`04e2f76`** 0.43.1 — feat(agent): gathering volume 8-16 — per-platform caps, hard aggregate cap, staggered S2 waves, web cap 4
+- **`91f98b7`** 0.43.0 — feat(agent): four parallel realtime workers — per-platform units with intra-platform query parallelism (gathering ~8-12s)
+- **`8fca9b3`** 0.42.4 — feat(agent): hide model picker in research mode — models belong in Settings, not the research surface
+- **`be5fc6a`** 0.42.3 — feat(agent): continue from report — follow-up chat with report context, prefill new research, regenerate
+- **`9b3c0e4`** 0.42.2 — feat(agent): pipeline view polish — planning skeleton, per-source status rows, verified chips, condensed notes
+- **`3439039`** 0.42.1 — feat(agent): plan review gate — approve/edit/regenerate the research agenda before workers start
+- **`17a07d1`** 0.42.0 — feat(agent): source modal — full evidence record behind every ledger card
+- **`2689f3a`** 0.41.5 — feat(agent): report rendering — safe markdown renderer with clickable citation anchors and verified-first ledger
+- **`87e47d3`** 0.41.3 — fix(agent): exhaust lint warning for loadHistory effect in research page
+- **`c584f2c`** 0.41.2 — feat(agent): research workspace UI — pipeline progress, report + citation ledger, history panel
+- **`d2bb2d7`** 0.41.1 — feat(agent): research pipeline hook — stage state machine with run persistence (agent_researches report_data)
+- **`5159c41`** 0.41.0 — feat(agent): research editorial — ledger-grounded report synthesis with citation keys
+- **`e884f23`** 0.40.5 — feat(agent): research verifier — dedupe, server-side link liveness, deterministic citation ledger
+- **`e739d16`** 0.40.4 — feat(agent): research workers — academic (OpenAlex/arXiv/Semantic Scholar) + web (Jina) with bounded concurrency
+- **`b6c2ce1`** 0.40.3 — feat(agent): research engine contracts + planner (gateway decomposition with schema validation and fallback)
+- **`4eca2c0`** 0.40.2 — feat(agent): gateway /v1/verify action — server-side URL/DOI liveness for research verifier
+- **`7f8cdf6`** 0.40.1 — chore(release): bump to 0.38.3 — research agent phase 1 + repo hygiene changelog
+- **`36f00c4`** 0.40.0 — chore(gitignore): untrack private docs, agent memory, and generated SEO outputs; ignore local agent tooling
+- **`d8d48d2`** 0.39.5 — fix(agent): resolve Deno lint errors in ai-gateway (parens around ?? chain, drop unused catch binding)
+- **`ff6c06b`** 0.39.4 — feat(agent): Phase 1 research agent — ai-gateway edge function with free-tier Zen fallback chain, per-user metering, and isolated /research-agent workspace
+
+### 2026-08-16
+
+- **`408277c`** 0.39.3 — feat(0-ai): route submissions through chat-first mode with research handoff
+- **`0b8be35`** 0.39.2 — feat(0-ai): chat stage, AUTO/CHAT/RESEARCH mode selector and ambiguity popup
+- **`ae9d185`** 0.39.1 — feat(0-ai): intent router (probe + local rules) and quick-chat engine
+- **`8d3aa68`** 0.39.0 — fix(0-ai): lower submit gate to 2 chars and hint why when too short
+- **`7d4951c`** 0.38.5 — chore(gitignore): ignore private 0-AI architecture doc
+- **`b3d56e1`** 0.38.4 — feat(0-ai): real planner agent with BYOK decomposition engine
+- **`1f0019b`** 0.38.3 — feat(0-ai): add mock deep-research workspace components
 
 ## [0.38.2] - 2026-08-13
 

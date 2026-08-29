@@ -33,7 +33,7 @@ export default function RoleChips() {
           {ROLES.map((role) => (
             <Link
               key={role.name}
-              to="/internships"
+              to={`/internships/browse?search=${encodeURIComponent(role.name)}`}
               className="chip-v3 border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 hover:border-blue-600/40 dark:hover:border-sky-400/40 hover:text-blue-600 dark:hover:text-sky-300 hover:shadow-lg hover:shadow-blue-600/10 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
             >
               <role.icon className="w-3.5 h-3.5" />

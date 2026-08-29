@@ -1,0 +1,463 @@
+/* ============================================================
+   Research Landing Page — Dayos-inspired editorial design system
+   Palette: #F5F5F2 bg, #FFF surface, #111 ink, #6F6F69 secondary,
+   #DCDCD5 border, #657C68 accent, #455A49 dark accent.
+   Instrument Serif (display) + Inter (UI).
+   Dark sections: #111111 bg, white text.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+.rl-root {
+  --rl-bg: #F5F5F2;
+  --rl-surface: #FFFFFF;
+  --rl-ink: #111111;
+  --rl-muted: #6F6F69;
+  --rl-border: #DCDCD5;
+  --rl-accent: #657C68;
+  --rl-accent-dark: #455A49;
+  --rl-dark: #111111;
+  --rl-dark-muted: #999999;
+
+  background-color: var(--rl-bg);
+  color: var(--rl-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Typography scale ───────────────────────────────────────── */
+
+.rl-display {
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+}
+
+.rl-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rl-muted);
+}
+
+.rl-eyebrow-light {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rl-dark-muted);
+}
+
+/* Responsive type clamp */
+.rl-hero-text {
+  font-size: clamp(3rem, 8vw, 9.375rem);
+  font-weight: 400;
+}
+
+.rl-statement-text {
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  font-weight: 400;
+}
+
+.rl-heading-text {
+  font-size: clamp(2rem, 4vw, 4rem);
+  font-weight: 400;
+}
+
+.rl-subheading {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ── Dark section ───────────────────────────────────────────── */
+
+.rl-dark-section {
+  background-color: var(--rl-dark);
+  color: #ffffff;
+}
+
+/* ── Hairline dividers ──────────────────────────────────────── */
+
+.rl-hairline {
+  border-top: 1px solid var(--rl-border);
+}
+
+.rl-hairline-b {
+  border-bottom: 1px solid var(--rl-border);
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+
+.rl-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--rl-ink);
+  color: var(--rl-bg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.rl-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.rl-btn-primary:hover {
+  background-color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.rl-btn-primary:hover::after {
+  opacity: 1;
+}
+
+.rl-btn-primary:active {
+  transform: translateY(0);
+}
+
+.rl-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: var(--rl-ink);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--rl-border);
+  border-radius: 9999px;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+.rl-btn-secondary:hover {
+  background-color: var(--rl-surface);
+  border-color: var(--rl-ink);
+  transform: translateY(-1px);
+}
+
+.rl-btn-primary-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  background-color: #ffffff;
+  color: var(--rl-dark);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+.rl-btn-primary-dark:hover {
+  background-color: #e5e5e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+/* ── Verified chip ──────────────────────────────────────────── */
+
+.rl-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: #e8f0e9;
+  color: var(--rl-accent-dark);
+}
+
+.rl-chip::before {
+  content: '✓';
+  font-size: 0.625rem;
+}
+
+.rl-chip-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background-color: rgba(101, 124, 104, 0.2);
+  color: #8fa692;
+}
+
+.rl-chip-dark::before {
+  content: '✓';
+  font-size: 0.625rem;
+}
+
+/* ── Section container — TIGHTER ────────────────────────────── */
+
+.rl-section {
+  padding: 3rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .rl-section {
+    padding: 5rem 2rem;
+  }
+}
+
+.rl-section-full {
+  padding: 3rem 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .rl-section-full {
+    padding: 5rem 2rem;
+  }
+}
+
+/* ── Nav ────────────────────────────────────────────────────── */
+
+.rl-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  transition:
+    height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    max-width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rl-nav.scrolled {
+  height: 54px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.25rem;
+  background-color: rgba(245, 245, 242, 0.92);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: none;
+  border-radius: 9999px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.08),
+    0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+@media (min-width: 768px) {
+  .rl-nav {
+    padding: 0 2rem;
+  }
+
+  .rl-nav.scrolled {
+    padding: 0 1.5rem;
+  }
+}
+
+/* ── Logo marquee (source logos) ────────────────────────────── */
+
+.rl-logo-marquee {
+  display: flex;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+.rl-logo-track {
+  display: flex;
+  gap: 4rem;
+  animation: rl-marquee 30s linear infinite;
+}
+
+@keyframes rl-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.rl-logo-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Scroll carousel (horizontal scroll on mobile) ──────────── */
+
+.rl-scroll-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 1rem;
+}
+
+.rl-scroll-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.rl-scroll-carousel > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .rl-scroll-carousel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: visible;
+    gap: 1.5rem;
+  }
+}
+
+/* ── Glassmorphism card ─────────────────────────────────────── */
+
+.rl-glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ── Scroll margin for anchor links ─────────────────────────── */
+
+[id] {
+  scroll-margin-top: 80px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ── Scrollbar styling ──────────────────────────────────────── */
+
+.rl-root ::-webkit-scrollbar {
+  width: 6px;
+}
+
+.rl-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.rl-root ::-webkit-scrollbar-thumb {
+  background: var(--rl-border);
+  border-radius: 3px;
+}
+
+/* ── Card hover effects ─────────────────────────────────────── */
+
+.rl-card-hover {
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rl-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border-color: var(--rl-accent);
+}
+
+/* ── Accent underline animation ─────────────────────────────── */
+
+.rl-underline-anim {
+  position: relative;
+  display: inline;
+}
+
+.rl-underline-anim::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--rl-accent);
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rl-underline-anim:hover::after {
+  width: 100%;
+}
+
+/* ── Gradient text ──────────────────────────────────────────── */
+
+.rl-gradient-text {
+  background: linear-gradient(135deg, var(--rl-ink) 0%, var(--rl-accent-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Section divider line ───────────────────────────────────── */
+
+.rl-section-line {
+  width: 48px;
+  height: 2px;
+  background: var(--rl-accent);
+  margin: 0 auto 2rem;
+}
+
+/* ── Image placeholder ──────────────────────────────────────── */
+
+.rl-image-placeholder {
+  background: linear-gradient(135deg, #e8e8e4 0%, #d4d4ce 100%);
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.rl-image-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(101,124,104,0.08) 0%, rgba(69,90,73,0.04) 100%);
+}
+
+/* ── Reduced motion ─────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-root *,
+  .rl-root *::before,
+  .rl-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
