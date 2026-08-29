@@ -303,6 +303,7 @@ export function ThreadInput({
   const [containerHeight, setContainerHeight] = useState(116)
   const [textareaHeight, setTextareaHeight] = useState(68)
   const [isScrolling, setIsScrolling] = useState(false)
+  const [dropdownPos, setDropdownPos] = useState({ bottom: 64, left: 16 })
 
   const value = localValue
   const hasValue = value.trim() !== '' || attachments.length > 0
@@ -325,6 +326,16 @@ export function ThreadInput({
     const idx = DEPTH_ORDER.indexOf(depth)
     if (idx !== -1) setEffortIndex(idx)
   }, [depth])
+
+  useEffect(() => {
+    if (isModelSelectOpen && internalContainerRef.current) {
+      const rect = internalContainerRef.current.getBoundingClientRect()
+      setDropdownPos({
+        bottom: window.innerHeight - rect.top + 8,
+        left: Math.min(rect.left, window.innerWidth - 276),
+      })
+    }
+  }, [isModelSelectOpen])
 
   const updateFades = () => {
     const el = textareaRef.current
@@ -716,11 +727,8 @@ export function ThreadInput({
                       <div
                         className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
                         style={{
-                          bottom: window.innerHeight - (internalContainerRef.current?.getBoundingClientRect().top ?? 0) + 8,
-                          left: Math.min(
-                            internalContainerRef.current?.getBoundingClientRect().left ?? 16,
-                            window.innerWidth - 276
-                          ),
+                          bottom: dropdownPos.bottom,
+                          left: dropdownPos.left,
                         }}
                       >
                         <div className="p-1.5">
