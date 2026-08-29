@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Sora:wght@400;500;600;700;800;900&family=Fraunces:ital,wght@1,500;1,600&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
 @import './components/dotmatrix-loader.css';
 
 @tailwind base;
@@ -7,6 +7,20 @@
 
 @layer base {
   :root {
+    /* ── ZYR0 Design System — Light Mode ──────────────────────────── */
+    --zyro-bg: #FAFAFA;
+    --zyro-surface: #FFFFFF;
+    --zyro-elevated: #F5F5F5;
+    --zyro-text: #0A0A0A;
+    --zyro-text-secondary: rgba(10, 10, 10, 0.64);
+    --zyro-text-muted: rgba(10, 10, 10, 0.48);
+    --zyro-border: rgba(10, 10, 10, 0.08);
+    --zyro-border-hover: rgba(10, 10, 10, 0.16);
+    --zyro-accent: #6366F1;
+    --zyro-accent-muted: rgba(99, 102, 241, 0.08);
+    --zyro-accent-hover: #4F46E5;
+
+    /* Legacy shadcn tokens (backward compat) */
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -103,6 +117,20 @@
   }
 
   .dark {
+    /* ── ZYR0 Design System — Dark Mode ───────────────────────────── */
+    --zyro-bg: #0A0A0A;
+    --zyro-surface: #141414;
+    --zyro-elevated: #191919;
+    --zyro-text: #FFFFFF;
+    --zyro-text-secondary: rgba(255, 255, 255, 0.64);
+    --zyro-text-muted: rgba(255, 255, 255, 0.48);
+    --zyro-border: rgba(255, 255, 255, 0.08);
+    --zyro-border-hover: rgba(255, 255, 255, 0.16);
+    --zyro-accent: #818CF8;
+    --zyro-accent-muted: rgba(129, 140, 248, 0.12);
+    --zyro-accent-hover: #A5B4FC;
+
+    /* Legacy shadcn tokens (dark) */
     --background: 224 71% 4%;
     --foreground: 213 31% 98%;
     --card: 224 71% 4%;
@@ -198,23 +226,26 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--zyro-bg);
+    color: var(--zyro-text);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  .font-display,
-  .font-heading {
-    font-family: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    letter-spacing: -0.028em;
+  /* Display serif headings — Dovetail-inspired */
+  h1, h2, h3 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    letter-spacing: -0.02em;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Smaller headings stay sans */
+  h4, h5, h6 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.01em;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -228,19 +259,37 @@
     text-wrap: balance;
   }
 
-  /* ── Landing V3 design system ─────────────────────────────────────── */
-  .font-accent {
-    font-family: 'Fraunces', Georgia, serif;
-    font-style: italic;
-    font-weight: 600;
+  /* ── ZYR0 Design System Utilities ────────────────────────────────── */
+
+  /* Display serif font */
+  .font-display {
+    font-family: 'DM Serif Display', Georgia, serif;
   }
 
+  /* Monospace labels — JetBrains Mono */
   .font-label {
-    font-family: 'Space Grotesk', 'Inter', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+    font-weight: 500;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
+
+  /* Semantic color utilities using CSS variables */
+  .bg-zyro { background: var(--zyro-bg); }
+  .bg-zyro-surface { background: var(--zyro-surface); }
+  .bg-zyro-elevated { background: var(--zyro-elevated); }
+  .bg-zyro-accent { background: var(--zyro-accent); }
+  .bg-zyro-accent-muted { background: var(--zyro-accent-muted); }
+
+  .text-zyro { color: var(--zyro-text); }
+  .text-zyro-secondary { color: var(--zyro-text-secondary); }
+  .text-zyro-muted { color: var(--zyro-text-muted); }
+  .text-zyro-accent { color: var(--zyro-accent); }
+
+  .border-zyro { border-color: var(--zyro-border); }
+  .border-zyro-hover { border-color: var(--zyro-border-hover); }
+
+  /* ── Legacy V3 utilities (kept for nav/footer compatibility) ────── */
 
   .text-gradient-v3 {
     background: linear-gradient(92deg, #1d4ed8 0%, #0284c7 55%, #4338ca 100%);
@@ -256,38 +305,26 @@
     color: transparent;
   }
 
-  .text-rotate-v3 {
-    background: linear-gradient(92deg, #1d4ed8 0%, #0e7490 55%, #4f46e5 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .dark .text-rotate-v3 {
-    background: linear-gradient(92deg, #38bdf8 0%, #22d3ee 55%, #818cf8 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
   .glass-card-v3 {
-    @apply rounded-3xl border border-slate-200/80 dark:border-white/10 backdrop-blur-md;
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.2);
+    @apply rounded-3xl border backdrop-blur-md;
+    border-color: var(--zyro-border);
+    background: var(--zyro-surface);
   }
 
   .dark .glass-card-v3 {
-    background: rgba(15, 23, 42, 0.6);
-    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.35);
+    background: rgba(20, 20, 20, 0.8);
   }
 
   .chip-v3 {
     @apply inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors;
+    border-color: var(--zyro-border);
+    color: var(--zyro-text-secondary);
   }
 
   /* Animated count-up utility (respects reduced motion) */
   .stat-value {
-    @apply font-display font-bold tabular-nums;
+    @apply font-bold tabular-nums;
+    font-family: 'DM Serif Display', Georgia, serif;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -297,7 +334,6 @@
       animation: none !important;
     }
   }
-  /* ──────────────────────────────────────────────────────────────────── */
 
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
@@ -321,12 +357,6 @@
 
   .animate-pulse-subtle {
     animation: pulseSubtle 2s ease-in-out infinite;
-  }
-
-  .animate-shimmer {
-    animation: shimmer 1.5s infinite;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    background-size: 200% 100%;
   }
 }
 
