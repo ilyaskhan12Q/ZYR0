@@ -683,7 +683,7 @@ export default function StudentWorkspace() {
             {activeTab === 'tasks' && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left: Tasks List */}
-                    <div data-tour="workspace-task-list" className={`lg:col-span-1 bg-card rounded-2xl border border-border shadow-sm flex flex-col overflow-hidden ${showTaskList || !selectedTask ? 'h-[680px]' : 'hidden lg:block lg:h-[680px]'}`}>
+                    <div data-tour="workspace-task-list" className={`lg:col-span-1 bg-card rounded-2xl border border-border shadow-sm flex flex-col overflow-hidden ${showTaskList || !selectedTask ? 'max-h-[680px]' : 'hidden lg:block lg:max-h-[680px]'}`}>
                       <div className="p-4 pb-3 border-b border-border flex-shrink-0">
                         <h3 className="font-bold text-foreground">Assigned Tasks</h3>
                         <p className="text-xs text-muted-foreground mt-0.5">{tasks.length} task{tasks.length !== 1 ? 's' : ''} for this placement</p>
@@ -726,20 +726,20 @@ export default function StudentWorkspace() {
                                   setShowTaskList(false);
                                   setExpandedSections({ brief: false, description: false, objectives: false });
                                 }}
-                                className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
+                                className={`w-full text-left p-3 rounded-xl border transition-all duration-150 cursor-pointer ${
                                   isSelected
                                     ? 'border-accent bg-accent/5 shadow-sm ring-1 ring-accent/20'
-                                    : 'border-border hover:bg-muted/40 hover:border-border/80 active:bg-muted/60 active:scale-[0.98]'
+                                    : 'border-border/60 hover:border-border hover:bg-muted/50 hover:shadow-sm active:bg-muted/70 active:scale-[0.98]'
                                 }`}
                               >
-                                <div className="flex items-center gap-2 mb-1.5">
+                                <div className="flex items-center gap-2 mb-1">
                                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot[t.status] || 'bg-slate-400'}`} />
-                                  <span className="font-semibold text-sm line-clamp-1 flex-1">{t.title}</span>
-                                  {hasDocs && <FileText className="w-3.5 h-3.5 text-accent flex-shrink-0" />}
-                                  {!isSelected && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 flex-shrink-0" />}
+                                  <span className="font-semibold text-[13px] line-clamp-1 flex-1">{t.title}</span>
+                                  {hasDocs && <FileText className="w-3.5 h-3.5 text-accent/70 flex-shrink-0" />}
+                                  {!isSelected && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />}
                                 </div>
 
-                                <div className="flex items-center gap-2 flex-wrap">
+                                <div className="flex items-center gap-1.5 flex-wrap ml-4">
                                   <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                                     statusBadge[t.status] || statusBadge.Pending
                                   }`}>
