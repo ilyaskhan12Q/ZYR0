@@ -31,7 +31,10 @@ export default function ResetPassword() {
     const { error } = await updatePassword(password);
     setLoading(false);
     if (error) {
-      setLocalError(error.message);
+      const msg = error.message || (typeof error === 'object' ? JSON.stringify(error) : String(error));
+      setLocalError(msg === '{}' || !msg
+        ? 'Unable to reset password. Please try again or contact support.'
+        : msg);
     } else {
       setSubmitted(true);
     }
