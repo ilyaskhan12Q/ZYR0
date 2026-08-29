@@ -64,18 +64,19 @@ export default function CompanyDropdown({ scrolled }: { scrolled: boolean }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[200px] bg-card rounded-xl border border-border shadow-xl py-1.5 z-50"
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[220px] bg-card/80 dark:bg-card/90 backdrop-blur-xl rounded-xl border border-border/50 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] py-1.5 z-50"
           >
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent rounded-t-xl" />
             {company.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors group"
+                className="flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted/60 transition-all group mx-1 rounded-lg"
               >
-                <item.icon className="w-4 h-4 text-muted-foreground" />
+                <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-accent transition-colors" />
                 <span className="flex-1">{item.label}</span>
-                <ChevronRight className="w-3 h-3 text-muted-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="w-3 h-3 text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               </Link>
             ))}
           </motion.div>

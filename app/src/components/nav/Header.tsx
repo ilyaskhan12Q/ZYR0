@@ -132,22 +132,24 @@ export default function Header() {
 
             {productsOpen && (
               <div
-                className="absolute top-full left-0 mt-2 w-[480px] p-2 rounded-xl border shadow-lg"
+                className="absolute top-full left-0 mt-2 w-[340px] sm:w-[480px] p-2 rounded-xl border backdrop-blur-xl z-50"
                 style={{
-                  background: 'var(--zyro-surface)',
-                  borderColor: 'var(--zyro-border)',
+                  background: 'color-mix(in srgb, var(--zyro-surface) 85%, transparent)',
+                  borderColor: 'color-mix(in srgb, var(--zyro-border) 50%, transparent)',
+                  boxShadow: '0 8px 30px -4px rgba(0,0,0,0.12), 0 0 0 0 transparent',
                 }}
               >
+                <div className="absolute inset-x-0 top-0 h-px rounded-t-xl" style={{ background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--zyro-accent) 40%, transparent), transparent)' }} />
                 {productsList.map((product) => (
                   <Link
                     key={product.id}
                     to={product.href}
                     onClick={() => setProductsOpen(false)}
-                    className="flex items-start gap-3 p-3 rounded-lg transition-colors duration-150"
+                    className="flex items-start gap-3 p-3 rounded-lg transition-all duration-150 group"
                     style={{ color: 'var(--zyro-text)' }}
                   >
                     <div
-                      className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
                       style={{ background: 'var(--zyro-accent-muted)' }}
                     >
                       <span
@@ -157,9 +159,9 @@ export default function Header() {
                         {product.name.charAt(4)}
                       </span>
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-sm font-medium">{product.name}</span>
+                        <span className="text-sm font-medium group-hover:text-[var(--zyro-accent)] transition-colors">{product.name}</span>
                         {product.badge && (
                           <span
                             className="font-label text-[9px] tracking-[0.1em] px-1.5 py-0.5 rounded"
@@ -215,22 +217,24 @@ export default function Header() {
 
             {resourcesOpen && (
               <div
-                className="absolute top-full left-0 mt-2 w-[220px] p-1.5 rounded-xl border shadow-lg"
+                className="absolute top-full left-0 mt-2 w-[240px] p-1.5 rounded-xl border backdrop-blur-xl z-50"
                 style={{
-                  background: 'var(--zyro-surface)',
-                  borderColor: 'var(--zyro-border)',
+                  background: 'color-mix(in srgb, var(--zyro-surface) 85%, transparent)',
+                  borderColor: 'color-mix(in srgb, var(--zyro-border) 50%, transparent)',
+                  boxShadow: '0 8px 30px -4px rgba(0,0,0,0.12), 0 0 0 0 transparent',
                 }}
               >
+                <div className="absolute inset-x-0 top-0 h-px rounded-t-xl" style={{ background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--zyro-accent) 40%, transparent), transparent)' }} />
                 {resources.map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={() => setResourcesOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                    className="flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-all duration-150 group"
                     style={{ color: 'var(--zyro-text-secondary)' }}
                   >
-                    <item.icon className="w-4 h-4" style={{ color: 'var(--zyro-text-muted)' }} />
-                    <span className="flex-1">{item.label}</span>
+                    <item.icon className="w-4 h-4 transition-colors group-hover:text-[var(--zyro-accent)]" style={{ color: 'var(--zyro-text-muted)' }} />
+                    <span className="flex-1 group-hover:text-[var(--zyro-text)] transition-colors">{item.label}</span>
                     {item.badge && (
                       <span
                         className="font-label text-[9px] tracking-[0.1em] px-1.5 py-0.5 rounded"
@@ -268,21 +272,23 @@ export default function Header() {
 
             {companyOpen && (
               <div
-                className="absolute top-full left-0 mt-2 w-[180px] p-1.5 rounded-xl border shadow-lg"
+                className="absolute top-full left-0 mt-2 w-[200px] p-1.5 rounded-xl border backdrop-blur-xl z-50"
                 style={{
-                  background: 'var(--zyro-surface)',
-                  borderColor: 'var(--zyro-border)',
+                  background: 'color-mix(in srgb, var(--zyro-surface) 85%, transparent)',
+                  borderColor: 'color-mix(in srgb, var(--zyro-border) 50%, transparent)',
+                  boxShadow: '0 8px 30px -4px rgba(0,0,0,0.12), 0 0 0 0 transparent',
                 }}
               >
+                <div className="absolute inset-x-0 top-0 h-px rounded-t-xl" style={{ background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--zyro-accent) 40%, transparent), transparent)' }} />
                 {company.map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
                     onClick={() => setCompanyOpen(false)}
-                    className="block px-3 py-2 text-sm rounded-lg transition-colors duration-150"
+                    className="block px-3 py-2 text-sm rounded-lg transition-all duration-150 group"
                     style={{ color: 'var(--zyro-text-secondary)' }}
                   >
-                    {item.label}
+                    <span className="group-hover:text-[var(--zyro-text)] transition-colors">{item.label}</span>
                   </Link>
                 ))}
               </div>
@@ -328,12 +334,14 @@ export default function Header() {
 
               {profileOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-56 rounded-xl border shadow-lg py-1"
+                  className="absolute right-0 mt-2 w-56 rounded-xl border backdrop-blur-xl py-1 z-50"
                   style={{
-                    background: 'var(--zyro-surface)',
-                    borderColor: 'var(--zyro-border)',
+                    background: 'color-mix(in srgb, var(--zyro-surface) 85%, transparent)',
+                    borderColor: 'color-mix(in srgb, var(--zyro-border) 50%, transparent)',
+                    boxShadow: '0 8px 30px -4px rgba(0,0,0,0.12), 0 0 0 0 transparent',
                   }}
                 >
+                  <div className="absolute inset-x-0 top-0 h-px rounded-t-xl" style={{ background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--zyro-accent) 40%, transparent), transparent)' }} />
                   <div
                     className="px-4 py-3 border-b"
                     style={{ borderColor: 'var(--zyro-border)' }}
