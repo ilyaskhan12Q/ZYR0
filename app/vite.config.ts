@@ -36,7 +36,6 @@ export default defineConfig(({ mode }) => {
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-motion': ['framer-motion'],
           'vendor-icons': ['lucide-react'],
-          'vendor-recharts': ['recharts'],
         },
       },
     },

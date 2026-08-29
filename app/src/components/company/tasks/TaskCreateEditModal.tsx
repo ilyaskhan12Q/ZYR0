@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Users, AlertCircle, CheckCircle2, Info, Calendar } from 'lucide-react';
+import {
+  X, User, Users, AlertCircle, CheckCircle2, Info, Calendar,
+  Upload, FileText, Trash2, Plus,
+} from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
-import { createTask, updateTask, bulkCreateTasks } from '@/services/tasks';
+import { createTask, updateTask, bulkCreateTasks, uploadTaskDocument } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
+import type { TaskAttachment } from '@/lib/database.types';
 
 interface TaskCreateEditModalProps {
   isOpen: boolean;
@@ -15,6 +19,9 @@ interface TaskCreateEditModalProps {
   onSuccess: () => void;
 }
 
+const ACCEPTED_FILE_TYPES = 'application/pdf,image/png,image/jpeg,image/webp';
+const MAX_FILE_SIZE_MB = 25;
+
 export function TaskCreateEditModal({
   isOpen,
   onClose,
@@ -25,6 +32,7 @@ export function TaskCreateEditModal({
   onSuccess,
 }: TaskCreateEditModalProps) {
   const isEditMode = !!taskToEdit;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -32,6 +40,16 @@ export function TaskCreateEditModal({
   const [dueDate, setDueDate] = useState('');
   const [internshipId, setInternshipId] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
+
+  // Document attachments
+  const [attachments, setAttachments] = useState<TaskAttachment[]>([]);
+  const [uploadingFile, setUploadingFile] = useState(false);
+
+  // Structured fields
+  const [objectives, setObjectives] = useState<string[]>(['']);
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState<string[]>(['']);
+  const [difficulty, setDifficulty] = useState<'Beginner' | 'Intermediate' | 'Advanced'>('Beginner');
+  const [estimatedDuration, setEstimatedDuration] = useState('');
 
   // Bulk assignment state
   const [assignmentScope, setAssignmentScope] = useState<'individual' | 'bulk'>('individual');
@@ -51,6 +69,11 @@ export function TaskCreateEditModal({
       setInternshipId(taskToEdit.internship_id || '');
       setAssignedTo(taskToEdit.assigned_to || '');
       setAssignmentScope('individual');
+      setAttachments(taskToEdit.attachments || []);
+      setObjectives(taskToEdit.objectives?.length ? taskToEdit.objectives : ['']);
+      setAcceptanceCriteria(taskToEdit.acceptance_criteria?.length ? taskToEdit.acceptance_criteria : ['']);
+      setDifficulty(taskToEdit.difficulty || 'Beginner');
+      setEstimatedDuration(taskToEdit.estimated_duration || '');
     } else {
       setTitle('');
       setDescription('');
@@ -62,6 +85,11 @@ export function TaskCreateEditModal({
       setBulkInternshipId('');
       setBulkEligibleInterns([]);
       setBulkResult(null);
+      setAttachments([]);
+      setObjectives(['']);
+      setAcceptanceCriteria(['']);
+      setDifficulty('Beginner');
+      setEstimatedDuration('');
     }
     setValidationErrors({});
   }, [taskToEdit, isOpen]);
@@ -79,6 +107,52 @@ export function TaskCreateEditModal({
     setBulkEligibleInterns(eligible);
   };
 
+  const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setValidationErrors((prev) => ({ ...prev, file: `File must be under ${MAX_FILE_SIZE_MB}MB` }));
+      return;
+    }
+
+    setUploadingFile(true);
+    setValidationErrors((prev) => ({ ...prev, file: '' }));
+
+    try {
+      const attachment = await uploadTaskDocument(file);
+      setAttachments((prev) => [...prev, attachment]);
+    } catch (err: any) {
+      setValidationErrors((prev) => ({ ...prev, file: err.message || 'Upload failed' }));
+    } finally {
+      setUploadingFile(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  }, []);
+
+  const handleRemoveAttachment = (id: string) => {
+    setAttachments((prev) => prev.filter((a) => a.id !== id));
+  };
+
+  const updateListItem = (
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    index: number,
+    value: string,
+  ) => {
+    setter((prev) => prev.map((item, i) => (i === index ? value : item)));
+  };
+
+  const addListItem = (setter: React.Dispatch<React.SetStateAction<string[]>>) => {
+    setter((prev) => [...prev, '']);
+  };
+
+  const removeListItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, index: number) => {
+    setter((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const cleanListItems = (items: string[]): string[] =>
+    items.map((s) => s.trim()).filter(Boolean);
+
   const validateForm = () => {
     const errors: Record<string, string> = {};
     if (!title.trim()) {
@@ -87,9 +161,9 @@ export function TaskCreateEditModal({
       errors.title = 'Title must be at least 3 characters';
     }
 
-    if (!description.trim()) {
-      errors.description = 'Description is required';
-    } else if (description.trim().length < 10) {
+    if (!description.trim() && attachments.length === 0) {
+      errors.description = 'Provide a description or upload a task document';
+    } else if (description.trim() && description.trim().length < 10) {
       errors.description = 'Description must be at least 10 characters';
     }
 
@@ -127,13 +201,22 @@ export function TaskCreateEditModal({
     setSubmitting(true);
     setBulkResult(null);
 
+    const taskData = {
+      title: title.trim(),
+      description: description.trim() || undefined,
+      priority,
+      due_date: dueDate || null,
+      attachments,
+      objectives: cleanListItems(objectives),
+      acceptance_criteria: cleanListItems(acceptanceCriteria),
+      difficulty,
+      estimated_duration: estimatedDuration.trim() || undefined,
+    };
+
     try {
       if (isEditMode) {
         const { error } = await updateTask(taskToEdit.id, {
-          title: title.trim(),
-          description: description.trim(),
-          priority,
-          due_date: dueDate || null,
+          ...taskData,
           internship_id: internshipId,
           assigned_to: assignedTo,
         });
@@ -145,14 +228,7 @@ export function TaskCreateEditModal({
       } else if (assignmentScope === 'bulk') {
         const internIds = bulkEligibleInterns.map((app: any) => app.student?.id || app.student_id);
         const { created, skipped, error } = await bulkCreateTasks(
-          {
-            title: title.trim(),
-            description: description.trim(),
-            priority,
-            due_date: dueDate || null,
-            internship_id: bulkInternshipId,
-            status: 'Pending',
-          },
+          { ...taskData, internship_id: bulkInternshipId, status: 'Pending' },
           internIds,
           existingTasks
         );
@@ -160,7 +236,6 @@ export function TaskCreateEditModal({
         if (!error) {
           setBulkResult({ created, skipped });
 
-          // Send notifications
           for (const app of bulkEligibleInterns) {
             const internId = app.student?.id || app.student_id;
             try {
@@ -184,17 +259,13 @@ export function TaskCreateEditModal({
         }
       } else {
         const { error } = await createTask({
-          title: title.trim(),
-          description: description.trim(),
-          priority,
-          due_date: dueDate || null,
+          ...taskData,
           internship_id: internshipId,
           assigned_to: assignedTo,
           status: 'Pending',
         });
 
         if (!error) {
-          // Trigger notification
           const assignedIntern = interns.find((i) => (i.student?.id || i.student_id) === assignedTo);
           if (assignedIntern) {
             try {
@@ -235,7 +306,7 @@ export function TaskCreateEditModal({
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="bg-card border border-border w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden my-8"
+          className="bg-card border border-border w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden my-8"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
@@ -255,7 +326,7 @@ export function TaskCreateEditModal({
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
             {/* Title */}
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
@@ -286,10 +357,13 @@ export function TaskCreateEditModal({
             {/* Description */}
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
-                Description & Instructions *
+                Description & Instructions
+                <span className="text-muted-foreground/60 font-normal normal-case ml-1">
+                  (required if no document uploaded)
+                </span>
               </label>
               <textarea
-                rows={4}
+                rows={3}
                 value={description}
                 onChange={(e) => {
                   setDescription(e.target.value);
@@ -297,7 +371,7 @@ export function TaskCreateEditModal({
                     setValidationErrors((prev) => ({ ...prev, description: '' }));
                   }
                 }}
-                placeholder="Detail the technical requirements, expected deliverables, and evaluation criteria..."
+                placeholder="Brief summary of the task. Upload a PDF for the full specification..."
                 className={`w-full px-3.5 py-2.5 bg-background border ${
                   validationErrors.description ? 'border-red-500' : 'border-border'
                 } rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none`}
@@ -307,6 +381,84 @@ export function TaskCreateEditModal({
                   <AlertCircle className="w-3.5 h-3.5" />
                   {validationErrors.description}
                 </p>
+              )}
+            </div>
+
+            {/* Document Upload */}
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                Task Brief Document
+              </label>
+              <div
+                onClick={() => !uploadingFile && fileInputRef.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const file = e.dataTransfer.files[0];
+                  if (file && fileInputRef.current) {
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    fileInputRef.current.files = dataTransfer.files;
+                    fileInputRef.current.dispatchEvent(new Event('change', { bubbles: true }));
+                  }
+                }}
+                className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
+                  uploadingFile
+                    ? 'border-accent/40 bg-accent/5'
+                    : 'border-border hover:border-accent/40 hover:bg-muted/30'
+                }`}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept={ACCEPTED_FILE_TYPES}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                {uploadingFile ? (
+                  <div className="flex items-center justify-center gap-2 text-accent text-sm">
+                    <Loader variant="button" /> Uploading...
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-1.5 text-muted-foreground">
+                    <Upload className="w-5 h-5" />
+                    <p className="text-xs">
+                      <span className="font-semibold text-accent">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-[10px]">PDF, PNG, JPG up to {MAX_FILE_SIZE_MB}MB</p>
+                  </div>
+                )}
+              </div>
+              {validationErrors.file && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  {validationErrors.file}
+                </p>
+              )}
+
+              {/* Uploaded files list */}
+              {attachments.length > 0 && (
+                <div className="mt-2 space-y-1.5">
+                  {attachments.map((att) => (
+                    <div key={att.id} className="flex items-center justify-between p-2 bg-muted/40 rounded-lg border border-border">
+                      <div className="flex items-center gap-2 text-xs min-w-0">
+                        <FileText className="w-4 h-4 text-accent flex-shrink-0" />
+                        <span className="truncate">{att.name}</span>
+                        <span className="text-muted-foreground flex-shrink-0">
+                          ({(Number(att.size) / 1024 / 1024).toFixed(1)}MB)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveAttachment(att.id)}
+                        className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -478,6 +630,96 @@ export function TaskCreateEditModal({
               </div>
             )}
 
+            {/* Structured Fields: Objectives */}
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">
+                Objectives
+              </label>
+              <div className="space-y-2">
+                {objectives.map((obj, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={obj}
+                      onChange={(e) => updateListItem(setObjectives, idx, e.target.value)}
+                      placeholder={`Objective ${idx + 1}`}
+                      className="flex-1 px-3.5 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
+                    />
+                    {objectives.length > 1 && (
+                      <button type="button" onClick={() => removeListItem(setObjectives, idx)}
+                        className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={() => addListItem(setObjectives)}
+                  className="flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 font-medium">
+                  <Plus className="w-3.5 h-3.5" /> Add Objective
+                </button>
+              </div>
+            </div>
+
+            {/* Structured Fields: Acceptance Criteria */}
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 block">
+                Acceptance Criteria
+              </label>
+              <div className="space-y-2">
+                {acceptanceCriteria.map((crt, idx) => (
+                  <div key={idx} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={crt}
+                      onChange={(e) => updateListItem(setAcceptanceCriteria, idx, e.target.value)}
+                      placeholder={`Criterion ${idx + 1}`}
+                      className="flex-1 px-3.5 py-2 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
+                    />
+                    {acceptanceCriteria.length > 1 && (
+                      <button type="button" onClick={() => removeListItem(setAcceptanceCriteria, idx)}
+                        className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={() => addListItem(setAcceptanceCriteria)}
+                  className="flex items-center gap-1.5 text-xs text-accent hover:text-accent/80 font-medium">
+                  <Plus className="w-3.5 h-3.5" /> Add Criterion
+                </button>
+              </div>
+            </div>
+
+            {/* Difficulty & Duration */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                  Difficulty
+                </label>
+                <select
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value as any)}
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer"
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                  Estimated Duration
+                </label>
+                <input
+                  type="text"
+                  value={estimatedDuration}
+                  onChange={(e) => setEstimatedDuration(e.target.value)}
+                  placeholder="e.g. 2 hours, 1 week"
+                  className="w-full px-3.5 py-2.5 bg-background border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+            </div>
+
             {/* Priority & Due Date */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -535,6 +777,7 @@ export function TaskCreateEditModal({
                 type="submit"
                 disabled={
                   submitting ||
+                  uploadingFile ||
                   (assignmentScope === 'bulk' && !isEditMode && bulkEligibleInterns.length === 0) ||
                   !!bulkResult
                 }

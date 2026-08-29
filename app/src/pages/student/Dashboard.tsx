@@ -30,7 +30,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.all([
+        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.allSettled([
           getMyApplications(),
           getMyTasks(),
           getUnreadCount(),
@@ -39,12 +39,12 @@ export default function StudentDashboard() {
           getMyTeamApplications()
         ]);
         
-        setApplications(apps?.data || []);
-        setTasks(myTasks?.data || []);
-        setUnreadMessages(unread || 0);
-        setConversations(convos?.data || []);
-        setCertificates(certs?.data || []);
-        setTeamApplications(teamApps?.data || []);
+        setApplications(apps.status === 'fulfilled' ? (apps.value?.data || []) : []);
+        setTasks(myTasks.status === 'fulfilled' ? (myTasks.value?.data || []) : []);
+        setUnreadMessages(unread.status === 'fulfilled' ? (unread.value || 0) : 0);
+        setConversations(convos.status === 'fulfilled' ? (convos.value?.data || []) : []);
+        setCertificates(certs.status === 'fulfilled' ? (certs.value?.data || []) : []);
+        setTeamApplications(teamApps.status === 'fulfilled' ? (teamApps.value?.data || []) : []);
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {

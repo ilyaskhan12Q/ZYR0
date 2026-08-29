@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar } from 'lucide-react';
+import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, FileText, ExternalLink, Github } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTasksAssignedByMe, reviewSubmission, updateTask } from '@/services/tasks';
+import { getCompanyTasks, reviewSubmission, updateTask } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 const tabs = ['To Review', 'Reviewed'];
@@ -27,7 +27,8 @@ export default function MentorTasks() {
 
   async function loadTasks() {
     try {
-      const res = await getTasksAssignedByMe();
+      if (!profile?.company_id) return;
+      const res = await getCompanyTasks(profile.company_id);
       if (res.data) {
         setTasks(res.data);
       }
@@ -225,6 +226,44 @@ export default function MentorTasks() {
                       <span className="text-xs text-muted-foreground">{new Date(submission.submitted_at).toLocaleDateString()}</span>
                     </div>
                     <p className="text-sm text-muted-foreground whitespace-pre-line">{submission.notes || 'No notes provided.'}</p>
+
+                    {/* Submitted Links */}
+                    {(submission.github_url || submission.live_demo_url) && (
+                      <div className="flex flex-wrap gap-3 mt-3 text-xs">
+                        {submission.github_url && (
+                          <a href={submission.github_url} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-accent hover:underline font-medium">
+                            <Github className="w-3.5 h-3.5" /> Repository <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                        {submission.live_demo_url && (
+                          <a href={submission.live_demo_url} target="_blank" rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-emerald-600 hover:underline font-medium">
+                            <ExternalLink className="w-3.5 h-3.5" /> Live Demo <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Submitted Files */}
+                    {submission.attachments && submission.attachments.length > 0 && (
+                      <div className="mt-3 space-y-1">
+                        <p className="text-xs font-medium text-muted-foreground">Attached Files:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {submission.attachments.map((file: any, idx: number) => (
+                            <a
+                              key={file.id || idx}
+                              href={file.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-card border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
+                            >
+                              <FileText className="w-3.5 h-3.5 text-accent" /> {file.name}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

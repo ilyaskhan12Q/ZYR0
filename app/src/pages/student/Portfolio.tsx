@@ -18,38 +18,46 @@ export default function StudentPortfolio() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadPortfolioData() {
       if (!profile) return;
       try {
-        const [certsRes, tasksRes, appsRes, evalsRes] = await Promise.all([
-          getMyCertificates(),
-          getMyTasks(),
-          getMyApplications(),
-          supabase
-            .from('evaluations')
-            .select(`
-              id, period, overall_rating, strengths, additional_comments,
-              mentor:profiles!mentor_id (full_name, avatar_url, title),
-              internship:internships!internship_id (
-                id, title,
-                company:companies!company_id (name)
-              )
-            `)
-            .eq('intern_id', profile.id)
-            .eq('status', 'Submitted'),
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getMyCertificates(),
+            getMyTasks(),
+            getMyApplications(),
+            supabase
+              .from('evaluations')
+              .select(`
+                id, period, overall_rating, strengths, additional_comments,
+                mentor:profiles!mentor_id (full_name, avatar_url, title),
+                internship:internships!internship_id (
+                  id, title,
+                  company:companies!company_id (name)
+                )
+              `)
+              .eq('intern_id', profile.id)
+              .eq('status', 'Submitted'),
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Portfolio load timeout')), 10000))
         ]);
 
-        if (certsRes.data) setCertificates(certsRes.data);
-        if (tasksRes.data) setTasks(tasksRes.data);
-        if (appsRes.data) setApplications(appsRes.data);
-        if (evalsRes.data) setTestimonials(evalsRes.data);
+        if (cancelled) return;
+        const [certsRes, tasksRes, appsRes, evalsRes] = settled;
+        if (certsRes.status === 'fulfilled' && certsRes.value.data) setCertificates(certsRes.value.data);
+        if (tasksRes.status === 'fulfilled' && tasksRes.value.data) setTasks(tasksRes.value.data);
+        if (appsRes.status === 'fulfilled' && appsRes.value.data) setApplications(appsRes.value.data);
+        if (evalsRes.status === 'fulfilled' && evalsRes.value.data) setTestimonials(evalsRes.value.data);
       } catch (err) {
         console.error('Error loading portfolio data:', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadPortfolioData();
+    return () => { cancelled = true; };
   }, [profile]);
 
   if (loading || !profile) {

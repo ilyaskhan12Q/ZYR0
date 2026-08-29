@@ -24,24 +24,38 @@ export default function CompanyInternships() {
   // Edit modal state
   const [editingInternship, setEditingInternship] = useState<Internship | null>(null);
 
-  async function loadData() {
-    const { data: co } = await getMyCompany();
-    if (co) {
-      setCompany(co);
-      const [internshipsRes, appsRes] = await Promise.all([
-        getInternships({ company_id: co.id, status: 'all' }),
-        getAllCompanyApplications(co.id)
-      ]);
-      if (internshipsRes.data) setInternships(internshipsRes.data);
-      if (appsRes.data) setApplications(appsRes.data);
-    }
-    setLoading(false);
-  }
-
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadData() {
+      try {
+        const { data: co } = await getMyCompany();
+        if (cancelled) return;
+        if (co) {
+          setCompany(co);
+          const settled = await Promise.race([
+            Promise.allSettled([
+              getInternships({ company_id: co.id, status: 'all' }),
+              getAllCompanyApplications(co.id)
+            ]),
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Internships load timeout')), 10000))
+          ]);
+          if (cancelled) return;
+          const [internshipsRes, appsRes] = settled;
+          if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) setInternships(internshipsRes.value.data);
+          if (appsRes.status === 'fulfilled' && appsRes.value.data) setApplications(appsRes.value.data);
+        }
+      } catch (error) {
+        console.error('Failed to load internships:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
     if (user) {
       loadData();
     }
+    return () => { cancelled = true; };
   }, [user]);
 
   const filtered = internships.filter(i => {

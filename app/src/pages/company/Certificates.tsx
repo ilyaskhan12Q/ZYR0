@@ -4,7 +4,7 @@ import { Search, CheckCircle2, XCircle, Send, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
-import { getTasksAssignedByMe } from '@/services/tasks';
+import { getCompanyTasks } from '@/services/tasks';
 import { getCompanyCertificates, issueCertificate, resendCertificateEmail } from '@/services/certificates';
 import { createWorkspaceEvent } from '@/services/workspaceEvents';
 import { clearCache } from '@/lib/cache';
@@ -27,19 +27,23 @@ export default function CompanyCertificates() {
       const { data: co } = await getMyCompany();
       if (co) {
         setCompany(co);
-        const [appsRes, tasksRes, certsRes] = await Promise.all([
-          getAllCompanyApplications(co.id),
-          getTasksAssignedByMe(),
-          getCompanyCertificates(co.id)
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getAllCompanyApplications(co.id),
+            getCompanyTasks(co.id),
+            getCompanyCertificates(co.id)
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Certificates load timeout')), 10000))
         ]);
 
-        if (appsRes.data) {
-          // Accepted applicants are interns
-          const activeInterns = appsRes.data.filter((app: any) => app.status === 'Accepted');
+        const [appsRes, tasksRes, certsRes] = settled;
+
+        if (appsRes.status === 'fulfilled' && appsRes.value.data) {
+          const activeInterns = appsRes.value.data.filter((app: any) => app.status === 'Accepted');
           setInterns(activeInterns);
         }
-        if (tasksRes.data) setTasks(tasksRes.data);
-        if (certsRes.data) setCertificates(certsRes.data);
+        if (tasksRes.status === 'fulfilled' && tasksRes.value.data) setTasks(tasksRes.value.data);
+        if (certsRes.status === 'fulfilled' && certsRes.value.data) setCertificates(certsRes.value.data);
       }
     } catch (err) {
       console.error(err);

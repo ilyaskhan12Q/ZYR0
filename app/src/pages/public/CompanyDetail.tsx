@@ -24,26 +24,34 @@ export default function CompanyDetail() {
   });
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadCompanyDetail() {
       if (!id) return;
       try {
-        const [compRes, internshipsRes, appsRes] = await Promise.all([
-          getCompanyById(id),
-          getInternships({ company_id: id, status: 'Active' }),
-          getAllCompanyApplications(id)
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getCompanyById(id),
+            getInternships({ company_id: id, status: 'Active' }),
+            getAllCompanyApplications(id)
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Company detail timeout')), 10000))
         ]);
 
-        if (compRes.data) {
-          setCompany(compRes.data);
+        if (cancelled) return;
+        const [compRes, internshipsRes, appsRes] = settled;
+
+        if (compRes.status === 'fulfilled' && compRes.value.data) {
+          setCompany(compRes.value.data);
         }
 
-        if (internshipsRes.data) {
-          setCompanyInternships(internshipsRes.data);
+        if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) {
+          setCompanyInternships(internshipsRes.value.data);
         }
 
         // Calculate statistics
-        const allInternships = internshipsRes.data || [];
-        const allApps = appsRes.data || [];
+        const allInternships = internshipsRes.status === 'fulfilled' ? (internshipsRes.value.data || []) : [];
+        const allApps = appsRes.status === 'fulfilled' ? (appsRes.value.data || []) : [];
         
         const applicantsCount = allApps.length;
         const activeCount = allApps.filter((a: any) => a.status === 'Accepted').length;
@@ -53,6 +61,8 @@ export default function CompanyDetail() {
           .from('certificates')
           .select('id', { count: 'exact', head: true })
           .eq('company_id', id);
+
+        if (cancelled) return;
 
         setStats({
           internships: allInternships.length,
@@ -64,10 +74,11 @@ export default function CompanyDetail() {
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadCompanyDetail();
+    return () => { cancelled = true; };
   }, [id]);
 
   if (loading) {

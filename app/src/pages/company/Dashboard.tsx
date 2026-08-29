@@ -15,20 +15,34 @@ export default function CompanyDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
-      const { data: co } = await getMyCompany();
-      if (co) {
-        setCompany(co);
-        const [internshipsRes, appsRes] = await Promise.all([
-          getInternships({ company_id: co.id }),
-          getAllCompanyApplications(co.id),
-        ]);
-        if (internshipsRes.data) setInternships(internshipsRes.data);
-        if (appsRes.data) setApplications(appsRes.data);
+      try {
+        const { data: co } = await getMyCompany();
+        if (cancelled) return;
+        if (co) {
+          setCompany(co);
+          const settled = await Promise.race([
+            Promise.allSettled([
+              getInternships({ company_id: co.id }),
+              getAllCompanyApplications(co.id),
+            ]),
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Company dashboard timeout')), 10000))
+          ]);
+          if (cancelled) return;
+          const [internshipsRes, appsRes] = settled;
+          if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) setInternships(internshipsRes.value.data);
+          if (appsRes.status === 'fulfilled' && appsRes.value.data) setApplications(appsRes.value.data);
+        }
+      } catch (error) {
+        console.error('Failed to load company dashboard:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     load();
+    return () => { cancelled = true; };
   }, [user]);
 
   if (loading) {

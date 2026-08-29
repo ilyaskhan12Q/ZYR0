@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Users, ClipboardList, CheckSquare, Star, ArrowRight, Clock, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
-import { getTasksAssignedByMe } from '@/services/tasks';
+import { getCompanyTasks } from '@/services/tasks';
 import { supabase } from '@/lib/supabase';
 
 export default function MentorDashboard() {
@@ -18,8 +18,10 @@ export default function MentorDashboard() {
     async function loadDashboardData() {
       if (!profile) return;
       try {
-        // Get tasks assigned by this mentor
-        const tasksRes = await getTasksAssignedByMe();
+        // Get tasks for this mentor's company
+        const tasksRes = profile.company_id
+          ? await getCompanyTasks(profile.company_id)
+          : { data: [] };
         
         // Get interns (accepted applications for the company internships)
         let internsData: any[] = [];

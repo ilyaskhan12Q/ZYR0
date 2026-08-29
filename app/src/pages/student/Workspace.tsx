@@ -1,14 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
-  Github, LayoutGrid, ChevronRight, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight
+  Github, LayoutGrid, ChevronRight, ChevronDown, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight,
+  Upload, FileText, Trash2, Download, Loader2, BarChart3, MessageCircle, List,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
 import { getMyActiveInternships } from '@/services/internships';
-import { getMyTasks, submitTask } from '@/services/tasks';
+import { getMyTasks, submitTask, uploadSubmissionFile } from '@/services/tasks';
+import type { TaskAttachment } from '@/lib/database.types';
 import { getMyCertificates } from '@/services/certificates';
 import { getWorkspaceEvents, clearWorkspaceEventsCache } from '@/services/workspaceEvents';
 import { useRealtimeInsert } from '@/hooks/useRealtime';
@@ -20,8 +22,11 @@ import { dispatchNotificationWithSimulation } from '@/services/notificationsSim'
 
 type WorkspaceTab = 'overview' | 'tasks' | 'submissions' | 'certificate';
 
+const WHATSAPP_URL = 'https://wa.me/923279883150';
+
 export default function StudentWorkspace() {
   const { internshipId } = useParams<{ internshipId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -34,14 +39,28 @@ export default function StudentWorkspace() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [certificates, setCertificates] = useState<any[]>([]);
   const [events, setEvents] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('overview');
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>(
+    (searchParams.get('tab') as WorkspaceTab) || 'overview'
+  );
 
   // Task detail and submission states
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
   const [githubUrl, setGithubUrl] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
   const [notes, setNotes] = useState('');
+
+  // Mobile task list visibility
+  const [showTaskList, setShowTaskList] = useState(true);
+
+  // Accordion sections for mobile
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    brief: false,
+    description: false,
+    objectives: false,
+  });
   const [submitting, setSubmitting] = useState(false);
+  const [submissionFiles, setSubmissionFiles] = useState<TaskAttachment[]>([]);
+  const [uploadingSubmissionFile, setUploadingSubmissionFile] = useState(false);
 
   // Load placement information, tasks and certificates
   const loadWorkspaceData = useCallback(async (forceRefresh = false) => {
@@ -124,6 +143,21 @@ export default function StudentWorkspace() {
     loadWorkspaceData();
   }, [loadWorkspaceData]);
 
+  // Auto-select task from URL ?taskId= after tasks load
+  useEffect(() => {
+    const taskIdParam = searchParams.get('taskId');
+    if (taskIdParam && tasks.length > 0 && activeTab === 'tasks') {
+      const match = tasks.find((t: any) => t.id === taskIdParam);
+      if (match) {
+        setSelectedTask(match);
+        // Clean taskId from URL after selecting
+        const next = new URLSearchParams(searchParams);
+        next.delete('taskId');
+        setSearchParams(next, { replace: true });
+      }
+    }
+  }, [tasks, activeTab, searchParams, setSearchParams]);
+
   // Subscribe to real-time updates for timeline events
   const activeInternshipId = (activePlacement?.internship as any)?.id;
   const realtimeFilter = activeInternshipId
@@ -157,6 +191,7 @@ export default function StudentWorkspace() {
         notes: notes.trim() || undefined,
         github_url: githubUrl.trim(),
         live_demo_url: demoUrl.trim() || undefined,
+        attachments: submissionFiles.length > 0 ? submissionFiles : undefined,
       });
 
       if (error) throw error;
@@ -165,9 +200,10 @@ export default function StudentWorkspace() {
       setGithubUrl('');
       setDemoUrl('');
       setNotes('');
+      setSubmissionFiles([]);
 
       // Trigger simulation notification to mentor/company supervisor
-      const recipientId = selectedTask.mentor_id || selectedTask.company_id;
+      const recipientId = selectedTask.assigned_by;
       if (recipientId) {
         try {
           await dispatchNotificationWithSimulation({
@@ -399,8 +435,12 @@ export default function StudentWorkspace() {
               key={tab}
               onClick={() => {
                 setActiveTab(tab);
-                // Reset selected task if changing tab
                 if (tab !== 'tasks') setSelectedTask(null);
+                // Sync tab to URL
+                const next = new URLSearchParams(searchParams);
+                next.set('tab', tab);
+                next.delete('taskId');
+                setSearchParams(next, { replace: true });
               }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                 isActive
@@ -642,66 +682,85 @@ export default function StudentWorkspace() {
             {/* TASKS PANEL */}
             {activeTab === 'tasks' && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left: Tasks List */}
-                <div data-tour="workspace-task-list" className="lg:col-span-1 bg-card rounded-2xl border border-border p-4 shadow-sm h-[600px] overflow-y-auto space-y-3">
-                  <div className="pb-3 border-b border-border mb-2">
-                    <h3 className="font-bold text-foreground">Assigned Tasks</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">Select a task row to review or submit credentials</p>
-                  </div>
+                    {/* Left: Tasks List */}
+                    <div data-tour="workspace-task-list" className={`lg:col-span-1 bg-card rounded-2xl border border-border shadow-sm flex flex-col overflow-hidden ${showTaskList || !selectedTask ? 'max-h-[680px]' : 'hidden lg:block lg:max-h-[680px]'}`}>
+                      <div className="p-4 pb-3 border-b border-border flex-shrink-0">
+                        <h3 className="font-bold text-foreground">Assigned Tasks</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{tasks.length} task{tasks.length !== 1 ? 's' : ''} for this placement</p>
+                      </div>
 
-                  {tasks.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground text-sm">
-                      No tasks assigned for this placement.
+                      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                        {tasks.length === 0 ? (
+                          <div className="text-center py-12 text-muted-foreground text-sm">
+                            No tasks assigned for this placement.
+                          </div>
+                        ) : (
+                          tasks.map((t) => {
+                            const isSelected = selectedTask?.id === t.id;
+                            const statusDot: Record<string, string> = {
+                              Pending: 'bg-slate-400',
+                              Submitted: 'bg-amber-500',
+                              'Under Review': 'bg-amber-500',
+                              Approved: 'bg-emerald-500',
+                              Rejected: 'bg-red-500',
+                            };
+                            const statusBadge: Record<string, string> = {
+                              Pending: 'bg-slate-100 text-slate-600 dark:bg-slate-800/40 dark:text-slate-400',
+                              Submitted: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+                              'Under Review': 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+                              Approved: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+                              Rejected: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+                            };
+                            const hasDocs = t.attachments && t.attachments.length > 0;
+
+                            return (
+                              <button
+                                key={t.id}
+                                data-tour="workspace-task-item"
+                                onClick={() => {
+                                  setSelectedTask(t);
+                                  setGithubUrl('');
+                                  setDemoUrl('');
+                                  setNotes('');
+                                  setSubmissionFiles([]);
+                                  setShowTaskList(false);
+                                  setExpandedSections({ brief: false, description: false, objectives: false });
+                                }}
+                                className={`w-full text-left p-3 rounded-xl border transition-all duration-150 cursor-pointer ${
+                                  isSelected
+                                    ? 'border-accent bg-accent/5 shadow-sm ring-1 ring-accent/20'
+                                    : 'border-border/60 hover:border-border hover:bg-muted/50 hover:shadow-sm active:bg-muted/70 active:scale-[0.98]'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDot[t.status] || 'bg-slate-400'}`} />
+                                  <span className="font-semibold text-[13px] line-clamp-1 flex-1">{t.title}</span>
+                                  {hasDocs && <FileText className="w-3.5 h-3.5 text-accent/70 flex-shrink-0" />}
+                                  {!isSelected && <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/40 flex-shrink-0" />}
+                                </div>
+
+                                <div className="flex items-center gap-1.5 flex-wrap ml-4">
+                                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                                    statusBadge[t.status] || statusBadge.Pending
+                                  }`}>
+                                    {t.status}
+                                  </span>
+                                  {t.priority && (
+                                    <span className="text-[10px] text-muted-foreground">{t.priority}</span>
+                                  )}
+                                  {t.due_date && (
+                                    <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                                      <Calendar className="w-2.5 h-2.5" />
+                                      {new Date(t.due_date).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    tasks.map((t) => {
-                      const isSelected = selectedTask?.id === t.id;
-                      const statusColors: Record<string, string> = {
-                        Pending: 'bg-slate-100 text-slate-700 dark:bg-slate-800/40 dark:text-slate-400',
-                        Submitted: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
-                        'Under Review': 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
-                        Approved: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
-                        Rejected: 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
-                      };
-
-                      return (
-                        <button
-                          key={t.id}
-                          data-tour="workspace-task-item"
-                          onClick={() => {
-                            setSelectedTask(t);
-                            // Clear form values
-                            setGithubUrl('');
-                            setDemoUrl('');
-                            setNotes('');
-                          }}
-                          className={`w-full text-left p-4 rounded-xl border transition-all ${
-                            isSelected
-                              ? 'border-accent bg-accent/5 shadow-sm'
-                              : 'border-border hover:bg-muted/40 hover:border-border/80'
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-semibold text-sm line-clamp-1">{t.title}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                              statusColors[t.status]
-                            }`}>
-                              {t.status}
-                            </span>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                            {t.description || 'No description provided.'}
-                          </p>
-
-                          <div className="flex justify-between items-center mt-3 pt-2.5 border-t border-border/40 text-[10px] text-muted-foreground">
-                            <span className="flex items-center gap-1"><Clock3 className="w-3 h-3" /> {t.estimated_duration || 'Flex'}</span>
-                            <span className="font-semibold">{t.difficulty || 'Beginner'}</span>
-                          </div>
-                        </button>
-                      );
-                    })
-                  )}
-                </div>
 
                 {/* Right: Selected Task Details & Form */}
                 <div className="lg:col-span-2 space-y-6">
@@ -710,223 +769,470 @@ export default function StudentWorkspace() {
                       initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
                       data-tour="workspace-task-details"
-                      className="bg-card rounded-2xl border border-border p-6 shadow-sm space-y-6"
+                      className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden"
                     >
-                      {/* Task Info row */}
-                      <div className="flex justify-between items-start flex-wrap gap-3 pb-4 border-b border-border">
-                        <div>
-                          <h2 className="text-lg font-bold">{selectedTask.title}</h2>
-                          <div className="flex flex-wrap items-center gap-3 mt-1.5">
-                            <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${
-                              selectedTask.priority === 'High' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' :
-                              selectedTask.priority === 'Medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' :
-                              'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'
-                            }`}>
-                              Priority: {selectedTask.priority}
-                            </span>
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Calendar className="w-3.5 h-3.5" /> Due: {selectedTask.due_date ? new Date(selectedTask.due_date).toLocaleDateString() : 'Flexible'}
-                            </span>
-                          </div>
-                        </div>
+                      {/* Mobile: Back to tasks */}
+                      <button
+                        onClick={() => {
+                          setShowTaskList(true);
+                          setSelectedTask(null);
+                        }}
+                        className="lg:hidden w-full flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <List className="w-4 h-4" /> Back to Tasks
+                        <span className="ml-auto text-xs text-muted-foreground/70">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</span>
+                      </button>
 
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="text-xs text-muted-foreground block">Difficulty: {selectedTask.difficulty || 'Beginner'}</span>
-                          <span className="text-xs text-muted-foreground block">Estimated duration: {selectedTask.estimated_duration || 'N/A'}</span>
-                        </div>
-                      </div>
-
-                      {/* Task Description */}
-                      <div className="space-y-2">
-                        <h4 className="font-semibold text-sm">Description</h4>
-                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                          {selectedTask.description || 'No detailed instructions provided.'}
-                        </p>
-                      </div>
-
-                      {/* Objectives & Criteria */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Objectives */}
-                        <div className="bg-muted/30 border border-border/80 rounded-xl p-4 space-y-2.5">
-                          <h4 className="font-semibold text-xs uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                            <BookOpen className="w-3.5 h-3.5 text-accent" /> Objectives
-                          </h4>
-                          {selectedTask.objectives && selectedTask.objectives.length > 0 ? (
-                            <ul className="space-y-1.5 text-xs text-muted-foreground">
-                              {selectedTask.objectives.map((obj: string, index: number) => (
-                                <li key={index} className="flex gap-2">
-                                  <span className="text-accent">•</span>
-                                  <span>{obj}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-xs text-muted-foreground italic">No specific objectives defined.</p>
-                          )}
-                        </div>
-
-                        {/* Acceptance Criteria */}
-                        <div className="bg-muted/30 border border-border/80 rounded-xl p-4 space-y-2.5">
-                          <h4 className="font-semibold text-xs uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                            <FileCheck className="w-3.5 h-3.5 text-accent" /> Acceptance Criteria
-                          </h4>
-                          {selectedTask.acceptance_criteria && selectedTask.acceptance_criteria.length > 0 ? (
-                            <ul className="space-y-1.5 text-xs text-muted-foreground">
-                              {selectedTask.acceptance_criteria.map((crt: string, index: number) => (
-                                <li key={index} className="flex gap-2">
-                                  <span className="text-accent">•</span>
-                                  <span>{crt}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-xs text-muted-foreground italic">No specific acceptance criteria defined.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Task Submissions Form or Review Status */}
-                      <div className="border-t border-border pt-6">
-                        {selectedTask.status === 'Approved' ? (
-                          <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-5 space-y-3">
-                            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
-                              <CheckCircle2 className="w-5 h-5" />
-                              <h4 className="font-bold text-sm">Task Approved & Completed!</h4>
+                      {/* Task Header */}
+                      <div className="p-6 pb-4 border-b border-border">
+                        <div className="flex justify-between items-start flex-wrap gap-3">
+                          <div>
+                            <h2 className="text-lg font-bold">{selectedTask.title}</h2>
+                            <div className="flex flex-wrap items-center gap-2.5 mt-2">
+                              <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${
+                                selectedTask.priority === 'High' ? 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400' :
+                                selectedTask.priority === 'Medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' :
+                                'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'
+                              }`}>
+                                {selectedTask.priority}
+                              </span>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Calendar className="w-3.5 h-3.5" /> Due: {selectedTask.due_date ? new Date(selectedTask.due_date).toLocaleDateString() : 'Flexible'}
+                              </span>
+                              {selectedTask.difficulty && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <BarChart3 className="w-3.5 h-3.5" /> {selectedTask.difficulty}
+                                </span>
+                              )}
+                              {selectedTask.estimated_duration && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Clock3 className="w-3.5 h-3.5" /> {selectedTask.estimated_duration}
+                                </span>
+                              )}
                             </div>
-                            {selectedTask.grade && (
-                              <p className="text-sm font-semibold text-foreground">
-                                Grade Awarded: <span className="text-emerald-600 font-bold">{selectedTask.grade}%</span>
-                              </p>
-                            )}
-                            {selectedTask.feedback && (
-                              <div className="text-xs text-muted-foreground italic bg-card/65 rounded-lg p-3 border border-emerald-100 dark:border-emerald-900/10">
-                                &ldquo;{selectedTask.feedback}&rdquo;
+                          </div>
+
+                          {/* Jump to submit — only for pending tasks */}
+                          {selectedTask.status === 'Pending' && (
+                            <button
+                              onClick={() => document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' })}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                            >
+                              Submit Work <ArrowRight className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-6 space-y-6">
+                        {/* SECTION: Task Brief */}
+                        {selectedTask.attachments && selectedTask.attachments.length > 0 && (
+                          <div className="space-y-3">
+                            <button
+                              onClick={() => setExpandedSections(s => ({ ...s, brief: !s.brief }))}
+                              className="lg:hidden w-full flex items-center justify-between"
+                            >
+                              <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                                <FileText className="w-4 h-4 text-accent" /> Task Brief
+                              </h4>
+                              <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSections.brief ? 'rotate-180' : ''}`} />
+                            </button>
+                            <h4 className="hidden lg:block font-semibold text-sm flex items-center gap-1.5">
+                              <FileText className="w-4 h-4 text-accent" /> Task Brief
+                            </h4>
+                            <div className={`${expandedSections.brief ? 'block' : 'hidden'} lg:block space-y-3`}>
+                              <div className="flex items-center justify-between">
+                                <span className="sr-only">Task Brief Actions</span>
+                                <div className="flex items-center gap-2">
+                                  <a
+                                    href={selectedTask.attachments[0].url}
+                                    download={selectedTask.attachments[0].name}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-xs font-medium transition-colors"
+                                  >
+                                    <Download className="w-3.5 h-3.5" /> Download PDF
+                                  </a>
+                                  <a
+                                    href={selectedTask.attachments[0].url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted hover:bg-muted/80 border border-border rounded-lg text-xs font-medium transition-colors"
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" /> Open
+                                  </a>
+                                </div>
                               </div>
-                            )}
-                          </div>
-                        ) : selectedTask.status === 'Submitted' || selectedTask.status === 'Under Review' ? (
-                          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 space-y-3">
-                            <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                              <Clock className="w-5 h-5" />
-                              <h4 className="font-bold text-sm">Awaiting Mentor Review</h4>
+                              {/* Task Brief — Open in new tab */}
+                              <div className="rounded-xl border border-border bg-muted/20 p-6 text-center space-y-3">
+                                <FileText className="w-10 h-10 mx-auto text-accent/60" />
+                                <p className="text-sm font-medium text-foreground">{selectedTask.attachments[0].name}</p>
+                                <div className="flex items-center justify-center gap-2">
+                                  <a
+                                    href={selectedTask.attachments[0].url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                                  >
+                                    <ExternalLink className="w-4 h-4" /> Open Brief
+                                  </a>
+                                  <a
+                                    href={selectedTask.attachments[0].url}
+                                    download={selectedTask.attachments[0].name}
+                                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-muted hover:bg-muted/80 border border-border rounded-lg text-sm font-medium transition-colors"
+                                  >
+                                    <Download className="w-4 h-4" /> Download
+                                  </a>
+                                </div>
+                              </div>
+                              {selectedTask.attachments.length > 1 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {selectedTask.attachments.slice(1).map((att: any, idx: number) => (
+                                    <a
+                                      key={att.id || idx}
+                                      href={att.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
+                                    >
+                                      <FileText className="w-3.5 h-3.5 text-accent" /> {att.name}
+                                    </a>
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                            <div className="flex flex-col gap-2">
+                          </div>
+                        )}
+
+                        {/* SECTION: Description */}
+                        <div className="space-y-2">
+                          <button
+                            onClick={() => setExpandedSections(s => ({ ...s, description: !s.description }))}
+                            className="lg:hidden w-full flex items-center justify-between"
+                          >
+                            <h4 className="font-semibold text-sm">Description</h4>
+                            <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSections.description ? 'rotate-180' : ''}`} />
+                          </button>
+                          <h4 className="hidden lg:block font-semibold text-sm">Description</h4>
+                          <div className={`${expandedSections.description ? 'block' : 'hidden'} lg:block`}>
+                            <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                              {selectedTask.description || 'No detailed instructions provided.'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Objectives & Criteria — side by side */}
+                        {(selectedTask.objectives?.length > 0 || selectedTask.acceptance_criteria?.length > 0) && (
+                          <div>
+                            <button
+                              onClick={() => setExpandedSections(s => ({ ...s, objectives: !s.objectives }))}
+                              className="lg:hidden w-full flex items-center justify-between mb-2"
+                            >
+                              <h4 className="font-semibold text-sm flex items-center gap-1.5">
+                                <BookOpen className="w-3.5 h-3.5 text-accent" /> Objectives & Criteria
+                              </h4>
+                              <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedSections.objectives ? 'rotate-180' : ''}`} />
+                            </button>
+                            <div className={`${expandedSections.objectives ? 'block' : 'hidden'} lg:block`}>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="bg-muted/30 border border-border/80 rounded-xl p-4 space-y-2.5">
+                                  <h4 className="font-semibold text-xs uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                                    <BookOpen className="w-3.5 h-3.5 text-accent" /> Objectives
+                                  </h4>
+                                  {selectedTask.objectives && selectedTask.objectives.length > 0 ? (
+                                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                                      {selectedTask.objectives.map((obj: string, index: number) => (
+                                        <li key={index} className="flex gap-2">
+                                          <span className="text-accent mt-0.5">•</span>
+                                          <span>{obj}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground italic">No specific objectives defined.</p>
+                                  )}
+                                </div>
+
+                                <div className="bg-muted/30 border border-border/80 rounded-xl p-4 space-y-2.5">
+                                  <h4 className="font-semibold text-xs uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                                    <FileCheck className="w-3.5 h-3.5 text-accent" /> Acceptance Criteria
+                                  </h4>
+                                  {selectedTask.acceptance_criteria && selectedTask.acceptance_criteria.length > 0 ? (
+                                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                                      {selectedTask.acceptance_criteria.map((crt: string, index: number) => (
+                                        <li key={index} className="flex gap-2">
+                                          <span className="text-accent mt-0.5">•</span>
+                                          <span>{crt}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground italic">No specific acceptance criteria defined.</p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* ── SECTION: Submit / Review ── */}
+                        <div id="task-submit-section" className="border-t border-border pt-6">
+                          {selectedTask.status === 'Approved' ? (
+                            <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/30 rounded-xl p-5 space-y-3">
+                              <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                                <CheckCircle2 className="w-5 h-5" />
+                                <h4 className="font-bold text-sm">Task Approved & Completed!</h4>
+                              </div>
+                              {selectedTask.grade && (
+                                <p className="text-sm font-semibold text-foreground">
+                                  Grade Awarded: <span className="text-emerald-600 font-bold">{selectedTask.grade}%</span>
+                                </p>
+                              )}
+                              {selectedTask.feedback && (
+                                <div className="text-xs text-muted-foreground italic bg-card/65 rounded-lg p-3 border border-emerald-100 dark:border-emerald-900/10">
+                                  &ldquo;{selectedTask.feedback}&rdquo;
+                                </div>
+                              )}
+                            </div>
+                          ) : selectedTask.status === 'Submitted' || selectedTask.status === 'Under Review' ? (
+                            <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 space-y-3">
+                              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                                <Clock className="w-5 h-5" />
+                                <h4 className="font-bold text-sm">Awaiting Mentor Review</h4>
+                              </div>
                               <p className="text-xs text-muted-foreground">
-                                Your solution has been submitted. The program coordinator will review your GitHub repository and grade your work.
+                                Your solution has been submitted. The coordinator will review your work.
                               </p>
-                              {(selectedTask.mentor_id || selectedTask.company_id) && (
-                                <Link 
-                                  to={`/student/messages?internshipId=${selectedTask.internship_id}&userId=${selectedTask.mentor_id || selectedTask.company_id}`}
+
+                              {(selectedTask.assigned_by) && (
+                                <Link
+                                  to={`/student/messages?internshipId=${selectedTask.internship_id}&userId=${selectedTask.assigned_by}`}
                                   className="inline-flex w-fit items-center gap-1.5 text-xs text-accent hover:underline font-medium"
                                 >
                                   <MessageSquare className="w-3.5 h-3.5" /> Message Reviewer
                                 </Link>
                               )}
-                            </div>
 
-                            {selectedTask.submissions?.[0] && (
-                              <div className="pt-2 text-xs space-y-1.5">
-                                <p className="font-medium">Submitted Links:</p>
-                                <a
-                                  href={selectedTask.submissions[0].github_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-accent hover:underline"
-                                >
-                                  <Github className="w-3.5 h-3.5" /> Repository Link <ExternalLink className="w-3 h-3" />
-                                </a>
-                                {selectedTask.submissions[0].live_demo_url && (
+                              {selectedTask.submissions?.[0] && (
+                                <div className="pt-2 text-xs space-y-1.5">
+                                  <p className="font-medium">Submitted Links:</p>
                                   <a
-                                    href={selectedTask.submissions[0].live_demo_url}
+                                    href={selectedTask.submissions[0].github_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center gap-1 text-accent hover:underline"
                                   >
-                                    <ExternalLink className="w-3.5 h-3.5" /> Live Demo Link <ExternalLink className="w-3 h-3" />
+                                    <Github className="w-3.5 h-3.5" /> Repository <ExternalLink className="w-3 h-3" />
                                   </a>
+                                  {selectedTask.submissions[0].live_demo_url && (
+                                    <a
+                                      href={selectedTask.submissions[0].live_demo_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1 text-accent hover:underline"
+                                    >
+                                      <ExternalLink className="w-3.5 h-3.5" /> Live Demo <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  )}
+                                  {selectedTask.submissions[0].attachments && selectedTask.submissions[0].attachments.length > 0 && (
+                                    <div className="pt-2 space-y-1.5">
+                                      <p className="font-medium">Submitted Files:</p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {selectedTask.submissions[0].attachments.map((file: any, idx: number) => (
+                                          <a
+                                            key={file.id || idx}
+                                            href={file.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 border border-border rounded-lg text-xs font-medium hover:border-accent transition-colors"
+                                          >
+                                            <FileText className="w-3.5 h-3.5 text-accent" /> {file.name}
+                                          </a>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            // ── Submission Form ──
+                            <form onSubmit={handleSubmitTask} className="space-y-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-bold text-sm flex items-center gap-1.5">
+                                  <Github className="w-4 h-4" /> Submit Your Work
+                                </h4>
+                                {selectedTask.status === 'Rejected' && (
+                                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 flex items-center gap-1">
+                                    <AlertCircle className="w-3 h-3" /> Resubmission Required
+                                  </span>
                                 )}
                               </div>
-                            )}
-                          </div>
-                        ) : (
-                          // Form submission
-                          <form onSubmit={handleSubmitTask} className="space-y-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-bold text-sm flex items-center gap-1.5">
-                                <Github className="w-4 h-4" /> Submit Task Solution
-                              </h4>
-                              {selectedTask.status === 'Rejected' && (
-                                <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 flex items-center gap-1">
-                                  <AlertCircle className="w-3 h-3" /> Requesting Resubmission
-                                </span>
+
+                              {selectedTask.status === 'Rejected' && selectedTask.feedback && (
+                                <div className="bg-red-50 dark:bg-red-950/10 border border-red-200 dark:border-red-900/20 text-red-700 dark:text-red-400 text-xs p-3.5 rounded-lg italic">
+                                  <strong>Mentor Feedback:</strong> &ldquo;{selectedTask.feedback}&rdquo;
+                                </div>
                               )}
-                            </div>
 
-                            {selectedTask.status === 'Rejected' && selectedTask.feedback && (
-                              <div className="bg-red-50 dark:bg-red-950/10 border border-red-200 dark:border-red-900/20 text-red-700 dark:text-red-400 text-xs p-3.5 rounded-lg italic">
-                                <strong>Mentor Feedback:</strong> &ldquo;{selectedTask.feedback}&rdquo;
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div data-tour="workspace-submission-github" className="space-y-1.5">
+                                  <label htmlFor="submission-github-url" className="text-xs font-semibold text-muted-foreground block">
+                                    GitHub Repository URL <span className="text-red-500">*</span>
+                                  </label>
+                                  <input
+                                    id="submission-github-url"
+                                    type="url"
+                                    required
+                                    value={githubUrl}
+                                    onChange={(e) => setGithubUrl(e.target.value)}
+                                    placeholder="https://github.com/username/project"
+                                    className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
+                                  />
+                                </div>
+                                <div data-tour="workspace-submission-demo" className="space-y-1.5">
+                                  <label htmlFor="submission-demo-url" className="text-xs font-semibold text-muted-foreground block">
+                                    Live Demo URL <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+                                  </label>
+                                  <input
+                                    id="submission-demo-url"
+                                    type="url"
+                                    value={demoUrl}
+                                    onChange={(e) => setDemoUrl(e.target.value)}
+                                    placeholder="https://project.vercel.app"
+                                    className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
+                                  />
+                                </div>
                               </div>
-                            )}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div data-tour="workspace-submission-github" className="space-y-1.5">
-                                <label htmlFor="submission-github-url" className="text-xs font-semibold text-muted-foreground block">
-                                  GitHub Repository URL <span className="text-red-500">*</span>
+                              <div data-tour="workspace-submission-notes" className="space-y-1.5">
+                                <label htmlFor="submission-notes" className="text-xs font-semibold text-muted-foreground block">
+                                  Submission Notes <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
                                 </label>
-                                <input
-                                  id="submission-github-url"
-                                  type="url"
-                                  required
-                                  value={githubUrl}
-                                  onChange={(e) => setGithubUrl(e.target.value)}
-                                  placeholder="https://github.com/username/project"
-                                  className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
+                                <textarea
+                                  id="submission-notes"
+                                  value={notes}
+                                  onChange={(e) => setNotes(e.target.value)}
+                                  rows={3}
+                                  placeholder="Explain implementation details, challenges, or assumptions..."
+                                  className="w-full text-sm p-3 bg-background border border-border rounded-lg input-focus resize-none focus-visible-ring"
                                 />
                               </div>
-                              <div data-tour="workspace-submission-demo" className="space-y-1.5">
-                                <label htmlFor="submission-demo-url" className="text-xs font-semibold text-muted-foreground block">
-                                  Live Demo URL <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
+
+                              {/* File Upload Zone */}
+                              <div className="space-y-1.5">
+                                <label className="text-xs font-semibold text-muted-foreground block">
+                                  File Attachments <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
                                 </label>
-                                <input
-                                  id="submission-demo-url"
-                                  type="url"
-                                  value={demoUrl}
-                                  onChange={(e) => setDemoUrl(e.target.value)}
-                                  placeholder="https://project.vercel.app"
-                                  className="w-full text-sm px-3.5 py-2.5 bg-background border border-border rounded-lg input-focus focus-visible-ring"
-                                />
+                                <div
+                                  onClick={() => !uploadingSubmissionFile && document.getElementById('submission-file-input')?.click()}
+                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                                  onDrop={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const file = e.dataTransfer.files[0];
+                                    if (file) {
+                                      const input = document.getElementById('submission-file-input') as HTMLInputElement;
+                                      if (input) {
+                                        const dt = new DataTransfer();
+                                        dt.items.add(file);
+                                        input.files = dt.files;
+                                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                                      }
+                                    }
+                                  }}
+                                  className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
+                                    uploadingSubmissionFile
+                                      ? 'border-accent/40 bg-accent/5'
+                                      : 'border-border hover:border-accent/40 hover:bg-muted/30'
+                                  }`}
+                                >
+                                  <input
+                                    id="submission-file-input"
+                                    type="file"
+                                    accept=".pdf,.png,.jpg,.jpeg,.webp,.zip"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      if (file.size > 25 * 1024 * 1024) {
+                                        toast.error('File must be under 25MB');
+                                        return;
+                                      }
+                                      setUploadingSubmissionFile(true);
+                                      try {
+                                        const att = await uploadSubmissionFile(file);
+                                        setSubmissionFiles((prev) => [...prev, att]);
+                                        toast.success('File uploaded');
+                                      } catch (err: any) {
+                                        toast.error(err.message || 'Upload failed');
+                                      } finally {
+                                        setUploadingSubmissionFile(false);
+                                        e.target.value = '';
+                                      }
+                                    }}
+                                  />
+                                  {uploadingSubmissionFile ? (
+                                    <div className="flex items-center justify-center gap-2 text-accent text-sm">
+                                      <Loader2 className="w-4 h-4 animate-spin" /> Uploading...
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                                      <Upload className="w-5 h-5" />
+                                      <p className="text-xs">
+                                        <span className="font-semibold text-accent">Click to upload</span> or drag & drop
+                                      </p>
+                                      <p className="text-[10px]">PDF, PNG, JPG, ZIP up to 25MB</p>
+                                    </div>
+                                  )}
+                                </div>
+                                {submissionFiles.length > 0 && (
+                                  <div className="mt-2 space-y-1.5">
+                                    {submissionFiles.map((att) => (
+                                      <div key={att.id} className="flex items-center justify-between p-2 bg-muted/40 rounded-lg border border-border">
+                                        <div className="flex items-center gap-2 text-xs min-w-0">
+                                          <FileText className="w-4 h-4 text-accent flex-shrink-0" />
+                                          <span className="truncate">{att.name}</span>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() => setSubmissionFiles((prev) => prev.filter((f) => f.id !== att.id))}
+                                          className="p-1 hover:bg-red-100 dark:hover:bg-red-950/30 rounded text-muted-foreground hover:text-red-500 transition-colors flex-shrink-0"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                            </div>
 
-                            <div data-tour="workspace-submission-notes" className="space-y-1.5">
-                              <label htmlFor="submission-notes" className="text-xs font-semibold text-muted-foreground block">
-                                Submission Notes <span className="text-xs text-muted-foreground font-normal">(Optional)</span>
-                              </label>
-                              <textarea
-                                id="submission-notes"
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                rows={3}
-                                placeholder="Explain implementation details, challenges, or assumptions..."
-                                className="w-full text-sm p-3 bg-background border border-border rounded-lg input-focus resize-none focus-visible-ring"
-                              />
-                            </div>
-
-                            <button
-                              type="submit"
-                              data-tour="workspace-submission-submit"
-                              disabled={submitting}
-                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
-                            >
-                              {submitting ? (
-                                <ButtonLoader loading={true} loadingText="Submitting..." />
-                              ) : (
-                                'Submit Solution'
-                              )}
-                            </button>
-                          </form>
-                        )}
+                              <button
+                                type="submit"
+                                data-tour="workspace-submission-submit"
+                                disabled={submitting}
+                                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
+                              >
+                                {submitting ? (
+                                  <ButtonLoader loading={true} loadingText="Submitting..." />
+                                ) : (
+                                  'Submit Solution'
+                                )}
+                              </button>
+                            </form>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Mobile sticky submit CTA for pending tasks */}
+                      {selectedTask.status === 'Pending' && (
+                        <div className="lg:hidden sticky bottom-0 border-t border-border bg-card p-4">
+                          <button
+                            onClick={() => document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-accent hover:bg-accent/90 text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+                          >
+                            Submit Work <ArrowRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
                     </motion.div>
                   ) : (
                     <div className="bg-card rounded-2xl border border-border p-8 shadow-sm text-center text-muted-foreground min-h-[300px] flex flex-col justify-center items-center gap-3">
@@ -1165,6 +1471,17 @@ export default function StudentWorkspace() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Floating WhatsApp button */}
+      <a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#1fb855] text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+        aria-label="Contact on WhatsApp"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </a>
     </div>
   );
 }

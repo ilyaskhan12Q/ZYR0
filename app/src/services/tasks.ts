@@ -1,7 +1,65 @@
 import { supabase } from '@/lib/supabase';
-import type { Task, TaskSubmission } from '@/lib/database.types';
+import type { Task, TaskSubmission, TaskAttachment } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+
+function sanitizeFilename(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
+/** Upload a task brief document (PDF/image) to Supabase Storage */
+export async function uploadTaskDocument(file: File): Promise<TaskAttachment> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const safeName = sanitizeFilename(file.name);
+  const path = `task-documents/${user.id}/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from('task-documents')
+    .upload(path, file, { upsert: false, contentType: file.type });
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('task-documents')
+    .getPublicUrl(path);
+
+  return {
+    id: crypto.randomUUID(),
+    name: file.name,
+    url: publicUrl,
+    type: file.type,
+    size: String(file.size),
+  };
+}
+
+/** Upload a student submission file to Supabase Storage */
+export async function uploadSubmissionFile(file: File): Promise<TaskAttachment> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const safeName = sanitizeFilename(file.name);
+  const path = `task-documents/${user.id}/${Date.now()}-${safeName}`;
+
+  const { error } = await supabase.storage
+    .from('task-documents')
+    .upload(path, file, { upsert: false, contentType: file.type });
+
+  if (error) throw error;
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('task-documents')
+    .getPublicUrl(path);
+
+  return {
+    id: crypto.randomUUID(),
+    name: file.name,
+    url: publicUrl,
+    type: file.type,
+    size: String(file.size),
+  };
+}
 
 /** Get tasks assigned to current user */
 export async function getMyTasks(useCache = true) {
@@ -101,6 +159,47 @@ export async function getTasksAssignedByMe(useCache = true) {
       submissions:task_submissions (*)
     `)
     .eq('assigned_by', user.id)
+    .order('created_at', { ascending: false });
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (!res.error) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
+}
+
+/** Get tasks for the user's company (all tasks across all team members) */
+export async function getCompanyTasks(companyId: string, useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: null, error: new Error('Not authenticated') };
+
+  const cacheKey = `company_tasks_${companyId}`;
+  if (useCache) {
+    const cached = getCachedData<any>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const { data: internships, error: intErr } = await supabase
+    .from('internships')
+    .select('id')
+    .eq('company_id', companyId);
+
+  if (intErr || !internships?.length) {
+    return { data: [], error: intErr };
+  }
+
+  const internshipIds = internships.map((i) => i.id);
+
+  const fetchFn = () => supabase
+    .from('tasks')
+    .select(`
+      *,
+      internship:internships!internship_id (id, title),
+      assignee:profiles!assigned_to (id, full_name, avatar_url, email),
+      submissions:task_submissions (*)
+    `)
+    .in('internship_id', internshipIds)
     .order('created_at', { ascending: false });
 
   const res = await dedupRequest(cacheKey, fetchFn);

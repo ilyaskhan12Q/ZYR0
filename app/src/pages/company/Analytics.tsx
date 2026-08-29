@@ -16,6 +16,8 @@ export default function CompanyAnalytics() {
   const [domainData, setDomainData] = useState<any[]>([]);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadAnalytics() {
       try {
         const { data: co } = await getMyCompany();
@@ -24,13 +26,19 @@ export default function CompanyAnalytics() {
           return;
         }
 
-        const [internshipsRes, appsRes] = await Promise.all([
-          getInternships({ company_id: co.id }),
-          getAllCompanyApplications(co.id),
+        const settled = await Promise.race([
+          Promise.allSettled([
+            getInternships({ company_id: co.id }),
+            getAllCompanyApplications(co.id),
+          ]),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Company analytics timeout')), 10000))
         ]);
 
-        const myInternships = internshipsRes.data || [];
-        const myApps = appsRes.data || [];
+        if (cancelled) return;
+        const [internshipsRes, appsRes] = settled;
+
+        const myInternships = internshipsRes.status === 'fulfilled' ? (internshipsRes.value.data || []) : [];
+        const myApps = appsRes.status === 'fulfilled' ? (appsRes.value.data || []) : [];
         const internshipIds = myInternships.map((i: any) => i.id);
 
         // Fetch tasks
@@ -122,10 +130,11 @@ export default function CompanyAnalytics() {
       } catch (err) {
         console.error('Error loading analytics:', err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     loadAnalytics();
+    return () => { cancelled = true; };
   }, [user]);
 
   if (loading) {
