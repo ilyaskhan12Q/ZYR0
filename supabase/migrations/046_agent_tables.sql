@@ -71,6 +71,10 @@ ALTER TABLE public.agent_researches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.agent_messages    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.agent_usage       ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "agent_researches_owner_select" ON public.agent_researches;
+DROP POLICY IF EXISTS "agent_researches_owner_insert" ON public.agent_researches;
+DROP POLICY IF EXISTS "agent_researches_owner_update" ON public.agent_researches;
+DROP POLICY IF EXISTS "agent_researches_owner_delete" ON public.agent_researches;
 CREATE POLICY "agent_researches_owner_select" ON public.agent_researches
   FOR SELECT USING (user_id = auth.uid());
 CREATE POLICY "agent_researches_owner_insert" ON public.agent_researches
@@ -80,6 +84,9 @@ CREATE POLICY "agent_researches_owner_update" ON public.agent_researches
 CREATE POLICY "agent_researches_owner_delete" ON public.agent_researches
   FOR DELETE USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "agent_messages_owner_select" ON public.agent_messages;
+DROP POLICY IF EXISTS "agent_messages_owner_insert" ON public.agent_messages;
+DROP POLICY IF EXISTS "agent_messages_owner_delete" ON public.agent_messages;
 CREATE POLICY "agent_messages_owner_select" ON public.agent_messages
   FOR SELECT USING (user_id = auth.uid());
 CREATE POLICY "agent_messages_owner_insert" ON public.agent_messages
@@ -87,6 +94,9 @@ CREATE POLICY "agent_messages_owner_insert" ON public.agent_messages
 CREATE POLICY "agent_messages_owner_delete" ON public.agent_messages
   FOR DELETE USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "agent_usage_owner_select" ON public.agent_usage;
+DROP POLICY IF EXISTS "agent_usage_owner_insert" ON public.agent_usage;
+DROP POLICY IF EXISTS "agent_usage_owner_delete" ON public.agent_usage;
 CREATE POLICY "agent_usage_owner_select" ON public.agent_usage
   FOR SELECT USING (user_id = auth.uid());
 CREATE POLICY "agent_usage_owner_insert" ON public.agent_usage
