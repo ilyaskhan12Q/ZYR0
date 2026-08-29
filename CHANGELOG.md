@@ -7,186 +7,179 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.39.0] - 2026-08-20
+All 136 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 0.61.0).
 
-### Changed
-- **Research Agent — Bolt-style workspace redesign** (`app/src/agent/ResearchAgentPage.tsx`, `app/src/agent/components/AgentHero.tsx`, `ResearchReasoning.tsx`, `app/src/styles/agent.css`):
-  - Complete visual overhaul: dark `#0f0f0f` background with blue ray gradient (replaces light academic theme), centered hero input ("What will you research?"), model selector with real agent models, depth pills (Quick/Standard/Deep), and "Research" CTA — matching the Bolt.new chat interface.
-  - `ChatReasoning`-style accordion replaces `PipelineView` for research progress: timeline dots + connecting lines show Understanding → Planning → Evidence → Verifying → Writing stages with real-time status indicators.
-  - History panel accessible via top-right button: lists recent sessions with mode badges (chat/research), quick-access to previous research.
-  - Removed `AgentSidebar`, `ComposerDock`, `LandingView`, `PipelineView`, `PlanReview`, `ReportView`, `AgentChat`, `ModelPill`, `AgentSettingsModal`, `useAgentLibrary` — workspace is now the single BoltStyleChat + reasoning accordion.
-  - `Vercel AI SDK` (`ai`) added as dependency for ChatReasoning type compatibility.
-- **Research Agent landing page** (`app/src/pages/research/ResearchLanding.tsx`, `app/src/styles/research-landing.css`, `app/src/components/research-landing/*`):
-  - Premium editorial landing at `/research`: Instrument Serif + Inter typography, `#F5F5F2` background, `#657C68` green accent, 16 sections (hero, editorial statement, questions, pipeline, live research, sources, evidence, report, features, audience, library, models, pricing with $X placeholders, CTA, footer).
-  - Sticky nav with scroll-blur effect, `Reveal` motion wrapper (reduced-motion-aware), `SectionHeading` shared component.
-  - All visuals CSS/SVG-only — no stock images, no fabricated claims/numbers.
-- **Hostname-aware routing** (`app/src/App.tsx`):
-  - When accessed on `research.zyroo.org`, the subdomain serves ResearchLanding at `/` and ResearchAgentPage at `/research-agent` (with auth). Other paths redirect to `https://zyroo.org`.
-  - Main site: `/research` serves the same landing page for reviewability before DNS is provisioned.
+### 2026-08-29
 
-### Added
-- **Vercel AI SDK** (`ai` package) for ChatReasoning type compatibility.
+- **`fc06a8b`** 0.61.0 — feat: SaaS ecosystem rebrand — homepage redesign, animations, nav update
 
-### Fixed
-- **Research Agent — two-tier source presentation + bigger evidence cap** (`app/src/agent/research/workers.ts`, `app/src/agent/research/verifier.ts`, `app/src/agent/hooks/useResearchPipeline.ts`, `app/src/agent/components/ReportView.tsx`, `PipelineView.tsx`, `app/src/agent/lib/reportPdf.ts`):
-  - Gather cap raised 16 → **24 candidates** (round-robin across platforms, fits the gateway verify ceiling of 25 so every candidate is checked in one pass).
-  - **Citation integrity**: ledger keys `[1]..[N]` are now assigned to **verified** entries only (unverified get `key: 0`), and the editorial agent receives only verified entries — every `[n]` cited in the report points to a live-confirmed source (previously unconfirmed links could be cited).
-  - **Sources tab split into two sections**: "Verified sources" (green ✓ verified chips, `[n]` badges) and "Additional sources" (amber unverified chips, no citation key, note that liveness couldn't be confirmed). Report header and PDF metadata now count verified vs additional separately (previously `ledger.length` miscounted unverified as verified).
-  - Pipeline evidence cards and Evidence tab show "pending verification" chips for unconfirmed items (previously the verified badge relied on ledger membership, which would have lit up unconfirmed items).
-- **Research Agent — a single platform (OpenAlex) filled the entire 16-item evidence cap** (`app/src/agent/research/workers.ts`): the gathered ledger was selected by `dedupeByUrl(...).slice(0, 16)` in platform order with OpenAlex first, so OpenAlex's 60 results consumed all 16 slots before arXiv/PubMed/Web items were considered — runs showed "OpenAlex 16, everything else 0". Selection now round-robins across platforms (verified live: gateway 60/60/5/0/4 → picked 16 = OpenAlex 4, arXiv 4, Semantic Scholar 4, Jina Web 4), so every platform with results is represented in the verified ledger.
-- **Research Agent — runs still returning 0 sources in real browsers** (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/research/workers.ts`, `app/src/agent/api/gateway.ts`, `app/src/agent/research/planner.ts`):
-  - **arXiv is CORS-blocked in browsers**: `export.arxiv.org` sends no `Access-Control-Allow-Origin`, so the browser-direct arXiv worker failed with "Failed to fetch" in every real run (invisible in Node-based tests). OpenAlex and arXiv search are now server-side gateway platforms (`openalex`, `arxiv` added to `SUPPORTED_PLATFORMS`), fetching via the edge function where CORS does not apply.
-  - **Gateway search ran platforms sequentially (~37s)** while the browser wrapped the call in a 15s timeout — gateway + web platforms silently contributed 0 in real runs. `searchPlatforms` now runs all platforms in parallel via `Promise.allSettled` (measured ~24s for 6 platforms), and the client uses a single gateway search call covering all 6 platforms with a 90s timeout that surfaces a pipeline note on timeout instead of failing silently.
-  - **`streamChat` swallowed SSE `error` events**: an error event with partial text returned `{ok:true}`. It now tracks the stream error and returns `{ok:false, error}`.
-  - **Planner degraded-output fallback**: free-tier providers occasionally return very short invalid responses (observed 93-token garbage). `decompose` now retries the plan request once before falling back to rule-built contracts, keeping real research plans on the model path.
-- **Research Agent — generated text cannot be scrolled** (`app/src/agent/ResearchAgentPage.tsx`, `app/src/agent/components/ReportView.tsx`, `app/src/agent/components/HistoryPanel.tsx`): both `ScrollArea` flex items (`flex-1`) lacked `min-h-0`, so the default `min-height: auto` grew them to the full content height and their viewports never overflowed. In chat mode this clipped long assistant answers with no way to scroll (`.agent-root` is `overflow-hidden`). Added `min-h-0` to the chat and report ScrollAreas so the viewport becomes the scroller (Radix scrollbar), and gave `HistoryPanel` an `overflow-y-auto` scroll container for long history lists.
-- **Research Agent — broken research runs producing "title only, 0 verified sources, 0 evidence items"** (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/hooks/useResearchPipeline.ts`, `app/src/agent/research/workers.ts`, `app/src/agent/research/editorial.ts`, `app/src/agent/components/ReportView.tsx`):
-  - **RLS-blocked persistence**: `agent_researches`/`agent_messages` inserts never set `user_id` (policies require `user_id = auth.uid()`), so every run hit "new row violates row-level security policy" — history was silently empty. Client now resolves the session user and writes `user_id` on both inserts; persistence failures are surfaced in the report's pipeline notes instead of silently dropped.
-  - **Dead gateway search on the Supabase edge**: Semantic Scholar keyless tier 429s datacenter IPs (now retried once after 1s backoff), PubMed rejected edge requests without a descriptive User-Agent, and Jina web search's ~12s latency blew the 10s search timeout. Gateway now sends `ZYROO-Research-Agent` User-Agent on all search calls, uses a dedicated 30s web-search timeout, and logs non-OK/failed upstream statuses.
-  - **Truncated editorial reports**: free models capped at 8192 output tokens; two editorial calls hit the cap exactly. Editorial prompt now constrains the report (Exec Summary ≤120 words, Key Findings ≤25 words each, dimension sections ≤350 words, Conclusion ≤120 words — full report ~6,000 tokens) so complete, well-formed reports fit comfortably.
-  - **Silent worker failures**: OpenAlex/arXiv worker fetch failures now surface as pipeline notes (`onNote`) instead of silently returning empty results.
-  - **ReportView pipeline notes**: collapsible amber banner on the report screen shows pipeline errors (worker/source/platform failures, history-save failures) so failures are visible after the run.
+### 2026-08-28
 
-### Changed
-- **Research Agent — single-page conversation workspace** (`app/src/agent/ResearchAgentPage.tsx`, `app/src/agent/components/AgentSidebar.tsx`, `ComposerDock.tsx`, `app/src/agent/hooks/useAgentChat.ts`, `useAgentLibrary.ts`, `app/src/styles/agent.css`):
-  - Chat and deep research now share **one unified thread** (ChatGPT-style): landing hero on an empty session, assistant/user bubbles, and research runs inline (topic bubble → live five-step progress with evidence cards → inline plan review → full report), with follow-up chat continuing below the report.
-  - **Left sidebar library** replaces the right-hand history panel: ZYROO wordmark, New session, **Chats** and **Research** sections (both from `agent_researches`, live-refreshed), Settings + profile chip pinned at the bottom; slide-over drawer on mobile.
-  - **Composer dock** replaces the header navigation: `[Chat | Research]` segmented toggle, always-visible model picker, Quick/Standard/Deep depth pills in research mode, single input with Send/Stop. The top bar now only carries the mobile menu trigger, settings and avatar.
-  - **Chat sessions persist** (`mode='chat'`): lazy session creation on the first message, user/assistant messages stored with model + token usage, latest chat auto-restored on reload, `loadSession(id)`/`resetSession()` powering the library.
-  - **Conversation backdrop**: the landing's parabolic-pentagon motif at ~15% opacity (multiply blend) behind the thread only; the sidebar stays solid.
-  - **Single input on a new session**: the composer dock collapses to its top strip (mode toggle + model picker + mobile sidebar trigger) while the thread is empty — the landing hero is the only input; sending a query reveals the dock input at the bottom. The hero respects the strip's mode (chat sends a message, research runs the pipeline) and was polished with an editorial eyebrow (`Deep Research · Verified Sources · Precision Editorial`), larger wordmark, two-line tagline and a refined underline input.
+- **`3f4684d`** 0.60.5 — fix: resolve TypeScript build errors in shader hero
+- **`7af5f22`** 0.60.4 — feat(hero): integrate shader hero with MeshGradient background
+- **`e987dc4`** 0.60.3 — feat(homepage): add scroll animations and smooth scroll
+- **`3837e31`** 0.60.2 — feat(nav): add Company dropdown and update Products/Resources dropdowns
+- **`d599bea`** 0.60.1 — chore: remove /0-ai route and ZeroAI module completely
+- **`96af704`** 0.60.0 — feat: redesign homepage with Dovetail-inspired design system
 
-### Added
-- **Academic Precision UI/UX redesign of the Research Agent (`app/src/styles/agent.css`, `app/src/agent/components/LandingView.tsx`, `PipelineView.tsx`, `ResearchAgentPage.tsx`, `PlanReview.tsx`, `HistoryPanel.tsx`)**:
-  - Agent workspace restyled to the "Academic Precision" design system: light theme (surface `#f9f9f9`, on-surface `#1a1c1c`, primary `#3525cd`, 1px borders, 4px radii, flat — no shadows), **Source Serif 4** serif headlines + **Geist** body (loaded via Google Fonts), scoped under `.agent-root` so the rest of the app is untouched.
-  - **Research Home landing** (`LandingView.tsx`): centered ZYROO wordmark + "Research anything. Understand everything." tagline, underline-only research input with hover/focus actions, **Quick / Standard / Deep** mode selectors (persisted to the `depth` column), and three Suggested Research cards with the design's exact copy.
-  - **Researching… progress view** (`PipelineView.tsx`): vertical five-step tracker — Understanding question → Building plan → Searching academic sources → Verifying evidence → Writing report — with completed/active (pulsing dot grid)/pending markers, per-platform live counts, and **Live Evidence Discovered** cards with verified badges; idle/failed states show a slim error banner above the landing.
-  - Top navigation bar: ZYROO wordmark, nav-style Chat/Research toggle (mobile segmented fallback), dark "New Research" action, settings icon, avatar chip.
-  - `run(topic, depth)` now accepts the mode selector's `ResearchDepth` ('quick' | 'standard' | 'deep'); defaults to `'standard'` so existing callers are unaffected.
-- **Report workspace + source panel (`app/src/agent/components/ReportView.tsx`, `SourceModal.tsx`)**:
-  - Report screen becomes a workspace with tabs **Overview | Findings | Evidence | Sources** (top bar on desktop, bottom navigation on mobile); article header shows the final-report eyebrow, serif display title, and researcher meta row.
-  - **Overview** renders Executive Summary (primary rule, per design), numbered Key Findings, Conclusion, and dimension sections; **Findings** numbers the four dimension sections 01–04; **Evidence** shows excerpt cards with verification state; **Sources** lists the ledger with verified/DOI chips.
-  - Citations `[n]` now open the **Source panel** instead of scrolling the ledger: a slide-up sheet (bottom on mobile, 400px right panel on desktop) with the Source-1 style header, Verified / DOI verified / Evidence verified checklist, evidence blockquote, and the bordered "Open original source" action.
-  - Old reports without Executive Summary/Key Findings/Conclusion sections degrade gracefully (first section becomes the lead block).
-- **Editorial report structure (`app/src/agent/research/editorial.ts`)**:
-  - Editorial prompt now asks for `## Executive Summary`, `## Key Findings` (bolded one-line findings with citations), the four dimension sections, `## Conclusion`, then `## Sources`. PDF export needs no change (renders headings generically).
-- **Jina web search via gateway (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/research/workers.ts`, `app/src/agent/api/gateway.ts`)**:
-  - `/v1/search` gains a `'web'` platform: 2 × `s.jina.ai` searches + up to 4 × `r.jina.ai` content fetches authenticated with `JINA_API_KEY` (env secret, never in the client bundle); skipped and reported when the key is absent, same keyless-first pattern as CORE.
-  - `webWorker` now dispatches through the gateway instead of the browser (key stays server-side); 4-stream parallelism and `WEB_CAP = 4` unchanged.
-- **Empty-platform visibility (`supabase/functions/ai-gateway/index.ts`, `app/src/agent/components/PipelineView.tsx`)**:
-  - Gateway `search` response now includes `empty: string[]`; the pipeline surfaces "0 results — possibly rate-limited" notes (e.g. for Semantic Scholar) in the errors panel instead of failing silently.
-  - PipelineView source rows always show a count — empty platforms display "0 found" instead of no label.
+### 2026-08-27
 
-### Fixed
-- **Stale JWT → "Unauthorized" from gateway (`app/src/agent/api/gateway.ts`)**:
-  - `accessToken()` now refreshes the Supabase session when the access token is expired (or expiring within 60s) instead of shipping the stale token to the gateway; all `functions.invoke` calls (`fetchAgentModels`, `verifyUrls`, `searchPlatforms`) retry once after `supabase.auth.refreshSession()` on a 401, and `streamChat` refreshes + re-sends once on 401. Session is no longer silently broken after long idle.
+- **`57b9ed1`** 0.59.5 — feat(nav): add Header component for product landing pages, restore original PublicLayout
+- **`2278e6a`** 0.59.4 — fix(consistency): align BentoProductGrid product badge with data.ts
+- **`e9ae0fc`** 0.59.3 — chore(cleanup): remove dead Framer components, legacy CSS, unused data
+- **`3e66dff`** 0.59.2 — fix(routing): add work.zyroo.org gateway, fix Landing SEO path
+- **`cdba79d`** 0.59.1 — feat(nav): unify navigation and footer across all pages
+- **`5cce4cc`** 0.59.0 — fix(router): route / to PlatformHome, /internships to Landing, and /internships/browse to BrowseInternships
+- **`59c974b`** 0.58.5 — fix(internships): correctly route /internships to Landing and /internships/browse to BrowseInternships with full link integration
+- **`e20e859`** 0.58.4 — fix(internships): restore BrowseInternships at /internships and /internships/browse with URL query sync
+- **`902437f`** 0.58.3 — fix(router): nest /internships route in PublicLayout to retain dedicated navbar
+- **`085550f`** 0.58.2 — feat(routing): integrate subdomain resolution and multi-product routes in App.tsx and SEO generator
+- **`73660f8`** 0.58.1 — feat(edu): add school os product surface, perspective switcher, and roi calculator
+- **`0c3673d`** 0.58.0 — feat(studio): add zyr0 studio product surface, interactive ai prompt simulator, and lead service
+- **`d9751eb`** 0.57.5 — feat(home): add bento-grid product showcase, solutions, and streamlined sections
+- **`d1e4413`** 0.57.4 — feat(nav): modernize platform navbar and footer with multi-product SaaS dropdown
+- **`c387610`** 0.57.3 — docs: add SaaS transition phases tracker
 
-### Added
-- **Gateway `/v1/search` action (`supabase/functions/ai-gateway/index.ts`)**:
-  - Server-side platform search for the research pipeline gather phase — keyless-first: Semantic Scholar (optional `SEMANTIC_SCHOLAR_API_KEY` env secret) and PubMed/E-utilities (optional `PUBMED_API_KEY`) run on free tiers; CORE requires `CORE_API_KEY` and is skipped (reported in `skipped`) when absent, so adding keys later needs no code change.
-  - PubMed: wave-parallel `esearch` (3 at a time + 150ms stagger) with a single batched `esummary` for all PMIDs; Semantic Scholar: wave-parallel Graph v1 search with `x-api-key` when configured; CORE: v3 `/search/works` with Bearer token.
-  - Returns normalized `SearchEvidence[]` per platform (id, title, url, sourceName, year, doi, authors, snippet), max 12 queries / 5 results each, 10s per-fetch timeout, JWT-gated like chat.
-- **Gateway search worker + dispatcher (`app/src/agent/research/workers.ts`, `app/src/agent/api/gateway.ts`)**:
-  - Semantic Scholar moved server-side via `/v1/search`; added **PubMed** and **CORE** platforms behind the same action (keyless-first — CORE reports "no API key configured — skipped" as a pipeline note until `CORE_API_KEY` is set).
-  - `runWorkers` now dispatches 4 concurrent streams: OpenAlex + arXiv (browser-direct keyless), gateway (S2 + PubMed + CORE in one call), Jina web; per-platform caps 6/6/6/4 with hard 16 aggregate cap unchanged; PipelineView source rows now list all six platforms.
-- **Dynamic Company Workspace Switcher (`app/src/App.tsx`, `app/src/layouts/PublicLayout.tsx`, `app/src/layouts/DashboardLayout.tsx`)**:
-  - Globalized `CompanyAccessProvider` across the application router to enable seamless, zero-cost access checking for dual-role users (e.g. Students holding accepted Company Team Memberships).
-  - Implemented dynamic **"Switch to Company Workspace"** button in `PublicLayout` and `DashboardLayout` profile dropdowns & mobile navigation drawers when an accepted company membership is detected.
-  - Added reciprocal **"Switch to Student Workspace"** menu option when an authorized student team member is navigating within the Company Portal.
-- **Last-Used Email One-Tap Sign-In (`app/src/lib/auth.ts`, `app/src/pages/auth/*`)**:
-  - `rememberEmail()` stores the last used email in localStorage (`zyro_last_email`) on login, registration, and OAuth success.
-  - The mobile account sheet offers **"Continue as [email]"** with one tap, plus "Use another account" and "Create a new account" actions; the login form pre-fills from the remembered email or `?email=`.
+### 2026-08-26
 
-### Changed
-- **Mobile Navbar Redesign (`app/src/layouts/PublicLayout.tsx`, `app/src/layouts/DashboardLayout.tsx`)**:
-  - Public header: removed the dead notification bell, added a mobile-only **"Log in"** button that opens a full-screen account sheet, replaced the inline mobile menu with a full-screen drawer (nav links, community slot, state-aware auth actions), made the profile avatar visible on mobile (logged-in users), and added `aria-expanded`/`aria-haspopup` plus body scroll-lock while sheets are open.
-  - Dashboard header: 44px touch targets for hamburger/search/bell/tour/theme/sidebar-close, body scroll-lock for the mobile sidebar, notifications panel capped to `calc(100vw - 1.5rem)`, sidebar submenu row heights bumped.
-  - Desktop navbar intentionally unchanged.
-- **Landing & About Pages (`app/src/pages/public/Landing.tsx`, `app/src/pages/public/About.tsx`)**:
-  - Testimonial cards use responsive min-heights (`min-h-[700px] xs:min-h-[820px] md:min-h-[460px]` and `min-h-[480px] xs:min-h-[560px]`).
-  - About page scroll animations moved from x-transforms to y-transforms to eliminate phantom horizontal overflow on phones.
-- **Student Dashboard (`app/src/pages/student/Dashboard.tsx`, `app/src/index.css`)**:
-  - Motion stagger delays zeroed on mobile via `stagger(isMobile, delay)` + `useIsMobile` for instant content, and stat cards use `p-4 sm:p-6`.
+- **`008a4bb`** 0.55.5 — Merge pull request #120 from ilyaskhan12Q/fix/agent-pipeline-optimizations
+- **`d2c51ac`** 0.57.2 — fix(homepage): strip all Framer Motion animation states that hide content
+- **`07102dc`** 0.57.1 — fix(homepage): responsive variants, Suprema branding, footer links
+- **`9b96e5c`** 0.57.0 — fix(homepage): fix React console warnings - srcSet, alt, webkit styles
+- **`3da5ae0`** 0.56.5 — fix(homepage): fix blank page - CSS background, pre-render, srcset paths
+- **`e6a2ae1`** 0.56.4 — fix(homepage): reduce PlatformHome chunk size below 600KB CI limit
+- **`c654be7`** 0.56.3 — feat(homepage): literal Suprema template conversion to React
+- **`53fc71c`** 0.56.2 — feat(homepage): rebuild PlatformHome as Suprema-inspired React homepage
+- **`2d1e06e`** 0.56.1 — feat(homepage): add platform homepage with product grid
+- **`0732004`** 0.56.0 — feat(nav): add multi-product dropdown navigation
 
-### Fixed
-- **Logged-Out Header Overflow on Phones (`app/src/layouts/PublicLayout.tsx`)**:
-  - The public header measured 379px on a 375px viewport when logged out; auth links are now hidden below the `sm` breakpoint in favor of the mobile "Log in" button, eliminating horizontal scroll on 320–414px screens.
-- **Company Portal Sidebar Navigation Gating (`app/src/layouts/DashboardLayout.tsx`, `app/src/contexts/CompanyAccessContext.tsx`, `app/src/services/companyTeam.ts`)**:
-  - Resolved bug where `useCompanyNavItems` filtered all sidebar navigation links to empty during `access.loading` or when team membership role resolution was unresolved.
-  - Added navigation fallback to show full static navigation items if filtering yields empty results or while access resolution is in progress.
-  - Updated `canAccessTab` in `CompanyAccessContext` to default to allowing tab access while loading or when member roles are unresolved to prevent false lockouts.
-  - Added cache normalizer in `getMyCompanyMembership` to auto-migrate legacy `{ data: company, error }` cache entries into `{ company, member, data, error }`.
+### 2026-08-24
 
-### Added
-- **Gateway `/v1/verify` action (`supabase/functions/ai-gateway/index.ts`)**:
-  - Server-side URL/DOI liveness checks for the research pipeline verifier (browsers cannot read cross-origin status codes): HEAD request with ranged-GET fallback, 5s timeout each, bounded concurrency 5, max 25 URLs per call, JWT-gated like chat.
-- **Research engine contracts (`app/src/agent/research/types.ts`, `app/src/agent/research/planner.ts`)**:
-  - Isolated pipeline types: `SubTaskContract` (4 dimensions), `EvidenceItem`, `CitationLedgerEntry` with deterministic `[1]..[N]` keys, `ResearchReport`, `PipelineStage`.
-  - `decompose()` planner: decomposes a topic into 4 sub-task worker contracts through the gateway chat (free-tier models), with strict schema validation and rule-based `fallbackContracts` when model output is malformed (pattern isolated from the legacy zeroai planner).
-- **Research workers (`app/src/agent/research/workers.ts`)**:
-  - Worker A (academic): OpenAlex, arXiv (Atom RSS), and Semantic Scholar graph search — all keyless, CORS-friendly; abstract inversion and author extraction included.
-  - Worker B (web): Jina `s.jina.ai` search + `r.jina.ai` content fetch for snippets (keyless free tier).
-  - Bounded concurrency 2 with hard 12s per-worker deadlines, `Promise.allSettled` isolation (one worker failing never blocks the other), URL dedupe, target 8–12 evidence items.
-- **Research verifier (`app/src/agent/research/verifier.ts`, gateway client `verifyUrls`)**:
-  - Dedupes evidence by normalized URL and fuzzy title.
-  - Server-side liveness pass via the gateway `verify` action: dead links (HTTP ≥ 400) dropped, transient/unknown kept but flagged unverified.
-  - Deterministic citation keys `[1]..[N]` assigned in ledger order — the editorial stage may only cite ledger keys.
-- **Research editorial (`app/src/agent/research/editorial.ts`)**:
-  - `synthesizeReport()`: streams the final report through the gateway chat with the verified citation ledger in context.
-  - Grounds every factual claim in ledger keys `[n]`; hard ban on AI clichés; fixed four-section structure ending with a Sources list; only ledger keys may be referenced.
-- **Research pipeline state machine (`app/src/agent/hooks/useResearchPipeline.ts`, migration `044_research_report_data.sql`)**:
-  - `idle → planning → working → verifying → writing → done/failed` with live stage + evidence streaming.
-  - Persists completed/failed runs to `agent_researches` (new `report_data` jsonb payload: contracts, ledger, model, timings) + a user message to `agent_messages`; history panel reads back via `loadHistory`/`loadReport` (migration applied to production).
-- **Research workspace UI (`PipelineView`, `ReportView`, `HistoryPanel`, `ResearchAgentPage`)**:
-  - Research mode enabled (previously "Research · Phase 2" disabled tab).
-  - Pipeline view: topic input, animated stage progress (planning → working → verifying → writing), live evidence chips, worker/verifier error surface.
-  - Report view: publication report rendered as grounded text + full verified citation ledger (verified/unverified badges, authors, years, DOI links).
-  - History panel: last 20 deep-research runs, reopen any report, "New research" reset.
-- **Report rendering (`app/src/agent/render/renderReportMarkdown.tsx`, `ReportView` rewrite)**:
-  - Dependency-free, XSS-safe markdown renderer (React-escaped, no dangerouslySetInnerHTML): headings, bold, bullet lists.
-  - Inline `[n]` citations become clickable anchors — emerald when verified, amber when unverified — that scroll to and flash-highlight the matching ledger card.
-  - Ledger cards sorted verified-first with consistent verified/unverified color language (left border, badge).
-- **Source modal (`app/src/agent/components/SourceModal.tsx`)**:
-  - "Details" on any ledger card opens a dialog with the full source record: title, verified status, source, year, authors, DOI, snippet, and "Open source" external link; unverified entries show an explicit notice.
-- **Plan review gate (`app/src/agent/components/PlanReview.tsx`, `useResearchPipeline` split)**:
-  - Pipeline now pauses at a new `review` stage after planning: 4 contract cards (2×2) with dimension badges, editable focus areas and sub-questions, expandable keywords/boundaries/output-fields.
-  - Actions: "Approve & research" (workers start with the edited agenda), "Regenerate plan" (re-decompose), "Cancel"; "Skip review next time" persisted in localStorage makes future runs flow straight through.
-  - Planner fallback/errors surfaced inline on the review screen.
-- **Pipeline view polish (`PipelineView` rewrite)**:
-  - Planning phase shows a 4-slot contract skeleton while the planner works.
-  - Working phase shows per-source status rows (OpenAlex/arXiv/Semantic Scholar/Jina Web): spinner while active, checkmark + per-source "N found" counts when done.
-  - Evidence chips get title/year tooltips and a green checkmark once the verifier confirms the link.
-  - Worker/verifier notes condensed into one collapsible amber panel instead of stacked error boxes.
-- **Continue from report (`ReportView` actions, `ResearchAgentPage`)**:
-  - "Ask follow-up" switches to chat with the report + its citation ledger loaded as the system prompt (answers cite the same [n] keys).
-  - "New research" resets the pipeline and pre-fills the topic input.
-  - "Regenerate" re-runs the pipeline on the same topic (straight through when "skip review" is set).
-- **Research-mode header cleanup**:
-  - Model picker hidden in research mode (models only affect planner/editorial; choice stays in Settings, used model shown in the report meta line). Chat mode unchanged.
-- **Four parallel realtime workers (`app/src/agent/research/workers.ts`)**:
-  - Split the academic+web worker pair into 4 independent per-platform workers: OpenAlex, arXiv, Semantic Scholar, Jina web — each with its own 12s deadline, dispatched 4-way via `Promise.allSettled` (one platform failing never blocks the others).
-  - Contract queries run in parallel *within* each platform (was sequential), bringing the gathering phase to ~8–12s: OpenAlex/arXiv/S2 ≈1–3s each, Jina capped at 2 searches + 2 content fetches (~8–9s long pole).
-  - PipelineView source status rows now light up live per platform.
-- **Gathering volume 8–16 (`workers.ts` caps)**:
-  - Per-platform caps: OpenAlex/arXiv/Semantic Scholar ≤6 each, Jina web ≤4, hard aggregate cap 16 — matching the approved "8–16" target.
-  - Semantic Scholar queries run in staggered waves of 3 with 150ms spacing (unauthenticated ~1 rps) to avoid 429 bursts while staying parallel.
-  - Jina expanded to 4 content fetches (2 per search) so web coverage matches the cap without blowing the 12s budget.
-- **PDF export (`app/src/agent/lib/reportPdf.ts`, `ReportView` "Export PDF")**:
-  - Client-side multi-page A4 PDF on the existing `jspdf` dependency (no new deps): topic + meta header, full report sections, then a complete citation-ledger appendix (`[n]`, title, source, year, authors, URL, verified/unverified).
-  - Direct browser download (`zyro-research-<slug>.pdf`), page-numbered footer; no storage writes.
+- **`66360c2`** 0.55.4 — fix(agent): fix model switching, button positions, placeholder alignment, mobile layout
+- **`aa55ec2`** 0.55.3 — feat(agent): replace input with polished PromptInput pattern
+- **`2514d6a`** 0.55.2 — fix(agent): mobile responsiveness — touch targets, layout, dropdown positioning
 
-## [0.38.3] - 2026-08-17
+### 2026-08-23
 
-### Added
-- **Research Agent Phase 1 (`supabase/functions/ai-gateway/index.ts`, `supabase/migrations/043_agent_tables.sql`, `app/src/agent/*`)**:
-  - New `ai-gateway` edge function: JWT-gated `POST /v1/chat` (stream + non-stream) and `GET /v1/models` catalog. Free-tier Zen model registry (`zen/deepseek-v4-flash-free`, `zen/mimo-v2.5-free`, `zen/hy3-free`) with automatic fallback chain, in-memory cooldowns on 429/FreeUsageLimit/5xx, upstream SSE passthrough with `usage` + `done` tail events, and DB-backed 20 req/min per-user rate limit.
-  - Migration 043 creates `agent_researches`, `agent_messages`, and `agent_usage` with owner-only RLS (`auth.uid()`) and hot-path indexes — the per-user metering and usage ledger.
-  - New isolated `/research-agent` workspace (`app/src/agent/` module: SSE gateway client, `useAgentChat`, `useAgentModels`, chat/ModelPill/Settings components, scoped `.agent-root` dark theme) registered behind `ProtectedRoute` (login required). Zero edits to the legacy `zeroai` module; legacy `/0-ai` remains URL-reachable.
+- **`1cefa68`** 0.54.1 — Merge pull request #118 from ilyaskhan12Q/feature/dayos-style-landing
+- **`3a7911c`** 0.55.1 — feat(agent): sidebar history, PDF export, shared components, bug fixes
+- **`2819d0b`** 0.55.0 — fix(agent): model dropdown via Portal, clickable citations in reports
+- **`5d92338`** 0.54.5 — fix(agent): model dropdown uses fixed positioning, chat history loading
+- **`380a0d6`** 0.54.4 — fix(agent): depth dropdown opens upward to stay visible
+- **`aa2b381`** 0.54.3 — feat(agent): depth dropdown, scrollable model selector, floating input
+- **`c668edd`** 0.54.2 — feat(agent): add Gemini models, optimize planner pipeline
+- **`1937815`** 0.54.0 — fix(landing): increase scrolled nav height 48px → 54px
+- **`f13ff84`** 0.53.5 — fix(landing): morphing navbar — remove Reveal wrapper, fix sticky
+- **`6103e79`** 0.53.4 — feat(landing): morphing navbar — shrinks to pill on scroll
+- **`9ec7783`** 0.53.3 — fix(landing): ReportSection heading overflow — use 2-col grid + smaller clamp
+- **`e28a8e8`** 0.53.2 — feat(landing): complete visual overhaul — tighter density, Dayos-level design
+- **`683a283`** 0.53.1 — feat(landing): self-contained Report, Audience, Pricing sections
+- **`2d2ed5f`** 0.53.0 — feat(landing): update composition, nav, delete unused sections
+- **`1ed4c94`** 0.52.5 — feat(landing): Dayos-style multi-column footer
+- **`b6efe4f`** 0.52.4 — feat(landing): two-column CTA section on dark bg
+- **`3c3a9c7`** 0.52.3 — feat(landing): horizontal scroll depth cards
+- **`685fb74`** 0.52.2 — feat(landing): 3-pillar feature section
+- **`218ad2a`** 0.52.1 — feat(landing): claim trail feature detail section
+- **`45b5728`** 0.52.0 — feat(landing): source logos bar + stats section on dark bg
+- **`83f39fe`** 0.51.5 — feat(landing): revolution statement + product showcase sections
+- **`f17eaa8`** 0.51.4 — feat(landing): dark hero + problem arc sections
+- **`43484cf`** 0.51.3 — style(landing): update CSS for Dayos-inspired design system
 
-### Chore
-- **Repo hygiene (`.gitignore`)**:
-  - Untracked private documentation (`docs/`), agent memory (`CLAUDE.md`), `.github/SECRETS_SETUP.md`, and build-generated SEO outputs (`app/public/sitemap.xml`, `robots.txt`, `llms.txt` — regenerated by `scripts/generate-seo.js` on every build).
-  - Ignored local agent tooling (`.agents/`, `.claude/`, `skills-lock.json`).
+### 2026-08-22
+
+- **`789173b`** 0.51.2 — Merge remote-tracking branch 'origin/main' into develop
+- **`3457785`** 0.51.1 — feat(landing): redesign with rich animations, glassmorphism, and scroll effects
+
+### 2026-08-21
+
+- **`7fee8e7`** 0.49.5 — Merge feature/agent-bolt-redesign: Bolt-style workspace + premium editorial landing + subdomain routing
+- **`755c066`** 0.51.0 — feat(agent): add slide-in animation for history panel
+- **`084e46a`** 0.50.5 — feat(agent): add AnimatePresence transition for hero→thread switch
+- **`82b3307`** 0.50.4 — feat(agent): add persistent sidebar with demo history, new chat, settings
+- **`f50bad7`** 0.50.3 — feat(agent): replace header text links with proper pill buttons
+- **`ac65f11`** 0.50.2 — feat(agent): add ThreadInput with mode toggle, depth pills, model selector
+- **`1aadb14`** 0.50.1 — fix(agent): add min-h-0 to thread area for proper overflow scrolling
+- **`6dfc49f`** 0.50.0 — fix(vercel): remove ignoreCommand to enable Vercel auto-deploy from develop
+- **`d138bf8`** 0.49.4 — feat(agent+landing): Bolt-style workspace + premium editorial landing
+
+### 2026-08-19
+
+- **`be2f21f`** 0.49.3 — Merge feature/agent-single-page: hero-only input + mode-aware landing
+- **`8fcbd5f`** 0.49.1 — Merge feature/agent-single-page: polish, changelog, empty-thread fix
+- **`f0fbce7`** 0.48.5 — Merge feature/agent-single-page: unified single-page thread
+- **`c988968`** 0.48.3 — Merge feature/agent-single-page: composer dock
+- **`2cad0ff`** 0.48.1 — Merge feature/agent-single-page: left AgentSidebar with library
+- **`94aedea`** 0.47.5 — Merge feature/agent-single-page: chat session persistence
+- **`2a0a643`** 0.47.2 — Merge feature/agent-single-page: conversation thread backdrop
+- **`27c3d59`** 0.47.0 — Merge fix/research-pipeline: 24-candidate gather, verified-only citations, two-tier sources
+- **`8032444`** 0.49.2 — feat(agent): single input on new sessions — hero-only, mode-aware
+- **`2fbb2fb`** 0.49.0 — docs(changelog): single-page Research Agent workspace; fix empty-thread hero when prefilled
+- **`6d2a585`** 0.48.4 — feat(agent): unified single-page thread with inline research runs
+- **`816afd5`** 0.48.2 — feat(agent): composer dock with mode toggle, model picker, depth pills
+- **`31c334b`** 0.48.0 — feat(agent): left AgentSidebar with chat + research library
+- **`ececcfd`** 0.47.4 — feat(agent): persist chat sessions and messages (mode='chat')
+- **`1cf6ce4`** 0.47.3 — feat(agent): persist chat sessions and messages (mode='chat')
+- **`781932c`** 0.47.1 — feat(agent): conversation thread backdrop with landing pentagon motif
+- **`4160f61`** 0.46.5 — feat(research-agent): 24-candidate gather, verified-only citations, two-tier source sections
+
+### 2026-08-18
+
+- **`c5d2b83`** 0.46.4 — Merge fix/research-pipeline: round-robin evidence selection
+- **`06bae78`** 0.46.2 — Merge fix/research-pipeline: server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry
+- **`5edfd73`** 0.46.0 — Merge fix/research-pipeline: scroll fixes for generated text and history
+- **`7f109c5`** 0.45.4 — Merge fix/research-pipeline: restore research pipeline (search, persistence, editorial)
+- **`3678381`** 0.45.1 — Merge feature/agent-ux-redesign: Academic Precision UI/UX redesign
+- **`6303cdb`** 0.44.4 — Merge feature/jina-gateway: Jina web via gateway + empty-platform visibility
+- **`a5680c3`** 0.44.2 — Merge fix/session-refresh: stale JWT refresh — gateway Unauthorized fix
+- **`6f5f1da`** 0.44.0 — Merge feature/gateway-search: Phase 3.5 — keyless-first gateway search (S2 + PubMed + CORE)
+- **`ea37067`** 0.46.3 — fix(research-agent): round-robin evidence selection so one platform can't fill the cap
+- **`77e835b`** 0.46.1 — fix(research-agent): server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry
+- **`8a64723`** 0.45.5 — fix(research-agent): restore scrolling for generated text and history
+- **`71d8943`** 0.45.3 — fix(research-agent): persist runs under user_id (RLS), surface pipeline errors
+- **`9e4ad9a`** 0.45.2 — fix(gateway): restore search on edge — UA header, 30s web timeout, S2 retry, status logging
+- **`8da0b2b`** 0.45.0 — ui: report workspace tabs + source verification panel + editorial structure
+- **`4c563cb`** 0.44.5 — ui: Academic Precision design system — light theme, landing, research progress timeline
+- **`8800599`** 0.44.3 — research: Jina web via gateway (JINA_API_KEY secret) + empty-platform visibility
+- **`fc216f2`** 0.44.1 — fix: refresh stale session before gateway calls — no more silent Unauthorized after idle
+- **`c2cd069`** 0.43.5 — research: gateway search worker — S2 server-side + PubMed + CORE (keyless-first), 6-platform UI
+- **`8d332c3`** 0.43.4 — gateway: /v1/search action — keyless-first S2 + PubMed, CORE env-gated
+
+### 2026-08-17
+
+- **`1458ae0`** 0.43.3 — Merge feature/research-phase3: Phase 3 — 4 parallel realtime workers (8-12s gathering), volume 8-16, PDF export
+- **`7888e1e`** 0.42.5 — Merge feature/research-ux: Phase 3 pre-work — research UX bundle (report rendering, source modal, plan review gate, pipeline polish, continue-from-report, research-mode cleanup)
+- **`8e9961f`** 0.41.4 — Merge feature/research-agent-pipeline: Phase 2 — deep research pipeline (planner, workers, verifier, editorial, workspace UI, migration 044)
+- **`56fb086`** 0.43.2 — feat(agent): PDF export — multi-page A4 report + citation ledger appendix via jsPDF (direct download)
+- **`04e2f76`** 0.43.1 — feat(agent): gathering volume 8-16 — per-platform caps, hard aggregate cap, staggered S2 waves, web cap 4
+- **`91f98b7`** 0.43.0 — feat(agent): four parallel realtime workers — per-platform units with intra-platform query parallelism (gathering ~8-12s)
+- **`8fca9b3`** 0.42.4 — feat(agent): hide model picker in research mode — models belong in Settings, not the research surface
+- **`be5fc6a`** 0.42.3 — feat(agent): continue from report — follow-up chat with report context, prefill new research, regenerate
+- **`9b3c0e4`** 0.42.2 — feat(agent): pipeline view polish — planning skeleton, per-source status rows, verified chips, condensed notes
+- **`3439039`** 0.42.1 — feat(agent): plan review gate — approve/edit/regenerate the research agenda before workers start
+- **`17a07d1`** 0.42.0 — feat(agent): source modal — full evidence record behind every ledger card
+- **`2689f3a`** 0.41.5 — feat(agent): report rendering — safe markdown renderer with clickable citation anchors and verified-first ledger
+- **`87e47d3`** 0.41.3 — fix(agent): exhaust lint warning for loadHistory effect in research page
+- **`c584f2c`** 0.41.2 — feat(agent): research workspace UI — pipeline progress, report + citation ledger, history panel
+- **`d2bb2d7`** 0.41.1 — feat(agent): research pipeline hook — stage state machine with run persistence (agent_researches report_data)
+- **`5159c41`** 0.41.0 — feat(agent): research editorial — ledger-grounded report synthesis with citation keys
+- **`e884f23`** 0.40.5 — feat(agent): research verifier — dedupe, server-side link liveness, deterministic citation ledger
+- **`e739d16`** 0.40.4 — feat(agent): research workers — academic (OpenAlex/arXiv/Semantic Scholar) + web (Jina) with bounded concurrency
+- **`b6c2ce1`** 0.40.3 — feat(agent): research engine contracts + planner (gateway decomposition with schema validation and fallback)
+- **`4eca2c0`** 0.40.2 — feat(agent): gateway /v1/verify action — server-side URL/DOI liveness for research verifier
+- **`7f8cdf6`** 0.40.1 — chore(release): bump to 0.38.3 — research agent phase 1 + repo hygiene changelog
+- **`36f00c4`** 0.40.0 — chore(gitignore): untrack private docs, agent memory, and generated SEO outputs; ignore local agent tooling
+- **`d8d48d2`** 0.39.5 — fix(agent): resolve Deno lint errors in ai-gateway (parens around ?? chain, drop unused catch binding)
+- **`ff6c06b`** 0.39.4 — feat(agent): Phase 1 research agent — ai-gateway edge function with free-tier Zen fallback chain, per-user metering, and isolated /research-agent workspace
+
+### 2026-08-16
+
+- **`408277c`** 0.39.3 — feat(0-ai): route submissions through chat-first mode with research handoff
+- **`0b8be35`** 0.39.2 — feat(0-ai): chat stage, AUTO/CHAT/RESEARCH mode selector and ambiguity popup
+- **`ae9d185`** 0.39.1 — feat(0-ai): intent router (probe + local rules) and quick-chat engine
+- **`8d3aa68`** 0.39.0 — fix(0-ai): lower submit gate to 2 chars and hint why when too short
+- **`7d4951c`** 0.38.5 — chore(gitignore): ignore private 0-AI architecture doc
+- **`b3d56e1`** 0.38.4 — feat(0-ai): real planner agent with BYOK decomposition engine
+- **`1f0019b`** 0.38.3 — feat(0-ai): add mock deep-research workspace components
 
 ## [0.38.2] - 2026-08-13
 
