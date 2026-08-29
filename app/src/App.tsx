@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useMemo, useEffect } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
@@ -37,7 +37,7 @@ const PlatformHome = lazy(() => import('@/pages/public/PlatformHome'));
 const StudioLanding = lazy(() => import('@/pages/studio/StudioLanding'));
 
 // Demo Pages
-const ShaderHeroDemo = lazy(() => import('@/pages/demo/ShaderHeroDemo'));
+
 
 // ZYR0 Edu / School OS Surface
 const SchoolOSLanding = lazy(() => import('@/pages/edu/SchoolOSLanding'));
@@ -84,8 +84,9 @@ const LazyDashboardLayout = lazy(() => import('@/layouts/DashboardLayout'));
 
 function SubdomainRedirect() {
   const location = useLocation();
-  const target = `https://zyroo.org${location.pathname}${location.search}`;
-  window.location.href = target;
+  useEffect(() => {
+    window.location.href = `https://zyroo.org${location.pathname}${location.search}`;
+  }, [location]);
   return <RouteLoading />;
 }
 
@@ -216,9 +217,6 @@ export default function App() {
 
             {/* ZYR0 Studio Dedicated Product Route */}
             <Route path="/studio" element={<StudioLanding />} />
-
-            {/* Demo Routes */}
-            <Route path="/demo/shader-hero" element={<ShaderHeroDemo />} />
 
             {/* ZYR0 Edu / School OS Dedicated Product Routes */}
             <Route path="/school" element={<SchoolOSLanding />} />
