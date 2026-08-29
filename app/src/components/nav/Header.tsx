@@ -130,7 +130,7 @@ export default function Header() {
               </button>
 
               {productsOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[340px] sm:w-[480px] p-2 rounded-xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 z-50">
+                <div className="absolute top-full left-0 mt-2 w-[340px] sm:w-[480px] p-2 rounded-xl bg-neutral-950 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 z-50">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent rounded-t-xl" />
                   {productsList.map((product) => (
                     <Link
@@ -192,7 +192,7 @@ export default function Header() {
               </button>
 
               {resourcesOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[240px] p-1.5 rounded-xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 z-50">
+                <div className="absolute top-full left-0 mt-2 w-[240px] p-1.5 rounded-xl bg-neutral-950 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 z-50">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent rounded-t-xl" />
                   {resources.map((item) => (
                     <Link
@@ -234,7 +234,7 @@ export default function Header() {
               </button>
 
               {companyOpen && (
-                <div className="absolute top-full left-0 mt-2 w-[200px] p-1.5 rounded-xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 z-50">
+                <div className="absolute top-full left-0 mt-2 w-[200px] p-1.5 rounded-xl bg-neutral-950 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 z-50">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent rounded-t-xl" />
                   {company.map((item) => (
                     <Link
@@ -285,7 +285,7 @@ export default function Header() {
                 </button>
 
                 {profileOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-neutral-950/95 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl bg-neutral-950 border border-white/15 backdrop-blur-2xl shadow-2xl shadow-black/90 py-1 z-50">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-400/40 to-transparent rounded-t-xl" />
                     <div className="px-4 py-3 border-b border-white/10">
                       <p className="text-sm font-medium text-white">

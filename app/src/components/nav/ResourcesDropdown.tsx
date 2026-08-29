@@ -65,7 +65,7 @@ export default function ResourcesDropdown({ scrolled }: { scrolled: boolean }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute right-0 top-full mt-2 w-[240px] bg-card/80 dark:bg-card/90 backdrop-blur-xl rounded-xl border border-border/50 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.4)] py-1.5 z-50"
+            className="absolute right-0 top-full mt-2 w-[240px] bg-card backdrop-blur-xl rounded-xl border border-border shadow-xl py-1.5 z-50"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent rounded-t-xl" />
             {resources.map((item) => (
