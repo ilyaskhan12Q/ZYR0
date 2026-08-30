@@ -9,9 +9,9 @@ module.exports = {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['DM Serif Display', 'Georgia', 'serif'],
-        heading: ['DM Serif Display', 'Georgia', 'serif'],
-        serif: ['DM Serif Display', 'Georgia', 'serif'],
+        display: ['Agbalumo', 'Georgia', 'serif'],
+        heading: ['DM Serif Text', 'Georgia', 'serif'],
+        serif: ['DM Serif Text', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
         label: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
       },

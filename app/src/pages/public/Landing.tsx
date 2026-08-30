@@ -499,7 +499,7 @@ export default function Landing() {
                     <ArrowRight className="w-4.5 h-4.5" />
                   </Link>
                   <Link
-                    to="/register"
+                    to="/register?redirect=%2Finternships"
                     className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
                   >
                     For Employers
@@ -1009,7 +1009,7 @@ export default function Landing() {
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                   <Link
-                    to="/register"
+                    to="/register?redirect=%2Finternships"
                     className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                   >
                     Create Free Account

@@ -159,7 +159,7 @@ export default function PricingSection() {
                   </div>
 
                   <Link
-                    to={tier.price === 'Custom' ? '/contact' : '/register'}
+                    to={tier.price === 'Custom' ? '/contact' : '/register?redirect=%2F'}
                     className="mt-8 w-full py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2"
                     style={{
                       background: isPro ? 'var(--zyro-accent)' : 'transparent',

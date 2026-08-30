@@ -11,6 +11,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
 import { productsList } from '@/components/platform-home/data';
 
+const productLogos: Record<string, string> = {
+  studio: '/logos/studio.png',
+  edu: '/logos/schoolOS.png',
+  research: '/logos/research.png',
+};
+
 const resources = [
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'FAQ', href: '/faq', icon: MessageCircle },
@@ -140,10 +146,12 @@ export default function Header() {
                       onClick={() => setProductsOpen(false)}
                       className="flex items-start gap-3 p-3 rounded-lg transition-all group hover:bg-white/5"
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10 group-hover:scale-105 transition-transform">
-                        <span className="font-display text-sm text-white">
-                          {product.name.charAt(4)}
-                        </span>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10 group-hover:scale-105 transition-transform overflow-hidden">
+                        {productLogos[product.id] ? (
+                          <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="font-display text-sm text-white">{product.name.charAt(4)}</span>
+                        )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
@@ -336,13 +344,13 @@ export default function Header() {
             ) : (
               <>
                 <Link
-                  to="/login"
+                  to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                   className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
+                  to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                   className="px-4 py-2 text-sm font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-md shadow-white/10"
                 >
                   Get Started
@@ -422,8 +430,12 @@ export default function Header() {
                       className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10">
-                          <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 overflow-hidden">
+                          {productLogos[product.id] ? (
+                            <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
+                          )}
                         </div>
                         <div>
                           <div className="text-sm font-semibold text-white">{product.name}</div>
@@ -526,14 +538,14 @@ export default function Header() {
                   ) : (
                     <>
                       <Link
-                        to="/register"
+                        to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                         onClick={() => setMobileOpen(false)}
                         className="w-full py-3 text-center text-sm font-semibold text-black bg-white rounded-xl shadow-lg"
                       >
                         Get Started Free
                       </Link>
                       <Link
-                        to="/login"
+                        to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                         onClick={() => setMobileOpen(false)}
                         className="w-full py-3 text-center text-sm font-medium text-neutral-300 hover:text-white border border-white/10 rounded-xl"
                       >

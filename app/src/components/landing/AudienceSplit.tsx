@@ -48,7 +48,7 @@ const CARDS = [
     checkBg: 'bg-emerald-500/15',
     checkColor: 'text-emerald-600 dark:text-emerald-400',
     items: EMPLOYER_CHECKLIST,
-    cta: { label: 'Post an Internship', to: '/register', className: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25 hover:shadow-emerald-500/40', text: 'text-white' },
+    cta: { label: 'Post an Internship', to: '/register?redirect=%2Finternships', className: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/25 hover:shadow-emerald-500/40', text: 'text-white' },
   },
   {
     key: 'mentors',
@@ -60,7 +60,7 @@ const CARDS = [
     checkBg: 'bg-amber-500/15',
     checkColor: 'text-amber-400',
     items: MENTOR_CHECKLIST,
-    cta: { label: 'Become a Mentor', to: '/register', className: 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25 hover:shadow-amber-500/40', text: 'text-slate-900' },
+    cta: { label: 'Become a Mentor', to: '/register?redirect=%2Finternships', className: 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/25 hover:shadow-amber-500/40', text: 'text-slate-900' },
   },
 ]
 

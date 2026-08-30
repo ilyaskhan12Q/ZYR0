@@ -518,6 +518,18 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             </Link>
           )}
           <Link
+            to="/"
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              location.pathname === '/'
+                ? 'bg-accent/10 text-accent'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            }`}
+            title={collapsed ? 'Home' : undefined}
+          >
+            <Home className="w-5 h-5 flex-shrink-0" />
+            {!collapsed && <span>Home</span>}
+          </Link>
+          <Link
             to={`/${role}/settings`}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
               location.pathname.includes('/settings')

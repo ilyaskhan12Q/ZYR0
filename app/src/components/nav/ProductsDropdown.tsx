@@ -1,44 +1,32 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase, FlaskConical, Palette, GraduationCap, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 const products = [
   {
     label: 'Internships',
     description: 'Find and manage structured internships with verified companies.',
     href: '/internships/browse',
-    icon: Briefcase,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bg: 'bg-emerald-50 dark:bg-emerald-500/10',
-    ring: 'ring-emerald-500/20 dark:ring-emerald-400/20',
+    logo: null,
   },
   {
     label: 'Research Agent',
     description: 'AI-powered deep research for papers, reports, and analysis.',
     href: '/research',
-    icon: FlaskConical,
-    color: 'text-blue-600 dark:text-blue-400',
-    bg: 'bg-blue-50 dark:bg-blue-500/10',
-    ring: 'ring-blue-500/20 dark:ring-blue-400/20',
+    logo: '/logos/research.png',
   },
   {
     label: 'ZYR0 Edu',
     description: 'Modern operating system for schools and colleges.',
     href: '/school',
-    icon: GraduationCap,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bg: 'bg-indigo-50 dark:bg-indigo-500/10',
-    ring: 'ring-indigo-500/20 dark:ring-indigo-400/20',
+    logo: '/logos/schoolOS.png',
   },
   {
     label: 'ZYRO Studio',
     description: 'Website builder — launch your portfolio in minutes.',
     href: '/studio',
-    icon: Palette,
-    color: 'text-purple-600 dark:text-purple-400',
-    bg: 'bg-purple-50 dark:bg-purple-500/10',
-    ring: 'ring-purple-500/20 dark:ring-purple-400/20',
+    logo: '/logos/studio.png',
     badge: 'Coming Soon',
   },
 ];
@@ -107,8 +95,12 @@ export default function ProductsDropdown({ scrolled }: { scrolled: boolean }) {
                 onClick={() => setOpen(false)}
                 className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/60 transition-all group"
               >
-                <div className={`w-10 h-10 rounded-lg ${product.bg} ring-1 ${product.ring} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
-                  <product.icon className={`w-5 h-5 ${product.color}`} />
+                <div className="w-10 h-10 rounded-lg bg-muted ring-1 ring-border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+                  {product.logo ? (
+                    <img src={product.logo} alt={product.label} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="font-display text-sm text-muted-foreground">{product.label.charAt(0)}</span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
