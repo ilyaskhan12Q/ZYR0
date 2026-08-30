@@ -11,6 +11,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
 import { productsList } from '@/components/platform-home/data';
 
+const productLogos: Record<string, string> = {
+  studio: '/logos/studio.png',
+  edu: '/logos/schoolOS.png',
+  research: '/logos/research.png',
+};
+
 const resources = [
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'FAQ', href: '/faq', icon: MessageCircle },
@@ -140,10 +146,12 @@ export default function Header() {
                       onClick={() => setProductsOpen(false)}
                       className="flex items-start gap-3 p-3 rounded-lg transition-all group hover:bg-white/5"
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10 group-hover:scale-105 transition-transform">
-                        <span className="font-display text-sm text-white">
-                          {product.name.charAt(4)}
-                        </span>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10 group-hover:scale-105 transition-transform overflow-hidden">
+                        {productLogos[product.id] ? (
+                          <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="font-display text-sm text-white">{product.name.charAt(4)}</span>
+                        )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 mb-0.5">
@@ -422,8 +430,12 @@ export default function Header() {
                       className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10">
-                          <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 overflow-hidden">
+                          {productLogos[product.id] ? (
+                            <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
+                          )}
                         </div>
                         <div>
                           <div className="text-sm font-semibold text-white">{product.name}</div>
