@@ -97,6 +97,17 @@
     --accent-800: #190561;
     --accent-900: #0c0231;
     --accent-950: #060118;
+
+    /* ZYR0 Brand Tokens (Light Mode) */
+    --zyro-bg: #FFFFFF;
+    --zyro-surface: #F8F8FA;
+    --zyro-elevated: #ECECEE;
+    --zyro-text: #313131;
+    --zyro-text-secondary: #5A5A6E;
+    --zyro-text-muted: #8A8A9E;
+    --zyro-accent: #7B7BDC;
+    --zyro-accent-muted: rgba(123, 123, 220, 0.1);
+    --zyro-border: #E2E2EA;
   }
 
   .dark {
@@ -188,6 +199,17 @@
     --accent-800: #b29efa;
     --accent-900: #d8cefd;
     --accent-950: #ece7fe;
+
+    /* ZYR0 Brand Tokens (Dark Mode) */
+    --zyro-bg: #120159;
+    --zyro-surface: #1A1A2E;
+    --zyro-elevated: #252540;
+    --zyro-text: #FFFFFF;
+    --zyro-text-secondary: #B0B0C8;
+    --zyro-text-muted: #7070A0;
+    --zyro-accent: #7B7BDC;
+    --zyro-accent-muted: rgba(123, 123, 220, 0.15);
+    --zyro-border: #2A2A45;
   }
 
   * {
@@ -210,7 +232,7 @@
   h6,
   .font-display,
   .font-heading {
-    font-family: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-family: 'Agbalumo', 'DM Serif Text', 'Georgia', serif !important;
     letter-spacing: -0.028em;
     -webkit-font-smoothing: antialiased;
   }
