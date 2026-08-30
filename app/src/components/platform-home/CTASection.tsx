@@ -40,7 +40,7 @@ export default function CTASection() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
               <Link
-                to="/register"
+                to="/register?redirect=%2F"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg text-sm font-medium transition-all duration-200"
                 style={{
                   background: 'var(--zyro-accent)',

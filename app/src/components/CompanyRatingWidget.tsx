@@ -145,8 +145,8 @@ export function CompanyRatingWidget({
       {loading ? (
         <Loader variant="inline" label="Loading your rating…" />
       ) : !authed ? (
-        <p className="text-xs text-muted-foreground">
-          <a href="/login" className="text-accent hover:underline">Sign in</a> to rate this company
+          <p className="text-xs text-muted-foreground">
+          <a href={`/login?redirect=${encodeURIComponent(window.location.pathname)}`} className="text-accent hover:underline">Sign in</a> to rate this company
         </p>
       ) : (
         <div className="flex flex-col gap-1">

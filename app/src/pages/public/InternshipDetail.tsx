@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Share2, CheckCircle2, Building2, ExternalLink } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
@@ -15,6 +15,7 @@ import ProfileCompletionRequiredModal from '@/components/onboarding/ProfileCompl
 export default function InternshipDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, profile, profileCompleted, profileCompletionPercentage, profileCompletionRequirements } = useAuth();
 
   const [internship, setInternship] = useState<any>(null);
@@ -56,7 +57,7 @@ export default function InternshipDetail() {
 
   const handleApply = async () => {
     if (!user) {
-      navigate('/login');
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
       return;
     }
 

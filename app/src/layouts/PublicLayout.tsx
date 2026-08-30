@@ -194,13 +194,13 @@ export default function PublicLayout() {
               ) : (
                 <>
                   <Link
-                    to="/login"
+                    to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                     className="hidden sm:inline-flex items-center text-sm font-medium text-foreground hover:text-accent transition-colors"
                   >
                     Log in
                   </Link>
                   <Link
-                    to="/register"
+                    to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                     className="hidden sm:inline-flex items-center text-sm font-medium bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
                   >
                     Get Started
@@ -332,14 +332,14 @@ export default function PublicLayout() {
                   ) : (
                     <>
                       <Link
-                        to="/login"
+                        to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex-1 text-center py-2.5 min-h-11 rounded-lg text-sm font-medium border border-border hover:bg-muted transition-colors flex items-center justify-center gap-2"
                       >
                         <LogIn className="w-4 h-4" /> Log in
                       </Link>
                       <Link
-                        to="/register"
+                        to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                         onClick={() => setMobileMenuOpen(false)}
                         className="flex-1 text-center py-2.5 min-h-11 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex items-center justify-center"
                       >
@@ -410,13 +410,13 @@ export default function PublicLayout() {
               )}
 
               <Link
-                to="/login"
+                to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                 className={`w-full flex items-center justify-center gap-2 min-h-12 rounded-xl text-sm font-medium transition-colors ${lastEmail ? 'border border-border hover:bg-muted text-foreground' : 'bg-accent text-white font-semibold hover:bg-accent/90'}`}
               >
                 <LogIn className="w-4 h-4" /> {lastEmail ? 'Use another account' : 'Log in'}
               </Link>
               <Link
-                to="/register"
+                to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                 className={`mt-3 w-full flex items-center justify-center gap-2 min-h-12 rounded-xl text-sm font-medium transition-colors ${lastEmail ? 'bg-accent text-white font-semibold hover:bg-accent/90' : 'border border-border hover:bg-muted text-foreground'}`}
               >
                 Create a new account

@@ -65,7 +65,7 @@ export const JOURNEY_CARDS: JourneyCardItem[] = [
     ],
     previewType: "profile_apply",
     ctaText: "Build Student Profile",
-    ctaHref: "/register?role=student"
+    ctaHref: "/register?role=student&redirect=%2Finternships"
   },
   {
     id: "selected",
@@ -83,7 +83,7 @@ export const JOURNEY_CARDS: JourneyCardItem[] = [
     ],
     previewType: "selection_pipeline",
     ctaText: "View Hiring Dashboard",
-    ctaHref: "/login"
+    ctaHref: "/login?redirect=%2Finternships"
   },
   {
     id: "projects",
@@ -137,6 +137,6 @@ export const JOURNEY_CARDS: JourneyCardItem[] = [
     ],
     previewType: "career_launch",
     ctaText: "Start Your Journey Free",
-    ctaHref: "/register"
+    ctaHref: "/register?redirect=%2Finternships"
   }
 ]

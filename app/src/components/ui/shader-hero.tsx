@@ -147,7 +147,7 @@ export const ShaderHero = () => {
           transition={{ delay: 1.4, duration: 0.8 }}
           className="mt-12 flex flex-col sm:flex-row items-center gap-3"
         >
-          <Link to="/register">
+          <Link to="/register?redirect=%2F">
             <Button
               size="lg"
               className="rounded-full px-7 py-5 text-sm font-semibold bg-white text-black hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25)]"

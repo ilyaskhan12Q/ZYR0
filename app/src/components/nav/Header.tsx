@@ -344,13 +344,13 @@ export default function Header() {
             ) : (
               <>
                 <Link
-                  to="/login"
+                  to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                   className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
+                  to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                   className="px-4 py-2 text-sm font-semibold text-black bg-white hover:bg-neutral-200 rounded-xl transition-all shadow-md shadow-white/10"
                 >
                   Get Started
@@ -538,14 +538,14 @@ export default function Header() {
                   ) : (
                     <>
                       <Link
-                        to="/register"
+                        to={`/register?redirect=${encodeURIComponent(location.pathname)}`}
                         onClick={() => setMobileOpen(false)}
                         className="w-full py-3 text-center text-sm font-semibold text-black bg-white rounded-xl shadow-lg"
                       >
                         Get Started Free
                       </Link>
                       <Link
-                        to="/login"
+                        to={`/login?redirect=${encodeURIComponent(location.pathname)}`}
                         onClick={() => setMobileOpen(false)}
                         className="w-full py-3 text-center text-sm font-medium text-neutral-300 hover:text-white border border-white/10 rounded-xl"
                       >
