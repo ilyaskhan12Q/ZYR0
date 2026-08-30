@@ -11,6 +11,7 @@ const products = [
     icon: Briefcase,
     color: 'text-emerald-600 dark:text-emerald-400',
     bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+    ring: 'ring-emerald-500/20 dark:ring-emerald-400/20',
   },
   {
     label: 'Research Agent',
@@ -19,6 +20,7 @@ const products = [
     icon: FlaskConical,
     color: 'text-blue-600 dark:text-blue-400',
     bg: 'bg-blue-50 dark:bg-blue-500/10',
+    ring: 'ring-blue-500/20 dark:ring-blue-400/20',
   },
   {
     label: 'ZYR0 Edu',
@@ -27,6 +29,7 @@ const products = [
     icon: GraduationCap,
     color: 'text-indigo-600 dark:text-indigo-400',
     bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+    ring: 'ring-indigo-500/20 dark:ring-indigo-400/20',
   },
   {
     label: 'ZYRO Studio',
@@ -35,6 +38,7 @@ const products = [
     icon: Palette,
     color: 'text-purple-600 dark:text-purple-400',
     bg: 'bg-purple-50 dark:bg-purple-500/10',
+    ring: 'ring-purple-500/20 dark:ring-purple-400/20',
     badge: 'Coming Soon',
   },
 ];
@@ -93,17 +97,18 @@ export default function ProductsDropdown({ scrolled }: { scrolled: boolean }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[340px] bg-card rounded-xl border border-border shadow-xl p-2 z-50"
+            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[340px] sm:w-[380px] bg-card backdrop-blur-xl rounded-xl border border-border shadow-xl p-2 z-50"
           >
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent rounded-t-xl" />
             {products.map((product) => (
               <Link
                 key={product.href}
                 to={product.href}
                 onClick={() => setOpen(false)}
-                className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors group"
+                className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/60 transition-all group"
               >
-                <div className={`w-9 h-9 rounded-lg ${product.bg} flex items-center justify-center shrink-0`}>
-                  <product.icon className={`w-4.5 h-4.5 ${product.color}`} />
+                <div className={`w-10 h-10 rounded-lg ${product.bg} ring-1 ${product.ring} flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform`}>
+                  <product.icon className={`w-5 h-5 ${product.color}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -120,7 +125,7 @@ export default function ProductsDropdown({ scrolled }: { scrolled: boolean }) {
                     {product.description}
                   </p>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 mt-1 shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               </Link>
             ))}
           </motion.div>

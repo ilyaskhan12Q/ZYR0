@@ -1,5 +1,5 @@
 import { SEO } from '@/components/SEO';
-import { ResearchNav } from '@/components/research-landing/ResearchNav';
+import Header from '@/components/nav/Header';
 import { HeroSection } from '@/components/research-landing/HeroSection';
 import { EditorialStatement } from '@/components/research-landing/EditorialStatement';
 import { ResearchEngine } from '@/components/research-landing/ResearchEngine';
@@ -23,7 +23,7 @@ export default function ResearchLanding() {
         description="Deep research, verified sources, structured reports. One question at a time."
         path="/research"
       />
-      <ResearchNav />
+      <Header />
       <main>
         <HeroSection />
         <EditorialStatement />
