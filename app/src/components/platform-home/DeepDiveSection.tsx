@@ -159,35 +159,28 @@ export default function DeepDiveSection() {
                         borderColor: 'var(--zyro-border)',
                       }}
                     >
-                      {item.productId !== 'work' ? (
-                        <img
-                          src={`/logos/${item.productId === 'edu' ? 'schoolOS' : item.productId}.png`}
-                          alt={`${product.name} logo`}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="text-center">
-                            <div
-                              className="w-14 h-14 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                              style={{ background: 'var(--zyro-accent-muted)' }}
+                      {/* Placeholder — replace with <img> */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="text-center">
+                          <div
+                            className="w-14 h-14 rounded-xl mx-auto mb-3 flex items-center justify-center"
+                            style={{ background: 'var(--zyro-accent-muted)' }}
+                          >
+                            <span
+                              className="font-display text-xl"
+                              style={{ color: 'var(--zyro-accent)' }}
                             >
-                              <span
-                                className="font-display text-xl"
-                                style={{ color: 'var(--zyro-accent)' }}
-                              >
-                                W
-                              </span>
-                            </div>
-                            <p
-                              className="font-label text-[10px] tracking-[0.15em]"
-                              style={{ color: 'var(--zyro-text-muted)' }}
-                            >
-                              {product.name}
-                            </p>
+                              {item.figureLabel.split(' ')[1]}
+                            </span>
                           </div>
+                          <p
+                            className="font-label text-[10px] tracking-[0.15em]"
+                            style={{ color: 'var(--zyro-text-muted)' }}
+                          >
+                            {product.name} screenshot
+                          </p>
                         </div>
-                      )}
+                      </div>
                     </div>
                   </Reveal>
                 </div>

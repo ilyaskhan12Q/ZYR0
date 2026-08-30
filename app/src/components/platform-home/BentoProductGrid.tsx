@@ -60,35 +60,28 @@ export default function BentoProductGrid() {
                     className={`relative ${config.aspect} w-full overflow-hidden`}
                     style={{ background: 'var(--zyro-elevated)' }}
                   >
-                    {product.id !== 'work' ? (
-                      <img
-                        src={`/logos/${product.id === 'edu' ? 'schoolOS' : product.id}.png`}
-                        alt={`${product.name} logo`}
-                        className="absolute inset-0 w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center">
-                          <div
-                            className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                            style={{ background: 'var(--zyro-accent-muted)' }}
+                    {/* Placeholder — replace with <img> when you have screenshots */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div
+                          className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
+                          style={{ background: 'var(--zyro-accent-muted)' }}
+                        >
+                          <span
+                            className="font-display text-lg"
+                            style={{ color: 'var(--zyro-accent)' }}
                           >
-                            <span
-                              className="font-display text-lg"
-                              style={{ color: 'var(--zyro-accent)' }}
-                            >
-                              W
-                            </span>
-                          </div>
-                          <p
-                            className="font-label text-[10px] tracking-[0.15em]"
-                            style={{ color: 'var(--zyro-text-muted)' }}
-                          >
-                            {product.name}
-                          </p>
+                            {product.name.charAt(4)}
+                          </span>
                         </div>
+                        <p
+                          className="font-label text-[10px] tracking-[0.15em]"
+                          style={{ color: 'var(--zyro-text-muted)' }}
+                        >
+                          {product.name}
+                        </p>
                       </div>
-                    )}
+                    </div>
 
                     {/* Hover overlay */}
                     <div
