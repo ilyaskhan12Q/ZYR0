@@ -4,10 +4,9 @@ import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-
-// ─── Extracted sub-components (must live OUTSIDE the parent component) ────────
-// Defining components inside a render function causes React to remount them
-// every time the parent re-renders, resetting local state.
+import { useAuth } from '@/contexts/AuthContext';
+import { getStudentSettings, updateStudentSettings, STUDENT_SETTINGS_DEFAULTS } from '@/services/settings';
+import type { StudentSettings } from '@/lib/database.types';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -57,39 +56,20 @@ function Toggle({
   );
 }
 
-// ─── Main Settings Component ──────────────────────────────────────────────────
-
 export default function StudentSettings() {
+  const { profile, refreshProfile } = useAuth();
   const { setTheme } = useTheme();
   const [showPass, setShowPass] = useState(false);
   const [saved, setSaved] = useState(false);
   const [password, setPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
-  const [settings, setSettings] = useState(() => {
-    const savedData = localStorage.getItem('zyr0_student_settings');
-    if (savedData) {
-      try {
-        return JSON.parse(savedData);
-      } catch (e) {
-        // ignore and fallback
-      }
+  const [settings, setSettings] = useState<StudentSettings>(STUDENT_SETTINGS_DEFAULTS);
+
+  useEffect(() => {
+    if (profile) {
+      setSettings(getStudentSettings(profile.settings as StudentSettings | null));
     }
-    return {
-      emailApps: true,
-      emailTasks: true,
-      emailMessages: true,
-      emailDeadlines: true,
-      smsApps: true,
-      smsTasks: true,
-      smsMessages: false,
-      smsDeadlines: true,
-      phoneNumber: '',
-      theme: 'system' as 'light' | 'dark' | 'system',
-      language: 'en',
-      twoFactor: false,
-      publicProfile: true,
-    };
-  });
+  }, [profile]);
 
   useEffect(() => {
     if (settings.theme) {
@@ -99,20 +79,22 @@ export default function StudentSettings() {
 
   const handleSave = async () => {
     try {
-      localStorage.setItem('zyr0_student_settings', JSON.stringify(settings));
-      
+      const { error } = await updateStudentSettings(settings);
+      if (error) throw error;
+
       if (password) {
         if (password.length < 6) {
           toast.error('Password must be at least 6 characters long');
           return;
         }
         setUpdatingPassword(true);
-        const { error } = await supabase.auth.updateUser({ password });
-        if (error) throw error;
+        const { error: passErr } = await supabase.auth.updateUser({ password });
+        if (passErr) throw passErr;
         setPassword('');
         toast.success('Password updated successfully!');
       }
 
+      await refreshProfile();
       setSaved(true);
       toast.success('Settings saved successfully!');
       setTimeout(() => setSaved(false), 2000);
@@ -139,7 +121,6 @@ export default function StudentSettings() {
         </button>
       </div>
 
-      {/* Notifications */}
       <Section title="Notifications">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,14 +130,16 @@ export default function StudentSettings() {
               <Toggle label="Task Assignments" desc="Get notified when new tasks are assigned" checked={settings.emailTasks} onChange={(v) => setSettings({ ...settings, emailTasks: v })} />
               <Toggle label="New Messages" desc="Get notified when you receive a message" checked={settings.emailMessages} onChange={(v) => setSettings({ ...settings, emailMessages: v })} />
               <Toggle label="Deadline Reminders" desc="Get reminded before task deadlines" checked={settings.emailDeadlines} onChange={(v) => setSettings({ ...settings, emailDeadlines: v })} />
+              <Toggle label="Product Updates" desc="New features and platform announcements" checked={settings.emailProductUpdates} onChange={(v) => setSettings({ ...settings, emailProductUpdates: v })} />
             </div>
 
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-foreground">SMS & Phone Alerts</h4>
+              <p className="text-xs text-muted-foreground italic">Coming soon — configure now, enabled later</p>
               <Toggle label="Application SMS Alerts" desc="Receive SMS alerts for status changes" checked={settings.smsApps} onChange={(v) => setSettings({ ...settings, smsApps: v })} />
               <Toggle label="Task Assignment SMS" desc="Receive SMS updates on task reviews and deadlines" checked={settings.smsTasks} onChange={(v) => setSettings({ ...settings, smsTasks: v })} />
               <Toggle label="New Messages SMS" desc="Receive text alerts for direct messages" checked={settings.smsMessages} onChange={(v) => setSettings({ ...settings, smsMessages: v })} />
-              
+
               <div className="pt-2">
                 <label className="text-xs text-muted-foreground mb-1 block">Primary Phone Number</label>
                 <input
@@ -172,7 +155,6 @@ export default function StudentSettings() {
         </div>
       </Section>
 
-      {/* Appearance */}
       <Section title="Appearance">
         <div className="grid grid-cols-3 gap-3">
           {[
@@ -195,10 +177,8 @@ export default function StudentSettings() {
         </div>
       </Section>
 
-      {/* Security */}
       <Section title="Security">
         <div className="space-y-4">
-          <Toggle label="Two-Factor Authentication" desc="Add an extra layer of security" checked={settings.twoFactor} onChange={(v) => setSettings({ ...settings, twoFactor: v })} />
           <div className="border-t border-border pt-4">
             <label className="text-sm font-medium mb-1.5 block">Change Password</label>
             <div className="relative">
@@ -210,12 +190,12 @@ export default function StudentSettings() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20"
               />
-              <button 
+              <button
                 type="button"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowPass(!showPass);
-                }} 
+                }}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 {showPass
@@ -228,7 +208,6 @@ export default function StudentSettings() {
         </div>
       </Section>
 
-      {/* Language & Region */}
       <Section title="Language & Region">
         <div>
           <label className="text-sm font-medium mb-1.5 block">Language</label>
