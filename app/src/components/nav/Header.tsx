@@ -44,6 +44,7 @@ export default function Header() {
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [companyOpen, setCompanyOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState<string | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const productsRef = useRef<HTMLDivElement>(null);
   const resourcesRef = useRef<HTMLDivElement>(null);
@@ -80,6 +81,7 @@ export default function Header() {
     setResourcesOpen(false);
     setCompanyOpen(false);
     setMobileOpen(false);
+    setMobileSection(null);
     setProfileOpen(false);
   }, [location.pathname]);
 
@@ -417,124 +419,166 @@ export default function Header() {
               </div>
 
               <div className="px-5 pb-8">
-                {/* Products */}
-                <div className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2">
-                  Products
-                </div>
-                <div className="grid grid-cols-1 gap-1.5 mb-4">
-                  {productsList.map((product) => (
+                {/* User info — logged in only */}
+                {user && (
+                  <div className="mb-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zyro-purple to-zyro-sapphire flex items-center justify-center text-white font-semibold text-sm border border-white/20">
+                        {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-white truncate">{user.user_metadata?.full_name || 'User'}</div>
+                        <div className="text-xs text-neutral-400 truncate">{user.email}</div>
+                      </div>
+                    </div>
                     <Link
-                      key={product.id}
-                      to={product.href}
+                      to={`/${effectiveRole}/dashboard`}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
+                      className="w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl flex items-center justify-center gap-2"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 overflow-hidden">
+                      <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
+                    </Link>
+                  </div>
+                )}
+
+                {/* Products — accordion */}
+                <button
+                  type="button"
+                  onClick={() => setMobileSection(mobileSection === 'products' ? null : 'products')}
+                  className="w-full flex items-center justify-between py-3 text-sm font-semibold text-white"
+                >
+                  <span>Products</span>
+                  <ChevronDown className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${mobileSection === 'products' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileSection === 'products' && (
+                  <div className="grid grid-cols-1 gap-1.5 pb-3">
+                    {productsList.map((product) => (
+                      <Link
+                        key={product.id}
+                        to={product.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-white/15 transition-all"
+                      >
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 overflow-hidden shrink-0">
                           {productLogos[product.id] ? (
                             <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
                           )}
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <div className="text-sm font-semibold text-white">{product.name}</div>
-                          <div className="text-[11px] text-neutral-400">{product.badge}</div>
+                          <div className="text-[11px] text-neutral-400 line-clamp-1">{product.badge}</div>
                         </div>
-                      </div>
-                      <ChevronDown className="w-4 h-4 -rotate-90 text-neutral-500" />
-                    </Link>
-                  ))}
-                </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
 
                 <div className="h-px bg-white/10" />
 
-                {/* Nav links */}
-                <nav className="flex flex-col py-3 gap-0.5">
-                  <button
-                    onClick={() => { setMobileOpen(false); scrollTo('#pricing'); }}
-                    className="flex items-center min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors text-left"
-                  >
-                    Pricing
-                  </button>
-                  {resources.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                      <item.icon className="w-4 h-4 text-neutral-400" />
-                      <span className="flex-1">{item.label}</span>
-                      {item.badge && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 border border-white/10">
-                          {item.badge}
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-                </nav>
+                {/* Pricing — standalone */}
+                <button
+                  onClick={() => { setMobileOpen(false); scrollTo('#pricing'); }}
+                  className="w-full flex items-center justify-between py-3 text-sm font-semibold text-white text-left"
+                >
+                  Pricing
+                </button>
 
                 <div className="h-px bg-white/10" />
 
-                <nav className="flex flex-col py-3 gap-0.5">
-                  {company.map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
+                {/* Resources — accordion */}
+                <button
+                  type="button"
+                  onClick={() => setMobileSection(mobileSection === 'resources' ? null : 'resources')}
+                  className="w-full flex items-center justify-between py-3 text-sm font-semibold text-white"
+                >
+                  <span>Resources</span>
+                  <ChevronDown className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${mobileSection === 'resources' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileSection === 'resources' && (
+                  <div className="flex flex-col gap-0.5 pb-3">
+                    {resources.map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <item.icon className="w-4 h-4 text-neutral-400" />
+                        <span className="flex-1">{item.label}</span>
+                        {item.badge && (
+                          <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-white/10 text-neutral-300 border border-white/10">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
 
                 <div className="h-px bg-white/10" />
 
-                {/* Auth */}
+                {/* Company — accordion */}
+                <button
+                  type="button"
+                  onClick={() => setMobileSection(mobileSection === 'company' ? null : 'company')}
+                  className="w-full flex items-center justify-between py-3 text-sm font-semibold text-white"
+                >
+                  <span>Company</span>
+                  <ChevronDown className={`w-4 h-4 text-neutral-400 transition-transform duration-200 ${mobileSection === 'company' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileSection === 'company' && (
+                  <div className="flex flex-col gap-0.5 pb-3">
+                    {company.map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+
+                <div className="h-px bg-white/10" />
+
+                {/* Bottom section: account links (logged in) or auth buttons (logged out) */}
                 <div className="pt-4 flex flex-col gap-2">
                   {user ? (
-                    <>
-                      <Link
-                        to={`/${effectiveRole}/dashboard`}
-                        onClick={() => setMobileOpen(false)}
-                        className="w-full py-3 text-center text-sm font-semibold text-white bg-white/10 rounded-xl flex items-center justify-center gap-2"
-                      >
-                        <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                      </Link>
+                    <div className="flex flex-col gap-0.5">
                       {companyAccess?.hasAccess && effectiveRole !== 'company' && (
                         <Link
                           to="/company/dashboard"
                           onClick={() => setMobileOpen(false)}
-                          className="w-full py-3 text-center text-sm font-medium border border-white/20 text-white rounded-xl flex items-center justify-center gap-2"
+                          className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
                         >
-                          <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
+                          <Building2 className="w-4 h-4 text-neutral-400" /> Switch to {companyAccess.company?.name || 'Company'}
                         </Link>
                       )}
-                      <div className="mt-2 flex flex-col gap-0.5">
-                        <Link
-                          to={`/${effectiveRole}/profile`}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <User className="w-4 h-4" /> Profile
-                        </Link>
-                        <Link
-                          to={`/${effectiveRole}/settings`}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <Settings className="w-4 h-4" /> Settings
-                        </Link>
-                        <button
-                          onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
-                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
-                        >
-                          <LogOut className="w-4 h-4" /> Sign Out
-                        </button>
-                      </div>
-                    </>
+                      <Link
+                        to={`/${effectiveRole}/profile`}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <User className="w-4 h-4 text-neutral-400" /> Profile
+                      </Link>
+                      <Link
+                        to={`/${effectiveRole}/settings`}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-neutral-400" /> Settings
+                      </Link>
+                      <button
+                        onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
                   ) : (
                     <>
                       <Link
