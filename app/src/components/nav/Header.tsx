@@ -419,6 +419,28 @@ export default function Header() {
               </div>
 
               <div className="px-5 pb-8">
+                {/* User info — logged in only */}
+                {user && (
+                  <div className="mb-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zyro-purple to-zyro-sapphire flex items-center justify-center text-white font-semibold text-sm border border-white/20">
+                        {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-white truncate">{user.user_metadata?.full_name || 'User'}</div>
+                        <div className="text-xs text-neutral-400 truncate">{user.email}</div>
+                      </div>
+                    </div>
+                    <Link
+                      to={`/${effectiveRole}/dashboard`}
+                      onClick={() => setMobileOpen(false)}
+                      className="w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl flex items-center justify-center gap-2"
+                    >
+                      <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
+                    </Link>
+                  </div>
+                )}
+
                 {/* Products — accordion */}
                 <button
                   type="button"
@@ -523,49 +545,40 @@ export default function Header() {
 
                 <div className="h-px bg-white/10" />
 
-                {/* Auth */}
+                {/* Bottom section: account links (logged in) or auth buttons (logged out) */}
                 <div className="pt-4 flex flex-col gap-2">
                   {user ? (
-                    <>
-                      <Link
-                        to={`/${effectiveRole}/dashboard`}
-                        onClick={() => setMobileOpen(false)}
-                        className="w-full py-3 text-center text-sm font-semibold text-white bg-white/10 rounded-xl flex items-center justify-center gap-2"
-                      >
-                        <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                      </Link>
+                    <div className="flex flex-col gap-0.5">
                       {companyAccess?.hasAccess && effectiveRole !== 'company' && (
                         <Link
                           to="/company/dashboard"
                           onClick={() => setMobileOpen(false)}
-                          className="w-full py-3 text-center text-sm font-medium border border-white/20 text-white rounded-xl flex items-center justify-center gap-2"
+                          className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
                         >
-                          <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
+                          <Building2 className="w-4 h-4 text-neutral-400" /> Switch to {companyAccess.company?.name || 'Company'}
                         </Link>
                       )}
-                      <div className="mt-2 flex flex-col gap-0.5">
-                        <Link
-                          to={`/${effectiveRole}/profile`}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <User className="w-4 h-4" /> Profile
-                        </Link>
-                        <Link
-                          to={`/${effectiveRole}/settings`}
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <Settings className="w-4 h-4" /> Settings
-                        </Link>
-                        <button
-                          onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
-                          className="flex items-center gap-3 min-h-12 px-4 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
-                        >
-                          <LogOut className="w-4 h-4" /> Sign Out
-                        </button>
-                      </div>
-                    </>
+                      <Link
+                        to={`/${effectiveRole}/profile`}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <User className="w-4 h-4 text-neutral-400" /> Profile
+                      </Link>
+                      <Link
+                        to={`/${effectiveRole}/settings`}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                      >
+                        <Settings className="w-4 h-4 text-neutral-400" /> Settings
+                      </Link>
+                      <button
+                        onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
+                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" /> Sign Out
+                      </button>
+                    </div>
                   ) : (
                     <>
                       <Link
