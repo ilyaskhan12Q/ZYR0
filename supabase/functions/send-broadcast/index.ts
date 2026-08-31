@@ -116,13 +116,6 @@ serve(async (req) => {
     }
 
     // Filter to users with emailProductUpdates enabled
-    const recipients = users.filter((u) => {
-      // We need to check settings.emailProductUpdates
-      // Since we can't filter jsonb in the query easily, we fetch all and filter here
-      return true; // Will be filtered below when we check settings
-    });
-
-    // Fetch settings for each user and filter
     const enabledUsers: Array<{ id: string; email: string; full_name: string | null }> = [];
 
     for (const u of users) {
