@@ -110,51 +110,51 @@ export default function StudentWorkspace() {
 
       setActivePlacement(selected);
 
-      // 3. Fetch tasks and filter in memory by this placement's internship_id
-      const tasksResult = await withTimeout(
-        getMyTasks(!forceRefresh),
-        10000,
-        { data: [], error: null },
-        'StudentWorkspace_LoadTasks'
-      );
-      const { data: allTasks, error: tasksErr } = tasksResult as any;
-      if (tasksErr) throw tasksErr;
+      // 3. Fetch tasks, certificates, and events in parallel
+      const internshipIdVal = (selected.internship as any)?.id;
+      if (forceRefresh && internshipIdVal) {
+        clearWorkspaceEventsCache(internshipIdVal, user.id);
+      }
 
+      const [tasksResult, certsResult, eventsResult] = await Promise.allSettled([
+        withTimeout(
+          getMyTasks(!forceRefresh),
+          10000,
+          { data: [], error: null },
+          'StudentWorkspace_LoadTasks'
+        ),
+        withTimeout(
+          getMyCertificates(),
+          10000,
+          { data: [] },
+          'StudentWorkspace_LoadCertificates'
+        ),
+        internshipIdVal
+          ? withTimeout(
+              getWorkspaceEvents(internshipIdVal, user.id, !forceRefresh),
+              10000,
+              { data: [], error: null },
+              'StudentWorkspace_LoadEvents'
+            )
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+
+      // 4. Process tasks
+      const { data: allTasks, error: tasksErr } = (tasksResult.status === 'fulfilled' ? tasksResult.value : { data: [], error: null }) as any;
+      if (tasksErr) throw tasksErr;
       const filteredTasks = (allTasks || []).filter(
         (t: any) => t.internship_id === (selected.internship as any)?.id
       );
       setTasks(filteredTasks);
 
-      // 4. Fetch certificates to check if this placement's certificate is issued
-      const certsResult = await withTimeout(
-        getMyCertificates(),
-        10000,
-        { data: [] },
-        'StudentWorkspace_LoadCertificates'
-      );
-      const { data: certs } = certsResult as any;
+      // 5. Process certificates
+      const { data: certs } = (certsResult.status === 'fulfilled' ? certsResult.value : { data: [] }) as any;
       setCertificates(certs || []);
 
-      // 5. Fetch workspace events
-      const internshipIdVal = (selected.internship as any)?.id;
-      if (internshipIdVal) {
-        if (forceRefresh) {
-          clearWorkspaceEventsCache(internshipIdVal, user.id);
-        }
-        const eventsResult = await withTimeout(
-          getWorkspaceEvents(
-            internshipIdVal,
-            user.id,
-            !forceRefresh
-          ),
-          10000,
-          { data: [], error: null },
-          'StudentWorkspace_LoadEvents'
-        );
-        const { data: eventsList, error: eventsErr } = eventsResult as any;
-        if (eventsErr) throw eventsErr;
-        setEvents(eventsList || []);
-      }
+      // 6. Process events
+      const { data: eventsList, error: eventsErr } = (eventsResult.status === 'fulfilled' ? eventsResult.value : { data: [], error: null }) as any;
+      if (eventsErr) throw eventsErr;
+      setEvents(eventsList || []);
 
     } catch (err: any) {
       console.error('Error loading workspace data:', err);
