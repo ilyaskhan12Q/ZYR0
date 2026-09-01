@@ -11,33 +11,34 @@ export default function AdminLogs() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadLogs() {
+  function loadLogs() {
     let cancelled = false;
-    try {
-      const result = await withTimeout(
-        supabase
-          .from('activity_logs')
-          .select(`
-            id, action, target, target_type, details, ip_address, created_at,
-            user:profiles!user_id (full_name, avatar_url)
-          `)
-          .order('created_at', { ascending: false })
-          .limit(100),
-        10000,
-        { data: [], error: null },
-        'AdminLogs'
-      );
-
-      if (result.error) throw result.error;
-      if (result.data && !cancelled) {
-        setLogs(result.data);
-      }
-    } catch (err) {
-      console.error('Error loading activity logs:', err);
-      toast.error('Failed to load activity logs');
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
+    withTimeout(
+      Promise.resolve(supabase
+        .from('activity_logs')
+        .select(`
+          id, action, target, target_type, details, ip_address, created_at,
+          user:profiles!user_id (full_name, avatar_url)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100)),
+      10000,
+      { data: [], error: null },
+      'AdminLogs'
+    )
+      .then((result) => {
+        if (result.error) throw result.error;
+        if (result.data && !cancelled) {
+          setLogs(result.data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error loading activity logs:', err);
+        toast.error('Failed to load activity logs');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }
 

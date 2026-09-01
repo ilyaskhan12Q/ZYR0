@@ -17,123 +17,123 @@ export default function MentorInterns() {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchInternsData() {
+    function fetchInternsData() {
       if (!profile?.company_id) {
         setLoading(false);
         return;
       }
 
-      try {
-        // 1. Fetch accepted applications for the company internships
-        const { data: apps, error: appsErr } = await withTimeout(
-          supabase
-            .from('applications')
-            .select(`
+      withTimeout(
+        Promise.resolve(supabase
+          .from('applications')
+          .select(`
+            id,
+            status,
+            internship:internships!internship_id (
               id,
-              status,
-              internship:internships!internship_id (
-                id,
-                title,
-                company_id,
-                company:companies!company_id (name)
-              ),
-              student:profiles!student_id (
-                id,
-                full_name,
-                avatar_url,
-                university
-              )
-            `)
-            .eq('status', 'Accepted'),
-          10000,
-          { data: [] },
-          'MentorInterns'
-        );
-
-        if (appsErr) throw appsErr;
-        if (cancelled) return;
-
-        // Filter applications for the mentor's company
-        const filteredApps = (apps || []).filter(
-          (app: any) => app.internship?.company_id === profile.company_id
-        );
-
-        // 2. Fetch tasks and evaluations for all filtered students — batched concurrency
-        const BATCH_SIZE = 3;
-        const internsList: any[] = [];
-
-        for (let i = 0; i < filteredApps.length; i += BATCH_SIZE) {
+              title,
+              company_id,
+              company:companies!company_id (name)
+            ),
+            student:profiles!student_id (
+              id,
+              full_name,
+              avatar_url,
+              university
+            )
+          `)
+          .eq('status', 'Accepted')),
+        10000,
+        { data: [] },
+        'MentorInterns'
+      )
+        .then(async (result) => {
+          const appsErr = result.error;
+          if (appsErr) throw appsErr;
           if (cancelled) return;
-          const batch = filteredApps.slice(i, i + BATCH_SIZE);
-          const batchResults = await Promise.allSettled(
-            batch.map(async (app: any) => {
-              const studentId = app.student?.id;
-              if (!studentId) return null;
 
-              const { data: tasks } = await withTimeout(
-                supabase
-                  .from('tasks')
-                  .select('id, status')
-                  .eq('assigned_to', studentId),
-                10000,
-                { data: [] },
-                'MentorInterns'
-              );
-
-              const { data: evals } = await withTimeout(
-                supabase
-                  .from('evaluations')
-                  .select('overall_rating')
-                  .eq('intern_id', studentId),
-                10000,
-                { data: [] },
-                'MentorInterns'
-              );
-
-              const totalTasks = tasks?.length || 0;
-              const completedTasks = tasks?.filter((t: any) => t.status === 'Approved').length || 0;
-              const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-              const ratings = evals?.map((e: any) => e.overall_rating) || [];
-              const avgRating = ratings.length > 0
-                ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
-                : 'N/A';
-
-              let status = 'On Track';
-              if (progress < 40 && totalTasks > 0) status = 'Needs Attention';
-              else if (progress >= 85 && totalTasks > 0) status = 'Exceeding';
-
-              return {
-                id: studentId,
-                internship_id: app.internship?.id,
-                name: app.student?.full_name || 'Anonymous Student',
-                avatar: app.student?.avatar_url,
-                role: app.internship?.title || 'Intern',
-                company: app.internship?.company?.name || 'Your Company',
-                university: app.student?.university || 'University Not Listed',
-                progress,
-                tasksCompleted: completedTasks,
-                totalTasks,
-                rating: avgRating,
-                status,
-              };
-            })
+          const apps = result.data;
+          const filteredApps = (apps || []).filter(
+            (app: any) => app.internship?.company_id === profile.company_id
           );
 
-          for (const r of batchResults) {
-            if (r.status === 'fulfilled' && r.value) internsList.push(r.value);
-          }
-        }
+          const BATCH_SIZE = 3;
+          const internsList: any[] = [];
 
-        if (!cancelled) {
-          setInterns(internsList);
-        }
-      } catch (err: any) {
-        console.error('Error fetching interns data:', err);
-        toast.error('Failed to load interns list');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+          for (let i = 0; i < filteredApps.length; i += BATCH_SIZE) {
+            if (cancelled) return;
+            const batch = filteredApps.slice(i, i + BATCH_SIZE);
+            const batchResults = await Promise.allSettled(
+              batch.map(async (app: any) => {
+                const studentId = app.student?.id;
+                if (!studentId) return null;
+
+                const { data: tasks } = await withTimeout(
+                  Promise.resolve(supabase
+                    .from('tasks')
+                    .select('id, status')
+                    .eq('assigned_to', studentId)),
+                  10000,
+                  { data: [] },
+                  'MentorInterns'
+                );
+
+                const { data: evals } = await withTimeout(
+                  Promise.resolve(supabase
+                    .from('evaluations')
+                    .select('overall_rating')
+                    .eq('intern_id', studentId)),
+                  10000,
+                  { data: [] },
+                  'MentorInterns'
+                );
+
+                const totalTasks = tasks?.length || 0;
+                const completedTasks = tasks?.filter((t: any) => t.status === 'Approved').length || 0;
+                const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+                const ratings = evals?.map((e: any) => e.overall_rating) || [];
+                const avgRating = ratings.length > 0
+                  ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
+                  : 'N/A';
+
+                let status = 'On Track';
+                if (progress < 40 && totalTasks > 0) status = 'Needs Attention';
+                else if (progress >= 85 && totalTasks > 0) status = 'Exceeding';
+
+                return {
+                  id: studentId,
+                  internship_id: app.internship?.id,
+                  name: app.student?.full_name || 'Anonymous Student',
+                  avatar: app.student?.avatar_url,
+                  role: app.internship?.title || 'Intern',
+                  company: app.internship?.company?.name || 'Your Company',
+                  university: app.student?.university || 'University Not Listed',
+                  progress,
+                  tasksCompleted: completedTasks,
+                  totalTasks,
+                  rating: avgRating,
+                  status,
+                };
+              })
+            );
+
+            for (const r of batchResults) {
+              if (r.status === 'fulfilled' && r.value) internsList.push(r.value);
+            }
+          }
+
+          if (!cancelled) {
+            setInterns(internsList);
+          }
+        })
+        .catch((err: any) => {
+          console.error('Error fetching interns data:', err);
+          toast.error('Failed to load interns list');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     }
 
     fetchInternsData();

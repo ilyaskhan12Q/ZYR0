@@ -18,63 +18,63 @@ export default function MentorDashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    async function loadDashboardData() {
+    function loadDashboardData() {
       if (!profile) return;
-      try {
-        // Get tasks for this mentor's company
-        const tasksRes = profile.company_id
-          ? await withTimeout(getCompanyTasks(profile.company_id), 10000, { data: [] }, 'MentorDashboard')
-          : { data: [] };
-        
-        // Get interns (accepted applications for the company internships)
-        let internsData: any[] = [];
-        if (profile.company_id) {
-          const { data } = await withTimeout(
-            supabase
-              .from('applications')
-              .select(`
-                id, status,
-                student:profiles!student_id (id, full_name, avatar_url, university),
-                internship:internships!internship_id (id, company_id)
-              `)
-              .eq('status', 'Accepted'),
-            10000,
-            { data: [] },
-            'MentorDashboard'
-          );
-          // Filter manually by company_id
-          internsData = (data || []).filter(
-            (app: any) => app.internship?.company_id === profile.company_id
-          );
-        }
-
-        // Get evaluations created by this mentor
-        const { data: evalsData } = await withTimeout(
-          supabase
-            .from('evaluations')
+      const tasksPromise = profile.company_id
+        ? withTimeout(getCompanyTasks(profile.company_id), 10000, { data: [] }, 'MentorDashboard')
+        : Promise.resolve({ data: [] });
+      
+      let internsPromise = Promise.resolve<any[]>([]);
+      if (profile.company_id) {
+        internsPromise = withTimeout(
+          Promise.resolve(supabase
+            .from('applications')
             .select(`
-              id, overall_rating, created_at, status,
-              intern:profiles!intern_id (id, full_name, avatar_url),
-              internship:internships!internship_id (id, title)
+              id, status,
+              student:profiles!student_id (id, full_name, avatar_url, university),
+              internship:internships!internship_id (id, company_id)
             `)
-            .eq('mentor_id', profile.id)
-            .order('created_at', { ascending: false }),
+            .eq('status', 'Accepted')),
           10000,
           { data: [] },
           'MentorDashboard'
-        );
-
-        if (!cancelled) {
-          if (tasksRes.data) setTasks(tasksRes.data);
-          setInterns(internsData);
-          if (evalsData) setEvaluations(evalsData);
-        }
-      } catch (err) {
-        console.error('Error loading mentor dashboard data:', err);
-        toast.error('Failed to load mentor dashboard');
-      } finally {
-        if (!cancelled) setLoading(false);
+        ).then((result) => {
+          return (result.data || []).filter(
+            (app: any) => app.internship?.company_id === profile.company_id
+          );
+        });
       }
+
+      const evalsPromise = withTimeout(
+        Promise.resolve(supabase
+          .from('evaluations')
+          .select(`
+            id, overall_rating, created_at, status,
+            intern:profiles!intern_id (id, full_name, avatar_url),
+            internship:internships!internship_id (id, title)
+          `)
+          .eq('mentor_id', profile.id)
+          .order('created_at', { ascending: false })),
+        10000,
+        { data: [] },
+        'MentorDashboard'
+      );
+
+      Promise.all([tasksPromise, internsPromise, evalsPromise])
+        .then(([tasksRes, internsData, evalsResult]) => {
+          if (!cancelled) {
+            if (tasksRes.data) setTasks(tasksRes.data);
+            setInterns(internsData);
+            if (evalsResult.data) setEvaluations(evalsResult.data);
+          }
+        })
+        .catch((err) => {
+          console.error('Error loading mentor dashboard data:', err);
+          toast.error('Failed to load mentor dashboard');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     }
 
     loadDashboardData();

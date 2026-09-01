@@ -26,24 +26,28 @@ export default function CompanyApplications() {
 
   useEffect(() => {
     let cancelled = false;
-    async function loadApplications() {
-      try {
-        setLoading(true);
-        const coResult = await withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyApplications');
-        const co = coResult?.data;
-        if (co) {
-          const { data, error } = await withTimeout(getAllCompanyApplications(co.id), 10000, { data: [], error: null }, 'CompanyApplicationsList');
-          if (error) throw error;
-          if (!cancelled) setApplications(data ?? []);
-        } else {
-          if (!cancelled) setApplications([]);
-        }
-      } catch (err) {
-        console.error('Error loading company applications:', err);
-        toast.error('Failed to load applications');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+    function loadApplications() {
+      setLoading(true);
+      withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyApplications')
+        .then((coResult) => {
+          const co = coResult?.data;
+          if (co) {
+            return withTimeout(getAllCompanyApplications(co.id), 10000, { data: [], error: null }, 'CompanyApplicationsList')
+              .then(({ data, error }) => {
+                if (error) throw error;
+                if (!cancelled) setApplications(data ?? []);
+              });
+          } else {
+            if (!cancelled) setApplications([]);
+          }
+        })
+        .catch((err) => {
+          console.error('Error loading company applications:', err);
+          toast.error('Failed to load applications');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     }
     loadApplications();
     return () => { cancelled = true; };

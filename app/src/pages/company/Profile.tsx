@@ -30,30 +30,32 @@ export default function CompanyProfile() {
 
   useEffect(() => {
     let cancelled = false;
-    async function loadCompany() {
-      try {
-        const result = await withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyProfile');
-        const data = result?.data;
-        if (data && !cancelled) {
-          setCompany(data);
-          setForm({
-            name: data.name || '',
-            email: data.email || '',
-            phone: data.phone || '',
-            website: data.website || '',
-            location: data.location || '',
-            size: data.size || '1-10 employees',
-            industry: data.industry || '',
-            founded: data.founded || '',
-            description: data.description || '',
-          });
-        }
-      } catch (err: any) {
-        console.error('Failed to load company profile:', err);
-        toast.error('Failed to load company profile');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+    function loadCompany() {
+      withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyProfile')
+        .then((result) => {
+          const data = result?.data;
+          if (data && !cancelled) {
+            setCompany(data);
+            setForm({
+              name: data.name || '',
+              email: data.email || '',
+              phone: data.phone || '',
+              website: data.website || '',
+              location: data.location || '',
+              size: data.size || '1-10 employees',
+              industry: data.industry || '',
+              founded: data.founded || '',
+              description: data.description || '',
+            });
+          }
+        })
+        .catch((err: any) => {
+          console.error('Failed to load company profile:', err);
+          toast.error('Failed to load company profile');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     }
     if (user) {
       loadCompany();
