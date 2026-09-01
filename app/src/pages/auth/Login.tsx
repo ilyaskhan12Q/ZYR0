@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { profile, user } = useAuth();
+  const { profile, user, profileLoaded } = useAuth();
   const postAuthTarget = postAuthRedirect(searchParams);
 
   const [email, setEmail] = useState(() => searchParams.get('email') || getLastEmail() || '');
@@ -19,6 +19,7 @@ export default function Login() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
+  const [signInPending, setSignInPending] = useState(false);
 
   // Remember this device's last-used email once mounted (used by the navbar "Continue as" flow)
   useEffect(() => {
@@ -26,13 +27,22 @@ export default function Login() {
     if (paramEmail) rememberEmail(paramEmail);
   }, [searchParams]);
 
+  // Navigate after profile loads (not before)
+  useEffect(() => {
+    if (signInPending && profileLoaded && profile) {
+      setSignInPending(false);
+      const role = profile.role as UserRole;
+      const target = postAuthTarget || `/${role}/dashboard`;
+      navigate(target, { replace: true });
+    }
+  }, [signInPending, profileLoaded, profile, navigate, postAuthTarget]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setLocalError(null);
 
-    const { data: signInData, error } = await signIn({ email, password });
+    const { error } = await signIn({ email, password });
     
     if (error) {
       let msg = error.message;
@@ -43,9 +53,9 @@ export default function Login() {
       setLoading(false);
     } else {
       rememberEmail(email);
-      const role = profile?.role || (signInData?.user?.user_metadata?.role as UserRole) || (user?.user_metadata?.role as UserRole) || 'student';
-      const target = postAuthTarget || `/${role}/dashboard`;
-      navigate(target, { replace: true });
+      // Wait for profile to load before navigating (handled by useEffect above)
+      setSignInPending(true);
+      setLoading(false);
     }
   };
 
