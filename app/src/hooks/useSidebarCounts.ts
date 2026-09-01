@@ -58,9 +58,9 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
     refreshTimerRef.current = setTimeout(() => refresh(true), 500);
   }, [refresh]);
 
-  // Initial load only — realtime subscriptions keep counts fresh.
+  // Initial load — use cache for instant response, then refresh in background
   useEffect(() => {
-    refresh(false);
+    refresh(true);
   }, [refresh]);
 
   // Realtime: refetch (bypassing cache) when relevant rows change.
@@ -104,6 +104,17 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
       });
     };
   }, [role, user?.id, debouncedRefresh]);
+
+  // Refresh counts when browser tab regains focus
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refresh(true);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [refresh]);
 
   return counts;
 }

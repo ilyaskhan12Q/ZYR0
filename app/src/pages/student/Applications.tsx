@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, MessageSquare } from 'lucide-react';
@@ -6,6 +6,7 @@ import { Loader } from '@/components/common/Loader';
 import { getMyApplications } from '@/services/applications';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
+import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 
 const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
 
@@ -40,6 +41,21 @@ export default function StudentApplications() {
     load();
     return () => { cancelled = true; };
   }, []);
+
+  // Refresh data when browser tab regains focus
+  const refreshOnFocus = useCallback(() => {
+    async function refresh() {
+      try {
+        const result = await withTimeout(getMyApplications(), 10000, { data: [] }, 'StudentApplications');
+        const data = result?.data;
+        if (data) setApplications(data);
+      } catch (error) {
+        console.error('Failed to refresh applications:', error);
+      }
+    }
+    refresh();
+  }, []);
+  useRefreshOnFocus(refreshOnFocus);
 
   const filtered = activeTab === 'All' ? applications : applications.filter(a => a.status === activeTab);
 

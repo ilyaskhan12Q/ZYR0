@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FolderOpen, Users, GraduationCap, Award, ArrowRight, Plus, Star, Loader2 } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
 import { getInternships } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
+import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 
 export default function CompanyDashboard() {
   const { user } = useAuth();
@@ -44,6 +45,32 @@ export default function CompanyDashboard() {
     load();
     return () => { cancelled = true; };
   }, [user]);
+
+  // Refresh data when browser tab regains focus
+  const refreshOnFocus = useCallback(() => {
+    async function refresh() {
+      try {
+        const { data: co } = await getMyCompany();
+        if (co) {
+          setCompany(co);
+          const settled = await Promise.race([
+            Promise.allSettled([
+              getInternships({ company_id: co.id }),
+              getAllCompanyApplications(co.id),
+            ]),
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Company dashboard timeout')), 10000))
+          ]);
+          const [internshipsRes, appsRes] = settled;
+          if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) setInternships(internshipsRes.value.data);
+          if (appsRes.status === 'fulfilled' && appsRes.value.data) setApplications(appsRes.value.data);
+        }
+      } catch (error) {
+        console.error('Failed to refresh company dashboard:', error);
+      }
+    }
+    refresh();
+  }, []);
+  useRefreshOnFocus(refreshOnFocus);
 
   if (loading) {
     return (
