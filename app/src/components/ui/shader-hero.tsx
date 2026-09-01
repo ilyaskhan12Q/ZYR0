@@ -21,24 +21,35 @@ const containerAnimation = {
 
 export const ShaderHero = () => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
+  const spotlightRef = useRef<HTMLDivElement>(null)
+  const rafRef = useRef(0)
+  const pendingRef = useRef(false)
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const container = containerRef.current
       if (!container) return
       const rect = container.getBoundingClientRect()
-      setMousePos({
-        x: (e.clientX - rect.left) / rect.width,
-        y: (e.clientY - rect.top) / rect.height,
-      })
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+
+      if (!pendingRef.current) {
+        pendingRef.current = true
+        rafRef.current = requestAnimationFrame(() => {
+          pendingRef.current = false
+          if (spotlightRef.current) {
+            spotlightRef.current.style.background = `radial-gradient(700px circle at ${x}% ${y}%, rgba(255,255,255,0.12), transparent 60%)`
+          }
+        })
+      }
     }
 
     const container = containerRef.current
     if (container) {
-      container.addEventListener("mousemove", handleMouseMove)
+      container.addEventListener("mousemove", handleMouseMove, { passive: true })
     }
     return () => {
+      cancelAnimationFrame(rafRef.current)
       if (container) {
         container.removeEventListener("mousemove", handleMouseMove)
       }
@@ -72,20 +83,11 @@ export const ShaderHero = () => {
         colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
         speed={0.25}
       />
-      <MeshGradient
-        className="absolute inset-0 w-full h-full opacity-50"
-        colors={["#000000", "#ffffff", "#3a3a3a"]}
-        speed={0.15}
-        distortion={0.8}
-        swirl={0.2}
-      />
 
       {/* Radial spotlight following mouse */}
       <div
+        ref={spotlightRef}
         className="absolute inset-0 opacity-30 transition-opacity duration-300 pointer-events-none"
-        style={{
-          background: `radial-gradient(700px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(255,255,255,0.12), transparent 60%)`,
-        }}
       />
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4">
