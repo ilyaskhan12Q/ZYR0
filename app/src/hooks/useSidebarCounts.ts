@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyActiveApplicationsCount, getCompanyActiveApplicationsCount } from '@/services/applications';
@@ -51,6 +51,13 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
     }
   }, [role, companyId]);
 
+  // Debounced refetch for realtime events
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const debouncedRefresh = useCallback(() => {
+    clearTimeout(refreshTimerRef.current);
+    refreshTimerRef.current = setTimeout(() => refresh(false), 500);
+  }, [refresh]);
+
   // Initial load only — realtime subscriptions keep counts fresh.
   useEffect(() => {
     refresh(false);
@@ -60,7 +67,7 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
   useEffect(() => {
     if (!role || !user?.id) return;
 
-    const onEvent = () => refresh(false);
+    const onEvent = () => debouncedRefresh();
     const channels: ReturnType<typeof supabase.channel>[] = [];
 
     if (role === 'student') {
@@ -91,11 +98,12 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
     channels.forEach((channel) => channel.subscribe());
 
     return () => {
+      clearTimeout(refreshTimerRef.current);
       channels.forEach((channel) => {
         supabase.removeChannel(channel);
       });
     };
-  }, [role, user?.id, refresh]);
+  }, [role, user?.id, debouncedRefresh]);
 
   return counts;
 }
