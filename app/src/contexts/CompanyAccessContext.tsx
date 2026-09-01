@@ -57,12 +57,12 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
 
   // Re-resolve membership when the tab regains focus so role changes,
   // removals, or new acceptances made elsewhere take effect instead of
-  // rendering a stale sidebar/access state until reload. Bypasses the
-  // 300s my_company cache so the freshest state is always read.
+  // rendering a stale sidebar/access state until reload. Uses cache first
+  // for instant response, then refreshes in background.
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        load(false);
+        load(true);
       }
     };
     document.addEventListener('visibilitychange', onVisible);

@@ -335,8 +335,8 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
           filter: `user_id=eq.${user.id}`,
         },
         () => {
-          // Bypass cache when a real-time event triggers to fetch the latest state
-          loadNotifications(false);
+          // Use cache for instant response, refresh in background
+          loadNotifications(true);
         }
       )
       .subscribe();
