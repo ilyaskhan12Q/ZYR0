@@ -41,21 +41,23 @@ export default function AdminInbox() {
   const [detail, setDetail] = useState<ContactMessage | null>(null);
   const [updating, setUpdating] = useState(false);
 
-  const loadMessages = useCallback(async () => {
+  const loadMessages = useCallback(() => {
     let cancelled = false;
-    try {
-      setLoading(true);
-      let query = supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
-      if (activeTab !== 'All') query = query.eq('status', activeTab);
-      const result = await withTimeout(query, 10000, { data: [], error: null }, 'AdminInbox');
-      if (result.error) throw result.error;
-      if (!cancelled) setMessages((result.data as ContactMessage[]) || []);
-    } catch (err) {
-      console.error('Error loading contact messages:', err);
-      toast.error('Failed to load inbox messages');
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
+    setLoading(true);
+    let query = supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+    if (activeTab !== 'All') query = query.eq('status', activeTab);
+    withTimeout(Promise.resolve(query), 10000, { data: [], error: null }, 'AdminInbox')
+      .then((result) => {
+        if (result.error) throw result.error;
+        if (!cancelled) setMessages((result.data as ContactMessage[]) || []);
+      })
+      .catch((err) => {
+        console.error('Error loading contact messages:', err);
+        toast.error('Failed to load inbox messages');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }, [activeTab]);
 
@@ -80,11 +82,11 @@ export default function AdminInbox() {
   const openDetail = (m: ContactMessage) => {
     setDetail(m);
     if (m.status === 'new') {
-      supabase
+      Promise.resolve(supabase
         .from('contact_messages')
         .update({ status: 'read' })
         .eq('id', m.id)
-        .then(() => loadMessages());
+      ).then(() => loadMessages());
     }
   };
 

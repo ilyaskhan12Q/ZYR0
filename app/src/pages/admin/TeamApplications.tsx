@@ -206,25 +206,27 @@ export default function AdminTeamApplications() {
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
-  const loadApplications = useCallback(async () => {
+  const loadApplications = useCallback(() => {
     let cancelled = false;
-    try {
-      setLoading(true);
-      const result = await withTimeout(
-        getTeamApplications(activeTab as any),
-        10000,
-        { data: [], error: null },
-        'AdminTeamApplications'
-      );
-      if (result.error) throw result.error;
-      if (!cancelled) setApplications(result.data);
-    } catch (err) {
-      console.error('Error loading team applications:', err);
-      setMessage({ type: 'err', text: 'Failed to load applications.' });
-      toast.error('Failed to load team applications');
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
+    setLoading(true);
+    withTimeout(
+      getTeamApplications(activeTab as any),
+      10000,
+      { data: [], error: null },
+      'AdminTeamApplications'
+    )
+      .then((result) => {
+        if (result.error) throw result.error;
+        if (!cancelled) setApplications(result.data);
+      })
+      .catch((err) => {
+        console.error('Error loading team applications:', err);
+        setMessage({ type: 'err', text: 'Failed to load applications.' });
+        toast.error('Failed to load team applications');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }, [activeTab]);
 

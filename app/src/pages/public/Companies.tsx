@@ -22,56 +22,57 @@ export default function Companies() {
 
   useEffect(() => {
     let cancelled = false;
-    async function loadCompanies() {
+    function loadCompanies() {
       setLoading(true);
-      try {
-        const result = await withTimeout(
-          getCompanies({
-            search: search.trim() || undefined,
-            industry: selectedIndustry !== 'All' ? selectedIndustry : undefined
-          }),
-          10000,
-          { data: [] },
-          'Companies'
-        );
-        const data = result?.data;
+      withTimeout(
+        getCompanies({
+          search: search.trim() || undefined,
+          industry: selectedIndustry !== 'All' ? selectedIndustry : undefined
+        }),
+        10000,
+        { data: [] },
+        'Companies'
+      )
+        .then((result) => {
+          const data = result?.data;
+          if (data) {
+            let filtered = data;
+            if (selectedSize !== 'All') {
+              filtered = data.filter((c: any) => c.size === selectedSize);
+            }
+            if (!cancelled) setCompanies(filtered);
 
-        if (data) {
-          let filtered = data;
-          if (selectedSize !== 'All') {
-            filtered = data.filter((c: any) => c.size === selectedSize);
-          }
-          if (!cancelled) setCompanies(filtered);
-
-          const companyIds = filtered.map((c: any) => c.id);
-          if (companyIds.length > 0) {
-            const countResult = await withTimeout(
-              supabase
-                .from('internships')
-                .select('company_id')
-                .in('company_id', companyIds)
-                .eq('status', 'Active'),
-              10000,
-              { data: [] },
-              'CompaniesCounts'
-            );
-            const countData = countResult?.data;
-
-            if (countData) {
-              const counts: Record<string, number> = {};
-              countData.forEach((i: any) => {
-                counts[i.company_id] = (counts[i.company_id] || 0) + 1;
+            const companyIds = filtered.map((c: any) => c.id);
+            if (companyIds.length > 0) {
+              return withTimeout(
+                Promise.resolve(supabase
+                  .from('internships')
+                  .select('company_id')
+                  .in('company_id', companyIds)
+                  .eq('status', 'Active')),
+                10000,
+                { data: [] },
+                'CompaniesCounts'
+              ).then((countResult) => {
+                const countData = countResult?.data;
+                if (countData) {
+                  const counts: Record<string, number> = {};
+                  countData.forEach((i: any) => {
+                    counts[i.company_id] = (counts[i.company_id] || 0) + 1;
+                  });
+                  if (!cancelled) setInternshipCounts(counts);
+                }
               });
-              if (!cancelled) setInternshipCounts(counts);
             }
           }
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('Failed to load companies');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error('Failed to load companies');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
     }
 
     const timer = setTimeout(() => {

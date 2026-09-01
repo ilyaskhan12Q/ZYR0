@@ -44,28 +44,30 @@ export default function AdminOfferLetters() {
   const [selected, setSelected]   = useState<OfferLetter | null>(null);
 
   // ── Load ────────────────────────────────────────────────────────────────────
-  async function load() {
+  function load() {
     let cancelled = false;
     setLoading(true);
-    try {
-      let query = supabase
-        .from('offer_letters')
-        .select(OFFER_LETTER_SELECT)
-        .order('created_at', { ascending: false });
+    let query = supabase
+      .from('offer_letters')
+      .select(OFFER_LETTER_SELECT)
+      .order('created_at', { ascending: false });
 
-      if (activeTab !== 'All') {
-        query = query.eq('status', activeTab);
-      }
-
-      const result = await withTimeout(query, 10000, { data: [], error: null }, 'AdminOfferLetters');
-      if (result.error) throw result.error;
-      if (result.data && !cancelled) setOffers(result.data as OfferLetter[]);
-    } catch (err) {
-      console.error('Error loading offer letters:', err);
-      toast.error('Failed to load offer letters');
-    } finally {
-      if (!cancelled) setLoading(false);
+    if (activeTab !== 'All') {
+      query = query.eq('status', activeTab);
     }
+
+    withTimeout(Promise.resolve(query), 10000, { data: [], error: null }, 'AdminOfferLetters')
+      .then((result) => {
+        if (result.error) throw result.error;
+        if (result.data && !cancelled) setOffers(result.data as OfferLetter[]);
+      })
+      .catch((err) => {
+        console.error('Error loading offer letters:', err);
+        toast.error('Failed to load offer letters');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }
 

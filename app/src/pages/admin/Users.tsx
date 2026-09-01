@@ -21,26 +21,28 @@ export default function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadUsers() {
+  function loadUsers() {
     let cancelled = false;
-    try {
-      const roleFilter = activeTab === 'All' ? undefined : activeTab.toLowerCase();
-      const result = await withTimeout(
-        getAllUsers(0, 100, roleFilter),
-        10000,
-        { data: [], error: null },
-        'AdminUsers'
-      );
-      if (result.error) throw result.error;
-      if (result.data && !cancelled) {
-        setUsers(result.data);
-      }
-    } catch (err) {
-      console.error('Error loading users:', err);
-      toast.error('Failed to load users');
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
+    const roleFilter = activeTab === 'All' ? undefined : activeTab.toLowerCase();
+    withTimeout(
+      getAllUsers(0, 100, roleFilter),
+      10000,
+      { data: [], error: null },
+      'AdminUsers'
+    )
+      .then((result) => {
+        if (result.error) throw result.error;
+        if (result.data && !cancelled) {
+          setUsers(result.data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error loading users:', err);
+        toast.error('Failed to load users');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }
 

@@ -38,24 +38,26 @@ export default function SiteBanners() {
   const [deleteTarget, setDeleteTarget] = useState<SiteBanner | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
 
-  const loadBanners = useCallback(async () => {
+  const loadBanners = useCallback(() => {
     let cancelled = false;
     setLoading(true);
-    try {
-      const result = await withTimeout(
-        getAllSiteBanners(),
-        10000,
-        [],
-        'AdminSiteBanners'
-      );
-      if (!cancelled) setBanners(result);
-    } catch (err) {
-      console.error(err);
-      setMessage({ type: 'err', text: 'Failed to load banners.' });
-      toast.error('Failed to load banners');
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
+    withTimeout(
+      getAllSiteBanners(),
+      10000,
+      [],
+      'AdminSiteBanners'
+    )
+      .then((result) => {
+        if (!cancelled) setBanners(result);
+      })
+      .catch((err) => {
+        console.error(err);
+        setMessage({ type: 'err', text: 'Failed to load banners.' });
+        toast.error('Failed to load banners');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }, []);
 

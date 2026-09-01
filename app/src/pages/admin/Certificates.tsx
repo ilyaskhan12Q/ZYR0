@@ -15,33 +15,35 @@ export default function AdminCertificates() {
   const [certificates, setCertificates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadCertificates() {
+  function loadCertificates() {
     let cancelled = false;
-    try {
-      let query = supabase
-        .from('certificates')
-        .select(`
-          *,
-          recipient:profiles!recipient_id (id, full_name, avatar_url),
-          company:companies!company_id (id, name, logo_url)
-        `)
-        .order('issue_date', { ascending: false });
+    let query = supabase
+      .from('certificates')
+      .select(`
+        *,
+        recipient:profiles!recipient_id (id, full_name, avatar_url),
+        company:companies!company_id (id, name, logo_url)
+      `)
+      .order('issue_date', { ascending: false });
 
-      if (activeTab !== 'All') {
-        query = query.eq('status', activeTab);
-      }
-
-      const result = await withTimeout(query, 10000, { data: [], error: null }, 'AdminCertificates');
-      if (result.error) throw result.error;
-      if (result.data && !cancelled) {
-        setCertificates(result.data);
-      }
-    } catch (err) {
-      console.error('Error loading certificates:', err);
-      toast.error('Failed to load certificates');
-    } finally {
-      if (!cancelled) setLoading(false);
+    if (activeTab !== 'All') {
+      query = query.eq('status', activeTab);
     }
+
+    withTimeout(Promise.resolve(query), 10000, { data: [], error: null }, 'AdminCertificates')
+      .then((result) => {
+        if (result.error) throw result.error;
+        if (result.data && !cancelled) {
+          setCertificates(result.data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error loading certificates:', err);
+        toast.error('Failed to load certificates');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => { cancelled = true; };
   }
 
