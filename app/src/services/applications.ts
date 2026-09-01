@@ -153,10 +153,10 @@ export async function applyToInternship(data: {
     clearCache(`my_applications_${user.id}`);
     clearCache(`has_applied_${user.id}_${data.internship_id}`);
     clearCache(`applications_for_internship_${data.internship_id}`);
-    supabase.rpc('increment_applicant_count', { internship_id: data.internship_id }).then(() => {});
+    supabase.rpc('increment_applicant_count', { internship_id: data.internship_id }).then(() => {}).catch(console.error);
     supabase.from('internships').select('company_id').eq('id', data.internship_id).single().then(
       ({ data: int }) => { if (int?.company_id) clearCache(`all_company_applications_${int.company_id}`); }
-    );
+    ).catch(console.error);
   }
   return res;
 }

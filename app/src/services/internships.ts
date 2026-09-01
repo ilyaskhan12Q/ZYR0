@@ -67,7 +67,7 @@ export async function getInternshipById(id: string, useCache = true) {
   }
 
   const fetchFn = () => {
-    supabase.rpc('increment_internship_view', { internship_id: id }).then(() => {});
+    supabase.rpc('increment_internship_view', { internship_id: id }).then(() => {}).catch(console.error);
     return supabase
       .from('internships')
       .select(`
