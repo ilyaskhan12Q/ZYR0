@@ -36,7 +36,7 @@ const company = [
 export default function Header() {
   const { user, profile, signOut } = useAuth();
   const companyAccess = useOptionalCompanyAccess();
-  const effectiveRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
+  const effectiveRole = profile?.role || null;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -305,32 +305,38 @@ export default function Header() {
                       <p className="text-xs text-neutral-400">{user.email}</p>
                     </div>
                     <div className="py-1">
-                      <button
-                        onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <LayoutDashboard className="w-4 h-4" /> Dashboard
-                      </button>
-                      {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                        <button
-                          onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-sm font-medium text-accent-400 hover:bg-white/5 transition-colors"
-                        >
-                          <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
-                        </button>
+                      {effectiveRole ? (
+                        <>
+                          <button
+                            onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }}
+                            className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <LayoutDashboard className="w-4 h-4" /> Dashboard
+                          </button>
+                          {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                            <button
+                              onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
+                              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm font-medium text-accent-400 hover:bg-white/5 transition-colors"
+                            >
+                              <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }}
+                            className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <User className="w-4 h-4" /> Profile
+                          </button>
+                          <button
+                            onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }}
+                            className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <Settings className="w-4 h-4" /> Settings
+                          </button>
+                        </>
+                      ) : (
+                        <div className="px-4 py-2 text-sm text-neutral-400">Loading...</div>
                       )}
-                      <button
-                        onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <User className="w-4 h-4" /> Profile
-                      </button>
-                      <button
-                        onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <Settings className="w-4 h-4" /> Settings
-                      </button>
                     </div>
                     <div className="border-t border-white/10 pt-1">
                       <button
@@ -431,13 +437,17 @@ export default function Header() {
                         <div className="text-xs text-neutral-400 truncate">{user.email}</div>
                       </div>
                     </div>
-                    <Link
-                      to={`/${effectiveRole}/dashboard`}
-                      onClick={() => setMobileOpen(false)}
-                      className="w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl flex items-center justify-center gap-2"
-                    >
-                      <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                    </Link>
+                    {effectiveRole ? (
+                      <Link
+                        to={`/${effectiveRole}/dashboard`}
+                        onClick={() => setMobileOpen(false)}
+                        className="w-full py-2.5 text-center text-sm font-semibold text-black bg-white rounded-xl flex items-center justify-center gap-2"
+                      >
+                        <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
+                      </Link>
+                    ) : (
+                      <div className="w-full py-2.5 text-center text-sm text-neutral-400">Loading...</div>
+                    )}
                   </div>
                 )}
 
@@ -549,7 +559,7 @@ export default function Header() {
                 <div className="pt-4 flex flex-col gap-2">
                   {user ? (
                     <div className="flex flex-col gap-0.5">
-                      {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                      {companyAccess?.hasAccess && effectiveRole && effectiveRole !== 'company' && (
                         <Link
                           to="/company/dashboard"
                           onClick={() => setMobileOpen(false)}
@@ -558,20 +568,24 @@ export default function Header() {
                           <Building2 className="w-4 h-4 text-neutral-400" /> Switch to {companyAccess.company?.name || 'Company'}
                         </Link>
                       )}
-                      <Link
-                        to={`/${effectiveRole}/profile`}
-                        onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <User className="w-4 h-4 text-neutral-400" /> Profile
-                      </Link>
-                      <Link
-                        to={`/${effectiveRole}/settings`}
-                        onClick={() => setMobileOpen(false)}
-                        className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                      >
-                        <Settings className="w-4 h-4 text-neutral-400" /> Settings
-                      </Link>
+                      {effectiveRole && (
+                        <>
+                          <Link
+                            to={`/${effectiveRole}/profile`}
+                            onClick={() => setMobileOpen(false)}
+                            className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <User className="w-4 h-4 text-neutral-400" /> Profile
+                          </Link>
+                          <Link
+                            to={`/${effectiveRole}/settings`}
+                            onClick={() => setMobileOpen(false)}
+                            className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <Settings className="w-4 h-4 text-neutral-400" /> Settings
+                          </Link>
+                        </>
+                      )}
                       <button
                         onClick={async () => { await signOut(); setMobileOpen(false); navigate('/'); }}
                         className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors"
