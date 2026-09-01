@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { getMyApplications } from '@/services/applications';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 const tabs = ['All', 'Applied', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'];
 
@@ -22,12 +24,21 @@ export default function StudentApplications() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
-      const { data } = await getMyApplications();
-      if (data) setApplications(data);
-      setLoading(false);
+      try {
+        const result = await withTimeout(getMyApplications(), 10000, { data: [] }, 'StudentApplications');
+        const data = result?.data;
+        if (data && !cancelled) setApplications(data);
+      } catch (error) {
+        console.error('Failed to load applications:', error);
+        toast.error('Failed to load applications');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
+    return () => { cancelled = true; };
   }, []);
 
   const filtered = activeTab === 'All' ? applications : applications.filter(a => a.status === activeTab);

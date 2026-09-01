@@ -5,6 +5,7 @@ import PublicLayout from '@/layouts/PublicLayout';
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/ProtectedRoute';
 import { CompanyAccessRoute } from '@/components/CompanyAccessRoute';
 import { CompanyAccessProvider } from '@/contexts/CompanyAccessContext';
+import { ErrorBoundary } from '@/ErrorBoundary';
 import { Toaster } from '@/components/ui/sonner';
 import { RouteLoading } from '@/components/RouteLoading';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -210,8 +211,9 @@ export default function App() {
     <LazyMotion features={domAnimation}>
       <CompanyAccessProvider>
         <ScrollToTop />
-        <Suspense fallback={<RouteLoading />}>
-          <Routes>
+        <ErrorBoundary>
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
             {/* Platform Master Homepage (Bento Grid SaaS Ecosystem) */}
             <Route path="/" element={<PlatformHome />} />
 
@@ -298,6 +300,7 @@ export default function App() {
           </Routes>
           <Toaster />
         </Suspense>
+        </ErrorBoundary>
       </CompanyAccessProvider>
     </LazyMotion>
   );

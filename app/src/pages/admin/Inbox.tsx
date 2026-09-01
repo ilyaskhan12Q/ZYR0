@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import {
   Inbox, Loader2, Mail, RefreshCw, Search, Eye, Check, Reply,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { withTimeout } from '@/lib/timeout';
 import type { ContactMessage, ContactMessageStatus } from '@/lib/database.types';
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
@@ -40,22 +42,26 @@ export default function AdminInbox() {
   const [updating, setUpdating] = useState(false);
 
   const loadMessages = useCallback(async () => {
+    let cancelled = false;
     try {
       setLoading(true);
       let query = supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
       if (activeTab !== 'All') query = query.eq('status', activeTab);
-      const { data, error } = await query;
-      if (error) throw error;
-      setMessages((data as ContactMessage[]) || []);
+      const result = await withTimeout(query, 10000, { data: [], error: null }, 'AdminInbox');
+      if (result.error) throw result.error;
+      if (!cancelled) setMessages((result.data as ContactMessage[]) || []);
     } catch (err) {
       console.error('Error loading contact messages:', err);
+      toast.error('Failed to load inbox messages');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }, [activeTab]);
 
   useEffect(() => {
-    loadMessages();
+    const cleanup = loadMessages();
+    return cleanup;
   }, [loadMessages]);
 
   const filtered = useMemo(() => {

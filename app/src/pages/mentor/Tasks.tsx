@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, FileText, ExternalLink, Github } from 'lucide-react';
@@ -6,6 +6,8 @@ import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCompanyTasks, reviewSubmission, updateTask } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 const tabs = ['To Review', 'Reviewed'];
 
@@ -24,25 +26,29 @@ export default function MentorTasks() {
   const [rubricsCodeQuality, setRubricsCodeQuality] = useState<Record<string, number>>({});
   const [rubricsDesign, setRubricsDesign] = useState<Record<string, number>>({});
   const [rubricsFunctionality, setRubricsFunctionality] = useState<Record<string, number>>({});
+  const cancelledRef = useRef(false);
 
   async function loadTasks() {
     try {
       if (!profile?.company_id) return;
-      const res = await getCompanyTasks(profile.company_id);
-      if (res.data) {
+      const res = await withTimeout(getCompanyTasks(profile.company_id), 10000, { data: [] }, 'MentorTasks');
+      if (res.data && !cancelledRef.current) {
         setTasks(res.data);
       }
     } catch (err) {
       console.error('Error loading mentor tasks:', err);
+      toast.error('Failed to load tasks');
     } finally {
-      setLoading(false);
+      if (!cancelledRef.current) setLoading(false);
     }
   }
 
   useEffect(() => {
+    cancelledRef.current = false;
     if (profile) {
       loadTasks();
     }
+    return () => { cancelledRef.current = true; };
   }, [profile]);
 
   const handleReview = async (taskId: string, submissionId: string, status: 'Approved' | 'Rejected') => {

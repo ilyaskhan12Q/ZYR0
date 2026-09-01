@@ -218,7 +218,10 @@ export async function acceptOfferLetter(id: string) {
     clearCache(createRequestKey('offer_letter', id));
     clearCache(createRequestKey('my_active_internships', res.data.student_id));
 
-    await supabase.from('profiles').update({ company_id: res.data.company_id }).eq('id', res.data.student_id);
+    const profileRes = await supabase.from('profiles').update({ company_id: res.data.company_id }).eq('id', res.data.student_id);
+    if (profileRes.error) {
+      console.error('Failed to update profile company_id after offer acceptance:', profileRes.error);
+    }
   }
 
   return res;

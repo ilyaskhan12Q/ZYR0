@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Plus, Mail, Shield, X, Trash2, Loader2, Send, RefreshCw, CheckCircle2, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompanyMembership, getCompanyTeam, addTeamMember, updateTeamMember, removeTeamMember, resendTeamInvite, COMPANY_TEAM_ROLES, teamRoleLabel } from '@/services/companyTeam';
+import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
 import type { CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
 
@@ -20,16 +21,26 @@ export default function CompanyTeam() {
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
-      const { data: membership } = await getMyCompanyMembership();
-      if (membership?.company) {
-        setCompanyId(membership.company.id);
-        const { data } = await getCompanyTeam(membership.company.id);
-        if (data) setMembers(data);
+      try {
+        const memberResult = await withTimeout(getMyCompanyMembership(), 10000, { data: null }, 'CompanyTeam');
+        const membership = memberResult?.data;
+        if (membership?.company) {
+          setCompanyId(membership.company.id);
+          const teamResult = await withTimeout(getCompanyTeam(membership.company.id), 10000, { data: [] }, 'CompanyTeamList');
+          const data = teamResult?.data;
+          if (data && !cancelled) setMembers(data);
+        }
+      } catch (err) {
+        console.error('Failed to load team:', err);
+        toast.error('Failed to load team data');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     if (user) load();
+    return () => { cancelled = true; };
   }, [user]);
 
   async function handleAdd() {

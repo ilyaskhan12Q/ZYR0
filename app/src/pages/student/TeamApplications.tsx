@@ -5,6 +5,8 @@ import { FileCheck, Clock, Star, Phone, XCircle, Rocket, ArrowRight, AlertCircle
 import { Loader } from '@/components/common/Loader';
 import { getMyTeamApplications } from '@/services/teamApplications';
 import { TEAM_ROLES } from '@/components/team/team-data';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 const tabs = ['All', 'New', 'Under Review', 'Shortlisted', 'Contacted', 'Rejected'];
 
@@ -27,12 +29,21 @@ export default function StudentTeamApplications() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
-      const { data } = await getMyTeamApplications();
-      if (data) setApplications(data);
-      setLoading(false);
+      try {
+        const result = await withTimeout(getMyTeamApplications(), 10000, { data: [] }, 'StudentTeamApplications');
+        const data = result?.data;
+        if (data && !cancelled) setApplications(data);
+      } catch (error) {
+        console.error('Failed to load team applications:', error);
+        toast.error('Failed to load team applications');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
+    return () => { cancelled = true; };
   }, []);
 
   const filtered = activeTab === 'All' ? applications : applications.filter(a => a.status === activeTab);

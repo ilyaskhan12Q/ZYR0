@@ -6,6 +6,7 @@ import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { getInternshipById } from '@/services/internships';
 import { applyToInternship, hasApplied } from '@/services/applications';
 import { useAuth } from '@/contexts/AuthContext';
+import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
@@ -35,24 +36,32 @@ export default function InternshipDetail() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
       if (!id) return;
-      
-      const { data, error: loadErr } = await getInternshipById(id);
-      if (loadErr) {
-        setError("Failed to load internship");
-      } else {
-        setInternship(data);
-      }
 
-      if (user) {
-        const applied = await hasApplied(id);
-        setApplicationStatus(applied);
-      }
+      try {
+        const result = await withTimeout(getInternshipById(id), 10000, { data: null, error: null }, 'InternshipDetail');
+        const { data, error: loadErr } = result || {};
+        if (loadErr) {
+          if (!cancelled) setError("Failed to load internship");
+        } else {
+          if (!cancelled) setInternship(data);
+        }
 
-      setLoading(false);
+        if (user) {
+          const applied = await withTimeout(hasApplied(id), 10000, null, 'InternshipDetailApplied');
+          if (!cancelled) setApplicationStatus(applied);
+        }
+      } catch (err) {
+        console.error('Failed to load internship:', err);
+        toast.error('Failed to load internship details');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
+    return () => { cancelled = true; };
   }, [id, user]);
 
   const handleApply = async () => {

@@ -15,8 +15,10 @@ import {
   ShieldCheck,
   ShieldAlert
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { getAllCompanies, updateCompanyStatus } from '@/services/companies';
+import { withTimeout } from '@/lib/timeout';
 import type { Company } from '@/lib/database.types';
 
 const tabs = ['All', 'Pending', 'Approved', 'Rejected', 'Suspended'];
@@ -35,18 +37,27 @@ export default function AdminCompanies() {
   const [submitError, setSubmitError] = useState('');
 
   async function loadCompanies() {
+    let cancelled = false;
     try {
       setLoading(true);
       const statusFilter = activeTab === 'All' ? undefined : activeTab.toLowerCase();
-      const res = await getAllCompanies({ status: statusFilter });
-      if (res.data) {
-        setCompanies(res.data as Company[]);
+      const result = await withTimeout(
+        getAllCompanies({ status: statusFilter }),
+        10000,
+        { data: [], error: null },
+        'AdminCompanies'
+      );
+      if (result.error) throw result.error;
+      if (result.data && !cancelled) {
+        setCompanies(result.data as Company[]);
       }
     } catch (err) {
       console.error('Error loading companies:', err);
+      toast.error('Failed to load companies');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
   // Avoid calling setState synchronously in useEffect to satisfy eslint
@@ -54,7 +65,8 @@ export default function AdminCompanies() {
     let active = true;
     const timer = setTimeout(() => {
       if (active) {
-        loadCompanies();
+        const cleanup = loadCompanies();
+        return () => { cleanup(); };
       }
     }, 0);
     return () => {

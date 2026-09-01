@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Eye, Download, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
 import { revokeCertificate } from '@/services/certificates';
 
 const tabs = ['All', 'Active', 'Revoked'];
@@ -14,6 +16,7 @@ export default function AdminCertificates() {
   const [loading, setLoading] = useState(true);
 
   async function loadCertificates() {
+    let cancelled = false;
     try {
       let query = supabase
         .from('certificates')
@@ -28,20 +31,23 @@ export default function AdminCertificates() {
         query = query.eq('status', activeTab);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      if (data) {
-        setCertificates(data);
+      const result = await withTimeout(query, 10000, { data: [], error: null }, 'AdminCertificates');
+      if (result.error) throw result.error;
+      if (result.data && !cancelled) {
+        setCertificates(result.data);
       }
     } catch (err) {
       console.error('Error loading certificates:', err);
+      toast.error('Failed to load certificates');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
   useEffect(() => {
-    loadCertificates();
+    const cleanup = loadCertificates();
+    return cleanup;
   }, [activeTab]);
 
   const handleRevoke = async (certId: string) => {

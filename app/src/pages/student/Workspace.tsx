@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
+import { withTimeout } from '@/lib/timeout';
 
 type WorkspaceTab = 'overview' | 'tasks' | 'submissions' | 'certificate';
 
@@ -72,7 +73,13 @@ export default function StudentWorkspace() {
       }
 
       // 1. Fetch all active accepted offer placements
-      const { data: activePlacements, error: placementsErr } = await getMyActiveInternships();
+      const placementsResult = await withTimeout(
+        getMyActiveInternships(),
+        10000,
+        { data: [], error: null },
+        'StudentWorkspace_LoadPlacements'
+      );
+      const { data: activePlacements, error: placementsErr } = placementsResult as any;
       if (placementsErr) throw placementsErr;
 
       const placementList = activePlacements || [];
@@ -104,7 +111,13 @@ export default function StudentWorkspace() {
       setActivePlacement(selected);
 
       // 3. Fetch tasks and filter in memory by this placement's internship_id
-      const { data: allTasks, error: tasksErr } = await getMyTasks(!forceRefresh);
+      const tasksResult = await withTimeout(
+        getMyTasks(!forceRefresh),
+        10000,
+        { data: [], error: null },
+        'StudentWorkspace_LoadTasks'
+      );
+      const { data: allTasks, error: tasksErr } = tasksResult as any;
       if (tasksErr) throw tasksErr;
 
       const filteredTasks = (allTasks || []).filter(
@@ -113,7 +126,13 @@ export default function StudentWorkspace() {
       setTasks(filteredTasks);
 
       // 4. Fetch certificates to check if this placement's certificate is issued
-      const { data: certs } = await getMyCertificates();
+      const certsResult = await withTimeout(
+        getMyCertificates(),
+        10000,
+        { data: [] },
+        'StudentWorkspace_LoadCertificates'
+      );
+      const { data: certs } = certsResult as any;
       setCertificates(certs || []);
 
       // 5. Fetch workspace events
@@ -122,11 +141,17 @@ export default function StudentWorkspace() {
         if (forceRefresh) {
           clearWorkspaceEventsCache(internshipIdVal, user.id);
         }
-        const { data: eventsList, error: eventsErr } = await getWorkspaceEvents(
-          internshipIdVal,
-          user.id,
-          !forceRefresh
+        const eventsResult = await withTimeout(
+          getWorkspaceEvents(
+            internshipIdVal,
+            user.id,
+            !forceRefresh
+          ),
+          10000,
+          { data: [], error: null },
+          'StudentWorkspace_LoadEvents'
         );
+        const { data: eventsList, error: eventsErr } = eventsResult as any;
         if (eventsErr) throw eventsErr;
         setEvents(eventsList || []);
       }

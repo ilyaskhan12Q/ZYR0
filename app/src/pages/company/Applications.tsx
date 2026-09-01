@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Eye, Inbox, Loader2, MessageSquare, Search, Star, XCircle } from 'lucide-react';
 import { getMyCompany } from '@/services/companies';
@@ -6,6 +6,8 @@ import { getAllCompanyApplications, updateApplicationStatus, APPLICATION_STATUSE
 import { applicationStatusClass } from '@/components/applications/status';
 import ApplicationDetailDialog from '@/components/applications/ApplicationDetailDialog';
 import { cn } from '@/lib/utils';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 import type { ApplicationStatus } from '@/lib/database.types';
 
 const tabs = ['All', ...APPLICATION_STATUSES];
@@ -22,27 +24,30 @@ export default function CompanyApplications() {
   const [detail, setDetail] = useState<any | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
-  const loadApplications = useCallback(async () => {
-    try {
-      setLoading(true);
-      const { data: co } = await getMyCompany();
-      if (co) {
-        const { data, error } = await getAllCompanyApplications(co.id);
-        if (error) throw error;
-        setApplications(data ?? []);
-      } else {
-        setApplications([]);
-      }
-    } catch (err) {
-      console.error('Error loading company applications:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    let cancelled = false;
+    async function loadApplications() {
+      try {
+        setLoading(true);
+        const coResult = await withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyApplications');
+        const co = coResult?.data;
+        if (co) {
+          const { data, error } = await withTimeout(getAllCompanyApplications(co.id), 10000, { data: [], error: null }, 'CompanyApplicationsList');
+          if (error) throw error;
+          if (!cancelled) setApplications(data ?? []);
+        } else {
+          if (!cancelled) setApplications([]);
+        }
+      } catch (err) {
+        console.error('Error loading company applications:', err);
+        toast.error('Failed to load applications');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
     loadApplications();
-  }, [loadApplications]);
+    return () => { cancelled = true; };
+  }, []);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

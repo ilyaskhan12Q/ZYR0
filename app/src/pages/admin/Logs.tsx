@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
+import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
 
 export default function AdminLogs() {
   const [search, setSearch] = useState('');
@@ -10,29 +12,38 @@ export default function AdminLogs() {
   const [loading, setLoading] = useState(true);
 
   async function loadLogs() {
+    let cancelled = false;
     try {
-      const { data, error } = await supabase
-        .from('activity_logs')
-        .select(`
-          id, action, target, target_type, details, ip_address, created_at,
-          user:profiles!user_id (full_name, avatar_url)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(100);
+      const result = await withTimeout(
+        supabase
+          .from('activity_logs')
+          .select(`
+            id, action, target, target_type, details, ip_address, created_at,
+            user:profiles!user_id (full_name, avatar_url)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(100),
+        10000,
+        { data: [], error: null },
+        'AdminLogs'
+      );
 
-      if (error) throw error;
-      if (data) {
-        setLogs(data);
+      if (result.error) throw result.error;
+      if (result.data && !cancelled) {
+        setLogs(result.data);
       }
     } catch (err) {
       console.error('Error loading activity logs:', err);
+      toast.error('Failed to load activity logs');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
   useEffect(() => {
-    loadLogs();
+    const cleanup = loadLogs();
+    return cleanup;
   }, []);
 
   const filtered = logs.filter(

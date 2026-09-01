@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, Megaphone, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -12,6 +13,7 @@ import { cn } from '@/lib/utils';
 import {
   createSiteBanner, deleteSiteBanner, getAllSiteBanners, toggleSiteBanner, updateSiteBanner,
 } from '@/services/siteBanners';
+import { withTimeout } from '@/lib/timeout';
 import type { SiteBanner } from '@/lib/database.types';
 
 const emptyForm = {
@@ -37,19 +39,29 @@ export default function SiteBanners() {
   const [form, setForm] = useState({ ...emptyForm });
 
   const loadBanners = useCallback(async () => {
+    let cancelled = false;
     setLoading(true);
     try {
-      setBanners(await getAllSiteBanners());
+      const result = await withTimeout(
+        getAllSiteBanners(),
+        10000,
+        [],
+        'AdminSiteBanners'
+      );
+      if (!cancelled) setBanners(result);
     } catch (err) {
       console.error(err);
       setMessage({ type: 'err', text: 'Failed to load banners.' });
+      toast.error('Failed to load banners');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    loadBanners();
+    const cleanup = loadBanners();
+    return cleanup;
   }, [loadBanners]);
 
   const openCreate = () => {

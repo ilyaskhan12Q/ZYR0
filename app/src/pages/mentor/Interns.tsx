@@ -5,6 +5,7 @@ import { ClipboardList, CheckSquare, Star, MessageSquare, Users } from 'lucide-r
 import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
 
 export default function MentorInterns() {
@@ -24,25 +25,30 @@ export default function MentorInterns() {
 
       try {
         // 1. Fetch accepted applications for the company internships
-        const { data: apps, error: appsErr } = await supabase
-          .from('applications')
-          .select(`
-            id,
-            status,
-            internship:internships!internship_id (
+        const { data: apps, error: appsErr } = await withTimeout(
+          supabase
+            .from('applications')
+            .select(`
               id,
-              title,
-              company_id,
-              company:companies!company_id (name)
-            ),
-            student:profiles!student_id (
-              id,
-              full_name,
-              avatar_url,
-              university
-            )
-          `)
-          .eq('status', 'Accepted');
+              status,
+              internship:internships!internship_id (
+                id,
+                title,
+                company_id,
+                company:companies!company_id (name)
+              ),
+              student:profiles!student_id (
+                id,
+                full_name,
+                avatar_url,
+                university
+              )
+            `)
+            .eq('status', 'Accepted'),
+          10000,
+          { data: [] },
+          'MentorInterns'
+        );
 
         if (appsErr) throw appsErr;
         if (cancelled) return;
@@ -64,15 +70,25 @@ export default function MentorInterns() {
               const studentId = app.student?.id;
               if (!studentId) return null;
 
-              const { data: tasks } = await supabase
-                .from('tasks')
-                .select('id, status')
-                .eq('assigned_to', studentId);
+              const { data: tasks } = await withTimeout(
+                supabase
+                  .from('tasks')
+                  .select('id, status')
+                  .eq('assigned_to', studentId),
+                10000,
+                { data: [] },
+                'MentorInterns'
+              );
 
-              const { data: evals } = await supabase
-                .from('evaluations')
-                .select('overall_rating')
-                .eq('intern_id', studentId);
+              const { data: evals } = await withTimeout(
+                supabase
+                  .from('evaluations')
+                  .select('overall_rating')
+                  .eq('intern_id', studentId),
+                10000,
+                { data: [] },
+                'MentorInterns'
+              );
 
               const totalTasks = tasks?.length || 0;
               const completedTasks = tasks?.filter((t: any) => t.status === 'Approved').length || 0;
@@ -109,7 +125,9 @@ export default function MentorInterns() {
           }
         }
 
-        setInterns(internsList);
+        if (!cancelled) {
+          setInterns(internsList);
+        }
       } catch (err: any) {
         console.error('Error fetching interns data:', err);
         toast.error('Failed to load interns list');

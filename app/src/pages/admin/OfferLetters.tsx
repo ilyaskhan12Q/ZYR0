@@ -4,8 +4,10 @@ import {
   Search, Eye, Download, XCircle, Loader2, Clock,
   CheckCircle2, Send, RotateCcw, AlertTriangle, FileText, ExternalLink
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { revokeOfferLetter } from '@/services/offerLetters';
+import { withTimeout } from '@/lib/timeout';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 
 // ── Status config ─────────────────────────────────────────────────────────────
@@ -43,6 +45,7 @@ export default function AdminOfferLetters() {
 
   // ── Load ────────────────────────────────────────────────────────────────────
   async function load() {
+    let cancelled = false;
     setLoading(true);
     try {
       let query = supabase
@@ -54,17 +57,22 @@ export default function AdminOfferLetters() {
         query = query.eq('status', activeTab);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      if (data) setOffers(data as OfferLetter[]);
+      const result = await withTimeout(query, 10000, { data: [], error: null }, 'AdminOfferLetters');
+      if (result.error) throw result.error;
+      if (result.data && !cancelled) setOffers(result.data as OfferLetter[]);
     } catch (err) {
       console.error('Error loading offer letters:', err);
+      toast.error('Failed to load offer letters');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
-  useEffect(() => { load(); }, [activeTab]);
+  useEffect(() => {
+    const cleanup = load();
+    return cleanup;
+  }, [activeTab]);
 
   // ── Filter ───────────────────────────────────────────────────────────────────
   const filtered = offers.filter((o) => {

@@ -8,22 +8,29 @@ import {
 import { Loader } from '@/components/common/Loader';
 import { getSavedInternships } from '@/services/internships';
 import { SaveButton } from '@/components/SaveButton';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 export default function StudentSavedInternships() {
   const [saves, setSaves] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      setLoading(true);
-      const { data } = await getSavedInternships(false); // always fresh
-      if (mounted) {
-        setSaves(data || []);
-        setLoading(false);
+    let cancelled = false;
+    async function load() {
+      try {
+        setLoading(true);
+        const result = await withTimeout(getSavedInternships(false), 10000, { data: [] }, 'StudentSavedInternships');
+        if (!cancelled) setSaves(result?.data || []);
+      } catch (error) {
+        console.error('Failed to load saved internships:', error);
+        toast.error('Failed to load saved internships');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    })();
-    return () => { mounted = false; };
+    }
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   // Remove an item from local list when unsaved

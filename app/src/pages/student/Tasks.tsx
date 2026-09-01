@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { getMyTasks } from '@/services/tasks';
 import { useAuth } from '@/contexts/AuthContext';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 const tabs = ['All', 'Pending', 'Submitted', 'Approved'];
 
@@ -33,17 +35,21 @@ export default function StudentTasks() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadTasks() {
       try {
-        const { data } = await getMyTasks();
-        if (data) setTasks(data);
-      } catch (err) {
-        console.error(err);
+        const result = await withTimeout(getMyTasks(), 10000, { data: [] }, 'StudentTasks');
+        const data = result?.data;
+        if (data && !cancelled) setTasks(data);
+      } catch (error) {
+        console.error('Failed to load tasks:', error);
+        toast.error('Failed to load tasks');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     if (user) loadTasks();
+    return () => { cancelled = true; };
   }, [user]);
 
   const filtered = activeTab === 'All' ? tasks : tasks.filter(t => t.status === activeTab);
