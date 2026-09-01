@@ -27,9 +27,9 @@ const mobileNavLinks = [
 ];
 
 export default function PublicLayout() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, profileLoaded, signOut } = useAuth();
   const companyAccess = useOptionalCompanyAccess();
-  const effectiveRole = profile?.role || (user?.user_metadata?.role as string) || 'student';
+  const effectiveRole = profile?.role || null;
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -166,20 +166,26 @@ export default function PublicLayout() {
                             <p className="text-xs text-muted-foreground">{user.email}</p>
                           </div>
                           <div className="py-1">
-                            <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
-                              <LayoutDashboard className="w-4 h-4" /> Dashboard
-                            </button>
-                            {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                              <button onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-b border-border my-1 py-2">
-                                <Building2 className="w-4 h-4 text-accent" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
-                              </button>
+                            {effectiveRole ? (
+                              <>
+                                <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/dashboard`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                                  <LayoutDashboard className="w-4 h-4" /> Dashboard
+                                </button>
+                                {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                                  <button onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-b border-border my-1 py-2">
+                                    <Building2 className="w-4 h-4 text-accent" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
+                                  </button>
+                                )}
+                                <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                                  <User className="w-4 h-4" /> Profile
+                                </button>
+                                <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
+                                  <Settings className="w-4 h-4" /> Settings
+                                </button>
+                              </>
+                            ) : (
+                              <div className="px-4 py-2 text-sm text-muted-foreground">Loading...</div>
                             )}
-                            <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
-                              <User className="w-4 h-4" /> Profile
-                            </button>
-                            <button onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/settings`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-muted transition-colors">
-                              <Settings className="w-4 h-4" /> Settings
-                            </button>
                           </div>
                           <div className="border-t border-border pt-1">
                             <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
@@ -290,44 +296,50 @@ export default function PublicLayout() {
                 <div className="pt-3 mt-3 border-t border-border flex flex-col gap-2">
                   {user ? (
                     <>
-                      <Link
-                        to={`/${effectiveRole}/dashboard`}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
-                      </Link>
-                      {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                        <Link
-                          to="/company/dashboard"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
-                        </Link>
+                      {effectiveRole ? (
+                        <>
+                          <Link
+                            to={`/${effectiveRole}/dashboard`}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <LayoutDashboard className="w-4 h-4" /> Go to Dashboard
+                          </Link>
+                          {companyAccess?.hasAccess && effectiveRole !== 'company' && (
+                            <Link
+                              to="/company/dashboard"
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="w-full text-center py-2.5 min-h-11 rounded-lg text-sm font-medium border border-accent text-accent hover:bg-accent/10 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
+                            </Link>
+                          )}
+                          <div className="pt-2 border-t border-border flex flex-col gap-1">
+                            <Link
+                              to={`/${effectiveRole}/profile`}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                            >
+                              <User className="w-4 h-4 text-muted-foreground" /> Profile
+                            </Link>
+                            <Link
+                              to={`/${effectiveRole}/settings`}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
+                            >
+                              <Settings className="w-4 h-4 text-muted-foreground" /> Settings
+                            </Link>
+                            <button
+                              onClick={async () => { await signOut(); navigate('/'); }}
+                              className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+                            >
+                              <LogOut className="w-4 h-4" /> Sign Out
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="px-4 py-2 text-sm text-muted-foreground">Loading...</div>
                       )}
-                      <div className="pt-2 border-t border-border flex flex-col gap-1">
-                        <Link
-                          to={`/${effectiveRole}/profile`}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                        >
-                          <User className="w-4 h-4 text-muted-foreground" /> Profile
-                        </Link>
-                        <Link
-                          to={`/${effectiveRole}/settings`}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                        >
-                          <Settings className="w-4 h-4 text-muted-foreground" /> Settings
-                        </Link>
-                        <button
-                          onClick={async () => { await signOut(); navigate('/'); }}
-                          className="flex items-center gap-3 px-4 py-2.5 min-h-11 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
-                        >
-                          <LogOut className="w-4 h-4" /> Sign Out
-                        </button>
-                      </div>
                     </>
                   ) : (
                     <>
