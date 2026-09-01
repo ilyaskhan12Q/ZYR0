@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Eye, Inbox, Loader2, MessageSquare, Search, Star, XCircle } from 'lucide-react';
 import { getMyCompany } from '@/services/companies';
@@ -8,6 +8,7 @@ import ApplicationDetailDialog from '@/components/applications/ApplicationDetail
 import { cn } from '@/lib/utils';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
+import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 import type { ApplicationStatus } from '@/lib/database.types';
 
 const tabs = ['All', ...APPLICATION_STATUSES];
@@ -52,6 +53,24 @@ export default function CompanyApplications() {
     loadApplications();
     return () => { cancelled = true; };
   }, []);
+
+  // Refresh data when browser tab regains focus
+  const refreshOnFocus = useCallback(() => {
+    async function refresh() {
+      try {
+        const coResult = await withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyApplications');
+        const co = coResult?.data;
+        if (co) {
+          const { data } = await withTimeout(getAllCompanyApplications(co.id), 10000, { data: [], error: null }, 'CompanyApplicationsList');
+          if (data) setApplications(data);
+        }
+      } catch (error) {
+        console.error('Failed to refresh company applications:', error);
+      }
+    }
+    refresh();
+  }, []);
+  useRefreshOnFocus(refreshOnFocus);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

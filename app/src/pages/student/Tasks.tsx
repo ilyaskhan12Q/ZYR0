@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -9,6 +9,7 @@ import { getMyTasks } from '@/services/tasks';
 import { useAuth } from '@/contexts/AuthContext';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
+import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 
 const tabs = ['All', 'Pending', 'Submitted', 'Approved'];
 
@@ -51,6 +52,21 @@ export default function StudentTasks() {
     if (user) loadTasks();
     return () => { cancelled = true; };
   }, [user]);
+
+  // Refresh data when browser tab regains focus
+  const refreshOnFocus = useCallback(() => {
+    async function refresh() {
+      try {
+        const result = await withTimeout(getMyTasks(), 10000, { data: [] }, 'StudentTasks');
+        const data = result?.data;
+        if (data) setTasks(data);
+      } catch (error) {
+        console.error('Failed to refresh tasks:', error);
+      }
+    }
+    if (user) refresh();
+  }, [user]);
+  useRefreshOnFocus(refreshOnFocus);
 
   const filtered = activeTab === 'All' ? tasks : tasks.filter(t => t.status === activeTab);
   const completedCount = tasks.filter(t => t.status === 'Approved').length;

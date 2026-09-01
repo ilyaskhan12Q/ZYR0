@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageSquare, AlertCircle, CheckCircle2, Circle, Rocket } from 'lucide-react';
@@ -10,6 +10,7 @@ import { getMyCertificates } from '@/services/certificates';
 import { getMyTeamApplications } from '@/services/teamApplications';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 
 const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, Award, Briefcase };
 
@@ -54,6 +55,32 @@ export default function StudentDashboard() {
     
     loadDashboard();
   }, []);
+
+  // Refresh data when browser tab regains focus
+  const refreshOnFocus = useCallback(() => {
+    async function refreshDashboard() {
+      try {
+        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.allSettled([
+          getMyApplications(),
+          getMyTasks(),
+          getUnreadCount(),
+          getMyConversations(),
+          getMyCertificates(),
+          getMyTeamApplications()
+        ]);
+        setApplications(apps.status === 'fulfilled' ? (apps.value?.data || []) : []);
+        setTasks(myTasks.status === 'fulfilled' ? (myTasks.value?.data || []) : []);
+        setUnreadMessages(unread.status === 'fulfilled' ? (unread.value || 0) : 0);
+        setConversations(convos.status === 'fulfilled' ? (convos.value?.data || []) : []);
+        setCertificates(certs.status === 'fulfilled' ? (certs.value?.data || []) : []);
+        setTeamApplications(teamApps.status === 'fulfilled' ? (teamApps.value?.data || []) : []);
+      } catch (error) {
+        console.error('Failed to refresh dashboard data:', error);
+      }
+    }
+    refreshDashboard();
+  }, []);
+  useRefreshOnFocus(refreshOnFocus);
 
   if (loading) {
     return (
