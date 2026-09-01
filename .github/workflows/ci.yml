@@ -42,7 +42,7 @@ jobs:
         run: npm ci
 
       - name: Run ESLint
-        run: echo "Skipping strict lint to allow deployment"
+        run: npm run lint
 
   # ── Job 2: TypeScript ──────────────────────────────────────────────────────
   typecheck:
