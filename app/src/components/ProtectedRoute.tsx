@@ -75,7 +75,7 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
  * Redirects already-logged-in users away from auth pages (login/register)
  */
 export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
-  const { session, user, profile, loading } = useAuth();
+  const { session, profile, loading, profileLoaded } = useAuth();
   const location = useLocation();
 
   if (loading) return null;
@@ -85,14 +85,23 @@ export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
     if (redirect) {
       return <Navigate to={redirect} replace />;
     }
-    const role: UserRole = profile?.role || (user?.user_metadata?.role as UserRole) || 'student';
+
+    // Wait for profile to load — never guess the role
+    if (!profileLoaded || !profile) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <Loader variant="page" label="Loading profile..." />
+        </div>
+      );
+    }
+
     const dashboardMap: Record<UserRole, string> = {
       student: '/student/dashboard',
       company: '/company/dashboard',
       mentor: '/mentor/dashboard',
       admin: '/admin/dashboard',
     };
-    return <Navigate to={dashboardMap[role] || '/student/dashboard'} replace />;
+    return <Navigate to={dashboardMap[profile.role]} replace />;
   }
 
   return <>{children}</>;
