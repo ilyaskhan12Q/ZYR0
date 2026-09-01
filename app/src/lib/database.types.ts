@@ -46,9 +46,26 @@ export interface Profile {
   github?: string | null;
   role_interest?: string | null;
   onboarding_tours: string[];
+  settings?: StudentSettings | null;
   created_at: string;
   updated_at: string;
   company?: Company | null;
+}
+
+export interface StudentSettings {
+  emailApps: boolean;
+  emailTasks: boolean;
+  emailMessages: boolean;
+  emailDeadlines: boolean;
+  emailProductUpdates: boolean;
+  smsApps: boolean;
+  smsTasks: boolean;
+  smsMessages: boolean;
+  smsDeadlines: boolean;
+  phoneNumber: string;
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  publicProfile: boolean;
 }
 
 export interface Company {
