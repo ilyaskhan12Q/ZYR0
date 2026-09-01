@@ -36,8 +36,7 @@ export default function AdminCompanies() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  async function loadCompanies() {
-    let cancelled = false;
+  async function fetchCompanies() {
     try {
       setLoading(true);
       const statusFilter = activeTab === 'All' ? undefined : activeTab.toLowerCase();
@@ -48,31 +47,42 @@ export default function AdminCompanies() {
         'AdminCompanies'
       );
       if (result.error) throw result.error;
-      if (result.data && !cancelled) {
+      if (result.data) {
         setCompanies(result.data as Company[]);
       }
     } catch (err) {
       console.error('Error loading companies:', err);
       toast.error('Failed to load companies');
     } finally {
-      if (!cancelled) setLoading(false);
+      setLoading(false);
     }
-    return () => { cancelled = true; };
   }
 
-  // Avoid calling setState synchronously in useEffect to satisfy eslint
   useEffect(() => {
-    let active = true;
-    const timer = setTimeout(() => {
-      if (active) {
-        const cleanup = loadCompanies();
-        return () => { cleanup(); };
+    let cancelled = false;
+    async function loadCompanies() {
+      try {
+        setLoading(true);
+        const statusFilter = activeTab === 'All' ? undefined : activeTab.toLowerCase();
+        const result = await withTimeout(
+          getAllCompanies({ status: statusFilter }),
+          10000,
+          { data: [], error: null },
+          'AdminCompanies'
+        );
+        if (result.error) throw result.error;
+        if (result.data && !cancelled) {
+          setCompanies(result.data as Company[]);
+        }
+      } catch (err) {
+        console.error('Error loading companies:', err);
+        if (!cancelled) toast.error('Failed to load companies');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    }, 0);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
+    }
+    loadCompanies();
+    return () => { cancelled = true; };
   }, [activeTab]);
 
   const handleOpenReview = (company: Company) => {
@@ -120,7 +130,7 @@ export default function AdminCompanies() {
       );
 
       handleCloseReview();
-      loadCompanies();
+      fetchCompanies();
     } catch (err) {
       console.error('Error submitting review:', err);
       const errMsg = err instanceof Error ? err.message : 'Failed to update company status. Please try again.';

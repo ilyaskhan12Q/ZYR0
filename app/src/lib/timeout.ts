@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const activeWarnings = new Set<string>();
 
 export function withTimeout<T>(
   promise: Promise<T>,
   ms: number,
-  fallback: T,
+  fallback: any,
   label?: string,
 ): Promise<T> {
   let timer: ReturnType<typeof setTimeout>;
@@ -14,7 +15,7 @@ export function withTimeout<T>(
         console.warn(`[withTimeout] ${label} exceeded ${ms}ms — using fallback`);
         setTimeout(() => activeWarnings.delete(label), 30_000);
       }
-      resolve(fallback);
+      resolve(fallback as T);
     }, ms);
   });
 
