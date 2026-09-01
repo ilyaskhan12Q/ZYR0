@@ -29,6 +29,14 @@ function initLenisIfPublic() {
   requestAnimationFrame(raf);
 }
 
+// Global error handlers for observability
+window.addEventListener('error', (event) => {
+  console.error('[Global Error]', event.error);
+});
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('[Unhandled Rejection]', event.reason);
+});
+
 initLenisIfPublic();
 
 createRoot(document.getElementById('root')!).render(
