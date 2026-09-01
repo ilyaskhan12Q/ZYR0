@@ -41,3 +41,15 @@ BEGIN
   RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- One-time data fix: promote all existing accepted company team members
+-- who still have role='student' (or other non-company roles) in profiles.
+UPDATE public.profiles p
+SET role = 'company'
+WHERE p.id IN (
+  SELECT ctm.user_id
+  FROM public.company_team_members ctm
+  WHERE ctm.status = 'accepted'
+    AND ctm.user_id IS NOT NULL
+)
+AND p.role != 'company';
