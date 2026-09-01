@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Eye, Inbox, Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,31 +23,29 @@ export default function AdminApplications() {
   const [detail, setDetail] = useState<any | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
 
-  const loadApplications = useCallback(async () => {
+  useEffect(() => {
     let cancelled = false;
-    try {
-      setLoading(true);
-      const result = await withTimeout(
-        getAllAdminApplications(activeTab as any),
-        10000,
-        { data: [], error: null },
-        'AdminApplications'
-      );
-      if (result.error) throw result.error;
-      if (!cancelled) setApplications(result.data);
-    } catch (err) {
-      console.error('Error loading admin applications:', err);
-      toast.error('Failed to load applications');
-    } finally {
-      if (!cancelled) setLoading(false);
+    async function loadApplications() {
+      try {
+        setLoading(true);
+        const result = await withTimeout(
+          getAllAdminApplications(activeTab as any),
+          10000,
+          { data: [], error: null },
+          'AdminApplications'
+        );
+        if (result.error) throw result.error;
+        if (!cancelled) setApplications(result.data);
+      } catch (err) {
+        console.error('Error loading admin applications:', err);
+        toast.error('Failed to load applications');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
+    loadApplications();
     return () => { cancelled = true; };
   }, [activeTab]);
-
-  useEffect(() => {
-    const cleanup = loadApplications();
-    return cleanup;
-  }, [loadApplications]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

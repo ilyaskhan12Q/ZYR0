@@ -14,32 +14,30 @@ export default function AdminInternships() {
   const [internships, setInternships] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  async function loadInternships() {
-    let cancelled = false;
-    try {
-      const statusFilter = activeTab === 'All' ? 'all' : activeTab;
-      const result = await withTimeout(
-        getInternships({ status: statusFilter, limit: 100 }),
-        10000,
-        { data: [], error: null },
-        'AdminInternships'
-      );
-      if (result.error) throw result.error;
-      if (result.data && !cancelled) {
-        setInternships(result.data);
-      }
-    } catch (err) {
-      console.error('Error loading internships:', err);
-      toast.error('Failed to load internships');
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
-    return () => { cancelled = true; };
-  }
-
   useEffect(() => {
-    const cleanup = loadInternships();
-    return cleanup;
+    let cancelled = false;
+    async function loadInternships() {
+      try {
+        const statusFilter = activeTab === 'All' ? 'all' : activeTab;
+        const result = await withTimeout(
+          getInternships({ status: statusFilter, limit: 100 }),
+          10000,
+          { data: [], error: null },
+          'AdminInternships'
+        );
+        if (result.error) throw result.error;
+        if (result.data && !cancelled) {
+          setInternships(result.data);
+        }
+      } catch (err) {
+        console.error('Error loading internships:', err);
+        toast.error('Failed to load internships');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    loadInternships();
+    return () => { cancelled = true; };
   }, [activeTab]);
 
   const toggleInternshipStatus = async (internshipId: string, currentStatus: string) => {

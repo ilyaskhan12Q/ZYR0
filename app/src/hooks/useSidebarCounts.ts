@@ -52,7 +52,7 @@ export function useSidebarCounts(companyIdOverride?: string | null): SidebarCoun
   }, [role, companyId]);
 
   // Debounced refetch for realtime events
-  const refreshTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const debouncedRefresh = useCallback(() => {
     clearTimeout(refreshTimerRef.current);
     refreshTimerRef.current = setTimeout(() => refresh(false), 500);
