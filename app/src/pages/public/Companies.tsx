@@ -5,6 +5,8 @@ import { Search, MapPin, Globe, Star, FolderOpen, Users, X } from 'lucide-react'
 import { Loader } from '@/components/common/Loader';
 import { getCompanies } from '@/services/companies';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 
 const industries = ['All', 'Technology', 'Design', 'Data Science', 'Cloud Computing', 'Sustainability', 'FinTech', 'Engineering'];
@@ -19,44 +21,56 @@ export default function Companies() {
   const [internshipCounts, setInternshipCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
+    let cancelled = false;
     async function loadCompanies() {
       setLoading(true);
       try {
-        const { data } = await getCompanies({
-          search: search.trim() || undefined,
-          industry: selectedIndustry !== 'All' ? selectedIndustry : undefined
-        });
+        const result = await withTimeout(
+          getCompanies({
+            search: search.trim() || undefined,
+            industry: selectedIndustry !== 'All' ? selectedIndustry : undefined
+          }),
+          10000,
+          { data: [] },
+          'Companies'
+        );
+        const data = result?.data;
 
         if (data) {
-          // If size is selected, filter locally
           let filtered = data;
           if (selectedSize !== 'All') {
             filtered = data.filter((c: any) => c.size === selectedSize);
           }
-          setCompanies(filtered);
+          if (!cancelled) setCompanies(filtered);
 
-          // Get internship counts for all these companies
           const companyIds = filtered.map((c: any) => c.id);
           if (companyIds.length > 0) {
-            const { data: countData } = await supabase
-              .from('internships')
-              .select('company_id')
-              .in('company_id', companyIds)
-              .eq('status', 'Active');
+            const countResult = await withTimeout(
+              supabase
+                .from('internships')
+                .select('company_id')
+                .in('company_id', companyIds)
+                .eq('status', 'Active'),
+              10000,
+              { data: [] },
+              'CompaniesCounts'
+            );
+            const countData = countResult?.data;
 
             if (countData) {
               const counts: Record<string, number> = {};
               countData.forEach((i: any) => {
                 counts[i.company_id] = (counts[i.company_id] || 0) + 1;
               });
-              setInternshipCounts(counts);
+              if (!cancelled) setInternshipCounts(counts);
             }
           }
         }
       } catch (err) {
         console.error(err);
+        toast.error('Failed to load companies');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -64,7 +78,10 @@ export default function Companies() {
       loadCompanies();
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [search, selectedIndustry, selectedSize]);
 
   return (

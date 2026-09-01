@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Shield, GraduationCap, Building2, UserCheck, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
+import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
 import { getAllUsers, updateUserStatus } from '@/services/users';
+import { withTimeout } from '@/lib/timeout';
 
 const tabs = ['All', 'Student', 'Company', 'Mentor', 'Admin'];
 
@@ -20,21 +22,31 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
 
   async function loadUsers() {
+    let cancelled = false;
     try {
       const roleFilter = activeTab === 'All' ? undefined : activeTab.toLowerCase();
-      const res = await getAllUsers(0, 100, roleFilter);
-      if (res.data) {
-        setUsers(res.data);
+      const result = await withTimeout(
+        getAllUsers(0, 100, roleFilter),
+        10000,
+        { data: [], error: null },
+        'AdminUsers'
+      );
+      if (result.error) throw result.error;
+      if (result.data && !cancelled) {
+        setUsers(result.data);
       }
     } catch (err) {
       console.error('Error loading users:', err);
+      toast.error('Failed to load users');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
   useEffect(() => {
-    loadUsers();
+    const cleanup = loadUsers();
+    return cleanup;
   }, [activeTab]);
 
   const toggleStatus = async (userId: string, currentStatus: string) => {

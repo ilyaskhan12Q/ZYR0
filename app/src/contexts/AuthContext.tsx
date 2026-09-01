@@ -8,6 +8,7 @@ import {
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { signOut as authSignOut } from '@/lib/auth';
+import { withTimeout } from '@/lib/timeout';
 import type { Profile } from '@/lib/database.types';
 import { checkProfileCompletion } from '@/services/users';
 
@@ -64,16 +65,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Get initial session — resolve loading as soon as session is known,
     // then fetch profile in background so the UI isn't blocked.
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setProfileLoaded(true));
-      } else {
+    withTimeout(
+      supabase.auth.getSession(),
+      5000,
+      { data: { session: null } },
+      'AuthContext.getSession',
+    )
+      .then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          fetchProfile(session.user.id).finally(() => setProfileLoaded(true));
+        } else {
+          setProfileLoaded(true);
+        }
+      })
+      .catch(() => {
         setProfileLoaded(true);
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
     // Listen for auth state changes (login, logout, token refresh, OAuth redirect)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(

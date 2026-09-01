@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { updateMyProfile, uploadAvatar } from '@/services/users';
 import { getCompanyById } from '@/services/companies';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
 
 export default function MentorProfile() {
@@ -27,29 +28,44 @@ export default function MentorProfile() {
 
   // Load profile data when available
   useEffect(() => {
+    let cancelled = false;
     if (profile && user) {
       const meta = user.user_metadata || {};
-      setForm({
-        name: profile.full_name || '',
-        email: user.email || '',
-        phone: meta.phone || '',
-        bio: profile.bio || '',
-        title: profile.title || '',
-        department: profile.department || '',
-      });
+      if (!cancelled) {
+        setForm({
+          name: profile.full_name || '',
+          email: user.email || '',
+          phone: meta.phone || '',
+          bio: profile.bio || '',
+          title: profile.title || '',
+          department: profile.department || '',
+        });
+      }
 
       // Fetch company if company_id is present
       if (profile.company_id) {
         setLoadingCompany(true);
-        getCompanyById(profile.company_id)
+        withTimeout(getCompanyById(profile.company_id), 10000, { data: null, error: null }, 'MentorProfile')
           .then(({ data, error }) => {
-            if (error) console.error('Error fetching company details:', error);
-            else setCompany(data);
+            if (!cancelled) {
+              if (error) {
+                console.error('Error fetching company details:', error);
+                toast.error('Failed to load company details');
+              } else {
+                setCompany(data);
+              }
+            }
           })
-          .catch((err) => console.error(err))
-          .finally(() => setLoadingCompany(false));
+          .catch((err) => {
+            console.error(err);
+            toast.error('Failed to load company details');
+          })
+          .finally(() => {
+            if (!cancelled) setLoadingCompany(false);
+          });
       }
     }
+    return () => { cancelled = true; };
   }, [profile, user]);
 
   const handleSave = async () => {

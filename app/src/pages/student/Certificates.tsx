@@ -5,6 +5,8 @@ import { Loader } from '@/components/common/Loader';
 import { getMyCertificates } from '@/services/certificates';
 import { useAuth } from '@/contexts/AuthContext';
 import CertificateDocument from '@/components/CertificateDocument';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 export default function StudentCertificates() {
   const { user } = useAuth();
@@ -13,19 +15,22 @@ export default function StudentCertificates() {
   const [selectedCert, setSelectedCert] = useState<any | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadCertificates() {
       try {
-        const { data } = await getMyCertificates();
-        setCerts(data || []);
-      } catch (err) {
-        console.error(err);
+        const result = await withTimeout(getMyCertificates(), 10000, { data: [] }, 'StudentCertificates');
+        if (!cancelled) setCerts(result?.data || []);
+      } catch (error) {
+        console.error('Failed to load certificates:', error);
+        toast.error('Failed to load certificates');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     if (user) {
       loadCertificates();
     }
+    return () => { cancelled = true; };
   }, [user]);
 
   if (loading) {

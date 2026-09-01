@@ -6,6 +6,8 @@ import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCompanyTasks } from '@/services/tasks';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 export default function MentorDashboard() {
   const { profile } = useAuth();
@@ -15,25 +17,31 @@ export default function MentorDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadDashboardData() {
       if (!profile) return;
       try {
         // Get tasks for this mentor's company
         const tasksRes = profile.company_id
-          ? await getCompanyTasks(profile.company_id)
+          ? await withTimeout(getCompanyTasks(profile.company_id), 10000, { data: [] }, 'MentorDashboard')
           : { data: [] };
         
         // Get interns (accepted applications for the company internships)
         let internsData: any[] = [];
         if (profile.company_id) {
-          const { data } = await supabase
-            .from('applications')
-            .select(`
-              id, status,
-              student:profiles!student_id (id, full_name, avatar_url, university),
-              internship:internships!internship_id (id, company_id)
-            `)
-            .eq('status', 'Accepted');
+          const { data } = await withTimeout(
+            supabase
+              .from('applications')
+              .select(`
+                id, status,
+                student:profiles!student_id (id, full_name, avatar_url, university),
+                internship:internships!internship_id (id, company_id)
+              `)
+              .eq('status', 'Accepted'),
+            10000,
+            { data: [] },
+            'MentorDashboard'
+          );
           // Filter manually by company_id
           internsData = (data || []).filter(
             (app: any) => app.internship?.company_id === profile.company_id
@@ -41,27 +49,36 @@ export default function MentorDashboard() {
         }
 
         // Get evaluations created by this mentor
-        const { data: evalsData } = await supabase
-          .from('evaluations')
-          .select(`
-            id, overall_rating, created_at, status,
-            intern:profiles!intern_id (id, full_name, avatar_url),
-            internship:internships!internship_id (id, title)
-          `)
-          .eq('mentor_id', profile.id)
-          .order('created_at', { ascending: false });
+        const { data: evalsData } = await withTimeout(
+          supabase
+            .from('evaluations')
+            .select(`
+              id, overall_rating, created_at, status,
+              intern:profiles!intern_id (id, full_name, avatar_url),
+              internship:internships!internship_id (id, title)
+            `)
+            .eq('mentor_id', profile.id)
+            .order('created_at', { ascending: false }),
+          10000,
+          { data: [] },
+          'MentorDashboard'
+        );
 
-        if (tasksRes.data) setTasks(tasksRes.data);
-        setInterns(internsData);
-        if (evalsData) setEvaluations(evalsData);
+        if (!cancelled) {
+          if (tasksRes.data) setTasks(tasksRes.data);
+          setInterns(internsData);
+          if (evalsData) setEvaluations(evalsData);
+        }
       } catch (err) {
         console.error('Error loading mentor dashboard data:', err);
+        toast.error('Failed to load mentor dashboard');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
     loadDashboardData();
+    return () => { cancelled = true; };
   }, [profile]);
 
   if (loading || !profile) {

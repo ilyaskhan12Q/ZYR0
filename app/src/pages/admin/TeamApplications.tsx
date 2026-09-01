@@ -4,6 +4,7 @@ import {
   AlertTriangle, Check, Download, Eye, FileText, Inbox, Loader2,
   Mail, Search, Trash2, X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { SITE_CONFIG } from '@/config/site';
@@ -15,6 +16,7 @@ import {
   markTeamApplicationEmailed,
   updateTeamApplicationStatus,
 } from '@/services/teamApplications';
+import { withTimeout } from '@/lib/timeout';
 import type { TeamApplicationStatus } from '@/lib/database.types';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -205,21 +207,30 @@ export default function AdminTeamApplications() {
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
   const loadApplications = useCallback(async () => {
+    let cancelled = false;
     try {
       setLoading(true);
-      const { data, error } = await getTeamApplications(activeTab as any);
-      if (error) throw error;
-      setApplications(data);
+      const result = await withTimeout(
+        getTeamApplications(activeTab as any),
+        10000,
+        { data: [], error: null },
+        'AdminTeamApplications'
+      );
+      if (result.error) throw result.error;
+      if (!cancelled) setApplications(result.data);
     } catch (err) {
       console.error('Error loading team applications:', err);
       setMessage({ type: 'err', text: 'Failed to load applications.' });
+      toast.error('Failed to load team applications');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }, [activeTab]);
 
   useEffect(() => {
-    loadApplications();
+    const cleanup = loadApplications();
+    return cleanup;
   }, [loadApplications]);
 
   const filtered = useMemo(() => {

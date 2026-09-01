@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useCallback, useState, t
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompanyMembership } from '@/services/companyTeam';
 import { canAccessCompanyTab, type CompanyTabKey } from '@/services/companyTeam';
+import { withTimeout } from '@/lib/timeout';
 import type { Company, CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
 
 export interface CompanyAccessValue {
@@ -31,12 +32,23 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-    const res = await getMyCompanyMembership(useCache);
-    const comp = res?.company ?? res?.data?.company ?? null;
-    const mem = res?.member ?? res?.data?.member ?? null;
-    setCompany(comp);
-    setMember(mem);
-    setLoading(false);
+    try {
+      const res = await withTimeout(
+        getMyCompanyMembership(useCache),
+        8000,
+        null,
+        'CompanyAccess.membership',
+      );
+      const comp = res?.company ?? res?.data?.company ?? null;
+      const mem = res?.member ?? res?.data?.member ?? null;
+      setCompany(comp);
+      setMember(mem);
+    } catch {
+      setCompany(null);
+      setMember(null);
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
   useEffect(() => {

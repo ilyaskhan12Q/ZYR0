@@ -5,6 +5,8 @@ import { Search, MapPin, Calendar, DollarSign, X, ArrowRight, Loader2 } from 'lu
 import { getInternships } from '@/services/internships';
 import { SaveButton } from '@/components/SaveButton';
 import { INTERNSHIP_DOMAINS } from '@/lib/internshipDomains';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 const locations = ['All', 'Remote', 'On-site', 'Hybrid'];
 
@@ -16,22 +18,29 @@ export default function StudentInternships() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     async function loadInternships() {
       setLoading(true);
       try {
-        const { data } = await getInternships({
-          status: 'Active',
-          domain: selectedDomain !== 'All' ? selectedDomain : undefined,
-          location_type: selectedLocation !== 'All' ? selectedLocation : undefined,
-          search: search.trim() || undefined,
-        });
-        if (data) {
-          setInternships(data);
+        const result = await withTimeout(
+          getInternships({
+            status: 'Active',
+            domain: selectedDomain !== 'All' ? selectedDomain : undefined,
+            location_type: selectedLocation !== 'All' ? selectedLocation : undefined,
+            search: search.trim() || undefined,
+          }),
+          10000,
+          { data: [] },
+          'StudentInternships'
+        );
+        if (result?.data && !cancelled) {
+          setInternships(result.data);
         }
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load internships:', err);
+        toast.error('Failed to load internships');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
 
@@ -39,7 +48,10 @@ export default function StudentInternships() {
       loadInternships();
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [search, selectedDomain, selectedLocation]);
 
   return (

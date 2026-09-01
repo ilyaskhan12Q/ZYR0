@@ -16,6 +16,8 @@ import {
 import OfferLetterDocument from '@/components/OfferLetterDocument';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -48,10 +50,11 @@ export default function StudentOfferLetters() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await getMyOfferLetters();
-      if (data) setOffers(data as OfferLetter[]);
-    } catch (err) {
-      console.error(err);
+      const result = await withTimeout(getMyOfferLetters(), 10000, { data: [] }, 'StudentOfferLetters');
+      if (result?.data) setOffers(result.data as OfferLetter[]);
+    } catch (error) {
+      console.error('Failed to load offer letters:', error);
+      toast.error('Failed to load offer letters');
     } finally {
       setLoading(false);
     }

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Eye, Lock, Unlock } from 'lucide-react';
+import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
 import { getInternships, updateInternship } from '@/services/internships';
+import { withTimeout } from '@/lib/timeout';
 
 const tabs = ['All', 'Active', 'Closed', 'Draft'];
 
@@ -13,21 +15,31 @@ export default function AdminInternships() {
   const [loading, setLoading] = useState(true);
 
   async function loadInternships() {
+    let cancelled = false;
     try {
       const statusFilter = activeTab === 'All' ? 'all' : activeTab;
-      const res = await getInternships({ status: statusFilter, limit: 100 });
-      if (res.data) {
-        setInternships(res.data);
+      const result = await withTimeout(
+        getInternships({ status: statusFilter, limit: 100 }),
+        10000,
+        { data: [], error: null },
+        'AdminInternships'
+      );
+      if (result.error) throw result.error;
+      if (result.data && !cancelled) {
+        setInternships(result.data);
       }
     } catch (err) {
       console.error('Error loading internships:', err);
+      toast.error('Failed to load internships');
     } finally {
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     }
+    return () => { cancelled = true; };
   }
 
   useEffect(() => {
-    loadInternships();
+    const cleanup = loadInternships();
+    return cleanup;
   }, [activeTab]);
 
   const toggleInternshipStatus = async (internshipId: string, currentStatus: string) => {

@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Mail, Phone, Globe, MapPin, Save, Plus, X, Upload, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany, updateCompany, createCompany, uploadCompanyLogo } from '@/services/companies';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 export default function CompanyProfile() {
   const { user } = useAuth();
@@ -27,10 +29,12 @@ export default function CompanyProfile() {
   });
 
   useEffect(() => {
+    let cancelled = false;
     async function loadCompany() {
       try {
-        const { data } = await getMyCompany();
-        if (data) {
+        const result = await withTimeout(getMyCompany(), 10000, { data: null }, 'CompanyProfile');
+        const data = result?.data;
+        if (data && !cancelled) {
           setCompany(data);
           setForm({
             name: data.name || '',
@@ -45,14 +49,16 @@ export default function CompanyProfile() {
           });
         }
       } catch (err: any) {
-        setError('Failed to fetch company profile');
+        console.error('Failed to load company profile:', err);
+        toast.error('Failed to load company profile');
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     if (user) {
       loadCompany();
     }
+    return () => { cancelled = true; };
   }, [user]);
 
   const handleSave = async () => {

@@ -5,6 +5,8 @@ import { Search, Send, Paperclip, ChevronLeft, CheckCheck, Loader2 } from 'lucid
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyConversations, getMessages, sendMessage, markMessagesRead } from '@/services/messages';
 import { supabase } from '@/lib/supabase';
+import { withTimeout } from '@/lib/timeout';
+import { toast } from 'sonner';
 
 export default function StudentMessages() {
   const { id } = useParams();
@@ -18,6 +20,7 @@ export default function StudentMessages() {
   const [loading, setLoading] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const cancelledRef = useRef(false);
 
   // Scroll to bottom helper
   const scrollToBottom = () => {
@@ -27,7 +30,7 @@ export default function StudentMessages() {
   // Load conversations list
   async function loadConversations() {
     try {
-      const res = await getMyConversations();
+      const res = await withTimeout(getMyConversations(), 10000, { data: [] }, 'StudentMessages');
       if (res.data) {
         setConversations(res.data);
         if (!selectedConv && res.data.length > 0) {
@@ -36,13 +39,16 @@ export default function StudentMessages() {
       }
     } catch (err) {
       console.error('Error loading conversations:', err);
+      toast.error('Failed to load conversations');
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
+    cancelledRef.current = false;
     loadConversations();
+    return () => { cancelledRef.current = true; };
   }, [profile]);
 
   // Select conversation matching query parameter user ID & internship ID
