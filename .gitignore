@@ -53,6 +53,8 @@ offer-letter&certificate/
 
 # Private working docs (0-AI architecture — not for the repo)
 docs/0-AI_ARCHITECTURE.md
+SAAS_REBRAND_PLAN.md
+phases.md
 
 # Private documentation & agent memory (local-only)
 /docs/
