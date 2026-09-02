@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 import { CompanyRatingWidget } from '@/components/CompanyRatingWidget';
+import { teamRoleLabel } from '@/services/companyTeam';
 
 export default function CompanyDetail() {
   const { id } = useParams();
@@ -239,7 +240,7 @@ export default function CompanyDetail() {
                   <img src={member.avatar_url || `https://ui-avatars.com/api/?name=${member.name || 'Member'}`} alt={`${member.name} avatar`} width="48" height="48" loading="lazy" className="w-12 h-12 rounded-full object-cover bg-background" />
                   <div>
                     <p className="font-medium">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">{member.role}</p>
+                    <p className="text-sm text-muted-foreground">{teamRoleLabel(member.role)}</p>
                     <p className="text-xs text-muted-foreground">{member.email}</p>
                   </div>
                 </div>
