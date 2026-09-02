@@ -83,7 +83,7 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
       canAccessTab: (tab: CompanyTabKey) => {
         if (loading) return true;
         if (isOwner) return true;
-        if (!memberRole) return true;
+        if (!memberRole) return false;
         return canAccessCompanyTab(memberRole, isOwner, tab);
       },
     };
