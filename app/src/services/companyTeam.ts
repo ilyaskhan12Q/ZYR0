@@ -300,6 +300,13 @@ export async function acceptTeamInvite(token: string) {
   return data === true;
 }
 
+/** Look up the invited email and company name from an invite token (no auth required). */
+export async function lookupInviteByToken(token: string) {
+  const { data, error } = await supabase.rpc('lookup_invite_by_token', { p_token: token });
+  if (error) return null;
+  return data as { email?: string; company_name?: string } | null;
+}
+
 /**
  * Resolve the current user's company + team role.
  * Owner (profile role "company") resolves through companies.owner_id;

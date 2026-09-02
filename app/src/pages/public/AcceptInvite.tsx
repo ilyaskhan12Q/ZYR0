@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Loader2, Building2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyAccess } from '@/contexts/CompanyAccessContext';
-import { acceptTeamInvite } from '@/services/companyTeam';
+import { acceptTeamInvite, lookupInviteByToken } from '@/services/companyTeam';
 import { SEO } from '@/components/SEO';
 
 export default function AcceptInvite() {
@@ -37,14 +37,21 @@ export default function AcceptInvite() {
       try {
         const ok = await acceptTeamInvite(token ?? '');
         if (ok) {
-          // The provider's cached membership is stale (null) from before
-          // acceptance; refetch now so "Go to Company Dashboard" doesn't
-          // bounce through CompanyAccessRoute.
           await refresh();
           setState('success');
         } else {
+          const lookup = await lookupInviteByToken(token ?? '');
+          const invitedEmail = lookup?.email;
+          const companyName = lookup?.company_name;
+          if (invitedEmail) {
+            setErrorMsg(
+              `This invitation is for ${invitedEmail}${companyName ? ` (${companyName})` : ''}. ` +
+              `Sign in with that email to accept it.`
+            );
+          } else {
+            setErrorMsg('This invitation is invalid or has already been accepted.');
+          }
           setState('error');
-          setErrorMsg('This invitation is invalid or has already been accepted.');
         }
       } catch (err: any) {
         setState('error');
