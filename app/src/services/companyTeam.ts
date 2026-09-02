@@ -255,14 +255,23 @@ export async function resendTeamInvite(id: string) {
     return { data: null, error: new Error('This member has already accepted the invitation.') };
   }
 
+  // Generate a new token for security (old token may have leaked)
+  const newToken = crypto.randomUUID();
+  await supabase
+    .from('company_team_members')
+    .update({ invite_token: newToken })
+    .eq('id', id);
+
   const { data: company } = await supabase
     .from('companies')
     .select('name')
     .eq('id', member.company_id)
     .single();
 
-  await sendInviteEmail(member, company?.name ?? 'your company');
-  return { data: member, error: null };
+  // Use the new token in the email
+  const updatedMember = { ...member, invite_token: newToken };
+  await sendInviteEmail(updatedMember, company?.name ?? 'your company');
+  return { data: updatedMember, error: null };
 }
 
 export async function removeTeamMember(id: string) {
