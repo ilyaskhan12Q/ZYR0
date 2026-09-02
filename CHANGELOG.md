@@ -7,7 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-All 136 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 0.61.0).
+All 156 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 0.62.6).
+
+### 2026-09-02
+
+- **`e108747`** 0.62.6 — chore: update .gitignore with phases.md and SAAS_REBRAND_PLAN.md
+- **`48b6471`** 0.62.5 — fix(dashboard): always show team role (Owner/Admin/HR Manager/Mentor/Reviewer) in profile dropdown
+- **`43e2e6b`** 0.62.4 — fix(invite): generate fresh token on each resend (invalidate old tokens)
+- **`b779815`** 0.62.3 — fix(invite): block company owner from inviting themselves via client-side check
+- **`4093026`** 0.62.2 — fix(rpc): accept_company_invite verifies invited email matches logged-in user + blocks owner
+- **`473733a`** 0.62.1 — fix(company-access): canAccessTab returns false when memberRole is null for non-owners
+- **`1755ba4`** 0.62.0 — Merge pull request #138 from ilyaskhan12Q/fix-company-invite-workflow
+- **`6402c06`** 0.61.15 — fix(sidebar): add missing cache policy aliases for count keys (use 60s TTL instead of 5s)
+- **`776772d`** 0.61.14 — fix(sidebar): refresh cache-first on mount + visibilitychange listener for tab-return
+- **`639ed38`** 0.61.13 — feat(hooks): add useRefreshOnFocus for tab-return refresh on student and company pages
+- **`d4b24de`** 0.61.12 — fix(public-nav): remove 'student' fallback from all nav components — use profile.role or null + loading guard
+- **`89ff614`** 0.61.11 — fix(profile): add missing profileLoaded guard in AuthContext before navigating
+- **`9cd2215`** 0.61.10 — fix(profile): remove 'student' fallback in PublicOnlyRoute — show loader until profile loads
+- **`1f18390`** 0.61.9 — fix(auth): Login.tsx waits for profileLoaded before navigating to prevent stale role redirect
+- **`495cf5d`** 0.61.8 — fix(invite): one-time data fix to promote team members' profiles to 'company' role + add RPC
+- **`88c0219`** 0.61.7 — fix(invite): accept_company_invite RPC now updates profiles.role to 'company' on accept
+- **`f298199`** 0.61.6 — chore(ci): re-enable ESLint in CI workflow
+- **`4ca0d5c`** 0.61.5 — perf(db): add indexes for profiles, applications, tasks, events, and certificates queries
+- **`319e0c0`** 0.61.4 — perf(workspace): parallelize tasks, certificates, and events fetches with Promise.allSettled
+- **`08c6e9f`** 0.61.3 — perf(shader): throttle mousemove via ref + rAF, single MeshGradient, Lenis on public routes only
+- **`b77816f`** 0.61.2 — perf(fonts): self-host Inter, Agbalumo, DM Serif Text as woff2 with font-display:swap
+- **`6db8bb5`** 0.61.1 — feat(timeout): add configurable timeouts to all data-fetch pages, AuthContext, ErrorBoundary
 
 ### 2026-08-29
 
