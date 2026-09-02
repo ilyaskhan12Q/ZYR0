@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { SEO } from '@/components/SEO';
 import type { UserRole } from '@/lib/database.types';
 import type { CompanyTabKey } from '@/services/companyTeam';
+import { teamRoleLabel } from '@/services/companyTeam';
 import { supabase } from '@/lib/supabase';
 import { getNotifications, getUnreadNotificationCount, markNotificationRead, markAllNotificationsRead } from '@/services/notifications';
 import { updateMyProfile } from '@/services/users';
@@ -674,7 +675,9 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                   >
                     <div className="px-4 py-3 border-b border-border">
                       <p className="text-sm font-medium">{user?.user_metadata?.full_name || 'User'}</p>
-                      <p className="text-xs text-muted-foreground capitalize">{role} Account</p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {companyAccess?.isOwner ? 'Owner' : companyAccess?.memberRole ? teamRoleLabel(companyAccess.memberRole) : role} Account
+                      </p>
                     </div>
                     <div className="py-1">
                       <button onClick={() => { setProfileOpen(false); navigate(`/${role}/profile`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-muted transition-colors">
