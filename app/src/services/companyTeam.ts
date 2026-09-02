@@ -169,6 +169,25 @@ export async function addTeamMember(data: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Block owner from inviting themselves
+  const { data: company } = await supabase
+    .from('companies')
+    .select('owner_id, name')
+    .eq('id', data.company_id)
+    .single();
+
+  if (company?.owner_id === user.id) {
+    throw new Error('You cannot invite yourself to your own company.');
+  }
+
+  // Block inviting the company owner's email
+  if (data.email?.trim().toLowerCase()) {
+    const { data: ownerUser } = await supabase.auth.admin.getUserById(company?.owner_id ?? '');
+    if (ownerUser?.user?.email?.toLowerCase() === data.email.trim().toLowerCase()) {
+      throw new Error('This email belongs to the company owner and cannot be invited as a team member.');
+    }
+  }
+
   const existing = await supabase
     .from('company_team_members')
     .select('id, email, user_id, status')
@@ -198,12 +217,6 @@ export async function addTeamMember(data: {
 
   clearCache(`company_team_${data.company_id}`);
   clearCache(createRequestKey('my_company', user.id));
-
-  const { data: company } = await supabase
-    .from('companies')
-    .select('name')
-    .eq('id', data.company_id)
-    .single();
 
   try {
     await sendInviteEmail(res.data, company?.name ?? 'your company');
@@ -242,14 +255,23 @@ export async function resendTeamInvite(id: string) {
     return { data: null, error: new Error('This member has already accepted the invitation.') };
   }
 
+  // Generate a new token for security (old token may have leaked)
+  const newToken = crypto.randomUUID();
+  await supabase
+    .from('company_team_members')
+    .update({ invite_token: newToken })
+    .eq('id', id);
+
   const { data: company } = await supabase
     .from('companies')
     .select('name')
     .eq('id', member.company_id)
     .single();
 
-  await sendInviteEmail(member, company?.name ?? 'your company');
-  return { data: member, error: null };
+  // Use the new token in the email
+  const updatedMember = { ...member, invite_token: newToken };
+  await sendInviteEmail(updatedMember, company?.name ?? 'your company');
+  return { data: updatedMember, error: null };
 }
 
 export async function removeTeamMember(id: string) {
