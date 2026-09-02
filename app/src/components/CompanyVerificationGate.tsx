@@ -67,6 +67,13 @@ export default function CompanyVerificationGate({ children, mode = 'block' }: Co
     );
   }
 
+  // Team members (non-owners) bypass the verification gate — they were invited
+  // by the owner and shouldn't be blocked by verification status they can't control.
+  const isOwner = company.owner_id === user?.id;
+  if (!isOwner) {
+    return <>{children}</>;
+  }
+
   const status = company.status || 'pending';
 
   if (status === 'approved') {
