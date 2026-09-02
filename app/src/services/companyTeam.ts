@@ -308,20 +308,19 @@ export async function lookupInviteByToken(token: string) {
 }
 
 /** Check if the current user is already an accepted team member in any company. */
-export async function isAlreadyTeamMember(): Promise<{ companyId: string; companyName: string } | null> {
+export async function isAlreadyTeamMember(): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!user) return false;
 
   const { data } = await supabase
     .from('company_team_members')
-    .select('company_id, companies(name)')
+    .select('id')
     .eq('user_id', user.id)
     .eq('status', 'accepted')
     .limit(1)
     .maybeSingle();
 
-  if (!data) return null;
-  return { companyId: data.company_id, companyName: (data.companies as any)?.name ?? '' };
+  return !!data;
 }
 
 /**

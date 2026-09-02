@@ -42,8 +42,7 @@ export function CompanyAccessRoute({ children }: { children: ReactNode }) {
     );
   }
 
-  const granted = profile.role === 'company' || !!company;
-  if (!granted) {
+  if (!company) {
     return <Navigate to={dashboardMap[profile.role] || '/student/dashboard'} replace />;
   }
 

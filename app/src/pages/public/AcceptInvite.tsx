@@ -59,22 +59,19 @@ export default function AcceptInvite() {
       if (ok) {
         await refresh();
         setState('success');
+      } else if (profile?.role === 'company') {
+        await refresh();
+        setState('success');
       } else {
-        const alreadyMember = await isAlreadyTeamMember();
-        if (alreadyMember) {
-          await refresh();
-          setState('success');
+        if (inviteEmail) {
+          setErrorMsg(
+            `This invitation is for ${inviteEmail}${companyName ? ` (${companyName})` : ''}. ` +
+            `Sign in with that email to accept it.`
+          );
         } else {
-          if (inviteEmail) {
-            setErrorMsg(
-              `This invitation is for ${inviteEmail}${companyName ? ` (${companyName})` : ''}. ` +
-              `Sign in with that email to accept it.`
-            );
-          } else {
-            setErrorMsg('This invitation is invalid or has already been accepted.');
-          }
-          setState('error');
+          setErrorMsg('This invitation is invalid or has already been accepted.');
         }
+        setState('error');
       }
     } catch (err: any) {
       setState('error');
