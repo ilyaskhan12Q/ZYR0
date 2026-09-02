@@ -307,6 +307,23 @@ export async function lookupInviteByToken(token: string) {
   return data as { email?: string; company_name?: string } | null;
 }
 
+/** Check if the current user is already an accepted team member in any company. */
+export async function isAlreadyTeamMember(): Promise<{ companyId: string; companyName: string } | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from('company_team_members')
+    .select('company_id, companies(name)')
+    .eq('user_id', user.id)
+    .eq('status', 'accepted')
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return null;
+  return { companyId: data.company_id, companyName: (data.companies as any)?.name ?? '' };
+}
+
 /**
  * Resolve the current user's company + team role.
  * Owner (profile role "company") resolves through companies.owner_id;
