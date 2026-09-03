@@ -8,7 +8,7 @@ import {
   Upload, FileText, Trash2, Download, Loader2, BarChart3, MessageCircle, List, Edit2,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
-import { getMyActiveInternships } from '@/services/internships';
+import { getMyActiveInternships, getInternshipById } from '@/services/internships';
 import { getMyTasks, submitTask, uploadSubmissionFile } from '@/services/tasks';
 import type { TaskAttachment } from '@/lib/database.types';
 import { getMyCertificates } from '@/services/certificates';
@@ -79,57 +79,21 @@ export default function StudentWorkspace() {
     try {
       if (forceRefresh) {
         clearCache(`my_tasks_${user.id}`);
+        clearCache(`my_active_internships_${user.id}`);
       }
 
-      // 1. Fetch all active accepted offer placements
-      const placementsResult = await withTimeout(
-        getMyActiveInternships(),
-        10000,
-        { data: [], error: null },
-        'StudentWorkspace_LoadPlacements'
-      );
-      const { data: activePlacements, error: placementsErr } = placementsResult as any;
-      if (placementsErr) throw placementsErr;
+      const taskIdParam = new URLSearchParams(window.location.search).get('taskId');
 
-      const placementList = activePlacements || [];
-      setPlacements(placementList);
-
-      if (placementList.length === 0) {
-        setActivePlacement(null);
-        setLoading(false);
-        return;
-      }
-
-      // 2. Select the placement (from URL param or default to the first active placement)
-      let selected = placementList[0];
-      const queryStr = window.location.search || '';
-      if (internshipId) {
-        const found = placementList.find((p: any) => (p.internship as any)?.id === internshipId);
-        if (found) {
-          selected = found;
-        } else {
-          // Redirect to root workspace or correct ID if path is invalid while keeping query params
-          navigate(`/student/workspace/${(selected.internship as any)?.id}${queryStr}`, { replace: true });
-          return;
-        }
-      } else {
-        // Redirection to the specific path while preserving query params
-        navigate(`/student/workspace/${(selected.internship as any)?.id}${queryStr}`, { replace: true });
-        return;
-      }
-
-      setActivePlacement(selected);
-
-      // 3. Fetch tasks, certificates, and events in parallel
-      const internshipIdVal = (selected.internship as any)?.id;
-      if (forceRefresh && internshipIdVal) {
-        clearWorkspaceEventsCache(internshipIdVal, user.id);
-      }
-
-      const hasTaskId = Boolean(searchParams.get('taskId'));
-      const [tasksResult, certsResult, eventsResult] = await Promise.allSettled([
+      // 1. Fetch active placements, student tasks, and certificates in parallel
+      const [placementsResult, tasksResult, certsResult] = await Promise.allSettled([
         withTimeout(
-          getMyTasks(!forceRefresh && !hasTaskId),
+          getMyActiveInternships(!forceRefresh),
+          10000,
+          { data: [], error: null },
+          'StudentWorkspace_LoadPlacements'
+        ),
+        withTimeout(
+          getMyTasks(!forceRefresh && !taskIdParam),
           10000,
           { data: [], error: null },
           'StudentWorkspace_LoadTasks'
@@ -140,32 +104,105 @@ export default function StudentWorkspace() {
           { data: [] },
           'StudentWorkspace_LoadCertificates'
         ),
-        internshipIdVal
-          ? withTimeout(
-              getWorkspaceEvents(internshipIdVal, user.id, !forceRefresh),
-              10000,
-              { data: [], error: null },
-              'StudentWorkspace_LoadEvents'
-            )
-          : Promise.resolve({ data: [], error: null }),
       ]);
 
-      // 4. Process tasks
+      const { data: activePlacements, error: placementsErr } = (placementsResult.status === 'fulfilled' ? placementsResult.value : { data: [], error: null }) as any;
+      if (placementsErr) throw placementsErr;
+
       const { data: allTasks, error: tasksErr } = (tasksResult.status === 'fulfilled' ? tasksResult.value : { data: [], error: null }) as any;
       if (tasksErr) throw tasksErr;
-      const filteredTasks = (allTasks || []).filter(
-        (t: any) => t.internship_id === (selected.internship as any)?.id
-      );
-      setTasks(filteredTasks);
 
-      // 5. Process certificates
       const { data: certs } = (certsResult.status === 'fulfilled' ? certsResult.value : { data: [] }) as any;
       setCertificates(certs || []);
 
-      // 6. Process events
-      const { data: eventsList, error: eventsErr } = (eventsResult.status === 'fulfilled' ? eventsResult.value : { data: [], error: null }) as any;
-      if (eventsErr) throw eventsErr;
-      setEvents(eventsList || []);
+      const placementList = [...(activePlacements || [])];
+
+      // If tasks exist for internships not in offer_letters, include them in placements
+      if (allTasks && allTasks.length > 0) {
+        for (const t of allTasks) {
+          if (t.internship && !placementList.some((p: any) => (p.internship as any)?.id === t.internship.id)) {
+            placementList.push({
+              id: `task-internship-${t.internship.id}`,
+              status: 'Accepted',
+              internship: t.internship,
+            });
+          }
+        }
+      }
+
+      // If a specific task was opened via ?taskId=..., prioritize that task's internship
+      const targetTask = taskIdParam ? (allTasks || []).find((t: any) => t.id === taskIdParam) : null;
+      const desiredInternshipId = targetTask?.internship_id || internshipId;
+
+      // 2. Select the placement
+      let selected = placementList.find((p: any) => (p.internship as any)?.id === desiredInternshipId);
+
+      // If not yet in placementList, load the internship directly
+      if (!selected && desiredInternshipId) {
+        const { data: directInternship } = await getInternshipById(desiredInternshipId);
+        if (directInternship) {
+          selected = {
+            id: `direct-${desiredInternshipId}`,
+            status: 'Accepted',
+            internship: directInternship,
+          };
+          placementList.unshift(selected);
+        }
+      }
+
+      // Fallback to first available placement if no specific internship was requested
+      if (!selected && placementList.length > 0) {
+        selected = placementList[0];
+      }
+
+      setPlacements(placementList);
+
+      if (!selected) {
+        setActivePlacement(null);
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
+
+      setActivePlacement(selected);
+
+      const selectedInternshipId = (selected.internship as any)?.id;
+
+      // Keep URL path in sync with selected placement without losing query parameters
+      if (selectedInternshipId && internshipId !== selectedInternshipId) {
+        const queryStr = window.location.search || '';
+        navigate(`/student/workspace/${selectedInternshipId}${queryStr}`, { replace: true });
+      }
+
+      // 3. Filter tasks specifically for the selected placement
+      const filteredTasks = (allTasks || []).filter(
+        (t: any) => t.internship_id === selectedInternshipId
+      );
+      setTasks(filteredTasks);
+
+      // 4. Auto-select requested task or initialize task selection
+      if (targetTask && targetTask.internship_id === selectedInternshipId) {
+        setSelectedTask(targetTask);
+        setIsEditingSubmission(false);
+        setActiveTab('tasks');
+      }
+
+      // 5. Fetch timeline events for selected placement
+      if (selectedInternshipId) {
+        if (forceRefresh) {
+          clearWorkspaceEventsCache(selectedInternshipId, user.id);
+        }
+        const eventsResult = await withTimeout(
+          getWorkspaceEvents(selectedInternshipId, user.id, !forceRefresh),
+          10000,
+          { data: [], error: null },
+          'StudentWorkspace_LoadEvents'
+        );
+        const { data: eventsList } = eventsResult as any;
+        setEvents(eventsList || []);
+      } else {
+        setEvents([]);
+      }
 
     } catch (err: any) {
       console.error('Error loading workspace data:', err);
@@ -173,7 +210,7 @@ export default function StudentWorkspace() {
     } finally {
       setLoading(false);
     }
-  }, [user, internshipId, navigate, searchParams]);
+  }, [user, internshipId, navigate]);
 
   useEffect(() => {
     loadWorkspaceData();
@@ -184,7 +221,7 @@ export default function StudentWorkspace() {
     const taskIdParam = searchParams.get('taskId');
     if (taskIdParam && tasks.length > 0) {
       const match = tasks.find((t: any) => t.id === taskIdParam);
-      if (match) {
+      if (match && selectedTask?.id !== match.id) {
         setSelectedTask(match);
         setIsEditingSubmission(false);
         if (activeTab !== 'tasks') {
@@ -192,7 +229,7 @@ export default function StudentWorkspace() {
         }
       }
     }
-  }, [tasks, activeTab, searchParams]);
+  }, [tasks, activeTab, searchParams, selectedTask]);
 
   // Subscribe to real-time updates for timeline events
   const activeInternshipId = (activePlacement?.internship as any)?.id;
@@ -422,6 +459,30 @@ export default function StudentWorkspace() {
               <span className="px-2.5 py-0.5 text-xs rounded-full bg-accent/15 text-accent font-medium uppercase tracking-wider">
                 Active Placement
               </span>
+              {placements.length > 1 && (
+                <div className="flex items-center gap-1.5 ml-1">
+                  <span className="text-xs text-muted-foreground font-medium">Switch Project:</span>
+                  <select
+                    value={(internship as any)?.id || ''}
+                    onChange={(e) => {
+                      const nextId = e.target.value;
+                      if (nextId) {
+                        navigate(`/student/workspace/${nextId}?tab=${activeTab}`);
+                      }
+                    }}
+                    className="text-xs bg-muted/70 hover:bg-muted border border-border rounded-lg px-2 py-1 font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+                  >
+                    {placements.map((p: any) => {
+                      const pIntern = p.internship as any;
+                      return (
+                        <option key={pIntern?.id} value={pIntern?.id}>
+                          {pIntern?.title} ({pIntern?.company?.name || 'Internship'})
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              )}
             </div>
             <p className="text-muted-foreground flex items-center gap-1.5 mt-1 text-sm">
               <span className="font-semibold text-foreground">{company?.name}</span>
