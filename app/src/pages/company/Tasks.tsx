@@ -13,6 +13,8 @@ import { getCompanyTasks, deleteMasterDeliverable } from '@/services/tasks';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications } from '@/services/applications';
 import { getInternships } from '@/services/internships';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 import { TaskStatsHeader } from '@/components/company/tasks/TaskStatsHeader';
 import { TaskFilterBar } from '@/components/company/tasks/TaskFilterBar';
@@ -58,14 +60,14 @@ export default function CompanyTasks() {
 
   const studentIdParam = searchParams.get('studentId') || searchParams.get('student_id');
 
-  const loadData = async () => {
+  const loadData = async (useCache = true) => {
     try {
       const { data: co } = await getMyCompany();
       if (co) {
         setCompany(co);
         const settled = await Promise.race([
           Promise.allSettled([
-            getCompanyTasks(co.id),
+            getCompanyTasks(co.id, useCache),
             getAllCompanyApplications(co.id),
             getInternships({ company_id: co.id, status: 'Active' }),
           ]),
@@ -97,6 +99,25 @@ export default function CompanyTasks() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Supabase Realtime live sync for tasks
+  useEffect(() => {
+    if (!company?.id) return;
+    const channel = supabase
+      .channel(`company-tasks-rt-${company.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tasks' },
+        () => {
+          loadData(false);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [company?.id]);
 
   // Filtered & Sorted Tasks Computation for Submissions Tab
   const filteredTasks = useMemo(() => {
@@ -259,20 +280,35 @@ export default function CompanyTasks() {
     );
     if (!confirmed) return;
 
+    // Optimistically remove unsubmitted matching tasks immediately from state
+    const previousTasks = [...tasks];
+    setTasks((prev) =>
+      prev.filter(
+        (t) =>
+          !(
+            t.internship_id === deliverable.internship_id &&
+            t.title === deliverable.title &&
+            (t.status === 'Pending' || t.status === 'Rejected')
+          )
+      )
+    );
+
     try {
       const res = await deleteMasterDeliverable(deliverable.internship_id, deliverable.title);
       if (res.error) {
-        alert(`Failed to delete deliverable: ${res.error.message || res.error}`);
+        setTasks(previousTasks);
+        toast.error(`Failed to delete deliverable: ${res.error.message || res.error}`);
       } else {
-        alert(
+        toast.success(
           `Deliverable deleted. Removed from ${res.deleted} intern(s).${
-            res.skipped > 0 ? ` ${res.skipped} completed/submitted task(s) preserved.` : ''
+            res.skipped > 0 ? ` ${res.skipped} submitted task(s) preserved.` : ''
           }`
         );
-        loadData();
+        loadData(false);
       }
     } catch (err: any) {
-      alert(`Error deleting deliverable: ${err.message || err}`);
+      setTasks(previousTasks);
+      toast.error(`Error deleting deliverable: ${err.message || err}`);
     }
   };
 
@@ -549,7 +585,7 @@ export default function CompanyTasks() {
           interns={interns}
           existingTasks={tasks}
           onClose={() => setShowCreateEditModal(false)}
-          onSuccess={loadData}
+          onSuccess={() => loadData(false)}
         />
       )}
 
@@ -563,7 +599,7 @@ export default function CompanyTasks() {
           }}
           tasksToExtend={tasksToExtend}
           onSuccess={() => {
-            loadData();
+            loadData(false);
             handleClearSelection();
           }}
         />
@@ -574,7 +610,7 @@ export default function CompanyTasks() {
         <TaskReviewDrawer
           task={reviewingTask}
           onClose={() => setReviewingTask(null)}
-          onSuccess={loadData}
+          onSuccess={() => loadData(false)}
         />
       )}
     </div>

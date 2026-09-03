@@ -268,6 +268,7 @@ export async function createTask(data: Partial<Task>) {
     .single();
 
   if (!res.error) {
+    clearCache('company_tasks');
     clearCache(`assigned_by_tasks_${user.id}`);
     if (data.assigned_to) {
       clearCache(`my_tasks_${data.assigned_to}`);
@@ -298,6 +299,7 @@ export async function updateTask(id: string, data: Partial<Task>) {
 
   const res = await supabase.from('tasks').update(data).eq('id', id).select().single();
   if (!res.error) {
+    clearCache('company_tasks');
     clearCache(`task_${id}`);
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -392,7 +394,8 @@ export async function bulkCreateTasks(
   const res = await supabase.from('tasks').insert(rows).select();
 
   if (!res.error) {
-    // Clear caches for assigner and every affected intern
+    // Clear caches for company, assigner and every affected intern
+    clearCache('company_tasks');
     clearCache(`assigned_by_tasks_${user.id}`);
     newInternIds.forEach(id => clearCache(`my_tasks_${id}`));
   }
@@ -422,6 +425,7 @@ export async function reviewSubmission(
     .single();
 
   if (!res.error) {
+    clearCache('company_tasks');
     const studentId = res.data?.student_id;
     const taskId = res.data?.task_id;
     if (studentId) {
@@ -457,6 +461,7 @@ export async function bulkExtendTaskDeadlines(
     .select('id, title, assigned_to, internship_id, status');
 
   if (!res.error && res.data) {
+    clearCache('company_tasks');
     clearCache(`assigned_by_tasks_${user.id}`);
     const affectedStudents = new Set(res.data.map(t => t.assigned_to));
     affectedStudents.forEach(studentId => {
@@ -507,6 +512,7 @@ export async function updateMasterDeliverable(
     .select('id, assigned_to');
 
   if (!res.error && res.data) {
+    clearCache('company_tasks');
     clearCache(`assigned_by_tasks_${user.id}`);
     res.data.forEach(t => {
       clearCache(`my_tasks_${t.assigned_to}`);
@@ -558,24 +564,36 @@ export async function deleteMasterDeliverable(
   }
 
   const idsToDelete = tasksToDelete.map(t => t.id);
-  const { error: delErr } = await supabase
+  const { data: deletedRows, error: delErr } = await supabase
     .from('tasks')
     .delete()
-    .in('id', idsToDelete);
+    .in('id', idsToDelete)
+    .select('id');
 
-  if (!delErr) {
-    clearCache(`assigned_by_tasks_${user.id}`);
-    tasksToDelete.forEach(t => {
-      clearCache(`my_tasks_${t.assigned_to}`);
-      clearCache(`task_${t.id}`);
-    });
+  // Bust company tasks cache and individual task caches
+  clearCache('company_tasks');
+  clearCache(`assigned_by_tasks_${user.id}`);
+  tasksToDelete.forEach(t => {
+    clearCache(`my_tasks_${t.assigned_to}`);
+    clearCache(`task_${t.id}`);
+  });
+
+  if (delErr) {
+    return {
+      deleted: 0,
+      skipped: matchingTasks.length,
+      hasSubmissions,
+      error: delErr,
+    };
   }
 
+  const actualDeleted = deletedRows ? deletedRows.length : tasksToDelete.length;
+
   return {
-    deleted: tasksToDelete.length,
-    skipped: matchingTasks.length - tasksToDelete.length,
+    deleted: actualDeleted,
+    skipped: matchingTasks.length - actualDeleted,
     hasSubmissions,
-    error: delErr,
+    error: null,
   };
 }
 
