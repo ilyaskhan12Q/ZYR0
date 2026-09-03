@@ -243,6 +243,24 @@ export async function createTask(data: Partial<Task>) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Enforce server-side invariant: assignee must have an accepted application for the project
+  if (data.internship_id && data.assigned_to) {
+    const { data: enrollment, error: enrollError } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('internship_id', data.internship_id)
+      .eq('student_id', data.assigned_to)
+      .eq('status', 'Accepted')
+      .maybeSingle();
+
+    if (enrollError || !enrollment) {
+      return {
+        data: null,
+        error: new Error('Assigned intern must be an accepted participant in the selected internship project'),
+      };
+    }
+  }
+
   const res = await supabase
     .from('tasks')
     .insert({ ...data, assigned_by: user.id })
@@ -260,6 +278,24 @@ export async function createTask(data: Partial<Task>) {
 
 /** Update a task */
 export async function updateTask(id: string, data: Partial<Task>) {
+  // If reassigning project or intern, enforce enrollment invariant
+  if (data.internship_id && data.assigned_to) {
+    const { data: enrollment, error: enrollError } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('internship_id', data.internship_id)
+      .eq('student_id', data.assigned_to)
+      .eq('status', 'Accepted')
+      .maybeSingle();
+
+    if (enrollError || !enrollment) {
+      return {
+        data: null,
+        error: new Error('Assigned intern must be an accepted participant in the selected internship project'),
+      };
+    }
+  }
+
   const res = await supabase.from('tasks').update(data).eq('id', id).select().single();
   if (!res.error) {
     clearCache(`task_${id}`);
@@ -292,9 +328,9 @@ export async function submitTask(data: {
     .single();
 
     if (!res.error) {
-    clearCache(`my_tasks_${user.id}`);
-    clearCache(`task_${data.task_id}`);
-  }
+      clearCache(`my_tasks_${user.id}`);
+      clearCache(`task_${data.task_id}`);
+    }
   return res;
 }
 
@@ -311,6 +347,28 @@ export async function bulkCreateTasks(
   if (!user) throw new Error('Not authenticated');
   if (!internIds.length) return { data: [], created: 0, skipped: 0, error: null };
 
+  // Enforce server-side invariant: interns must be accepted in the selected internship
+  let targetInternIds = internIds;
+  if (baseData.internship_id) {
+    const { data: acceptedApps } = await supabase
+      .from('applications')
+      .select('student_id')
+      .eq('internship_id', baseData.internship_id)
+      .eq('status', 'Accepted')
+      .in('student_id', internIds);
+
+    const validIds = new Set(acceptedApps?.map((a: any) => a.student_id) || []);
+    targetInternIds = internIds.filter(id => validIds.has(id));
+    if (!targetInternIds.length) {
+      return {
+        data: [],
+        created: 0,
+        skipped: internIds.length,
+        error: new Error('No accepted interns found for this internship project'),
+      };
+    }
+  }
+
   // Deduplicate against existing tasks with the same title + internship + assignee
   const existingSet = new Set(
     existingTasks
@@ -318,7 +376,7 @@ export async function bulkCreateTasks(
       .map(t => t.assigned_to),
   );
 
-  const newInternIds = internIds.filter(id => !existingSet.has(id));
+  const newInternIds = targetInternIds.filter(id => !existingSet.has(id));
   const skipped = internIds.length - newInternIds.length;
 
   if (!newInternIds.length) {
