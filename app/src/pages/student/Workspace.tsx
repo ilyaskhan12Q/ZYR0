@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
-  Github, LayoutGrid, ChevronRight, ChevronDown, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight,
+  Github, LayoutGrid, ChevronRight, ChevronDown, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight, ArrowDown,
   Upload, FileText, Trash2, Download, Loader2, BarChart3, MessageCircle, List,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
@@ -837,13 +837,13 @@ export default function StudentWorkspace() {
                             </div>
                           </div>
 
-                          {/* Jump to submit — only for pending tasks */}
-                          {selectedTask.status === 'Pending' && (
+                          {/* Jump to submit — only for pending or revision tasks */}
+                          {(selectedTask.status === 'Pending' || selectedTask.status === 'Rejected') && (
                             <button
                               onClick={() => document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' })}
                               className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
                             >
-                              Submit Work <ArrowRight className="w-4 h-4" />
+                              Submit Work <ArrowDown className="w-4 h-4" />
                             </button>
                           )}
                         </div>
@@ -1237,27 +1237,15 @@ export default function StudentWorkspace() {
                                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
                               >
                                 {submitting ? (
-                                  <ButtonLoader loading={true} loadingText="Submitting..." />
+                                  <ButtonLoader loading={true} loadingText="Submitting Work..." />
                                 ) : (
-                                  'Submit Solution'
+                                  'Submit Work'
                                 )}
                               </button>
                             </form>
                           )}
                         </div>
                       </div>
-
-                      {/* Mobile sticky submit CTA for pending tasks */}
-                      {selectedTask.status === 'Pending' && (
-                        <div className="lg:hidden sticky bottom-0 border-t border-border bg-card p-4">
-                          <button
-                            onClick={() => document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-accent hover:bg-accent/90 text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
-                          >
-                            Submit Work <ArrowRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
                     </motion.div>
                   ) : (
                     <div className="bg-card rounded-2xl border border-border p-8 shadow-sm text-center text-muted-foreground min-h-[300px] flex flex-col justify-center items-center gap-3">

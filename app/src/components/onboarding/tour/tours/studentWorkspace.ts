@@ -62,7 +62,7 @@ export const studentWorkspaceTour: TourDefinition = {
     {
       id: 'workspace-submission-submit',
       title: '4. Submit for review',
-      body: 'Hit "Submit Solution" and your work is sent to the coordinator for grading. You can track progress under Submissions History.',
+      body: 'Hit "Submit Work" and your work is sent to the coordinator for grading. You can track progress under Submissions History.',
       target: 'workspace-submission-submit',
       placement: 'right',
     },
