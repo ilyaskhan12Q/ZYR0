@@ -76,7 +76,10 @@ export async function getMyTasks(useCache = true) {
     .from('tasks')
     .select(`
       *,
-      internship:internships!internship_id (id, title),
+      internship:internships!internship_id (
+        *,
+        company:companies!company_id (id, name, logo_url, rating, owner_id)
+      ),
       assigner:profiles!assigned_by (id, full_name, avatar_url, role),
       submissions:task_submissions (*)
     `)

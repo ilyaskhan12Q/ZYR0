@@ -155,6 +155,22 @@ export default function StudentWorkspace() {
         selected = placementList[0];
       }
 
+      // Ensure the selected placement has full company and internship details
+      const selectedInternshipId = (selected?.internship as any)?.id;
+      if (selectedInternshipId && (!(selected.internship as any)?.company || !(selected.internship as any)?.company?.name)) {
+        const { data: fullInternship } = await getInternshipById(selectedInternshipId);
+        if (fullInternship) {
+          selected = {
+            ...selected,
+            internship: fullInternship,
+          };
+          const idx = placementList.findIndex((p: any) => (p.internship as any)?.id === selectedInternshipId);
+          if (idx !== -1) {
+            placementList[idx] = selected;
+          }
+        }
+      }
+
       setPlacements(placementList);
 
       if (!selected) {
@@ -165,8 +181,6 @@ export default function StudentWorkspace() {
       }
 
       setActivePlacement(selected);
-
-      const selectedInternshipId = (selected.internship as any)?.id;
 
       // Keep URL path in sync with selected placement without losing query parameters
       if (selectedInternshipId && internshipId !== selectedInternshipId) {

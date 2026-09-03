@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { getCompanyTasks, deleteMasterDeliverable } from '@/services/tasks';
 import { getMyCompany } from '@/services/companies';
-import { getAllCompanyApplications } from '@/services/applications';
+import { getCompanyOfferLetters } from '@/services/offerLetters';
 import { getInternships } from '@/services/internships';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -68,7 +68,7 @@ export default function CompanyTasks() {
         const settled = await Promise.race([
           Promise.allSettled([
             getCompanyTasks(co.id, useCache),
-            getAllCompanyApplications(co.id),
+            getCompanyOfferLetters(co.id, useCache),
             getInternships({ company_id: co.id, status: 'Active' }),
           ]),
           new Promise<never>((_, reject) =>
@@ -76,14 +76,22 @@ export default function CompanyTasks() {
           ),
         ]);
 
-        const [tasksRes, appsRes, internshipsRes] = settled;
+        const [tasksRes, offersRes, internshipsRes] = settled;
 
         if (tasksRes.status === 'fulfilled' && tasksRes.value.data) {
           setTasks(tasksRes.value.data);
         }
-        if (appsRes.status === 'fulfilled' && appsRes.value.data) {
-          const activeInterns = appsRes.value.data.filter((app: any) => app.status === 'Accepted');
-          setInterns(activeInterns);
+        if (offersRes.status === 'fulfilled' && offersRes.value.data) {
+          const acceptedInterns = (offersRes.value.data || [])
+            .filter((ol: any) => ol.status === 'Accepted')
+            .map((ol: any) => ({
+              id: ol.id,
+              internship_id: ol.internship_id,
+              student_id: ol.student_id,
+              student: ol.student,
+              status: 'Accepted',
+            }));
+          setInterns(acceptedInterns);
         }
         if (internshipsRes.status === 'fulfilled' && internshipsRes.value.data) {
           setInternships(internshipsRes.value.data);
