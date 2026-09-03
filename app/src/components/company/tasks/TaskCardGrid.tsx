@@ -18,6 +18,9 @@ import {
 
 interface TaskCardGridProps {
   tasks: any[];
+  selectedTaskIds?: string[];
+  onToggleSelectTask?: (taskId: string) => void;
+  onExtendDeadline?: (task: any) => void;
   onOpenReview?: (task: any) => void;
   onOpenEdit?: (task: any) => void;
   onReviewTask?: (task: any) => void;
@@ -26,6 +29,9 @@ interface TaskCardGridProps {
 
 export function TaskCardGrid({
   tasks,
+  selectedTaskIds = [],
+  onToggleSelectTask,
+  onExtendDeadline,
   onOpenReview,
   onOpenEdit,
   onReviewTask,
@@ -59,17 +65,30 @@ export function TaskCardGrid({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
             className={`bg-card rounded-2xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group ${
-              isOverdue
+              selectedTaskIds.includes(task.id)
+                ? 'ring-2 ring-accent border-accent bg-accent/5'
+                : isOverdue
                 ? 'border-red-500/30 dark:border-red-500/20 bg-red-500/5'
                 : task.status === 'Submitted'
                 ? 'border-amber-500/30 bg-amber-500/5'
                 : 'border-border'
             }`}
           >
-            {/* Top Row: Status Badge & Priority Pill */}
+            {/* Top Row: Selection Checkbox, Status Badge & Priority Pill */}
             <div>
               <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
+                  {onToggleSelectTask && (
+                    <input
+                      type="checkbox"
+                      checked={selectedTaskIds.includes(task.id)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        onToggleSelectTask(task.id);
+                      }}
+                      className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20 cursor-pointer"
+                    />
+                  )}
                   <span
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full font-semibold ${
                       task.status === 'Approved'
@@ -177,37 +196,55 @@ export function TaskCardGrid({
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+            <div className="mt-4 pt-3 border-t border-border flex items-center justify-between gap-2">
               {submission ? (
-                <button
-                  type="button"
-                  onClick={() => handleReview(task)}
-                  className={`w-full py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-                    task.status === 'Submitted'
-                      ? 'bg-accent text-white shadow-sm hover:bg-accent/90'
-                      : 'bg-muted text-foreground hover:bg-muted/80'
-                  }`}
-                >
-                  {task.status === 'Submitted' ? (
-                    <>
-                      <Eye className="w-3.5 h-3.5" /> Review Deliverables
-                    </>
-                  ) : (
-                    <>
-                      <Eye className="w-3.5 h-3.5" /> View Review & Grade
-                    </>
+                <div className="flex items-center gap-2 w-full">
+                  <button
+                    type="button"
+                    onClick={() => handleReview(task)}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                      task.status === 'Submitted'
+                        ? 'bg-accent text-white shadow-sm hover:bg-accent/90'
+                        : 'bg-muted text-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    {task.status === 'Submitted' ? 'Review' : 'View Grade'}
+                  </button>
+                  {task.status !== 'Approved' && onExtendDeadline && (
+                    <button
+                      type="button"
+                      onClick={() => onExtendDeadline(task)}
+                      className="py-2 px-3 border border-border hover:border-accent/40 hover:bg-accent/5 rounded-xl text-xs font-medium text-foreground hover:text-accent transition-colors flex items-center gap-1"
+                      title="Extend Deadline"
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Extend</span>
+                    </button>
                   )}
-                </button>
+                </div>
               ) : (
                 <div className="flex items-center justify-between w-full">
                   <span className="text-[11px] text-muted-foreground italic">Awaiting submission</span>
-                  <button
-                    type="button"
-                    onClick={() => handleEdit(task)}
-                    className="py-1.5 px-3 border border-border text-foreground hover:bg-muted rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5"
-                  >
-                    <Pencil className="w-3.5 h-3.5" /> Edit
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {onExtendDeadline && (
+                      <button
+                        type="button"
+                        onClick={() => onExtendDeadline(task)}
+                        className="py-1.5 px-2.5 border border-border text-foreground hover:text-accent hover:border-accent/40 hover:bg-accent/5 rounded-xl text-xs font-medium transition-colors flex items-center gap-1"
+                        title="Extend Deadline"
+                      >
+                        <Clock className="w-3.5 h-3.5" /> Extend
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(task)}
+                      className="py-1.5 px-3 border border-border text-foreground hover:bg-muted rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5"
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

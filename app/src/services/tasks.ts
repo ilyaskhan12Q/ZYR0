@@ -437,3 +437,145 @@ export async function reviewSubmission(
   }
   return res;
 }
+
+/** Bulk-extend deadlines for multiple tasks (mentor/company) */
+export async function bulkExtendTaskDeadlines(
+  taskIds: string[],
+  newDueDate: string,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  if (!taskIds.length) return { data: [], count: 0, error: null };
+
+  const res = await supabase
+    .from('tasks')
+    .update({
+      due_date: newDueDate,
+      updated_at: new Date().toISOString(),
+    })
+    .in('id', taskIds)
+    .select('id, title, assigned_to, internship_id, status');
+
+  if (!res.error && res.data) {
+    clearCache(`assigned_by_tasks_${user.id}`);
+    const affectedStudents = new Set(res.data.map(t => t.assigned_to));
+    affectedStudents.forEach(studentId => {
+      clearCache(`my_tasks_${studentId}`);
+    });
+    taskIds.forEach(id => clearCache(`task_${id}`));
+  }
+
+  return {
+    data: res.data || [],
+    count: res.data?.length || 0,
+    error: res.error,
+  };
+}
+
+/** Update a master deliverable and sync details across all assigned intern task instances */
+export async function updateMasterDeliverable(
+  internshipId: string,
+  currentTitle: string,
+  updates: Partial<Task>,
+  syncDeadline: boolean = true,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const payload: Record<string, any> = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.title !== undefined) payload.title = updates.title;
+  if (updates.description !== undefined) payload.description = updates.description;
+  if (updates.priority !== undefined) payload.priority = updates.priority;
+  if (updates.difficulty !== undefined) payload.difficulty = updates.difficulty;
+  if (updates.estimated_duration !== undefined) payload.estimated_duration = updates.estimated_duration;
+  if (updates.attachments !== undefined) payload.attachments = updates.attachments;
+  if (updates.objectives !== undefined) payload.objectives = updates.objectives;
+  if (updates.acceptance_criteria !== undefined) payload.acceptance_criteria = updates.acceptance_criteria;
+
+  if (syncDeadline && updates.due_date !== undefined) {
+    payload.due_date = updates.due_date;
+  }
+
+  const res = await supabase
+    .from('tasks')
+    .update(payload)
+    .eq('internship_id', internshipId)
+    .eq('title', currentTitle)
+    .select('id, assigned_to');
+
+  if (!res.error && res.data) {
+    clearCache(`assigned_by_tasks_${user.id}`);
+    res.data.forEach(t => {
+      clearCache(`my_tasks_${t.assigned_to}`);
+      clearCache(`task_${t.id}`);
+    });
+  }
+
+  return {
+    updated: res.data?.length || 0,
+    error: res.error,
+  };
+}
+
+/** Safely delete a master deliverable (deletes pending/unsubmitted tasks; warns on submitted) */
+export async function deleteMasterDeliverable(
+  internshipId: string,
+  title: string,
+  forceDeleteAll: boolean = false,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Fetch all tasks matching this deliverable
+  const { data: matchingTasks, error: fetchErr } = await supabase
+    .from('tasks')
+    .select('id, status, assigned_to')
+    .eq('internship_id', internshipId)
+    .eq('title', title);
+
+  if (fetchErr || !matchingTasks?.length) {
+    return { deleted: 0, skipped: 0, error: fetchErr || new Error('No matching tasks found') };
+  }
+
+  const hasSubmissions = matchingTasks.some(t => t.status === 'Submitted' || t.status === 'Approved');
+
+  let tasksToDelete = matchingTasks;
+  if (!forceDeleteAll && hasSubmissions) {
+    // Only delete unsubmitted (Pending/Rejected) tasks
+    tasksToDelete = matchingTasks.filter(t => t.status === 'Pending' || t.status === 'Rejected');
+  }
+
+  if (!tasksToDelete.length) {
+    return {
+      deleted: 0,
+      skipped: matchingTasks.length,
+      hasSubmissions,
+      error: new Error('Cannot delete deliverable: all assigned interns have already submitted work.'),
+    };
+  }
+
+  const idsToDelete = tasksToDelete.map(t => t.id);
+  const { error: delErr } = await supabase
+    .from('tasks')
+    .delete()
+    .in('id', idsToDelete);
+
+  if (!delErr) {
+    clearCache(`assigned_by_tasks_${user.id}`);
+    tasksToDelete.forEach(t => {
+      clearCache(`my_tasks_${t.assigned_to}`);
+      clearCache(`task_${t.id}`);
+    });
+  }
+
+  return {
+    deleted: tasksToDelete.length,
+    skipped: matchingTasks.length - tasksToDelete.length,
+    hasSubmissions,
+    error: delErr,
+  };
+}
+
