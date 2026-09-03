@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const currentUserIdRef = useRef<string | null>(null);
 
   async function fetchProfile(userId: string) {
     const { data } = await supabase
@@ -86,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(({ data: { session } }) => {
         setSession(session);
         setUser(session?.user ?? null);
+        currentUserIdRef.current = session?.user?.id ?? null;
         if (session?.user) {
           fetchProfile(session.user.id).finally(() => setProfileLoaded(true));
         } else {
@@ -104,8 +107,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        const nextUserId = session?.user?.id ?? null;
+        const isSameUser = !!nextUserId && nextUserId === currentUserIdRef.current;
+        currentUserIdRef.current = nextUserId;
+
         if (session?.user) {
-          setProfileLoaded(false);
+          // Only drop profileLoaded to false if switching accounts or if profile not yet loaded.
+          // For background token refresh or focus return of the same user, keep profileLoaded
+          // true so route guards do not unmount the active application and destroy form states.
+          if (!isSameUser) {
+            setProfileLoaded(false);
+          }
           await fetchProfile(session.user.id);
           setProfileLoaded(true);
         } else {
@@ -119,10 +131,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function signOut() {
+    currentUserIdRef.current = null;
     await authSignOut();
     setSession(null);
     setUser(null);
     setProfile(null);
+    setProfileLoaded(true);
   }
 
   const completion = checkProfileCompletion(profile);

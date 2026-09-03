@@ -48,13 +48,18 @@ export function ProtectedRoute({ children, role }: ProtectedRouteProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Session exists but profile still loading — brief loader, not a redirect
-  if (!profileLoaded || !profile) {
+  // Session exists but profile still loading initially — brief loader, not a redirect
+  if (!profileLoaded && !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader variant="page" label="Loading profile..." />
       </div>
     );
+  }
+
+  // Session exists and profile finished loading, but no profile record found
+  if (!profile) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // Wrong role
@@ -87,12 +92,16 @@ export function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
     }
 
     // Wait for profile to load — never guess the role
-    if (!profileLoaded || !profile) {
+    if (!profileLoaded && !profile) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-background">
           <Loader variant="page" label="Loading profile..." />
         </div>
       );
+    }
+
+    if (!profile) {
+      return <>{children}</>;
     }
 
     const dashboardMap: Record<UserRole, string> = {

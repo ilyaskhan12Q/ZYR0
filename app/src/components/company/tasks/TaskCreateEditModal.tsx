@@ -59,8 +59,20 @@ export function TaskCreateEditModal({
 
   const [submitting, setSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const prevIsOpenRef = useRef(false);
+  const prevTaskToEditIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Only re-initialize when modal opens (false -> true) or when taskToEdit ID changes.
+    // Do NOT wipe user form state on redundant re-renders while the modal remains open.
+    const isOpening = isOpen && !prevIsOpenRef.current;
+    const taskChanged = (taskToEdit?.id || null) !== prevTaskToEditIdRef.current;
+    prevIsOpenRef.current = isOpen;
+    prevTaskToEditIdRef.current = taskToEdit?.id || null;
+
+    if (!isOpen) return;
+    if (!isOpening && !taskChanged) return;
+
     if (taskToEdit) {
       setTitle(taskToEdit.title || '');
       setDescription(taskToEdit.description || '');

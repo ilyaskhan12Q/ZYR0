@@ -33,13 +33,18 @@ export function CompanyAccessRoute({ children }: { children: ReactNode }) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Session exists but profile still loading
-  if (!profileLoaded || !profile) {
+  // Session exists but profile still loading initially
+  if (!profileLoaded && !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader variant="page" label="Loading profile..." />
       </div>
     );
+  }
+
+  // Session exists and profile finished loading, but no profile record found
+  if (!profile) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (!company) {
