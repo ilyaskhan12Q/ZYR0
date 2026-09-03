@@ -24,6 +24,19 @@ async function fetchUserSettings(userId: string): Promise<StudentSettings> {
   return getStudentSettings(data?.settings as StudentSettings | null);
 }
 
+function toAbsoluteUrl(url?: string): string | undefined {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+  const origin = typeof window !== 'undefined' && window.location?.origin
+    ? window.location.origin
+    : 'https://zyroo.org';
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  return `${origin}${cleanPath}`;
+}
+
 export async function dispatchNotificationWithSimulation({
   userId,
   title,
@@ -33,6 +46,8 @@ export async function dispatchNotificationWithSimulation({
   studentEmail = 'intern@zyroo.org',
   studentPhone,
 }: NotificationPayload) {
+  const absoluteUrl = toAbsoluteUrl(actionUrl);
+
   // 1. Always create the DB in-app notification
   try {
     await createNotification({
@@ -40,7 +55,7 @@ export async function dispatchNotificationWithSimulation({
       type,
       title,
       message,
-      action_url: actionUrl,
+      action_url: absoluteUrl || actionUrl,
     });
   } catch (error) {
     console.error('Failed to save notification in db:', error);
@@ -81,7 +96,7 @@ export async function dispatchNotificationWithSimulation({
           type,
           title,
           message,
-          actionUrl,
+          actionUrl: absoluteUrl,
         },
       });
     } catch (emailErr) {
