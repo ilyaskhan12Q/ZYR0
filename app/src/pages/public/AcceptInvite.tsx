@@ -41,9 +41,9 @@ export default function AcceptInvite() {
       setInviteEmail(email);
       setCompanyName(company);
 
-      const alreadyMember = await isAlreadyTeamMember();
-      if (alreadyMember) {
-        setState('success');
+      if (!email) {
+        setState('error');
+        setErrorMsg('This invitation link is invalid or has already been accepted.');
         return;
       }
 

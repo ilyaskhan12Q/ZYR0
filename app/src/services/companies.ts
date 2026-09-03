@@ -80,16 +80,28 @@ export async function createCompany(data: Partial<Company>) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  return supabase
+  const res = await supabase
     .from('companies')
     .insert({ ...data, owner_id: user.id, status: 'pending' })
     .select()
     .single();
+
+  if (!res.error && res.data) {
+    clearCache(createRequestKey('my_company', user.id));
+    await supabase.from('profiles').update({ company_id: res.data.id }).eq('id', user.id);
+  }
+  return res;
 }
 
 /** Update company */
 export async function updateCompany(id: string, data: Partial<Company>) {
-  return supabase.from('companies').update(data).eq('id', id).select().single();
+  const res = await supabase.from('companies').update(data).eq('id', id).select().single();
+  if (!res.error && res.data) {
+    clearCache(createRequestKey('company', id));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) clearCache(createRequestKey('my_company', user.id));
+  }
+  return res;
 }
 
 /** Upload company logo */

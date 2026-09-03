@@ -43,6 +43,17 @@ export function CompanyAccessRoute({ children }: { children: ReactNode }) {
   }
 
   if (!company) {
+    // A newly registered company owner needs to access /company/profile or /company/dashboard
+    // to set up their company.
+    if (profile.role === 'company') {
+      const isSetupPath = location.pathname === '/company/profile' || location.pathname === '/company/dashboard';
+      if (isSetupPath) {
+        return <>{children}</>;
+      }
+      return <Navigate to="/company/profile" replace />;
+    }
+
+    // Unaffiliated users are redirected to their own dashboard
     return <Navigate to={dashboardMap[profile.role] || '/student/dashboard'} replace />;
   }
 
