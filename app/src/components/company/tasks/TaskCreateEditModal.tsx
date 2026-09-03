@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, User, Users, AlertCircle, CheckCircle2, Info, Calendar,
@@ -115,9 +115,22 @@ export function TaskCreateEditModal({
       setBulkEligibleInterns([]);
       return;
     }
-    const eligible = interns.filter((app: any) => app.internship_id === id);
+    const eligible = interns.filter((app: any) => app.internship_id === id && app.status === 'Accepted');
     setBulkEligibleInterns(eligible);
   };
+
+  // Derive eligible individual interns for the currently selected internship project
+  const eligibleIndividualInterns = useMemo(() => {
+    if (!internshipId) return [];
+    const seen = new Set<string>();
+    return interns.filter((app: any) => {
+      if (app.internship_id !== internshipId || app.status !== 'Accepted') return false;
+      const internId = app.student?.id || app.student_id;
+      if (!internId || seen.has(internId)) return false;
+      seen.add(internId);
+      return true;
+    });
+  }, [interns, internshipId]);
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -185,6 +198,12 @@ export function TaskCreateEditModal({
       }
       if (!assignedTo) {
         errors.intern = 'Please select an intern';
+      } else if (
+        internshipId &&
+        eligibleIndividualInterns.length > 0 &&
+        !eligibleIndividualInterns.some((i) => (i.student?.id || i.student_id) === assignedTo)
+      ) {
+        errors.intern = 'Selected intern is not enrolled in this project';
       }
     } else {
       if (!bulkInternshipId) {
@@ -517,9 +536,13 @@ export function TaskCreateEditModal({
                   <select
                     value={internshipId}
                     onChange={(e) => {
-                      setInternshipId(e.target.value);
-                      if (validationErrors.internship) {
-                        setValidationErrors((prev) => ({ ...prev, internship: '' }));
+                      const newId = e.target.value;
+                      if (newId !== internshipId) {
+                        setInternshipId(newId);
+                        setAssignedTo(''); // Clear previously selected intern
+                        if (validationErrors.internship || validationErrors.intern) {
+                          setValidationErrors((prev) => ({ ...prev, internship: '', intern: '' }));
+                        }
                       }
                     }}
                     className={`w-full px-3.5 py-2.5 bg-background border ${
@@ -547,6 +570,7 @@ export function TaskCreateEditModal({
                   </label>
                   <select
                     value={assignedTo}
+                    disabled={!internshipId}
                     onChange={(e) => {
                       setAssignedTo(e.target.value);
                       if (validationErrors.intern) {
@@ -555,19 +579,36 @@ export function TaskCreateEditModal({
                     }}
                     className={`w-full px-3.5 py-2.5 bg-background border ${
                       validationErrors.intern ? 'border-red-500' : 'border-border'
-                    } rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer`}
+                    } rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    <option value="">Select Intern</option>
-                    {interns.map((i) => (
-                      <option key={i.student?.id || i.student_id} value={i.student?.id || i.student_id}>
-                        {i.student?.full_name || 'Intern'}
-                      </option>
-                    ))}
+                    {!internshipId ? (
+                      <option value="">Select an Internship Project first</option>
+                    ) : eligibleIndividualInterns.length === 0 ? (
+                      <option value="">No accepted interns found for this project</option>
+                    ) : (
+                      <>
+                        <option value="">Select Intern ({eligibleIndividualInterns.length} available)</option>
+                        {eligibleIndividualInterns.map((i) => {
+                          const internId = i.student?.id || i.student_id;
+                          return (
+                            <option key={internId} value={internId}>
+                              {i.student?.full_name || 'Intern'} {i.student?.email ? `(${i.student.email})` : ''}
+                            </option>
+                          );
+                        })}
+                      </>
+                    )}
                   </select>
                   {validationErrors.intern && (
                     <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
                       <AlertCircle className="w-3.5 h-3.5" />
                       {validationErrors.intern}
+                    </p>
+                  )}
+                  {internshipId && eligibleIndividualInterns.length === 0 && !validationErrors.intern && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                      <Info className="w-3.5 h-3.5" />
+                      No accepted interns enrolled in this project yet.
                     </p>
                   )}
                 </div>
