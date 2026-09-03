@@ -33,12 +33,11 @@ export type CompanyTabKey = (typeof COMPANY_TAB_KEYS)[number];
 
 const ALL_TABS: CompanyTabKey[] = [...COMPANY_TAB_KEYS];
 
-/** Tab access per team role. Owned companies can access everything. */
 export const COMPANY_ROLE_PERMISSIONS: Record<CompanyTeamRole, CompanyTabKey[]> = {
-  admin: ALL_TABS.filter((t) => t !== 'settings'),
-  hr: ['dashboard', 'profile', 'internships', 'applications', 'interns', 'messages', 'certificates', 'offer-letters'],
-  mentor: ['dashboard', 'profile', 'interns', 'tasks', 'messages'],
-  reviewer: ['dashboard', 'profile', 'applications', 'interns', 'tasks'],
+  admin: ALL_TABS,
+  hr: ['dashboard', 'profile', 'internships', 'applications', 'interns', 'messages', 'certificates', 'offer-letters', 'settings'],
+  mentor: ['dashboard', 'profile', 'interns', 'tasks', 'messages', 'settings'],
+  reviewer: ['dashboard', 'profile', 'applications', 'interns', 'tasks', 'settings'],
 };
 
 export function canAccessCompanyTab(role: CompanyTeamRole | null, isOwner: boolean, tab: CompanyTabKey): boolean {
@@ -280,13 +279,14 @@ export async function removeTeamMember(id: string) {
     .eq('id', id)
     .single();
 
-  const res = await supabase.from('company_team_members').delete().eq('id', id);
+  const { data, error } = await supabase.rpc('remove_company_team_member', { p_member_id: id });
+  if (error) throw error;
 
-  if (member?.company_id && !res.error) {
+  if (member?.company_id) {
     clearCache(`company_team_${member.company_id}`);
     if (member.user_id) clearCache(createRequestKey('my_company', member.user_id));
   }
-  return res;
+  return { data, error: null };
 }
 
 /** Accept a pending invite for the currently authenticated user. */
@@ -340,23 +340,6 @@ export async function getMyCompanyMembership(useCache = true) {
   if (useCache) {
     const cached = getCachedData<any>(cacheKey);
     if (cached) {
-      // If cached entry comes from old getMyCompany ({ data: company, error }), migrate it to membership shape
-      if (cached.data && !('company' in cached)) {
-        const comp = cached.data;
-        return {
-          company: comp,
-          member: null,
-          data: { company: comp, member: null },
-          error: cached.error ?? null,
-        };
-      }
-      // If cached is new shape, ensure data alias is attached for compatibility with destructuring { data }
-      if ('company' in cached) {
-        return {
-          ...cached,
-          data: cached.data ?? { company: cached.company, member: cached.member ?? null },
-        };
-      }
       return cached;
     }
   }

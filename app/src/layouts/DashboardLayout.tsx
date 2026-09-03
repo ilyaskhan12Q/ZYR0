@@ -227,6 +227,9 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
   useEffect(() => {
     if (profile && !profileCompleted && profile.role !== 'admin' && profile.role === role) {
+      if (role === 'company' && companyAccess && !companyAccess.isOwner) {
+        return;
+      }
       const restricted = RESTRICTED_ROUTES[profile.role] || [];
       const isRestricted = restricted.some(route => 
         location.pathname === route || location.pathname.startsWith(route + '/')
@@ -236,7 +239,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         toast.error("Please complete your profile before using this feature.");
       }
     }
-  }, [location.pathname, profile, profileCompleted, navigate, role]);
+  }, [location.pathname, profile, profileCompleted, navigate, role, companyAccess]);
 
   const getRequirementStatus = (reqName: string) => {
     if (!profile) return false;
@@ -412,7 +415,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             const hasChildren = item.children && item.children.length > 0;
             const isExpanded = expandedSections.includes(item.label);
             
-            const isItemRestricted = profile && !profileCompleted && profile.role !== 'admin' && (
+            const isItemRestricted = profile && !profileCompleted && profile.role !== 'admin' && !(role === 'company' && companyAccess && !companyAccess.isOwner) && (
               (RESTRICTED_ROUTES[profile.role] || []).some(route => item.href === route || item.href.startsWith(route + '/'))
             );
 
@@ -469,7 +472,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                     className="ml-4 mt-1 space-y-1 border-l-2 border-border pl-3"
                   >
                     {item.children?.map((child) => {
-                      const isChildRestricted = profile && !profileCompleted && profile.role !== 'admin' && (
+                      const isChildRestricted = profile && !profileCompleted && profile.role !== 'admin' && !(role === 'company' && companyAccess && !companyAccess.isOwner) && (
                         (RESTRICTED_ROUTES[profile.role] || []).some(route => child.href === route || child.href.startsWith(route + '/'))
                       );
                       return (

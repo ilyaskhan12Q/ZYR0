@@ -68,7 +68,20 @@ serve(async (req: Request) => {
       const isOwner = companyData?.owner_id === user.id;
       const isAdmin = callerProfile?.role === 'admin';
 
+      let isAuthorizedMember = false;
       if (!isOwner && !isAdmin) {
+        const { data: teamMember } = await supabaseAdmin
+          .from('company_team_members')
+          .select('id')
+          .eq('company_id', certificate.company_id)
+          .eq('user_id', user.id)
+          .eq('status', 'accepted')
+          .in('role', ['admin', 'hr'])
+          .maybeSingle();
+        isAuthorizedMember = !!teamMember;
+      }
+
+      if (!isOwner && !isAdmin && !isAuthorizedMember) {
         return new Response(JSON.stringify({ error: 'Forbidden' }), {
           status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -282,7 +295,20 @@ serve(async (req: Request) => {
     const isOwner = ownerId === user.id;
     const isAdmin = callerProfile?.role === 'admin';
 
-    if (!isOwner && !isAdmin) {
+    let isAuthorizedMember = false;
+    if (!isOwner && !isAdmin && internship?.company_id) {
+      const { data: teamMember } = await supabaseAdmin
+        .from('company_team_members')
+        .select('id')
+        .eq('company_id', internship.company_id)
+        .eq('user_id', user.id)
+        .eq('status', 'accepted')
+        .in('role', ['admin', 'hr'])
+        .maybeSingle();
+      isAuthorizedMember = !!teamMember;
+    }
+
+    if (!isOwner && !isAdmin && !isAuthorizedMember) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });

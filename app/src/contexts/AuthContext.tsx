@@ -47,9 +47,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .from('companies')
           .select('*')
           .eq('owner_id', userId)
-          .single();
+          .maybeSingle();
         if (ownerCompany) {
           data.company = ownerCompany;
+        } else {
+          const { data: teamMember } = await supabase
+            .from('company_team_members')
+            .select('company:companies(*)')
+            .eq('user_id', userId)
+            .eq('status', 'accepted')
+            .order('accepted_at', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          if (teamMember?.company) {
+            data.company = teamMember.company as any;
+          }
         }
       }
       setProfile(data);

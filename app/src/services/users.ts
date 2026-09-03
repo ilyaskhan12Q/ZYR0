@@ -170,19 +170,26 @@ export function checkProfileCompletion(profile: (Profile & { company?: any }) | 
 
   } else if (role === 'company') {
     const company = profile.company;
+    const isOwner = !company?.owner_id || company.owner_id === profile.id;
     const hasFullName = !!profile.full_name && profile.full_name.trim().length > 0;
     const hasAvatar = !!profile.avatar_url && profile.avatar_url.trim().length > 0;
-    const hasCoName = !!company?.name && company.name.trim().length > 0;
-    const hasCoLogo = !!company?.logo_url && company.logo_url.trim().length > 0;
-    const hasCoDesc = !!company?.description && company.description.trim().length > 0;
-    const hasCoIndustry = !!company?.industry && company.industry.trim().length > 0;
 
     if (hasFullName) score += 20; else requirements.push('Basic profile (Full Name)');
     if (hasAvatar) score += 20; else requirements.push('Basic profile (Avatar)');
-    if (hasCoName) score += 15; else requirements.push('Company details (Name)');
-    if (hasCoLogo) score += 15; else requirements.push('Company details (Logo)');
-    if (hasCoDesc) score += 15; else requirements.push('Organization information (Description)');
-    if (hasCoIndustry) score += 15; else requirements.push('Organization information (Industry)');
+
+    if (isOwner) {
+      const hasCoName = !!company?.name && company.name.trim().length > 0;
+      const hasCoLogo = !!company?.logo_url && company.logo_url.trim().length > 0;
+      const hasCoDesc = !!company?.description && company.description.trim().length > 0;
+      const hasCoIndustry = !!company?.industry && company.industry.trim().length > 0;
+
+      if (hasCoName) score += 15; else requirements.push('Company details (Name)');
+      if (hasCoLogo) score += 15; else requirements.push('Company details (Logo)');
+      if (hasCoDesc) score += 15; else requirements.push('Organization information (Description)');
+      if (hasCoIndustry) score += 15; else requirements.push('Organization information (Industry)');
+    } else {
+      score += 60;
+    }
   } else {
     return { completed: true, percentage: 100, requirements: [] };
   }

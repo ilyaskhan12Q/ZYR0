@@ -41,7 +41,7 @@ serve(async (req) => {
       { count: totalCertificates },
     ] = await Promise.all([
       supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
+      supabaseAdmin.from('companies').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
       supabaseAdmin.from('internships').select('*', { count: 'exact', head: true }).eq('status', 'Active'),
       supabaseAdmin.from('applications').select('*', { count: 'exact', head: true }),
       supabaseAdmin.from('certificates').select('*', { count: 'exact', head: true }).eq('status', 'Active'),

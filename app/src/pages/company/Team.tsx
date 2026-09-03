@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Mail, Shield, X, Trash2, Loader2, Send, RefreshCw, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Mail, Shield, X, Trash2, Loader2, Send, RefreshCw, CheckCircle2, Clock, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMyCompanyMembership, getCompanyTeam, addTeamMember, updateTeamMember, removeTeamMember, resendTeamInvite, COMPANY_TEAM_ROLES, teamRoleLabel } from '@/services/companyTeam';
+import { useCompanyAccess } from '@/contexts/CompanyAccessContext';
+import { getCompanyTeam, addTeamMember, updateTeamMember, removeTeamMember, resendTeamInvite, COMPANY_TEAM_ROLES, teamRoleLabel } from '@/services/companyTeam';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
 import type { CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
 
 export default function CompanyTeam() {
   const { user } = useAuth();
+  const { company, isOwner } = useCompanyAccess();
   const [loading, setLoading] = useState(true);
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [members, setMembers] = useState<CompanyTeamMember[]>([]);
@@ -23,15 +25,12 @@ export default function CompanyTeam() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
+      if (!company?.id) return;
+      setCompanyId(company.id);
       try {
-        const memberResult = await withTimeout(getMyCompanyMembership(), 10000, { data: null }, 'CompanyTeam');
-        const membership = memberResult?.data;
-        if (membership?.company) {
-          setCompanyId(membership.company.id);
-          const teamResult = await withTimeout(getCompanyTeam(membership.company.id), 10000, { data: [] }, 'CompanyTeamList');
-          const data = teamResult?.data;
-          if (data && !cancelled) setMembers(data);
-        }
+        const teamResult = await withTimeout(getCompanyTeam(company.id), 10000, { data: [] }, 'CompanyTeamList');
+        const data = teamResult?.data;
+        if (data && !cancelled) setMembers(data);
       } catch (err) {
         console.error('Failed to load team:', err);
         toast.error('Failed to load team data');
@@ -39,9 +38,13 @@ export default function CompanyTeam() {
         if (!cancelled) setLoading(false);
       }
     }
-    if (user) load();
+    if (company?.id) {
+      load();
+    } else if (user) {
+      setLoading(false);
+    }
     return () => { cancelled = true; };
-  }, [user]);
+  }, [company, user]);
 
   async function handleAdd() {
     if (!companyId || !newEmail.trim()) return;
@@ -62,6 +65,14 @@ export default function CompanyTeam() {
   }
 
   async function handleRemove(member: CompanyTeamMember) {
+    if (member.user_id === user?.id) {
+      toast.error('You cannot remove yourself from the team');
+      return;
+    }
+    if (!isOwner && member.role === 'admin') {
+      toast.error('Only the company owner can remove an administrator');
+      return;
+    }
     if (!window.confirm(`Remove ${member.name} from the team?`)) return;
     try {
       await removeTeamMember(member.id);
@@ -74,6 +85,10 @@ export default function CompanyTeam() {
 
   async function handleRoleChange(member: CompanyTeamMember, role: CompanyTeamRole) {
     if (role === member.role) return;
+    if (!isOwner && (member.role === 'admin' || role === 'admin')) {
+      toast.error('Only the company owner can modify administrator roles');
+      return;
+    }
     setUpdatingRole(member.id);
     try {
       const { data, error } = await updateTeamMember(member.id, { role });
@@ -181,10 +196,41 @@ export default function CompanyTeam() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
+              {company && (
+                <tr className="bg-muted/10">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold text-sm">
+                        {company.owner?.full_name ? company.owner.full_name.charAt(0).toUpperCase() : 'O'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium flex items-center gap-1.5">
+                          {company.owner?.full_name || 'Company Owner'}
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-600 border border-amber-500/20">Owner</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">{company.email || company.owner?.department || 'Organization Primary'}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs rounded-full font-medium">
+                      <Crown className="w-3 h-3" /> Owner
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs rounded-full font-medium">
+                      <CheckCircle2 className="w-3 h-3" /> Active
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
+                    Primary Owner
+                  </td>
+                </tr>
+              )}
               {members.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted-foreground">
-                    No team members yet. Invite members to manage your internship program.
+                  <td colSpan={4} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                    No invited team members yet. Invite members to manage your internship program.
                   </td>
                 </tr>
               ) : (
@@ -208,9 +254,9 @@ export default function CompanyTeam() {
                         </span>
                         <select
                           value={member.role}
-                          disabled={updatingRole === member.id || member.user_id === user?.id}
+                          disabled={updatingRole === member.id || member.user_id === user?.id || (!isOwner && member.role === 'admin')}
                           onChange={(e) => handleRoleChange(member, e.target.value as CompanyTeamRole)}
-                          title={member.user_id === user?.id ? 'You cannot change your own role' : 'Change role'}
+                          title={member.user_id === user?.id ? 'You cannot change your own role' : !isOwner && member.role === 'admin' ? 'Only the owner can modify administrator roles' : 'Change role'}
                           className="px-2 py-1 text-xs bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:opacity-40">
                           {COMPANY_TEAM_ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
                         </select>
@@ -237,7 +283,9 @@ export default function CompanyTeam() {
                           </button>
                         )}
                         <button onClick={() => handleRemove(member)}
-                          className="p-1.5 hover:bg-red-50 rounded-lg disabled:opacity-50" title="Remove">
+                          disabled={member.user_id === user?.id || (!isOwner && member.role === 'admin')}
+                          className="p-1.5 hover:bg-red-50 rounded-lg disabled:opacity-50"
+                          title={member.user_id === user?.id ? 'You cannot remove yourself' : !isOwner && member.role === 'admin' ? 'Only the owner can remove administrators' : 'Remove'}>
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
                       </div>
