@@ -502,24 +502,65 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
         <div className="border-t border-border p-3 space-y-1 flex-shrink-0">
           {/* Workspace switcher — shown in the mobile drawer (desktop keeps the header avatar menu) */}
           {companyAccess?.hasAccess && role !== 'company' && (
-            <Link
-              to="/company/dashboard"
-              onClick={() => setMobileOpen(false)}
-              className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
-            >
-              <Building2 className="w-5 h-5 flex-shrink-0" />
-              <span>Switch to {companyAccess.company?.name || 'Company'} Workspace</span>
-            </Link>
+            companyAccess.companies && companyAccess.companies.length > 1 ? (
+              companyAccess.companies.map((c) => (
+                <button
+                  key={c.company.id}
+                  onClick={async () => {
+                    setMobileOpen(false);
+                    try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                    await companyAccess.switchCompany(c.company.id);
+                    navigate('/company/dashboard');
+                  }}
+                  className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors w-full text-left"
+                >
+                  <Building2 className="w-5 h-5 flex-shrink-0" />
+                  <span>Switch to {c.company.name} Workspace</span>
+                </button>
+              ))
+            ) : (
+              <Link
+                to="/company/dashboard"
+                onClick={() => {
+                  setMobileOpen(false);
+                  try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                }}
+                className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
+              >
+                <Building2 className="w-5 h-5 flex-shrink-0" />
+                <span>Switch to {companyAccess.company?.name || 'Company'} Workspace</span>
+              </Link>
+            )
           )}
           {role === 'company' && profile?.role && profile.role !== 'company' && (
             <Link
               to={`/${profile.role}/dashboard`}
-              onClick={() => setMobileOpen(false)}
+              onClick={() => {
+                setMobileOpen(false);
+                try { localStorage.setItem('zyro_last_workspace', profile.role); } catch {}
+              }}
               className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
             >
               <User className="w-5 h-5 flex-shrink-0" />
               <span>Switch to {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Workspace</span>
             </Link>
+          )}
+          {role === 'company' && companyAccess && companyAccess.companies && companyAccess.companies.length > 1 && (
+            companyAccess.companies
+              .filter((c) => c.company.id !== companyAccess.company?.id)
+              .map((c) => (
+                <button
+                  key={c.company.id}
+                  onClick={async () => {
+                    setMobileOpen(false);
+                    await companyAccess.switchCompany(c.company.id);
+                  }}
+                  className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors w-full text-left"
+                >
+                  <Building2 className="w-5 h-5 flex-shrink-0" />
+                  <span>Switch to {c.company.name} Workspace</span>
+                </button>
+              ))
           )}
           <Link
             to="/"
@@ -690,20 +731,61 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                         <Settings className="w-4 h-4" /> Settings
                       </button>
                       {companyAccess?.hasAccess && role !== 'company' && (
-                        <button
-                          onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2"
-                        >
-                          <Building2 className="w-4 h-4 text-accent" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
-                        </button>
+                        companyAccess.companies && companyAccess.companies.length > 1 ? (
+                          companyAccess.companies.map((c) => (
+                            <button
+                              key={c.company.id}
+                              onClick={async () => {
+                                setProfileOpen(false);
+                                try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                                await companyAccess.switchCompany(c.company.id);
+                                navigate('/company/dashboard');
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2 text-left"
+                            >
+                              <Building2 className="w-4 h-4 text-accent" /> Switch to {c.company.name} Workspace
+                            </button>
+                          ))
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setProfileOpen(false);
+                              try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                              navigate('/company/dashboard');
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2 text-left"
+                          >
+                            <Building2 className="w-4 h-4 text-accent" /> Switch to {companyAccess.company?.name || 'Company'} Workspace
+                          </button>
+                        )
                       )}
                       {role === 'company' && profile?.role && profile.role !== 'company' && (
                         <button
-                          onClick={() => { setProfileOpen(false); navigate(`/${profile.role}/dashboard`); }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            try { localStorage.setItem('zyro_last_workspace', profile.role); } catch {}
+                            navigate(`/${profile.role}/dashboard`);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2 text-left"
                         >
                           <User className="w-4 h-4 text-accent" /> Switch to {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Workspace
                         </button>
+                      )}
+                      {role === 'company' && companyAccess && companyAccess.companies && companyAccess.companies.length > 1 && (
+                        companyAccess.companies
+                          .filter((c) => c.company.id !== companyAccess.company?.id)
+                          .map((c) => (
+                            <button
+                              key={c.company.id}
+                              onClick={async () => {
+                                setProfileOpen(false);
+                                await companyAccess.switchCompany(c.company.id);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-2 text-sm text-accent hover:bg-accent/10 font-medium transition-colors border-t border-border mt-1 pt-2 text-left"
+                            >
+                              <Building2 className="w-4 h-4 text-accent" /> Switch to {c.company.name} Workspace
+                            </button>
+                          ))
                       )}
                     </div>
                     <div className="border-t border-border pt-1">

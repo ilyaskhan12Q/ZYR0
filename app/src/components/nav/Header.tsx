@@ -314,12 +314,33 @@ export default function Header() {
                             <LayoutDashboard className="w-4 h-4" /> Dashboard
                           </button>
                           {companyAccess?.hasAccess && effectiveRole !== 'company' && (
-                            <button
-                              onClick={() => { setProfileOpen(false); navigate('/company/dashboard'); }}
-                              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm font-medium text-accent-400 hover:bg-white/5 transition-colors"
-                            >
-                              <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
-                            </button>
+                            companyAccess.companies && companyAccess.companies.length > 1 ? (
+                              companyAccess.companies.map((c) => (
+                                <button
+                                  key={c.company.id}
+                                  onClick={async () => {
+                                    setProfileOpen(false);
+                                    try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                                    await companyAccess.switchCompany(c.company.id);
+                                    navigate('/company/dashboard');
+                                  }}
+                                  className="w-full flex items-center gap-2.5 px-4 py-2 text-sm font-medium text-accent-400 hover:bg-white/5 transition-colors"
+                                >
+                                  <Building2 className="w-4 h-4" /> Switch to {c.company.name}
+                                </button>
+                              ))
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setProfileOpen(false);
+                                  try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                                  navigate('/company/dashboard');
+                                }}
+                                className="w-full flex items-center gap-2.5 px-4 py-2 text-sm font-medium text-accent-400 hover:bg-white/5 transition-colors"
+                              >
+                                <Building2 className="w-4 h-4" /> Switch to {companyAccess.company?.name || 'Company'}
+                              </button>
+                            )
                           )}
                           <button
                             onClick={() => { setProfileOpen(false); navigate(`/${effectiveRole}/profile`); }}
@@ -560,13 +581,33 @@ export default function Header() {
                   {user ? (
                     <div className="flex flex-col gap-0.5">
                       {companyAccess?.hasAccess && effectiveRole && effectiveRole !== 'company' && (
-                        <Link
-                          to="/company/dashboard"
-                          onClick={() => setMobileOpen(false)}
-                          className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <Building2 className="w-4 h-4 text-neutral-400" /> Switch to {companyAccess.company?.name || 'Company'}
-                        </Link>
+                        companyAccess.companies && companyAccess.companies.length > 1 ? (
+                          companyAccess.companies.map((c) => (
+                            <button
+                              key={c.company.id}
+                              onClick={async () => {
+                                setMobileOpen(false);
+                                try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                                await companyAccess.switchCompany(c.company.id);
+                                navigate('/company/dashboard');
+                              }}
+                              className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors w-full text-left"
+                            >
+                              <Building2 className="w-4 h-4 text-neutral-400" /> Switch to {c.company.name}
+                            </button>
+                          ))
+                        ) : (
+                          <Link
+                            to="/company/dashboard"
+                            onClick={() => {
+                              setMobileOpen(false);
+                              try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
+                            }}
+                            className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 transition-colors"
+                          >
+                            <Building2 className="w-4 h-4 text-neutral-400" /> Switch to {companyAccess.company?.name || 'Company'}
+                          </Link>
+                        )
                       )}
                       {effectiveRole && (
                         <>
