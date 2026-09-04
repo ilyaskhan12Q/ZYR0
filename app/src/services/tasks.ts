@@ -76,7 +76,10 @@ export async function getMyTasks(useCache = true) {
     .from('tasks')
     .select(`
       *,
-      internship:internships!internship_id (id, title),
+      internship:internships!internship_id (
+        *,
+        company:companies!company_id (id, name, logo_url, rating, owner_id)
+      ),
       assigner:profiles!assigned_by (id, full_name, avatar_url, role),
       submissions:task_submissions (*)
     `)
@@ -243,6 +246,24 @@ export async function createTask(data: Partial<Task>) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Enforce server-side invariant: assignee must have an accepted application for the project
+  if (data.internship_id && data.assigned_to) {
+    const { data: enrollment, error: enrollError } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('internship_id', data.internship_id)
+      .eq('student_id', data.assigned_to)
+      .eq('status', 'Accepted')
+      .maybeSingle();
+
+    if (enrollError || !enrollment) {
+      return {
+        data: null,
+        error: new Error('Assigned intern must be an accepted participant in the selected internship project'),
+      };
+    }
+  }
+
   const res = await supabase
     .from('tasks')
     .insert({ ...data, assigned_by: user.id })
@@ -250,6 +271,7 @@ export async function createTask(data: Partial<Task>) {
     .single();
 
   if (!res.error) {
+    clearCache('company_tasks');
     clearCache(`assigned_by_tasks_${user.id}`);
     if (data.assigned_to) {
       clearCache(`my_tasks_${data.assigned_to}`);
@@ -260,8 +282,27 @@ export async function createTask(data: Partial<Task>) {
 
 /** Update a task */
 export async function updateTask(id: string, data: Partial<Task>) {
+  // If reassigning project or intern, enforce enrollment invariant
+  if (data.internship_id && data.assigned_to) {
+    const { data: enrollment, error: enrollError } = await supabase
+      .from('applications')
+      .select('id')
+      .eq('internship_id', data.internship_id)
+      .eq('student_id', data.assigned_to)
+      .eq('status', 'Accepted')
+      .maybeSingle();
+
+    if (enrollError || !enrollment) {
+      return {
+        data: null,
+        error: new Error('Assigned intern must be an accepted participant in the selected internship project'),
+      };
+    }
+  }
+
   const res = await supabase.from('tasks').update(data).eq('id', id).select().single();
   if (!res.error) {
+    clearCache('company_tasks');
     clearCache(`task_${id}`);
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -292,9 +333,9 @@ export async function submitTask(data: {
     .single();
 
     if (!res.error) {
-    clearCache(`my_tasks_${user.id}`);
-    clearCache(`task_${data.task_id}`);
-  }
+      clearCache(`my_tasks_${user.id}`);
+      clearCache(`task_${data.task_id}`);
+    }
   return res;
 }
 
@@ -311,6 +352,28 @@ export async function bulkCreateTasks(
   if (!user) throw new Error('Not authenticated');
   if (!internIds.length) return { data: [], created: 0, skipped: 0, error: null };
 
+  // Enforce server-side invariant: interns must be accepted in the selected internship
+  let targetInternIds = internIds;
+  if (baseData.internship_id) {
+    const { data: acceptedApps } = await supabase
+      .from('applications')
+      .select('student_id')
+      .eq('internship_id', baseData.internship_id)
+      .eq('status', 'Accepted')
+      .in('student_id', internIds);
+
+    const validIds = new Set(acceptedApps?.map((a: any) => a.student_id) || []);
+    targetInternIds = internIds.filter(id => validIds.has(id));
+    if (!targetInternIds.length) {
+      return {
+        data: [],
+        created: 0,
+        skipped: internIds.length,
+        error: new Error('No accepted interns found for this internship project'),
+      };
+    }
+  }
+
   // Deduplicate against existing tasks with the same title + internship + assignee
   const existingSet = new Set(
     existingTasks
@@ -318,7 +381,7 @@ export async function bulkCreateTasks(
       .map(t => t.assigned_to),
   );
 
-  const newInternIds = internIds.filter(id => !existingSet.has(id));
+  const newInternIds = targetInternIds.filter(id => !existingSet.has(id));
   const skipped = internIds.length - newInternIds.length;
 
   if (!newInternIds.length) {
@@ -334,7 +397,8 @@ export async function bulkCreateTasks(
   const res = await supabase.from('tasks').insert(rows).select();
 
   if (!res.error) {
-    // Clear caches for assigner and every affected intern
+    // Clear caches for company, assigner and every affected intern
+    clearCache('company_tasks');
     clearCache(`assigned_by_tasks_${user.id}`);
     newInternIds.forEach(id => clearCache(`my_tasks_${id}`));
   }
@@ -364,6 +428,7 @@ export async function reviewSubmission(
     .single();
 
   if (!res.error) {
+    clearCache('company_tasks');
     const studentId = res.data?.student_id;
     const taskId = res.data?.task_id;
     if (studentId) {
@@ -379,3 +444,159 @@ export async function reviewSubmission(
   }
   return res;
 }
+
+/** Bulk-extend deadlines for multiple tasks (mentor/company) */
+export async function bulkExtendTaskDeadlines(
+  taskIds: string[],
+  newDueDate: string,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+  if (!taskIds.length) return { data: [], count: 0, error: null };
+
+  const res = await supabase
+    .from('tasks')
+    .update({
+      due_date: newDueDate,
+      updated_at: new Date().toISOString(),
+    })
+    .in('id', taskIds)
+    .select('id, title, assigned_to, internship_id, status');
+
+  if (!res.error && res.data) {
+    clearCache('company_tasks');
+    clearCache(`assigned_by_tasks_${user.id}`);
+    const affectedStudents = new Set(res.data.map(t => t.assigned_to));
+    affectedStudents.forEach(studentId => {
+      clearCache(`my_tasks_${studentId}`);
+    });
+    taskIds.forEach(id => clearCache(`task_${id}`));
+  }
+
+  return {
+    data: res.data || [],
+    count: res.data?.length || 0,
+    error: res.error,
+  };
+}
+
+/** Update a master deliverable and sync details across all assigned intern task instances */
+export async function updateMasterDeliverable(
+  internshipId: string,
+  currentTitle: string,
+  updates: Partial<Task>,
+  syncDeadline: boolean = true,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const payload: Record<string, any> = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.title !== undefined) payload.title = updates.title;
+  if (updates.description !== undefined) payload.description = updates.description;
+  if (updates.priority !== undefined) payload.priority = updates.priority;
+  if (updates.difficulty !== undefined) payload.difficulty = updates.difficulty;
+  if (updates.estimated_duration !== undefined) payload.estimated_duration = updates.estimated_duration;
+  if (updates.attachments !== undefined) payload.attachments = updates.attachments;
+  if (updates.objectives !== undefined) payload.objectives = updates.objectives;
+  if (updates.acceptance_criteria !== undefined) payload.acceptance_criteria = updates.acceptance_criteria;
+
+  if (syncDeadline && updates.due_date !== undefined) {
+    payload.due_date = updates.due_date;
+  }
+
+  const res = await supabase
+    .from('tasks')
+    .update(payload)
+    .eq('internship_id', internshipId)
+    .eq('title', currentTitle)
+    .select('id, assigned_to');
+
+  if (!res.error && res.data) {
+    clearCache('company_tasks');
+    clearCache(`assigned_by_tasks_${user.id}`);
+    res.data.forEach(t => {
+      clearCache(`my_tasks_${t.assigned_to}`);
+      clearCache(`task_${t.id}`);
+    });
+  }
+
+  return {
+    updated: res.data?.length || 0,
+    error: res.error,
+  };
+}
+
+/** Safely delete a master deliverable (deletes pending/unsubmitted tasks; warns on submitted) */
+export async function deleteMasterDeliverable(
+  internshipId: string,
+  title: string,
+  forceDeleteAll: boolean = false,
+) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Fetch all tasks matching this deliverable
+  const { data: matchingTasks, error: fetchErr } = await supabase
+    .from('tasks')
+    .select('id, status, assigned_to')
+    .eq('internship_id', internshipId)
+    .eq('title', title);
+
+  if (fetchErr || !matchingTasks?.length) {
+    return { deleted: 0, skipped: 0, error: fetchErr || new Error('No matching tasks found') };
+  }
+
+  const hasSubmissions = matchingTasks.some(t => t.status === 'Submitted' || t.status === 'Approved');
+
+  let tasksToDelete = matchingTasks;
+  if (!forceDeleteAll && hasSubmissions) {
+    // Only delete unsubmitted (Pending/Rejected) tasks
+    tasksToDelete = matchingTasks.filter(t => t.status === 'Pending' || t.status === 'Rejected');
+  }
+
+  if (!tasksToDelete.length) {
+    return {
+      deleted: 0,
+      skipped: matchingTasks.length,
+      hasSubmissions,
+      error: new Error('Cannot delete deliverable: all assigned interns have already submitted work.'),
+    };
+  }
+
+  const idsToDelete = tasksToDelete.map(t => t.id);
+  const { data: deletedRows, error: delErr } = await supabase
+    .from('tasks')
+    .delete()
+    .in('id', idsToDelete)
+    .select('id');
+
+  // Bust company tasks cache and individual task caches
+  clearCache('company_tasks');
+  clearCache(`assigned_by_tasks_${user.id}`);
+  tasksToDelete.forEach(t => {
+    clearCache(`my_tasks_${t.assigned_to}`);
+    clearCache(`task_${t.id}`);
+  });
+
+  if (delErr) {
+    return {
+      deleted: 0,
+      skipped: matchingTasks.length,
+      hasSubmissions,
+      error: delErr,
+    };
+  }
+
+  const actualDeleted = deletedRows ? deletedRows.length : tasksToDelete.length;
+
+  return {
+    deleted: actualDeleted,
+    skipped: matchingTasks.length - actualDeleted,
+    hasSubmissions,
+    error: null,
+  };
+}
+

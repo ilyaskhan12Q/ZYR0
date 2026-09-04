@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, User, Users, AlertCircle, CheckCircle2, Info, Calendar,
   Upload, FileText, Trash2, Plus,
 } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
-import { createTask, updateTask, bulkCreateTasks, uploadTaskDocument } from '@/services/tasks';
+import { createTask, updateTask, updateMasterDeliverable, bulkCreateTasks, uploadTaskDocument } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import type { TaskAttachment } from '@/lib/database.types';
 
@@ -59,8 +59,20 @@ export function TaskCreateEditModal({
 
   const [submitting, setSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const prevIsOpenRef = useRef(false);
+  const prevTaskToEditIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Only re-initialize when modal opens (false -> true) or when taskToEdit ID changes.
+    // Do NOT wipe user form state on redundant re-renders while the modal remains open.
+    const isOpening = isOpen && !prevIsOpenRef.current;
+    const taskChanged = (taskToEdit?.id || null) !== prevTaskToEditIdRef.current;
+    prevIsOpenRef.current = isOpen;
+    prevTaskToEditIdRef.current = taskToEdit?.id || null;
+
+    if (!isOpen) return;
+    if (!isOpening && !taskChanged) return;
+
     if (taskToEdit) {
       setTitle(taskToEdit.title || '');
       setDescription(taskToEdit.description || '');
@@ -103,9 +115,22 @@ export function TaskCreateEditModal({
       setBulkEligibleInterns([]);
       return;
     }
-    const eligible = interns.filter((app: any) => app.internship_id === id);
+    const eligible = interns.filter((app: any) => app.internship_id === id && app.status === 'Accepted');
     setBulkEligibleInterns(eligible);
   };
+
+  // Derive eligible individual interns for the currently selected internship project
+  const eligibleIndividualInterns = useMemo(() => {
+    if (!internshipId) return [];
+    const seen = new Set<string>();
+    return interns.filter((app: any) => {
+      if (app.internship_id !== internshipId || app.status !== 'Accepted') return false;
+      const internId = app.student?.id || app.student_id;
+      if (!internId || seen.has(internId)) return false;
+      seen.add(internId);
+      return true;
+    });
+  }, [interns, internshipId]);
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -167,12 +192,22 @@ export function TaskCreateEditModal({
       errors.description = 'Description must be at least 10 characters';
     }
 
-    if (assignmentScope === 'individual' || isEditMode) {
+    if (taskToEdit?.isMasterEdit) {
+      if (!internshipId) {
+        errors.internship = 'Please select an internship project';
+      }
+    } else if (assignmentScope === 'individual' || isEditMode) {
       if (!internshipId) {
         errors.internship = 'Please select an internship project';
       }
       if (!assignedTo) {
         errors.intern = 'Please select an intern';
+      } else if (
+        internshipId &&
+        eligibleIndividualInterns.length > 0 &&
+        !eligibleIndividualInterns.some((i) => (i.student?.id || i.student_id) === assignedTo)
+      ) {
+        errors.intern = 'Selected intern is not enrolled in this project';
       }
     } else {
       if (!bulkInternshipId) {
@@ -215,15 +250,29 @@ export function TaskCreateEditModal({
 
     try {
       if (isEditMode) {
-        const { error } = await updateTask(taskToEdit.id, {
-          ...taskData,
-          internship_id: internshipId,
-          assigned_to: assignedTo,
-        });
+        if (taskToEdit.isMasterEdit) {
+          const { error } = await updateMasterDeliverable(
+            taskToEdit.internship_id || internshipId,
+            taskToEdit.originalTitle || taskToEdit.title,
+            taskData,
+            true
+          );
 
-        if (!error) {
-          onSuccess();
-          onClose();
+          if (!error) {
+            onSuccess();
+            onClose();
+          }
+        } else {
+          const { error } = await updateTask(taskToEdit.id, {
+            ...taskData,
+            internship_id: internshipId,
+            assigned_to: assignedTo,
+          });
+
+          if (!error) {
+            onSuccess();
+            onClose();
+          }
         }
       } else if (assignmentScope === 'bulk') {
         const internIds = bulkEligibleInterns.map((app: any) => app.student?.id || app.student_id);
@@ -312,10 +361,18 @@ export function TaskCreateEditModal({
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <div>
               <h2 className="font-bold text-lg text-foreground">
-                {isEditMode ? 'Edit Task Specifications' : 'Assign New Task'}
+                {taskToEdit?.isMasterEdit
+                  ? 'Edit Master Deliverable'
+                  : isEditMode
+                  ? 'Edit Task Specifications'
+                  : 'Assign New Task'}
               </h2>
               <p className="text-xs text-muted-foreground">
-                {isEditMode ? 'Modify task requirements & details' : 'Delegate work to enrolled interns'}
+                {taskToEdit?.isMasterEdit
+                  ? 'Updates will sync across all assigned interns in this project'
+                  : isEditMode
+                  ? 'Modify task requirements & details'
+                  : 'Delegate work to enrolled interns'}
               </p>
             </div>
             <button
@@ -505,9 +562,13 @@ export function TaskCreateEditModal({
                   <select
                     value={internshipId}
                     onChange={(e) => {
-                      setInternshipId(e.target.value);
-                      if (validationErrors.internship) {
-                        setValidationErrors((prev) => ({ ...prev, internship: '' }));
+                      const newId = e.target.value;
+                      if (newId !== internshipId) {
+                        setInternshipId(newId);
+                        setAssignedTo(''); // Clear previously selected intern
+                        if (validationErrors.internship || validationErrors.intern) {
+                          setValidationErrors((prev) => ({ ...prev, internship: '', intern: '' }));
+                        }
                       }
                     }}
                     className={`w-full px-3.5 py-2.5 bg-background border ${
@@ -529,36 +590,66 @@ export function TaskCreateEditModal({
                   )}
                 </div>
 
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
-                    Assign To *
-                  </label>
-                  <select
-                    value={assignedTo}
-                    onChange={(e) => {
-                      setAssignedTo(e.target.value);
-                      if (validationErrors.intern) {
-                        setValidationErrors((prev) => ({ ...prev, intern: '' }));
-                      }
-                    }}
-                    className={`w-full px-3.5 py-2.5 bg-background border ${
-                      validationErrors.intern ? 'border-red-500' : 'border-border'
-                    } rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer`}
-                  >
-                    <option value="">Select Intern</option>
-                    {interns.map((i) => (
-                      <option key={i.student?.id || i.student_id} value={i.student?.id || i.student_id}>
-                        {i.student?.full_name || 'Intern'}
-                      </option>
-                    ))}
-                  </select>
-                  {validationErrors.intern && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      {validationErrors.intern}
-                    </p>
-                  )}
-                </div>
+                {taskToEdit?.isMasterEdit ? (
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                      Target Scope
+                    </label>
+                    <div className="w-full px-3.5 py-2.5 bg-accent/10 border border-accent/20 rounded-xl text-xs font-semibold text-accent flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      <span>Syncs across all assigned interns in project</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
+                      Assign To *
+                    </label>
+                    <select
+                      value={assignedTo}
+                      disabled={!internshipId}
+                      onChange={(e) => {
+                        setAssignedTo(e.target.value);
+                        if (validationErrors.intern) {
+                          setValidationErrors((prev) => ({ ...prev, intern: '' }));
+                        }
+                      }}
+                      className={`w-full px-3.5 py-2.5 bg-background border ${
+                        validationErrors.intern ? 'border-red-500' : 'border-border'
+                      } rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      {!internshipId ? (
+                        <option value="">Select an Internship Project first</option>
+                      ) : eligibleIndividualInterns.length === 0 ? (
+                        <option value="">No accepted interns found for this project</option>
+                      ) : (
+                        <>
+                          <option value="">Select Intern ({eligibleIndividualInterns.length} available)</option>
+                          {eligibleIndividualInterns.map((i) => {
+                            const internId = i.student?.id || i.student_id;
+                            return (
+                              <option key={internId} value={internId}>
+                                {i.student?.full_name || 'Intern'} {i.student?.email ? `(${i.student.email})` : ''}
+                              </option>
+                            );
+                          })}
+                        </>
+                      )}
+                    </select>
+                    {validationErrors.intern && (
+                      <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        {validationErrors.intern}
+                      </p>
+                    )}
+                    {internshipId && eligibleIndividualInterns.length === 0 && !validationErrors.intern && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+                        <Info className="w-3.5 h-3.5" />
+                        No accepted interns enrolled in this project yet.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

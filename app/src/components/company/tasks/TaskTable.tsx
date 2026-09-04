@@ -14,6 +14,10 @@ import {
 
 interface TaskTableProps {
   tasks: any[];
+  selectedTaskIds?: string[];
+  onToggleSelectTask?: (taskId: string) => void;
+  onSelectAllOnPage?: () => void;
+  onExtendDeadline?: (task: any) => void;
   onOpenReview?: (task: any) => void;
   onOpenEdit?: (task: any) => void;
   onReviewTask?: (task: any) => void;
@@ -22,6 +26,10 @@ interface TaskTableProps {
 
 export function TaskTable({
   tasks,
+  selectedTaskIds = [],
+  onToggleSelectTask,
+  onSelectAllOnPage,
+  onExtendDeadline,
   onOpenReview,
   onOpenEdit,
   onReviewTask,
@@ -31,12 +39,24 @@ export function TaskTable({
   const handleEdit = onEditTask || onOpenEdit || (() => {});
   if (tasks.length === 0) return null;
 
+  const isAllSelected = tasks.length > 0 && tasks.every((t) => selectedTaskIds.includes(t.id));
+
   return (
     <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm border-collapse">
           <thead>
             <tr className="bg-muted/50 border-b border-border text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <th className="py-3.5 px-4 w-10">
+                {onSelectAllOnPage && (
+                  <input
+                    type="checkbox"
+                    checked={isAllSelected}
+                    onChange={onSelectAllOnPage}
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20 cursor-pointer"
+                  />
+                )}
+              </th>
               <th className="py-3.5 px-4">Task & Project</th>
               <th className="py-3.5 px-4">Assigned Intern</th>
               <th className="py-3.5 px-4">Status</th>
@@ -67,8 +87,20 @@ export function TaskTable({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: idx * 0.02 }}
-                  className="hover:bg-muted/40 transition-colors group"
+                  className={`hover:bg-muted/40 transition-colors group ${
+                    selectedTaskIds.includes(task.id) ? 'bg-accent/5' : ''
+                  }`}
                 >
+                  <td className="py-3.5 px-4 w-10">
+                    {onToggleSelectTask && (
+                      <input
+                        type="checkbox"
+                        checked={selectedTaskIds.includes(task.id)}
+                        onChange={() => onToggleSelectTask(task.id)}
+                        className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20 cursor-pointer"
+                      />
+                    )}
+                  </td>
                   {/* Task & Project */}
                   <td className="py-3.5 px-4">
                     <div className="font-semibold text-foreground group-hover:text-accent transition-colors line-clamp-1">
@@ -177,6 +209,17 @@ export function TaskTable({
 
                   {/* Actions */}
                   <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                    {task.status !== 'Approved' && onExtendDeadline && (
+                      <button
+                        type="button"
+                        onClick={() => onExtendDeadline(task)}
+                        className="py-1.5 px-2.5 border border-border text-muted-foreground hover:text-accent hover:border-accent/40 rounded-xl text-xs font-medium transition-colors inline-flex items-center gap-1 mr-1.5"
+                        title="Extend Deadline"
+                      >
+                        <Clock className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Extend</span>
+                      </button>
+                    )}
                     {submission ? (
                       <button
                         type="button"

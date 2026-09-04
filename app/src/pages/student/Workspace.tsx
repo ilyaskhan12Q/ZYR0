@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
-  Github, LayoutGrid, ChevronRight, ChevronDown, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight,
-  Upload, FileText, Trash2, Download, Loader2, BarChart3, MessageCircle, List,
+  Github, LayoutGrid, ChevronRight, ChevronDown, Lock, BookOpen, Clock3, Award, MessageSquare, ArrowRight, ArrowDown,
+  Upload, FileText, Trash2, Download, Loader2, BarChart3, MessageCircle, List, Edit2,
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
-import { getMyActiveInternships } from '@/services/internships';
+import { getMyActiveInternships, getInternshipById } from '@/services/internships';
 import { getMyTasks, submitTask, uploadSubmissionFile } from '@/services/tasks';
 import type { TaskAttachment } from '@/lib/database.types';
 import { getMyCertificates } from '@/services/certificates';
@@ -46,9 +46,18 @@ export default function StudentWorkspace() {
 
   // Task detail and submission states
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
+  const [isEditingSubmission, setIsEditingSubmission] = useState(false);
   const [githubUrl, setGithubUrl] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
   const [notes, setNotes] = useState('');
+
+  // Synchronize activeTab with URL ?tab= parameter
+  const tabParam = searchParams.get('tab') as WorkspaceTab | null;
+  useEffect(() => {
+    if (tabParam && ['overview', 'tasks', 'submissions', 'certificate'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
 
   // Mobile task list visibility
   const [showTaskList, setShowTaskList] = useState(true);
@@ -70,55 +79,21 @@ export default function StudentWorkspace() {
     try {
       if (forceRefresh) {
         clearCache(`my_tasks_${user.id}`);
+        clearCache(`my_active_internships_${user.id}`);
       }
 
-      // 1. Fetch all active accepted offer placements
-      const placementsResult = await withTimeout(
-        getMyActiveInternships(),
-        10000,
-        { data: [], error: null },
-        'StudentWorkspace_LoadPlacements'
-      );
-      const { data: activePlacements, error: placementsErr } = placementsResult as any;
-      if (placementsErr) throw placementsErr;
+      const taskIdParam = new URLSearchParams(window.location.search).get('taskId');
 
-      const placementList = activePlacements || [];
-      setPlacements(placementList);
-
-      if (placementList.length === 0) {
-        setActivePlacement(null);
-        setLoading(false);
-        return;
-      }
-
-      // 2. Select the placement (from URL param or default to the first active placement)
-      let selected = placementList[0];
-      if (internshipId) {
-        const found = placementList.find((p: any) => (p.internship as any)?.id === internshipId);
-        if (found) {
-          selected = found;
-        } else {
-          // Redirect to root workspace or correct ID if path is invalid
-          navigate(`/student/workspace/${(selected.internship as any)?.id}`, { replace: true });
-          return;
-        }
-      } else {
-        // Redirection to the specific path
-        navigate(`/student/workspace/${(selected.internship as any)?.id}`, { replace: true });
-        return;
-      }
-
-      setActivePlacement(selected);
-
-      // 3. Fetch tasks, certificates, and events in parallel
-      const internshipIdVal = (selected.internship as any)?.id;
-      if (forceRefresh && internshipIdVal) {
-        clearWorkspaceEventsCache(internshipIdVal, user.id);
-      }
-
-      const [tasksResult, certsResult, eventsResult] = await Promise.allSettled([
+      // 1. Fetch active placements, student tasks, and certificates in parallel
+      const [placementsResult, tasksResult, certsResult] = await Promise.allSettled([
         withTimeout(
-          getMyTasks(!forceRefresh),
+          getMyActiveInternships(!forceRefresh),
+          10000,
+          { data: [], error: null },
+          'StudentWorkspace_LoadPlacements'
+        ),
+        withTimeout(
+          getMyTasks(!forceRefresh && !taskIdParam),
           10000,
           { data: [], error: null },
           'StudentWorkspace_LoadTasks'
@@ -129,32 +104,119 @@ export default function StudentWorkspace() {
           { data: [] },
           'StudentWorkspace_LoadCertificates'
         ),
-        internshipIdVal
-          ? withTimeout(
-              getWorkspaceEvents(internshipIdVal, user.id, !forceRefresh),
-              10000,
-              { data: [], error: null },
-              'StudentWorkspace_LoadEvents'
-            )
-          : Promise.resolve({ data: [], error: null }),
       ]);
 
-      // 4. Process tasks
+      const { data: activePlacements, error: placementsErr } = (placementsResult.status === 'fulfilled' ? placementsResult.value : { data: [], error: null }) as any;
+      if (placementsErr) throw placementsErr;
+
       const { data: allTasks, error: tasksErr } = (tasksResult.status === 'fulfilled' ? tasksResult.value : { data: [], error: null }) as any;
       if (tasksErr) throw tasksErr;
-      const filteredTasks = (allTasks || []).filter(
-        (t: any) => t.internship_id === (selected.internship as any)?.id
-      );
-      setTasks(filteredTasks);
 
-      // 5. Process certificates
       const { data: certs } = (certsResult.status === 'fulfilled' ? certsResult.value : { data: [] }) as any;
       setCertificates(certs || []);
 
-      // 6. Process events
-      const { data: eventsList, error: eventsErr } = (eventsResult.status === 'fulfilled' ? eventsResult.value : { data: [], error: null }) as any;
-      if (eventsErr) throw eventsErr;
-      setEvents(eventsList || []);
+      const placementList = [...(activePlacements || [])];
+
+      // If tasks exist for internships not in offer_letters, include them in placements
+      if (allTasks && allTasks.length > 0) {
+        for (const t of allTasks) {
+          if (t.internship && !placementList.some((p: any) => (p.internship as any)?.id === t.internship.id)) {
+            placementList.push({
+              id: `task-internship-${t.internship.id}`,
+              status: 'Accepted',
+              internship: t.internship,
+            });
+          }
+        }
+      }
+
+      // If a specific task was opened via ?taskId=..., prioritize that task's internship
+      const targetTask = taskIdParam ? (allTasks || []).find((t: any) => t.id === taskIdParam) : null;
+      const desiredInternshipId = targetTask?.internship_id || internshipId;
+
+      // 2. Select the placement
+      let selected = placementList.find((p: any) => (p.internship as any)?.id === desiredInternshipId);
+
+      // If not yet in placementList, load the internship directly
+      if (!selected && desiredInternshipId) {
+        const { data: directInternship } = await getInternshipById(desiredInternshipId);
+        if (directInternship) {
+          selected = {
+            id: `direct-${desiredInternshipId}`,
+            status: 'Accepted',
+            internship: directInternship,
+          };
+          placementList.unshift(selected);
+        }
+      }
+
+      // Fallback to first available placement if no specific internship was requested
+      if (!selected && placementList.length > 0) {
+        selected = placementList[0];
+      }
+
+      // Ensure the selected placement has full company and internship details
+      const selectedInternshipId = (selected?.internship as any)?.id;
+      if (selectedInternshipId && (!(selected.internship as any)?.company || !(selected.internship as any)?.company?.name)) {
+        const { data: fullInternship } = await getInternshipById(selectedInternshipId);
+        if (fullInternship) {
+          selected = {
+            ...selected,
+            internship: fullInternship,
+          };
+          const idx = placementList.findIndex((p: any) => (p.internship as any)?.id === selectedInternshipId);
+          if (idx !== -1) {
+            placementList[idx] = selected;
+          }
+        }
+      }
+
+      setPlacements(placementList);
+
+      if (!selected) {
+        setActivePlacement(null);
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
+
+      setActivePlacement(selected);
+
+      // Keep URL path in sync with selected placement without losing query parameters
+      if (selectedInternshipId && internshipId !== selectedInternshipId) {
+        const queryStr = window.location.search || '';
+        navigate(`/student/workspace/${selectedInternshipId}${queryStr}`, { replace: true });
+      }
+
+      // 3. Filter tasks specifically for the selected placement
+      const filteredTasks = (allTasks || []).filter(
+        (t: any) => t.internship_id === selectedInternshipId
+      );
+      setTasks(filteredTasks);
+
+      // 4. Auto-select requested task or initialize task selection
+      if (targetTask && targetTask.internship_id === selectedInternshipId) {
+        setSelectedTask(targetTask);
+        setIsEditingSubmission(false);
+        setActiveTab('tasks');
+      }
+
+      // 5. Fetch timeline events for selected placement
+      if (selectedInternshipId) {
+        if (forceRefresh) {
+          clearWorkspaceEventsCache(selectedInternshipId, user.id);
+        }
+        const eventsResult = await withTimeout(
+          getWorkspaceEvents(selectedInternshipId, user.id, !forceRefresh),
+          10000,
+          { data: [], error: null },
+          'StudentWorkspace_LoadEvents'
+        );
+        const { data: eventsList } = eventsResult as any;
+        setEvents(eventsList || []);
+      } else {
+        setEvents([]);
+      }
 
     } catch (err: any) {
       console.error('Error loading workspace data:', err);
@@ -171,17 +233,17 @@ export default function StudentWorkspace() {
   // Auto-select task from URL ?taskId= after tasks load
   useEffect(() => {
     const taskIdParam = searchParams.get('taskId');
-    if (taskIdParam && tasks.length > 0 && activeTab === 'tasks') {
+    if (taskIdParam && tasks.length > 0) {
       const match = tasks.find((t: any) => t.id === taskIdParam);
-      if (match) {
+      if (match && selectedTask?.id !== match.id) {
         setSelectedTask(match);
-        // Clean taskId from URL after selecting
-        const next = new URLSearchParams(searchParams);
-        next.delete('taskId');
-        setSearchParams(next, { replace: true });
+        setIsEditingSubmission(false);
+        if (activeTab !== 'tasks') {
+          setActiveTab('tasks');
+        }
       }
     }
-  }, [tasks, activeTab, searchParams, setSearchParams]);
+  }, [tasks, activeTab, searchParams, selectedTask]);
 
   // Subscribe to real-time updates for timeline events
   const activeInternshipId = (activePlacement?.internship as any)?.id;
@@ -243,11 +305,12 @@ export default function StudentWorkspace() {
         }
       }
 
+      setIsEditingSubmission(false);
       // Reload to reflect new submission status
-      await loadWorkspaceData();
+      await loadWorkspaceData(true);
 
       // Refresh the selected task state with updated submission data
-      const updatedTasks = await getMyTasks();
+      const updatedTasks = await getMyTasks(false);
       const match = (updatedTasks.data || []).find((t: any) => t.id === selectedTask.id);
       if (match) setSelectedTask(match);
 
@@ -410,6 +473,30 @@ export default function StudentWorkspace() {
               <span className="px-2.5 py-0.5 text-xs rounded-full bg-accent/15 text-accent font-medium uppercase tracking-wider">
                 Active Placement
               </span>
+              {placements.length > 1 && (
+                <div className="flex items-center gap-1.5 ml-1">
+                  <span className="text-xs text-muted-foreground font-medium">Switch Project:</span>
+                  <select
+                    value={(internship as any)?.id || ''}
+                    onChange={(e) => {
+                      const nextId = e.target.value;
+                      if (nextId) {
+                        navigate(`/student/workspace/${nextId}?tab=${activeTab}`);
+                      }
+                    }}
+                    className="text-xs bg-muted/70 hover:bg-muted border border-border rounded-lg px-2 py-1 font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-accent cursor-pointer"
+                  >
+                    {placements.map((p: any) => {
+                      const pIntern = p.internship as any;
+                      return (
+                        <option key={pIntern?.id} value={pIntern?.id}>
+                          {pIntern?.title} ({pIntern?.company?.name || 'Internship'})
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              )}
             </div>
             <p className="text-muted-foreground flex items-center gap-1.5 mt-1 text-sm">
               <span className="font-semibold text-foreground">{company?.name}</span>
@@ -464,7 +551,7 @@ export default function StudentWorkspace() {
                 // Sync tab to URL
                 const next = new URLSearchParams(searchParams);
                 next.set('tab', tab);
-                next.delete('taskId');
+                if (tab !== 'tasks') next.delete('taskId');
                 setSearchParams(next, { replace: true });
               }}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
@@ -744,12 +831,17 @@ export default function StudentWorkspace() {
                                 data-tour="workspace-task-item"
                                 onClick={() => {
                                   setSelectedTask(t);
-                                  setGithubUrl('');
-                                  setDemoUrl('');
-                                  setNotes('');
+                                  setIsEditingSubmission(false);
+                                  setGithubUrl(t.submissions?.[0]?.github_url || '');
+                                  setDemoUrl(t.submissions?.[0]?.live_demo_url || '');
+                                  setNotes(t.submissions?.[0]?.notes || '');
                                   setSubmissionFiles([]);
                                   setShowTaskList(false);
                                   setExpandedSections({ brief: false, description: false, objectives: false });
+                                  const next = new URLSearchParams(searchParams);
+                                  next.set('tab', 'tasks');
+                                  next.set('taskId', t.id);
+                                  setSearchParams(next, { replace: true });
                                 }}
                                 className={`w-full text-left p-3 rounded-xl border transition-all duration-150 cursor-pointer ${
                                   isSelected
@@ -837,13 +929,23 @@ export default function StudentWorkspace() {
                             </div>
                           </div>
 
-                          {/* Jump to submit — only for pending tasks */}
-                          {selectedTask.status === 'Pending' && (
+                          {/* Jump to submit or update work */}
+                          {selectedTask.status !== 'Approved' && (
                             <button
-                              onClick={() => document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' })}
-                              className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                              onClick={() => {
+                                if (selectedTask.status === 'Submitted' || selectedTask.status === 'Under Review') {
+                                  setGithubUrl(selectedTask.submissions?.[0]?.github_url || '');
+                                  setDemoUrl(selectedTask.submissions?.[0]?.live_demo_url || '');
+                                  setNotes(selectedTask.submissions?.[0]?.notes || '');
+                                  setIsEditingSubmission(true);
+                                }
+                                document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' });
+                              }}
+                              className="inline-flex items-center gap-1.5 px-4 py-2 bg-accent hover:bg-accent/90 text-white rounded-lg text-sm font-medium transition-colors shadow-sm cursor-pointer"
                             >
-                              Submit Work <ArrowRight className="w-4 h-4" />
+                              {selectedTask.status === 'Submitted' || selectedTask.status === 'Under Review'
+                                ? 'Update Work'
+                                : 'Submit Work'} <ArrowDown className="w-4 h-4" />
                             </button>
                           )}
                         </div>
@@ -1017,14 +1119,28 @@ export default function StudentWorkspace() {
                                 </div>
                               )}
                             </div>
-                          ) : selectedTask.status === 'Submitted' || selectedTask.status === 'Under Review' ? (
+                          ) : (selectedTask.status === 'Submitted' || selectedTask.status === 'Under Review') && !isEditingSubmission ? (
                             <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-5 space-y-3">
-                              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
-                                <Clock className="w-5 h-5" />
-                                <h4 className="font-bold text-sm">Awaiting Mentor Review</h4>
+                              <div className="flex items-center justify-between gap-2 flex-wrap">
+                                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                                  <Clock className="w-5 h-5" />
+                                  <h4 className="font-bold text-sm">Awaiting Mentor Review</h4>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setGithubUrl(selectedTask.submissions?.[0]?.github_url || '');
+                                    setDemoUrl(selectedTask.submissions?.[0]?.live_demo_url || '');
+                                    setNotes(selectedTask.submissions?.[0]?.notes || '');
+                                    setIsEditingSubmission(true);
+                                  }}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-200/70 dark:bg-amber-900/40 text-amber-900 dark:text-amber-200 hover:bg-amber-200 transition-colors cursor-pointer"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" /> Update Submission
+                                </button>
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                Your solution has been submitted. The coordinator will review your work.
+                                Your solution has been submitted. You can update your submission details anytime before mentor grading.
                               </p>
 
                               {(selectedTask.assigned_by) && (
@@ -1083,8 +1199,17 @@ export default function StudentWorkspace() {
                             <form onSubmit={handleSubmitTask} className="space-y-4">
                               <div className="flex items-center justify-between mb-2">
                                 <h4 className="font-bold text-sm flex items-center gap-1.5">
-                                  <Github className="w-4 h-4" /> Submit Your Work
+                                  <Github className="w-4 h-4" /> {isEditingSubmission ? 'Update Your Submission' : 'Submit Your Work'}
                                 </h4>
+                                {isEditingSubmission && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsEditingSubmission(false)}
+                                    className="text-xs text-muted-foreground hover:text-foreground font-medium underline cursor-pointer"
+                                  >
+                                    Cancel
+                                  </button>
+                                )}
                                 {selectedTask.status === 'Rejected' && (
                                   <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-red-100 dark:bg-red-950/30 text-red-700 dark:text-red-400 flex items-center gap-1">
                                     <AlertCircle className="w-3 h-3" /> Resubmission Required
@@ -1237,27 +1362,20 @@ export default function StudentWorkspace() {
                                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:bg-accent/70 text-white rounded-lg text-sm font-medium transition-colors shadow-sm focus-visible-ring"
                               >
                                 {submitting ? (
-                                  <ButtonLoader loading={true} loadingText="Submitting..." />
+                                  <ButtonLoader
+                                    loading={true}
+                                    loadingText={isEditingSubmission ? 'Updating Submission...' : 'Submitting Work...'}
+                                  />
+                                ) : isEditingSubmission ? (
+                                  'Update Submission'
                                 ) : (
-                                  'Submit Solution'
+                                  'Submit Work'
                                 )}
                               </button>
                             </form>
                           )}
                         </div>
                       </div>
-
-                      {/* Mobile sticky submit CTA for pending tasks */}
-                      {selectedTask.status === 'Pending' && (
-                        <div className="lg:hidden sticky bottom-0 border-t border-border bg-card p-4">
-                          <button
-                            onClick={() => document.getElementById('task-submit-section')?.scrollIntoView({ behavior: 'smooth' })}
-                            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-accent hover:bg-accent/90 text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
-                          >
-                            Submit Work <ArrowRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
                     </motion.div>
                   ) : (
                     <div className="bg-card rounded-2xl border border-border p-8 shadow-sm text-center text-muted-foreground min-h-[300px] flex flex-col justify-center items-center gap-3">
