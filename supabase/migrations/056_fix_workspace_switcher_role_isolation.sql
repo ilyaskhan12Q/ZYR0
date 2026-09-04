@@ -1,5 +1,5 @@
 -- =============================================
--- Migration 054: Fix Workspace Switcher Role Isolation
+-- Migration 056: Fix Workspace Switcher Role Isolation
 --
 -- Restores role isolation between personal identity (profiles.role)
 -- and company team membership (company_team_members).
