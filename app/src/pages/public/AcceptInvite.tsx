@@ -10,7 +10,7 @@ import { SEO } from '@/components/SEO';
 export default function AcceptInvite() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
   const { refresh } = useCompanyAccess();
   const token = searchParams.get('token');
   const [state, setState] = useState<'idle' | 'confirm' | 'working' | 'success' | 'error'>('idle');
@@ -57,10 +57,14 @@ export default function AcceptInvite() {
     try {
       const ok = await acceptTeamInvite(token ?? '');
       if (ok) {
+        try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
         await refresh();
+        if (refreshProfile) await refreshProfile();
         setState('success');
       } else if (profile?.role === 'company') {
+        try { localStorage.setItem('zyro_last_workspace', 'company'); } catch {}
         await refresh();
+        if (refreshProfile) await refreshProfile();
         setState('success');
       } else {
         if (inviteEmail) {

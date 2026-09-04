@@ -32,7 +32,9 @@ export default function Login() {
     if (signInPending && profileLoaded && profile) {
       setSignInPending(false);
       const role = profile.role as UserRole;
-      const target = postAuthTarget || `/${role}/dashboard`;
+      let lastWorkspace: string | null = null;
+      try { lastWorkspace = localStorage.getItem('zyro_last_workspace'); } catch {}
+      const target = postAuthTarget || (lastWorkspace === 'company' ? '/company/dashboard' : `/${role}/dashboard`);
       navigate(target, { replace: true });
     }
   }, [signInPending, profileLoaded, profile, navigate, postAuthTarget]);

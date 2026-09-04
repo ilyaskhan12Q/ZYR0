@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useCallback, useState, type ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMyCompanyMembership } from '@/services/companyTeam';
+import { getMyCompanyMembership, switchActiveCompany, type CompanyWorkspaceItem } from '@/services/companyTeam';
 import { canAccessCompanyTab, type CompanyTabKey } from '@/services/companyTeam';
 import { withTimeout } from '@/lib/timeout';
 import type { Company, CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
@@ -10,10 +10,12 @@ export interface CompanyAccessValue {
   member: CompanyTeamMember | null;
   /** Team role for non-owner members; null for owners and non-members. */
   memberRole: CompanyTeamRole | null;
+  companies: CompanyWorkspaceItem[];
   isOwner: boolean;
   hasAccess: boolean;
   loading: boolean;
   refresh: () => Promise<void>;
+  switchCompany: (companyId: string) => Promise<void>;
   canAccessTab: (tab: CompanyTabKey) => boolean;
 }
 
@@ -23,12 +25,14 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [company, setCompany] = useState<Company | null>(null);
   const [member, setMember] = useState<CompanyTeamMember | null>(null);
+  const [companies, setCompanies] = useState<CompanyWorkspaceItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (useCache = true) => {
     if (!user) {
       setCompany(null);
       setMember(null);
+      setCompanies([]);
       setLoading(false);
       return;
     }
@@ -41,15 +45,23 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
       );
       const comp = res?.company ?? res?.data?.company ?? null;
       const mem = res?.member ?? res?.data?.member ?? null;
+      const comps = res?.companies ?? [];
       setCompany(comp);
       setMember(mem);
+      setCompanies(comps);
     } catch {
       setCompany(null);
       setMember(null);
+      setCompanies([]);
     } finally {
       setLoading(false);
     }
   }, [user]);
+
+  const switchCompany = useCallback(async (companyId: string) => {
+    switchActiveCompany(companyId);
+    await load(false);
+  }, [load]);
 
   useEffect(() => {
     load();
@@ -76,10 +88,12 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
       company,
       member,
       memberRole,
+      companies,
       isOwner,
       hasAccess: !!company,
       loading,
       refresh: load,
+      switchCompany,
       canAccessTab: (tab: CompanyTabKey) => {
         if (loading) return true;
         if (isOwner) return true;
@@ -87,7 +101,7 @@ export function CompanyAccessProvider({ children }: { children: ReactNode }) {
         return canAccessCompanyTab(memberRole, isOwner, tab);
       },
     };
-  }, [company, member, loading, load]);
+  }, [company, member, companies, loading, load, switchCompany]);
 
   return <CompanyAccessContext.Provider value={value}>{children}</CompanyAccessContext.Provider>;
 }

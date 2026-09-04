@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
+import type { Company, CompanyTeamMember, CompanyTeamRole } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
@@ -323,18 +323,46 @@ export async function isAlreadyTeamMember(): Promise<boolean> {
   return !!data;
 }
 
+export interface CompanyWorkspaceItem {
+  company: Company;
+  member: CompanyTeamMember | null;
+  isOwner: boolean;
+  memberRole: CompanyTeamRole | 'owner';
+}
+
+export const ACTIVE_COMPANY_KEY = 'zyro_active_company_id';
+
+export function getActiveCompanyId(): string | null {
+  try {
+    return localStorage.getItem(ACTIVE_COMPANY_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setActiveCompanyId(companyId: string) {
+  try {
+    localStorage.setItem(ACTIVE_COMPANY_KEY, companyId);
+  } catch {
+    // ignore storage error
+  }
+}
+
+export function switchActiveCompany(companyId: string) {
+  setActiveCompanyId(companyId);
+  supabase.auth.getUser().then(({ data: { user } }) => {
+    if (user) clearCache(createRequestKey('my_company', user.id));
+  });
+}
+
 /**
  * Resolve the current user's company + team role.
- * Owner (profile role "company") resolves through companies.owner_id;
- * everyone else resolves through their accepted company_team_members row.
- *
- * A user accepted into multiple companies resolves to their earliest
- * accepted membership (single active workspace; the switcher targets
- * one company at a time).
+ * Resolves owned companies (companies.owner_id) and accepted team memberships.
+ * Returns the currently active company along with the full list of accessible workspaces.
  */
 export async function getMyCompanyMembership(useCache = true) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { company: null, member: null, data: null, error: new Error('Not authenticated') };
+  if (!user) return { company: null, member: null, companies: [], data: null, error: new Error('Not authenticated') };
 
   const cacheKey = createRequestKey('my_company', user.id);
   if (useCache) {
@@ -345,37 +373,63 @@ export async function getMyCompanyMembership(useCache = true) {
   }
 
   const fetchFn = async () => {
+    // 1. Fetch owned company
     const { data: ownerCompany } = await supabase
       .from('companies')
       .select('*, team:company_team_members(*), owner:profiles!owner_id (id, full_name, title, department)')
       .eq('owner_id', user.id)
       .maybeSingle();
 
-    if (ownerCompany) {
-      const payload = { company: ownerCompany, member: null };
-      return { ...payload, data: payload, error: null };
-    }
-
-    const { data: member, error } = await supabase
+    // 2. Fetch all accepted memberships
+    const { data: teamMembers, error } = await supabase
       .from('company_team_members')
       .select('*, company:companies(*, team:company_team_members(*), owner:profiles!owner_id (id, full_name, title, department))')
       .eq('user_id', user.id)
       .eq('status', 'accepted')
-      .order('accepted_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
+      .order('accepted_at', { ascending: true });
 
-    if (error) {
-      const payload = { company: null, member: null };
+    if (error && !ownerCompany) {
+      const payload = { company: null, member: null, companies: [] };
       return { ...payload, data: payload, error };
     }
-    if (!member) {
-      const payload = { company: null, member: null };
+
+    const allWorkspaces: CompanyWorkspaceItem[] = [];
+
+    if (ownerCompany) {
+      allWorkspaces.push({
+        company: ownerCompany,
+        member: null,
+        isOwner: true,
+        memberRole: 'owner',
+      });
+    }
+
+    if (teamMembers && teamMembers.length > 0) {
+      for (const m of teamMembers) {
+        if (m.company) {
+          allWorkspaces.push({
+            company: m.company as unknown as Company,
+            member: m,
+            isOwner: false,
+            memberRole: m.role as CompanyTeamRole,
+          });
+        }
+      }
+    }
+
+    if (allWorkspaces.length === 0) {
+      const payload = { company: null, member: null, companies: [] };
       return { ...payload, data: payload, error: null };
     }
 
-    const comp = (member.company as unknown as import('@/lib/database.types').Company) ?? null;
-    const payload = { company: comp, member };
+    const preferredId = getActiveCompanyId();
+    const active = (preferredId ? allWorkspaces.find((w) => w.company.id === preferredId) : null) || allWorkspaces[0];
+
+    const payload = {
+      company: active.company,
+      member: active.member,
+      companies: allWorkspaces,
+    };
     return { ...payload, data: payload, error: null };
   };
 
