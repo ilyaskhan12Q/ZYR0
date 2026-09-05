@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState, Component, type ReactNode } from "react"
+import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react"
 import { m } from "framer-motion"
-import { MeshGradient } from "@paper-design/shaders-react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
+
+const LazyMeshGradient = lazy(() => import("@paper-design/shaders-react").then(m => ({ default: m.MeshGradient })))
 
 class ShaderErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
   state = { hasError: false }
@@ -34,20 +35,25 @@ function ShaderFallback() {
 
 function ShaderGradient() {
   const [hasWebGL2, setHasWebGL2] = useState(true)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setHasWebGL2(detectWebGL2())
+    const timer = setTimeout(() => setMounted(true), 100)
+    return () => clearTimeout(timer)
   }, [])
 
-  if (!hasWebGL2) return <ShaderFallback />
+  if (!hasWebGL2 || !mounted) return <ShaderFallback />
 
   return (
     <ShaderErrorBoundary fallback={<ShaderFallback />}>
-      <MeshGradient
-        className="absolute inset-0 w-full h-full"
-        colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
-        speed={0.25}
-      />
+      <Suspense fallback={<ShaderFallback />}>
+        <LazyMeshGradient
+          className="absolute inset-0 w-full h-full"
+          colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
+          speed={0.25}
+        />
+      </Suspense>
     </ShaderErrorBoundary>
   )
 }
