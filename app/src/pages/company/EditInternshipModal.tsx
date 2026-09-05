@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Save, Plus, Trash2, AlertCircle, Loader2, Info, Calendar, DollarSign, MapPin, Users, CheckCircle2 } from 'lucide-react';
 import type { Internship, LocationType, InternshipType, StipendType, ExperienceLevel, InternshipStatus } from '@/lib/database.types';
 import { updateInternship, getAcceptedCountForInternship } from '@/services/internships';
@@ -226,7 +226,7 @@ export default function EditInternshipModal({
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
@@ -657,7 +657,7 @@ export default function EditInternshipModal({
               </div>
             </div>
           )}
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

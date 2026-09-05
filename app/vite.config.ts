@@ -36,6 +36,7 @@ export default defineConfig(({ mode }) => {
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-motion': ['framer-motion'],
           'vendor-icons': ['lucide-react'],
+          'vendor-common': ['lenis', 'sonner', 'next-themes', 'react-helmet-async'],
         },
       },
     },

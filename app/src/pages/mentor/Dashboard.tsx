@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Users, ClipboardList, CheckSquare, Star, ArrowRight, Clock, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -106,7 +106,7 @@ export default function MentorDashboard() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card border border-border">
+          <m.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card border border-border">
             <div className="flex items-center justify-between">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
                 <stat.icon className="w-5 h-5" />
@@ -114,14 +114,14 @@ export default function MentorDashboard() {
             </div>
             <p className="text-2xl font-bold mt-3">{stat.value}</p>
             <p className="text-sm text-muted-foreground">{stat.label}</p>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Pending Reviews */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">Pending Reviews</h3>
@@ -144,10 +144,10 @@ export default function MentorDashboard() {
                 <div className="p-8 text-center text-muted-foreground">No pending reviews</div>
               )}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* My Interns */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">My Interns</h3>
@@ -169,12 +169,12 @@ export default function MentorDashboard() {
                 <div className="p-8 text-center text-muted-foreground">No active interns found</div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         <div className="space-y-6">
           {/* Recent Evaluations */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Recent Evaluations</h3>
             <div className="space-y-3">
@@ -196,10 +196,10 @@ export default function MentorDashboard() {
                 <p className="text-sm text-muted-foreground">No evaluations created yet.</p>
               )}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Quick Actions */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Quick Actions</h3>
             <div className="space-y-2">
@@ -214,7 +214,7 @@ export default function MentorDashboard() {
                 </Link>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>

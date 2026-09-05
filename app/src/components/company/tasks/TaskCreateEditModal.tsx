@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   X, User, Users, AlertCircle, CheckCircle2, Info, Calendar,
   Upload, FileText, Trash2, Plus,
@@ -351,7 +351,7 @@ export function TaskCreateEditModal({
         role="dialog"
         aria-modal="true"
       >
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -886,7 +886,7 @@ export function TaskCreateEditModal({
               </button>
             </div>
           </form>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   FileText, Download, CheckCircle2, XCircle, Search, Eye,
   Clock, AlertTriangle, Building2, Calendar, MapPin,
@@ -209,7 +209,7 @@ export default function StudentOfferLetters() {
 
       {/* Empty State */}
       {filtered.length === 0 && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-16 bg-card rounded-xl border border-border"
@@ -221,7 +221,7 @@ export default function StudentOfferLetters() {
           <p className="text-sm text-muted-foreground mt-1">
             When a company accepts your application, their offer letter will appear here.
           </p>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Grid */}
@@ -232,7 +232,7 @@ export default function StudentOfferLetters() {
           const canAct = offer.status === 'Sent';
 
           return (
-            <motion.div
+            <m.div
               key={offer.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -346,7 +346,7 @@ export default function StudentOfferLetters() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
@@ -387,14 +387,14 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
   const [viewTab, setViewTab] = useState<'document' | 'details'>('document');
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6"
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.95, y: 16 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 16 }}
@@ -562,7 +562,7 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
             )}
           </div>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

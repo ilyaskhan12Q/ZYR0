@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   AlertTriangle, Check, Download, Eye, FileText, Inbox, Loader2,
   Mail, Search, Trash2, X,
@@ -463,7 +463,7 @@ export default function AdminTeamApplications() {
                   </tr>
                 ) : (
                   filtered.map((app) => (
-                    <motion.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                    <m.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3">
                         <input type="checkbox" checked={selected.has(app.id)} onChange={() => toggleSelected(app.id)}
                           aria-label={`Select ${app.full_name}`} className="accent-blue-600 w-4 h-4" />
@@ -521,7 +521,7 @@ export default function AdminTeamApplications() {
                           </button>
                         </div>
                       </td>
-                    </motion.tr>
+                    </m.tr>
                   ))
                 )}
               </tbody>

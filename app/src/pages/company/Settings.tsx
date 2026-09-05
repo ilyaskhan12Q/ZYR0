@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Save, Lock, Eye, EyeOff, Moon, Sun, Monitor, Loader2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
@@ -123,7 +123,7 @@ export default function CompanySettings() {
       </div>
 
       {/* Notifications */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1"
@@ -149,10 +149,10 @@ export default function CompanySettings() {
           checked={settings.emailMessages}
           onChange={(v) => setSettings({ ...settings, emailMessages: v })}
         />
-      </motion.div>
+      </m.div>
 
       {/* Appearance */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -178,10 +178,10 @@ export default function CompanySettings() {
             </button>
           ))}
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Security */}
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -221,7 +221,7 @@ export default function CompanySettings() {
             </button>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

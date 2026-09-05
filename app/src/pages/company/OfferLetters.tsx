@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   FileText, Send, Download, Eye, XCircle, Search, Clock,
   CheckCircle2, AlertTriangle, Loader2, RotateCcw, Building2,
@@ -621,20 +621,20 @@ export default function CompanyOfferLetters() {
       {/* Feedback */}
       <AnimatePresence>
         {error && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 text-sm flex items-center gap-2 border border-red-100 dark:border-red-900"
           >
             <AlertTriangle className="w-4 h-4 shrink-0" /> {error}
-          </motion.div>
+          </m.div>
         )}
         {successMsg && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
             className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 text-sm flex items-center gap-2 border border-emerald-100 dark:border-emerald-900"
           >
             <CheckCircle2 className="w-4 h-4 shrink-0" /> {successMsg}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -803,7 +803,7 @@ export default function CompanyOfferLetters() {
                     const canRevoke = ['Pending', 'Sent'].includes(offer.status);
 
                     return (
-                      <motion.tr
+                      <m.tr
                         key={offer.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -880,7 +880,7 @@ export default function CompanyOfferLetters() {
                             )}
                           </div>
                         </td>
-                      </motion.tr>
+                      </m.tr>
                     );
                   })}
                 </tbody>
@@ -964,14 +964,14 @@ function CompanyOfferModal({ offer, onClose, onDownload, onPreviewCanvas, onRevo
   const [viewTab, setViewTab] = useState<'document' | 'details'>('document');
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
       className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6"
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.95, y: 16 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, y: 16 }}
@@ -1108,7 +1108,7 @@ function CompanyOfferModal({ offer, onClose, onDownload, onPreviewCanvas, onRevo
             </button>
           )}
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

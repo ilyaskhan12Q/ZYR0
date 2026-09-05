@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, MapPin, Globe, Star, FolderOpen, Users, X } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { getCompanies } from '@/services/companies';
@@ -94,12 +94,12 @@ export default function Companies() {
         keywords="internship companies, hiring companies, top internship providers, company profiles, tech companies hiring interns"
       />
       <div className="max-w-7xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold">Browse Companies</h1>
           <p className="mt-2 text-muted-foreground">Discover top companies offering internship opportunities</p>
-        </motion.div>
+        </m.div>
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
+        <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -114,7 +114,7 @@ export default function Companies() {
               {sizes.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-        </motion.div>
+        </m.div>
 
         {loading ? (
           <Loader variant="container" label="Loading companies..." />
@@ -125,7 +125,7 @@ export default function Companies() {
             {companies.map((company, i) => {
               const activeJobs = internshipCounts[company.id] || 0;
               return (
-                <motion.div key={company.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+                <m.div key={company.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                   className="bg-card rounded-xl border border-border shadow-md overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                   <div className="h-24 bg-gradient-to-r from-primary to-accent dark:from-slate-900 dark:to-accent/50 relative">
                     <div className="absolute -bottom-8 left-5">
@@ -154,7 +154,7 @@ export default function Companies() {
                       View Profile
                     </Link>
                   </div>
-                </motion.div>
+                </m.div>
               );
             })}
           </div>

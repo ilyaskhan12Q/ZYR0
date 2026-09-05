@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Star, ClipboardList, MessageSquare, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -85,7 +85,7 @@ export default function CompanyInterns() {
             const status = progress >= 80 ? 'Exceeding' : progress >= 50 ? 'On Track' : 'Needs Attention';
 
             return (
-              <motion.div key={intern.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
+              <m.div key={intern.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
                 className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -108,7 +108,7 @@ export default function CompanyInterns() {
                     <span className="text-sm font-medium">{progress}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} />
+                    <m.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} />
                   </div>
                 </div>
 
@@ -138,7 +138,7 @@ export default function CompanyInterns() {
                     <MessageSquare className="w-3.5 h-3.5" /> Message
                   </button>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

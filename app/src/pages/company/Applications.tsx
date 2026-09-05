@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CheckCircle2, Eye, Inbox, Loader2, MessageSquare, Search, Star, XCircle } from 'lucide-react';
 import { getMyCompany } from '@/services/companies';
 import { getAllCompanyApplications, updateApplicationStatus, APPLICATION_STATUSES } from '@/services/applications';
@@ -164,7 +164,7 @@ export default function CompanyApplications() {
                     const student = Array.isArray(app.student) ? app.student[0] : app.student;
                     const internship = Array.isArray(app.internship) ? app.internship[0] : app.internship;
                     return (
-                      <motion.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                      <m.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <img
@@ -252,7 +252,7 @@ export default function CompanyApplications() {
                             )}
                           </div>
                         </td>
-                      </motion.tr>
+                      </m.tr>
                     );
                   })
                 )}

@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { StrictMode, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
@@ -37,20 +37,26 @@ window.addEventListener('unhandledrejection', (event) => {
   console.error('[Unhandled Rejection]', event.reason);
 });
 
-initLenisIfPublic();
+function Root() {
+  useEffect(() => {
+    initLenisIfPublic();
+  }, []);
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ErrorBoundary>
-      <HelmetProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="dark">
-              <App />
-            </ThemeProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </HelmetProvider>
-    </ErrorBoundary>
-  </StrictMode>,
-);
+  return (
+    <StrictMode>
+      <ErrorBoundary>
+        <HelmetProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <ThemeProvider attribute="class" defaultTheme="dark">
+                <App />
+              </ThemeProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </HelmetProvider>
+      </ErrorBoundary>
+    </StrictMode>
+  );
+}
+
+createRoot(document.getElementById('root')!).render(<Root />);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, Users, FileCheck, Award, Calendar, Loader2 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
@@ -162,19 +162,19 @@ export default function CompanyAnalytics() {
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card">
+            <m.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card">
               <div className="flex items-center justify-between">
                 <Icon className="w-5 h-5 text-accent" />
               </div>
               <p className="text-2xl font-bold mt-3">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="lg:col-span-2 bg-card rounded-xl border border-border shadow-sm p-6">
           <h3 className="font-semibold mb-4">Applications Over Time</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -187,9 +187,9 @@ export default function CompanyAnalytics() {
               <Area type="monotone" dataKey="accepted" stroke="#10B981" fill="#10B981" fillOpacity={0.1} strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
-        </motion.div>
+        </m.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
           className="bg-card rounded-xl border border-border shadow-sm p-6">
           <h3 className="font-semibold mb-4">Applications by Domain</h3>
           <ResponsiveContainer width="100%" height={250}>
@@ -213,10 +213,10 @@ export default function CompanyAnalytics() {
               </div>
             ))}
           </div>
-        </motion.div>
+        </m.div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6">
         <h3 className="font-semibold mb-4">Internship Performance (Applications)</h3>
         <ResponsiveContainer width="100%" height={250}>
@@ -228,7 +228,7 @@ export default function CompanyAnalytics() {
             <Bar dataKey="applications" fill="#3B82F6" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </motion.div>
+      </m.div>
     </div>
   );
 }
