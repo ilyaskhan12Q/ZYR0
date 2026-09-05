@@ -243,7 +243,8 @@ const staticPagesMeta = {
         '@type': 'WebSite',
         'name': 'ZYR0',
         'url': `${url}/`,
-        'description': 'Structured internship platform for students, companies, and mentors.',
+        'description': 'An ecosystem of tools for those who build, learn, research, and work.',
+        'inLanguage': 'en',
         'potentialAction': {
           '@type': 'SearchAction',
           'target': {
@@ -258,11 +259,17 @@ const staticPagesMeta = {
         '@type': 'Organization',
         'name': 'ZYR0',
         'url': `${url}/`,
-        'logo': `${url}/zyro-logo.png`,
-        'description': 'ZYR0 is a professional internship platform connecting students, companies, and mentors for structured, verifiable internship experiences.',
+        'logo': {
+          '@type': 'ImageObject',
+          'url': `${url}/zyro-logo.png`,
+          'width': 512,
+          'height': 512
+        },
+        'description': 'ZYR0 is an ecosystem of tools for those who build, learn, research, and work — from idea to live app, from school to career.',
         'sameAs': [
           'https://github.com/ilyaskhan12Q/ZYR0',
-          'https://linkedin.com/company/zyr0-co'
+          'https://linkedin.com/company/zyr0-co',
+          'https://x.com/zyroplatform'
         ],
         'contactPoint': {
           '@type': 'ContactPoint',
