@@ -169,6 +169,10 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
+# IndexNow — instant indexing for Bing, Yandex, Naver, Seznam
+# Key file: https://zyroo.org/{key}.txt
+# Submit URLs: POST https://api.indexnow.org/indexnow
+
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
 }
