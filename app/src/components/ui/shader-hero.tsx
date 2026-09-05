@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, Component, ReactNode } from "react"
+import { useEffect, useRef, useState, Component, type ReactNode } from "react"
 import { m } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"

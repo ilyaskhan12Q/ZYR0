@@ -37,7 +37,6 @@ export default defineConfig(({ mode }) => {
           'vendor-motion': ['framer-motion'],
           'vendor-icons': ['lucide-react'],
           'vendor-recharts': ['recharts'],
-          'vendor-pdf': ['react-pdf', 'pdfjs-dist'],
           'vendor-forms': ['react-hook-form', 'zod'],
           'vendor-common': ['lenis', 'sonner', 'next-themes', 'react-helmet-async', 'embla-carousel-react'],
         },

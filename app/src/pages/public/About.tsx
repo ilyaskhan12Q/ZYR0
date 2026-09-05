@@ -208,14 +208,14 @@ export default function About() {
           </m.div>
           <div className="relative">
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-border md:-translate-x-px" />
-            {milestones.map((m, i) => (
+            {milestones.map((ms, i) => (
               <m.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                 className={`relative flex items-start gap-6 mb-10 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                 <div className={`flex-1 ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                   <div className="bg-card rounded-xl border border-border p-5 shadow-sm ml-10 md:ml-0">
-                    <span className="text-accent font-bold">{m.year}</span>
-                    <h4 className="font-semibold mt-1">{m.title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{m.desc}</p>
+                    <span className="text-accent font-bold">{ms.year}</span>
+                    <h4 className="font-semibold mt-1">{ms.title}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{ms.desc}</p>
                   </div>
                 </div>
                 <div className="absolute left-4 md:left-1/2 w-3 h-3 bg-accent rounded-full border-4 border-background -translate-x-1.5 mt-5" />
