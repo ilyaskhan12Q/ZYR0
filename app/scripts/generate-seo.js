@@ -177,11 +177,14 @@ Sitemap: ${SITE_URL}/sitemap.xml
 function generateLlmsTxt() {
   return `# ZYR0
 
-> ZYR0 is Pakistan's structured internship platform. Students apply for verified internship opportunities, work on real milestone-based tasks with professional mentors, and earn blockchain-verified digital certificates that employers can instantly authenticate online. Companies hire and manage interns; mentors review and guide their work.
+> An ecosystem of tools for those who build, learn, research, and work. From idea to live app, from school to career — ZYR0 covers the full lifecycle.
 
 ## Important
-- [Home](${SITE_URL}/): ZYR0 — structured internships for students and employers in Pakistan.
-- [Browse Internships](${SITE_URL}/internships): Search verified internship opportunities in Pakistan by domain, location, and type.
+- [Home](${SITE_URL}/): ZYR0 — Think. Build. Scale to ∞.
+- [ZYR0 Studio](${SITE_URL}/studio): From idea to live full-stack app in minutes. Generate clean, production-ready React apps.
+- [ZYR0 School OS](${SITE_URL}/school): Transform school management with intelligent automation.
+- [ZYR0 Research](${SITE_URL}/research): Autonomous deep intelligence for literature reviews, market intelligence, and code audits.
+- [ZYR0 Work](${SITE_URL}/internships): Bridge academic theory with real engineering. Verifiable proof-of-work credentials.
 - [Partner Companies](${SITE_URL}/companies): Verified companies offering structured internships on ZYR0.
 - [Verify Certificate](${SITE_URL}/verify): Instantly verify ZYR0 internship certificates and offer letters by credential ID.
 - [About ZYR0](${SITE_URL}/about): ZYR0's mission, vision, and values.
@@ -227,9 +230,8 @@ console.log(`[SEO Generate] Wrote llms.txt to ${publicDir}`);
 
 const staticPagesMeta = {
   '': {
-    title: 'ZYR0 — Structured Internship Platform for Students & Employers',
-    description: 'ZYR0 is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform.',
-    keywords: 'internship platform, internship management, student internships, internships in Pakistan, internship tracking, internship certificates, mentor feedback, internship workflow, companies hiring interns',
+    title: 'ZYR0 — Think. Build. Scale to ∞.',
+    description: 'From first prototype to school management, academic research, and workforce entry. An ecosystem of tools for those who build, learn, research, and work.',
     structuredData: (url) => [
       {
         '@context': 'https://schema.org',
@@ -536,14 +538,15 @@ function generateBodyHtml(routePath, data = {}) {
     contentHtml = `
       <section style="padding: 5rem 2rem 3rem; text-align: center; max-width: 1000px; margin: 0 auto; font-family: sans-serif;">
         <h1 style="font-size: 3rem; font-weight: 800; color: #1e293b; margin-bottom: 1.5rem; line-height: 1.1;">
-          Structured Internship Platform for Students & Employers
+          Think. Build. Scale to ∞.
         </h1>
         <p style="font-size: 1.25rem; color: #475569; line-height: 1.7; max-width: 700px; margin: 0 auto 2.5rem auto;">
-          ZYR0 connects students, companies, and mentors through structured internship tracking, milestone-based task management, and blockchain-verified digital certificates. Built for Pakistan's next generation of engineers.
+          An ecosystem of tools for those who build, learn, research, and work. From idea to live app, from school to career — ZYR0 covers the full lifecycle.
         </p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem;">
-          <a href="/internships" style="background: #2563eb; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Browse Internships</a>
-          <a href="/register?type=employer" style="background: #059669; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Register Your Company</a>
+          <a href="/studio" style="background: #2563eb; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Try ZYR0 Studio</a>
+          <a href="/internships" style="background: #059669; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Browse Internships</a>
+          <a href="/research" style="background: #7c3aed; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Try Research Agent</a>
           <a href="/verify" style="background: #f1f5f9; color: #334155; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; border: 1px solid #e2e8f0;">Verify Certificate</a>
         </div>
       </section>
@@ -555,42 +558,42 @@ function generateBodyHtml(routePath, data = {}) {
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
             <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
               <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Studio</h3>
-              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Turn natural language into production-ready React apps. No boilerplate, no config.</p>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">From idea to live full-stack app in minutes. Generate clean, production-ready React apps with zero boilerplate.</p>
             </div>
             <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
               <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 School OS</h3>
-              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">A modern operating system for schools. Admissions, attendance, grading, and timetables.</p>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Transform school management with intelligent automation. Attendance, fees, exams, and communication.</p>
             </div>
             <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
               <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Research</h3>
-              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Autonomous deep research with verifiable citations and cross-verified reports.</p>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Autonomous deep intelligence. Literature reviews, market intelligence, and code audits in minutes.</p>
             </div>
             <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
               <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Work</h3>
-              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Proof-of-work internships with GitHub-backed projects and cryptographic certificates.</p>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Bridge academic theory with real engineering. Verifiable proof-of-work credentials and evaluated interns.</p>
             </div>
           </div>
         </div>
       </section>
 
       <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
-        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 2.5rem;">Trusted by Students & Companies Across Pakistan</h2>
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 2.5rem;">Built for Every Stage</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
           <div>
-            <div style="font-size: 2.5rem; font-weight: 800; color: #2563eb;">50+</div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #2563eb;">∞</div>
+            <div style="color: #64748b; font-size: 0.95rem;">From Prototype to Production</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #059669;">50+</div>
             <div style="color: #64748b; font-size: 0.95rem;">University Partners</div>
           </div>
           <div>
-            <div style="font-size: 2.5rem; font-weight: 800; color: #059669;">100+</div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #7c3aed;">100+</div>
             <div style="color: #64748b; font-size: 0.95rem;">Verified Companies</div>
           </div>
           <div>
-            <div style="font-size: 2.5rem; font-weight: 800; color: #7c3aed;">1000+</div>
-            <div style="color: #64748b; font-size: 0.95rem;">Interns Placed</div>
-          </div>
-          <div>
             <div style="font-size: 2.5rem; font-weight: 800; color: #ea580c;">100%</div>
-            <div style="color: #64748b; font-size: 0.95rem;">Verified Certificates</div>
+            <div style="color: #64748b; font-size: 0.95rem;">Verified Credentials</div>
           </div>
         </div>
       </section>
