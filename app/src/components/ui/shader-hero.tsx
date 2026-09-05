@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, Component, type ReactNode } from "react"
 import { m } from "framer-motion"
+import { MeshGradient } from "@paper-design/shaders-react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -40,20 +41,15 @@ function ShaderGradient() {
 
   if (!hasWebGL2) return <ShaderFallback />
 
-  try {
-    const { MeshGradient } = require("@paper-design/shaders-react")
-    return (
-      <ShaderErrorBoundary fallback={<ShaderFallback />}>
-        <MeshGradient
-          className="absolute inset-0 w-full h-full"
-          colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
-          speed={0.25}
-        />
-      </ShaderErrorBoundary>
-    )
-  } catch {
-    return <ShaderFallback />
-  }
+  return (
+    <ShaderErrorBoundary fallback={<ShaderFallback />}>
+      <MeshGradient
+        className="absolute inset-0 w-full h-full"
+        colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
+        speed={0.25}
+      />
+    </ShaderErrorBoundary>
+  )
 }
 
 const letterAnimation = {
