@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, Send, Paperclip, ChevronLeft, CheckCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyConversations, getMessages, sendMessage, markMessagesRead } from '@/services/messages';
@@ -272,7 +272,7 @@ export default function StudentMessages() {
                 messages.map((msg) => {
                   const isSent = msg.sender_id === profile.id;
                   return (
-                    <motion.div
+                    <m.div
                       key={msg.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -285,7 +285,7 @@ export default function StudentMessages() {
                           {isSent && <CheckCheck className="w-3 h-3" />}
                         </p>
                       </div>
-                    </motion.div>
+                    </m.div>
                   );
                 })
               )}

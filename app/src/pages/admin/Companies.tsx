@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Search,
   CheckCircle2,
@@ -207,7 +207,7 @@ export default function AdminCompanies() {
                   </tr>
                 ) : (
                   filtered.map((company) => (
-                    <motion.tr
+                    <m.tr
                       key={company.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -265,7 +265,7 @@ export default function AdminCompanies() {
                           </button>
                         </div>
                       </td>
-                    </motion.tr>
+                    </m.tr>
                   ))
                 )}
               </tbody>
@@ -278,7 +278,7 @@ export default function AdminCompanies() {
       <AnimatePresence>
         {selectedCompany && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -456,7 +456,7 @@ export default function AdminCompanies() {
                   </div>
                 </form>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Shield, Lock, Eye, Database, Bell, Mail, FileText, Cookie } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 
@@ -85,14 +85,14 @@ export default function PrivacyPolicy() {
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Shield className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Privacy Policy</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Your privacy matters to us. This policy explains what information we collect, how we use it, and the choices you have.
             </p>
             <p className="mt-3 text-sm text-white/50">Last updated: July 2026</p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -100,7 +100,7 @@ export default function PrivacyPolicy() {
       <section className="px-4 py-16">
         <div className="max-w-3xl mx-auto space-y-10">
           {sections.map((section, i) => (
-            <motion.div
+            <m.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -122,7 +122,7 @@ export default function PrivacyPolicy() {
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       </section>

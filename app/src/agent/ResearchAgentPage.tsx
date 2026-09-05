@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { AgentHero } from '@/agent/components/AgentHero';
 import { ResearchReasoning } from '@/agent/components/ResearchReasoning';
 import { ThreadInput } from '@/agent/components/ThreadInput';
@@ -170,7 +170,7 @@ export default function ResearchAgentPage() {
       <div className="flex-1 min-w-0 flex flex-col">
       <AnimatePresence mode="wait">
       {isEmpty ? (
-        <motion.div
+        <m.div
           key="hero"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -190,9 +190,9 @@ export default function ResearchAgentPage() {
           onOpenHistory={() => setSidebarOpen(true)}
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
         />
-        </motion.div>
+        </m.div>
       ) : (
-        <motion.div
+        <m.div
           key="thread"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -375,7 +375,7 @@ export default function ResearchAgentPage() {
             onStop={abort}
             running={pipeline.running || streaming}
           />
-        </motion.div>
+        </m.div>
       )}
       </AnimatePresence>
       </div>

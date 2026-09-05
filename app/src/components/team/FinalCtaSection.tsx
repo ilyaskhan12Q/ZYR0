@@ -1,4 +1,4 @@
-import { useReducedMotion, motion } from 'framer-motion';
+import { useReducedMotion, m } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon } from '@/components/icons/BrandIcons';
@@ -12,7 +12,7 @@ export function FinalCtaSection() {
   return (
     <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
       <div className="max-w-5xl mx-auto">
-        <motion.div
+        <m.div
           initial={reduce ? false : { opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-60px' }}
@@ -56,7 +56,7 @@ export function FinalCtaSection() {
               </a>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </section>
   );

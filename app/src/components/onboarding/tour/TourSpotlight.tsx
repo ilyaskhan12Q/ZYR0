@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useTour } from './TourProvider';
 import { cn } from '@/lib/utils';
@@ -240,7 +240,7 @@ export function TourSpotlight() {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         key="tour-overlay"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -251,7 +251,7 @@ export function TourSpotlight() {
       />
 
       {rect && !isMobile && !isCenterStep && (
-        <motion.div
+        <m.div
           key={`ring-${step.id}`}
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -269,7 +269,7 @@ export function TourSpotlight() {
 
       {isCenterStep ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-          <motion.div
+          <m.div
             key={`card-${step.id}`}
             initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 8 }}
             animate={reducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
@@ -283,10 +283,10 @@ export function TourSpotlight() {
             )}
           >
             {cardInner}
-          </motion.div>
+          </m.div>
         </div>
       ) : (
-        <motion.div
+        <m.div
           key={`card-${step.id}`}
           initial={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.98, y: 8 }}
           animate={reducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
@@ -314,7 +314,7 @@ export function TourSpotlight() {
             />
           )}
           {cardInner}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

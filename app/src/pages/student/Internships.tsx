@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, MapPin, Calendar, DollarSign, X, ArrowRight, Loader2 } from 'lucide-react';
 import { getInternships } from '@/services/internships';
 import { SaveButton } from '@/components/SaveButton';
@@ -98,7 +98,7 @@ export default function StudentInternships() {
               </div>
             ) : (
               internships.map((internship, i) => (
-                <motion.div key={internship.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                <m.div key={internship.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                   className="internship-card bg-card border border-border rounded-xl shadow-sm hover:shadow-md transition-all">
                   <div className="p-5">
                     <div className="flex items-start justify-between">
@@ -130,7 +130,7 @@ export default function StudentInternships() {
                       </Link>
                     </div>
                   </div>
-                </motion.div>
+                </m.div>
               ))
             )}
           </div>

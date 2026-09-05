@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, Eye, Lock, Unlock } from 'lucide-react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
@@ -109,7 +109,7 @@ export default function AdminInternships() {
                   filtered.map((i) => {
                     const company = Array.isArray(i.company) ? i.company[0] : i.company;
                     return (
-                      <motion.tr key={i.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                      <m.tr key={i.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3">
                           <p className="text-sm font-medium">{i.title}</p>
                           <p className="text-xs text-muted-foreground">{i.domain} &middot; {i.location_type}</p>
@@ -138,7 +138,7 @@ export default function AdminInternships() {
                             </button>
                           </div>
                         </td>
-                      </motion.tr>
+                      </m.tr>
                     );
                   })
                 )}

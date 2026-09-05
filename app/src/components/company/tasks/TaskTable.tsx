@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   CheckCircle2,
   Clock,
@@ -82,7 +82,7 @@ export function TaskTable({
                 : '—';
 
               return (
-                <motion.tr
+                <m.tr
                   key={task.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -244,7 +244,7 @@ export function TaskTable({
                       </button>
                     )}
                   </td>
-                </motion.tr>
+                </m.tr>
               );
             })}
           </tbody>

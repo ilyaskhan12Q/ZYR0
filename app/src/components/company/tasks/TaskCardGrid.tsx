@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   CheckCircle2,
   Clock,
@@ -59,7 +59,7 @@ export function TaskCardGrid({
           : 'No date';
 
         return (
-          <motion.div
+          <m.div
             key={task.id}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -248,7 +248,7 @@ export function TaskCardGrid({
                 </div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         );
       })}
     </div>
