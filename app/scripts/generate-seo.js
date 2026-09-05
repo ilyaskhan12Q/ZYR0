@@ -532,8 +532,69 @@ function generateBodyHtml(routePath, data = {}) {
   let contentHtml = '';
 
   if (routePath === '') {
-    // Homepage: React app takes over completely, return minimal placeholder
-    return '<div style="min-height:100vh;background:#000;"></div>';
+    // Homepage: pre-rendered SSR content for crawlers (React app takes over on client)
+    contentHtml = `
+      <section style="padding: 5rem 2rem 3rem; text-align: center; max-width: 1000px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="font-size: 3rem; font-weight: 800; color: #1e293b; margin-bottom: 1.5rem; line-height: 1.1;">
+          Structured Internship Platform for Students & Employers
+        </h1>
+        <p style="font-size: 1.25rem; color: #475569; line-height: 1.7; max-width: 700px; margin: 0 auto 2.5rem auto;">
+          ZYR0 connects students, companies, and mentors through structured internship tracking, milestone-based task management, and blockchain-verified digital certificates. Built for Pakistan's next generation of engineers.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem;">
+          <a href="/internships" style="background: #2563eb; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Browse Internships</a>
+          <a href="/register?type=employer" style="background: #059669; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Register Your Company</a>
+          <a href="/verify" style="background: #f1f5f9; color: #334155; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; border: 1px solid #e2e8f0;">Verify Certificate</a>
+        </div>
+      </section>
+
+      <section style="padding: 4rem 2rem; background-color: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+        <div style="max-width: 1000px; margin: 0 auto; font-family: sans-serif;">
+          <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 0.5rem;">Four Products, One Ecosystem</h2>
+          <p style="text-align: center; color: #64748b; margin-bottom: 3rem; font-size: 1.05rem;">Each product works standalone. Together, they cover the full lifecycle.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Studio</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Turn natural language into production-ready React apps. No boilerplate, no config.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 School OS</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">A modern operating system for schools. Admissions, attendance, grading, and timetables.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Research</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Autonomous deep research with verifiable citations and cross-verified reports.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Work</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Proof-of-work internships with GitHub-backed projects and cryptographic certificates.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 2.5rem;">Trusted by Students & Companies Across Pakistan</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #2563eb;">50+</div>
+            <div style="color: #64748b; font-size: 0.95rem;">University Partners</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #059669;">100+</div>
+            <div style="color: #64748b; font-size: 0.95rem;">Verified Companies</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #7c3aed;">1000+</div>
+            <div style="color: #64748b; font-size: 0.95rem;">Interns Placed</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #ea580c;">100%</div>
+            <div style="color: #64748b; font-size: 0.95rem;">Verified Certificates</div>
+          </div>
+        </div>
+      </section>
+    `;
 
   } else if (routePath === 'about') {
     contentHtml = `
