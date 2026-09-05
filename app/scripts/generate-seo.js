@@ -277,6 +277,20 @@ const staticPagesMeta = {
           'contactType': 'customer support',
           'availableLanguage': 'English'
         }
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        'name': 'ZYR0',
+        'url': `${url}/`,
+        'applicationCategory': 'BusinessApplication',
+        'operatingSystem': 'Web',
+        'description': 'An ecosystem of tools for those who build, learn, research, and work — from idea to live app, from school to career.',
+        'offers': {
+          '@type': 'Offer',
+          'price': '0',
+          'priceCurrency': 'USD'
+        }
       }
     ]
   },
