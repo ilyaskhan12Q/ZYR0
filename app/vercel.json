@@ -1,36 +1,6 @@
 {
   "rewrites": [
-    { "source": "/studio", "destination": "/index.html" },
-    { "source": "/school", "destination": "/index.html" },
-    { "source": "/edu", "destination": "/index.html" },
-    { "source": "/research", "destination": "/index.html" },
-    { "source": "/internships", "destination": "/index.html" },
-    { "source": "/internships/:id", "destination": "/index.html" },
-    { "source": "/internships/browse", "destination": "/index.html" },
-    { "source": "/companies", "destination": "/index.html" },
-    { "source": "/companies/:id", "destination": "/index.html" },
-    { "source": "/careers", "destination": "/index.html" },
-    { "source": "/careers/apply", "destination": "/index.html" },
-    { "source": "/about", "destination": "/index.html" },
-    { "source": "/contact", "destination": "/index.html" },
-    { "source": "/faq", "destination": "/index.html" },
-    { "source": "/help", "destination": "/index.html" },
-    { "source": "/verify", "destination": "/index.html" },
-    { "source": "/privacy", "destination": "/index.html" },
-    { "source": "/terms", "destination": "/index.html" },
-    { "source": "/cookies", "destination": "/index.html" },
-    { "source": "/login", "destination": "/index.html" },
-    { "source": "/register", "destination": "/index.html" },
-    { "source": "/forgot-password", "destination": "/index.html" },
-    { "source": "/reset-password", "destination": "/index.html" },
-    { "source": "/auth/:path*", "destination": "/index.html" },
-    { "source": "/student/:path*", "destination": "/index.html" },
-    { "source": "/company/:path*", "destination": "/index.html" },
-    { "source": "/mentor/:path*", "destination": "/index.html" },
-    { "source": "/admin/:path*", "destination": "/index.html" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "status": 404 }
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
