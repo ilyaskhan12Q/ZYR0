@@ -14,7 +14,6 @@ export default function BentoProductGrid() {
   return (
     <section id="products" className="py-20 md:py-28">
       <div className="max-w-[1264px] mx-auto px-6 md:px-16">
-        {/* Section header */}
         <Reveal>
           <div className="max-w-2xl mb-12 md:mb-16">
             <p
@@ -39,11 +38,11 @@ export default function BentoProductGrid() {
           </div>
         </Reveal>
 
-        {/* Bento grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
           {gridConfig.map((config, index) => {
             const product = productsList.find((p) => p.id === config.id);
             if (!product) return null;
+            const Icon = product.icon;
 
             return (
               <Reveal key={product.id} delay={index * 0.08} className={`${config.colSpan} ${config.rowSpan}`}>
@@ -55,31 +54,23 @@ export default function BentoProductGrid() {
                     borderColor: 'var(--zyro-border)',
                   }}
                 >
-                  {/* Image area */}
+                  {/* Gradient placeholder area */}
                   <div
                     className={`relative ${config.aspect} w-full overflow-hidden`}
-                    style={{ background: 'var(--zyro-elevated)' }}
+                    style={{
+                      background: `linear-gradient(135deg, ${product.color}18 0%, ${product.color}08 50%, transparent 100%)`,
+                    }}
                   >
-                    {/* Placeholder — replace with <img> when you have screenshots */}
+                    {/* Product icon — centered */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div
-                          className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                          style={{ background: 'var(--zyro-accent-muted)' }}
-                        >
-                          <span
-                            className="font-display text-lg"
-                            style={{ color: 'var(--zyro-accent)' }}
-                          >
-                            {product.name.charAt(4)}
-                          </span>
-                        </div>
-                        <p
-                          className="font-label text-[10px] tracking-[0.15em]"
-                          style={{ color: 'var(--zyro-text-muted)' }}
-                        >
-                          {product.name}
-                        </p>
+                      <div
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
+                        style={{ background: `${product.color}20` }}
+                      >
+                        <Icon
+                          className="w-8 h-8 md:w-10 md:h-10"
+                          style={{ color: product.color }}
+                        />
                       </div>
                     </div>
 

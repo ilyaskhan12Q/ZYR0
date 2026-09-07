@@ -4,8 +4,6 @@ import Header from '@/components/nav/Header';
 import { ShaderHero } from '@/components/ui/shader-hero';
 import LogoWall from '@/components/platform-home/LogoWall';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
-import DeepDiveSection from '@/components/platform-home/DeepDiveSection';
-import SolutionsSection from '@/components/platform-home/SolutionsSection';
 import CTASection from '@/components/platform-home/CTASection';
 import PlatformFooter from '@/components/nav/PlatformFooter';
 
@@ -36,8 +34,6 @@ export default function PlatformHome() {
         <ShaderHero />
         <LogoWall />
         <BentoProductGrid />
-        <DeepDiveSection />
-        <SolutionsSection />
         <Suspense fallback={<SectionFallback />}>
           <PricingSection />
         </Suspense>
