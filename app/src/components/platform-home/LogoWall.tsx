@@ -1,34 +1,12 @@
-const logos = [
-  { name: 'Vercel', icon: '▲' },
-  { name: 'Stripe', icon: 'S' },
-  { name: 'Notion', icon: '◆' },
-  { name: 'Linear', icon: 'gué' },
-  { name: 'Supabase', icon: '⚡' },
-  { name: 'GitHub', icon: '⊚' },
-  { name: 'Figma', icon: '◉' },
-  { name: 'Slack', icon: '#' },
-  { name: 'Raycast', icon: '◈' },
-  { name: 'Clerk', icon: '⬡' },
-];
-
-function LogoPlaceholder({ name, icon }: { name: string; icon: string }) {
-  return (
-    <div className="flex items-center gap-2.5 select-none shrink-0">
-      <span
-        className="text-lg md:text-xl"
-        style={{ color: 'var(--zyro-text-muted)' }}
-      >
-        {icon}
-      </span>
-      <span
-        className="text-sm md:text-base font-semibold tracking-tight whitespace-nowrap"
-        style={{ color: 'var(--zyro-text-secondary)' }}
-      >
-        {name}
-      </span>
-    </div>
-  );
-}
+const PARTNERS = [
+  { name: 'OpenAI', color: '#10A37F' },
+  { name: 'Anthropic', color: '#D4A574' },
+  { name: 'DeepSeek', color: '#4D6BFE' },
+  { name: 'Cloudflare', color: '#F38020' },
+  { name: 'Google', color: '#4285F4' },
+  { name: 'Vercel', color: '#666666' },
+  { name: 'Supabase', color: '#3ECF8E' },
+]
 
 export default function LogoWall() {
   return (
@@ -38,7 +16,7 @@ export default function LogoWall() {
           className="font-label text-[11px] tracking-[0.25em] uppercase text-center mb-12"
           style={{ color: 'var(--zyro-text-muted)' }}
         >
-          Trusted by teams building the future
+          Powered by industry-leading technology
         </p>
       </div>
 
@@ -72,29 +50,22 @@ export default function LogoWall() {
 
         {/* Marquee track */}
         <div className="flex w-max animate-marquee py-6 md:py-8">
-          {[...logos, ...logos, ...logos].map((logo, i) => (
+          {[...PARTNERS, ...PARTNERS, ...PARTNERS].map((partner, i) => (
             <div
-              key={`${logo.name}-${i}`}
-              className="mx-8 md:mx-14 shrink-0 flex items-center"
+              key={`${partner.name}-${i}`}
+              className="partner-item mx-8 md:mx-14 shrink-0 flex items-center cursor-default"
+              style={{ '--brand': partner.color } as React.CSSProperties}
             >
-              <LogoPlaceholder name={logo.name} icon={logo.icon} />
+              <span
+                className="text-sm md:text-base font-semibold tracking-tight whitespace-nowrap transition-colors duration-300"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
+                {partner.name}
+              </span>
             </div>
           ))}
         </div>
       </div>
-
-      <style>{`
-        @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
-        }
-        .animate-marquee {
-          animation: marquee 35s linear infinite;
-        }
-        .animate-marquee:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </section>
-  );
+  )
 }
