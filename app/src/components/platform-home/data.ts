@@ -65,10 +65,10 @@ export const productsList: ProductItem[] = [
 ];
 
 export const stats = [
-  { number: '4', label: 'Flagship SaaS Products' },
-  { number: '10K+', label: 'Active Users & Builders' },
-  { number: '120+', label: 'Partner Companies & Schools' },
-  { number: '99.9%', label: 'Platform Uptime' },
+  { number: '4', label: 'Integrated Products' },
+  { number: '1.0K+', label: 'Engineers Trust Us' },
+  { number: '50+', label: 'Institutions Partnered' },
+  { number: '99.9%', label: 'Dependable Uptime' },
 ];
 
 export const ecosystemSolutions = [

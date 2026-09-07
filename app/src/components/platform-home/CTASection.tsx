@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { stats } from './data';
 import Reveal from './Reveal';
-import CountUp from './CountUp';
 
 export default function CTASection() {
   return (
@@ -38,7 +36,7 @@ export default function CTASection() {
               automate deep research, and build verifiable proof of engineering excellence.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 to="/register?redirect=%2F"
                 className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg text-sm font-medium transition-all duration-200"
@@ -60,29 +58,6 @@ export default function CTASection() {
               >
                 Book a Demo
               </Link>
-            </div>
-
-            {/* Stats */}
-            <div
-              className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t"
-              style={{ borderColor: 'var(--zyro-border)' }}
-            >
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <div
-                    className="text-3xl md:text-4xl font-display mb-1"
-                    style={{ color: 'var(--zyro-text)' }}
-                  >
-                    <CountUp end={stat.number} />
-                  </div>
-                  <div
-                    className="font-label text-[10px] tracking-[0.15em]"
-                    style={{ color: 'var(--zyro-text-muted)' }}
-                  >
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </Reveal>

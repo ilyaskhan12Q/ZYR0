@@ -5,6 +5,7 @@ import { ShaderHero } from '@/components/ui/shader-hero';
 import LogoWall from '@/components/platform-home/LogoWall';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
 import WhyZyroSection from '@/components/platform-home/WhyZyroSection';
+import StatsSection from '@/components/platform-home/StatsSection';
 import CTASection from '@/components/platform-home/CTASection';
 import PlatformFooter from '@/components/nav/PlatformFooter';
 
@@ -36,6 +37,7 @@ export default function PlatformHome() {
         <LogoWall />
         <BentoProductGrid />
         <WhyZyroSection />
+        <StatsSection />
         <Suspense fallback={<SectionFallback />}>
           <PricingSection />
         </Suspense>
