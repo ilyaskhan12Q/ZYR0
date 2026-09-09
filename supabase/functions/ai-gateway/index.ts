@@ -779,16 +779,25 @@ async function chatOnce(admin: ReturnType<typeof createClient>, userId: string, 
     ? [req.model, ...fallbackOrder().filter((id) => id !== req.model)]
     : fallbackOrder();
 
+  console.log(`[ai-gateway] chatOnce chain: ${chain.join(', ')}`);
   let lastError = 'All models unavailable';
   for (const modelId of chain) {
     const entry = resolveEntry(modelId);
-    if (!entry || !isUsable(entry)) continue;
-    if ((cooldowns.get(entry.id) ?? 0) > Date.now()) continue;
+    if (!entry || !isUsable(entry)) {
+      console.log(`[ai-gateway] skip ${modelId}: entry=${!!entry} usable=${entry ? isUsable(entry) : 'n/a'}`);
+      continue;
+    }
+    if ((cooldowns.get(entry.id) ?? 0) > Date.now()) {
+      console.log(`[ai-gateway] skip ${modelId}: cooldown`);
+      continue;
+    }
 
+    console.log(`[ai-gateway] trying ${modelId}...`);
     const started = Date.now();
     try {
       const res = await upstreamFetch(entry, req, false);
       const body = await readUpstreamText(res);
+      console.log(`[ai-gateway] ${modelId} status=${res.status} body=${body.slice(0, 300)}`);
       if (!res.ok) {
         const cooldown = cooldownMsFor(res.status, body);
         if (cooldown > 0) cooldowns.set(entry.id, Date.now() + cooldown);
@@ -838,31 +847,45 @@ async function chatStream(admin: ReturnType<typeof createClient>, userId: string
 
   const started = Date.now();
 
+  console.log(`[ai-gateway] chatStream chain: ${chain.join(', ')}`);
   for (const modelId of chain) {
     const entry = resolveEntry(modelId);
-    if (!entry || !isUsable(entry)) continue;
-    if ((cooldowns.get(entry.id) ?? 0) > Date.now()) continue;
+    if (!entry || !isUsable(entry)) {
+      console.log(`[ai-gateway] skip ${modelId}: entry=${!!entry} usable=${entry ? isUsable(entry) : 'n/a'}`);
+      continue;
+    }
+    if ((cooldowns.get(entry.id) ?? 0) > Date.now()) {
+      console.log(`[ai-gateway] skip ${modelId}: cooldown until ${new Date(cooldowns.get(entry.id)!).toISOString()}`);
+      continue;
+    }
 
+    console.log(`[ai-gateway] trying ${modelId}...`);
     try {
       let res = await upstreamFetch(entry, req, true);
+      console.log(`[ai-gateway] ${modelId} response: status=${res.status}`);
 
       // Some gateways reject stream_options.include_usage — retry without it.
       if (!res.ok) {
         const errText = await readUpstreamText(res);
+        console.log(`[ai-gateway] ${modelId} error body: ${errText.slice(0, 300)}`);
         const cooldown = cooldownMsFor(res.status, errText);
         if (cooldown > 0) cooldowns.set(entry.id, Date.now() + cooldown);
         if (res.status === 400 && /stream_options|include_usage/i.test(errText)) {
+          console.log(`[ai-gateway] ${modelId} retrying without stream_options...`);
           res = await upstreamFetch(entry, req, false);
+          console.log(`[ai-gateway] ${modelId} retry response: status=${res.status}`);
         } else {
           continue;
         }
       }
       if (!res.ok || !res.body) {
         const errText = await readUpstreamText(res);
+        console.log(`[ai-gateway] ${modelId} final fail: status=${res.status} body=${errText.slice(0, 200)}`);
         const cooldown = cooldownMsFor(res.status, errText);
         if (cooldown > 0) cooldowns.set(entry.id, Date.now() + cooldown);
         continue;
       }
+      console.log(`[ai-gateway] ${modelId} streaming OK`);
 
       const reader = res.body.getReader();
       const encoder = new TextEncoder();
@@ -931,11 +954,13 @@ async function chatStream(admin: ReturnType<typeof createClient>, userId: string
           ...corsHeaders,
         },
       });
-    } catch {
+    } catch (err) {
+      console.warn(`[ai-gateway] ${entry.id} exception:`, err.message);
       cooldowns.set(entry.id, Date.now() + 30_000);
     }
   }
 
+  console.error(`[ai-gateway] ALL MODELS FAILED for stream request. Chain was: ${chain.join(', ')}`);
   return new Response(JSON.stringify({ error: 'All models unavailable' }), {
     status: 503,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
