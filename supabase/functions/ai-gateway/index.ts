@@ -157,16 +157,18 @@ const REGISTRY: RegistryEntry[] = [
 ];
 
 // Default fallback chain: Gemini first (fastest), then free Zen models, then other BYOK.
-const FALLBACK_ORDER = REGISTRY.map((e) => e.id).filter((id) => {
-  const e = REGISTRY.find((r) => r.id === id)!;
-  return e.tier === 'free' || (e.envKey && Deno.env.get(e.envKey));
-}).sort((a, b) => {
-  const ea = REGISTRY.find((r) => r.id === a)!;
-  const eb = REGISTRY.find((r) => r.id === b)!;
-  // Gemini first, then free, then other BYOK
-  const tierOrder = (t: string) => t === 'google' ? 0 : ea.tier === 'free' ? 1 : 2;
-  return tierOrder(ea.provider) - tierOrder(eb.provider);
-});
+// Lazy — recomputed per request so env vars (GEMINI_API_KEY etc.) are always fresh.
+function fallbackOrder(): string[] {
+  return REGISTRY.map((e) => e.id).filter((id) => {
+    const e = REGISTRY.find((r) => r.id === id)!;
+    return e.tier === 'free' || (e.envKey && Deno.env.get(e.envKey));
+  }).sort((a, b) => {
+    const ea = REGISTRY.find((r) => r.id === a)!;
+    const eb = REGISTRY.find((r) => r.id === b)!;
+    const tierRank = (e: RegistryEntry) => e.provider === 'google' ? 0 : e.tier === 'free' ? 1 : 2;
+    return tierRank(ea) - tierRank(eb);
+  });
+}
 
 const PER_USER_RPM_LIMIT = 20; // requests per minute, DB-backed
 const REQUEST_TIMEOUT_MS = 300_000; // OpenCode's OPENAI_HEADER_TIMEOUT_DEFAULT
@@ -774,8 +776,8 @@ async function readUpstreamText(res: Response): Promise<string> {
 // Non-stream path: returns { text, model, usage, latencyMs }
 async function chatOnce(admin: ReturnType<typeof createClient>, userId: string, req: ChatRequest) {
   const chain = req.model
-    ? [req.model, ...FALLBACK_ORDER.filter((id) => id !== req.model)]
-    : FALLBACK_ORDER;
+    ? [req.model, ...fallbackOrder().filter((id) => id !== req.model)]
+    : fallbackOrder();
 
   let lastError = 'All models unavailable';
   for (const modelId of chain) {
@@ -831,8 +833,8 @@ async function chatOnce(admin: ReturnType<typeof createClient>, userId: string, 
 // event once the stream (and ledger write) completes.
 async function chatStream(admin: ReturnType<typeof createClient>, userId: string, req: ChatRequest) {
   const chain = req.model
-    ? [req.model, ...FALLBACK_ORDER.filter((id) => id !== req.model)]
-    : FALLBACK_ORDER;
+    ? [req.model, ...fallbackOrder().filter((id) => id !== req.model)]
+    : fallbackOrder();
 
   const started = Date.now();
 
