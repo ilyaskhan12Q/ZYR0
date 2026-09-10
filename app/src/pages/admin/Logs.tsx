@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
@@ -92,7 +92,7 @@ export default function AdminLogs() {
                   </tr>
                 ) : (
                   filtered.map((log) => (
-                    <motion.tr key={log.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                    <m.tr key={log.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <img src={log.user?.avatar_url || `https://ui-avatars.com/api/?name=${log.user?.full_name || 'System'}`} alt="" className="w-8 h-8 rounded-full object-cover" />
@@ -105,7 +105,7 @@ export default function AdminLogs() {
                       <td className="px-4 py-3 text-sm font-medium">{log.details || log.target || '-'}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{new Date(log.created_at).toLocaleString()}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground font-mono">{log.ip_address || 'n/a'}</td>
-                    </motion.tr>
+                    </m.tr>
                   ))
                 )}
               </tbody>

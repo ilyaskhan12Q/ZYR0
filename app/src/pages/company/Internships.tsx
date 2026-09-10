@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Plus, Search, Edit, Eye, XCircle, Users, TrendingUp, Calendar, MapPin, DollarSign, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -122,7 +122,7 @@ export default function CompanyInternships() {
             const isUpdating = updating === internship.id;
 
             return (
-              <motion.div key={internship.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
+              <m.div key={internship.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
                 className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -167,7 +167,7 @@ export default function CompanyInternships() {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })
         )}

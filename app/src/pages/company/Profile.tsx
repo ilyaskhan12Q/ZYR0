@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, Phone, Globe, MapPin, Save, Plus, X, Upload, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany, updateCompany, createCompany, uploadCompanyLogo } from '@/services/companies';
@@ -130,7 +130,7 @@ export default function CompanyProfile() {
 
       {/* Header / Cover Logo */}
       {company && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="h-32 bg-gradient-to-r from-primary to-accent dark:from-slate-950 dark:to-accent/50 relative" />
           <div className="px-6 pb-6">
@@ -158,11 +158,11 @@ export default function CompanyProfile() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Basic Info */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <h3 className="font-semibold">Basic Information</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -198,10 +198,10 @@ export default function CompanyProfile() {
           <textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
             className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none" />
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Contact */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <h3 className="font-semibold">Contact Information</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -226,7 +226,7 @@ export default function CompanyProfile() {
               className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20" />
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

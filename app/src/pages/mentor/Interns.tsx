@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ClipboardList, CheckSquare, Star, MessageSquare, Users } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -174,7 +174,7 @@ export default function MentorInterns() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {interns.map((intern, i) => (
-            <motion.div 
+            <m.div 
               key={intern.id} 
               initial={{ opacity: 0, y: 20 }} 
               animate={{ opacity: 1, y: 0 }} 
@@ -207,7 +207,7 @@ export default function MentorInterns() {
                   <span className="text-sm font-medium">{intern.progress}%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <motion.div 
+                  <m.div 
                     className="h-full bg-accent rounded-full" 
                     initial={{ width: 0 }} 
                     animate={{ width: `${intern.progress}%` }} 
@@ -253,7 +253,7 @@ export default function MentorInterns() {
                   <MessageSquare className="w-4 h-4" /> Message
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       )}

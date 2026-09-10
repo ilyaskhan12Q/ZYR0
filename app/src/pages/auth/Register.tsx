@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Briefcase, GraduationCap, Building2, Users, ArrowRight, ArrowLeft, CheckCircle2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 import { signUp, signInWithGoogle, signInWithLinkedIn, rememberEmail } from '../../lib/auth';
@@ -135,7 +135,7 @@ export default function Register() {
         path="/register"
         noIndex={true}
       />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-2xl">
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
@@ -149,7 +149,7 @@ export default function Register() {
         <AnimatePresence mode="wait">
           {/* Step 1: Role Selection */}
           {step === 'role' && (
-            <motion.div key="role" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <m.div key="role" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold">Join ZYR0</h1>
                 <p className="text-muted-foreground mt-2">Select your role to get started</p>
@@ -193,12 +193,12 @@ export default function Register() {
               <p className="text-center mt-4 text-sm text-muted-foreground">
                 Already have an account? <Link to="/login" className="text-accent font-medium hover:underline focus-visible-ring rounded-sm">Sign In</Link>
               </p>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Step 2: Form */}
           {step === 'form' && (
-            <motion.div key="form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <m.div key="form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="bg-card rounded-xl border border-border shadow-lg p-8">
                 <button onClick={() => setStep('role')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-accent mb-4 focus-visible-ring rounded-sm p-1">
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Back
@@ -332,12 +332,12 @@ export default function Register() {
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Step 3: OTP Verification */}
           {step === 'otp' && (
-            <motion.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <m.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="bg-card rounded-xl border border-border shadow-lg p-8">
                 <button onClick={() => setStep('form')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-accent mb-4 focus-visible-ring rounded-sm p-1">
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" /> Back to Signup
@@ -392,18 +392,18 @@ export default function Register() {
                   Didn't receive the email? Check your spam folder or try registering again.
                 </p>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Step 4: Success */}
           {step === 'success' && (
-            <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
+            <m.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
               <div className="bg-card rounded-xl border border-border shadow-lg p-10">
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
+                <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
                   <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
                     <CheckCircle2 className="w-10 h-10 text-emerald-600" aria-hidden="true" />
                   </div>
-                </motion.div>
+                </m.div>
                 <h2 className="mt-6 text-2xl font-bold">Email Verified! 🎉</h2>
                 <p className="mt-2 text-muted-foreground">
                   {postAuthTarget
@@ -420,10 +420,10 @@ export default function Register() {
                   {postAuthTarget ? 'Continue to Application' : 'Go to Dashboard'} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

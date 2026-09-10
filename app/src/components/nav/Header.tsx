@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ChevronDown, LogOut, User, LayoutDashboard, Settings,
   Building2, Sun, Moon, HelpCircle, MessageCircle, BookOpen,
@@ -420,7 +420,7 @@ export default function Header() {
         {mobileOpen && (
           <div className="fixed inset-0 z-[60] md:hidden">
             <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-            <motion.div
+            <m.div
               initial={{ y: '-100%' }}
               animate={{ y: 0 }}
               exit={{ y: '-100%' }}
@@ -654,7 +654,7 @@ export default function Header() {
                   )}
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         )}
       </div>

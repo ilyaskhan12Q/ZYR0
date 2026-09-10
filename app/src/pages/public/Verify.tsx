@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle2, XCircle, Award, Shield, QrCode, HelpCircle, BookOpen, FileText } from 'lucide-react';
 import { verifyCertificate } from '@/services/certificates';
 import { getOfferLetterById } from '@/services/offerLetters';
@@ -178,16 +178,16 @@ export default function Verify() {
         keywords="verify certificate, internship certificate verification, verify offer letter, offer verification, credential verification, ZYR0"
       />
       <div className="max-w-4xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-accent" aria-hidden="true" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold">Verify Credentials</h1>
           <p className="mt-3 text-muted-foreground">Verify the authenticity of ZYR0 certificates and offer letters</p>
-        </motion.div>
+        </m.div>
 
         {/* Tab Switcher */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+        <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
           className="max-w-2xl mx-auto mb-4">
           <div className="flex items-center bg-muted rounded-xl p-1 gap-1">
             <button
@@ -210,9 +210,9 @@ export default function Verify() {
               Offer Letter
             </button>
           </div>
-        </motion.div>
+        </m.div>
 
-        <motion.div initial={{ opacity: activeTab === 'offer' ? 0 : 1 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
+        <m.div initial={{ opacity: activeTab === 'offer' ? 0 : 1 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
           className="bg-card rounded-xl border border-border p-6 shadow-sm max-w-2xl mx-auto">
 
           {/* ── Certificate tab: search card ── */}
@@ -301,7 +301,7 @@ export default function Verify() {
             </button>
           </div>
           )}
-        </motion.div>
+        </m.div>
 
         {/* Result status for screen readers */}
         <div className="sr-only" role="status" aria-live="polite">
@@ -320,7 +320,7 @@ export default function Verify() {
         <AnimatePresence mode="wait">
           {/* Certificate result */}
           {activeTab === 'certificate' && certResult === 'valid' && verifiedCert && (
-            <motion.div key="valid-cert" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
+            <m.div key="valid-cert" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
               className="mt-8 space-y-6">
               <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -339,15 +339,15 @@ export default function Verify() {
                 </div>
               </div>
               <CertificateDocument certificate={verifiedCert} />
-            </motion.div>
+            </m.div>
           )}
           {activeTab === 'certificate' && certResult === 'invalid' && (
-            <motion.div key="invalid-cert" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+            <m.div key="invalid-cert" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="mt-8 bg-card rounded-xl border-2 border-red-200 dark:border-red-900/30 shadow-lg overflow-hidden max-w-2xl mx-auto" role="alert">
               <div className="bg-red-50 dark:bg-red-950/20 p-6 text-center">
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
+                <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
                   <XCircle className="w-16 h-16 text-red-500 mx-auto" aria-hidden="true" />
-                </motion.div>
+                </m.div>
                 <h2 className="mt-4 text-2xl font-bold text-red-700 dark:text-red-400">Certificate Not Found</h2>
                 <p className="text-sm text-red-600 dark:text-red-300 mt-1">The certificate ID you entered could not be verified.</p>
               </div>
@@ -360,12 +360,12 @@ export default function Verify() {
                   Try Again
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Offer letter result */}
           {activeTab === 'offer' && offerResult === 'valid' && verifiedOffer && (
-            <motion.div key="valid-offer" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
+            <m.div key="valid-offer" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
               className="mt-8 space-y-6">
               <div className={`rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 ${
                 offerInactive ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-emerald-500/10 border border-emerald-500/20'
@@ -394,15 +394,15 @@ export default function Verify() {
               <div className="flex justify-center">
                 <OfferLetterDocument offer={verifiedOffer} />
               </div>
-            </motion.div>
+            </m.div>
           )}
           {activeTab === 'offer' && offerResult === 'invalid' && (
-            <motion.div key="invalid-offer" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+            <m.div key="invalid-offer" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="mt-8 bg-card rounded-xl border-2 border-red-200 dark:border-red-900/30 shadow-lg overflow-hidden max-w-2xl mx-auto" role="alert">
               <div className="bg-red-50 dark:bg-red-950/20 p-6 text-center">
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
+                <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
                   <XCircle className="w-16 h-16 text-red-500 mx-auto" aria-hidden="true" />
-                </motion.div>
+                </m.div>
                 <h2 className="mt-4 text-2xl font-bold text-red-700 dark:text-red-400">Offer Letter Not Found</h2>
                 <p className="text-sm text-red-600 dark:text-red-300 mt-1">The offer ID you entered could not be verified.</p>
               </div>
@@ -415,12 +415,12 @@ export default function Verify() {
                   Try Again
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Help links */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -438,7 +438,7 @@ export default function Verify() {
               Contact Support
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

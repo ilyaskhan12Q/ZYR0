@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown, ChevronRight, FileText, Calendar, Clock,
   Users, CheckCircle2, AlertTriangle, Edit3, Trash2, Plus,
@@ -303,7 +303,7 @@ export function MasterDeliverablesList({
                 {/* Expanded Slide-Down Detail Drawer */}
                 <AnimatePresence>
                   {isExpanded && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
@@ -486,7 +486,7 @@ export function MasterDeliverablesList({
                           })}
                         </div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>

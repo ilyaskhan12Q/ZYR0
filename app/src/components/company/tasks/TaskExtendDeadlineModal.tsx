@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, AlertTriangle, CheckCircle2, X, Send, Sparkles, Loader2, Users } from 'lucide-react';
 import { bulkExtendTaskDeadlines } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
@@ -115,7 +115,7 @@ export function TaskExtendDeadlineModal({
         role="dialog"
         aria-modal="true"
       >
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.96, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 10 }}
@@ -288,7 +288,7 @@ export function TaskExtendDeadlineModal({
               </button>
             </div>
           </form>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

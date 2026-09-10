@@ -503,6 +503,16 @@
   animation-play-state: paused;
 }
 
+.partner-item:hover {
+  color: var(--brand, #fff);
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--brand, #fff) 40%, transparent));
+}
+
+.partner-item:hover span {
+  color: var(--brand, #fff) !important;
+}
+
 .v3-pulse-dot {
   animation: pulseDot 1.8s ease-out infinite;
 }

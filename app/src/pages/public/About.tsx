@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, Eye, Shield, Zap, Users, Award, Globe, Heart, Lightbulb, MapPin, GraduationCap, Building2, ArrowRight } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
@@ -55,24 +55,24 @@ export default function About() {
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl sm:text-5xl font-bold">About ZYR0</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               ZYR0 is a modern internship management platform that connects students, companies, mentors, and educational institutions in a single ecosystem. We believe every student deserves a meaningful, structured internship experience that translates into real career growth.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* The Problem We Address */}
       <section className="px-4 py-16 bg-muted/30 border-b border-border">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Challenge</span>
             <h2 className="text-3xl font-bold mt-3">Why internship infrastructure matters</h2>
-          </motion.div>
+          </m.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <motion.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
               <div className="w-12 h-12 bg-red-100 dark:bg-red-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <MapPin className="w-6 h-6 text-red-500" />
@@ -81,8 +81,8 @@ export default function About() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Quality internship opportunities in Pakistan are concentrated in major cities and a handful of universities. Students outside these networks lack visibility into available positions and struggle to find structured programs that build real skills.
               </p>
-            </motion.div>
-            <motion.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
+            </m.div>
+            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
               className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
               <div className="w-12 h-12 bg-orange-100 dark:bg-orange-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <GraduationCap className="w-6 h-6 text-orange-500" />
@@ -91,8 +91,8 @@ export default function About() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Traditional internship certificates are easy to forge and difficult for employers to validate. Students who complete genuine programs struggle to prove their experience, undermining the value of their hard work.
               </p>
-            </motion.div>
-            <motion.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+            </m.div>
+            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
               className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
               <div className="w-12 h-12 bg-amber-100 dark:bg-amber-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-6 h-6 text-amber-500" />
@@ -101,7 +101,7 @@ export default function About() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Companies manage internships through ad-hoc email chains, shared spreadsheets, and manual tracking. This creates inconsistent experiences for interns and administrative overhead for employers that discourages them from offering structured programs.
               </p>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -109,12 +109,12 @@ export default function About() {
       {/* Mission & Vision */}
       <section className="px-4 py-16">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
             <h2 className="text-3xl font-bold mt-3">What drives us</h2>
-          </motion.div>
+          </m.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               className="bg-card rounded-xl border border-border p-8 shadow-sm">
               <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4">
                 <Target className="w-6 h-6 text-accent" />
@@ -126,8 +126,8 @@ export default function About() {
               <p className="text-muted-foreground leading-relaxed mt-4">
                 We are building the infrastructure that makes internships reliable — where students receive consistent mentorship and clear goals, companies can scale their talent pipelines, and every completed program produces a credential that employers can verify instantly.
               </p>
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            </m.div>
+            <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               className="bg-card rounded-xl border border-border p-8 shadow-sm">
               <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4">
                 <Eye className="w-6 h-6 text-accent" />
@@ -139,7 +139,7 @@ export default function About() {
               <p className="text-muted-foreground leading-relaxed mt-4">
                 We envision a future where geographic location and institutional affiliation no longer determine a student&apos;s access to meaningful professional experience — where any motivated student can find, complete, and prove a high-quality internship on a level playing field.
               </p>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -147,20 +147,20 @@ export default function About() {
       {/* Values */}
       <section className="px-4 py-16 bg-muted/50">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="text-3xl font-bold">Our Values</h2>
             <p className="mt-3 text-muted-foreground">The principles that guide everything we do</p>
-          </motion.div>
+          </m.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {values.map((v, i) => (
-              <motion.div key={i} role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+              <m.div key={i} role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className="bg-card rounded-xl border border-border p-6 text-center shadow-sm">
                 <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <v.icon className="w-6 h-6 text-accent" />
                 </div>
                 <h3 className="font-semibold">{v.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{v.desc}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -169,32 +169,32 @@ export default function About() {
       {/* Our Philosophy */}
       <section className="px-4 py-16 border-b border-border">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
             <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Philosophy</span>
             <h2 className="text-3xl font-bold mt-3">How we approach internships</h2>
-          </motion.div>
+          </m.div>
           <div className="space-y-6">
-            <motion.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
               className="bg-card rounded-xl border border-border p-8 shadow-sm">
               <h3 className="text-xl font-bold mb-3">Structure creates accountability</h3>
               <p className="text-muted-foreground leading-relaxed">
                 We believe that unstructured internships benefit neither the student nor the organization. Without clear milestones, defined deliverables, and regular feedback cycles, interns often leave without meaningful skills and companies cannot measure the impact of their programs. ZYR0 provides the framework that makes every internship productive for both sides.
               </p>
-            </motion.div>
-            <motion.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
+            </m.div>
+            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
               className="bg-card rounded-xl border border-border p-8 shadow-sm">
               <h3 className="text-xl font-bold mb-3">Credentials must be trustworthy</h3>
               <p className="text-muted-foreground leading-relaxed">
                 An internship certificate is only valuable if employers trust it. Our verification system attaches a unique credential ID to every completed program, allowing anyone — from HR teams to hiring managers — to confirm authenticity in seconds. This protects the integrity of every student&apos;s hard work and gives companies confidence when evaluating candidates.
               </p>
-            </motion.div>
-            <motion.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+            </m.div>
+            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
               className="bg-card rounded-xl border border-border p-8 shadow-sm">
               <h3 className="text-xl font-bold mb-3">Mentorship scales with the right tools</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Effective mentorship requires more than occasional check-ins. Our platform gives mentors structured access to intern submissions, progress data, and feedback history — enabling them to provide targeted guidance across multiple mentees without losing context. This makes quality mentorship viable even for busy industry professionals.
               </p>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -202,25 +202,25 @@ export default function About() {
       {/* Timeline */}
       <section className="px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <h2 className="text-3xl font-bold">Our Journey</h2>
             <p className="mt-3 text-muted-foreground">Key milestones in our growth</p>
-          </motion.div>
+          </m.div>
           <div className="relative">
             <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-border md:-translate-x-px" />
-            {milestones.map((m, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
+            {milestones.map((ms, i) => (
+              <m.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
                 className={`relative flex items-start gap-6 mb-10 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
                 <div className={`flex-1 ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                   <div className="bg-card rounded-xl border border-border p-5 shadow-sm ml-10 md:ml-0">
-                    <span className="text-accent font-bold">{m.year}</span>
-                    <h4 className="font-semibold mt-1">{m.title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{m.desc}</p>
+                    <span className="text-accent font-bold">{ms.year}</span>
+                    <h4 className="font-semibold mt-1">{ms.title}</h4>
+                    <p className="text-sm text-muted-foreground mt-1">{ms.desc}</p>
                   </div>
                 </div>
                 <div className="absolute left-4 md:left-1/2 w-3 h-3 bg-accent rounded-full border-4 border-background -translate-x-1.5 mt-5" />
                 <div className="hidden md:block flex-1" />
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -229,7 +229,7 @@ export default function About() {
       {/* Team / Founder — placeholder until verified */}
       <section className="px-4 py-16 bg-muted/30 border-b border-border">
         <div className="max-w-3xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-border">
               <Users className="w-8 h-8 text-muted-foreground" />
             </div>
@@ -240,14 +240,14 @@ export default function About() {
             <p className="mt-4 text-muted-foreground max-w-xl mx-auto leading-relaxed">
               Founder and team profiles are being prepared for this section. We believe in transparency about who is building ZYR0 and will share verified information here as soon as it is available.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* CTA */}
       <section className="px-4 py-16 bg-muted/50">
         <div className="max-w-3xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <Heart className="w-10 h-10 text-accent mx-auto mb-4" />
             <h2 className="text-3xl font-bold">Join the ZYR0 Community</h2>
             <p className="mt-4 text-muted-foreground">Whether you are a student, company, mentor, or university — there is a place for you in our ecosystem.</p>
@@ -262,7 +262,7 @@ export default function About() {
                 Contact Us
               </Link>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>

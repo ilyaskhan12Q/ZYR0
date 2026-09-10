@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ClipboardList, Clock, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 
 interface TaskStatsHeaderProps {
@@ -75,7 +75,7 @@ export function TaskStatsHeader({ tasks, activeTab, onSelectTab }: TaskStatsHead
         const Icon = stat.icon;
         const isActive = activeTab === stat.id;
         return (
-          <motion.button
+          <m.button
             key={stat.title}
             type="button"
             onClick={() => onSelectTab?.(stat.id)}
@@ -107,7 +107,7 @@ export function TaskStatsHeader({ tasks, activeTab, onSelectTab }: TaskStatsHead
             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
               {stat.subtext}
             </p>
-          </motion.button>
+          </m.button>
         );
       })}
     </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown, Menu, X, Code, School,
   BrainCircuit, Briefcase, ArrowRight,
@@ -215,7 +215,7 @@ export default function PlatformNav() {
 
                   <AnimatePresence>
                     {profileOpen && (
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
@@ -288,7 +288,7 @@ export default function PlatformNav() {
                             <LogOut className="w-4 h-4" /> Sign Out
                           </button>
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -346,7 +346,7 @@ export default function PlatformNav() {
           {/* Mobile Menu */}
           <AnimatePresence>
             {mobileMenuOpen && (
-              <motion.div
+              <m.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -452,7 +452,7 @@ export default function PlatformNav() {
                     Get Started Free
                   </Link>
                 )}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { 
   Users, 
   FileCheck, 
@@ -367,7 +367,7 @@ export default function AdminAnalytics() {
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <motion.div 
+          <m.div 
             key={i} 
             initial={{ opacity: 0, y: 15 }} 
             animate={{ opacity: 1, y: 0 }} 
@@ -385,14 +385,14 @@ export default function AdminAnalytics() {
               <p className="text-sm font-semibold text-foreground mt-1">{stat.label}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{stat.subtext}</p>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Registrations Trend */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ delay: 0.2 }}
@@ -430,10 +430,10 @@ export default function AdminAnalytics() {
               <Area type="monotone" name="Mentors" dataKey="mentors" stroke="#8B5CF6" fillOpacity={0} strokeWidth={2} strokeDasharray="4 4" />
             </AreaChart>
           </ResponsiveContainer>
-        </motion.div>
+        </m.div>
 
         {/* Monthly Applications */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ delay: 0.3 }}
@@ -462,10 +462,10 @@ export default function AdminAnalytics() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </motion.div>
+        </m.div>
 
         {/* Active Domains Breakdown */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ delay: 0.4 }}
@@ -494,10 +494,10 @@ export default function AdminAnalytics() {
               ))}
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Most Popular Internships */}
-        <motion.div 
+        <m.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
           transition={{ delay: 0.5 }}
@@ -527,7 +527,7 @@ export default function AdminAnalytics() {
               <div className="text-center text-muted-foreground py-8">No internship applications yet</div>
             )}
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

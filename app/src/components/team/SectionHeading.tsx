@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useReducedMotion, motion } from 'framer-motion';
+import { useReducedMotion, m } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +22,7 @@ export function Reveal({ children, className, delay = 0, y = 24, once = true }: 
     return <div className={className}>{children}</div>;
   }
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, margin: '-60px' }}
@@ -30,7 +30,7 @@ export function Reveal({ children, className, delay = 0, y = 24, once = true }: 
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 

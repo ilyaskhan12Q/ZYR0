@@ -1,11 +1,62 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { motion } from "framer-motion"
+import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react"
+import { m } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { MeshGradient } from "@paper-design/shaders-react"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
+
+const LazyMeshGradient = lazy(() => import("@paper-design/shaders-react").then(m => ({ default: m.MeshGradient })))
+
+class ShaderErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false }
+  static getDerivedStateFromError() { return { hasError: true } }
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children
+  }
+}
+
+function detectWebGL2(): boolean {
+  if (typeof document === 'undefined') return false
+  try {
+    const canvas = document.createElement('canvas')
+    const gl = canvas.getContext('webgl2')
+    return !!gl
+  } catch { return false }
+}
+
+function ShaderFallback() {
+  return (
+    <div className="absolute inset-0 w-full h-full bg-black">
+      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-900 to-neutral-800" />
+    </div>
+  )
+}
+
+function ShaderGradient() {
+  const [hasWebGL2, setHasWebGL2] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setHasWebGL2(detectWebGL2())
+    const timer = setTimeout(() => setMounted(true), 100)
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!hasWebGL2 || !mounted) return <ShaderFallback />
+
+  return (
+    <ShaderErrorBoundary fallback={<ShaderFallback />}>
+      <Suspense fallback={<ShaderFallback />}>
+        <LazyMeshGradient
+          className="absolute inset-0 w-full h-full"
+          colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
+          speed={0.25}
+        />
+      </Suspense>
+    </ShaderErrorBoundary>
+  )
+}
 
 const letterAnimation = {
   hidden: { opacity: 0, y: 40, filter: "blur(8px)" },
@@ -78,11 +129,7 @@ export const ShaderHero = () => {
         </defs>
       </svg>
 
-      <MeshGradient
-        className="absolute inset-0 w-full h-full"
-        colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
-        speed={0.25}
-      />
+      <ShaderGradient />
 
       {/* Radial spotlight following mouse */}
       <div
@@ -92,7 +139,7 @@ export const ShaderHero = () => {
 
       <div className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4">
         {/* Badge */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
@@ -100,10 +147,10 @@ export const ShaderHero = () => {
         >
           <Sparkles className="w-3.5 h-3.5 text-white/60" />
           ZYR0 2.0 — Now Live
-        </motion.div>
+        </m.div>
 
         {/* Title — ZYR0 on first line */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
@@ -112,38 +159,38 @@ export const ShaderHero = () => {
           <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-black tracking-[-0.05em] text-white leading-[0.85]">
             ZYR0
           </h1>
-        </motion.div>
+        </m.div>
 
         {/* Subtitle tagline — letter by letter */}
-        <motion.h2
+        <m.h2
           variants={containerAnimation}
           initial="hidden"
           animate="visible"
           className="mt-4 text-2xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.02em] text-white/70 flex flex-wrap justify-center leading-[1.2]"
         >
           {"Think. Build. Scale to ∞.".split("").map((char, index) => (
-            <motion.span
+            <m.span
               key={index}
               variants={letterAnimation}
               className={char === " " ? "w-2 md:w-3" : ""}
             >
               {char}
-            </motion.span>
+            </m.span>
           ))}
-        </motion.h2>
+        </m.h2>
 
         {/* Subtitle */}
-        <motion.p
+        <m.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.8 }}
           className="mt-8 max-w-lg text-base md:text-lg text-white/50 leading-relaxed"
         >
           An ecosystem of tools for those who build, learn, research, and work.
-        </motion.p>
+        </m.p>
 
         {/* CTAs */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4, duration: 0.8 }}
@@ -176,10 +223,10 @@ export const ShaderHero = () => {
               Book a Demo
             </Button>
           </Link>
-        </motion.div>
+        </m.div>
 
         {/* Product pillars */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8, duration: 0.8 }}
@@ -188,7 +235,7 @@ export const ShaderHero = () => {
           <p className="text-xs tracking-[0.3em] uppercase text-white/40 font-bold">
             Build · Learn · Research · Work
           </p>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Bottom gradient fade */}

@@ -1,4 +1,4 @@
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import type { ReactNode, RefObject } from 'react';
 import { useRef } from 'react';
 
@@ -41,7 +41,7 @@ export function Reveal({
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, x: offsetX, y: offsetY, scale: scaleVal }}
       whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
       viewport={{ once: true, margin: `${threshold}px` }}
@@ -49,7 +49,7 @@ export function Reveal({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -79,9 +79,9 @@ export function ParallaxLayer({
   }
 
   return (
-    <motion.div ref={ref} style={{ [direction]: translate }} className={className}>
+    <m.div ref={ref} style={{ [direction]: translate }} className={className}>
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -103,7 +103,7 @@ export function StaggerContainer({
   }
 
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: `${threshold}px` }}
@@ -114,7 +114,7 @@ export function StaggerContainer({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -137,7 +137,7 @@ export function StaggerItem({
   }
 
   return (
-    <motion.div
+    <m.div
       variants={{
         hidden: { opacity: 0, x: defaults.x, y: defaults.y, scale: defaults.scale },
         visible: { opacity: 1, x: 0, y: 0, scale: 1 },
@@ -146,6 +146,6 @@ export function StaggerItem({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }

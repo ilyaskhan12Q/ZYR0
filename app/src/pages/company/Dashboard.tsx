@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FolderOpen, Users, GraduationCap, Award, ArrowRight, Plus, Star, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -117,7 +117,7 @@ export default function CompanyDashboard() {
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card">
+            <m.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="stat-card">
               <div className="flex items-center justify-between">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
                   <Icon className={`w-5 h-5 ${stat.iconColor}`} />
@@ -125,7 +125,7 @@ export default function CompanyDashboard() {
               </div>
               <p className="text-2xl font-bold mt-3">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
@@ -133,7 +133,7 @@ export default function CompanyDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* Recent Applicants */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">Recent Applicants</h3>
@@ -168,10 +168,10 @@ export default function CompanyDashboard() {
                 })
               )}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Active Internships */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">Active Internships</h3>
@@ -201,12 +201,12 @@ export default function CompanyDashboard() {
                 })
               )}
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         <div className="space-y-6">
           {/* Application Status Breakdown */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Application Breakdown</h3>
             <div className="space-y-3">
@@ -232,11 +232,11 @@ export default function CompanyDashboard() {
                 );
               })}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Company info card */}
           {company && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
               className="bg-card rounded-xl border border-border shadow-sm p-5">
               <h3 className="font-semibold mb-3">Company Profile</h3>
               <div className="flex items-center gap-3 mb-3">
@@ -260,7 +260,7 @@ export default function CompanyDashboard() {
                 </p>
               </div>
               <Link to="/company/profile" className="mt-3 text-xs text-accent hover:underline block">Edit Profile →</Link>
-            </motion.div>
+            </m.div>
           )}
         </div>
       </div>

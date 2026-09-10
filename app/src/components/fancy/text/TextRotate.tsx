@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useId } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 
 export interface TextRotateProps {
   texts: string[];
@@ -90,7 +90,7 @@ export const TextRotate: React.FC<TextRotateProps> = ({
         aria-live="polite"
       >
         <AnimatePresence mode="wait" initial={false}>
-          <motion.span
+          <m.span
             key={`${keyId}-${currentTextIndex}`}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -100,7 +100,7 @@ export const TextRotate: React.FC<TextRotateProps> = ({
             aria-hidden="true"
           >
             {currentText}
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </span>
     );
@@ -134,7 +134,7 @@ export const TextRotate: React.FC<TextRotateProps> = ({
       aria-live="polite"
     >
       <AnimatePresence mode="wait" initial={false}>
-        <motion.span
+        <m.span
           key={`${keyId}-${currentTextIndex}`}
           className={`inline-flex flex-wrap items-center ${splitLevelClassName}`}
           aria-hidden="true"
@@ -147,7 +147,7 @@ export const TextRotate: React.FC<TextRotateProps> = ({
                 {chars.map((char, charIdx) => {
                   const currentIndex = globalCharIndex++;
                   return (
-                    <motion.span
+                    <m.span
                       key={`${charIdx}-${char}-${currentIndex}`}
                       initial={initial}
                       animate={animate}
@@ -159,13 +159,13 @@ export const TextRotate: React.FC<TextRotateProps> = ({
                       className="inline-block whitespace-pre"
                     >
                       {char}
-                    </motion.span>
+                    </m.span>
                   );
                 })}
               </span>
             );
           })}
-        </motion.span>
+        </m.span>
       </AnimatePresence>
     </span>
   );

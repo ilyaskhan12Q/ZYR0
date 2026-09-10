@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { useReducedMotion, motion } from 'framer-motion';
+import { useReducedMotion, m } from 'framer-motion';
 import { Reveal, SectionHeading } from './SectionHeading';
 import type { TimelineStep } from './team-data';
 import { cn } from '@/lib/utils';
@@ -62,7 +62,7 @@ export function TimelineSection({
 
           {/* Animated fill rail */}
           {!reduce && (
-            <motion.div
+            <m.div
               initial={{ scaleY: 0 }}
               whileInView={{ scaleY: 1 }}
               viewport={{ once: true, margin: '-80px' }}

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useReducedMotion, motion } from 'framer-motion';
+import { useReducedMotion, m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight, Users, Layers, CalendarClock } from 'lucide-react';
 import { TEAM_ROLES, STATUS_META } from './team-data';
@@ -28,13 +28,13 @@ function Float({
     return <div className={className}>{children}</div>;
   }
   return (
-    <motion.div
+    <m.div
       animate={{ y: [0, -10, 0] }}
       transition={{ duration: 5.5, delay, repeat: Infinity, ease: 'easeInOut' }}
       className={cn('will-change-transform', className)}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -128,7 +128,7 @@ export function FoundingHero() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left — narrative */}
           <div className="lg:col-span-6 flex flex-col justify-center space-y-6 lg:space-y-7 text-left">
-            <motion.div
+            <m.div
               initial={reduce ? false : { opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.05 }}
@@ -138,9 +138,9 @@ export function FoundingHero() {
               <span className="font-label text-[10px] tracking-[0.2em] text-blue-600 dark:text-sky-400">
                 Founding Development Team
               </span>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               initial={reduce ? false : { opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
@@ -148,9 +148,9 @@ export function FoundingHero() {
             >
               Build the platform that{' '}
               <span className="font-accent text-gradient-v3">launches student careers.</span>
-            </motion.div>
+            </m.div>
 
-            <motion.p
+            <m.p
               initial={reduce ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -159,9 +159,9 @@ export function FoundingHero() {
               ZYR0 is assembling a <strong className="font-semibold text-slate-900 dark:text-white">founding development team</strong> of
               students to design, build, and ship the internship platform of record. We work in the
               open, our standards are professional, and every contribution is credited.
-            </motion.p>
+            </m.p>
 
-            <motion.div
+            <m.div
               initial={reduce ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.3 }}
@@ -181,10 +181,10 @@ export function FoundingHero() {
               >
                 How We Work
               </button>
-            </motion.div>
+            </m.div>
 
             {/* Floating metrics */}
-            <motion.div
+            <m.div
               initial={reduce ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.4 }}
@@ -218,7 +218,7 @@ export function FoundingHero() {
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Hours / week</p>
               </div>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Right — team workspace / git visualisation */}
@@ -226,7 +226,7 @@ export function FoundingHero() {
             <div className="absolute w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl -top-10 -right-10 pointer-events-none" />
 
-            <motion.div
+            <m.div
               initial={reduce ? false : { opacity: 0, y: 40, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -291,7 +291,7 @@ export function FoundingHero() {
               <Float delay={0.5} className="absolute -left-4 sm:-left-8 -bottom-4 z-10 hidden sm:block">
                 <RoleFloater role={featuredRoles[2]} compact />
               </Float>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </div>

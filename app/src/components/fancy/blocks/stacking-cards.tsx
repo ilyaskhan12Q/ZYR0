@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { m, useScroll, useTransform } from "framer-motion"
 import type { MotionValue, UseScrollOptions } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -98,14 +98,14 @@ export function StackingCardItem({
       }}
       {...props}
     >
-      <motion.div
+      <m.div
         style={{
           scale,
         }}
         className="w-full flex justify-center items-center"
       >
         {children}
-      </motion.div>
+      </m.div>
     </div>
   )
 }

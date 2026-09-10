@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   ClipboardList, CheckCircle2, Clock, AlertCircle, Circle, Calendar,
   ChevronRight, Loader2, FileText, MessageCircle, ExternalLink,
@@ -106,7 +106,7 @@ export default function StudentTasks() {
             <span className="text-sm font-bold text-accent">{completedCount}/{tasks.length} completed</span>
           </div>
           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-            <motion.div
+            <m.div
               initial={{ width: 0 }}
               animate={{ width: `${progressPct}%` }}
               transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -152,7 +152,7 @@ export default function StudentTasks() {
               isPending ? 'border-accent/40' : 'border-border';
 
             return (
-              <motion.div
+              <m.div
                 key={task.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -234,7 +234,7 @@ export default function StudentTasks() {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })
         )}

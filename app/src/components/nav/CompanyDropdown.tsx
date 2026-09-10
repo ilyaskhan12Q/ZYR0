@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Building2, Mail, Briefcase, BadgeCheck, ChevronRight } from 'lucide-react';
 
 const company = [
@@ -59,7 +59,7 @@ export default function CompanyDropdown({ scrolled }: { scrolled: boolean }) {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
@@ -79,7 +79,7 @@ export default function CompanyDropdown({ scrolled }: { scrolled: boolean }) {
                 <ChevronRight className="w-3 h-3 text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
               </Link>
             ))}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

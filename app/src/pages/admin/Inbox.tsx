@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Inbox, Loader2, Mail, RefreshCw, Search, Eye, Check, Reply,
 } from 'lucide-react';

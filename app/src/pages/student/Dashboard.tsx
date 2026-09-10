@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageSquare, AlertCircle, CheckCircle2, Circle, Rocket } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyApplications } from '@/services/applications';
@@ -199,14 +199,14 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-6">
       {/* Welcome */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Student'}!</h1>
         <p className="text-sm text-muted-foreground mt-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-      </motion.div>
+      </m.div>
 
       {/* Profile Completion Warning Banner */}
       {!profileCompleted && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-5 shadow-sm space-y-4"
@@ -260,7 +260,7 @@ export default function StudentDashboard() {
               </div>
             )}
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Stats */}
@@ -268,7 +268,7 @@ export default function StudentDashboard() {
         {studentStats.map((stat, i) => {
           const Icon = iconMap[stat.icon] || Briefcase;
           return (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, i * 0.08)}
+            <m.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, i * 0.08)}
               className="stat-card">
               <div className="flex items-center justify-between">
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${i === 0 ? 'bg-blue-100 dark:bg-blue-950/30' : i === 1 ? 'bg-amber-100 dark:bg-amber-950/30' : i === 2 ? 'bg-emerald-100 dark:bg-emerald-950/30' : 'bg-purple-100 dark:bg-purple-950/30'}`}>
@@ -277,7 +277,7 @@ export default function StudentDashboard() {
               </div>
               <p className="text-2xl font-bold mt-3">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
@@ -286,7 +286,7 @@ export default function StudentDashboard() {
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Recent Applications */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.2)}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.2)}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">Recent Applications</h3>
@@ -314,10 +314,10 @@ export default function StudentDashboard() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* My Tasks */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.3)}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.3)}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">My Tasks</h3>
@@ -361,13 +361,13 @@ export default function StudentDashboard() {
                 <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${progressPercent}%` }} />
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
           {/* Join the Founding Team */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.25)}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.25)}
             className="rounded-xl border border-slate-200 dark:border-white/10 bg-gradient-to-br from-blue-600 via-sky-600 to-indigo-700 p-5 text-white shadow-lg shadow-blue-600/20">
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
@@ -408,10 +408,10 @@ export default function StudentDashboard() {
                 </Link>
               </>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Quick Actions */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.3)}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.3)}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <div className="grid grid-cols-2 gap-3">
@@ -428,10 +428,10 @@ export default function StudentDashboard() {
                 </Link>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Upcoming Deadlines */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.4)}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.4)}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Upcoming Deadlines</h3>
             <div className="space-y-3">
@@ -455,10 +455,10 @@ export default function StudentDashboard() {
                 );
               })}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Recent Messages */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.5)}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={stagger(isMobile, 0.5)}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Recent Messages</h3>
             <div className="space-y-3">
@@ -482,7 +482,7 @@ export default function StudentDashboard() {
                 );
               })}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>

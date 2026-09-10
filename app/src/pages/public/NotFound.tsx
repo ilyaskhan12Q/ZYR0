@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileQuestion, Home, ArrowLeft, Search } from 'lucide-react';
 import { SEO } from '@/components/SEO';
@@ -24,7 +24,7 @@ export default function NotFound() {
         noIndex={true}
       />
       <div className="max-w-md w-full text-center space-y-8">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -35,9 +35,9 @@ export default function NotFound() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
             <span className="relative inline-flex rounded-full h-4 w-4 bg-accent"></span>
           </span>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -48,10 +48,10 @@ export default function NotFound() {
           <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
             Sorry, we couldn&apos;t find the page you are looking for. It might have been removed, renamed, or is temporarily unavailable.
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Search Bar to help users find other content */}
-        <motion.form
+        <m.form
           onSubmit={handleSearchSubmit}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,9 +66,9 @@ export default function NotFound() {
             className="w-full pl-10 pr-4 py-2 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-accent text-sm"
           />
           <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-muted-foreground" />
-        </motion.form>
+        </m.form>
 
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
@@ -86,7 +86,7 @@ export default function NotFound() {
           >
             <ArrowLeft className="w-4 h-4" /> Browse Internships
           </Link>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Eye, Inbox, Loader2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -133,7 +133,7 @@ export default function AdminApplications() {
                     const student = Array.isArray(app.student) ? app.student[0] : app.student;
                     const internship = Array.isArray(app.internship) ? app.internship[0] : app.internship;
                     return (
-                      <motion.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                      <m.tr key={app.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <img src={student?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(student?.full_name || 'U')}`} alt="" className="w-8 h-8 rounded-full object-cover" />
@@ -183,7 +183,7 @@ export default function AdminApplications() {
                             </select>
                           </div>
                         </td>
-                      </motion.tr>
+                      </m.tr>
                     );
                   })
                 )}

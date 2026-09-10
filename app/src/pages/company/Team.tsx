@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Plus, Mail, Shield, X, Trash2, Loader2, Send, RefreshCw, CheckCircle2, Clock, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanyAccess } from '@/contexts/CompanyAccessContext';
@@ -146,7 +146,7 @@ export default function CompanyTeam() {
       </div>
 
       {showAdd && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+        <m.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl border border-border p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold">Invite Team Member</h3>
@@ -181,7 +181,7 @@ export default function CompanyTeam() {
           <p className="text-xs text-muted-foreground mt-3">
             They'll receive an email with a secure link. After signing in, they can access only the tabs their role allows.
           </p>
-        </motion.div>
+        </m.div>
       )}
 
       <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
@@ -235,7 +235,7 @@ export default function CompanyTeam() {
                 </tr>
               ) : (
                 members.map((member) => (
-                  <motion.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                  <m.tr key={member.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <img
@@ -290,7 +290,7 @@ export default function CompanyTeam() {
                         </button>
                       </div>
                     </td>
-                  </motion.tr>
+                  </m.tr>
                 ))
               )}
             </tbody>

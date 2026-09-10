@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Search, Eye, Download, XCircle, Loader2, Clock,
   CheckCircle2, Send, RotateCcw, AlertTriangle, FileText, ExternalLink
@@ -197,7 +197,7 @@ export default function AdminOfferLetters() {
                     const canRevoke = ['Pending', 'Sent'].includes(offer.status);
 
                     return (
-                      <motion.tr
+                      <m.tr
                         key={offer.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -290,7 +290,7 @@ export default function AdminOfferLetters() {
                             )}
                           </div>
                         </td>
-                      </motion.tr>
+                      </m.tr>
                     );
                   })
                 )}
@@ -302,14 +302,14 @@ export default function AdminOfferLetters() {
 
       {/* Detail Drawer — inline selected offer details */}
       {selected && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={() => setSelected(null)}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.95 }}
@@ -359,8 +359,8 @@ export default function AdminOfferLetters() {
                 </a>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </div>
   );

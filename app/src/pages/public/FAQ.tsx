@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
@@ -165,7 +165,7 @@ const faqData: FAQCategory[] = [
 function FAQItem({ item, index }: { item: FAQItem; index: number }) {
   const [open, setOpen] = useState(false);
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -183,7 +183,7 @@ function FAQItem({ item, index }: { item: FAQItem; index: number }) {
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -193,10 +193,10 @@ function FAQItem({ item, index }: { item: FAQItem; index: number }) {
             <div className="px-5 pb-5 pt-2 bg-muted/20 border-t border-border">
               <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -237,13 +237,13 @@ export default function FAQ() {
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <HelpCircle className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Frequently Asked Questions</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Find answers to the most common questions about the ZYR0 platform.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -279,7 +279,7 @@ export default function FAQ() {
             ))}
 
           {/* Contact CTA */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -293,7 +293,7 @@ export default function FAQ() {
             >
               Contact Support
             </a>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>
