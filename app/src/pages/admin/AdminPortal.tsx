@@ -16,6 +16,7 @@ const AdminOfferLetters = lazy(() => import('./OfferLetters'));
 const AdminTeamApplications = lazy(() => import('./TeamApplications'));
 const AdminSiteBanners = lazy(() => import('./SiteBanners'));
 const AdminInbox = lazy(() => import('./Inbox'));
+const AdminBlogs = lazy(() => import('./Blogs'));
 
 export default function AdminPortal() {
   return (
@@ -36,6 +37,7 @@ export default function AdminPortal() {
       <Route path="team-applications" element={<AdminTeamApplications />} />
       <Route path="site-banners" element={<AdminSiteBanners />} />
       <Route path="inbox" element={<AdminInbox />} />
+      <Route path="blogs" element={<AdminBlogs />} />
       <Route path="analytics" element={<AdminAnalytics />} />
       <Route path="reports" element={<AdminReports />} />
       <Route path="settings" element={<AdminSettings />} />
