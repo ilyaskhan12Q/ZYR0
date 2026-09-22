@@ -105,51 +105,6 @@ ZYR0 solves this challenge by delivering a centralized ecosystem where companies
 
 ---
 
-## Project Structure
-
-```text
-zyro-kim/
-├── app/                        # Main web application frontend
-│   ├── public/                 # Static web assets & pre-rendered SEO pages
-│   ├── scripts/                # Automated SEO & sitemap pre-rendering scripts
-│   │   └── generate-seo.js
-│   ├── src/
-│   │   ├── components/         # Reusable UI & feature components
-│   │   │   ├── common/         # Buttons, modals, spinners, and badges
-│   │   │   ├── company/        # Verification gate & company widgets
-│   │   │   ├── navigation/     # Public/Dashboard headers, footers, & social CTAs
-│   │   │   ├── tasks/          # Modular task management workspace & review drawer
-│   │   │   └── ui/             # Radix UI primitives & text animation engines
-│   │   ├── config/             # Site configuration (`site.ts`) & social links
-│   │   ├── contexts/           # React context providers (AuthContext)
-│   │   ├── lib/                # Utility helpers & request deduplication registry
-│   │   ├── pages/              # Portal views (Student, Company, Mentor, Admin, Public)
-│   │   ├── services/           # Supabase service layer with SWR caching
-│   │   └── types/              # TypeScript interfaces & database schemas
-│   ├── package.json            # Node.js dependencies & npm scripts
-│   └── vite.config.ts          # Vite build, chunking, & alias configuration
-├── branding/                   # Official logo assets, social graphics, & identity
-├── docs/                       # Architecture, engineering specs, & performance reports
-│   ├── ARCHITECTURE.md
-│   ├── ENGINEERING_PRINCIPLES.md
-│   ├── FEATURE_STATUS.md
-│   ├── GIT_WORKFLOW.md
-│   ├── OPTIMISTIC_UPDATES.md
-│   ├── PRODUCT_VISION.md
-│   ├── REQUEST_DEDUPLICATION.md
-│   ├── STALE_WHILE_REVALIDATE.md
-│   ├── SUPABASE_EMAIL_TEMPLATES.md
-│   └── performance/            # Mobile audit reports & benchmarking data
-├── supabase/                   # Database migrations, RLS policies, & Edge Functions
-├── CHANGELOG.md                # Detailed release history and version tracking
-├── CONTRIBUTING.md             # Guidelines for community contributions
-├── LICENSE                     # Proprietary license — all rights reserved
-├── README.md                   # Project overview & documentation
-└── SECURITY.md                 # Vulnerability disclosure & security policies
-```
-
----
-
 ## Getting Access
 
 ZYR0 is a **proprietary product** and is **not open source**. This repository is published for visibility, evaluation, and collaboration with approved partners only — the setup, build, and deployment instructions are intentionally not published.
