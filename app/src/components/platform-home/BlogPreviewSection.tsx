@@ -60,14 +60,17 @@ export default function BlogPreviewSection() {
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>Editorial & Insights</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold text-white tracking-tight">
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold tracking-tight"
+                style={{ color: 'var(--zyro-text)' }}
+              >
                 Latest from the blog.
               </h2>
             </div>
 
             <Link
               to="/blog"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#7B7BDC] hover:text-white transition-colors group"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#7B7BDC] hover:underline transition-colors group"
             >
               <span>View all articles</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -81,7 +84,7 @@ export default function BlogPreviewSection() {
             <Reveal key={post.slug} delay={index * 0.08}>
               <Link
                 to={`/blog/${post.slug}`}
-                className="group relative rounded-2xl border p-6 h-full flex flex-col justify-between transition-all duration-300 hover:border-white/[0.2] hover:shadow-[0_8px_30px_rgba(0,0,0,0.5)] block overflow-hidden"
+                className="group relative rounded-2xl border p-6 h-full flex flex-col justify-between transition-all duration-300 hover:border-[var(--zyro-accent)]/50 hover:shadow-lg block overflow-hidden"
                 style={{
                   background: 'var(--zyro-surface)',
                   borderColor: 'var(--zyro-border)',
@@ -89,23 +92,36 @@ export default function BlogPreviewSection() {
               >
                 {/* Subtle top gradient accent */}
                 <div
-                  className={`absolute top-0 left-0 right-0 h-32 bg-gradient-to-b ${post.gradient} pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity`}
+                  className={`absolute top-0 left-0 right-0 h-32 bg-gradient-to-b ${post.gradient} pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity`}
                 />
 
                 <div className="relative z-10">
                   {/* Category & Read Time */}
                   <div className="flex items-center justify-between gap-2 mb-4 text-xs">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-white/70 px-2 py-0.5 rounded bg-white/[0.05] border border-white/[0.08]">
+                    <span
+                      className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded border"
+                      style={{
+                        background: 'var(--zyro-elevated)',
+                        borderColor: 'var(--zyro-border)',
+                        color: 'var(--zyro-text-muted)',
+                      }}
+                    >
                       {post.category}
                     </span>
-                    <span className="flex items-center gap-1 text-white/40 font-mono text-[11px]">
+                    <span
+                      className="flex items-center gap-1 font-mono text-[11px]"
+                      style={{ color: 'var(--zyro-text-muted)' }}
+                    >
                       <Clock className="w-3 h-3" />
                       {post.readTime}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-lg font-semibold text-white group-hover:text-[#7B7BDC] transition-colors leading-snug mb-3">
+                  <h3
+                    className="text-lg font-semibold transition-colors leading-snug mb-3 group-hover:text-[#7B7BDC]"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
                     {post.title}
                   </h3>
 
@@ -119,8 +135,14 @@ export default function BlogPreviewSection() {
                 </div>
 
                 {/* Date & Read more link */}
-                <div className="relative z-10 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1 text-white/40 font-mono text-[11px]">
+                <div
+                  className="relative z-10 pt-4 border-t flex items-center justify-between text-xs"
+                  style={{ borderColor: 'var(--zyro-border)' }}
+                >
+                  <span
+                    className="flex items-center gap-1 font-mono text-[11px]"
+                    style={{ color: 'var(--zyro-text-muted)' }}
+                  >
                     <Calendar className="w-3 h-3" />
                     {post.date}
                   </span>

@@ -25,7 +25,13 @@ function SectionFallback() {
 
 export default function PlatformHome() {
   return (
-    <div className="min-h-screen bg-[#07070D] text-white overflow-x-hidden">
+    <div
+      className="min-h-screen overflow-x-hidden transition-colors duration-200"
+      style={{
+        background: 'var(--zyro-bg)',
+        color: 'var(--zyro-text)',
+      }}
+    >
       <SEO
         title="ZYR0 — The Multi-Product AI & SaaS Ecosystem"
         description="Build full-stack apps with ZYR0 Studio, manage institutions with School OS, run autonomous deep research with the Research Agent, and gain verified experience with ZYR0 Work."

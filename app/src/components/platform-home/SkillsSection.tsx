@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, Download, Star, ArrowRight, PlusCircle, CheckCircle2, Blocks, Cpu, Shield } from 'lucide-react';
+import { Download, Star, ArrowRight, PlusCircle, CheckCircle2, Blocks, Shield } from 'lucide-react';
 import Reveal from './Reveal';
 
 interface SkillItem {
@@ -79,7 +79,10 @@ export default function SkillsSection() {
                 <Blocks className="w-3.5 h-3.5" />
                 <span>Extensible Ecosystem</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold text-white tracking-tight mb-4">
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold tracking-tight mb-4"
+                style={{ color: 'var(--zyro-text)' }}
+              >
                 Publish & install autonomous skills.
               </h2>
               <p
@@ -93,8 +96,12 @@ export default function SkillsSection() {
             <div className="flex items-center gap-3 shrink-0">
               <Link
                 to="/register?redirect=%2Fskills"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold text-white border transition-all duration-200 hover:bg-white/[0.06]"
-                style={{ borderColor: 'var(--zyro-border)' }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs sm:text-sm font-semibold border transition-all duration-200"
+                style={{
+                  borderColor: 'var(--zyro-border)',
+                  color: 'var(--zyro-text)',
+                  background: 'var(--zyro-surface)',
+                }}
               >
                 <PlusCircle className="w-4 h-4 text-[#7B7BDC]" />
                 <span>Publish a Skill</span>
@@ -116,7 +123,7 @@ export default function SkillsSection() {
           {featuredSkills.map((skill, index) => (
             <Reveal key={skill.id} delay={index * 0.08}>
               <div
-                className="group relative rounded-2xl border p-5 sm:p-6 h-full flex flex-col justify-between transition-all duration-300 hover:border-[#7B7BDC]/50 hover:shadow-[0_0_25px_rgba(123,123,220,0.1)]"
+                className="group relative rounded-2xl border p-5 sm:p-6 h-full flex flex-col justify-between transition-all duration-300 hover:border-[#7B7BDC]/50 hover:shadow-lg"
                 style={{
                   background: 'var(--zyro-surface)',
                   borderColor: 'var(--zyro-border)',
@@ -125,26 +132,39 @@ export default function SkillsSection() {
                 <div>
                   {/* Category & Badge */}
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-white/50 px-2 py-0.5 rounded bg-white/[0.04] border border-white/[0.06]">
+                    <span
+                      className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border"
+                      style={{
+                        background: 'var(--zyro-elevated)',
+                        borderColor: 'var(--zyro-border)',
+                        color: 'var(--zyro-text-muted)',
+                      }}
+                    >
                       {skill.category}
                     </span>
                     {skill.authorType === 'official' ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">
                         <CheckCircle2 className="w-3 h-3" /> Official
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
                         Community
                       </span>
                     )}
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-semibold text-white group-hover:text-[#7B7BDC] transition-colors mb-1.5">
+                  <h3
+                    className="text-base font-semibold transition-colors mb-1.5"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
                     {skill.name}
                   </h3>
 
-                  <p className="text-xs text-white/40 mb-3 font-mono">
+                  <p
+                    className="text-xs mb-3 font-mono"
+                    style={{ color: 'var(--zyro-text-muted)' }}
+                  >
                     by {skill.author}
                   </p>
 
@@ -162,7 +182,12 @@ export default function SkillsSection() {
                     {skill.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[10px] px-2 py-0.5 rounded bg-white/[0.03] text-white/60 font-mono border border-white/[0.04]"
+                        className="text-[10px] px-2 py-0.5 rounded font-mono border"
+                        style={{
+                          background: 'var(--zyro-elevated)',
+                          borderColor: 'var(--zyro-border)',
+                          color: 'var(--zyro-text-secondary)',
+                        }}
                       >
                         {tag}
                       </span>
@@ -170,12 +195,18 @@ export default function SkillsSection() {
                   </div>
 
                   {/* Metrics Footer */}
-                  <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-white/50">
+                  <div
+                    className="pt-3 border-t flex items-center justify-between text-xs"
+                    style={{
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text-muted)',
+                    }}
+                  >
                     <div className="flex items-center gap-1">
-                      <Download className="w-3.5 h-3.5 text-white/40" />
+                      <Download className="w-3.5 h-3.5" />
                       <span className="font-mono text-[11px]">{skill.installs}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-amber-400 font-mono text-[11px]">
+                    <div className="flex items-center gap-1 text-amber-500 font-mono text-[11px]">
                       <Star className="w-3.5 h-3.5 fill-current" />
                       <span>{skill.rating}</span>
                     </div>
@@ -191,21 +222,27 @@ export default function SkillsSection() {
           <div
             className="mt-6 rounded-xl border p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4"
             style={{
-              background: 'linear-gradient(90deg, rgba(18,1,89,0.3) 0%, rgba(26,26,46,0.6) 100%)',
+              background: 'var(--zyro-surface)',
               borderColor: 'var(--zyro-border)',
             }}
           >
             <div className="flex items-center gap-3 text-center sm:text-left">
-              <div className="w-8 h-8 rounded-lg bg-[#7B7BDC]/20 border border-[#7B7BDC]/30 flex items-center justify-center text-[#7B7BDC] shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#7B7BDC]/15 border border-[#7B7BDC]/30 flex items-center justify-center text-[#7B7BDC] shrink-0">
                 <Shield className="w-4 h-4" />
               </div>
-              <p className="text-xs sm:text-sm text-white/80">
-                <span className="font-semibold text-white">Open Developer Registry:</span> Build skills locally with the ZYR0 CLI, submit for automated security verification, and distribute to thousands of institutions.
+              <p
+                className="text-xs sm:text-sm leading-relaxed"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
+                <span className="font-semibold" style={{ color: 'var(--zyro-text)' }}>
+                  Open Developer Registry:
+                </span>{' '}
+                Build skills locally with the ZYR0 CLI, submit for automated verification, and distribute to thousands of institutions.
               </p>
             </div>
             <Link
               to="/contact"
-              className="text-xs font-semibold text-[#7B7BDC] hover:text-white transition-colors shrink-0 flex items-center gap-1"
+              className="text-xs font-semibold text-[#7B7BDC] hover:underline transition-colors shrink-0 flex items-center gap-1"
             >
               <span>Developer SDK Docs</span>
               <ArrowRight className="w-3.5 h-3.5" />

@@ -53,7 +53,10 @@ export default function FeatureHighlightStrip() {
               >
                 Why ZYR0
               </p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold text-white tracking-tight">
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold tracking-tight"
+                style={{ color: 'var(--zyro-text)' }}
+              >
                 Architected differently.
               </h2>
             </div>
@@ -74,12 +77,22 @@ export default function FeatureHighlightStrip() {
             return (
               <Reveal key={item.number} delay={index * 0.07}>
                 <div
-                  className="group relative py-7 md:py-8 px-4 sm:px-6 transition-all duration-300 rounded-xl hover:bg-white/[0.02] flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="group relative py-7 md:py-8 px-4 sm:px-6 transition-all duration-300 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  style={{
+                    backgroundColor: 'transparent',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--zyro-surface)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                 >
                   {/* Left Column: Number + Icon + Title */}
                   <div className="flex items-start sm:items-center gap-5 md:w-5/12 shrink-0">
                     <span
-                      className="font-mono text-2xl sm:text-3xl font-semibold opacity-30 group-hover:opacity-100 group-hover:text-[#7B7BDC] transition-all duration-300"
+                      className="font-mono text-2xl sm:text-3xl font-semibold opacity-40 group-hover:opacity-100 transition-all duration-300"
+                      style={{ color: 'var(--zyro-text-muted)' }}
                     >
                       {item.number}
                     </span>
@@ -97,14 +110,27 @@ export default function FeatureHighlightStrip() {
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base sm:text-lg font-semibold text-white group-hover:text-[#7B7BDC] transition-colors">
+                        <h3
+                          className="text-base sm:text-lg font-semibold transition-colors"
+                          style={{ color: 'var(--zyro-text)' }}
+                        >
                           {item.title}
                         </h3>
-                        <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.04] text-white/50 border border-white/[0.06]">
+                        <span
+                          className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded-full border"
+                          style={{
+                            background: 'var(--zyro-surface)',
+                            borderColor: 'var(--zyro-border)',
+                            color: 'var(--zyro-text-muted)',
+                          }}
+                        >
                           {item.badge}
                         </span>
                       </div>
-                      <p className="text-xs text-white/40 mt-0.5 font-mono">
+                      <p
+                        className="text-xs mt-0.5 font-mono"
+                        style={{ color: 'var(--zyro-text-muted)' }}
+                      >
                         {item.tagline}
                       </p>
                     </div>
@@ -121,7 +147,10 @@ export default function FeatureHighlightStrip() {
                   </div>
 
                   {/* Right Column: Arrow indicator */}
-                  <div className="hidden md:flex items-center justify-end w-1/12 text-white/20 group-hover:text-white/80 group-hover:translate-x-1 transition-all">
+                  <div
+                    className="hidden md:flex items-center justify-end w-1/12 group-hover:translate-x-1 transition-all"
+                    style={{ color: 'var(--zyro-text-muted)' }}
+                  >
                     <ArrowUpRight className="w-5 h-5" />
                   </div>
                 </div>

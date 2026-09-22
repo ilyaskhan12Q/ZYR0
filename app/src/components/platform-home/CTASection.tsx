@@ -9,7 +9,7 @@ export default function CTASection() {
       <div
         className="absolute inset-0 pointer-events-none opacity-25"
         style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(18, 1, 89, 0.7) 0%, rgba(123, 123, 220, 0.15) 35%, transparent 70%)',
+          background: 'radial-gradient(circle at 50% 50%, var(--zyro-accent-muted) 0%, transparent 70%)',
         }}
       />
 
@@ -17,9 +17,10 @@ export default function CTASection() {
         <Reveal scale={0.96}>
           <div className="flex flex-col items-center justify-center">
             <div
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium mb-6 border bg-white/[0.04]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium mb-6 border shadow-sm"
               style={{
                 borderColor: 'var(--zyro-border)',
+                background: 'var(--zyro-surface)',
                 color: 'var(--zyro-accent)',
               }}
             >
@@ -27,7 +28,10 @@ export default function CTASection() {
               <span>Get started in seconds</span>
             </div>
 
-            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-bold text-white tracking-tight leading-[1.05] mb-6">
+            <h2
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight leading-[1.05] mb-6"
+              style={{ color: 'var(--zyro-text)' }}
+            >
               Ready to build?
             </h2>
 
@@ -41,7 +45,11 @@ export default function CTASection() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <Link
                 to="/register?redirect=%2F"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-9 py-5 rounded-full text-sm font-semibold bg-white text-black hover:bg-neutral-100 hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 shadow-[0_0_35px_rgba(255,255,255,0.2)]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-9 py-5 rounded-full text-sm font-semibold hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 shadow-md"
+                style={{
+                  background: 'var(--zyro-text)',
+                  color: 'var(--zyro-bg)',
+                }}
               >
                 <span>Get Started Free</span>
                 <ArrowRight className="w-4 h-4" />
@@ -49,7 +57,12 @@ export default function CTASection() {
 
               <Link
                 to="/contact"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-5 rounded-full text-sm font-medium text-white/70 hover:text-white hover:bg-white/[0.06] border border-white/[0.1] transition-all duration-200"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-5 rounded-full text-sm font-medium border transition-all duration-200"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                  color: 'var(--zyro-text-secondary)',
+                }}
               >
                 <span>Book a Demo</span>
               </Link>

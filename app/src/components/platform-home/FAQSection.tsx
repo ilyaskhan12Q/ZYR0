@@ -25,7 +25,8 @@ export default function FAQSection() {
               <span>Questions & Answers</span>
             </div>
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold mb-4 text-white tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold mb-4 tracking-tight"
+              style={{ color: 'var(--zyro-text)' }}
             >
               Common questions.
             </h2>
@@ -45,13 +46,11 @@ export default function FAQSection() {
             return (
               <Reveal key={faq.question} delay={idx * 0.04}>
                 <div
-                  className={`rounded-xl border transition-all duration-300 overflow-hidden ${
-                    isOpen
-                      ? 'border-[#7B7BDC]/50 shadow-[0_0_20px_rgba(123,123,220,0.08)]'
-                      : 'border-white/[0.08] hover:border-white/[0.15]'
-                  }`}
+                  className="rounded-xl border transition-all duration-300 overflow-hidden"
                   style={{
-                    background: isOpen ? 'var(--zyro-surface)' : 'rgba(26,26,46,0.4)',
+                    background: isOpen ? 'var(--zyro-surface)' : 'var(--zyro-bg)',
+                    borderColor: isOpen ? 'var(--zyro-accent)' : 'var(--zyro-border)',
+                    boxShadow: isOpen ? '0 0 20px rgba(123,123,220,0.08)' : 'none',
                   }}
                 >
                   <button
@@ -60,15 +59,20 @@ export default function FAQSection() {
                     className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 transition-colors"
                     aria-expanded={isOpen}
                   >
-                    <span className="text-sm sm:text-base font-semibold text-white">
+                    <span
+                      className="text-sm sm:text-base font-semibold"
+                      style={{ color: 'var(--zyro-text)' }}
+                    >
                       {faq.question}
                     </span>
                     <div
                       className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300 ${
-                        isOpen
-                          ? 'bg-[#7B7BDC] text-white rotate-180'
-                          : 'bg-white/[0.05] text-white/60'
+                        isOpen ? 'rotate-180' : ''
                       }`}
+                      style={{
+                        background: isOpen ? 'var(--zyro-accent)' : 'var(--zyro-elevated)',
+                        color: isOpen ? '#FFFFFF' : 'var(--zyro-text-muted)',
+                      }}
                     >
                       <ChevronDown className="w-4 h-4" />
                     </div>
@@ -91,7 +95,10 @@ export default function FAQSection() {
         {/* Support Link */}
         <Reveal delay={0.3}>
           <div className="mt-10 text-center">
-            <p className="text-xs text-white/50">
+            <p
+              className="text-xs"
+              style={{ color: 'var(--zyro-text-muted)' }}
+            >
               Have a specific institutional or technical question?{' '}
               <Link to="/contact" className="text-[#7B7BDC] hover:underline font-medium inline-flex items-center gap-1">
                 Contact our engineering team <ArrowRight className="w-3 h-3" />
