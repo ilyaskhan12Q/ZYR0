@@ -1,72 +1,25 @@
 "use client"
 
-import { useEffect, useRef, useState, lazy, Suspense, Component, type ReactNode } from "react"
+import { useEffect, useRef } from "react"
 import { m } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 
-const LazyMeshGradient = lazy(() => import("@paper-design/shaders-react").then(m => ({ default: m.MeshGradient })))
-
-class ShaderErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
-  state = { hasError: false }
-  static getDerivedStateFromError() { return { hasError: true } }
-  render() {
-    return this.state.hasError ? this.props.fallback : this.props.children
-  }
-}
-
-function detectWebGL2(): boolean {
-  if (typeof document === 'undefined') return false
-  try {
-    const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl2')
-    return !!gl
-  } catch { return false }
-}
-
-function ShaderFallback() {
-  return (
-    <div className="absolute inset-0 w-full h-full bg-black">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-neutral-900 to-neutral-800" />
-    </div>
-  )
-}
-
-function ShaderGradient() {
-  const [hasWebGL2, setHasWebGL2] = useState(true)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setHasWebGL2(detectWebGL2())
-    const timer = setTimeout(() => setMounted(true), 100)
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (!hasWebGL2 || !mounted) return <ShaderFallback />
-
-  return (
-    <ShaderErrorBoundary fallback={<ShaderFallback />}>
-      <Suspense fallback={<ShaderFallback />}>
-        <LazyMeshGradient
-          className="absolute inset-0 w-full h-full"
-          colors={["#000000", "#2a2a2a", "#4a4a4a", "#ffffff"]}
-          speed={0.25}
-        />
-      </Suspense>
-    </ShaderErrorBoundary>
-  )
-}
-
 const letterAnimation = {
-  hidden: { opacity: 0, y: 40, filter: "blur(8px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const } },
+  hidden: { opacity: 0, y: 35, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const }
+  },
 }
 
 const containerAnimation = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.04 },
+    transition: { staggerChildren: 0.035, delayChildren: 0.4 },
   },
 }
 
@@ -89,7 +42,7 @@ export const ShaderHero = () => {
         rafRef.current = requestAnimationFrame(() => {
           pendingRef.current = false
           if (spotlightRef.current) {
-            spotlightRef.current.style.background = `radial-gradient(700px circle at ${x}% ${y}%, rgba(255,255,255,0.12), transparent 60%)`
+            spotlightRef.current.style.background = `radial-gradient(650px circle at ${x}% ${y}%, rgba(123, 123, 220, 0.08), rgba(0, 81, 195, 0.03) 40%, transparent 70%)`
           }
         })
       }
@@ -110,53 +63,43 @@ export const ShaderHero = () => {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-black relative overflow-hidden w-full"
+      className="relative min-h-[92vh] md:min-h-screen bg-[#07070D] overflow-hidden w-full flex flex-col justify-center items-center select-none"
     >
-      <svg className="absolute inset-0 w-0 h-0">
-        <defs>
-          <filter id="glass-effect" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence baseFrequency="0.004" numOctaves="1" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.25" />
-            <feColorMatrix
-              type="matrix"
-              values="1 0 0 0 0  
-                      0 1 0 0 0
-                      0 0 1 0 0
-                      0 0 0 0.9 0"
-              result="tint"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      <ShaderGradient />
-
-      {/* Radial spotlight following mouse */}
+      {/* Subtle background static gradient depth */}
       <div
-        ref={spotlightRef}
-        className="absolute inset-0 opacity-30 transition-opacity duration-300 pointer-events-none"
+        className="absolute inset-0 pointer-events-none opacity-40"
+        style={{
+          background: 'radial-gradient(circle at 50% 18%, rgba(18, 1, 89, 0.45) 0%, rgba(7, 7, 13, 0) 70%)'
+        }}
       />
 
-      <div className="relative z-10 flex flex-col items-center justify-center text-center min-h-screen px-4">
+      {/* Subtle interactive cursor spotlight */}
+      <div
+        ref={spotlightRef}
+        className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+      />
+
+      {/* Content wrapper */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-24 pb-16 max-w-5xl mx-auto">
         {/* Badge */}
         <m.div
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
+          initial={{ opacity: 0, y: -16, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="mb-8 px-4 py-1.5 rounded-full bg-white/[0.06] text-white/80 text-xs font-medium flex items-center gap-2 backdrop-blur-xl border border-white/[0.08]"
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="mb-6 md:mb-8 px-4 py-1.5 rounded-full bg-white/[0.04] text-white/80 text-xs font-medium flex items-center gap-2 backdrop-blur-md border border-white/[0.08] shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
         >
-          <Sparkles className="w-3.5 h-3.5 text-white/60" />
-          ZYR0 2.0 — Now Live
+          <Sparkles className="w-3.5 h-3.5 text-[#7B7BDC]" />
+          <span>ZYR0 2.0 — The Unified Platform</span>
         </m.div>
 
-        {/* Title — ZYR0 on first line */}
+        {/* Hero Brand Wordmark in Agbalumo */}
         <m.div
-          initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
+          initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
+          transition={{ delay: 0.25, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="text-center"
         >
-          <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-black tracking-[-0.05em] text-white leading-[0.85]">
+          <h1 className="font-agbalumo text-7xl sm:text-8xl md:text-9xl lg:text-[10.5rem] text-white leading-[0.88] tracking-[-0.03em] drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
             ZYR0
           </h1>
         </m.div>
@@ -166,7 +109,7 @@ export const ShaderHero = () => {
           variants={containerAnimation}
           initial="hidden"
           animate="visible"
-          className="mt-4 text-2xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.02em] text-white/70 flex flex-wrap justify-center leading-[1.2]"
+          className="mt-5 md:mt-6 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.03em] text-white/85 flex flex-wrap justify-center leading-tight font-display"
         >
           {"Think. Build. Scale to ∞.".split("").map((char, index) => (
             <m.span
@@ -179,46 +122,49 @@ export const ShaderHero = () => {
           ))}
         </m.h2>
 
-        {/* Subtitle */}
+        {/* Supporting description */}
         <m.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.8 }}
-          className="mt-8 max-w-lg text-base md:text-lg text-white/50 leading-relaxed"
+          transition={{ delay: 0.75, duration: 0.6 }}
+          className="mt-6 md:mt-8 max-w-xl text-base sm:text-lg text-white/60 leading-relaxed font-sans"
         >
           An ecosystem of tools for those who build, learn, research, and work.
+          Autonomous AI creation, modern school management, and verifiable credentials.
         </m.p>
 
         {/* CTAs */}
         <m.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
-          className="mt-12 flex flex-col sm:flex-row items-center gap-3"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.95, duration: 0.6 }}
+          className="mt-10 md:mt-12 flex flex-col sm:flex-row items-center gap-3.5 w-full sm:w-auto"
         >
-          <Link to="/register?redirect=%2F">
+          <Link to="/register?redirect=%2F" className="w-full sm:w-auto">
             <Button
               size="lg"
-              className="rounded-full px-7 py-5 text-sm font-semibold bg-white text-black hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25)]"
+              className="w-full sm:w-auto rounded-full px-8 py-6 text-sm font-semibold bg-white text-black hover:bg-neutral-100 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-[0_0_35px_rgba(255,255,255,0.18)]"
             >
               Get Started Free
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
-          <Link to="/#products">
+
+          <a href="#products" className="w-full sm:w-auto">
             <Button
               variant="ghost"
               size="lg"
-              className="rounded-full px-7 py-5 text-sm font-semibold text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-300"
+              className="w-full sm:w-auto rounded-full px-7 py-6 text-sm font-medium text-white/70 hover:text-white hover:bg-white/[0.06] border border-white/[0.08] transition-all duration-200"
             >
               Explore Products
             </Button>
-          </Link>
-          <Link to="/contact">
+          </a>
+
+          <Link to="/contact" className="w-full sm:w-auto">
             <Button
               variant="ghost"
               size="lg"
-              className="rounded-full px-7 py-5 text-sm font-semibold text-white/60 hover:text-white hover:bg-white/[0.06] transition-all duration-300"
+              className="w-full sm:w-auto rounded-full px-7 py-6 text-sm font-medium text-white/50 hover:text-white hover:bg-white/[0.06] transition-all duration-200"
             >
               Book a Demo
             </Button>
@@ -229,17 +175,19 @@ export const ShaderHero = () => {
         <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 0.8 }}
-          className="mt-20"
+          transition={{ delay: 1.15, duration: 0.7 }}
+          className="mt-16 md:mt-20 pt-6 border-t border-white/[0.06]"
         >
-          <p className="text-xs tracking-[0.3em] uppercase text-white/40 font-bold">
+          <p className="font-label text-[11px] tracking-[0.28em] uppercase text-white/35 font-semibold">
             Build · Learn · Research · Work
           </p>
         </m.div>
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+      {/* Bottom subtle edge divider */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-white/[0.06]" />
     </div>
   )
 }
+
+export const CleanHero = ShaderHero
