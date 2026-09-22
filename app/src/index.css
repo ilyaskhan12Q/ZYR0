@@ -153,6 +153,10 @@
     --zyro-accent: #7B7BDC;
     --zyro-accent-muted: rgba(123, 123, 220, 0.1);
     --zyro-border: #E2E2EA;
+    --zyro-sapphire: #0051C3;
+    --zyro-sapphire-muted: rgba(0, 81, 195, 0.12);
+    --zyro-twilight: #120159;
+    --zyro-hyacinth: #7B7BDC;
   }
 
   .dark {
@@ -255,6 +259,10 @@
     --zyro-accent: #7B7BDC;
     --zyro-accent-muted: rgba(123, 123, 220, 0.15);
     --zyro-border: #2A2A45;
+    --zyro-sapphire: #0051C3;
+    --zyro-sapphire-muted: rgba(0, 81, 195, 0.2);
+    --zyro-twilight: #120159;
+    --zyro-hyacinth: #7B7BDC;
   }
 
   * {
@@ -269,6 +277,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  .font-brand-logo,
+  .font-agbalumo {
+    font-family: 'Agbalumo', cursive, sans-serif !important;
+  }
+
   h1,
   h2,
   h3,
@@ -277,8 +290,8 @@
   h6,
   .font-display,
   .font-heading {
-    font-family: 'Agbalumo', 'DM Serif Text', 'Georgia', serif !important;
-    letter-spacing: -0.028em;
+    font-family: 'Sora', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.025em;
     -webkit-font-smoothing: antialiased;
   }
 
