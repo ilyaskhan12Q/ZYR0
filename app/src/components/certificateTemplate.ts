@@ -229,6 +229,18 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .gov { display: flex; align-items: flex-end; }
     .logos-top { display: flex; gap: 14px; align-items: center; margin-top: 4px; }
     .logo-top { height: 64px; width: auto; display: block; object-fit: contain; }
+    .cert-meta-top {
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: .5px;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+    .cert-meta-top b { color: #111; font-weight: 700; }
+    .award-center { display: flex; flex-direction: column; align-items: center; }
+    .award-center .logo-top { height: 48px; margin-top: 2px; }
     .award-sub {
       text-align: center;
       color: #1e40af;
@@ -236,7 +248,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       font-weight: 800;
       letter-spacing: 1.2px;
       text-transform: uppercase;
-      margin-top: 22px;
+      margin-top: 6px;
     }
     .zyro-brand { text-align: right; }
     .brand-main { font-size: 34px; font-weight: 800; color: #1e3a8a; letter-spacing: 2.5px; line-height: 1; }
@@ -396,14 +408,15 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
         <div class="inner">
           <div class="top-row">
             <div class="gov">
-              <div class="logos-top">
-                <img class="logo-top" src="${oLogoSrc}" alt="ZYRO Platform" />
-              </div>
+              <div class="cert-meta-top">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
-            <div class="award-sub">Awarded by ZYRO</div>
+            <div class="award-center">
+              <img class="logo-top" src="${oLogoSrc}" alt="ZYRO Platform" />
+              <div class="award-sub">Awarded by ZYRO</div>
+            </div>
             <div class="zyro-brand">
               <div class="brand-main">ZYR<img class="brand-o" src="${oLogoSrc}" alt="" /></div>
-              <div class="brand-sub">Internship Platform</div>
+              <div class="brand-sub">Think. Build. Scale to ∞.</div>
             </div>
           </div>
 
@@ -436,7 +449,6 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
               <div class="sig-line" aria-hidden="true"></div>
               <div class="sig-title">Program Coordinator</div>
               <div class="sig-company">${companyName}</div>
-              <div class="sig-meta">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
             <div class="center-col">
               <div class="seal-qr">
