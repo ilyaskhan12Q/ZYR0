@@ -73,6 +73,7 @@ const pages = [
   { path: 'faq', lastmod: '2026-08-06' },
   { path: 'help', lastmod: '2026-08-06' },
   { path: 'verify', lastmod: '2026-08-06' },
+  { path: 'blog', lastmod: '2026-09-19' },
   { path: 'privacy', lastmod: '2026-07-18' },
   { path: 'terms', lastmod: '2026-07-18' },
   { path: 'cookies', lastmod: '2026-07-18' }

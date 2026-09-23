@@ -16,8 +16,9 @@ const STUDIO_HOST = 'studio.zyroo.org';
 const SCHOOL_HOST = 'school.zyroo.org';
 const EDU_HOST = 'edu.zyroo.org';
 const WORK_HOST = 'work.zyroo.org';
+const BLOG_HOST = 'blog.zyroo.org';
 
-type ProductSubdomain = 'research' | 'studio' | 'school' | 'work' | null;
+type ProductSubdomain = 'research' | 'studio' | 'school' | 'work' | 'blog' | null;
 
 function useProductSubdomain(): ProductSubdomain {
   return useMemo(() => {
@@ -27,6 +28,7 @@ function useProductSubdomain(): ProductSubdomain {
     if (host === STUDIO_HOST) return 'studio';
     if (host === SCHOOL_HOST || host === EDU_HOST) return 'school';
     if (host === WORK_HOST) return 'work';
+    if (host === BLOG_HOST) return 'blog';
     return null;
   }, []);
 }
@@ -46,6 +48,10 @@ const SchoolOSLanding = lazy(() => import('@/pages/edu/SchoolOSLanding'));
 // ZYR0 Research Routes
 const ResearchAgentPage = lazy(() => import('@/agent/ResearchAgentPage'));
 const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
+
+// ZYR0 Blog / Journal Public Pages
+const BlogHome = lazy(() => import('@/pages/public/BlogHome'));
+const BlogPostDetail = lazy(() => import('@/pages/public/BlogPostDetail'));
 
 // ZYR0 Work / Internship Public Pages
 const Landing = lazy(() => import('@/pages/public/Landing'));
@@ -206,7 +212,33 @@ export default function App() {
     );
   }
 
-  // 5. Main Domain Ecosystem Router (zyroo.org, localhost, Vercel deployments)
+  // 5. Blog Subdomain Gateway (blog.zyroo.org)
+  if (productSubdomain === 'blog') {
+    return (
+      <LazyMotion features={domAnimation}>
+        <CompanyAccessProvider>
+          <ScrollToTop />
+          <Suspense fallback={<RouteLoading />}>
+            <Routes>
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<BlogHome />} />
+                <Route path="/:slug" element={<BlogPostDetail />} />
+              </Route>
+              <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+              <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="*" element={<SubdomainRedirect />} />
+            </Routes>
+            <Toaster />
+          </Suspense>
+        </CompanyAccessProvider>
+      </LazyMotion>
+    );
+  }
+
+  // 6. Main Domain Ecosystem Router (zyroo.org, localhost, Vercel deployments)
   return (
     <LazyMotion features={domAnimation}>
       <CompanyAccessProvider>
@@ -259,6 +291,8 @@ export default function App() {
               <Route path="/help" element={<HelpCenter />} />
               <Route path="/careers" element={<Careers />} />
               <Route path="/careers/apply" element={<TeamApply />} />
+              <Route path="/blog" element={<BlogHome />} />
+              <Route path="/blog/:slug" element={<BlogPostDetail />} />
             </Route>
 
             {/* Auth Routes */}

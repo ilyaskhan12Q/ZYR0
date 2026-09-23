@@ -3,11 +3,18 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, FileText, BookOpen, MessageCircle, Shield, BadgeCheck, Cookie, ChevronRight } from 'lucide-react';
 
-const resources = [
+interface ResourceItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: string;
+}
+
+const resources: ResourceItem[] = [
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'FAQ', href: '/faq', icon: MessageCircle },
   { label: 'Verify Certificate', href: '/verify', icon: BadgeCheck },
-  { label: 'Blog', href: '/blog', icon: BookOpen, badge: 'Soon' },
+  { label: 'Blog', href: '/blog', icon: BookOpen },
   { label: 'Privacy Policy', href: '/privacy', icon: Shield },
   { label: 'Terms of Service', href: '/terms', icon: FileText },
   { label: 'Cookie Policy', href: '/cookie', icon: Cookie },
