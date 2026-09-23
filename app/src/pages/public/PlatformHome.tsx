@@ -4,13 +4,16 @@ import Header from '@/components/nav/Header';
 import { ShaderHero } from '@/components/ui/shader-hero';
 import LogoWall from '@/components/platform-home/LogoWall';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
-import FeatureHighlightStrip from '@/components/platform-home/FeatureHighlightStrip';
 import SkillsSection from '@/components/platform-home/SkillsSection';
 import BlogPreviewSection from '@/components/platform-home/BlogPreviewSection';
 import CTASection from '@/components/platform-home/CTASection';
 import PlatformFooter from '@/components/nav/PlatformFooter';
 
 const FAQSection = lazy(() => import('@/components/platform-home/FAQSection'));
+// ponytail: lazy — keeps gsap+ScrollTrigger+SplitText out of the initial homepage chunk
+const FeatureHighlightStrip = lazy(
+  () => import('@/components/platform-home/FeatureHighlightStrip'),
+);
 
 function SectionFallback() {
   return (
@@ -26,7 +29,7 @@ function SectionFallback() {
 export default function PlatformHome() {
   return (
     <div
-      className="min-h-screen overflow-x-hidden transition-colors duration-200"
+      className="min-h-screen overflow-x-clip transition-colors duration-200"
       style={{
         background: 'var(--zyro-bg)',
         color: 'var(--zyro-text)',
@@ -50,8 +53,10 @@ export default function PlatformHome() {
         {/* Core Products Showcase — enriched Bento Grid with UI mockups */}
         <BentoProductGrid />
 
-        {/* Linear/Vercel-style Feature Highlight Strip */}
-        <FeatureHighlightStrip />
+        {/* Why ZYR0 — GSAP horizontal scroll timeline */}
+        <Suspense fallback={<SectionFallback />}>
+          <FeatureHighlightStrip />
+        </Suspense>
 
         {/* Skills Marketplace — featured official & community skills */}
         <SkillsSection />
