@@ -327,19 +327,19 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 
     /* ── Footer: signatures | seal + QR ───────────────────────────────── */
     .footer-row {
-      margin-top: 14px;
-      padding-top: 16px;
+      margin-top: 4px;
+      padding-top: 8px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
-      align-items: end;
+      align-items: start;
       gap: 28px;
     }
     .sig-block { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .sig-block.sig-dir { transform: translate(14px, -8px); }
+    .sig-block.sig-dir { transform: translate(14px, 0); }
     .sig-line { width: 200px; height: 42px; border-bottom: 1.5px solid #666; margin-bottom: 5px; }
-    .sig-title { font-size: 9.5px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
-    .sig-company { font-size: 11px; font-weight: 700; color: #333; letter-spacing: .5px; margin-top: 3px; }
-    .sig-meta { margin-top: 8px; font-size: 8.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
+    .sig-title { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+    .sig-company { font-size: 12px; font-weight: 700; color: #333; letter-spacing: .5px; margin-top: 3px; }
+    .sig-meta { margin-top: 8px; font-size: 9.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
     .sig-meta b { color: #111; font-weight: 700; }
     .center-col { display: flex; flex-direction: column; align-items: center; }
     .seal-qr { display: flex; align-items: flex-end; gap: 16px; }
@@ -356,10 +356,10 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       justify-content: center;
       color: #fff;
     }
-    .badge-text { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; margin-top: 7px; color: #b89c56; letter-spacing: 1.5px; }
+    .badge-text { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; margin-top: 7px; color: #b89c56; letter-spacing: 1.5px; }
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .qr-img { width: 70px; height: 70px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
-    .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
+    .qr-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
 
     @media print {
       body { width: 297mm; height: 210mm; }
