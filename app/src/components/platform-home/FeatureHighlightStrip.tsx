@@ -5,7 +5,7 @@ export default function FeatureHighlightStrip() {
   return (
     <>
       {/* Lead-in — pinned timeline scrolls in from here */}
-      <section className="py-20 md:py-28 relative overflow-hidden">
+      <section className="pt-20 md:pt-28 pb-6 md:pb-8 relative overflow-hidden">
         <div className="max-w-[1264px] mx-auto px-6 md:px-16">
           <div className="max-w-2xl">
             <p
