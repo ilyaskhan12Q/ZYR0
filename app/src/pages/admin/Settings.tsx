@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Save, Globe, Lock, Mail, Shield, Bell } from 'lucide-react';
 
 function Toggle({ label, desc, checked, onChange }: { label: string; desc?: string; checked: boolean; onChange: (v: boolean) => void }) {
@@ -64,25 +64,25 @@ export default function AdminSettings() {
         </button>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1">
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1">
         <h3 className="font-semibold mb-2 flex items-center gap-2"><Globe className="w-4 h-4" /> General</h3>
         <Toggle label="Maintenance Mode" desc="Put the platform in maintenance mode" checked={settings.maintenanceMode} onChange={(v) => setSettings({ ...settings, maintenanceMode: v })} />
         <div className="border-t border-border" />
         <Toggle label="Open Registration" desc="Allow new users to register" checked={settings.openRegistration} onChange={(v) => setSettings({ ...settings, openRegistration: v })} />
         <div className="border-t border-border" />
         <Toggle label="Require Email Verification" desc="Users must verify email before accessing platform" checked={settings.requireEmailVerification} onChange={(v) => setSettings({ ...settings, requireEmailVerification: v })} />
-      </motion.div>
+      </m.div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1">
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1">
         <h3 className="font-semibold mb-2 flex items-center gap-2"><Lock className="w-4 h-4" /> Authentication</h3>
         <Toggle label="Google OAuth" desc="Allow login with Google" checked={settings.googleOAuth} onChange={(v) => setSettings({ ...settings, googleOAuth: v })} />
         <div className="border-t border-border" />
         <Toggle label="LinkedIn OAuth" desc="Allow login with LinkedIn" checked={settings.linkedinOAuth} onChange={(v) => setSettings({ ...settings, linkedinOAuth: v })} />
         <div className="border-t border-border" />
         <Toggle label="Require Two-Factor Auth" desc="Enforce 2FA for all users" checked={settings.twoFactorRequired} onChange={(v) => setSettings({ ...settings, twoFactorRequired: v })} />
-      </motion.div>
+      </m.div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <h3 className="font-semibold mb-2 flex items-center gap-2"><Mail className="w-4 h-4" /> Email Settings</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -97,14 +97,14 @@ export default function AdminSettings() {
           </div>
         </div>
         <button className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">Send Test Email</button>
-      </motion.div>
+      </m.div>
 
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1">
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-1">
         <h3 className="font-semibold mb-2 flex items-center gap-2"><Shield className="w-4 h-4" /> Security & Backup</h3>
         <Toggle label="Automatic Backups" desc="Daily automated database backups" checked={settings.autoBackup} onChange={(v) => setSettings({ ...settings, autoBackup: v })} />
         <div className="border-t border-border" />
         <Toggle label="Analytics Collection" desc="Collect usage analytics" checked={settings.analyticsEnabled} onChange={(v) => setSettings({ ...settings, analyticsEnabled: v })} />
-      </motion.div>
+      </m.div>
     </div>
   );
 }

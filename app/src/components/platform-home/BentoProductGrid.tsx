@@ -14,7 +14,6 @@ export default function BentoProductGrid() {
   return (
     <section id="products" className="py-20 md:py-28">
       <div className="max-w-[1264px] mx-auto px-6 md:px-16">
-        {/* Section header */}
         <Reveal>
           <div className="max-w-2xl mb-12 md:mb-16">
             <p
@@ -39,55 +38,45 @@ export default function BentoProductGrid() {
           </div>
         </Reveal>
 
-        {/* Bento grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
           {gridConfig.map((config, index) => {
             const product = productsList.find((p) => p.id === config.id);
             if (!product) return null;
+            const Icon = product.icon;
 
             return (
               <Reveal key={product.id} delay={index * 0.08} className={`${config.colSpan} ${config.rowSpan}`}>
                 <Link
                   to={product.href}
-                  className="group relative rounded-2xl border overflow-hidden transition-all duration-300 block h-full"
+                  className="group relative rounded-2xl border overflow-hidden transition-all duration-300 block h-full hover:border-[var(--zyro-accent)]/50 hover:shadow-lg"
                   style={{
                     background: 'var(--zyro-surface)',
                     borderColor: 'var(--zyro-border)',
                   }}
                 >
-                  {/* Image area */}
+                  {/* Clean preview/placeholder area ready for gifs or screenshots */}
                   <div
-                    className={`relative ${config.aspect} w-full overflow-hidden`}
-                    style={{ background: 'var(--zyro-elevated)' }}
+                    className={`relative ${config.aspect} w-full overflow-hidden flex items-center justify-center`}
+                    style={{
+                      background: `linear-gradient(135deg, ${product.color}15 0%, ${product.color}05 50%, transparent 100%)`,
+                    }}
                   >
-                    {/* Placeholder — replace with <img> when you have screenshots */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div
-                          className="w-12 h-12 rounded-xl mx-auto mb-3 flex items-center justify-center"
-                          style={{ background: 'var(--zyro-accent-muted)' }}
-                        >
-                          <span
-                            className="font-display text-lg"
-                            style={{ color: 'var(--zyro-accent)' }}
-                          >
-                            {product.name.charAt(4)}
-                          </span>
-                        </div>
-                        <p
-                          className="font-label text-[10px] tracking-[0.15em]"
-                          style={{ color: 'var(--zyro-text-muted)' }}
-                        >
-                          {product.name}
-                        </p>
-                      </div>
+                    {/* Centered product icon */}
+                    <div
+                      className="w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-sm"
+                      style={{ background: `${product.color}20` }}
+                    >
+                      <Icon
+                        className="w-8 h-8 md:w-10 md:h-10"
+                        style={{ color: product.color }}
+                      />
                     </div>
 
                     {/* Hover overlay */}
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6"
                       style={{
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%)',
                       }}
                     >
                       <span className="text-white text-sm font-medium flex items-center gap-1.5">

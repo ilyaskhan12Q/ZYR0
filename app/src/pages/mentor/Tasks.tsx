@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CheckCircle2, Clock, ThumbsUp, ThumbsDown, Calendar, FileText, ExternalLink, Github } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -201,7 +201,7 @@ export default function MentorTasks() {
           filtered.map((task, i) => {
             const submission = task.submissions?.[0];
             return (
-              <motion.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              <m.div key={task.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-card rounded-xl border border-border p-6 shadow-sm">
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -416,7 +416,7 @@ export default function MentorTasks() {
                     </div>
                   )
                 )}
-              </motion.div>
+              </m.div>
             );
           })
         )}

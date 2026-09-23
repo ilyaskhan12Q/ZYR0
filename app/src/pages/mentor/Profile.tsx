@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { User, Mail, Briefcase, Building, Save, Upload, Link as LinkIcon, Info } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -141,7 +141,7 @@ export default function MentorProfile() {
       </div>
 
       {/* Avatar Section */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6">
         <div className="flex items-center gap-6">
           <div className="relative">
@@ -168,10 +168,10 @@ export default function MentorProfile() {
             <p className="text-xs text-muted-foreground mt-1">JPG, PNG or GIF. Max 2MB.</p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Basic Info */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <h3 className="font-semibold">Professional Details</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -206,10 +206,10 @@ export default function MentorProfile() {
           <textarea rows={4} placeholder="Describe your background and what topics you can mentor in..." value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })}
             className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none" />
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Corporate Affiliation (Read-Only) */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold flex items-center gap-2">
@@ -248,7 +248,7 @@ export default function MentorProfile() {
             You are not currently associated with any company. Please contact an administrator to get assigned.
           </div>
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }

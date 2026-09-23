@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Lock, Eye, EyeOff, Moon, Sun, Monitor, Save } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
@@ -10,14 +10,14 @@ import type { StudentSettings } from '@/lib/database.types';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-5"
     >
       <h3 className="font-semibold">{title}</h3>
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 

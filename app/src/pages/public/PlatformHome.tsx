@@ -4,18 +4,21 @@ import Header from '@/components/nav/Header';
 import { ShaderHero } from '@/components/ui/shader-hero';
 import LogoWall from '@/components/platform-home/LogoWall';
 import BentoProductGrid from '@/components/platform-home/BentoProductGrid';
-import DeepDiveSection from '@/components/platform-home/DeepDiveSection';
-import SolutionsSection from '@/components/platform-home/SolutionsSection';
+import SkillsSection from '@/components/platform-home/SkillsSection';
+import BlogPreviewSection from '@/components/platform-home/BlogPreviewSection';
 import CTASection from '@/components/platform-home/CTASection';
 import PlatformFooter from '@/components/nav/PlatformFooter';
 
-const PricingSection = lazy(() => import('@/components/platform-home/PricingSection'));
 const FAQSection = lazy(() => import('@/components/platform-home/FAQSection'));
+// ponytail: lazy — keeps gsap+ScrollTrigger+SplitText out of the initial homepage chunk
+const FeatureHighlightStrip = lazy(
+  () => import('@/components/platform-home/FeatureHighlightStrip'),
+);
 
 function SectionFallback() {
   return (
     <div
-      className="min-h-[200px] flex items-center justify-center text-xs"
+      className="min-h-[160px] flex items-center justify-center text-xs"
       style={{ color: 'var(--zyro-text-muted)' }}
     >
       Loading...
@@ -25,27 +28,52 @@ function SectionFallback() {
 
 export default function PlatformHome() {
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div
+      className="min-h-screen overflow-x-clip transition-colors duration-200"
+      style={{
+        background: 'var(--zyro-bg)',
+        color: 'var(--zyro-text)',
+      }}
+    >
       <SEO
         title="ZYR0 — The Multi-Product AI & SaaS Ecosystem"
-        description="Build full-stack apps with ZYR0 Studio, manage educational institutions with School OS, run autonomous deep research with the Research Agent, and gain verified work experience with ZYR0 Work."
+        description="Build full-stack apps with ZYR0 Studio, manage institutions with School OS, run autonomous deep research with the Research Agent, and gain verified experience with ZYR0 Work."
         path="/"
       />
+      {/* Header — preserved untouched */}
       <Header />
+
       <main>
+        {/* Clean Hero — solid dark, Apple-style minimal, Agbalumo wordmark */}
         <ShaderHero />
+
+        {/* Partner & Infrastructure Logos — authentic SVGs */}
         <LogoWall />
+
+        {/* Core Products Showcase — enriched Bento Grid with UI mockups */}
         <BentoProductGrid />
-        <DeepDiveSection />
-        <SolutionsSection />
+
+        {/* Why ZYR0 — GSAP horizontal scroll timeline */}
         <Suspense fallback={<SectionFallback />}>
-          <PricingSection />
+          <FeatureHighlightStrip />
         </Suspense>
+
+        {/* Skills Marketplace — featured official & community skills */}
+        <SkillsSection />
+
+        {/* Editorial Insights — Latest from the Blog */}
+        <BlogPreviewSection />
+
+        {/* Common Questions & Answers Accordion */}
         <Suspense fallback={<SectionFallback />}>
           <FAQSection />
         </Suspense>
+
+        {/* Minimal Statement CTA */}
         <CTASection />
       </main>
+
+      {/* Footer — preserved untouched */}
       <PlatformFooter />
     </div>
   );

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Loader2, Megaphone, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -192,7 +192,7 @@ export default function SiteBanners() {
       ) : (
         <div className="space-y-3">
           {banners.map((banner) => (
-            <motion.div
+            <m.div
               key={banner.id}
               layout
               className={cn(
@@ -257,7 +257,7 @@ export default function SiteBanners() {
                   </button>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           ))}
         </div>
       )}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import {
   Menu, X, ChevronDown, LogOut, User, LayoutDashboard,
@@ -155,7 +155,7 @@ export default function PublicLayout() {
                     </button>
                     <AnimatePresence>
                       {profileOpen && (
-                        <motion.div
+                        <m.div
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 8 }}
@@ -213,7 +213,7 @@ export default function PublicLayout() {
                               <LogOut className="w-4 h-4" /> Sign Out
                             </button>
                           </div>
-                        </motion.div>
+                        </m.div>
                       )}
                     </AnimatePresence>
                   </div>
@@ -263,14 +263,14 @@ export default function PublicLayout() {
       {/* Full-screen mobile menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] md:hidden"
           >
             <div className="absolute inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
-            <motion.div
+            <m.div
               initial={{ y: '-100%' }}
               animate={{ y: 0 }}
               exit={{ y: '-100%' }}
@@ -402,22 +402,22 @@ export default function PublicLayout() {
                   )}
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Full-screen mobile account sheet (logged out) */}
       <AnimatePresence>
         {accountOpen && !user && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] md:hidden"
           >
             <div className="absolute inset-0 bg-black/50" onClick={() => setAccountOpen(false)} />
-            <motion.div
+            <m.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -474,8 +474,8 @@ export default function PublicLayout() {
               >
                 Create a new account
               </Link>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 

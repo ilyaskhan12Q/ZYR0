@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Bookmark, MapPin, Calendar, DollarSign,
   ArrowRight, Search
@@ -73,7 +73,7 @@ export default function StudentSavedInternships() {
             const company = internship.company;
 
             return (
-              <motion.div
+              <m.div
                 key={save.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -149,7 +149,7 @@ export default function StudentSavedInternships() {
                     </Link>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>

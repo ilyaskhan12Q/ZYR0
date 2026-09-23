@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { User, Mail, MapPin, GraduationCap, Calendar, Save, Plus, X, Upload, FileText, AlertCircle, CheckCircle2, RotateCcw, Sparkles, BookOpen, Briefcase, Phone } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -386,7 +386,7 @@ export default function StudentProfile() {
 
       {/* Restored Draft Alert Banner */}
       {isDraftRestored && (
-        <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
+        <m.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }}
           className="bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 rounded-xl p-4 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-amber-500 flex-shrink-0" />
@@ -397,11 +397,11 @@ export default function StudentProfile() {
           <button onClick={discardDraft} className="text-xs underline hover:no-underline font-medium flex-shrink-0">
             Discard Draft
           </button>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Profile Completion Meter */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
         className="bg-card rounded-xl border border-border shadow-sm p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -418,10 +418,10 @@ export default function StudentProfile() {
             <span className="font-medium text-foreground">Missing items:</span> {missing.join(', ')}
           </p>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Avatar Card */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6">
         <div className="flex items-center gap-6">
           <div className="relative">
@@ -444,10 +444,10 @@ export default function StudentProfile() {
             <p className="text-sm text-muted-foreground">Upload a professional photo for companies and mentors. JPG, PNG, or GIF. Max 2MB.</p>
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Basic Information */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border">
           <User className="w-5 h-5 text-accent" />
@@ -565,10 +565,10 @@ export default function StudentProfile() {
             className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none text-sm" 
           />
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Education */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border">
           <GraduationCap className="w-5 h-5 text-accent" />
@@ -681,10 +681,10 @@ export default function StudentProfile() {
             )}
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Resume Upload */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center justify-between pb-2 border-b border-border">
           <div className="flex items-center gap-2">
@@ -726,10 +726,10 @@ export default function StudentProfile() {
             <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeChange} className="hidden" disabled={uploadingResume} />
           </label>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Technical Skills */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border">
           <BookOpen className="w-5 h-5 text-accent" />
@@ -768,10 +768,10 @@ export default function StudentProfile() {
             <Plus className="w-4 h-4" /> Add
           </button>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Online Profiles & Portfolios */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+      <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-2 pb-2 border-b border-border">
           <Briefcase className="w-5 h-5 text-accent" />
@@ -812,7 +812,7 @@ export default function StudentProfile() {
             />
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

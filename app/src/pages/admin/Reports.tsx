@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { 
   Download, 
   Calendar, 
@@ -302,7 +302,7 @@ export default function AdminReports() {
         {reportsList.map((report, i) => {
           const activeGen = generating[report.id];
           return (
-            <motion.div 
+            <m.div 
               key={i} 
               initial={{ opacity: 0, y: 15 }} 
               animate={{ opacity: 1, y: 0 }} 
@@ -353,7 +353,7 @@ export default function AdminReports() {
                   )}
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>

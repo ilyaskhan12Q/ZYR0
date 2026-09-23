@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Share2, CheckCircle2, Building2, ExternalLink } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { getInternshipById } from '@/services/internships';
@@ -299,7 +299,7 @@ export default function InternshipDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="lg:col-span-2">
             {/* Header */}
             <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
               <div className="flex items-start justify-between">
@@ -349,20 +349,20 @@ export default function InternshipDetail() {
                 ))}
               </div>
               <div className="p-6">
-                <motion.div
+                <m.div
                   key={currentTab.label}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
                 >
                   {currentTab.content}
-                </motion.div>
+                </m.div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Sidebar */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-6">
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="space-y-6">
             {/* Apply Card */}
             <div className="bg-card rounded-xl border border-border p-6 shadow-sm sticky top-24">
               <div className="text-center mb-5">
@@ -460,7 +460,7 @@ export default function InternshipDetail() {
                 </Link>
               </div>
             )}
-          </motion.div>
+          </m.div>
         </div>
       </div>
 

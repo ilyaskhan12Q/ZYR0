@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, ArrowRight, X, Zap, CheckCircle2, UserCheck } from 'lucide-react';
 
 interface ProfileCompletionRequiredModalProps {
@@ -24,7 +24,7 @@ export default function ProfileCompletionRequiredModal({
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         {/* Backdrop */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -33,7 +33,7 @@ export default function ProfileCompletionRequiredModal({
         />
 
         {/* Modal Window */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -129,7 +129,7 @@ export default function ProfileCompletionRequiredModal({
               </button>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

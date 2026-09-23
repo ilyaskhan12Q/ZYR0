@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, MapPin, Globe, Users, FolderOpen, Mail, Phone, Calendar, Award, ExternalLink } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { getCompanyById } from '@/services/companies';
@@ -133,7 +133,7 @@ export default function CompanyDetail() {
         </Link>
 
         {/* Company Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
           <div className="h-32 bg-gradient-to-r from-primary to-accent dark:from-slate-900 dark:to-accent/50" />
           <div className="px-6 pb-6">
@@ -182,7 +182,7 @@ export default function CompanyDetail() {
               </div>
             )}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
@@ -192,17 +192,17 @@ export default function CompanyDetail() {
             { label: 'Active Interns', value: stats.activeInterns, icon: Users },
             { label: 'Certificates Issued', value: stats.certificates, icon: Award },
           ].map((stat, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}
+            <m.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 + i * 0.05 }}
               className="stat-card text-center bg-card border border-border rounded-xl p-4 shadow-sm">
               <stat.icon className="w-5 h-5 text-accent mx-auto mb-2" />
               <p className="text-2xl font-bold">{stat.value}</p>
               <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-            </motion.div>
+            </m.div>
           ))}
         </div>
 
         {/* Internships */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-8">
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-8">
           <h2 className="text-xl font-bold mb-4">Open Internships</h2>
           <div className="space-y-4">
             {companyInternships.length > 0 ? companyInternships.map((internship) => (
@@ -228,11 +228,11 @@ export default function CompanyDetail() {
               <p className="text-muted-foreground text-center py-8">No open internships at the moment.</p>
             )}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Team */}
         {company.team && company.team.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-8">
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-8">
             <h2 className="text-xl font-bold mb-4">Team</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {company.team.map((member: any) => (
@@ -246,7 +246,7 @@ export default function CompanyDetail() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </div>
     </div>

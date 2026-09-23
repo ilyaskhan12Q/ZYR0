@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Briefcase, Building2, Calendar, MapPin, ClipboardList, CheckCircle2,
   Clock, AlertTriangle, AlertCircle, FileCheck, ExternalLink, ShieldCheck,
@@ -401,7 +401,7 @@ export default function StudentWorkspace() {
   if (!activePlacement) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center bg-card rounded-2xl border border-border p-8 md:p-12 shadow-sm space-y-6"
@@ -447,7 +447,7 @@ export default function StudentWorkspace() {
               View Offer Letters
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -577,7 +577,7 @@ export default function StudentWorkspace() {
       {/* Tab Panel contents */}
       <div className="min-h-[400px]">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={activeTab}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -882,7 +882,7 @@ export default function StudentWorkspace() {
                 {/* Right: Selected Task Details & Form */}
                 <div className="lg:col-span-2 space-y-6">
                   {selectedTask ? (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, scale: 0.98 }}
                       animate={{ opacity: 1, scale: 1 }}
                       data-tour="workspace-task-details"
@@ -1376,7 +1376,7 @@ export default function StudentWorkspace() {
                           )}
                         </div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   ) : (
                     <div className="bg-card rounded-2xl border border-border p-8 shadow-sm text-center text-muted-foreground min-h-[300px] flex flex-col justify-center items-center gap-3">
                       <ClipboardList className="w-12 h-12 text-muted-foreground/45" />
@@ -1485,7 +1485,7 @@ export default function StudentWorkspace() {
 
                 {activeCertificate ? (
                   // Renders real certificate mockup
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="max-w-3xl mx-auto bg-white dark:bg-slate-900 border-8 border-double border-accent/25 rounded-2xl p-8 shadow-lg text-center relative overflow-hidden"
@@ -1576,7 +1576,7 @@ export default function StudentWorkspace() {
                         </Link>
                       </div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 ) : (
                   // Lock screen
                   <div className="max-w-md mx-auto text-center py-12 px-6 bg-muted/30 border border-border rounded-2xl space-y-5">
@@ -1611,7 +1611,7 @@ export default function StudentWorkspace() {
                 )}
               </div>
             )}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
 

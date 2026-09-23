@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Loader } from '@/components/common/Loader';
 import {
   X,
@@ -156,7 +156,7 @@ export function TaskReviewDrawer({ task, onClose, onSuccess }: TaskReviewDrawerP
         aria-modal="true"
         aria-label="Task Review Workspace"
       >
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
@@ -556,7 +556,7 @@ export function TaskReviewDrawer({ task, onClose, onSuccess }: TaskReviewDrawerP
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </AnimatePresence>
   );

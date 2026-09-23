@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, CheckCircle2, XCircle, Send, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyCompany } from '@/services/companies';
@@ -217,7 +217,7 @@ export default function CompanyCertificates() {
                 filtered.map((intern) => {
                   const isIssuing = issuingId === intern.id;
                   return (
-                    <motion.tr key={intern.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                    <m.tr key={intern.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <img
@@ -294,7 +294,7 @@ export default function CompanyCertificates() {
                           </button>
                         )}
                       </td>
-                    </motion.tr>
+                    </m.tr>
                   );
                 })
               )}

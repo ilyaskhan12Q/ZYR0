@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail, Phone, Headphones, Megaphone, FileCheck } from 'lucide-react';
 import { SEO } from '@/components/SEO';
@@ -87,13 +87,13 @@ export default function HelpCenter() {
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Help Center</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               Step-by-step guides and resources to help you get the most out of the ZYR0 platform.
             </p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -118,14 +118,14 @@ export default function HelpCenter() {
       {/* Guides */}
       <section className="px-4 py-16">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
             <h2 className="text-3xl font-bold">Getting Started Guides</h2>
             <p className="mt-2 text-muted-foreground">Everything you need to start using ZYR0 in your role.</p>
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {guides.map((guide, i) => (
-              <motion.div
+              <m.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -153,7 +153,7 @@ export default function HelpCenter() {
                     </li>
                   ))}
                 </ol>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>
@@ -162,13 +162,13 @@ export default function HelpCenter() {
       {/* Get Support */}
       <section className="px-4 py-16 bg-muted/40 border-b border-border">
         <div className="max-w-5xl mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
+          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-10">
             <h2 className="text-3xl font-bold">Get Support</h2>
             <p className="mt-2 text-muted-foreground">Facing an issue or have a question? Pick the channel that fits — we are here to help.</p>
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <motion.a
+            <m.a
               href={SITE_CONFIG.social.whatsappSupportGroup}
               target="_blank"
               rel="noopener noreferrer"
@@ -187,9 +187,9 @@ export default function HelpCenter() {
                 <p className="text-sm text-muted-foreground mt-2">Get answers to questions or issues quickly — connect with the ZYR0 team and other users in real time.</p>
                 <p className="text-sm font-medium text-emerald-600 mt-2">Join the group →</p>
               </div>
-            </motion.a>
+            </m.a>
 
-            <motion.a
+            <m.a
               href={SITE_CONFIG.social.whatsappChannel}
               target="_blank"
               rel="noopener noreferrer"
@@ -209,9 +209,9 @@ export default function HelpCenter() {
                 <p className="text-sm text-muted-foreground mt-2">Follow for new internship openings, deadlines, and official platform news — announcements only, no chat.</p>
                 <p className="text-sm font-medium text-emerald-600 mt-2">Follow the channel →</p>
               </div>
-            </motion.a>
+            </m.a>
 
-            <motion.a
+            <m.a
               href={`mailto:${SITE_CONFIG.supportEmail}`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -229,9 +229,9 @@ export default function HelpCenter() {
                 <p className="text-sm text-muted-foreground mt-2">For account issues, verification queries, or partnership requests — write to {SITE_CONFIG.supportEmail}.</p>
                 <p className="text-sm font-medium text-accent mt-2">Send an email →</p>
               </div>
-            </motion.a>
+            </m.a>
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -247,7 +247,7 @@ export default function HelpCenter() {
                 <p className="text-sm text-muted-foreground mt-2">Prefer to talk? Call us directly during business hours and we will walk you through the issue.</p>
                 <p className="text-sm font-medium text-accent mt-2">+92 327 988 3150</p>
               </div>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </section>
@@ -256,7 +256,7 @@ export default function HelpCenter() {
       <section className="px-4 py-8">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -269,8 +269,8 @@ export default function HelpCenter() {
               <Link to="/faq" className="flex items-center gap-1 text-sm font-medium text-accent hover:underline flex-shrink-0">
                 View FAQ <ArrowRight className="w-4 h-4" />
               </Link>
-            </motion.div>
-            <motion.a
+            </m.div>
+            <m.a
               href={SITE_CONFIG.social.whatsappSupportGroup}
               target="_blank"
               rel="noopener noreferrer"
@@ -287,7 +287,7 @@ export default function HelpCenter() {
               <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 flex-shrink-0">
                 <Headphones className="w-4 h-4" /> Get help
               </span>
-            </motion.a>
+            </m.a>
           </div>
         </div>
       </section>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ArrowLeft, Save, Send, Plus, X, Loader2 } from 'lucide-react';
 import { getMyCompany } from '@/services/companies';
 import { createInternship } from '@/services/internships';
@@ -154,7 +154,7 @@ export default function PostInternship() {
           </button>
         </div>
       ) : (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
           {/* Basic Info */}
           <div className="bg-card rounded-xl border border-border shadow-sm p-6 space-y-4">
             <h3 className="font-semibold">Basic Information</h3>
@@ -374,7 +374,7 @@ export default function PostInternship() {
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />} Publish
             </button>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

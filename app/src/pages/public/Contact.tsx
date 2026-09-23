@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, CheckCircle2, Globe, HelpCircle, BookOpen, Facebook, Loader2, AlertTriangle } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
@@ -87,10 +87,10 @@ export default function Contact() {
         structuredData={contactStructuredData}
       />
       <div className="max-w-5xl mx-auto">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold">Contact Us</h1>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto">Have questions? We would love to hear from you. Send us a message and we will respond as soon as possible.</p>
-        </motion.div>
+        </m.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Info */}
@@ -126,12 +126,12 @@ export default function Contact() {
           </address>
 
           {/* Contact Form */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2">
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:col-span-2">
             {status === 'success' ? (
               <div className="bg-card rounded-xl border border-border p-10 shadow-sm text-center">
-                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
+                <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
                   <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
-                </motion.div>
+                </m.div>
                 <h3 className="mt-4 text-xl font-bold">Message Sent!</h3>
                 <p className="mt-2 text-muted-foreground">Thank you for reaching out. We received your message and will get back to you within 24 hours.</p>
               </div>
@@ -225,11 +225,11 @@ export default function Contact() {
                 </button>
               </form>
             )}
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Additional resources */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -247,7 +247,7 @@ export default function Contact() {
               Privacy Policy
             </Link>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

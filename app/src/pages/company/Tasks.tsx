@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Plus,
   Loader2,
@@ -498,7 +498,7 @@ export default function CompanyTasks() {
         <div className="space-y-6">
           {/* Selected Student Banner (if query param active) */}
           {studentIdParam && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center justify-between p-4 bg-accent/10 border border-accent/20 rounded-2xl text-sm shadow-sm"
@@ -528,7 +528,7 @@ export default function CompanyTasks() {
               >
                 <FilterX className="w-3.5 h-3.5" /> Clear Filter
               </button>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Filter Bar & Controls */}

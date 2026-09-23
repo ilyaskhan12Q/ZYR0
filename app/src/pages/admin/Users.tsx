@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, Shield, GraduationCap, Building2, UserCheck, Eye, ToggleLeft, ToggleRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
@@ -122,7 +122,7 @@ export default function AdminUsers() {
                     const config = roleConfig[user.role] || roleConfig.student;
                     const RoleIcon = config.icon;
                     return (
-                      <motion.tr key={user.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                      <m.tr key={user.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             <img src={user.avatar_url || `https://ui-avatars.com/api/?name=${user.full_name || 'User'}`} alt="" className="w-9 h-9 rounded-full object-cover" />
@@ -158,7 +158,7 @@ export default function AdminUsers() {
                             </button>
                           </div>
                         </td>
-                      </motion.tr>
+                      </m.tr>
                     );
                   })
                 )}

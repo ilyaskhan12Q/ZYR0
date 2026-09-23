@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileCheck, Clock, Star, Phone, XCircle, Rocket, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
@@ -94,7 +94,7 @@ export default function StudentTeamApplications() {
             const isRejected = app.status === 'Rejected';
 
             return (
-              <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              <m.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-start justify-between">
                   <div>
@@ -144,7 +144,7 @@ export default function StudentTeamApplications() {
                     })}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })
         )}

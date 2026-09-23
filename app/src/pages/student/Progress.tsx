@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, CheckCircle2, Clock, Target, Award, BookOpen, Code, Users, MessageSquare, Lightbulb, Star } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -76,13 +76,13 @@ export default function StudentProgress() {
       <h1 className="text-2xl font-bold">My Progress</h1>
 
       {/* Overall Progress */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="bg-card rounded-xl border border-border p-8 shadow-sm">
         <div className="flex flex-col md:flex-row items-center gap-8">
           <div className="relative w-40 h-40 flex-shrink-0">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
               <circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--muted))" strokeWidth="10" />
-              <motion.circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--accent))" strokeWidth="10"
+              <m.circle cx="60" cy="60" r="50" fill="none" stroke="hsl(var(--accent))" strokeWidth="10"
                 strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 50}`}
                 initial={{ strokeDashoffset: 2 * Math.PI * 50 }}
                 animate={{ strokeDashoffset: 2 * Math.PI * 50 * (1 - completionRate / 100) }}
@@ -108,11 +108,11 @@ export default function StudentProgress() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Progress by Internship */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="bg-card rounded-xl border border-border shadow-sm p-6">
           <h3 className="font-semibold mb-4">Internship Progress</h3>
           {activeInternships.length === 0 ? (
@@ -134,7 +134,7 @@ export default function StudentProgress() {
                       <span className="text-sm font-bold">{pct}%</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <motion.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} />
+                      <m.div className="h-full bg-accent rounded-full" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, delay: i * 0.1 }} />
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">{completed}/{internTasks.length} tasks completed</p>
                   </div>
@@ -142,10 +142,10 @@ export default function StudentProgress() {
               })}
             </div>
           )}
-        </motion.div>
+        </m.div>
 
         {/* Skills */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
           className="bg-card rounded-xl border border-border shadow-sm p-6">
           <h3 className="font-semibold mb-4">Skills Gained</h3>
           {skillsList.length === 0 ? (
@@ -169,11 +169,11 @@ export default function StudentProgress() {
               })}
             </div>
           )}
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Timeline */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
         className="bg-card rounded-xl border border-border shadow-sm p-6">
         <h3 className="font-semibold mb-4">Activity Timeline</h3>
         {activities.length === 0 ? (
@@ -195,7 +195,7 @@ export default function StudentProgress() {
             ))}
           </div>
         )}
-      </motion.div>
+      </m.div>
     </div>
   );
 }
