@@ -113,23 +113,6 @@ export function noiseSvg(): string {
 </svg>`;
 }
 
-/** QCA (UK) badge fallback — used only until a real partner logo is supplied. */
-function qcaSvg(): string {
-  return `
-<svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" style="width:42px;height:42px;display:block">
-  <defs>
-    <linearGradient id="qca-grad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#1f9d6b"/>
-      <stop offset="1" stop-color="#2b6cb0"/>
-    </linearGradient>
-  </defs>
-  <rect x="3" y="3" width="90" height="90" rx="22" fill="url(#qca-grad)"/>
-  <rect x="3" y="3" width="90" height="90" rx="22" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
-  <text x="48" y="50" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="bold" fill="#ffffff">QCA</text>
-  <text x="48" y="70" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="bold" fill="#ffffff">UK</text>
-</svg>`;
-}
-
 // ── Main document builder ──────────────────────────────────────────────────
 
 export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
@@ -140,11 +123,8 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     dates,
     credentialId,
     issueDateStr,
-    supervisorName,
     qrSrc,
-    isoSrc,
     oLogoSrc,
-    qcaSrc,
     fontCss,
   } = opts;
 
@@ -247,8 +227,20 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     /* ── Header row: Govt crest | award sub-header | ZYRO brand ──────── */
     .top-row { display: grid; grid-template-columns: 1fr 1.5fr 1fr; align-items: start; }
     .gov { display: flex; align-items: flex-end; }
-    .logos-top { display: flex; gap: 14px; align-items: center; margin-top: 12px; }
+    .logos-top { display: flex; gap: 14px; align-items: center; margin-top: 4px; }
     .logo-top { height: 64px; width: auto; display: block; object-fit: contain; }
+    .cert-meta-top {
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: .5px;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+    .cert-meta-top b { color: #111; font-weight: 700; }
+    .award-center { display: flex; flex-direction: column; align-items: center; }
+    .award-center .logo-top { height: 48px; margin-top: 2px; }
     .award-sub {
       text-align: center;
       color: #1e40af;
@@ -256,7 +248,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       font-weight: 800;
       letter-spacing: 1.2px;
       text-transform: uppercase;
-      margin-top: 26px;
+      margin-top: 6px;
     }
     .zyro-brand { text-align: right; }
     .brand-main { font-size: 34px; font-weight: 800; color: #1e3a8a; letter-spacing: 2.5px; line-height: 1; }
@@ -347,20 +339,19 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 
     /* ── Footer: signatures | seal + QR ───────────────────────────────── */
     .footer-row {
-      margin-top: 14px;
-      padding-top: 16px;
+      margin-top: 4px;
+      padding-top: 8px;
       display: grid;
       grid-template-columns: 1fr auto 1fr;
-      align-items: end;
+      align-items: start;
       gap: 28px;
     }
     .sig-block { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .sig-block.sig-dir { transform: translate(14px, -20px); }
-    .sig-script { font-family: 'Playfair Display', serif; font-style: italic; font-size: 26px; color: #1a1a1a; line-height: 1; margin-bottom: 6px; display: inline-block; padding-bottom: 6px; border-bottom: 1.5px solid #666; }
-    .sig-name { font-size: 13px; font-weight: 600; color: #333; margin-top: 7px; letter-spacing: .3px; }
-    .sig-title { font-size: 9.5px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
-    .sig-company { font-size: 11px; font-weight: 700; color: #333; letter-spacing: .5px; margin-top: 3px; }
-    .sig-meta { margin-top: 8px; font-size: 8.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
+    .sig-block.sig-dir { transform: translate(14px, 0); }
+    .sig-line { width: 200px; height: 42px; border-bottom: 1.5px solid #666; margin-bottom: 5px; }
+    .sig-title { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+    .sig-company { font-size: 12px; font-weight: 700; color: #333; letter-spacing: .5px; margin-top: 3px; }
+    .sig-meta { margin-top: 8px; font-size: 9.5px; font-weight: 600; color: #555; letter-spacing: .4px; line-height: 1.55; }
     .sig-meta b { color: #111; font-weight: 700; }
     .center-col { display: flex; flex-direction: column; align-items: center; }
     .seal-qr { display: flex; align-items: flex-end; gap: 16px; }
@@ -377,10 +368,10 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       justify-content: center;
       color: #fff;
     }
-    .badge-text { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; margin-top: 7px; color: #b89c56; letter-spacing: 1.5px; }
+    .badge-text { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; margin-top: 7px; color: #b89c56; letter-spacing: 1.5px; }
     .qr { display: flex; flex-direction: column; align-items: center; gap: 5px; }
     .qr-img { width: 70px; height: 70px; padding: 3px; background: #fff; border: 1px solid #d8d2c2; }
-    .qr-label { font-size: 8.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
+    .qr-label { font-size: 9.5px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: #4a4a4a; }
 
     @media print {
       body { width: 297mm; height: 210mm; }
@@ -417,16 +408,15 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
         <div class="inner">
           <div class="top-row">
             <div class="gov">
-              <div class="logos-top">
-                <img class="logo-top" src="${isoSrc}" alt="ISO 9001:2015" />
-                ${qcaSrc ? `<img class="logo-top" src="${qcaSrc}" alt="QCA UK" />` : qcaSvg()}
-                <img class="logo-top" src="${oLogoSrc}" alt="ZYRO Platform" />
-              </div>
+              <div class="cert-meta-top">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
-            <div class="award-sub">ZYRO Awarding this certificate of achievement</div>
+            <div class="award-center">
+              <img class="logo-top" src="${oLogoSrc}" alt="ZYRO Platform" />
+              <div class="award-sub">Awarded by ZYRO</div>
+            </div>
             <div class="zyro-brand">
               <div class="brand-main">ZYR<img class="brand-o" src="${oLogoSrc}" alt="" /></div>
-              <div class="brand-sub">Internship Platform</div>
+              <div class="brand-sub">Think. Build. Scale to ∞.</div>
             </div>
           </div>
 
@@ -456,11 +446,9 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 
           <div class="footer-row">
             <div class="sig-block">
-              <div class="sig-script">${supervisorName}</div>
-              <div class="sig-name">${supervisorName}</div>
+              <div class="sig-line" aria-hidden="true"></div>
               <div class="sig-title">Program Coordinator</div>
               <div class="sig-company">${companyName}</div>
-              <div class="sig-meta">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
             </div>
             <div class="center-col">
               <div class="seal-qr">
@@ -480,9 +468,8 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
               </div>
             </div>
             <div class="sig-block sig-dir">
-              <div class="sig-script">ilyas khan</div>
-              <div class="sig-name">ZYRO Director</div>
-              <div class="sig-title">ZYRO Platforms</div>
+              <div class="sig-line" aria-hidden="true"></div>
+              <div class="sig-title">ZYRO Director</div>
             </div>
           </div>
         </div>
