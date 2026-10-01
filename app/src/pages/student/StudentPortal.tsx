@@ -17,6 +17,7 @@ const StudentOfferLetters = lazy(() => import('./OfferLetters'));
 const StudentWorkspace = lazy(() => import('./Workspace'));
 const InternshipDetail = lazy(() => import('../public/InternshipDetail'));
 const StudentSavedInternships = lazy(() => import('./SavedInternships'));
+const StudentTools = lazy(() => import('./Tools'));
 
 export default function StudentPortal() {
   return (
@@ -39,6 +40,7 @@ export default function StudentPortal() {
       <Route path="certificates" element={<StudentCertificates />} />
       <Route path="offer-letters" element={<StudentOfferLetters />} />
       <Route path="portfolio" element={<StudentPortfolio />} />
+      <Route path="tools" element={<StudentTools />} />
       <Route path="profile" element={<StudentProfile />} />
       <Route path="settings" element={<StudentSettings />} />
     </Routes>

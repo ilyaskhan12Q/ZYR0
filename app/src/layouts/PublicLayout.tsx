@@ -19,6 +19,7 @@ import ResourcesDropdown from '@/components/nav/ResourcesDropdown';
 import CompanyDropdown from '@/components/nav/CompanyDropdown';
 
 const mobileNavLinks = [
+  { label: 'ToolHub', href: '/tools' },
   { label: 'Research', href: '/research' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },

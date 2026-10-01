@@ -6,7 +6,7 @@ import {
   Home, FolderOpen, FileCheck, FileText, ClipboardList, CheckSquare, Award,
   Briefcase, BarChart3, Users, UserCog, Shield, MessageSquare,
   Building2, ChevronLeft, ChevronRight,
-  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone, Compass
+  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone, Compass, BookOpen, Wrench
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess, type CompanyAccessValue } from '@/contexts/CompanyAccessContext';
@@ -46,6 +46,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Tasks', href: '/student/tasks', icon: ClipboardList, tourTarget: 'nav-tasks', badgeKey: 'tasks' },
     { label: 'Progress', href: '/student/progress', icon: TrendingUp, tourTarget: 'nav-progress' },
     { label: 'Messages', href: '/student/messages', icon: MessageSquare, badgeKey: 'messages' },
+    { label: 'ToolHub Submissions', href: '/student/tools', icon: Wrench },
     { label: 'Certificates', href: '/student/certificates', icon: Award, tourTarget: 'nav-certificates' },
     { label: 'Offer Letters', href: '/student/offer-letters', icon: FileText },
     { label: 'Portfolio', href: '/student/portfolio', icon: User },
@@ -61,6 +62,7 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Applications', href: '/company/applications', icon: FileCheck, badgeKey: 'applications' },
     { label: 'Interns', href: '/company/interns', icon: Users },
     { label: 'Tasks', href: '/company/tasks', icon: ClipboardList },
+    { label: 'Developer Tools', href: '/company/tools', icon: Wrench },
     { label: 'Messages', href: '/company/messages', icon: MessageSquare },
     { label: 'Analytics', href: '/company/analytics', icon: BarChart3 },
     { label: 'Certificates', href: '/company/certificates', icon: Award },
@@ -85,6 +87,8 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Applications', href: '/admin/applications', icon: FileCheck },
     { label: 'Team Applications', href: '/admin/team-applications', icon: Rocket },
     { label: 'Site Banners', href: '/admin/site-banners', icon: Megaphone },
+    { label: 'Blog CMS', href: '/admin/blogs', icon: BookOpen },
+    { label: 'ToolHub Queue', href: '/admin/tools', icon: Wrench },
     { label: 'Inbox', href: '/admin/inbox', icon: MessageSquare },
     { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { label: 'Reports', href: '/admin/reports', icon: Flag },

@@ -70,3 +70,7 @@ phases.md
 .agents/
 .claude/
 skills-lock.json
+
+# Brag launch video deliverables & working files
+brag-output/
+brag-output-*/

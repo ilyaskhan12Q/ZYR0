@@ -2,7 +2,7 @@ import {
   Code, GraduationCap, Sparkles, Briefcase,
   Shield, Zap, Globe, Layers, BarChart3, Users,
   ArrowRight, Check, CheckCircle2, ChevronRight, FileCode,
-  School, BrainCircuit, Rocket, Lock, Laptop
+  School, BrainCircuit, Rocket, Lock, Laptop, Compass
 } from 'lucide-react';
 
 export interface ProductItem {
@@ -61,6 +61,17 @@ export const productsList: ProductItem[] = [
     icon: Briefcase,
     color: 'rgb(52, 211, 153)',
     features: ['GitHub-backed project delegations', 'PR-style split-pane review drawer', 'Cryptographic certificate verification', 'End-to-end talent pipeline']
+  },
+  {
+    id: 'toolhub',
+    name: 'ZYR0 ToolHub',
+    badge: 'Directory',
+    headline: 'Curated directory of AI utilities & developer tools',
+    description: 'Discover intelligent utilities, autonomous agent workflows, and open-source tools curated from ZYR0, GitHub, and Hugging Face.',
+    href: '/tools',
+    icon: Compass,
+    color: 'rgb(168, 85, 247)',
+    features: ['ZYR0 native tools (ZYRA, Docsmith)', 'Curated GitHub & Hugging Face utilities', 'One-click install commands', 'Live search and filterable directory']
   }
 ];
 
@@ -183,17 +194,18 @@ export const footerNav = {
     { label: 'ZYR0 Edu', href: '/school' },
     { label: 'ZYR0 Research', href: '/research' },
     { label: 'ZYR0 Work', href: '/internships' },
+    { label: 'ToolHub', href: '/tools' },
     { label: 'Browse Internships', href: '/internships/browse' },
   ],
   resources: [
     { label: 'Help Center', href: '/help' },
     { label: 'FAQ', href: '/faq' },
-    { label: 'Blog', href: '/blog', badge: 'Soon' },
+    { label: 'Blog', href: '/blog' },
     { label: 'Verify Certificate', href: '/verify' },
     { label: 'Privacy Policy', href: '/privacy' },
     { label: 'Terms of Service', href: '/terms' },
     { label: 'Cookie Policy', href: '/cookies' },
-  ],
+  ] as Array<{ label: string; href: string; badge?: string }>,
   company: [
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' },

@@ -23,6 +23,13 @@ const products = [
     logo: '/logos/schoolOS.png',
   },
   {
+    label: 'ToolHub',
+    description: 'Curated directory of AI utilities, developer tools, and agent workflows.',
+    href: '/tools',
+    logo: null,
+    badge: 'Directory',
+  },
+  {
     label: 'ZYRO Studio',
     description: 'Website builder — launch your portfolio in minutes.',
     href: '/studio',

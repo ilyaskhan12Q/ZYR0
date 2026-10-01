@@ -16,6 +16,7 @@ const CompanyCertificates = lazy(() => import('./Certificates'));
 const CompanyOfferLetters = lazy(() => import('./OfferLetters'));
 const CompanyTeam = lazy(() => import('./Team'));
 const CompanySettings = lazy(() => import('./Settings'));
+const CompanyTools = lazy(() => import('./Tools'));
 const MentorMessages = lazy(() => import('../mentor/Messages'));
 
 export default function CompanyPortal() {
@@ -23,6 +24,7 @@ export default function CompanyPortal() {
     <Suspense fallback={<RouteLoading />}>
     <Routes>
       <Route index element={<Navigate to="dashboard" replace />} />
+      <Route path="tools" element={<CompanyTools />} />
 
       {/* Dashboard gets a warning banner if unverified, but remains accessible */}
       <Route

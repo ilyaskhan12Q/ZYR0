@@ -22,6 +22,7 @@ export const COMPANY_TAB_KEYS = [
   'applications',
   'interns',
   'tasks',
+  'tools',
   'messages',
   'analytics',
   'certificates',
@@ -35,9 +36,9 @@ const ALL_TABS: CompanyTabKey[] = [...COMPANY_TAB_KEYS];
 
 export const COMPANY_ROLE_PERMISSIONS: Record<CompanyTeamRole, CompanyTabKey[]> = {
   admin: ALL_TABS,
-  hr: ['dashboard', 'profile', 'internships', 'applications', 'interns', 'messages', 'certificates', 'offer-letters', 'settings'],
-  mentor: ['dashboard', 'profile', 'interns', 'tasks', 'messages', 'settings'],
-  reviewer: ['dashboard', 'profile', 'applications', 'interns', 'tasks', 'settings'],
+  hr: ['dashboard', 'profile', 'internships', 'applications', 'interns', 'tools', 'messages', 'certificates', 'offer-letters', 'settings'],
+  mentor: ['dashboard', 'profile', 'interns', 'tasks', 'tools', 'messages', 'settings'],
+  reviewer: ['dashboard', 'profile', 'applications', 'interns', 'tasks', 'tools', 'settings'],
 };
 
 export function canAccessCompanyTab(role: CompanyTeamRole | null, isOwner: boolean, tab: CompanyTabKey): boolean {

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   ChevronDown, LogOut, User, LayoutDashboard, Settings,
   Building2, Sun, Moon, HelpCircle, MessageCircle, BookOpen,
-  Shield, FileText, Cookie, BadgeCheck
+  Shield, FileText, Cookie, BadgeCheck, Compass
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,10 +17,18 @@ const productLogos: Record<string, string> = {
   research: '/logos/research.png',
 };
 
-const resources = [
+interface HeaderResourceItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: string;
+}
+
+const resources: HeaderResourceItem[] = [
+  { label: 'ToolHub', href: '/tools', icon: Compass, badge: 'New' },
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'FAQ', href: '/faq', icon: MessageCircle },
-  { label: 'Blog', href: '/blog', icon: BookOpen, badge: 'Soon' },
+  { label: 'Blog', href: '/blog', icon: BookOpen },
   { label: 'Verify Certificate', href: '/verify', icon: BadgeCheck },
   { label: 'Privacy Policy', href: '/privacy', icon: Shield },
   { label: 'Terms of Service', href: '/terms', icon: FileText },
@@ -151,6 +159,8 @@ export default function Header() {
                       <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-white/5 border border-white/10 group-hover:scale-105 transition-transform overflow-hidden">
                         {productLogos[product.id] ? (
                           <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
+                        ) : product.icon ? (
+                          <product.icon className="w-5 h-5 text-accent-400" />
                         ) : (
                           <span className="font-display text-sm text-white">{product.name.charAt(4)}</span>
                         )}
@@ -493,6 +503,8 @@ export default function Header() {
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10 overflow-hidden shrink-0">
                           {productLogos[product.id] ? (
                             <img src={productLogos[product.id]} alt={product.name} className="w-full h-full object-cover" />
+                          ) : product.icon ? (
+                            <product.icon className="w-4 h-4 text-accent-400" />
                           ) : (
                             <span className="text-white font-display text-xs">{product.name.charAt(4)}</span>
                           )}
