@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Briefcase, Mail, Lock, Eye, EyeOff, ArrowRight, GraduationCap, Building2, Banknote, Star } from 'lucide-react';
 import { signIn, signInWithGoogle, signInWithLinkedIn, rememberEmail, getLastEmail } from '../../lib/auth';
 import type { UserRole } from '../../lib/database.types';
@@ -85,7 +85,7 @@ export default function Login() {
         noIndex={true}
       />
       {/* Left Side - Branding */}
-      <motion.div 
+      <m.div 
         initial={{ opacity: 0 }} 
         animate={{ opacity: 1 }} 
         transition={{ duration: 0.5 }}
@@ -128,11 +128,11 @@ export default function Login() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       {/* Right Side - Form */}
       <div className="flex-1 flex items-center justify-center p-6 bg-background">
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+        <m.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
@@ -252,7 +252,7 @@ export default function Login() {
               Register
             </Link>
           </p>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CheckSquare, Star, Save, Send, ChevronDown, ChevronUp, User, Award, ThumbsUp, ThumbsDown, Info } from 'lucide-react';
 import { Loader, ButtonLoader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -324,7 +324,7 @@ export default function MentorEvaluations() {
       ) : (
         <>
           {/* Skills Assessment */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
             className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <button onClick={() => toggleSection('skills')} className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors">
               <h3 className="font-semibold text-foreground">Skills Assessment</h3>
@@ -368,10 +368,10 @@ export default function MentorEvaluations() {
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Overall Performance */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
             <button onClick={() => toggleSection('overall')} className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors">
               <h3 className="font-semibold text-foreground">Overall Performance</h3>
@@ -433,10 +433,10 @@ export default function MentorEvaluations() {
                 </div>
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Recommendation */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5 space-y-4">
             <h3 className="font-semibold text-foreground">Recommendation</h3>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -478,7 +478,7 @@ export default function MentorEvaluations() {
                 className="w-full px-3 py-2.5 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none disabled:bg-muted/50 disabled:text-muted-foreground" 
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {!isSubmitted && (
             <div className="flex gap-3">

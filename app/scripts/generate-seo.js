@@ -169,6 +169,10 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
+# IndexNow — instant indexing for Bing, Yandex, Naver, Seznam
+# Key file: https://zyroo.org/{key}.txt
+# Submit URLs: POST https://api.indexnow.org/indexnow
+
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
 }
@@ -177,11 +181,14 @@ Sitemap: ${SITE_URL}/sitemap.xml
 function generateLlmsTxt() {
   return `# ZYR0
 
-> ZYR0 is Pakistan's structured internship platform. Students apply for verified internship opportunities, work on real milestone-based tasks with professional mentors, and earn blockchain-verified digital certificates that employers can instantly authenticate online. Companies hire and manage interns; mentors review and guide their work.
+> An ecosystem of tools for those who build, learn, research, and work. From idea to live app, from school to career — ZYR0 covers the full lifecycle.
 
 ## Important
-- [Home](${SITE_URL}/): ZYR0 — structured internships for students and employers in Pakistan.
-- [Browse Internships](${SITE_URL}/internships): Search verified internship opportunities in Pakistan by domain, location, and type.
+- [Home](${SITE_URL}/): ZYR0 — Think. Build. Scale to ∞.
+- [ZYR0 Studio](${SITE_URL}/studio): From idea to live full-stack app in minutes. Generate clean, production-ready React apps.
+- [ZYR0 School OS](${SITE_URL}/school): Transform school management with intelligent automation.
+- [ZYR0 Research](${SITE_URL}/research): Autonomous deep intelligence for literature reviews, market intelligence, and code audits.
+- [ZYR0 Work](${SITE_URL}/internships): Bridge academic theory with real engineering. Verifiable proof-of-work credentials.
 - [Partner Companies](${SITE_URL}/companies): Verified companies offering structured internships on ZYR0.
 - [Verify Certificate](${SITE_URL}/verify): Instantly verify ZYR0 internship certificates and offer letters by credential ID.
 - [About ZYR0](${SITE_URL}/about): ZYR0's mission, vision, and values.
@@ -227,9 +234,8 @@ console.log(`[SEO Generate] Wrote llms.txt to ${publicDir}`);
 
 const staticPagesMeta = {
   '': {
-    title: 'ZYR0 — Structured Internship Platform for Students & Employers',
-    description: 'ZYR0 is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform.',
-    keywords: 'internship platform, internship management, student internships, internships in Pakistan, internship tracking, internship certificates, mentor feedback, internship workflow, companies hiring interns',
+    title: 'ZYR0 — Think. Build. Scale to ∞.',
+    description: 'From first prototype to school management, academic research, and workforce entry. An ecosystem of tools for those who build, learn, research, and work.',
     structuredData: (url) => [
       {
         '@context': 'https://schema.org',
@@ -241,7 +247,8 @@ const staticPagesMeta = {
         '@type': 'WebSite',
         'name': 'ZYR0',
         'url': `${url}/`,
-        'description': 'Structured internship platform for students, companies, and mentors.',
+        'description': 'An ecosystem of tools for those who build, learn, research, and work.',
+        'inLanguage': 'en',
         'potentialAction': {
           '@type': 'SearchAction',
           'target': {
@@ -256,11 +263,17 @@ const staticPagesMeta = {
         '@type': 'Organization',
         'name': 'ZYR0',
         'url': `${url}/`,
-        'logo': `${url}/zyro-logo.png`,
-        'description': 'ZYR0 is a professional internship platform connecting students, companies, and mentors for structured, verifiable internship experiences.',
+        'logo': {
+          '@type': 'ImageObject',
+          'url': `${url}/zyro-logo.png`,
+          'width': 512,
+          'height': 512
+        },
+        'description': 'ZYR0 is an ecosystem of tools for those who build, learn, research, and work — from idea to live app, from school to career.',
         'sameAs': [
           'https://github.com/ilyaskhan12Q/ZYR0',
-          'https://linkedin.com/company/zyr0-co'
+          'https://linkedin.com/company/zyr0-co',
+          'https://x.com/zyroplatform'
         ],
         'contactPoint': {
           '@type': 'ContactPoint',
@@ -268,6 +281,62 @@ const staticPagesMeta = {
           'contactType': 'customer support',
           'availableLanguage': 'English'
         }
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        'name': 'ZYR0',
+        'url': `${url}/`,
+        'applicationCategory': 'BusinessApplication',
+        'operatingSystem': 'Web',
+        'description': 'An ecosystem of tools for those who build, learn, research, and work — from idea to live app, from school to career.',
+        'offers': {
+          '@type': 'Offer',
+          'price': '0',
+          'priceCurrency': 'USD'
+        }
+      }
+    ]
+  },
+  'studio': {
+    title: 'ZYR0 Studio — From Idea to Live App in Minutes',
+    description: 'Turn natural language into production-ready React apps with zero boilerplate. Generate clean code, deploy with one click, and own everything you build.',
+    structuredData: (url) => [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${url}/` },
+          { '@type': 'ListItem', position: 2, name: 'Studio', item: `${url}/studio` }
+        ],
+      }
+    ]
+  },
+  'school': {
+    title: 'ZYR0 School OS — Intelligent School Management',
+    description: 'Transform school management with intelligent automation. Streamline attendance, fee collection, examinations, and communication with ZYR0 School OS.',
+    structuredData: (url) => [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${url}/` },
+          { '@type': 'ListItem', position: 2, name: 'School OS', item: `${url}/school` }
+        ],
+      }
+    ]
+  },
+  'research': {
+    title: 'ZYR0 Research — Autonomous Deep Intelligence',
+    description: 'Conduct deep literature reviews, market intelligence, and code audits in minutes with verifiable citations. Autonomous research at your fingertips.',
+    structuredData: (url) => [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: `${url}/` },
+          { '@type': 'ListItem', position: 2, name: 'Research', item: `${url}/research` }
+        ],
       }
     ]
   },
@@ -532,8 +601,139 @@ function generateBodyHtml(routePath, data = {}) {
   let contentHtml = '';
 
   if (routePath === '') {
-    // Homepage: React app takes over completely, return minimal placeholder
-    return '<div style="min-height:100vh;background:#000;"></div>';
+    // Homepage: pre-rendered SSR content for crawlers (React app takes over on client)
+    contentHtml = `
+      <section style="padding: 5rem 2rem 3rem; text-align: center; max-width: 1000px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="font-size: 3rem; font-weight: 800; color: #1e293b; margin-bottom: 1.5rem; line-height: 1.1;">
+          Think. Build. Scale to ∞.
+        </h1>
+        <p style="font-size: 1.25rem; color: #475569; line-height: 1.7; max-width: 700px; margin: 0 auto 2.5rem auto;">
+          An ecosystem of tools for those who build, learn, research, and work. From idea to live app, from school to career — ZYR0 covers the full lifecycle.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 4rem;">
+          <a href="/studio" style="background: #2563eb; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Try ZYR0 Studio</a>
+          <a href="/internships" style="background: #059669; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Browse Internships</a>
+          <a href="/research" style="background: #7c3aed; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600;">Try Research Agent</a>
+          <a href="/verify" style="background: #f1f5f9; color: #334155; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; border: 1px solid #e2e8f0;">Verify Certificate</a>
+        </div>
+      </section>
+
+      <section style="padding: 4rem 2rem; background-color: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;">
+        <div style="max-width: 1000px; margin: 0 auto; font-family: sans-serif;">
+          <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 0.5rem;">Four Products, One Ecosystem</h2>
+          <p style="text-align: center; color: #64748b; margin-bottom: 3rem; font-size: 1.05rem;">Each product works standalone. Together, they cover the full lifecycle.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Studio</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">From idea to live full-stack app in minutes. Generate clean, production-ready React apps with zero boilerplate.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 School OS</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Transform school management with intelligent automation. Attendance, fees, exams, and communication.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Research</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Autonomous deep intelligence. Literature reviews, market intelligence, and code audits in minutes.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+              <h3 style="font-weight: 700; color: #1e293b; margin-bottom: 0.5rem;">ZYR0 Work</h3>
+              <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5;">Bridge academic theory with real engineering. Verifiable proof-of-work credentials and evaluated interns.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 2.5rem;">Built for Every Stage</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #2563eb;">∞</div>
+            <div style="color: #64748b; font-size: 0.95rem;">From Prototype to Production</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #059669;">50+</div>
+            <div style="color: #64748b; font-size: 0.95rem;">University Partners</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #7c3aed;">100+</div>
+            <div style="color: #64748b; font-size: 0.95rem;">Verified Companies</div>
+          </div>
+          <div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #ea580c;">100%</div>
+            <div style="color: #64748b; font-size: 0.95rem;">Verified Credentials</div>
+          </div>
+        </div>
+      </section>
+    `;
+
+  } else if (routePath === 'studio') {
+    contentHtml = `
+      <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin-bottom: 1.5rem;">ZYR0 Studio — From Idea to Live App</h1>
+        <p style="font-size: 1.125rem; color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Turn natural language into production-ready React applications. No boilerplate, no configuration files, no setup friction. Describe what you want, and ZYR0 Studio generates clean, deployable code in seconds.</p>
+        
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 3rem; margin-bottom: 1rem;">How It Works</h2>
+        <p style="color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">ZYR0 Studio uses advanced AI to understand your requirements and generate full-stack React applications. Simply describe your app in plain English — whether it's a dashboard, landing page, or internal tool — and Studio delivers production-ready code with modern best practices baked in.</p>
+        
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem;">Key Features</h2>
+        <ul style="line-height: 1.8; color: #475569; padding-left: 1.5rem; margin-bottom: 1.5rem;">
+          <li><strong>Natural Language to Code:</strong> Describe your app in plain English and get production-ready React code.</li>
+          <li><strong>Modern Stack:</strong> React 19, Tailwind CSS, TypeScript — industry-standard technologies.</li>
+          <li><strong>One-Click Deploy:</strong> Deploy directly to Cloudflare or Vercel with a single click.</li>
+          <li><strong>Full Code Export:</strong> Download your code, connect to Git, and own everything you build.</li>
+          <li><strong>No Lock-In:</strong> Your code is yours. Export anytime, deploy anywhere.</li>
+        </ul>
+
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem;">Who It's For</h2>
+        <p style="color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Whether you're a founder validating an idea, a developer prototyping a side project, or a team building internal tools — ZYR0 Studio eliminates the setup overhead so you can focus on what matters: shipping products.</p>
+      </section>
+    `;
+
+  } else if (routePath === 'school') {
+    contentHtml = `
+      <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin-bottom: 1.5rem;">ZYR0 School OS — Intelligent School Management</h1>
+        <p style="font-size: 1.125rem; color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Transform how your school operates with a unified platform that handles admissions, attendance, fee collection, grading, and communication — all in one place. Built for modern educational institutions in Pakistan.</p>
+        
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 3rem; margin-bottom: 1rem;">Multi-Role Portals</h2>
+        <p style="color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Every stakeholder — administrators, teachers, parents, and students — gets a dedicated portal tailored to their needs. Real-time dashboards keep everyone informed and connected.</p>
+        
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem;">Core Features</h2>
+        <ul style="line-height: 1.8; color: #475569; padding-left: 1.5rem; margin-bottom: 1.5rem;">
+          <li><strong>Biometric Attendance:</strong> Automated tracking with real-time parent notifications.</li>
+          <li><strong>Fee Collection:</strong> Automated invoicing, receipt generation, and payment tracking.</li>
+          <li><strong>AI Timetable Scheduler:</strong> Intelligent scheduling with substitution management.</li>
+          <li><strong>Live Telemetry:</strong> Academic and attendance analytics in real time.</li>
+          <li><strong>Parent Communication:</strong> Direct messaging, progress reports, and event notifications.</li>
+        </ul>
+
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem;">Why Schools Choose ZYR0</h2>
+        <p style="color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Traditional school management systems are fragmented, outdated, and hard to use. ZYR0 School OS unifies everything into a single intelligent platform — reducing administrative overhead while improving communication between teachers, parents, and students.</p>
+      </section>
+    `;
+
+  } else if (routePath === 'research') {
+    contentHtml = `
+      <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #1e293b; margin-bottom: 1.5rem;">ZYR0 Research — Autonomous Deep Intelligence</h1>
+        <p style="font-size: 1.125rem; color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Conduct exhaustive literature reviews, market intelligence analysis, and code audits in minutes — not weeks. ZYR0 Research Agent plans, executes, cross-verifies, and synthesizes comprehensive reports with verifiable citations.</p>
+        
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 3rem; margin-bottom: 1rem;">How It Works</h2>
+        <p style="color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">The Research Agent uses multi-agent recursive search loops to gather information from across the web. Every claim is backed by a verifiable citation. The system cross-verifies findings across multiple sources to ensure accuracy and completeness.</p>
+        
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem;">Key Capabilities</h2>
+        <ul style="line-height: 1.8; color: #475569; padding-left: 1.5rem; margin-bottom: 1.5rem;">
+          <li><strong>Literature Reviews:</strong> Comprehensive academic and industry research in minutes.</li>
+          <li><strong>Market Intelligence:</strong> Competitive analysis, trend identification, and market sizing.</li>
+          <li><strong>Code Audits:</strong> Deep analysis of codebases for security, performance, and quality.</li>
+          <li><strong>Verifiable Citations:</strong> Every claim linked to its source for full transparency.</li>
+          <li><strong>Export Formats:</strong> Download reports as PDF or Markdown with LaTeX support.</li>
+        </ul>
+
+        <h2 style="font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem;">Who It's For</h2>
+        <p style="color: #475569; line-height: 1.7; margin-bottom: 1.5rem;">Researchers, analysts, consultants, and developers who need comprehensive intelligence without spending weeks manual searching. ZYR0 Research automates the heavy lifting while maintaining academic rigor.</p>
+      </section>
+    `;
 
   } else if (routePath === 'about') {
     contentHtml = `

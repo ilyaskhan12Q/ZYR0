@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Briefcase, Award, Code, Star, Share2, MapPin, GraduationCap, Calendar, Quote, CheckCircle2 } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { useAuth } from '@/contexts/AuthContext';
@@ -80,7 +80,7 @@ export default function StudentPortfolio() {
       </div>
 
       {/* Profile Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         <div className="h-32 bg-gradient-to-r from-primary to-accent" />
         <div className="px-6 pb-6">
@@ -97,22 +97,22 @@ export default function StudentPortfolio() {
             {profile.portfolio_url && <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {profile.portfolio_url}</span>}
           </div>
         </div>
-      </motion.div>
+      </m.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* About */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="bg-card rounded-xl border border-border shadow-sm p-6">
             <h3 className="font-semibold mb-3">About</h3>
             <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
               {profile.bio || 'No bio provided yet. Update your profile settings to add your professional description.'}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Experience */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="bg-card rounded-xl border border-border shadow-sm p-6">
             <h3 className="font-semibold mb-4">Experience</h3>
             {experiences.length === 0 ? (
@@ -136,10 +136,10 @@ export default function StudentPortfolio() {
                 })}
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Skills */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm p-6">
             <h3 className="font-semibold mb-4">Skills</h3>
             {(!profile.skills || profile.skills.length === 0) ? (
@@ -151,13 +151,13 @@ export default function StudentPortfolio() {
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
           {/* Certificates */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-3">Certificates</h3>
             {certificates.length === 0 ? (
@@ -178,10 +178,10 @@ export default function StudentPortfolio() {
                 })}
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Testimonials */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-3">Supervisor Testimonials</h3>
             {testimonials.length === 0 ? (
@@ -203,10 +203,10 @@ export default function StudentPortfolio() {
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Stats */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-3">Stats</h3>
             <div className="grid grid-cols-2 gap-3">
@@ -223,14 +223,14 @@ export default function StudentPortfolio() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
 
       {/* Share Portfolio Modal */}
       {shareModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-card border border-border w-full max-w-md rounded-xl p-6 shadow-xl">
+          <m.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-card border border-border w-full max-w-md rounded-xl p-6 shadow-xl">
             <h3 className="text-lg font-semibold mb-2">Share Portfolio</h3>
             <p className="text-sm text-muted-foreground mb-4">Copy the link below to share your verified student portfolio.</p>
             <input type="text" readOnly value={`${window.location.origin}/verify/portfolio/${profile.id}`} className="w-full p-2.5 bg-muted border border-border rounded-lg text-sm mb-4 focus:outline-none" />
@@ -241,7 +241,7 @@ export default function StudentPortfolio() {
                 alert('Copied to clipboard!');
               }} className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">Copy Link</button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       )}
     </div>

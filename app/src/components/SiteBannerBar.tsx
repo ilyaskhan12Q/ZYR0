@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { X, TriangleAlert } from 'lucide-react';
 import { getActiveSiteBanner } from '@/services/siteBanners';
 import { SITE_CONFIG } from '@/config/site';
@@ -57,7 +57,7 @@ export function SiteBannerBar({ onVisibilityChange }: SiteBannerBarProps) {
   return (
     <AnimatePresence>
       {banner && (
-        <motion.div
+        <m.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -98,7 +98,7 @@ export function SiteBannerBar({ onVisibilityChange }: SiteBannerBarProps) {
               </button>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

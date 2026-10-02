@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileCheck, Clock, CheckCircle2, XCircle, Star, AlertCircle, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
@@ -100,7 +100,7 @@ export default function StudentApplications() {
             const company = Array.isArray(app.internship?.company) ? app.internship.company[0] : app.internship?.company;
 
             return (
-              <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              <m.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                 className="bg-card rounded-xl border border-border p-5 shadow-sm hover:shadow-md transition-all">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
@@ -155,7 +155,7 @@ export default function StudentApplications() {
                     })}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })
         )}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import { resetPassword } from '@/lib/auth';
 import { SEO } from '@/components/SEO';
@@ -36,7 +36,7 @@ export default function ForgotPassword() {
         path="/forgot-password"
         noIndex={true}
       />
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
+      <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2">
             <div className="w-10 h-10 flex items-center justify-center">
@@ -83,9 +83,9 @@ export default function ForgotPassword() {
             </>
           ) : (
             <div className="text-center py-4">
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
+              <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
                 <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
-              </motion.div>
+              </m.div>
               <h3 className="mt-4 text-xl font-bold">Check Your Email</h3>
               <p className="mt-2 text-sm text-muted-foreground">We&apos;ve sent a password reset link to {email}</p>
             </div>
@@ -96,7 +96,7 @@ export default function ForgotPassword() {
             </Link>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 }

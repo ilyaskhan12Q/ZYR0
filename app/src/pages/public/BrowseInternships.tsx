@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import {
   Search, MapPin, Calendar, DollarSign, Filter,
   X, Clock, ArrowRight
@@ -77,13 +77,13 @@ export default function BrowseInternships() {
       />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold">Browse Internships</h1>
           <p className="mt-2 text-muted-foreground">Find the perfect opportunity to kickstart your career</p>
-        </motion.div>
+        </m.div>
 
         {/* Search & Filters */}
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
+        <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
@@ -121,7 +121,7 @@ export default function BrowseInternships() {
           </div>
 
           {showFilters && (
-            <motion.div
+            <m.div
               id="filter-panel"
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
@@ -160,7 +160,7 @@ export default function BrowseInternships() {
                   {types.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Active filters */}
@@ -186,7 +186,7 @@ export default function BrowseInternships() {
               </button>
             </div>
           )}
-        </motion.div>
+        </m.div>
 
         {loading ? (
           <Loader variant="page" label="Loading internships..." />
@@ -200,7 +200,7 @@ export default function BrowseInternships() {
               {filtered.map((internship, i) => {
                 const company = Array.isArray(internship.company) ? internship.company[0] : internship.company;
                 return (
-                  <motion.div
+                  <m.div
                     key={internship.id}
                     role="article"
                     initial={{ opacity: 0, y: 20 }}
@@ -272,7 +272,7 @@ export default function BrowseInternships() {
                         </Link>
                       </div>
                     </div>
-                  </motion.div>
+                  </m.div>
                 );
               })}
             </div>

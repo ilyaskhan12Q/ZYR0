@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Search, Eye, Download, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
@@ -121,7 +121,7 @@ export default function AdminCertificates() {
                   </tr>
                 ) : (
                   filtered.map((cert) => (
-                    <motion.tr key={cert.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
+                    <m.tr key={cert.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-muted/30 transition-colors">
                       <td className="px-4 py-3">
                         <p className="text-sm font-medium">{cert.title}</p>
                         <p className="text-xs text-muted-foreground font-mono">{cert.credential_id}</p>
@@ -160,7 +160,7 @@ export default function AdminCertificates() {
                           )}
                         </div>
                       </td>
-                    </motion.tr>
+                    </m.tr>
                   ))
                 )}
               </tbody>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Cookie, Settings, BarChart2, Shield, ToggleRight, Mail, FileText } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 
@@ -42,21 +42,21 @@ export default function CookiePolicy() {
       {/* Hero */}
       <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Cookie className="w-12 h-12 mx-auto mb-4 text-white/70" />
             <h1 className="text-4xl sm:text-5xl font-bold">Cookie Policy</h1>
             <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
               This policy explains how ZYR0 uses cookies and similar technologies to provide, improve, and protect our platform.
             </p>
             <p className="mt-3 text-sm text-white/50">Last updated: July 2025</p>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
       {/* What are cookies */}
       <section className="px-4 py-16">
         <div className="max-w-3xl mx-auto">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -71,12 +71,12 @@ export default function CookiePolicy() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, to remember your preferences, and to provide information to site operators. ZYR0 uses cookies to keep you logged in, remember your settings, and understand how the platform is used.
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Cookie Types */}
           <div className="space-y-6">
             {cookieTypes.map((type, i) => (
-              <motion.div
+              <m.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -107,12 +107,12 @@ export default function CookiePolicy() {
                     ))}
                   </ul>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
 
           {/* Controls */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -136,7 +136,7 @@ export default function CookiePolicy() {
                 For questions about our cookie usage, contact us at <span className="text-accent">privacy@zyroo.org</span>.
               </p>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
 

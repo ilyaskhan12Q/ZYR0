@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Users, FolderOpen, FileCheck, Award, Shield, Zap, TrendingUp, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -243,18 +243,18 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {stats.map((stat, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="stat-card border border-border">
+          <m.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="stat-card border border-border">
             <stat.icon className="w-5 h-5 text-accent mb-2" />
             <p className="text-xl font-bold">{stat.value}</p>
             <p className="text-xs text-muted-foreground">{stat.label}</p>
-          </motion.div>
+          </m.div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           {/* User Growth Chart */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="bg-card rounded-xl border border-border shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">User Registration Trends</h3>
@@ -271,10 +271,10 @@ export default function AdminDashboard() {
                 <Area type="monotone" dataKey="mentors" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.1} strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
-          </motion.div>
+          </m.div>
 
           {/* Recent Activity */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm">
             <div className="p-5 border-b border-border flex items-center justify-between">
               <h3 className="font-semibold">Recent Activity</h3>
@@ -297,12 +297,12 @@ export default function AdminDashboard() {
                 <div className="p-8 text-center text-muted-foreground">No recent system activities logged</div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         </div>
 
         <div className="space-y-6">
           {/* System Health */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">System Health</h3>
             <div className="space-y-3">
@@ -316,10 +316,10 @@ export default function AdminDashboard() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Quick Actions */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
             className="bg-card rounded-xl border border-border shadow-sm p-5">
             <h3 className="font-semibold mb-4">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
@@ -335,7 +335,7 @@ export default function AdminDashboard() {
                 </Link>
               ))}
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>

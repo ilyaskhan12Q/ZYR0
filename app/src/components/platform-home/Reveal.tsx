@@ -1,5 +1,5 @@
 import { useRef, type ReactNode } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { m, useInView } from 'framer-motion';
 
 interface RevealProps {
   children: ReactNode;
@@ -50,7 +50,7 @@ export default function Reveal({
     : initial;
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={initial}
       animate={animate}
@@ -59,6 +59,6 @@ export default function Reveal({
       style={style}
     >
       {children}
-    </motion.div>
+    </m.div>
   );
 }
