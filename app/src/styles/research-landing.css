@@ -1,36 +1,45 @@
 /* ============================================================
-   Research Landing Page — Dayos-inspired editorial design system
-   Palette: #F5F5F2 bg, #FFF surface, #111 ink, #6F6F69 secondary,
-   #DCDCD5 border, #657C68 accent, #455A49 dark accent.
-   Instrument Serif (display) + Inter (UI).
-   Dark sections: #111111 bg, white text.
+   Research Landing Page — ZYR0 Editorial Tech Design System
+   Harmonized with ZYR0 brand tokens (--zyro-*)
+   Typography: DM Serif Text (display) + Inter (UI)
+   Signatures: Canonical Sapphire Blue (#0051C3) & Hyacinth Blue (#7B7BDC)
+   Full Light & Dark Mode Support
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
-
 .rl-root {
-  --rl-bg: #F5F5F2;
-  --rl-surface: #FFFFFF;
-  --rl-ink: #111111;
-  --rl-muted: #6F6F69;
-  --rl-border: #DCDCD5;
-  --rl-accent: #657C68;
-  --rl-accent-dark: #455A49;
-  --rl-dark: #111111;
-  --rl-dark-muted: #999999;
+  --rl-bg: var(--zyro-bg, #FFFFFF);
+  --rl-surface: var(--zyro-surface, #F8F9FA);
+  --rl-ink: var(--zyro-text, #111111);
+  --rl-muted: var(--zyro-text-secondary, #6F6F69);
+  --rl-border: var(--zyro-border, rgba(0, 0, 0, 0.08));
+  --rl-accent: var(--zyro-accent, #7B7BDC);
+  --rl-accent-dark: #0051C3;
+  --rl-dark: #0B0F17;
+  --rl-dark-muted: #94A3B8;
 
   background-color: var(--rl-bg);
   color: var(--rl-ink);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
   -webkit-font-smoothing: antialiased;
+}
+
+.dark .rl-root,
+[data-theme="dark"] .rl-root {
+  --rl-bg: var(--zyro-bg, #0B0F17);
+  --rl-surface: var(--zyro-surface, #121824);
+  --rl-ink: var(--zyro-text, #F8FAFC);
+  --rl-muted: var(--zyro-text-secondary, #94A3B8);
+  --rl-border: var(--zyro-border, rgba(255, 255, 255, 0.08));
+  --rl-accent: var(--zyro-accent, #7B7BDC);
+  --rl-accent-dark: #38BDF8;
 }
 
 /* ── Typography scale ───────────────────────────────────────── */
 
 .rl-display {
-  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif, 'DM Serif Text', Georgia, 'Times New Roman', serif);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
   font-weight: 400;
 }
 
@@ -183,8 +192,9 @@
   font-size: 0.6875rem;
   font-weight: 600;
   border-radius: 9999px;
-  background-color: #e8f0e9;
-  color: var(--rl-accent-dark);
+  background-color: var(--zyro-accent-muted, rgba(123, 123, 220, 0.12));
+  color: var(--zyro-accent, #7B7BDC);
+  border: 1px solid var(--zyro-border, transparent);
 }
 
 .rl-chip::before {
@@ -200,8 +210,9 @@
   font-size: 0.6875rem;
   font-weight: 600;
   border-radius: 9999px;
-  background-color: rgba(101, 124, 104, 0.2);
-  color: #8fa692;
+  background-color: var(--zyro-accent-muted, rgba(123, 123, 220, 0.15));
+  color: var(--zyro-accent, #7B7BDC);
+  border: 1px solid var(--zyro-border, rgba(255, 255, 255, 0.08));
 }
 
 .rl-chip-dark::before {
