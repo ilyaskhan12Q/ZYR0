@@ -91,7 +91,13 @@ export default function SchoolOSLanding() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-indigo-500 selection:text-white font-sans antialiased overflow-x-hidden">
+    <div
+      className="min-h-screen transition-colors duration-200 overflow-x-hidden"
+      style={{
+        background: 'var(--zyro-bg)',
+        color: 'var(--zyro-text)',
+      }}
+    >
       <SEO
         title="ZYR0 Edu (School OS) — Enterprise School Management System"
         description="The modern, all-in-one operating system for K-12 schools, colleges, and educational institutions. Attendance, fee invoicing, exams, and timetables."
@@ -102,33 +108,54 @@ export default function SchoolOSLanding() {
       <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero */}
         <div className="text-center max-w-4xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-6 font-mono">
+          <div
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-[11px] tracking-[0.2em] uppercase border mb-6"
+            style={{
+              background: 'var(--zyro-surface)',
+              borderColor: 'var(--zyro-border)',
+              color: '#6366F1',
+            }}
+          >
             <School className="w-3.5 h-3.5" />
             ZYR0 Edu • Institutional SaaS
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight font-mono mb-6 leading-tight">
+          <h1
+            className="text-4xl sm:text-6xl lg:text-7xl font-serif font-normal tracking-tight mb-6 leading-[1.08] text-balance"
+            style={{ color: 'var(--zyro-text)' }}
+          >
             The Modern Operating System for <br />
-            <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-              Schools, Colleges & Academies.
+            <span className="italic" style={{ color: '#6366F1' }}>
+              schools, colleges & academies.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p
+            className="text-base sm:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
+            style={{ color: 'var(--zyro-text-secondary)' }}
+          >
             Eliminate administrative paperwork. Unify admissions, biometric attendance, automated fee recovery, examination grading, and parent communications under one intelligent platform.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="#book-demo"
-              className="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl transition-all shadow-xl shadow-indigo-600/30 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full font-medium text-sm transition-all shadow-sm hover:opacity-90 flex items-center justify-center gap-2"
+              style={{
+                background: 'var(--zyro-text)',
+                color: 'var(--zyro-bg)',
+              }}
             >
               <span>Book Institutional Walkthrough</span>
               <ArrowRight className="w-4 h-4" />
             </a>
             <a
               href="#perspective-tour"
-              className="w-full sm:w-auto px-8 py-3.5 bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-sm rounded-xl border border-white/15 transition-all"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full font-medium text-sm border transition-all hover:bg-black/5 dark:hover:bg-white/5"
+              style={{
+                borderColor: 'var(--zyro-border)',
+                color: 'var(--zyro-text)',
+              }}
             >
               Take Interactive Tour
             </a>
@@ -143,10 +170,22 @@ export default function SchoolOSLanding() {
         {/* Modules Grid */}
         <div className="mb-24">
           <div className="text-center max-w-2xl mx-auto mb-14">
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-mono mb-3">
-              Comprehensive Institutional Modules
+            <span
+              className="font-mono text-[11px] tracking-[0.25em] uppercase"
+              style={{ color: '#6366F1' }}
+            >
+              Integrated Modules
+            </span>
+            <h2
+              className="mt-3 text-3xl sm:text-5xl font-serif font-normal tracking-tight mb-3"
+              style={{ color: 'var(--zyro-text)' }}
+            >
+              Comprehensive <span className="italic" style={{ color: '#6366F1' }}>institutional modules</span>
             </h2>
-            <p className="text-sm text-neutral-400">
+            <p
+              className="text-sm sm:text-base max-w-xl mx-auto"
+              style={{ color: 'var(--zyro-text-secondary)' }}
+            >
               Engineered to replace 5+ disparate software tools with a single unified platform.
             </p>
           </div>
@@ -157,13 +196,34 @@ export default function SchoolOSLanding() {
               return (
                 <div
                   key={mod.title}
-                  className="p-6 rounded-3xl bg-neutral-900/60 border border-white/10 hover:border-indigo-500/30 transition-all group"
+                  className="p-6 rounded-3xl border transition-all duration-300 hover:shadow-md hover:-translate-y-1 group"
+                  style={{
+                    background: 'var(--zyro-surface)',
+                    borderColor: 'var(--zyro-border)',
+                  }}
                 >
-                  <div className={`w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-4 ${mod.color} group-hover:scale-105 transition-transform`}>
+                  <div
+                    className="w-10 h-10 rounded-2xl border flex items-center justify-center mb-4 transition-transform group-hover:scale-105"
+                    style={{
+                      background: 'var(--zyro-bg)',
+                      borderColor: 'var(--zyro-border)',
+                      color: '#6366F1',
+                    }}
+                  >
                     <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="text-lg font-bold text-white font-mono mb-2">{mod.title}</h3>
-                  <p className="text-xs text-neutral-400 leading-relaxed">{mod.description}</p>
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
+                    {mod.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    {mod.description}
+                  </p>
                 </div>
               );
             })}
@@ -171,23 +231,38 @@ export default function SchoolOSLanding() {
         </div>
 
         {/* Interactive ROI Calculator */}
-        <div className="mb-24 rounded-3xl bg-neutral-900/70 border border-white/15 p-6 sm:p-10 backdrop-blur-xl">
+        <div
+          className="mb-24 rounded-3xl border p-6 sm:p-10 backdrop-blur-xl shadow-lg"
+          style={{
+            background: 'var(--zyro-surface)',
+            borderColor: 'var(--zyro-border)',
+          }}
+        >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-6 space-y-4">
-              <div className="text-xs font-mono text-indigo-400 uppercase tracking-wider font-semibold">
+              <div
+                className="text-xs font-mono uppercase tracking-wider font-semibold"
+                style={{ color: '#6366F1' }}
+              >
                 Institutional Efficiency Estimator
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white font-mono">
+              <h3
+                className="text-2xl sm:text-3xl font-serif font-normal"
+                style={{ color: 'var(--zyro-text)' }}
+              >
                 Calculate Time & Revenue Saved
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+              <p
+                className="text-xs sm:text-sm leading-relaxed"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
                 See how much admin overhead your school eliminates by switching to ZYR0 School OS.
               </p>
 
               <div className="pt-4">
                 <div className="flex justify-between text-xs font-mono mb-2">
-                  <span className="text-neutral-400">Total Student Body:</span>
-                  <span className="text-white font-bold">{studentCount} Students</span>
+                  <span style={{ color: 'var(--zyro-text-secondary)' }}>Total Student Body:</span>
+                  <span className="font-bold" style={{ color: 'var(--zyro-text)' }}>{studentCount} Students</span>
                 </div>
                 <input
                   type="range"
@@ -196,47 +271,84 @@ export default function SchoolOSLanding() {
                   step="50"
                   value={studentCount}
                   onChange={(e) => setStudentCount(Number(e.target.value))}
-                  className="w-full h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                  className="w-full h-2 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                 />
               </div>
             </div>
 
             <div className="lg:col-span-6 grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-center">
+              <div
+                className="p-4 rounded-2xl border text-center"
+                style={{
+                  background: 'var(--zyro-bg)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
                 <div className="text-2xl sm:text-3xl font-black text-indigo-400 font-mono">
                   {Math.round(studentCount * 0.45)} hrs
                 </div>
-                <div className="text-xs text-neutral-400 mt-1">Admin hours saved / month</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--zyro-text-secondary)' }}>Admin hours saved / month</div>
               </div>
-              <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-center">
+              <div
+                className="p-4 rounded-2xl border text-center"
+                style={{
+                  background: 'var(--zyro-bg)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
                 <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
                   +18.5%
                 </div>
-                <div className="text-xs text-neutral-400 mt-1">Fee collection speedup</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--zyro-text-secondary)' }}>Fee collection speedup</div>
               </div>
-              <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-center">
+              <div
+                className="p-4 rounded-2xl border text-center"
+                style={{
+                  background: 'var(--zyro-bg)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
                 <div className="text-2xl sm:text-3xl font-black text-sky-400 font-mono">
                   100%
                 </div>
-                <div className="text-xs text-neutral-400 mt-1">Paperless report cards</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--zyro-text-secondary)' }}>Paperless report cards</div>
               </div>
-              <div className="p-4 rounded-2xl bg-black/60 border border-white/10 text-center">
+              <div
+                className="p-4 rounded-2xl border text-center"
+                style={{
+                  background: 'var(--zyro-bg)',
+                  borderColor: 'var(--zyro-border)',
+                }}
+              >
                 <div className="text-2xl sm:text-3xl font-black text-purple-400 font-mono">
                   0 hrs
                 </div>
-                <div className="text-xs text-neutral-400 mt-1">Manual attendance logging</div>
+                <div className="text-xs mt-1" style={{ color: 'var(--zyro-text-secondary)' }}>Manual attendance logging</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Book a Demo Form Section */}
-        <div id="book-demo" className="rounded-3xl bg-neutral-900/90 border border-indigo-500/30 p-6 sm:p-12 scroll-mt-28">
+        <div
+          id="book-demo"
+          className="rounded-3xl border p-6 sm:p-12 scroll-mt-28 shadow-xl"
+          style={{
+            background: 'var(--zyro-surface)',
+            borderColor: 'var(--zyro-border)',
+          }}
+        >
           <div className="max-w-2xl mx-auto text-center mb-8">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-mono mb-2">
+            <h3
+              className="text-2xl sm:text-4xl font-serif font-normal mb-2"
+              style={{ color: 'var(--zyro-text)' }}
+            >
               Book an Institutional Walkthrough
             </h3>
-            <p className="text-xs sm:text-sm text-neutral-400">
+            <p
+              className="text-xs sm:text-sm"
+              style={{ color: 'var(--zyro-text-secondary)' }}
+            >
               Schedule a personalized 30-minute demonstration tailored to your school or university requirements.
             </p>
           </div>
@@ -245,47 +357,67 @@ export default function SchoolOSLanding() {
             <form onSubmit={handleFormSubmit} className="max-w-xl mx-auto space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono text-neutral-400 mb-1">Your Full Name</label>
+                  <label className="block text-xs font-mono mb-1" style={{ color: 'var(--zyro-text-secondary)' }}>Your Full Name</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Prof. Muhammad Ahmed"
-                    className="w-full bg-neutral-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-400 font-mono"
+                    className="w-full border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400/40 transition-all font-mono"
+                    style={{
+                      background: 'var(--zyro-bg)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text)',
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono text-neutral-400 mb-1">Official Email</label>
+                  <label className="block text-xs font-mono mb-1" style={{ color: 'var(--zyro-text-secondary)' }}>Official Email</label>
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="principal@academy.edu"
-                    className="w-full bg-neutral-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-400 font-mono"
+                    className="w-full border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400/40 transition-all font-mono"
+                    style={{
+                      background: 'var(--zyro-bg)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text)',
+                    }}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-mono text-neutral-400 mb-1">Institution Name</label>
+                  <label className="block text-xs font-mono mb-1" style={{ color: 'var(--zyro-text-secondary)' }}>Institution Name</label>
                   <input
                     type="text"
                     required
                     value={formData.institutionName}
                     onChange={(e) => setFormData({ ...formData, institutionName: e.target.value })}
                     placeholder="Beaconhouse / LGS / NUST"
-                    className="w-full bg-neutral-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-400 font-mono"
+                    className="w-full border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400/40 transition-all font-mono"
+                    style={{
+                      background: 'var(--zyro-bg)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text)',
+                    }}
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-mono text-neutral-400 mb-1">Approx. Student Body</label>
+                  <label className="block text-xs font-mono mb-1" style={{ color: 'var(--zyro-text-secondary)' }}>Approx. Student Body</label>
                   <select
                     value={formData.estimatedUsers}
                     onChange={(e) => setFormData({ ...formData, estimatedUsers: e.target.value })}
-                    className="w-full bg-neutral-950 border border-white/15 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-400 font-mono"
+                    className="w-full border rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400/40 transition-all font-mono"
+                    style={{
+                      background: 'var(--zyro-bg)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text)',
+                    }}
                   >
                     <option value="100-500 students">100 - 500 students</option>
                     <option value="500-1500 students">500 - 1,500 students</option>
@@ -296,20 +428,29 @@ export default function SchoolOSLanding() {
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-neutral-400 mb-1">Specific Requirements / Notes (Optional)</label>
+                <label className="block text-xs font-mono mb-1" style={{ color: 'var(--zyro-text-secondary)' }}>Specific Requirements / Notes (Optional)</label>
                 <textarea
                   rows={3}
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="e.g. Currently using manual registers and seeking biometric integration..."
-                  className="w-full bg-neutral-950 border border-white/15 rounded-xl p-3 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-indigo-400 font-mono"
+                  className="w-full border rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400/40 transition-all font-mono"
+                  style={{
+                    background: 'var(--zyro-bg)',
+                    borderColor: 'var(--zyro-border)',
+                    color: 'var(--zyro-text)',
+                  }}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs font-mono tracking-wider uppercase transition-all shadow-lg shadow-indigo-600/30 active:scale-98 flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-full font-medium text-sm transition-all shadow-sm hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{
+                  background: 'var(--zyro-text)',
+                  color: 'var(--zyro-bg)',
+                }}
               >
                 <span>{isSubmitting ? 'Submitting...' : 'Request Walkthrough & Quote'}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -318,8 +459,8 @@ export default function SchoolOSLanding() {
           ) : (
             <div className="max-w-md mx-auto p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
               <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-              <h4 className="text-lg font-bold text-white font-mono">Walkthrough Request Confirmed</h4>
-              <p className="text-xs text-neutral-300">
+              <h4 className="text-lg font-serif font-normal" style={{ color: 'var(--zyro-text)' }}>Walkthrough Request Confirmed</h4>
+              <p className="text-xs" style={{ color: 'var(--zyro-text-secondary)' }}>
                 Thank you! Our institutional specialist will contact you at <span className="text-emerald-400">{formData.email}</span> within 24 hours.
               </p>
             </div>

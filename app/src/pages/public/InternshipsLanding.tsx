@@ -8,12 +8,10 @@ import {
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
-import { CanvasParticles } from '@/components/CanvasParticles';
 import { toast } from 'sonner';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon, LinkedInIcon } from '@/components/icons/BrandIcons';
 import { TextRotate } from '@/components/fancy/text/TextRotate';
-import { BackgroundLayer } from '@/components/landing/BackgroundLayer';
 import { JourneySection } from '@/components/landing/JourneySection/JourneySection';
 import AnimatedSearchMockup from '@/components/landing/AnimatedSearchMockup';
 import StatsBand from '@/components/landing/StatsBand';
@@ -67,12 +65,12 @@ const homepageStructuredData = [
 ];
 
 const features = [
-  { icon: Search, title: 'Curated Sourcing', desc: 'Find internships in Pakistan matching your background and career goals. Filter by domain, duration, location type, and stipend to discover opportunities that fit your needs.', color: 'bg-blue-100 text-blue-600' },
-  { icon: FileCheck, title: 'Application Transparency', desc: 'Track your applications from submission through review to final acceptance in real time. Know exactly where you stand with every opportunity.', color: 'bg-emerald-100 text-emerald-600' },
-  { icon: ClipboardList, title: 'Milestone Coordination', desc: 'Manage internship tasks with clear deliverables, timeline tracking, and milestone reviews. Every task has defined acceptance criteria and feedback loops.', color: 'bg-purple-100 text-purple-600' },
-  { icon: Users, title: 'Professional Mentorship', desc: 'Get matched with industry mentors who review your work, provide structured guidance, and help you grow through actionable feedback on each submission.', color: 'bg-orange-100 text-orange-600' },
-  { icon: Award, title: 'Verified Achievements', desc: 'Earn secure completion certificates with unique credential IDs that employers can instantly authenticate through the public verification portal.', color: 'bg-yellow-100 text-yellow-600' },
-  { icon: Briefcase, title: 'Professional Portfolios', desc: 'Accumulate a permanent, structured history of completed milestones, mentor feedback, and demonstrated skills that you can share with future employers.', color: 'bg-teal-100 text-teal-600' },
+  { icon: Search, title: 'Curated Sourcing', desc: 'Find internships in Pakistan matching your background and career goals. Filter by domain, duration, location type, and stipend to discover opportunities that fit your needs.' },
+  { icon: FileCheck, title: 'Application Transparency', desc: 'Track your applications from submission through review to final acceptance in real time. Know exactly where you stand with every opportunity.' },
+  { icon: ClipboardList, title: 'Milestone Coordination', desc: 'Manage internship tasks with clear deliverables, timeline tracking, and milestone reviews. Every task has defined acceptance criteria and feedback loops.' },
+  { icon: Users, title: 'Professional Mentorship', desc: 'Get matched with industry mentors who review your work, provide structured guidance, and help you grow through actionable feedback on each submission.' },
+  { icon: Award, title: 'Verified Achievements', desc: 'Earn secure completion certificates with unique credential IDs that employers can instantly authenticate through the public verification portal.' },
+  { icon: Briefcase, title: 'Professional Portfolios', desc: 'Accumulate a permanent, structured history of completed milestones, mentor feedback, and demonstrated skills that you can share with future employers.' },
 ];
 
 const steps = [
@@ -125,17 +123,17 @@ function testimonialInitials(name: string) {
 }
 
 const testimonialKindLabel: Record<string, { label: string; className: string }> = {
-  featured: { label: 'Company Official', className: 'bg-blue-600/10 text-blue-600 dark:text-sky-400 border-blue-600/20' },
-  student: { label: 'Student', className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
-  intern: { label: 'Intern', className: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/20' },
-  mentor: { label: 'Mentor', className: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+  featured: { label: 'Company Official', className: 'bg-[var(--zyro-accent-muted)] text-[var(--zyro-accent)] border-[var(--zyro-border)]' },
+  student: { label: 'Student', className: 'bg-[var(--zyro-surface)] text-[var(--zyro-text)] border-[var(--zyro-border)]' },
+  intern: { label: 'Intern', className: 'bg-[var(--zyro-surface)] text-[var(--zyro-text)] border-[var(--zyro-border)]' },
+  mentor: { label: 'Mentor', className: 'bg-[var(--zyro-surface)] text-[var(--zyro-text)] border-[var(--zyro-border)]' },
 };
 
 const testimonialKindAccent: Record<string, string> = {
-  featured: '#3b82f6',
-  student: '#10b981',
-  intern: '#8b5cf6',
-  mentor: '#f59e0b',
+  featured: 'var(--zyro-accent)',
+  student: 'var(--zyro-accent)',
+  intern: 'var(--zyro-accent)',
+  mentor: 'var(--zyro-accent)',
 };
 
 const roles = [
@@ -143,25 +141,21 @@ const roles = [
     icon: GraduationCap,
     title: 'Students',
     desc: 'Build experience that employers recognize.',
-    color: 'text-blue-500 bg-blue-500/10'
   },
   {
     icon: Building2,
     title: 'Companies',
     desc: 'Develop future professionals through structured internships.',
-    color: 'text-emerald-500 bg-emerald-500/10'
   },
   {
     icon: Users,
     title: 'Mentors',
     desc: 'Guide the next generation with measurable impact.',
-    color: 'text-orange-500 bg-orange-500/10'
   },
   {
     icon: Globe,
     title: 'Universities',
     desc: 'Bridge education with industry experience.',
-    color: 'text-purple-500 bg-purple-500/10'
   }
 ];
 
@@ -170,61 +164,32 @@ const confidenceCards = [
     icon: Award,
     title: 'Verified Certificates',
     desc: 'Every certificate issued is tamper-proof and linked to a unique credential ID that any prospective employer can instantly verify through the public verification portal.',
-    color: 'text-yellow-500 bg-yellow-500/10'
   },
   {
     icon: ClipboardList,
     title: 'Structured Internship Lifecycle',
     desc: 'From initial application through task management, mentor feedback, and final certification — every stage follows a consistent, documented process that both interns and companies can rely on.',
-    color: 'text-blue-500 bg-blue-500/10'
   },
   {
     icon: Users,
     title: 'Role-Based Access',
     desc: 'Granular access controls ensure students, mentors, employers, and administrators only interact with the data and features relevant to their role on the platform.',
-    color: 'text-emerald-500 bg-emerald-500/10'
   },
   {
     icon: FileCheck,
     title: 'Privacy First',
     desc: 'Personal profiles, evaluations, feedback logs, and workspace documents remain secure behind authentication and Row Level Security policies tailored to each user role.',
-    color: 'text-purple-500 bg-purple-500/10'
   },
   {
     icon: TrendingUp,
     title: 'Transparent Progress',
     desc: 'Every assigned task, supervisor review, and milestone update is documented in a single timeline visible to all stakeholders — no more lost emails or status confusion.',
-    color: 'text-orange-500 bg-orange-500/10'
   },
   {
     icon: Globe,
     title: 'Built to Grow',
     desc: 'Architected to serve single student placements as efficiently as university-wide internship cohorts, with flexible configuration that adapts to programs of any size.',
-    color: 'text-teal-500 bg-teal-500/10'
   }
-];
-
-const PARTICLE_PRESETS = [
-  { left: '12%', top: '45%', duration: 4.2, delay: 0.5 },
-  { left: '25%', top: '15%', duration: 3.8, delay: 1.2 },
-  { left: '38%', top: '78%', duration: 4.9, delay: 0.1 },
-  { left: '50%', top: '30%', duration: 3.5, delay: 1.8 },
-  { left: '62%', top: '85%', duration: 4.7, delay: 0.8 },
-  { left: '78%', top: '22%', duration: 3.9, delay: 1.4 },
-  { left: '88%', top: '65%', duration: 4.4, delay: 0.3 },
-  { left: '5%', top: '88%', duration: 4.1, delay: 1.6 },
-  { left: '92%', top: '12%', duration: 3.6, delay: 0.9 },
-  { left: '45%', top: '60%', duration: 4.8, delay: 0.4 },
-  { left: '18%', top: '72%', duration: 3.7, delay: 1.1 },
-  { left: '30%', top: '50%', duration: 4.5, delay: 0.7 },
-  { left: '55%', top: '10%', duration: 3.4, delay: 1.5 },
-  { left: '70%', top: '75%', duration: 4.6, delay: 0.2 },
-  { left: '82%', top: '55%', duration: 4.0, delay: 1.3 },
-  { left: '15%', top: '28%', duration: 3.3, delay: 1.7 },
-  { left: '28%', top: '90%', duration: 4.3, delay: 0.6 },
-  { left: '60%', top: '40%', duration: 4.1, delay: 1.0 },
-  { left: '75%', top: '95%', duration: 4.9, delay: 0.3 },
-  { left: '85%', top: '35%', duration: 3.5, delay: 1.9 },
 ];
 
 const MotionDiv = ({ isMobile, children, initial, animate, transition, whileInView, viewport, ...props }: any) => {
@@ -284,7 +249,7 @@ const MotionP = ({ isMobile, children, initial, animate, transition, whileInView
   );
 };
 
-export default function Landing() {
+export default function InternshipsLanding() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -353,60 +318,38 @@ export default function Landing() {
   };
 
   return (
-    <div className="relative min-h-screen text-slate-100 overflow-x-clip bg-slate-950">
-      {/* Background Layer (Fixed z-0 Canvas) */}
-      <BackgroundLayer />
-
+    <div
+      className="relative min-h-screen overflow-x-clip transition-colors duration-200"
+      style={{
+        background: 'var(--zyro-bg)',
+        color: 'var(--zyro-text)',
+      }}
+    >
       <SEO
-        title="ZYR0 — Structured Internship Platform for Students & Employers"
-        description="ZYR0 is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform."
+        title="ZYR0 Work — Structured Internship Platform for Students & Employers"
+        description="ZYR0 Work is a professional internship platform connecting students, companies, and mentors. Track student internships, verify completion certificates, and coordinate mentor feedback on a structured platform."
         path="/internships"
         keywords="internship platform, internship management, student internships, internships in Pakistan, internship tracking, internship certificates, mentor feedback, internship workflow, companies hiring interns"
         structuredData={homepageStructuredData}
       />
 
-      {/* Floating Content Layer (z-10) */}
+      {/* Floating Content Layer */}
       <div className="relative z-10">
 
-        {/* Hero Section — redesigned with Sora font pairing, SaaS color system, layered radial glows, and floating workspace preview */}
+        {/* Hero Section — aligned to ZYR0 luxury-tech minimalism */}
         <section
           aria-label="Platform introduction"
-          onPointerMove={handlePointerMove}
-          className="relative flex items-center justify-center overflow-hidden hero-gradient hero-full-height py-14 lg:py-20"
-          style={{
-            '--mouse-x': '50%',
-            '--mouse-y': '50%'
-          } as React.CSSProperties}
+          className="relative flex items-center justify-center overflow-hidden py-16 lg:py-24"
         >
-          {/* Animated Particles - high performance Canvas based rendering */}
-          <CanvasParticles />
+          {/* Subtle Sapphire Ambient Glow */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-30"
+            style={{
+              background: 'radial-gradient(circle at 60% 25%, var(--zyro-sapphire-muted) 0%, transparent 70%)',
+            }}
+          />
 
-          {/* Layered Radial Glows & SaaS Ambient Background */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(16,185,129,0.14),rgba(79,70,229,0.16),transparent_80%)] pointer-events-none" />
-          <div className="hidden lg:block absolute top-1/4 left-1/6 w-[45vw] max-w-[500px] h-[45vw] max-h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
-          <div className="hidden lg:block absolute bottom-1/4 right-1/6 w-[45vw] max-w-[550px] h-[45vw] max-h-[550px] bg-indigo-500/12 rounded-full blur-[160px] pointer-events-none" />
-          <div className="hidden lg:block absolute top-1/3 right-1/4 w-[30vw] max-w-[350px] h-[30vw] max-h-[350px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-
-          {/* Mouse-reactive lighting effect - Only rendered/active on desktop */}
-          {!isMobile && (
-            <div
-              className="absolute inset-0 pointer-events-none opacity-50 mix-blend-screen transition-all duration-300"
-              style={{
-                background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(16,185,129,0.12), transparent 80%)`,
-              }}
-            />
-          )}
-
-
-          {/* Subtle Masked Grid Overlay */}
-          <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{
-            backgroundImage: 'linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '48px 48px',
-            maskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-            WebkitMaskImage: 'radial-gradient(ellipse at center, black 40%, transparent 80%)',
-          }} />
-
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full mt-6 lg:mt-0">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
               {/* Left Column: Typography, Actions, Trust */}
               <div className="lg:col-span-7 flex flex-col justify-center space-y-6 lg:space-y-8 text-left">
@@ -419,13 +362,18 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.4, delay: 0.1 }
                   )}
-                  className="inline-flex items-center gap-2.5 self-start bg-white/70 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 backdrop-blur-xl rounded-full px-4 py-1.5 text-xs text-slate-900 dark:text-white/90 shadow-sm hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200"
+                  className="inline-flex items-center gap-2.5 self-start px-4 py-1.5 rounded-full text-xs font-medium border shadow-xs backdrop-blur-md transition-colors"
+                  style={{
+                    background: 'var(--zyro-surface)',
+                    borderColor: 'var(--zyro-border)',
+                    color: 'var(--zyro-text-secondary)',
+                  }}
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                  <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Pakistan's Premier Internship Engine</span>
+                  <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
+                  <span className="font-mono text-[11px] tracking-[0.2em] uppercase">ZYR0 Work • Verified Internship Engine</span>
                 </MotionDiv>
 
-                {/* Title Section with Oversized Sora Typography & TextRotate */}
+                {/* Title Section with DM Serif Text */}
                 <div className="space-y-2 sm:space-y-3">
                   <MotionDiv
                     isMobile={isMobile}
@@ -434,24 +382,25 @@ export default function Landing() {
                       { opacity: 1, y: 0 },
                       { duration: 0.5, delay: 0.2 }
                     )}
-                    className="font-display font-[800] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] text-slate-900 dark:text-white leading-[1.06] drop-shadow-sm"
+                    className="font-serif font-normal text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.75rem] tracking-tight leading-[1.05]"
+                    style={{ color: 'var(--zyro-text)' }}
                   >
                     Launch Your Career With{' '}
-                    <span className="font-accent text-gradient-v3">Internships</span>{' '}
+                    <span className="italic" style={{ color: 'var(--zyro-accent)' }}>Internships</span>{' '}
                     that Matter
                   </MotionDiv>
 
-                  <div className="font-display font-[900] text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[4.85rem] tracking-[-0.035em] leading-[1.06] min-h-[1.3em] flex items-center">
+                  <div className="font-serif font-normal text-3xl xs:text-4xl sm:text-5xl md:text-6xl tracking-tight leading-tight min-h-[1.3em] flex items-center">
                     <TextRotate
                       texts={[
                         'Paid Roles.',
                         'Real Experience.',
-                        'Verified Certificates.',
+                        'Verified Credentials.',
                         'Industry Projects.',
-                        'Dream Companies.',
-                        'Career Growth.',
+                        'Engineering Mentorship.',
+                        'Verifiable Career Growth.',
                       ]}
-                      mainClassName="text-rotate-v3 font-display font-[900] tracking-[-0.035em]"
+                      mainClassName="font-serif font-normal tracking-tight text-[var(--zyro-accent)]"
                       staggerFrom="last"
                       initial={{ y: '100%', opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
@@ -473,10 +422,11 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: 0.4 }
                   )}
-                  className="text-base sm:text-lg text-slate-600 dark:text-slate-300/80 max-w-xl leading-relaxed font-normal"
+                  className="text-base sm:text-lg max-w-xl leading-relaxed"
+                  style={{ color: 'var(--zyro-text-secondary)' }}
                 >
-                  Free for students · Paid internships · 1,200+ live roles. ZYR0 bridges
-                  academic learning with real-world industry demands — structured milestone
+                  Free for students · 1,200+ live verified placements. ZYR0 bridges
+                  academic learning with engineering demands — structured milestone
                   tasks, 1-on-1 mentor guidance, and employer-verified certificates that
                   accelerate your hiring pipeline.
                 </MotionP>
@@ -493,29 +443,43 @@ export default function Landing() {
                 >
                   <Link
                     to="/internships/browse"
-                    className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-600 text-white font-display font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-blue-600/25 hover:shadow-blue-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base border border-sky-400/30"
+                    className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-sm shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                    style={{
+                      background: 'var(--zyro-text)',
+                      color: 'var(--zyro-bg)',
+                    }}
                   >
-                    Find an Internship
-                    <ArrowRight className="w-4.5 h-4.5" />
+                    <span>Find an Internship</span>
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     to="/register?redirect=%2Finternships"
-                    className="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800/90 text-white border border-white/20 backdrop-blur-xl px-6 py-3.5 rounded-xl font-display font-semibold hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-sm sm:text-base shadow-md hover:border-white/30"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-medium text-sm border transition-all duration-200"
+                    style={{
+                      background: 'var(--zyro-surface)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text-secondary)',
+                    }}
                   >
-                    For Employers
+                    <span>For Employers</span>
                   </Link>
                   <a
                     href={SITE_CONFIG.social.whatsappChannel}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 bg-slate-900/80 border border-emerald-500/35 text-emerald-300 px-5 py-3.5 rounded-xl font-medium hover:bg-slate-800/90 hover:border-emerald-400/50 backdrop-blur-xl transition-all duration-200 text-sm hover:scale-[1.02] active:scale-[0.98] shadow-md"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full font-medium text-sm border transition-all duration-200 hover:opacity-90"
+                    style={{
+                      background: 'var(--zyro-surface)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text-muted)',
+                    }}
                     title="Join ZYR0 Official WhatsApp Channel for instant job & internship updates"
                   >
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400" />
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                     </span>
-                    <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-600 dark:text-emerald-400" />
+                    <WhatsAppIcon className="w-4 h-4 fill-current text-emerald-500" />
                     <span>WhatsApp Channel</span>
                   </a>
                 </MotionDiv>
@@ -567,26 +531,36 @@ export default function Landing() {
         <LogoMarquee />
 
         {/* Community / Stay Updated Section */}
-        <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-slate-200 dark:border-white/10">
-          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
+        <section className="py-14 lg:py-20 px-4 bg-transparent relative overflow-hidden border-y border-[var(--zyro-border)]">
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sky-400/10 border border-sky-400/25 text-sky-400 font-label text-[10px] tracking-[0.2em] mb-4 shadow-xs">
+              <div
+                className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-mono tracking-[0.2em] uppercase mb-4 border shadow-xs"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                  color: 'var(--zyro-accent)',
+                }}
+              >
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-600 dark:bg-sky-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600 dark:bg-emerald-400"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--zyro-accent)] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--zyro-accent)]"></span>
                 </span>
                 Official Community Channels
               </div>
-              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
+              <h2
+                className="font-serif font-normal text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight mb-4"
+                style={{ color: 'var(--zyro-text)' }}
+              >
                 Never Miss an Opportunity. <br className="hidden sm:inline" />
-                <span className="font-accent text-blue-600 dark:text-sky-400">
+                <span className="italic" style={{ color: 'var(--zyro-accent)' }}>
                   Stay Connected in Real-Time.
                 </span>
               </h2>
-              <p className="mt-4 text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed">
+              <p
+                className="mt-4 text-base sm:text-lg leading-relaxed"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
                 Join the official ZYR0 community channels for instant alerts on new internship drops, hiring drives, platform announcements, and career resources across Pakistan.
               </p>
             </div>
@@ -600,22 +574,32 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: 0.1 }
                 )}
-                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-emerald-500/40 dark:border-emerald-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-emerald-500/60 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 group"
+                className="rounded-2xl border p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-lg group"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                }}
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 transition-transform duration-300 group-hover:scale-105">
                       <WhatsAppIcon className="w-6 h-6 fill-current" />
                     </div>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       Live Alerts
                     </span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
+                  <h3
+                    className="text-xl sm:text-2xl font-semibold mb-2 transition-colors"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
                     WhatsApp Channel
                   </h3>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
+                  <p
+                    className="text-sm leading-relaxed mb-6"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
                     Receive instant broadcast alerts for high-priority internship openings, hiring announcements, deadlines, and official platform news directly on WhatsApp.
                   </p>
                 </div>
@@ -624,11 +608,15 @@ export default function Landing() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Join ZYR0 WhatsApp Channel for instant updates"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-emerald-500 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 active:scale-95 group/btn"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-full font-semibold text-sm transition-all duration-200 shadow-sm hover:scale-[1.01] active:scale-[0.98]"
+                  style={{
+                    background: 'var(--zyro-text)',
+                    color: 'var(--zyro-bg)',
+                  }}
                 >
                   <WhatsAppIcon className="w-4.5 h-4.5 fill-current" />
-                  Join WhatsApp Channel
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+                  <span>Join WhatsApp Channel</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </a>
               </MotionDiv>
 
@@ -640,22 +628,32 @@ export default function Landing() {
                   { opacity: 1, y: 0 },
                   { duration: 0.5, delay: 0.2 }
                 )}
-                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-blue-500/40 dark:border-blue-500/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between hover:border-blue-500/60 dark:hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group"
+                className="rounded-2xl border p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 hover:shadow-lg group"
+                style={{
+                  background: 'var(--zyro-surface)',
+                  borderColor: 'var(--zyro-border)',
+                }}
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 transition-transform duration-300 group-hover:scale-105">
                       <LinkedInIcon className="w-6 h-6 fill-current" />
                     </div>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30">
-                      <span className="w-2 h-2 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                       Official Page
                     </span>
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-sky-300 transition-colors">
+                  <h3
+                    className="text-xl sm:text-2xl font-semibold mb-2 transition-colors"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
                     LinkedIn Network
                   </h3>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-6">
+                  <p
+                    className="text-sm leading-relaxed mb-6"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
                     Follow our official LinkedIn page for professional networking, employer spotlights, student success stories, and corporate announcements.
                   </p>
                 </div>
@@ -664,11 +662,15 @@ export default function Landing() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Follow ZYR0 on LinkedIn"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white py-3.5 px-6 rounded-xl font-semibold text-sm hover:bg-blue-500 transition-all duration-200 shadow-lg shadow-blue-600/25 active:scale-95 group/btn"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-full font-semibold text-sm transition-all duration-200 shadow-sm hover:scale-[1.01] active:scale-[0.98]"
+                  style={{
+                    background: 'var(--zyro-text)',
+                    color: 'var(--zyro-bg)',
+                  }}
                 >
                   <LinkedInIcon className="w-4.5 h-4.5 fill-current" />
-                  Follow on LinkedIn
-                  <ArrowRight className="w-4 h-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
+                  <span>Follow on LinkedIn</span>
+                  <ArrowRight className="w-4 h-4 ml-1" />
                 </a>
               </MotionDiv>
             </div>
@@ -689,17 +691,34 @@ export default function Landing() {
                 )}
                 className="lg:col-span-5 space-y-6"
               >
-                <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Our Purpose</span>
-                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
-                  Every career starts <span className="font-accent text-blue-600 dark:text-sky-400">somewhere.</span>
+                <span
+                  className="font-mono text-[11px] tracking-[0.25em] uppercase"
+                  style={{ color: 'var(--zyro-accent)' }}
+                >
+                  Our Purpose
+                </span>
+                <h2
+                  className="font-serif font-normal text-3xl sm:text-4xl lg:text-5xl tracking-tight leading-tight"
+                  style={{ color: 'var(--zyro-text)' }}
+                >
+                  Every career starts <span className="italic" style={{ color: 'var(--zyro-accent)' }}>somewhere.</span>
                 </h2>
-                <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
+                <p
+                  className="text-base sm:text-lg leading-relaxed font-normal"
+                  style={{ color: 'var(--zyro-text-secondary)' }}
+                >
                   Every industry leader was once a beginner, and every meaningful journey begins with a first opportunity. At ZYR0, we believe student internships are more than temporary roles—they are the foundation for long-term career growth.
                 </p>
-                <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                <p
+                  className="text-sm sm:text-base leading-relaxed"
+                  style={{ color: 'var(--zyro-text-secondary)' }}
+                >
                   Students across Pakistan often face a fragmented internship landscape: unstructured applications, no standardized feedback, and credentials that employers struggle to verify. ZYR0 replaces this uncertainty with a cohesive platform that connects students, companies, and mentors in one ecosystem. We bring structure, mentorship, and clear milestones to every internship while helping universities bridge academic learning with industry demands.
                 </p>
-                <p className="text-slate-600 dark:text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                <p
+                  className="text-sm sm:text-base leading-relaxed"
+                  style={{ color: 'var(--zyro-text-secondary)' }}
+                >
                   Whether you are a student seeking your first professional role, a company looking to build a talent pipeline, a mentor wanting to guide the next generation, or a university aiming to strengthen industry linkages — ZYR0 provides the infrastructure to make internships measurable, transparent, and career-relevant.
                 </p>
               </MotionDiv>
@@ -716,13 +735,34 @@ export default function Landing() {
                       { opacity: 1, y: 0 },
                       { duration: 0.5, delay: i * 0.1 }
                     )}
-                    className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
+                    className="rounded-2xl border p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+                    style={{
+                      background: 'var(--zyro-surface)',
+                      borderColor: 'var(--zyro-border)',
+                    }}
                   >
-                    <div className={`w-10 h-10 ${role.color} rounded-xl flex items-center justify-center`}>
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center border"
+                      style={{
+                        background: 'var(--zyro-surface)',
+                        borderColor: 'var(--zyro-border)',
+                        color: 'var(--zyro-accent)',
+                      }}
+                    >
                       <role.icon className="w-5 h-5" />
                     </div>
-                    <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{role.title}</h3>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{role.desc}</p>
+                    <h3
+                      className="mt-4 font-semibold text-lg"
+                      style={{ color: 'var(--zyro-text)' }}
+                    >
+                      {role.title}
+                    </h3>
+                    <p
+                      className="mt-2 text-sm leading-relaxed"
+                      style={{ color: 'var(--zyro-text-secondary)' }}
+                    >
+                      {role.desc}
+                    </p>
                   </MotionDiv>
                 ))}
               </div>
@@ -741,9 +781,25 @@ export default function Landing() {
               )}
               className="text-center mb-14"
             >
-              <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">Capabilities</span>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white text-balance">Built for accountability and <span className="font-accent text-blue-600 dark:text-sky-400">clear outcomes</span></h2>
-              <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              <span
+                className="font-mono text-[11px] tracking-[0.25em] uppercase"
+                style={{ color: 'var(--zyro-accent)' }}
+              >
+                Capabilities
+              </span>
+              <h2
+                className="mt-3 font-serif font-normal text-3xl sm:text-4xl lg:text-5xl text-balance"
+                style={{ color: 'var(--zyro-text)' }}
+              >
+                Built for accountability and{' '}
+                <span className="italic" style={{ color: 'var(--zyro-accent)' }}>
+                  clear outcomes
+                </span>
+              </h2>
+              <p
+                className="mt-4 max-w-2xl mx-auto text-base"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
                 Students, companies, and mentors use ZYR0 to track progress, share feedback, and verify internship outcomes — all within a single structured workflow designed for measurable growth.
               </p>
             </MotionDiv>
@@ -758,14 +814,35 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="feature-card"
+                  className="rounded-2xl border p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+                  style={{
+                    background: 'var(--zyro-surface)',
+                    borderColor: 'var(--zyro-border)',
+                  }}
                   role="article"
                 >
-                  <div className={`w-12 h-12 ${feature.color} rounded-xl flex items-center justify-center`}>
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center border"
+                    style={{
+                      background: 'var(--zyro-surface)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-accent)',
+                    }}
+                  >
                     <feature.icon className="w-6 h-6" />
                   </div>
-                  <h3 className="mt-4 font-display text-lg font-bold text-slate-900 dark:text-white">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{feature.desc}</p>
+                  <h3
+                    className="mt-4 font-semibold text-lg"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
+                    {feature.title}
+                  </h3>
+                  <p
+                    className="mt-2 text-sm leading-relaxed"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    {feature.desc}
+                  </p>
                 </MotionDiv>
               ))}
             </div>
@@ -792,11 +869,25 @@ export default function Landing() {
               )}
               className="text-center mb-14"
             >
-              <span className="font-label text-[11px] tracking-[0.22em] text-blue-600 dark:text-sky-400">System Credibility</span>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-white tracking-tight">
-                Built on transparency. <span className="font-accent text-blue-600 dark:text-sky-400">Designed for confidence.</span>
+              <span
+                className="font-mono text-[11px] tracking-[0.25em] uppercase"
+                style={{ color: 'var(--zyro-accent)' }}
+              >
+                System Credibility
+              </span>
+              <h2
+                className="mt-3 font-serif font-normal text-3xl sm:text-4xl lg:text-5xl tracking-tight"
+                style={{ color: 'var(--zyro-text)' }}
+              >
+                Built on transparency.{' '}
+                <span className="italic" style={{ color: 'var(--zyro-accent)' }}>
+                  Designed for confidence.
+                </span>
               </h2>
-              <p className="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
+              <p
+                className="mt-4 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
                 A reliable internship management platform requires clear guardrails at every stage — from application through task completion and certification. ZYR0 aligns processes with industry expectations to ensure internships translate into credible, verifiable career development for all participants.
               </p>
             </MotionDiv>
@@ -812,13 +903,34 @@ export default function Landing() {
                     { opacity: 1, y: 0 },
                     { duration: 0.5, delay: i * 0.1 }
                   )}
-                  className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-white/20 hover:shadow-emerald-500/10"
+                  className="rounded-2xl border p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+                  style={{
+                    background: 'var(--zyro-surface)',
+                    borderColor: 'var(--zyro-border)',
+                  }}
                 >
-                  <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center`}>
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center border"
+                    style={{
+                      background: 'var(--zyro-surface)',
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-accent)',
+                    }}
+                  >
                     <card.icon className="w-5 h-5" />
                   </div>
-                  <h3 className="mt-4 font-display text-base font-bold text-slate-900 dark:text-white">{card.title}</h3>
-                  <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{card.desc}</p>
+                  <h3
+                    className="mt-4 font-semibold text-base"
+                    style={{ color: 'var(--zyro-text)' }}
+                  >
+                    {card.title}
+                  </h3>
+                  <p
+                    className="mt-2 text-xs sm:text-sm leading-relaxed"
+                    style={{ color: 'var(--zyro-text-secondary)' }}
+                  >
+                    {card.desc}
+                  </p>
                 </MotionDiv>
               ))}
             </div>
@@ -836,14 +948,25 @@ export default function Landing() {
               )}
               className="text-center mb-14"
             >
-              <span className="font-label text-[11px] uppercase tracking-[0.22em] text-sky-400">Reviews</span>
-              <h2 className="mt-3 font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white">
+              <span
+                className="font-mono text-[11px] tracking-[0.25em] uppercase"
+                style={{ color: 'var(--zyro-accent)' }}
+              >
+                Reviews
+              </span>
+              <h2
+                className="mt-3 font-serif font-normal text-3xl sm:text-4xl lg:text-5xl tracking-tight"
+                style={{ color: 'var(--zyro-text)' }}
+              >
                 Verified experiences from{' '}
-                <span className="font-accent text-blue-600 dark:text-sky-400">
+                <span className="italic" style={{ color: 'var(--zyro-accent)' }}>
                   our community
                 </span>
               </h2>
-              <p className="mt-4 text-slate-500 dark:text-slate-400 text-base max-w-xl mx-auto leading-relaxed">
+              <p
+                className="mt-4 text-base max-w-xl mx-auto leading-relaxed"
+                style={{ color: 'var(--zyro-text-secondary)' }}
+              >
                 Real people, real results — from students, mentors, and companies who've experienced ZYR0 first-hand.
               </p>
             </MotionDiv>
@@ -867,8 +990,8 @@ export default function Landing() {
                     >
                       <BlobCard
                         accent={accent}
-                        className="w-full h-full min-h-[700px] xs:min-h-[820px] md:min-h-[460px]"
-                        contentClassName="grid md:grid-cols-[5fr_7fr] w-full h-full"
+                        className="w-full h-full min-h-[700px] xs:min-h-[820px] md:min-h-[460px] border border-[var(--zyro-border)]"
+                        contentClassName="grid md:grid-cols-[5fr_7fr] w-full h-full bg-[var(--zyro-surface)]"
                       >
                         {/* Photo with gradient overlay for depth */}
                         <div className="relative aspect-[3/4] md:aspect-auto md:h-full overflow-hidden bg-slate-100 dark:bg-slate-800/40">
@@ -885,24 +1008,36 @@ export default function Landing() {
 
                         {/* Quote side */}
                         <div className="p-7 md:p-10 flex flex-col justify-center gap-6">
-                          <span className={`inline-flex self-start items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.2em] border ${label.className}`}>
+                          <span className={`inline-flex self-start items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.2em] border ${label.className}`}>
                             {label.label}
                           </span>
 
                           <div>
-                            <Quote className="w-10 h-10 text-blue-500/20 dark:text-sky-400/20 mb-3" />
-                            <p className="text-lg md:text-xl lg:text-2xl leading-[1.55] font-normal text-slate-800 dark:text-slate-100 tracking-[-0.01em]">
-                              {t.quote}
+                            <Quote className="w-10 h-10 mb-3 opacity-20" style={{ color: 'var(--zyro-accent)' }} />
+                            <p
+                              className="text-lg md:text-xl lg:text-2xl leading-[1.55] font-serif font-normal"
+                              style={{ color: 'var(--zyro-text)' }}
+                            >
+                              "{t.quote}"
                             </p>
                           </div>
 
-                          <div className="pt-5 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-full bg-white ring-2 ring-slate-200 dark:ring-white/10 shrink-0 overflow-hidden flex items-center justify-center p-1.5">
+                          <div
+                            className="pt-5 border-t flex items-center gap-4"
+                            style={{ borderColor: 'var(--zyro-border)' }}
+                          >
+                            <div
+                              className="w-12 h-12 rounded-full border shrink-0 overflow-hidden flex items-center justify-center p-1.5"
+                              style={{
+                                background: 'var(--zyro-surface)',
+                                borderColor: 'var(--zyro-border)',
+                              }}
+                            >
                               <img src="/zyro-logo.webp" alt="ZYR0 logo" className="w-full h-full object-contain" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-base font-bold text-slate-900 dark:text-white">{t.name}</p>
-                              <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{t.role}</p>
+                              <p className="text-base font-semibold" style={{ color: 'var(--zyro-text)' }}>{t.name}</p>
+                              <p className="text-sm mt-0.5" style={{ color: 'var(--zyro-text-secondary)' }}>{t.role}</p>
                             </div>
                           </div>
                         </div>
@@ -922,7 +1057,11 @@ export default function Landing() {
                     )}
                     className="md:col-span-6 lg:col-span-3 group h-full transition-all duration-300 hover:-translate-y-1"
                   >
-                    <BlobCard accent={accent} className="w-full h-full min-h-[560px] xs:min-h-[640px]" contentClassName="!items-start !justify-start w-full h-full">
+                    <BlobCard
+                      accent={accent}
+                      className="w-full h-full min-h-[560px] xs:min-h-[640px] border border-[var(--zyro-border)]"
+                      contentClassName="!items-start !justify-start w-full h-full bg-[var(--zyro-surface)]"
+                    >
                       {/* Photo */}
                       {t.image ? (
                         <div className="relative h-60 w-full shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800/40">
@@ -937,9 +1076,22 @@ export default function Landing() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
                         </div>
                       ) : (
-                        <div className="relative h-60 w-full shrink-0 overflow-hidden flex items-center justify-center" style={{ background: `${accent}1a` }}>
-                          <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: `linear-gradient(135deg, ${accent}, #6366f1)` }}>
-                            <Users className="w-8 h-8 text-white" />
+                        <div
+                          className="relative h-60 w-full shrink-0 overflow-hidden flex items-center justify-center border-b"
+                          style={{
+                            background: 'var(--zyro-surface)',
+                            borderColor: 'var(--zyro-border)',
+                          }}
+                        >
+                          <div
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center border shadow-sm"
+                            style={{
+                              background: 'var(--zyro-surface)',
+                              borderColor: 'var(--zyro-border)',
+                              color: 'var(--zyro-accent)',
+                            }}
+                          >
+                            <Users className="w-8 h-8" />
                           </div>
                         </div>
                       )}
@@ -947,14 +1099,28 @@ export default function Landing() {
                       {/* Content */}
                       <div className="p-5 pb-3 flex flex-col flex-1 w-full">
                         <div className="flex-1">
-                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-[0.18em] border ${label.className}`}>
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.18em] border ${label.className}`}>
                             {label.label}
                           </span>
-                          <Quote className="mt-3 w-6 h-6 text-blue-500/20 dark:text-sky-400/20" />
-                          <p className="mt-2 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-300">{t.quote}</p>
+                          <Quote className="mt-3 w-6 h-6 opacity-20" style={{ color: 'var(--zyro-accent)' }} />
+                          <p
+                            className="mt-2 text-sm leading-relaxed"
+                            style={{ color: 'var(--zyro-text-secondary)' }}
+                          >
+                            "{t.quote}"
+                          </p>
                         </div>
-                        <div className="mt-5 pt-5 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-3.5 px-1">
-                          <div className="w-11 h-11 rounded-full ring-2 ring-slate-200 dark:ring-white/15 shrink-0 overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                        <div
+                          className="mt-5 pt-5 border-t flex items-center gap-3.5 px-1"
+                          style={{ borderColor: 'var(--zyro-border)' }}
+                        >
+                          <div
+                            className="w-11 h-11 rounded-full border shrink-0 overflow-hidden flex items-center justify-center"
+                            style={{
+                              background: 'var(--zyro-surface)',
+                              borderColor: 'var(--zyro-border)',
+                            }}
+                          >
                             {t.image ? (
                               <img
                                 src={t.image}
@@ -964,12 +1130,14 @@ export default function Landing() {
                                 className="w-full h-full object-cover object-[center_15%]"
                               />
                             ) : (
-                              <span className="text-xs text-white font-bold select-none">{testimonialInitials(t.name)}</span>
+                              <span className="text-xs font-mono font-semibold" style={{ color: 'var(--zyro-text)' }}>
+                                {testimonialInitials(t.name)}
+                              </span>
                             )}
                           </div>
                           <div>
-                            <p className="text-[15px] font-bold leading-tight text-slate-900 dark:text-white">{t.name}</p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-snug">{t.role}</p>
+                            <p className="text-[15px] font-semibold leading-tight" style={{ color: 'var(--zyro-text)' }}>{t.name}</p>
+                            <p className="text-xs mt-1 leading-snug" style={{ color: 'var(--zyro-text-secondary)' }}>{t.role}</p>
                           </div>
                         </div>
                       </div>
@@ -982,41 +1150,71 @@ export default function Landing() {
         </section>
 
         {/* CTA Banner */}
-        <section className="py-14 lg:py-20 px-4 bg-transparent content-visibility-auto">
+        <section className="py-14 lg:py-20 px-4 content-visibility-auto">
           <div className="max-w-5xl mx-auto">
             <MotionDiv
               isMobile={isMobile}
               {...viewProps(
-                { opacity: 0, scale: 0.95 },
+                { opacity: 0, scale: 0.98 },
                 { opacity: 1, scale: 1 },
                 { duration: 0.6 }
               )}
-              className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 backdrop-blur-xl border border-white/20 rounded-2xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden shadow-2xl shadow-blue-600/20 text-white"
+              className="relative rounded-3xl border p-8 sm:p-12 md:p-16 text-center overflow-hidden shadow-xl"
+              style={{
+                background: 'var(--zyro-surface)',
+                borderColor: 'var(--zyro-border)',
+              }}
             >
-              {/* Ambient Lighting Orbs */}
-              <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-violet-400/25 rounded-full blur-3xl pointer-events-none" />
+              {/* Subtle ambient accent glow */}
+              <div
+                className="absolute top-0 right-1/4 -mt-20 w-80 h-80 rounded-full blur-3xl pointer-events-none opacity-20 dark:opacity-30"
+                style={{ background: 'var(--zyro-accent)' }}
+              />
 
               <div className="relative z-10 space-y-6">
-                <span className="inline-block px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-white/20 backdrop-blur-md text-white border border-white/30">
+                <span
+                  className="inline-block px-3.5 py-1.5 rounded-full font-mono text-[11px] tracking-[0.2em] uppercase border"
+                  style={{
+                    background: 'var(--zyro-bg)',
+                    borderColor: 'var(--zyro-border)',
+                    color: 'var(--zyro-accent)',
+                  }}
+                >
                   Get Started Today
                 </span>
-                <h2 className="font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-slate-900 dark:text-white max-w-2xl mx-auto">
-                  Ready to transform <span className="font-accent text-sky-100">how internships work?</span>
+                <h2
+                  className="font-serif font-normal text-3xl sm:text-4xl lg:text-5xl tracking-tight max-w-2xl mx-auto"
+                  style={{ color: 'var(--zyro-text)' }}
+                >
+                  Ready to transform{' '}
+                  <span className="italic" style={{ color: 'var(--zyro-accent)' }}>
+                    how internships work?
+                  </span>
                 </h2>
-                <p className="text-white/90 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+                <p
+                  className="max-w-xl mx-auto text-base leading-relaxed"
+                  style={{ color: 'var(--zyro-text-secondary)' }}
+                >
                   Join thousands of students, companies, mentors, and universities building Pakistan's structured internship ecosystem.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                   <Link
                     to="/register?redirect=%2Finternships"
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-white text-slate-900 hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-full font-medium text-sm transition-all hover:opacity-90 shadow-sm"
+                    style={{
+                      background: 'var(--zyro-text)',
+                      color: 'var(--zyro-bg)',
+                    }}
                   >
                     Create Free Account
                   </Link>
                   <Link
                     to="/internships/browse"
-                    className="w-full sm:w-auto px-8 py-3.5 rounded-xl font-semibold bg-slate-900/40 hover:bg-slate-900/60 text-white border border-white/30 backdrop-blur-sm transition-all"
+                    className="w-full sm:w-auto px-8 py-3.5 rounded-full font-medium text-sm border transition-all hover:bg-black/5 dark:hover:bg-white/5"
+                    style={{
+                      borderColor: 'var(--zyro-border)',
+                      color: 'var(--zyro-text)',
+                    }}
                   >
                     Explore Opportunities
                   </Link>

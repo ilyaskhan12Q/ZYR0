@@ -28,7 +28,7 @@ export function ResearchFooter() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <span className="rl-display text-xl font-bold text-white">ZYROO</span>
+              <span className="rl-display text-xl font-bold text-white">ZYR0</span>
               <p className="text-xs text-[#666] mt-2 max-w-xs leading-relaxed">
                 Deep research, verified sources, structured reports.
               </p>
@@ -51,7 +51,7 @@ export function ResearchFooter() {
           </div>
 
           <div className="mt-8 pt-6 border-t border-[#222] flex flex-col md:flex-row justify-between items-center gap-3">
-            <p className="text-[11px] text-[#666]">© 2026 Zyroo. All rights reserved.</p>
+            <p className="text-[11px] text-[#666]">© 2026 ZYR0. All rights reserved.</p>
             <div className="flex items-center gap-5">
               <a href="https://twitter.com/zyroo" className="text-[#666] hover:text-white transition-colors" aria-label="Twitter">
                 <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>

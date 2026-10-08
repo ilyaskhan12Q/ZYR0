@@ -57,7 +57,7 @@ const BlogPostDetail = lazy(() => import('@/pages/public/BlogPostDetail'));
 const ToolHub = lazy(() => import('@/pages/public/ToolHub'));
 
 // ZYR0 Work / Internship Public Pages
-const Landing = lazy(() => import('@/pages/public/Landing'));
+const InternshipsLanding = lazy(() => import('@/pages/public/InternshipsLanding'));
 const BrowseInternships = lazy(() => import('@/pages/public/BrowseInternships'));
 const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
 const Companies = lazy(() => import('@/pages/public/Companies'));
@@ -189,7 +189,7 @@ export default function App() {
           <Suspense fallback={<RouteLoading />}>
             <Routes>
               <Route element={<PublicLayout />}>
-                <Route path="/" element={<Landing />} />
+                <Route path="/" element={<InternshipsLanding />} />
                 <Route path="/browse" element={<BrowseInternships />} />
                 <Route path="/:id" element={<InternshipDetail />} />
                 <Route path="/companies" element={<Companies />} />
@@ -273,7 +273,7 @@ export default function App() {
             {/* ZYR0 Work / Internships Dedicated Routes & Public Portal with PublicLayout */}
             <Route element={<PublicLayout />}>
               {/* /internships is the ZYR0 Work overview/landing page */}
-              <Route path="/internships" element={<Landing />} />
+              <Route path="/internships" element={<InternshipsLanding />} />
               {/* /internships/browse is the uploaded internships searchable catalog */}
               <Route path="/internships/browse" element={<BrowseInternships />} />
               <Route path="/internships/:id" element={<InternshipDetail />} />

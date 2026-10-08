@@ -24,12 +24,12 @@ export default function CTASection() {
                 color: 'var(--zyro-accent)',
               }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#7B7BDC]" />
+              <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
               <span>Get started in seconds</span>
             </div>
 
             <h2
-              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight leading-[1.05] mb-6"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif font-normal tracking-tight leading-[1.05] mb-6"
               style={{ color: 'var(--zyro-text)' }}
             >
               Ready to build?

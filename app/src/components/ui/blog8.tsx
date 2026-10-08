@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface Post {
   id: string;
@@ -17,6 +18,7 @@ interface Post {
 
 interface Blog8Props {
   heading?: string;
+  headingClassName?: string;
   description?: string;
   /** CTA row under the description (router links etc. stay with the caller) */
   actions?: ReactNode;
@@ -25,6 +27,7 @@ interface Blog8Props {
 
 const Blog8 = ({
   heading = 'Blog Posts',
+  headingClassName,
   description = 'Discover the latest insights and tutorials about modern web development, UI design, and component-driven architecture.',
   actions,
   posts = [],
@@ -33,7 +36,7 @@ const Blog8 = ({
     <section className="py-20 md:py-28">
       <div className="max-w-[1264px] mx-auto flex flex-col items-center gap-16 px-6 md:px-16">
         <div className="text-center">
-          <h2 className="mx-auto mb-6 text-pretty text-3xl font-display font-semibold md:text-4xl lg:max-w-3xl">
+          <h2 className={cn("mx-auto mb-6 text-pretty text-3xl font-display font-semibold md:text-4xl lg:max-w-3xl", headingClassName)}>
             {heading}
           </h2>
           <p className="mx-auto max-w-2xl text-muted-foreground md:text-lg">

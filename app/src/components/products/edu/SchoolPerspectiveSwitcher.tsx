@@ -10,7 +10,13 @@ export default function SchoolPerspectiveSwitcher() {
   const [activeRole, setActiveRole] = useState<'admin' | 'teacher' | 'student' | 'parent'>('admin');
 
   return (
-    <div className="rounded-3xl bg-neutral-900/80 border border-white/15 p-4 sm:p-8 backdrop-blur-xl shadow-2xl shadow-black/80">
+    <div
+      className="rounded-3xl border p-4 sm:p-8 backdrop-blur-xl shadow-xl transition-colors duration-200"
+      style={{
+        background: 'var(--zyro-surface)',
+        borderColor: 'var(--zyro-border)',
+      }}
+    >
       {/* Role Navigation Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
@@ -18,7 +24,10 @@ export default function SchoolPerspectiveSwitcher() {
             <School className="w-4 h-4" />
             <span>Interactive Multi-Role Experience Tour</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-bold text-white font-mono">
+          <h3
+            className="text-xl sm:text-2xl font-serif font-normal"
+            style={{ color: 'var(--zyro-text)' }}
+          >
             Experience School OS from Every Perspective
           </h3>
         </div>

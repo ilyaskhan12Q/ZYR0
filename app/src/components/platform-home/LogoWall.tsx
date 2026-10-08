@@ -130,7 +130,7 @@ export default function LogoWall() {
                 </span>
               </span>
               <span
-                className="text-sm md:text-[15px] font-semibold tracking-tight whitespace-nowrap transition-colors duration-300 group-hover/item:text-white"
+                className="text-sm md:text-[15px] font-semibold tracking-tight whitespace-nowrap transition-colors duration-300 group-hover/item:text-[var(--zyro-text)]"
                 style={{ color: 'var(--zyro-text-secondary)' }}
               >
                 {partner.name}
