@@ -64,7 +64,7 @@ export const ShaderHero = () => {
                 color: 'var(--zyro-text-secondary)',
               }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#7B7BDC]" />
+              <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
               <span>ZYR0 2.0 — The Unified Platform</span>
             </m.div>
 
@@ -87,7 +87,7 @@ export const ShaderHero = () => {
               variants={containerAnimation}
               initial="hidden"
               animate="visible"
-              className="mt-4 md:mt-5 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-[-0.03em] flex flex-wrap justify-center lg:justify-start leading-tight font-display transition-colors"
+              className="mt-4 md:mt-5 text-2xl sm:text-3xl md:text-4xl font-serif font-normal tracking-[-0.02em] flex flex-wrap justify-center lg:justify-start leading-tight transition-colors"
               style={{ color: 'var(--zyro-text)' }}
             >
               {"Think. Build. Scale to ∞.".split("").map((char, index) => (

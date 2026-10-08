@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, PlusCircle } from 'lucide-react';
 import { Blog8 } from '@/components/ui/blog8';
+import { Button } from '@/components/ui/button';
 import Reveal from './Reveal';
 
 const skills = [
@@ -76,28 +77,35 @@ export default function SkillsSection() {
       <Reveal>
         <Blog8
           heading="Publish & install autonomous skills."
+          headingClassName="font-serif font-normal text-3xl md:text-5xl tracking-tight text-[var(--zyro-text)]"
           description="Supercharge ZYR0 Studio, School OS, and the Research Agent. Whether you are an individual developer or an enterprise, build and publish skills for the entire network."
           actions={
             <>
-              <Link
-                to="/register?redirect=%2Fskills"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold border transition-all duration-200 cursor-pointer"
-                style={{
-                  borderColor: 'var(--zyro-border)',
-                  color: 'var(--zyro-text)',
-                  background: 'var(--zyro-surface)',
-                }}
-              >
-                <PlusCircle className="w-4 h-4 text-[#7B7BDC]" />
-                <span>Publish a Skill</span>
+              <Link to="/skills">
+                <Button
+                  className="rounded-full px-6 py-2.5 text-sm font-semibold shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  style={{
+                    background: 'var(--zyro-text)',
+                    color: 'var(--zyro-bg)',
+                  }}
+                >
+                  <span>Browse Skills Hub</span>
+                  <ArrowRight className="ml-1.5 w-4 h-4" />
+                </Button>
               </Link>
-              <Link
-                to="/skills"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold text-white transition-all duration-200 cursor-pointer hover:opacity-90"
-                style={{ background: 'var(--zyro-accent)' }}
-              >
-                <span>Browse Skills Hub</span>
-                <ArrowRight className="w-4 h-4" />
+              <Link to="/register?redirect=%2Fskills">
+                <Button
+                  variant="ghost"
+                  className="rounded-full px-6 py-2.5 text-sm font-medium border transition-all"
+                  style={{
+                    borderColor: 'var(--zyro-border)',
+                    color: 'var(--zyro-text-secondary)',
+                    background: 'var(--zyro-surface)',
+                  }}
+                >
+                  <PlusCircle className="mr-1.5 w-4 h-4 text-[var(--zyro-accent)]" />
+                  <span>Publish a Skill</span>
+                </Button>
               </Link>
             </>
           }
