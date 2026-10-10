@@ -29,14 +29,14 @@ export function FinalCta() {
           {/* Right: About */}
           <Reveal variant="fade-right" delay={0.1}>
             <div className="border border-[#333] rounded-xl p-6">
-              <p className="rl-eyebrow-light text-[#657C68] mb-3">About ZYROO</p>
+              <p className="rl-eyebrow-light text-[#657C68] mb-3">About ZYR0</p>
               <h3 className="text-lg font-semibold text-white mb-2">Research without the guesswork.</h3>
               <p className="text-[#999] text-sm leading-relaxed mb-4">
-                ZYROO is a research agent that explores academic and web sources, verifies every citation,
+                ZYR0 is a research agent that explores academic and web sources, verifies every citation,
                 and delivers structured reports.
               </p>
               <a href="/about" className="inline-block text-xs font-medium text-[#657C68] hover:text-[#8fa692] transition-colors rl-underline-anim">
-                Learn more about ZYROO →
+                Learn more about ZYR0 →
               </a>
             </div>
           </Reveal>

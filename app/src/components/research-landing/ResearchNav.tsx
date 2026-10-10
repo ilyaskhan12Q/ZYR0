@@ -20,7 +20,7 @@ export function ResearchNav() {
     <nav className={`rl-nav ${scrolled ? 'scrolled' : ''}`}>
       <div className="flex w-full items-center justify-between mx-auto" style={{ maxWidth: 1200 }}>
         <a href="/" className="rl-display text-xl font-bold tracking-tight text-[var(--rl-ink)]">
-          ZYROO
+          ZYR0
         </a>
 
         <div className="hidden md:flex items-center gap-8">

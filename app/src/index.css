@@ -49,6 +49,13 @@
 
 @layer base {
   :root {
+    /* Tailwind's white/black resolve their channels through these (see
+       tailwind.config.js), so a single scope can re-point them: the
+       research workspace flips --color-white-rgb to ink for its light
+       theme, making `text-white`, `bg-white/5`, `border-white/10`… follow
+       the theme instead of staying white. */
+    --color-white-rgb: 255 255 255;
+    --color-black-rgb: 0 0 0;
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;

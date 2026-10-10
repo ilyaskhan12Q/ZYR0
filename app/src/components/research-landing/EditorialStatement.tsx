@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     label: 'DEPTH',
-    text: 'ZYROO digs deeper. Academic papers, web sources, real-time data. Every citation verified.',
+    text: 'ZYR0 digs deeper. Academic papers, web sources, real-time data. Every citation verified.',
   },
 ];
 

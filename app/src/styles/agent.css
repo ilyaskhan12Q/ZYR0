@@ -1,12 +1,100 @@
 /* ============================================================
-   Research Agent workspace — dark theme ("Ray"),
-   imported ONLY by the ResearchAgentPage route chunk.
+   Research Agent workspace — themed ("Ray"), imported ONLY by the
+   ResearchAgentPage route chunk.
+
+   Light is the default; the page sets data-ag-theme="dark" on
+   .agent-root to switch. Components reference the --ag-* tokens through
+   Tailwind arbitrary values, and Tailwind's white/black utilities read
+   their channels from --color-white-rgb / --color-black-rgb — the white
+   channel is re-pointed to ink here, so `text-white`, `bg-white/5`,
+   `border-white/10`, `ring-white/[0.08]`… all flip with the theme
+   instead of staying white-on-white.
    ============================================================ */
 
 .agent-root {
-  background-color: #0f0f0f;
-  color: #e5e5e5;
+  /* --- Light (default) --- */
+  --color-white-rgb: 13 13 13; /* ink: what `white` utilities become here */
+  --ag-bg: #ffffff; /* page + thread background */
+  --ag-rail: #f7f7f8; /* sidebar + mobile opener */
+  --ag-panel: #ffffff; /* sheets, menus, sticky headers */
+  --ag-surface: #ffffff; /* cards, assistant bubble, composer */
+  --ag-track: #ececee; /* segmented-control track */
+  --ag-switch: #93c5fd; /* switch track, off — pale brand blue (on = #1488fc) */
+  --ag-text: #0d0d0d;
+  --ag-text-2: #3f3f46;
+  --ag-text-3: #52525b;
+  --ag-text-4: #71717a;
+  --ag-text-5: #82828a;
+  --ag-text-6: #8c8c94;
+  --ag-line: #c7c7cc;
+  /* Translucent variants: Tailwind can't apply /60 etc. to a var(), so
+     the alpha-composited shades exist as their own tokens. */
+  --ag-rail-80: rgba(247, 247, 248, 0.8);
+  --ag-panel-60: rgba(255, 255, 255, 0.6);
+  --ag-panel-70: rgba(255, 255, 255, 0.7);
+  --ag-panel-90: rgba(255, 255, 255, 0.9);
+  --ag-panel-95: rgba(255, 255, 255, 0.95);
+  --ag-surface-90: rgba(255, 255, 255, 0.9);
+  --ag-hairline: rgba(13, 13, 13, 0.05);
+  --ag-shadow: rgba(0, 0, 0, 0.12);
+  --ag-glow-edge: rgba(17, 17, 20, 0.04);
+
+  background-color: var(--ag-bg);
+  color: var(--ag-text);
   font-family: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+.agent-root[data-ag-theme='dark'] {
+  /* --- Dark (the original "Ray" palette) --- */
+  --color-white-rgb: 255 255 255;
+  --ag-bg: #0f0f0f;
+  --ag-rail: #111113;
+  --ag-panel: #1a1a1e;
+  --ag-surface: #1e1e22;
+  --ag-track: #141417;
+  --ag-switch: #2563eb; /* switch track, off — deep brand blue (on = #1488fc) */
+  --ag-text: #e5e5e5;
+  --ag-text-2: #c5c5c5;
+  --ag-text-3: #a0a0a5;
+  --ag-text-4: #8a8a8f;
+  --ag-text-5: #6a6a6f;
+  --ag-text-6: #5a5a5f;
+  --ag-line: #4a4a50;
+  --ag-rail-80: rgba(17, 17, 19, 0.8);
+  --ag-panel-60: rgba(26, 26, 30, 0.6);
+  --ag-panel-70: rgba(26, 26, 30, 0.7);
+  --ag-panel-90: rgba(26, 26, 30, 0.9);
+  --ag-panel-95: rgba(26, 26, 30, 0.95);
+  --ag-surface-90: rgba(30, 30, 34, 0.9);
+  --ag-hairline: rgba(255, 255, 255, 0.05);
+  --ag-shadow: rgba(0, 0, 0, 0.4);
+  --ag-glow-edge: rgba(17, 17, 20, 0.2);
+}
+
+/* Tailwind palette colours compile to literals, so light mode re-points
+   the handful of text usages that would wash out on a white background. */
+.agent-root[data-ag-theme='light'] .text-emerald-400 { color: #059669; }
+.agent-root[data-ag-theme='light'] .text-emerald-300 { color: #047857; }
+.agent-root[data-ag-theme='light'] .text-red-400 { color: #dc2626; }
+.agent-root[data-ag-theme='light'] .text-red-300 { color: #b91c1c; }
+.agent-root[data-ag-theme='light'] .text-amber-500 { color: #b45309; }
+.agent-root[data-ag-theme='light'] .text-amber-600 { color: #92400e; }
+.agent-root[data-ag-theme='light'] .text-blue-400 { color: #2563eb; }
+
+/* The settings switches are shadcn components. Tailwind v3 does NOT turn a
+   `!` suffix into !important, so pinning the colours with utilities let
+   shadcn's own bg-input / bg-primary rules win the specificity fight —
+   style them here instead: a blue track in both states (off = muted brand
+   blue, on = vivid #1488fc) carrying a white thumb. */
+.agent-root [data-slot='switch'] {
+  background-color: var(--ag-switch);
+}
+.agent-root [data-slot='switch'][data-state='checked'] {
+  background-color: #1488fc;
+}
+.agent-root [data-slot='switch'] [data-slot='switch-thumb'][data-slot='switch-thumb'] {
+  background-color: #ffffff;
+  box-shadow: 0 1px 2px rgba(13, 13, 13, 0.28);
 }
 
 .agent-whitespace-pre-wrap {

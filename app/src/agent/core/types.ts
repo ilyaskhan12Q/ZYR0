@@ -19,6 +19,17 @@ export interface AgentUsageMeta {
   latencyMs: number;
 }
 
+/**
+ * Lightweight attachment descriptor forwarded with a user message.
+ * `url` is a local blob URL used for in-app preview only — it is never
+ * sent to the gateway (which is text-only).
+ */
+export interface AgentAttachment {
+  id: string;
+  name: string;
+  url: string;
+}
+
 export interface AgentChatMessage {
   id: string;
   role: 'user' | 'assistant';
