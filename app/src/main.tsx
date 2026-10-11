@@ -6,9 +6,11 @@ import { HelmetProvider } from 'react-helmet-async';
 import { PostHogProvider, usePostHog } from '@posthog/react';
 import Lenis from 'lenis';
 import './index.css';
+import '@bible-strong/avatar-react/styles.css';
 import App from './App.tsx';
 import { ErrorBoundary } from './ErrorBoundary';
 import { AuthProvider } from './contexts/AuthContext';
+import { SiteMascot } from './components/SiteMascot';
 
 const posthogOptions = {
   api_host: import.meta.env.POSTHOG_HOST,
@@ -74,6 +76,7 @@ function Root() {
               <AuthProvider>
                 <ThemeProvider attribute="class" defaultTheme="light">
                   <App />
+                  <SiteMascot />
                 </ThemeProvider>
               </AuthProvider>
             </BrowserRouter>

@@ -16,7 +16,7 @@ export function FinalCta() {
                 Search deeper. Verify faster. Understand more.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <a href="/research-agent" className="rl-btn-primary-dark">
+                <a href="/research-agent" data-mascot className="rl-btn-primary-dark">
                   Start researching <span aria-hidden="true">&rarr;</span>
                 </a>
                 <a href="#pricing-plans" className="inline-flex items-center gap-2 px-6 py-3.5 text-[0.9375rem] font-medium text-[#999] hover:text-white transition-colors">

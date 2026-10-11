@@ -443,6 +443,7 @@ export default function InternshipsLanding() {
                 >
                   <Link
                     to="/internships/browse"
+                    data-mascot
                     className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-sm shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                     style={{
                       background: 'var(--zyro-text)',

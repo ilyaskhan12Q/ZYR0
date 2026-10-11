@@ -140,6 +140,7 @@ export default function SchoolOSLanding() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="#book-demo"
+              data-mascot
               className="w-full sm:w-auto px-8 py-3.5 rounded-full font-medium text-sm transition-all shadow-sm hover:opacity-90 flex items-center justify-center gap-2"
               style={{
                 background: 'var(--zyro-text)',

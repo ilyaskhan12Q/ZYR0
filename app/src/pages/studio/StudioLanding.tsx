@@ -277,6 +277,7 @@ export default function StudioLanding() {
             <div className="flex flex-col sm:flex-row justify-center gap-4 pt-2">
               <a
                 href="#top"
+                data-mascot
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="px-8 py-3.5 rounded-full font-medium text-sm transition-all shadow-sm hover:opacity-90"
                 style={{

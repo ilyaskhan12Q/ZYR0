@@ -45,6 +45,7 @@ export default function CTASection() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
               <Link
                 to="/register?redirect=%2F"
+                data-mascot
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-9 py-5 rounded-full text-sm font-semibold hover:scale-[1.03] active:scale-[0.98] transition-all duration-200 shadow-md"
                 style={{
                   background: 'var(--zyro-text)',
