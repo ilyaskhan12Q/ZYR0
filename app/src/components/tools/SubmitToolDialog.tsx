@@ -29,6 +29,15 @@ const inputCls =
   'w-full px-3.5 py-2 bg-muted/40 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--zyro-accent)] text-foreground';
 const inputErrorCls = 'border-red-500/70 focus:ring-red-500';
 
+function FieldError({ msg }: { msg?: string }) {
+  return msg ? (
+    <p className="text-[11px] text-red-500 flex items-center gap-1 mt-1">
+      <AlertCircle className="w-3 h-3 shrink-0" />
+      {msg}
+    </p>
+  ) : null;
+}
+
 export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDialogProps) {
   const { user, profile } = useAuth();
 
@@ -191,14 +200,6 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const previewCaps = capabilitiesInput.split('\n').map((c) => c.trim()).filter(Boolean);
   const previewInitials = (name.trim() || '?')
     .split(/\s+/).map((n) => n[0]).slice(0, 2).join('').toUpperCase();
-
-  const FieldError = ({ msg }: { msg?: string }) =>
-    msg ? (
-      <p className="text-[11px] text-red-500 flex items-center gap-1 mt-1">
-        <AlertCircle className="w-3 h-3 shrink-0" />
-        {msg}
-      </p>
-    ) : null;
 
   return (
     <Dialog open={open} onOpenChange={(val) => {
