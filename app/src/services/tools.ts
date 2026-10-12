@@ -13,6 +13,7 @@ export interface SubmitToolInput {
   source_url: string;
   documentation_url?: string;
   image_url?: string;
+  cover_color?: string;
   capabilities: string[];
   install_command?: string;
   install_instructions?: string;
@@ -41,6 +42,7 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
     sourceUrl: dbTool.source_url,
     documentationUrl: dbTool.documentation_url || undefined,
     imageUrl: dbTool.image_url || undefined,
+    coverColor: dbTool.cover_color || undefined,
     badge: dbTool.badge || undefined,
     featured: dbTool.featured,
     capabilities: dbTool.capabilities || [],
@@ -108,6 +110,7 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
     source_url: input.source_url.trim(),
     documentation_url: input.documentation_url?.trim() || null,
     image_url: input.image_url?.trim() || null,
+    ...(input.cover_color ? { cover_color: input.cover_color.trim() } : {}),
     capabilities: input.capabilities,
     install_command: input.install_command?.trim() || null,
     install_instructions: input.install_instructions?.trim() || null,

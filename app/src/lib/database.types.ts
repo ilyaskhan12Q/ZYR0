@@ -450,6 +450,7 @@ export interface DbTool {
   source_url: string;
   documentation_url: string | null;
   image_url: string | null;
+  cover_color: string | null;
   badge: string | null;
   featured: boolean;
   capabilities: string[];
