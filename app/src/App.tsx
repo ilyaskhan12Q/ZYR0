@@ -111,7 +111,9 @@ export default function App() {
           <ScrollToTop />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<ResearchLanding />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<ResearchLanding />} />
+              </Route>
               <Route
                 path="/research-agent"
                 element={
@@ -142,7 +144,9 @@ export default function App() {
           <ScrollToTop />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<StudioLanding />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<StudioLanding />} />
+              </Route>
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -165,7 +169,9 @@ export default function App() {
           <ScrollToTop />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<SchoolOSLanding />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<SchoolOSLanding />} />
+              </Route>
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -249,18 +255,7 @@ export default function App() {
         <ErrorBoundary>
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-            {/* Platform Master Homepage (Bento Grid SaaS Ecosystem) */}
-            <Route path="/" element={<PlatformHome />} />
-
-            {/* ZYR0 Studio Dedicated Product Route */}
-            <Route path="/studio" element={<StudioLanding />} />
-
-            {/* ZYR0 Edu / School OS Dedicated Product Routes */}
-            <Route path="/school" element={<SchoolOSLanding />} />
-            <Route path="/edu" element={<SchoolOSLanding />} />
-
-            {/* ZYR0 Research Routes */}
-            <Route path="/research" element={<ResearchLanding />} />
+            {/* ZYR0 Research Agent (protected app page — no public chrome) */}
             <Route
               path="/research-agent"
               element={
@@ -270,8 +265,22 @@ export default function App() {
               }
             />
 
-            {/* ZYR0 Work / Internships Dedicated Routes & Public Portal with PublicLayout */}
+            {/* All public/marketing pages share one nav + footer */}
             <Route element={<PublicLayout />}>
+              {/* Platform Master Homepage (Bento Grid SaaS Ecosystem) */}
+              <Route path="/" element={<PlatformHome />} />
+
+              {/* ZYR0 Studio Dedicated Product Route */}
+              <Route path="/studio" element={<StudioLanding />} />
+
+              {/* ZYR0 Edu / School OS Dedicated Product Routes */}
+              <Route path="/school" element={<SchoolOSLanding />} />
+              <Route path="/edu" element={<SchoolOSLanding />} />
+
+              {/* ZYR0 Research Landing */}
+              <Route path="/research" element={<ResearchLanding />} />
+
+              {/* ZYR0 Work / Internships Dedicated Routes & Public Portal */}
               {/* /internships is the ZYR0 Work overview/landing page */}
               <Route path="/internships" element={<InternshipsLanding />} />
               {/* /internships/browse is the uploaded internships searchable catalog */}
@@ -334,8 +343,10 @@ export default function App() {
               <Route path="*" element={<Suspense fallback={<RouteLoading />}><AdminPortal /></Suspense>} />
             </Route>
 
-            {/* Fallback 404 */}
-            <Route path="*" element={<NotFound />} />
+            {/* Fallback 404 (with public chrome) */}
+            <Route element={<PublicLayout />}>
+              <Route path="*" element={<NotFound />} />
+            </Route>
           </Routes>
           <Toaster />
         </Suspense>
