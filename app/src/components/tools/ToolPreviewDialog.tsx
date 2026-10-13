@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
   ExternalLink, Terminal, Copy, Check, BookOpen, Tag,
-  Layers, Info, FileText
+  Layers, Info, FileText, ArrowUpRight
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -321,6 +322,14 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
             >
               Close
             </Button>
+
+            <Link
+              to={`/tools/${tool.slug}`}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-[var(--zyro-accent)] transition-colors w-full sm:w-auto justify-center"
+            >
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              Full Page
+            </Link>
 
             <a
               href={tool.sourceUrl}

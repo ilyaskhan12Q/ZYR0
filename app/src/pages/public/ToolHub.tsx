@@ -115,7 +115,7 @@ export default function ToolHub() {
         return false;
       }
 
-      // Search query filter (matches name, tagline, description, tags, source)
+      // Search query filter (matches name, tagline, description, tags, source, author, capabilities)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchesName = tool.name.toLowerCase().includes(q);
@@ -123,7 +123,9 @@ export default function ToolHub() {
         const matchesDesc = tool.description.toLowerCase().includes(q);
         const matchesTags = tool.tags.some((t) => t.toLowerCase().includes(q));
         const matchesSource = tool.source.toLowerCase().includes(q);
-        return matchesName || matchesTagline || matchesDesc || matchesTags || matchesSource;
+        const matchesAuthor = (tool.author?.name || '').toLowerCase().includes(q);
+        const matchesCaps = (tool.capabilities || []).some((c) => c.toLowerCase().includes(q));
+        return matchesName || matchesTagline || matchesDesc || matchesTags || matchesSource || matchesAuthor || matchesCaps;
       }
 
       return true;

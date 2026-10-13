@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ExternalLink, Terminal, Sparkles, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { type ToolItem, coverGradient } from '@/data/tools';
@@ -10,6 +11,7 @@ interface ToolCardProps {
 }
 
 export function ToolCard({ tool, onPreview }: ToolCardProps) {
+  const navigate = useNavigate();
   const [imgFailed, setImgFailed] = useState(false);
   const showImage = Boolean(tool.imageUrl) && !imgFailed;
 
@@ -146,10 +148,10 @@ export function ToolCard({ tool, onPreview }: ToolCardProps) {
 
       <CardFooter className="p-4 pt-2 border-t border-border/40 bg-muted/20 flex items-center justify-between">
         <button
-          onClick={() => onPreview(tool)}
+          onClick={() => navigate(`/tools/${tool.slug}`)}
           className="text-xs font-medium text-foreground hover:text-[var(--zyro-accent)] transition-colors inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded py-1 px-1 -mx-1"
         >
-          <span>View Details</span>
+          <span>Inspect</span>
           <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
         </button>
 
