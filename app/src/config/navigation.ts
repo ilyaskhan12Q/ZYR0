@@ -2,6 +2,7 @@ import type React from 'react';
 import {
   Code, School, BrainCircuit, Briefcase, Compass,
   HelpCircle, MessageCircle, BookOpen, BadgeCheck, Shield, FileText, Cookie,
+  Building2, Mail,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -81,9 +82,9 @@ export const resourcesNav: NavItem[] = [
 ];
 
 export const companyNav: NavItem[] = [
-  { label: 'About', href: '/about' },
-  { label: 'Contact', href: '/contact' },
-  { label: 'Careers', href: '/careers' },
+  { label: 'About', href: '/about', icon: Building2 },
+  { label: 'Contact', href: '/contact', icon: Mail },
+  { label: 'Careers', href: '/careers', icon: Briefcase },
 ];
 
 export const footerNav = {

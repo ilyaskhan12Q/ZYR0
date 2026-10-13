@@ -8,22 +8,23 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
-import { CommunitySocialNav } from '@/components/navigation/CommunitySocialNav';
 import { productsNav, resourcesNav, companyNav } from '@/config/navigation';
 
-// Theme-aware floating pill nav: frosted white in light mode, black glass in dark.
+// Dark translucent glass pill (the "/" look): blur layer over the hero so the
+// page background bleeds through and the nav feels part of the page, not on top
+// of it. Frosts denser on scroll for readability over busy content.
 const pillClass = (scrolled: boolean) =>
   `rounded-2xl border backdrop-blur-xl transition-all duration-300 flex items-center justify-between gap-3 px-4 sm:px-5 ${
     scrolled
-      ? 'bg-white/90 dark:bg-black/85 border-black/10 dark:border-white/15 shadow-xl shadow-black/10 dark:shadow-black/50 py-2.5'
-      : 'bg-white/70 dark:bg-black/60 border-black/5 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/40 py-3'
+      ? 'bg-black/85 dark:bg-black/85 border-white/15 shadow-2xl shadow-black/80 py-2.5'
+      : 'bg-black/50 dark:bg-black/40 border-white/10 shadow-lg shadow-black/40 py-3'
   }`;
 
 const triggerClass = (open: boolean) =>
   `flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
     open
-      ? 'text-slate-900 dark:text-white bg-black/5 dark:bg-white/10'
-      : 'text-slate-700 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5'
+      ? 'text-white bg-white/10'
+      : 'text-neutral-300 hover:text-white hover:bg-white/5'
   }`;
 
 const panelClass = (width: string, align: 'left' | 'right' = 'left') =>
@@ -122,13 +123,13 @@ export default function SiteNav() {
   );
 
   return (
-    <div ref={navRef} className="pointer-events-none">
+    <div ref={navRef} className="pointer-events-none relative">
       {/* Desktop / tablet pill */}
       <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pointer-events-auto">
         <div className={pillClass(scrolled)}>
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img src="/zyro-logo.webp" alt="" width="28" height="28" className="w-7 h-7 object-contain rounded-md" />
-            <span className="text-xl font-display tracking-tight text-slate-900 dark:text-white">ZYR0</span>
+            <span className="text-xl font-display tracking-tight text-white">ZYR0</span>
           </Link>
 
           <nav className="flex items-center gap-0.5" aria-label="Primary">
@@ -198,6 +199,7 @@ export default function SiteNav() {
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent rounded-t-xl" />
                     {companyNav.map((item) => (
                       <Link key={item.href} to={item.href} onClick={() => setOpenMenu(null)} className={menuItemClass}>
+                        {item.icon && <item.icon className="w-4 h-4 text-muted-foreground" />}
                         <span className="flex-1">{item.label}</span>
                         <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
                       </Link>
@@ -232,16 +234,13 @@ export default function SiteNav() {
               </AnimatePresence>
             </div>
 
-            <div id="header-community-cta-slot" className="hidden lg:flex items-center gap-2 pl-3 ml-1 border-l border-border/40">
-              <CommunitySocialNav scrolled={scrolled} />
-            </div>
           </nav>
 
           <div className="flex items-center gap-2 shrink-0">
             <button
               aria-label="Toggle color theme"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
             >
               {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -326,7 +325,7 @@ export default function SiteNav() {
               <>
                 <Link
                   to={`/login?redirect=${redirect}`}
-                  className="px-3.5 py-2 text-sm font-medium text-slate-700 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
                 >
                   Sign In
                 </Link>
@@ -347,13 +346,13 @@ export default function SiteNav() {
         <div className={pillClass(scrolled)}>
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src="/zyro-logo.webp" alt="" width="24" height="24" className="w-6 h-6 object-contain rounded-md" />
-            <span className="text-lg font-display tracking-tight text-slate-900 dark:text-white">ZYR0</span>
+            <span className="text-lg font-display tracking-tight text-white">ZYR0</span>
           </Link>
           <div className="flex items-center gap-1">
             <button
               aria-label="Toggle color theme"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-slate-600 dark:text-neutral-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
             >
               {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -363,7 +362,7 @@ export default function SiteNav() {
               aria-haspopup="true"
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav-sheet"
-              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-slate-800 dark:text-neutral-200 bg-black/5 dark:bg-white/10 border border-black/5 dark:border-white/10"
+              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-white bg-white/10 border border-white/15 hover:bg-white/20 transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -439,7 +438,7 @@ export default function SiteNav() {
                 {([
                   { id: 'products' as const, label: 'Products', items: productsNav.map((p) => ({ key: p.id, label: p.name, href: p.href, logo: p.logo, icon: p.icon, badge: p.badge })) },
                   { id: 'resources' as const, label: 'Resources', items: resourcesNav.map((r) => ({ key: r.href, label: r.label, href: r.href, icon: r.icon, badge: r.badge })) },
-                  { id: 'company' as const, label: 'Company', items: companyNav.map((c) => ({ key: c.href, label: c.label, href: c.href })) },
+                  { id: 'company' as const, label: 'Company', items: companyNav.map((c) => ({ key: c.href, label: c.label, href: c.href, icon: c.icon })) },
                 ]).map((section) => (
                   <div key={section.id} className="border-t border-border first:border-t-0">
                     <button
@@ -483,10 +482,6 @@ export default function SiteNav() {
                   >
                     Research
                   </Link>
-                </div>
-
-                <div id="mobile-community-cta-slot" className="pt-3 mt-1 border-t border-border">
-                  <CommunitySocialNav mobile />
                 </div>
 
                 {/* Auth section */}
