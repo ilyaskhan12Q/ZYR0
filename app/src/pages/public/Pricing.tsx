@@ -5,6 +5,8 @@ import AudienceToggle, { type AudienceType } from '@/components/pricing/Audience
 import BillingToggle, { type BillingInterval } from '@/components/pricing/BillingToggle';
 import PricingCard, { type PricingCardData } from '@/components/pricing/PricingCard';
 import BookDemoModal from '@/components/pricing/BookDemoModal';
+import UpgradePlanModal from '@/components/pricing/UpgradePlanModal';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Check,
   Minus,
@@ -16,13 +18,21 @@ import {
 } from 'lucide-react';
 
 export default function Pricing() {
+  const { user, profile } = useAuth();
   const [audience, setAudience] = useState<AudienceType>('personal');
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [targetUpgradePlan, setTargetUpgradePlan] = useState<'go' | 'plus'>('plus');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
+  };
+
+  const handleOpenUpgrade = (plan: 'go' | 'plus') => {
+    setTargetUpgradePlan(plan);
+    setUpgradeModalOpen(true);
   };
 
   const personalCards: PricingCardData[] = [
@@ -32,8 +42,8 @@ export default function Pricing() {
       description: 'Essential toolkit to kickstart your research, build developer skills, and apply to tech roles.',
       monthlyPrice: '$0',
       yearlyPrice: '$0',
-      ctaLabel: 'Get Started Free',
-      ctaHref: '/register',
+      ctaLabel: user ? 'Current Plan' : 'Get Started Free',
+      ctaHref: user ? (profile?.role ? `/${profile.role}/dashboard` : '/student/workspace') : '/register',
       features: [
         { highlight: 'Verified internships:', text: 'Browse and apply with PR-style workspaces' },
         { highlight: 'Cryptographic credentials:', text: 'Earn tamper-proof completion certificates (SHA-256)' },
@@ -51,7 +61,8 @@ export default function Pricing() {
       yearlyPrice: '$3.99',
       yearlySubtext: '$47.90 billed annually (Save ~20%)',
       ctaLabel: 'Upgrade to GO',
-      ctaHref: '/register?plan=go',
+      ctaHref: user ? undefined : '/register?plan=go',
+      onCtaClick: user ? () => handleOpenUpgrade('go') : undefined,
       ctaVariant: 'soft-accent',
       features: [
         { text: 'Everything in Free, plus:' },
@@ -72,7 +83,8 @@ export default function Pricing() {
       yearlyPrice: '$7.99',
       yearlySubtext: '$95.90 billed annually (Save ~20%)',
       ctaLabel: 'Upgrade to PLUS',
-      ctaHref: '/register?plan=plus',
+      ctaHref: user ? undefined : '/register?plan=plus',
+      onCtaClick: user ? () => handleOpenUpgrade('plus') : undefined,
       features: [
         { text: 'Everything in ZYR0 GO, plus:' },
         { highlight: 'Deep reasoning models:', text: 'Multi-step evidence synthesis for complex queries' },
@@ -493,6 +505,15 @@ export default function Pricing() {
 
       {/* Upgrade to Business Modal */}
       <BookDemoModal open={demoModalOpen} onOpenChange={setDemoModalOpen} />
+
+      {/* In-App Plan Upgrade Modal */}
+      <UpgradePlanModal
+        open={upgradeModalOpen}
+        onOpenChange={setUpgradeModalOpen}
+        initialPlan={targetUpgradePlan}
+        interval={interval}
+        onIntervalChange={setInterval}
+      />
     </div>
   );
 }
