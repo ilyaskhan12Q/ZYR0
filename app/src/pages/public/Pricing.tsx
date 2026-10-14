@@ -1,6 +1,7 @@
 import { useState, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
+import AudienceToggle, { type AudienceType } from '@/components/pricing/AudienceToggle';
 import BillingToggle, { type BillingInterval } from '@/components/pricing/BillingToggle';
 import PricingCard, { type PricingCardData } from '@/components/pricing/PricingCard';
 import BookDemoModal from '@/components/pricing/BookDemoModal';
@@ -10,9 +11,12 @@ import {
   Sparkles,
   Building2,
   ChevronDown,
+  CreditCard,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function Pricing() {
+  const [audience, setAudience] = useState<AudienceType>('personal');
   const [interval, setInterval] = useState<BillingInterval>('monthly');
   const [demoModalOpen, setDemoModalOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -21,67 +25,106 @@ export default function Pricing() {
     setOpenFaq(openFaq === idx ? null : idx);
   };
 
-  const cards: PricingCardData[] = [
+  const personalCards: PricingCardData[] = [
     {
       id: 'free',
       name: 'Free',
-      description: 'Essential access to ZYR0 Work internships, standard AI research, and interactive developer tools.',
+      description: 'Essential toolkit to kickstart your research, build developer skills, and apply to tech roles.',
       monthlyPrice: '$0',
       yearlyPrice: '$0',
       ctaLabel: 'Get Started Free',
       ctaHref: '/register',
       features: [
-        { text: 'ZYR0 Work: Browse and apply to verified internships' },
-        { text: 'ZYR0 Work: PR-style task submission workspace' },
-        { text: 'ZYR0 Work: Verifiable cryptographic certificates' },
-        { text: 'ZYR0 Research: Standard research queries & synthesis' },
-        { text: 'ZYR0 Research: Verified academic & web citations' },
-        { text: 'ZYR0 Research: Standard AI limits (20 req/min)' },
-        { text: 'ZYR0 Studio: Interactive prompt-to-app simulator' },
-        { text: 'ZYR0 ToolHub: Curated developer utilities catalog' },
+        { highlight: 'Verified internships:', text: 'Browse and apply with PR-style workspaces' },
+        { highlight: 'Cryptographic credentials:', text: 'Earn tamper-proof completion certificates (SHA-256)' },
+        { highlight: 'AI research agent:', text: 'Standard synthesis with verified citations (20 req/min)' },
+        { highlight: 'Studio sandbox:', text: 'Interactive prompt-to-app simulation playground' },
+        { highlight: 'Developer ToolHub:', text: 'Curated library of open-source utilities and helpers' },
+        { highlight: 'Community support:', text: 'Public documentation and active builder forums' },
       ],
     },
     {
-      id: 'pro',
-      name: 'Pro',
+      id: 'go',
+      name: 'ZYR0 GO',
+      description: 'For ambitious students & active creators wanting faster research throughput and priority job applications.',
+      monthlyPrice: '$4.99',
+      yearlyPrice: '$3.99',
+      yearlySubtext: '$47.90 billed annually (Save ~20%)',
+      ctaLabel: 'Upgrade to GO',
+      ctaHref: '/register?plan=go',
+      ctaVariant: 'soft-accent',
+      features: [
+        { text: 'Everything in Free, plus:' },
+        { highlight: '5× faster synthesis:', text: 'Expanded context capacity with lower latency' },
+        { highlight: 'One-click exports:', text: 'Download comprehensive research to Markdown & PDF' },
+        { highlight: 'Multi-source citations:', text: 'Direct export from arXiv, PubMed & OpenAlex' },
+        { highlight: 'Priority candidate status:', text: 'Highlighted profile on active company job boards' },
+        { highlight: 'Studio architecture presets:', text: 'Pre-built full-stack components and layouts' },
+      ],
+    },
+    {
+      id: 'plus',
+      name: 'ZYR0 PLUS',
       badge: 'Most Popular',
       highlighted: true,
-      description: 'High-depth research reasoning, extended agent capabilities, and priority builder tool access.',
+      description: 'The flagship power experience with deep multi-step AI reasoning and priority Studio builder access.',
       monthlyPrice: '$9.99',
       yearlyPrice: '$7.99',
       yearlySubtext: '$95.90 billed annually (Save ~20%)',
-      ctaLabel: 'Choose Pro',
-      ctaHref: '/register?plan=pro',
+      ctaLabel: 'Upgrade to PLUS',
+      ctaHref: '/register?plan=plus',
       features: [
-        { text: 'Everything in Free' },
-        { text: 'ZYR0 Research: Deep multi-step research synthesis' },
-        { text: 'ZYR0 Research: Priority queue during peak demand' },
-        { text: 'ZYR0 Research: Unlimited session history & PDF exports' },
-        { text: 'ZYR0 Studio: VIP early access to full app builder', badge: 'Early Access' },
-        { text: 'ZYR0 Studio: Clean React 19 + TypeScript code exports', badge: 'Early Access' },
-        { text: 'ZYR0 Work: Highlighted candidate profile badge', badge: 'In Rollout' },
-        { text: 'Unified cross-product subscription coverage', badge: 'In Rollout' },
+        { text: 'Everything in ZYR0 GO, plus:' },
+        { highlight: 'Deep reasoning models:', text: 'Multi-step evidence synthesis for complex queries' },
+        { highlight: 'Zero queue delays:', text: 'Dedicated priority compute queue during peak traffic' },
+        { highlight: 'Persistent research vault:', text: 'Unlimited session history & cross-topic memory' },
+        { highlight: 'VIP Studio builder:', text: 'Early access to the autonomous prompt-to-app engine', badge: 'Early Access' },
+        { highlight: 'Production code export:', text: 'Clean React 19 + TypeScript + Tailwind source code', badge: 'Early Access' },
+        { highlight: 'All-in-one ecosystem pass:', text: 'One subscription covers all current and upcoming tools', badge: 'In Rollout' },
+      ],
+    },
+  ];
+
+  const businessCards: PricingCardData[] = [
+    {
+      id: 'teams',
+      name: 'Teams',
+      description: 'For startups, engineering guilds, and hiring managers posting verified internships and evaluating candidate code.',
+      monthlyPrice: '$0',
+      yearlyPrice: '$0',
+      periodText: '/month',
+      ctaLabel: 'Start Hiring Free',
+      ctaHref: '/register/company',
+      features: [
+        { highlight: 'Zero platform fees:', text: 'Post unlimited verified internship listings with custom screening' },
+        { highlight: 'PR evaluation suite:', text: 'Review candidate GitHub pull requests, code & portfolios' },
+        { highlight: 'Cryptographic offers:', text: 'Issue signed, verifiable offer letters and contracts' },
+        { highlight: 'Tamper-proof credentials:', text: 'Award cryptographic completion certificates (SHA-256)' },
+        { highlight: 'Hiring team roles:', text: 'Granular permissions for Owners, Admins, and Reviewers' },
+        { highlight: 'Real-time telemetry:', text: 'Live applicant pipeline dashboards and scoring analytics' },
       ],
     },
     {
       id: 'custom',
       name: 'Custom',
-      badge: 'Enterprise & Institutions',
-      description: 'Comprehensive company intern management, team governance, and SchoolOS institutional deployments.',
+      badge: 'Organization',
+      highlighted: true,
+      topProducts: ['ZYR0 SchoolOS', 'ZYR0 Studio', 'ZYR0 Work', 'ZYR0 Research'],
+      description: 'Comprehensive institutional deployment for schools, universities, multi-campus academies, and enterprise hiring guilds.',
       monthlyPrice: 'Custom',
       yearlyPrice: 'Custom',
-      yearlySubtext: 'Tailored institutional agreement',
-      ctaLabel: 'Book a Demo',
+      periodText: '',
+      yearlySubtext: 'Tailored institutional & enterprise agreements',
+      ctaLabel: 'Contact Sales',
+      ctaIcon: Building2,
       onCtaClick: () => setDemoModalOpen(true),
       features: [
-        { text: 'ZYR0 Work: Unlimited internship postings & screening' },
-        { text: 'ZYR0 Work: End-to-end applicant reviews & code grading' },
-        { text: 'ZYR0 Work: Cryptographic offer letters & certificates' },
-        { text: 'ZYR0 Work: Company team roles (Owner, Admin, Member)' },
-        { text: 'ZYR0 SchoolOS: Full school management deployment', badge: 'In Rollout' },
-        { text: 'ZYR0 SchoolOS: Principal, Teacher & Parent portals', badge: 'In Rollout' },
-        { text: 'Dedicated account manager & customized SLAs' },
-        { text: 'Annual invoicing, purchase orders & custom terms' },
+        { highlight: 'SchoolOS deployment:', text: 'Enterprise engine for attendance, grading & timetable scheduling', badge: 'In Rollout' },
+        { highlight: 'Multi-role portals:', text: 'Tailored dashboards for Principals, Faculty, Students & Parents', badge: 'In Rollout' },
+        { highlight: 'Private cloud Studio:', text: 'Self-hosted AI builder environment with custom design tokens' },
+        { highlight: 'Campus placement networks:', text: 'Automated student cohort scoring and employer matching' },
+        { highlight: 'Enterprise governance:', text: 'Dedicated account manager, customized SLAs & SSO security' },
+        { highlight: 'Institutional billing:', text: 'Annual purchase orders, custom invoicing, and direct contracting' },
       ],
     },
   ];
@@ -90,99 +133,93 @@ export default function Pricing() {
     {
       category: 'ZYR0 Work (Internships & Workforce)',
       rows: [
-        { feature: 'Internship discovery & search filters', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Direct internship applications & tracking', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'PR-style task submission workspace', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Cryptographic completion certificates', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Featured applicant profile placement', free: false, pro: 'In Rollout', custom: true, status: 'In Rollout' },
-        { feature: 'Company internship posting & applicant review', free: false, pro: false, custom: true, status: 'Live' },
-        { feature: 'Company multi-member team permissions', free: false, pro: false, custom: true, status: 'Live' },
+        { feature: 'Internship discovery & search filters', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Direct internship applications & tracking', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'PR-style task submission workspace', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Cryptographic completion certificates', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Featured applicant profile placement', free: false, go: true, plus: true, teams: false, ent: true, status: 'Live' },
+        { feature: 'Company internship posting & applicant review', free: false, go: false, plus: false, teams: true, ent: true, status: 'Live' },
+        { feature: 'Company multi-member team permissions', free: false, go: false, plus: false, teams: true, ent: true, status: 'Live' },
       ],
     },
     {
       category: 'ZYR0 Research (Autonomous AI Agent)',
       rows: [
-        { feature: 'Standard research chat & question answering', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Verifiable citations (OpenAlex, arXiv, PubMed)', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Markdown & PDF report export', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'AI request rate limits', free: '20 req/min', pro: 'Priority / High', custom: 'Dedicated', status: 'Live' },
-        { feature: 'Deep multi-step research synthesis', free: 'Standard', pro: 'Deep Reasoning', custom: 'Custom Models', status: 'Live' },
-        { feature: 'Priority model compute during peak hours', free: false, pro: true, custom: true, status: 'Live' },
+        { feature: 'Standard research chat & question answering', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Verifiable citations (OpenAlex, arXiv, PubMed)', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Markdown & PDF report export', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'AI request rate limits', free: '20 req/min', go: 'High', plus: 'Priority', teams: 'Standard', ent: 'Dedicated', status: 'Live' },
+        { feature: 'Deep multi-step research synthesis', free: 'Standard', go: 'Extended', plus: 'Deep Reasoning', teams: 'Standard', ent: 'Custom Models', status: 'Live' },
+        { feature: 'Priority model compute during peak hours', free: false, go: false, plus: true, teams: false, ent: true, status: 'Live' },
       ],
     },
     {
       category: 'ZYR0 Studio (AI Web & App Builder)',
       rows: [
-        { feature: 'Interactive prompt-to-code simulator', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Curated preset architecture templates', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Autonomous prompt-to-app generator', free: 'Waitlist', pro: 'VIP Early Access', custom: 'Private Cloud', status: 'Early Access' },
-        { feature: 'Clean TypeScript/Vite/Tailwind code export', free: false, pro: 'Early Access', custom: 'Full Export', status: 'Early Access' },
-        { feature: '1-click cloud deployment & custom domains', free: false, pro: 'Early Access', custom: 'Enterprise CDN', status: 'Early Access' },
+        { feature: 'Interactive prompt-to-code simulator', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Curated preset architecture templates', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Autonomous prompt-to-app generator', free: 'Waitlist', go: 'Waitlist', plus: 'VIP Early Access', teams: 'Waitlist', ent: 'Private Cloud', status: 'Early Access' },
+        { feature: 'Clean TypeScript/Vite/Tailwind code export', free: false, go: false, plus: 'Early Access', teams: false, ent: 'Full Export', status: 'Early Access' },
+        { feature: '1-click cloud deployment & custom domains', free: false, go: false, plus: 'Early Access', teams: false, ent: 'Enterprise CDN', status: 'Early Access' },
       ],
     },
     {
       category: 'ZYR0 SchoolOS (Education Operating System)',
       rows: [
-        { feature: 'Interactive role perspective switcher & tour', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Time & revenue ROI calculator', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Institutional demo walkthrough session', free: false, pro: false, custom: true, status: 'Live' },
-        { feature: 'Attendance, grading & timetable management', free: false, pro: false, custom: 'Institutional', status: 'In Rollout' },
-        { feature: 'Multi-campus administrative governance', free: false, pro: false, custom: 'Institutional', status: 'In Rollout' },
+        { feature: 'Interactive role perspective switcher & tour', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Time & revenue ROI calculator', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Institutional demo walkthrough session', free: false, go: false, plus: false, teams: false, ent: true, status: 'Live' },
+        { feature: 'Attendance, grading & timetable management', free: false, go: false, plus: false, teams: false, ent: 'Institutional', status: 'In Rollout' },
+        { feature: 'Multi-campus administrative governance', free: false, go: false, plus: false, teams: false, ent: 'Institutional', status: 'In Rollout' },
       ],
     },
     {
       category: 'Support & Administration',
       rows: [
-        { feature: 'Community support & help documentation', free: true, pro: true, custom: true, status: 'Live' },
-        { feature: 'Priority email developer support', free: false, pro: true, custom: true, status: 'Live' },
-        { feature: 'Dedicated account manager & SLA', free: false, pro: false, custom: true, status: 'Live' },
-        { feature: 'Invoicing & purchase order contracting', free: false, pro: false, custom: true, status: 'Live' },
+        { feature: 'Community support & help documentation', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Priority email developer support', free: false, go: false, plus: true, teams: true, ent: true, status: 'Live' },
+        { feature: 'Dedicated account manager & SLA', free: false, go: false, plus: false, teams: false, ent: true, status: 'Live' },
+        { feature: 'Invoicing & purchase order contracting', free: false, go: false, plus: false, teams: false, ent: true, status: 'Live' },
       ],
     },
   ];
 
   const faqs = [
     {
-      q: 'How does the unified Pro subscription work across products?',
-      a: 'One ZYR0 Pro subscription covers eligible benefits across all four product verticals — ZYR0 Research, Studio, SchoolOS, and Work. You do not need to purchase separate accounts for different tools.',
+      q: 'What is the difference between ZYR0 GO and ZYR0 PLUS?',
+      a: 'ZYR0 GO ($4.99/mo) is designed for students and creators who want expanded research capacity, faster synthesis, and verified application status. ZYR0 PLUS ($9.99/mo) is the full flagship tier with deep multi-step reasoning, priority compute queues, unlimited session history, and VIP early access to the upcoming ZYR0 Studio autonomous app builder and code exports.',
+    },
+    {
+      q: 'Is the Teams plan really $0/month?',
+      a: 'Yes. Companies, engineering guilds, and startups can sign up, post internship listings, review applicants, assign PR-style tasks, and issue cryptographic certificates completely free of charge.',
+    },
+    {
+      q: 'What is included in the Custom tier?',
+      a: 'The Custom tier provides tailored organizational deployments covering SchoolOS (admissions, attendance, grading engine, timetable scheduler), enterprise ZYR0 Studio private cloud hosting, custom hiring pipelines, dedicated SLAs, and institutional invoicing.',
     },
     {
       q: 'Can I cancel or switch billing intervals anytime?',
-      a: 'Yes. You can cancel your subscription at any time with no lock-in. If you choose annual billing, you pay $95.90 for 12 months of coverage, saving approximately 20% compared to paying monthly.',
+      a: 'Yes. You can cancel your subscription at any time with no lock-in. Annual billing saves approximately 20% compared to paying monthly.',
     },
     {
-      q: 'What is included in the Free tier?',
-      a: 'The Free tier is free forever. It includes full access to ZYR0 Work for discovering and applying to internships, completing tasks, earning verifiable digital certificates, running standard AI research queries, and using the Studio interactive simulator.',
-    },
-    {
-      q: 'What features in ZYR0 Studio are live today versus early access?',
-      a: 'Today, ZYR0 Studio features a live interactive simulator that lets you test prompt-to-app workflows. Pro subscribers receive priority early-access enrollment as full code generation and 1-click cloud deployments roll out.',
-    },
-    {
-      q: 'How do companies and schools get started with Custom plans?',
-      a: 'Companies hiring interns can register and start managing internships immediately. Schools, colleges, and larger organizations can click "Book a Demo" to schedule a personalized 30-minute walkthrough tailored to institutional needs.',
+      q: 'How does the unified subscription work across products?',
+      a: 'A single ZYR0 PLUS subscription covers eligible benefits across all products in the ecosystem. You do not need to buy separate accounts for Research, Studio, or Work.',
     },
   ];
 
   return (
-    <div
-      className="min-h-screen transition-colors duration-200 overflow-x-clip"
-      style={{
-        background: 'var(--zyro-bg)',
-        color: 'var(--zyro-text)',
-      }}
-    >
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-200 overflow-x-clip">
       <SEO
         title="Pricing & Plans — ZYR0 Ecosystem"
-        description="Transparent pricing for students, builders, and organizations. Start free with ZYR0 Work & Research, unlock high-depth Pro, or scale with Custom institutional plans."
+        description="Transparent pricing for students, creators, and organizations. Start free with ZYR0 Work & Research, unlock ZYR0 GO ($4.99) or ZYR0 PLUS ($9.99), or scale with Teams and Custom solutions."
         path="/pricing"
       />
 
       <main className="pt-28 sm:pt-36 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono tracking-widest uppercase border border-border bg-muted text-muted-foreground mb-4">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5 text-accent" />
             Transparent Ecosystem Pricing
           </div>
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-foreground leading-[1.1]">
@@ -192,20 +229,43 @@ export default function Pricing() {
             </span>
           </h1>
           <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Start free as a student or individual researcher. Upgrade to Pro for high-depth AI research and builder tools. Scale with Custom for company intern management and institutional deployments.
+            Choose Personal plans for individual students, researchers, and creators — or Business plans for hiring teams, schools, and enterprise deployments.
           </p>
 
-          {/* Billing Frequency Switch */}
-          <div className="mt-8">
-            <BillingToggle interval={interval} onChange={setInterval} />
+          {/* Audience Switcher (Personal vs Business) */}
+          <div className="mt-8 flex justify-center">
+            <AudienceToggle audience={audience} onChange={setAudience} />
           </div>
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-24 max-w-6xl mx-auto items-stretch">
-          {cards.map((card) => (
-            <PricingCard key={card.id} card={card} interval={interval} />
-          ))}
+        <div className="mb-24">
+          {audience === 'personal' ? (
+            <div className="max-w-6xl mx-auto">
+              {/* Billing Toggle aligned to left above Free card + Link to Billing Help on right */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                <BillingToggle interval={interval} onChange={setInterval} />
+                <Link
+                  to="/billing-help"
+                  className="text-[11px] font-mono text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1 self-start sm:self-auto"
+                >
+                  <span>See billing help & policies</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+                {personalCards.map((card) => (
+                  <PricingCard key={card.id} card={card} interval={interval} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto items-stretch">
+              {businessCards.map((card) => (
+                <PricingCard key={card.id} card={card} interval={interval} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Feature Comparison Section */}
@@ -226,23 +286,31 @@ export default function Pricing() {
             <div className="overflow-x-auto">
               <table className="w-full table-fixed text-left text-xs border-collapse">
                 <colgroup>
-                  <col className="w-[46%]" />
-                  <col className="w-[18%]" />
-                  <col className="w-[18%]" />
-                  <col className="w-[18%]" />
+                  <col className="w-[40%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[12%]" />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-border bg-muted/40">
+                  <tr className="border-b border-border bg-muted/60">
                     <th className="py-3.5 px-4 sm:px-6 font-semibold text-foreground text-left">
                       Capability
                     </th>
-                    <th className="py-3.5 px-3 sm:px-4 font-semibold text-foreground text-center">
-                      Free ($0)
+                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                      Free
                     </th>
-                    <th className="py-3.5 px-3 sm:px-4 font-semibold text-accent text-center">
-                      Pro ($9.99/mo)
+                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                      GO ($4.99)
                     </th>
-                    <th className="py-3.5 px-3 sm:px-4 font-semibold text-foreground text-center">
+                    <th className="py-3.5 px-2 font-semibold text-accent text-center">
+                      PLUS ($9.99)
+                    </th>
+                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                      Teams
+                    </th>
+                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
                       Custom
                     </th>
                   </tr>
@@ -250,9 +318,9 @@ export default function Pricing() {
                 <tbody>
                   {comparisonCategories.map((cat, catIdx) => (
                     <Fragment key={catIdx}>
-                      <tr className="bg-muted/50 border-t border-b border-border">
+                      <tr className="bg-muted/40 border-t border-b border-border">
                         <td
-                          colSpan={4}
+                          colSpan={6}
                           className="py-2.5 px-4 sm:px-6 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
                         >
                           {cat.category}
@@ -261,7 +329,7 @@ export default function Pricing() {
                       {cat.rows.map((row, rowIdx) => (
                         <tr
                           key={`row-${catIdx}-${rowIdx}`}
-                          className="border-b border-border/50 hover:bg-muted/15 transition-colors"
+                          className="border-b border-border/60 hover:bg-muted/20 transition-colors"
                         >
                           <td className="py-3 px-4 sm:px-6 text-foreground font-medium align-middle">
                             <div className="flex items-center gap-2">
@@ -273,7 +341,7 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-3 sm:px-4 text-center align-middle">
+                          <td className="py-3 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
                               {typeof row.free === 'boolean' ? (
                                 row.free ? (
@@ -288,32 +356,62 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-3 sm:px-4 text-center align-middle">
+                          <td className="py-3 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
-                              {typeof row.pro === 'boolean' ? (
-                                row.pro ? (
+                              {typeof row.go === 'boolean' ? (
+                                row.go ? (
+                                  <Check className="w-4 h-4 text-foreground" />
+                                ) : (
+                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                )
+                              ) : (
+                                <span className="font-mono text-[11px] text-muted-foreground">
+                                  {row.go}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-2 text-center align-middle bg-accent/[0.02]">
+                            <div className="flex items-center justify-center">
+                              {typeof row.plus === 'boolean' ? (
+                                row.plus ? (
                                   <Check className="w-4 h-4 text-accent" />
                                 ) : (
                                   <Minus className="w-4 h-4 text-muted-foreground/30" />
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-accent font-medium">
-                                  {row.pro}
+                                  {row.plus}
                                 </span>
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-3 sm:px-4 text-center align-middle">
+                          <td className="py-3 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
-                              {typeof row.custom === 'boolean' ? (
-                                row.custom ? (
+                              {typeof row.teams === 'boolean' ? (
+                                row.teams ? (
                                   <Check className="w-4 h-4 text-foreground" />
                                 ) : (
                                   <Minus className="w-4 h-4 text-muted-foreground/30" />
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-foreground font-medium">
-                                  {row.custom}
+                                  {row.teams}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3 px-2 text-center align-middle">
+                            <div className="flex items-center justify-center">
+                              {typeof row.ent === 'boolean' ? (
+                                row.ent ? (
+                                  <Check className="w-4 h-4 text-foreground" />
+                                ) : (
+                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                )
+                              ) : (
+                                <span className="font-mono text-[11px] text-foreground font-medium">
+                                  {row.ent}
                                 </span>
                               )}
                             </div>
@@ -362,7 +460,7 @@ export default function Pricing() {
                     />
                   </button>
                   {isOpen && (
-                    <div className="px-5 pb-4 text-xs leading-relaxed text-muted-foreground border-t border-border/50 pt-3">
+                    <div className="px-5 pb-4 text-xs leading-relaxed text-muted-foreground border-t border-border/60 pt-3">
                       {faq.a}
                     </div>
                   )}
@@ -370,41 +468,30 @@ export default function Pricing() {
               );
             })}
           </div>
-        </div>
 
-        {/* Institutional Walkthrough Callout Banner */}
-        <div className="rounded-3xl border border-border bg-card p-8 sm:p-12 text-center relative overflow-hidden shadow-sm max-w-5xl mx-auto">
-          <div className="relative z-10 max-w-2xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border border-border bg-muted text-muted-foreground">
-              <Building2 className="w-3 h-3 text-foreground" />
-              Institutions & Enterprise
+          {/* See Billing Help Callout Banner */}
+          <div className="mt-8 p-5 rounded-2xl border border-border bg-card flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-left space-y-1">
+              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-accent" />
+                Questions about payments, renewals, or compute refunds?
+              </span>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                Review our complete, transparent subscription lifecycle, compute consumption terms, and fair use guidelines.
+              </p>
             </div>
-            <h3 className="text-2xl sm:text-4xl font-serif font-normal text-foreground">
-              Looking for a campus deployment or high-volume hiring setup?
-            </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              We provide tailored deployments for schools, universities, and enterprise hiring guilds with custom invoicing, student imports, and dedicated SLAs.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setDemoModalOpen(true)}
-                className="px-6 py-3 rounded-xl text-xs sm:text-sm font-medium bg-accent text-white hover:bg-accent/90 transition-all cursor-pointer"
-              >
-                Book Institutional Demo
-              </button>
-              <Link
-                to="/contact?subject=partnership"
-                className="px-6 py-3 rounded-xl text-xs sm:text-sm font-medium border border-border text-foreground hover:bg-muted transition-all"
-              >
-                Contact Sales Team
-              </Link>
-            </div>
+            <Link
+              to="/billing-help"
+              className="text-xs font-semibold text-accent hover:underline flex items-center gap-1 shrink-0"
+            >
+              <span>See billing help & policies</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </div>
         </div>
       </main>
 
-      {/* Book a Demo Modal */}
+      {/* Upgrade to Business Modal */}
       <BookDemoModal open={demoModalOpen} onOpenChange={setDemoModalOpen} />
     </div>
   );
