@@ -2,7 +2,7 @@ import type React from 'react';
 import {
   Code, School, BrainCircuit, Briefcase, Compass,
   HelpCircle, MessageCircle, BookOpen, BadgeCheck, Shield, FileText, Cookie,
-  Building2, Mail,
+  Building2, Mail, CreditCard,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -23,7 +23,7 @@ export interface ProductNavItem {
 }
 
 // Single source of truth for every nav/footer link.
-// Only routes verified live in App.tsx — no /cookie, no #pricing, no /security.
+// All routes verified live in App.tsx.
 export const productsNav: ProductNavItem[] = [
   {
     id: 'studio',
@@ -71,6 +71,7 @@ export const productsNav: ProductNavItem[] = [
 ];
 
 export const resourcesNav: NavItem[] = [
+  { label: 'Pricing', href: '/pricing', icon: CreditCard },
   { label: 'ToolHub', href: '/tools', icon: Compass, badge: 'New' },
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'FAQ', href: '/faq', icon: MessageCircle },
@@ -94,6 +95,7 @@ export const footerNav = {
     { label: 'ZYR0 Research', href: '/research' },
     { label: 'ZYR0 Work', href: '/internships' },
     { label: 'ZYR0 ToolHub', href: '/tools' },
+    { label: 'Pricing & Plans', href: '/pricing' },
     { label: 'Browse Internships', href: '/internships/browse' },
   ],
   students: [

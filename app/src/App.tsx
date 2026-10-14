@@ -53,6 +53,9 @@ const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
 const BlogHome = lazy(() => import('@/pages/public/BlogHome'));
 const BlogPostDetail = lazy(() => import('@/pages/public/BlogPostDetail'));
 
+// ZYR0 Pricing
+const Pricing = lazy(() => import('@/pages/public/Pricing'));
+
 // ZYR0 ToolHub Discovery + Detail Pages
 const ToolHub = lazy(() => import('@/pages/public/ToolHub'));
 const ToolDetail = lazy(() => import('@/pages/public/ToolDetail'));
@@ -309,6 +312,7 @@ export default function App() {
               <Route path="/tools" element={<ToolHub />} />
               <Route path="/tools/:slug" element={<ToolDetail />} />
               <Route path="/toolhub" element={<Navigate to="/tools" replace />} />
+              <Route path="/pricing" element={<Pricing />} />
             </Route>
 
             {/* Auth Routes */}

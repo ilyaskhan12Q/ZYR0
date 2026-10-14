@@ -178,10 +178,10 @@ export default function SiteNav() {
             </div>
 
             <Link
-              to="/research"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${location.pathname === '/research' ? 'text-accent bg-accent/10' : triggerClass(false)}`}
+              to="/pricing"
+              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${location.pathname === '/pricing' ? 'text-accent bg-accent/10' : triggerClass(false)}`}
             >
-              Research
+              Pricing
             </Link>
 
             <div className="relative">
@@ -476,11 +476,11 @@ export default function SiteNav() {
 
                 <div className="border-t border-border">
                   <Link
-                    to="/research"
+                    to="/pricing"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center min-h-12 text-sm font-semibold ${location.pathname === '/research' ? 'text-accent' : 'text-foreground'}`}
+                    className={`flex items-center min-h-12 text-sm font-semibold ${location.pathname === '/pricing' ? 'text-accent' : 'text-foreground'}`}
                   >
-                    Research
+                    Pricing
                   </Link>
                 </div>
 
