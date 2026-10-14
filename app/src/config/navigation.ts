@@ -72,6 +72,7 @@ export const productsNav: ProductNavItem[] = [
 
 export const resourcesNav: NavItem[] = [
   { label: 'Pricing', href: '/pricing', icon: CreditCard },
+  { label: 'Billing Help', href: '/billing-help', icon: CreditCard },
   { label: 'ToolHub', href: '/tools', icon: Compass, badge: 'New' },
   { label: 'Help Center', href: '/help', icon: HelpCircle },
   { label: 'FAQ', href: '/faq', icon: MessageCircle },
@@ -113,6 +114,7 @@ export const footerNav = {
   ],
   resources: [
     { label: 'Help Center', href: '/help' },
+    { label: 'Billing Help', href: '/billing-help' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Blog', href: '/blog' },
   ],

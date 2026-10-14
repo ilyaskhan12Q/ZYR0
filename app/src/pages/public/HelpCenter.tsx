@@ -72,7 +72,7 @@ const topics = [
   { label: 'Certificates', href: '/faq#certificates' },
   { label: 'Account Management', href: '/faq#account' },
   { label: 'Privacy & Security', href: '/privacy' },
-  { label: 'Billing & Plans', href: '/contact' },
+  { label: 'Billing & Plans', href: '/billing-help' },
 ];
 
 export default function HelpCenter() {

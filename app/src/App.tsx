@@ -75,6 +75,7 @@ const TermsOfService = lazy(() => import('@/pages/public/TermsOfService'));
 const CookiePolicy = lazy(() => import('@/pages/public/CookiePolicy'));
 const FAQ = lazy(() => import('@/pages/public/FAQ'));
 const HelpCenter = lazy(() => import('@/pages/public/HelpCenter'));
+const BillingHelp = lazy(() => import('@/pages/public/BillingHelp'));
 const Careers = lazy(() => import('@/pages/public/Careers'));
 const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
@@ -313,6 +314,8 @@ export default function App() {
               <Route path="/tools/:slug" element={<ToolDetail />} />
               <Route path="/toolhub" element={<Navigate to="/tools" replace />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/billing-help" element={<BillingHelp />} />
+              <Route path="/help/billing" element={<Navigate to="/billing-help" replace />} />
             </Route>
 
             {/* Auth Routes */}
