@@ -4,6 +4,7 @@ import { Save, Lock, Eye, EyeOff, Moon, Sun, Monitor, Loader2 } from 'lucide-rea
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import SubscriptionPlanCard from '@/components/pricing/SubscriptionPlanCard';
 
 function Toggle({
   label,
@@ -121,6 +122,8 @@ export default function CompanySettings() {
           {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
+ 
+      <SubscriptionPlanCard />
 
       {/* Notifications */}
       <m.div

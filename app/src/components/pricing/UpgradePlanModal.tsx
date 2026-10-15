@@ -105,6 +105,7 @@ export default function UpgradePlanModal({
       try {
         localStorage.setItem('zyro_active_plan', selectedPlan);
         localStorage.setItem('zyro_active_interval', interval);
+        window.dispatchEvent(new Event('zyro_plan_changed'));
       } catch {
         /* ignore */
       }
