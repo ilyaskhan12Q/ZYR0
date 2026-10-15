@@ -106,14 +106,162 @@ export async function getAllUsers(page = 0, limit = 20, role?: string) {
   return query;
 }
 
-/** Admin: update user status */
-export async function updateUserStatus(userId: string, status: Profile['status']) {
-  return supabase.from('profiles').update({ status }).eq('id', userId);
+/** Admin: record an administrative audit log entry */
+export async function recordAdminAuditLog({
+  actorId,
+  targetUserId,
+  action,
+  reason,
+  metadata = {},
+}: {
+  actorId?: string | null;
+  targetUserId?: string | null;
+  action: string;
+  reason?: string | null;
+  metadata?: Record<string, any>;
+}) {
+  try {
+    return await supabase.from('activity_logs').insert({
+      actor_id: actorId || null,
+      user_id: targetUserId || null,
+      action,
+      target: targetUserId || null,
+      target_type: 'user',
+      reason: reason || null,
+      details: reason ? `${action}: ${reason}` : action,
+      metadata,
+    });
+  } catch (err) {
+    console.warn('Failed to record admin audit log:', err);
+    return null;
+  }
 }
 
-/** Admin: update user role */
-export async function updateUserRole(userId: string, role: Profile['role']) {
-  return supabase.from('profiles').update({ role }).eq('id', userId);
+/** Admin: update user status with optional reason and audit logging */
+export async function updateUserStatus(
+  userId: string,
+  status: Profile['status'],
+  options?: { reason?: string; actorId?: string }
+) {
+  // If attempting to suspend/deactivate an admin, verify there is at least one other active admin
+  if (status === 'inactive' || status === 'suspended') {
+    const { data: targetProfile } = await supabase
+      .from('profiles')
+      .select('role, status')
+      .eq('id', userId)
+      .single();
+
+    if (targetProfile?.role === 'admin' && targetProfile?.status === 'active') {
+      const { count } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'admin')
+        .eq('status', 'active')
+        .neq('id', userId);
+
+      if ((count ?? 0) < 1) {
+        throw new Error('Cannot deactivate or suspend the last remaining active platform administrator.');
+      }
+    }
+  }
+
+  const updatePayload: Partial<Profile> = {
+    status,
+    status_reason: options?.reason || null,
+  };
+
+  if (status === 'suspended') {
+    updatePayload.suspended_at = new Date().toISOString();
+    updatePayload.suspended_by = options?.actorId || null;
+  } else if (status === 'active') {
+    updatePayload.suspended_at = null;
+    updatePayload.suspended_by = null;
+  }
+
+  const result = await supabase.from('profiles').update(updatePayload).eq('id', userId);
+  if (result.error) throw result.error;
+
+  await recordAdminAuditLog({
+    actorId: options?.actorId,
+    targetUserId: userId,
+    action: status === 'suspended' ? 'user_suspended' : status === 'active' ? 'user_activated' : 'user_status_changed',
+    reason: options?.reason,
+    metadata: { new_status: status },
+  });
+
+  return result;
+}
+
+/** Admin: update user role with last-admin guard and audit logging */
+export async function updateUserRole(
+  userId: string,
+  role: Profile['role'],
+  options?: { reason?: string; actorId?: string }
+) {
+  // Check last-admin safeguard if demoting an admin
+  if (role !== 'admin') {
+    const { data: targetProfile } = await supabase
+      .from('profiles')
+      .select('role, status')
+      .eq('id', userId)
+      .single();
+
+    if (targetProfile?.role === 'admin') {
+      const { count } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'admin')
+        .eq('status', 'active')
+        .neq('id', userId);
+
+      if ((count ?? 0) < 1) {
+        throw new Error('Cannot demote the last remaining active platform administrator.');
+      }
+    }
+  }
+
+  const result = await supabase.from('profiles').update({ role }).eq('id', userId);
+  if (result.error) throw result.error;
+
+  await recordAdminAuditLog({
+    actorId: options?.actorId,
+    targetUserId: userId,
+    action: 'user_role_changed',
+    reason: options?.reason,
+    metadata: { new_role: role },
+  });
+
+  return result;
+}
+
+/** Admin: update user plan tier with audit logging */
+export async function updateUserPlanTier(
+  userId: string,
+  planTier: NonNullable<Profile['plan_tier']>,
+  options?: { reason?: string; actorId?: string; expiresAt?: string | null }
+) {
+  const updatePayload: Partial<Profile> = {
+    plan_tier: planTier,
+    plan_granted_by: options?.actorId || null,
+    plan_granted_at: new Date().toISOString(),
+    plan_expires_at: options?.expiresAt || null,
+  };
+
+  const result = await supabase.from('profiles').update(updatePayload).eq('id', userId);
+  if (result.error) throw result.error;
+
+  await recordAdminAuditLog({
+    actorId: options?.actorId,
+    targetUserId: userId,
+    action: 'plan_tier_changed',
+    reason: options?.reason,
+    metadata: {
+      new_plan_tier: planTier,
+      expires_at: options?.expiresAt || null,
+    },
+  });
+
+  return result;
 }
 
 export interface ProfileCompletion {
