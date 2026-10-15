@@ -30,22 +30,40 @@ function PageTracker() {
 
 const PUBLIC_PREFIXES = ['/', '/internships', '/companies', '/about', '/contact', '/faq', '/careers', '/research', '/studio', '/school', '/edu', '/verify'];
 
-function initLenisIfPublic() {
-  const path = window.location.pathname;
-  const isPublic = PUBLIC_PREFIXES.some(p => p === '/' ? path === '/' : path.startsWith(p));
-  if (!isPublic) return;
+// Match a whole path segment: '/research' must not match '/research-agent'.
+function isPublicPath(path: string): boolean {
+  return PUBLIC_PREFIXES.some((p) => (p === '/' ? path === '/' : path === p || path.startsWith(`${p}/`)));
+}
 
-  const lenis = new Lenis({
-    duration: 1.2,
-    easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    touchMultiplier: 2,
-  });
+/**
+ * Smooth (Lenis) scrolling is only for the public, window-scrolling pages.
+ * Inner-scrolling routes such as /research-agent must keep native wheel input,
+ * so Lenis is created per public route and fully torn down when leaving it.
+ */
+function LenisManager() {
+  const location = useLocation();
 
-  function raf(time: number) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
+  useEffect(() => {
+    if (!isPublicPath(location.pathname)) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      touchMultiplier: 2,
+    });
+
+    let rafId = requestAnimationFrame(function raf(time: number) {
+      lenis.raf(time);
+      rafId = requestAnimationFrame(raf);
+    });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, [location.pathname]);
+
+  return null;
 }
 
 // Global error handlers for observability
@@ -57,10 +75,6 @@ window.addEventListener('unhandledrejection', (event) => {
 });
 
 function Root() {
-  useEffect(() => {
-    initLenisIfPublic();
-  }, []);
-
   return (
     <StrictMode>
       <PostHogProvider
@@ -71,6 +85,7 @@ function Root() {
           <HelmetProvider>
             <BrowserRouter>
               <PageTracker />
+              <LenisManager />
               <AuthProvider>
                 <ThemeProvider attribute="class" defaultTheme="light">
                   <App />

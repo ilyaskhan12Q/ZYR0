@@ -53,7 +53,7 @@ function toReportData(report: ResearchReport): ReportPayload {
   };
 }
 
-export function useResearchPipeline() {
+export function useResearchPipeline(persistHistory = true) {
   const [stage, setStage] = useState<PipelineStage>('idle');
   const [message, setMessage] = useState('');
   const [detail, setDetail] = useState<string | undefined>();
@@ -214,11 +214,14 @@ export function useResearchPipeline() {
 
         emit({ stage: 'done', message: 'Research complete' });
         setReport(research);
-        const saved = await persist(research, 'completed');
-        if (!saved) {
-          setErrors((prev) => [...prev, 'history: could not save this run to your research history']);
+        // Temporary chats: surface the report, skip the history write.
+        if (persistHistory) {
+          const saved = await persist(research, 'completed');
+          if (!saved) {
+            setErrors((prev) => [...prev, 'history: could not save this run to your research history']);
+          }
+          await loadHistory();
         }
-        await loadHistory();
       } catch (err) {
         const failure = err instanceof Error ? err.message : 'Research pipeline failed';
         setErrors((prev) => [...prev, failure]);
@@ -228,7 +231,7 @@ export function useResearchPipeline() {
         abortRef.current = null;
       }
     },
-    [emit, loadHistory, persist],
+    [emit, loadHistory, persist, persistHistory],
   );
 
   const run = useCallback(
