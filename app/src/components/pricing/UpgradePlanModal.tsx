@@ -128,8 +128,7 @@ export default function UpgradePlanModal({
         <div className="p-6 sm:p-7 border-b border-border bg-muted/40">
           <DialogHeader className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider bg-accent/10 border border-accent/25 text-accent font-semibold">
-                <Sparkles className="w-3 h-3" />
+              <div className="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-mono uppercase tracking-wider bg-muted text-muted-foreground border border-border font-medium">
                 {activePlanInfo.badge}
               </div>
 
@@ -151,7 +150,7 @@ export default function UpgradePlanModal({
                   onClick={() => setSelectedPlan('plus')}
                   className={`px-3 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
                     selectedPlan === 'plus'
-                      ? 'bg-accent text-white shadow-xs'
+                      ? 'bg-foreground text-background shadow-xs'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -203,12 +202,12 @@ export default function UpgradePlanModal({
                 onClick={() => onIntervalChange('yearly')}
                 className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1 ${
                   isYearly
-                    ? 'bg-accent text-white shadow-xs'
+                    ? 'bg-foreground text-background shadow-xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <span>Yearly</span>
-                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-black/20 text-white">
+                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-muted-foreground/30 text-current">
                   -20%
                 </span>
               </button>
@@ -231,7 +230,7 @@ export default function UpgradePlanModal({
             <ul className="space-y-2">
               {activePlanInfo.highlights.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-xs text-foreground/90">
-                  <Check className="w-3.5 h-3.5 text-accent mt-0.5 shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-foreground mt-0.5 shrink-0" />
                   <span className="leading-snug">{item}</span>
                 </li>
               ))}
@@ -261,7 +260,7 @@ export default function UpgradePlanModal({
               type="button"
               onClick={handleCheckout}
               disabled={loading}
-              className="w-full py-3.5 px-4 rounded-xl text-sm font-semibold bg-accent text-white hover:bg-accent/90 shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-3 px-4 rounded-xl text-xs font-semibold bg-foreground text-background hover:opacity-90 transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-2xs"
             >
               {loading ? (
                 <>

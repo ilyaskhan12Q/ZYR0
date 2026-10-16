@@ -248,6 +248,8 @@ export default function AdminDashboard() {
 
     return {
       requests: agentUsageRows.length,
+      inputTokens: totalInput,
+      outputTokens: totalOutput,
       totalTokens,
       avgLatency,
       topModel,
@@ -264,21 +266,21 @@ export default function AdminDashboard() {
     const mentorsCount = profiles.filter((p) => p.role === 'mentor').length;
 
     return [
-      { label: 'Students', value: studentsCount.toString(), icon: Users },
-      { label: 'Mentors', value: mentorsCount.toString(), icon: Shield },
-      { label: 'Companies', value: companies.length.toString(), icon: FolderOpen },
-      { label: 'Internships', value: internshipsCount.toString(), icon: Zap },
+      { label: 'Students', value: studentsCount.toString(), subtext: 'Registered learners', icon: Users },
+      { label: 'Mentors', value: mentorsCount.toString(), subtext: 'Industry guides', icon: Shield },
+      { label: 'Companies', value: companies.length.toString(), subtext: 'Partner orgs', icon: FolderOpen },
+      { label: 'Internships', value: internshipsCount.toString(), subtext: 'Active postings', icon: Zap },
       {
         label: 'Est. MRR',
         value: `$${planBreakdown.mrr.toFixed(2)}`,
+        subtext: `${planBreakdown.paid} paid accounts`,
         icon: CreditCard,
-        color: 'text-amber-500',
       },
       {
         label: 'AI Tokens',
         value: `${(aiTelemetry.totalTokens / 1000).toFixed(1)}k`,
+        subtext: `${aiTelemetry.requests} invocations`,
         icon: Cpu,
-        color: 'text-cyan-500',
       },
     ];
   }, [profiles, companies, internshipsCount, planBreakdown, aiTelemetry]);
@@ -351,20 +353,24 @@ export default function AdminDashboard() {
         {stats.map((stat, i) => (
           <m.div
             key={i}
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-            className="p-4 rounded-2xl bg-card border border-border shadow-2xs flex flex-col justify-between"
+            transition={{ delay: i * 0.03 }}
+            className="p-4 rounded-xl bg-card border border-border shadow-2xs flex flex-col justify-between"
           >
             <div className="flex items-center justify-between">
-              <stat.icon className={`w-4 h-4 ${stat.color || 'text-accent'}`} />
-              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
-                Active
+              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                {stat.label}
               </span>
+              <stat.icon className="w-3.5 h-3.5 text-muted-foreground/70" />
             </div>
-            <div className="mt-2">
-              <p className="text-xl font-bold tracking-tight">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+            <div className="mt-3">
+              <p className="text-2xl font-bold tracking-tight text-foreground font-mono tabular-nums">
+                {stat.value}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                {stat.subtext}
+              </p>
             </div>
           </m.div>
         ))}
@@ -372,125 +378,200 @@ export default function AdminDashboard() {
 
       {/* Monetization & AI Compute Telemetry Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Subscription & Monetization Card */}
+        {/* Subscription & Monetization Card (Linear/Datadog Operational Command Center) */}
         <m.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="p-5 rounded-2xl bg-card border border-border shadow-2xs space-y-4"
+          className="p-5 rounded-xl bg-card border border-border shadow-2xs space-y-4"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center">
-                <CreditCard className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm">Subscription & Plan Health</h3>
-                <p className="text-xs text-muted-foreground">Monetization breakdown across user base</p>
-              </div>
+            <div>
+              <h3 className="font-semibold text-sm text-foreground tracking-tight">Subscription & Monetization Yield</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Tier distribution across user base and revenue run-rate</p>
             </div>
-            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              {planBreakdown.conversion}% Conv.
+            <span className="text-xs font-mono font-medium px-2 py-0.5 rounded border border-border bg-muted/50 text-foreground">
+              {planBreakdown.conversion}% Conversion
             </span>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 pt-1">
-            <div className="p-3 rounded-xl bg-muted/40 border border-border text-center">
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Free</p>
-              <p className="text-lg font-bold mt-0.5">{planBreakdown.free}</p>
-              <p className="text-[10px] text-muted-foreground">Standard</p>
+          {/* Segmented Proportional Visual Distribution Bar */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
+              <span>Tier Distribution</span>
+              <span>{planBreakdown.total} Total Users</span>
             </div>
-            <div className="p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/25 text-center">
-              <p className="text-[10px] uppercase font-semibold text-cyan-600 dark:text-cyan-400">GO</p>
-              <p className="text-lg font-bold text-cyan-600 dark:text-cyan-400 mt-0.5">
-                {planBreakdown.go}
-              </p>
-              <p className="text-[10px] text-muted-foreground">$4.99/mo</p>
-            </div>
-            <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/25 text-center">
-              <p className="text-[10px] uppercase font-semibold text-amber-600 dark:text-amber-400 flex items-center justify-center gap-1">
-                <Sparkles className="w-2.5 h-2.5" /> PLUS
-              </p>
-              <p className="text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">
-                {planBreakdown.plus}
-              </p>
-              <p className="text-[10px] text-muted-foreground">$9.99/mo</p>
-            </div>
-            <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/25 text-center">
-              <p className="text-[10px] uppercase font-semibold text-emerald-600 dark:text-emerald-400">
-                Custom
-              </p>
-              <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                {planBreakdown.enterprise}
-              </p>
-              <p className="text-[10px] text-muted-foreground">Org/School</p>
+            <div className="h-2.5 w-full rounded-md bg-muted overflow-hidden flex border border-border/60">
+              <div
+                style={{ width: `${(planBreakdown.free / planBreakdown.total) * 100}%` }}
+                className="bg-muted-foreground/30 hover:opacity-90 transition-all"
+                title={`Free: ${planBreakdown.free} (${((planBreakdown.free / planBreakdown.total) * 100).toFixed(1)}%)`}
+              />
+              <div
+                style={{ width: `${(planBreakdown.go / planBreakdown.total) * 100}%` }}
+                className="bg-cyan-500/70 hover:opacity-90 transition-all"
+                title={`GO: ${planBreakdown.go} (${((planBreakdown.go / planBreakdown.total) * 100).toFixed(1)}%)`}
+              />
+              <div
+                style={{ width: `${(planBreakdown.plus / planBreakdown.total) * 100}%` }}
+                className="bg-foreground hover:opacity-90 transition-all"
+                title={`PLUS: ${planBreakdown.plus} (${((planBreakdown.plus / planBreakdown.total) * 100).toFixed(1)}%)`}
+              />
+              <div
+                style={{ width: `${(planBreakdown.enterprise / planBreakdown.total) * 100}%` }}
+                className="bg-emerald-500 hover:opacity-90 transition-all"
+                title={`Enterprise: ${planBreakdown.enterprise} (${((planBreakdown.enterprise / planBreakdown.total) * 100).toFixed(1)}%)`}
+              />
             </div>
           </div>
 
-          <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">
-              Total Paid Accounts: <strong className="text-foreground">{planBreakdown.paid}</strong>
+          {/* Descriptive Breakdown Table */}
+          <div className="divide-y divide-border rounded-lg border border-border bg-muted/20">
+            <div className="grid grid-cols-4 p-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              <span>Tier</span>
+              <span className="text-right">Users</span>
+              <span className="text-right">Share</span>
+              <span className="text-right">MRR Yield</span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shrink-0" />
+                Free
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.free}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {((planBreakdown.free / planBreakdown.total) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono text-muted-foreground">$0.00</span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0" />
+                ZYR0 GO
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.go}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {((planBreakdown.go / planBreakdown.total) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono font-medium text-foreground">
+                ${(planBreakdown.go * 4.99).toFixed(2)}
+              </span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-foreground shrink-0" />
+                ZYR0 PLUS
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.plus}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {((planBreakdown.plus / planBreakdown.total) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono font-medium text-foreground">
+                ${(planBreakdown.plus * 9.99).toFixed(2)}
+              </span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                Enterprise
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.enterprise}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {((planBreakdown.enterprise / planBreakdown.total) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono text-muted-foreground">Custom SLA</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Total Paid Accounts: <strong className="text-foreground font-mono">{planBreakdown.paid}</strong>
             </span>
-            <span className="text-muted-foreground">
-              Estimated Run-Rate: <strong className="text-accent">${(planBreakdown.mrr * 12).toFixed(2)}/yr</strong>
+            <span>
+              Annualized Run-Rate: <strong className="text-foreground font-mono">${(planBreakdown.mrr * 12).toFixed(2)}/yr</strong>
             </span>
           </div>
         </m.div>
 
-        {/* AI Research & Compute Telemetry Card */}
+        {/* AI Research & Compute Telemetry Card (Linear/Datadog Operational Command Center) */}
         <m.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="p-5 rounded-2xl bg-card border border-border shadow-2xs space-y-4"
+          className="p-5 rounded-xl bg-card border border-border shadow-2xs space-y-4"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-500 flex items-center justify-center">
-                <Cpu className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm">AI Research & Compute Meter</h3>
-                <p className="text-xs text-muted-foreground">Gateway invocation volumes & token burn</p>
-              </div>
+            <div>
+              <h3 className="font-semibold text-sm text-foreground tracking-tight">AI Compute & Gateway Telemetry</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Token consumption, latency health, and reasoning engine load</p>
             </div>
-            <span className="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
-              Live Gateway
+            <span className="inline-flex items-center gap-1.5 text-xs font-mono font-medium px-2 py-0.5 rounded border border-border bg-muted/50 text-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Operational</span>
             </span>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 pt-1">
-            <div className="p-3 rounded-xl bg-muted/40 border border-border text-center">
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Invocations</p>
-              <p className="text-lg font-bold mt-0.5">{aiTelemetry.requests}</p>
-              <p className="text-[10px] text-muted-foreground">Queries</p>
+          {/* Contextual Metrics Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Invocations</p>
+              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{aiTelemetry.requests}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Agent executions</p>
             </div>
-            <div className="p-3 rounded-xl bg-muted/40 border border-border text-center">
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Total Tokens</p>
-              <p className="text-lg font-bold mt-0.5">
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Total Tokens</p>
+              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">
                 {(aiTelemetry.totalTokens / 1000).toFixed(1)}k
               </p>
-              <p className="text-[10px] text-muted-foreground">In + Out</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {aiTelemetry.requests > 0 ? Math.round(aiTelemetry.totalTokens / aiTelemetry.requests) : 0} tok/req avg
+              </p>
             </div>
-            <div className="p-3 rounded-xl bg-muted/40 border border-border text-center">
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Avg Latency</p>
-              <p className="text-lg font-bold mt-0.5">{aiTelemetry.avgLatency}ms</p>
-              <p className="text-[10px] text-muted-foreground">Round-trip</p>
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Avg Latency</p>
+              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{aiTelemetry.avgLatency}ms</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {aiTelemetry.avgLatency < 500 ? 'Optimal response' : 'Standard lane'}
+              </p>
             </div>
-            <div className="p-3 rounded-xl bg-muted/40 border border-border text-center">
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Top Model</p>
-              <p className="text-xs font-bold truncate mt-1.5" title={aiTelemetry.topModel}>
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Top Engine</p>
+              <p className="text-xs font-bold font-mono truncate mt-2 text-foreground" title={aiTelemetry.topModel}>
                 {aiTelemetry.topModel.replace('gemini-', '').replace('llama-', '')}
               </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">Primary engine</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Primary model</p>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-border flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Rate Limit: 20 req/min/user</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-              <Activity className="w-3 h-3" /> Compute healthy
-            </span>
+          {/* Token Breakdown Bar */}
+          <div className="p-3 rounded-lg border border-border bg-muted/10 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-muted-foreground">Prompt vs Completion Tokens</span>
+              <span className="text-foreground">
+                In: {((aiTelemetry.inputTokens || 0) / 1000).toFixed(1)}k · Out: {((aiTelemetry.outputTokens || 0) / 1000).toFixed(1)}k
+              </span>
+            </div>
+            <div className="h-2 w-full rounded bg-muted overflow-hidden flex border border-border/50">
+              <div
+                style={{
+                  width: `${aiTelemetry.totalTokens > 0 ? ((aiTelemetry.inputTokens || 0) / aiTelemetry.totalTokens) * 100 : 50}%`,
+                }}
+                className="bg-muted-foreground/60 transition-all"
+                title="Input/Prompt tokens"
+              />
+              <div
+                style={{
+                  width: `${aiTelemetry.totalTokens > 0 ? ((aiTelemetry.outputTokens || 0) / aiTelemetry.totalTokens) * 100 : 50}%`,
+                }}
+                className="bg-foreground transition-all"
+                title="Output/Completion tokens"
+              />
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+            <span>Gateway Policy: Max 20 req/min/user</span>
+            <span className="text-foreground font-mono">Queue Delay: 0ms (Dedicated)</span>
           </div>
         </m.div>
       </div>

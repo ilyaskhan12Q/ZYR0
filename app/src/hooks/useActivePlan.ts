@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { PlanTier } from '@/lib/database.types';
 
+export interface PlanEntitlement {
+  label: string;
+  value: string;
+}
+
 export interface PlanMeta {
   tier: PlanTier;
   name: string;
@@ -11,40 +16,61 @@ export interface PlanMeta {
   badgeColor: string;
   description: string;
   isManualGrant: boolean;
+  entitlements: PlanEntitlement[];
 }
 
 export const PLAN_DETAILS: Record<PlanTier, Omit<PlanMeta, 'tier' | 'isManualGrant'>> = {
   free: {
-    name: 'Free Plan',
+    name: 'Free Tier',
     badge: 'Standard',
     isPaid: false,
     color: 'text-foreground',
     badgeColor: 'bg-muted text-muted-foreground border-border',
-    description: 'Essential platform access, verified workspaces, and standard AI research synthesis.',
+    description: 'Essential platform access, verified candidate profiles, and standard AI research synthesis.',
+    entitlements: [
+      { label: 'Compute Lane', value: 'Standard Shared Queue' },
+      { label: 'Context Horizon', value: 'Standard 32k window' },
+      { label: 'Export Options', value: 'Web view & plain text' },
+    ],
   },
   go: {
     name: 'ZYR0 GO',
-    badge: 'Creator Boost',
+    badge: 'Creator',
     isPaid: true,
-    color: 'text-cyan-600 dark:text-cyan-400',
-    badgeColor: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/25',
+    color: 'text-foreground',
+    badgeColor: 'bg-muted/80 text-foreground border-border',
     description: '5× faster synthesis, priority candidate status, and one-click Markdown/PDF exports.',
+    entitlements: [
+      { label: 'Compute Lane', value: 'Priority Creator Lane (5×)' },
+      { label: 'Context Horizon', value: 'Expanded 64k window' },
+      { label: 'Export Options', value: 'Markdown & structured PDF' },
+    ],
   },
   plus: {
     name: 'ZYR0 PLUS',
-    badge: 'Flagship Tier',
+    badge: 'Pro',
     isPaid: true,
-    color: 'text-amber-600 dark:text-amber-400',
-    badgeColor: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/25',
+    color: 'text-foreground',
+    badgeColor: 'bg-muted/80 text-foreground border-border',
     description: 'Deep multi-step reasoning models, zero queue delays, and VIP early access to ZYR0 Studio.',
+    entitlements: [
+      { label: 'Compute Lane', value: 'Dedicated Fast Lane (0 delay)' },
+      { label: 'Reasoning Engine', value: 'Deep Multi-Step Models' },
+      { label: 'Studio Access', value: 'Autonomous Code & UI Builder' },
+    ],
   },
   enterprise: {
-    name: 'Enterprise / Custom',
+    name: 'Enterprise',
     badge: 'Institutional',
     isPaid: true,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25',
-    description: 'Full institutional deployment covering SchoolOS, custom SLAs, and multi-role academy portals.',
+    color: 'text-foreground',
+    badgeColor: 'bg-muted/80 text-foreground border-border',
+    description: 'Institutional deployment covering SchoolOS, custom SLAs, and multi-role academy portals.',
+    entitlements: [
+      { label: 'Deployment', value: 'SchoolOS & Custom SLAs' },
+      { label: 'Compute Lane', value: 'Dedicated Compute Instance' },
+      { label: 'Governance', value: 'SSO & Multi-Admin Audit Trail' },
+    ],
   },
 };
 

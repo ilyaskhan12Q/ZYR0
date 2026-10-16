@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Sparkles, CheckCircle2, ShieldCheck, ArrowRight, ExternalLink } from 'lucide-react';
+import { ShieldCheck, ArrowRight, ExternalLink } from 'lucide-react';
 import type { PlanTier } from '@/lib/database.types';
 import { PLAN_DETAILS } from '@/hooks/useActivePlan';
 
@@ -31,21 +31,19 @@ export default function PlanStatusModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md p-6 border border-border bg-card text-foreground rounded-3xl shadow-2xl space-y-5">
+      <DialogContent className="max-w-md p-6 border border-border bg-card text-foreground rounded-2xl shadow-xl space-y-5">
         <DialogHeader className="space-y-2 text-left">
           <div className="flex items-center justify-between">
-            <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${info.badgeColor}`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              {info.badge}
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground bg-muted border border-border px-2.5 py-0.5 rounded-md">
+              <span className={`w-1.5 h-1.5 rounded-full ${info.isPaid ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
+              <span>Active Status</span>
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Active
+            <span className="text-xs font-mono font-medium text-muted-foreground px-2 py-0.5 rounded border border-border bg-card">
+              {info.badge}
             </span>
           </div>
 
-          <DialogTitle className={`text-2xl font-bold tracking-tight ${info.color}`}>
+          <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
             {info.name}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
@@ -54,11 +52,26 @@ export default function PlanStatusModal({
         </DialogHeader>
 
         {isManualGrant && (
-          <div className="p-3 rounded-xl bg-accent/5 border border-accent/20 flex items-center gap-2.5 text-xs text-accent">
-            <ShieldCheck className="w-4 h-4 shrink-0" />
+          <div className="p-2.5 rounded-lg bg-muted/50 border border-border flex items-center gap-2 text-xs text-muted-foreground">
+            <ShieldCheck className="w-4 h-4 text-foreground shrink-0" />
             <span>Complimentary platform grant assigned by administration.</span>
           </div>
         )}
+
+        {/* Structured Entitlements List */}
+        <div className="space-y-2 pt-1">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            Active Entitlements
+          </p>
+          <div className="divide-y divide-border rounded-lg border border-border bg-muted/20">
+            {info.entitlements.map((spec, i) => (
+              <div key={i} className="flex items-center justify-between p-2.5 text-xs">
+                <span className="text-muted-foreground">{spec.label}</span>
+                <span className="font-medium text-foreground">{spec.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="pt-2 border-t border-border space-y-3">
           <button
@@ -67,7 +80,7 @@ export default function PlanStatusModal({
               onOpenChange(false);
               onOpenUpgrade();
             }}
-            className="w-full py-2.5 px-4 rounded-xl bg-accent text-accent-foreground font-semibold text-xs transition-opacity hover:opacity-90 flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            className="w-full py-2.5 px-4 rounded-xl bg-foreground text-background font-medium text-xs transition-opacity hover:opacity-90 flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
           >
             <span>{normalizedPlan === 'free' ? 'Upgrade Plan' : 'Change Plan'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
