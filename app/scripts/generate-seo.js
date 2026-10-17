@@ -192,6 +192,7 @@ function generateLlmsTxt() {
 - [ZYR0 Research](${SITE_URL}/research): Autonomous deep intelligence for literature reviews, market intelligence, and code audits.
 - [ZYR0 Work](${SITE_URL}/internships): Bridge academic theory with real engineering. Verifiable proof-of-work credentials.
 - [Partner Companies](${SITE_URL}/companies): Verified companies offering structured internships on ZYR0.
+- [ToolHub](${SITE_URL}/tools): Curated AI, developer utilities, and agent skills from ZYR0, GitHub, and Hugging Face.
 - [Verify Certificate](${SITE_URL}/verify): Instantly verify ZYR0 internship certificates and offer letters by credential ID.
 - [About ZYR0](${SITE_URL}/about): ZYR0's mission, vision, and values.
 - [FAQ](${SITE_URL}/faq): Common questions about applying, stipends, milestone tasks, and certificates.
@@ -1175,9 +1176,9 @@ function prerenderStaticPages(indexHtml) {
   }
 }
 
-// Extend the sitemap with dynamic, indexable URLs (approved companies, active internships, published blogs)
+// Extend the sitemap with dynamic, indexable URLs (approved companies, active internships, published blogs, approved tools)
 // using honest lastmod dates from the database. Listing pages adopt the newest record date.
-function writeEnhancedSitemap(companies, internships, blogs) {
+function writeEnhancedSitemap(companies, internships, blogs, tools) {
   const entries = buildStaticSitemapEntries();
 
   const newest = (rows) => {
@@ -1187,11 +1188,13 @@ function writeEnhancedSitemap(companies, internships, blogs) {
   const newestCompany = newest(companies);
   const newestInternship = newest(internships);
   const newestBlog = newest(blogs);
+  const newestTool = newest(tools);
 
   for (const entry of entries) {
     if (entry.loc === `${SITE_URL}/companies` && newestCompany) entry.lastmod = newestCompany;
     if (entry.loc === `${SITE_URL}/internships` && newestInternship) entry.lastmod = newestInternship;
     if (entry.loc === `${SITE_URL}/blog` && newestBlog) entry.lastmod = newestBlog;
+    if (entry.loc === `${SITE_URL}/tools` && newestTool) entry.lastmod = newestTool;
   }
 
   for (const company of companies || []) {
@@ -1210,6 +1213,12 @@ function writeEnhancedSitemap(companies, internships, blogs) {
     entries.push({
       loc: `${SITE_URL}/blog/${blog.slug}`,
       lastmod: isoDate(blog.published_at || blog.updated_at || blog.created_at),
+    });
+  }
+  for (const tool of tools || []) {
+    entries.push({
+      loc: `${SITE_URL}/tools/${tool.slug}`,
+      lastmod: isoDate(tool.updated_at || tool.created_at),
     });
   }
 
@@ -1456,8 +1465,89 @@ async function prerenderDynamicPages(indexHtml) {
       fs.writeFileSync(path.join(routeDir, 'index.html'), pageHtml, 'utf-8');
     }
 
+    // Pre-render approved tool and skill detail pages
+    let tools = [];
+    console.log('[SEO Prerender] Fetching approved tools from Supabase...');
+    try {
+      tools = await supabaseQuery('tools', {
+        select: 'slug,name,tagline,description,item_type,category,tags,source,source_url,author_name,author_url,version,install_command,capabilities,image_url,cover_color,badge,featured,updated_at,created_at',
+        status: 'eq.approved',
+      });
+      console.log(`[SEO Prerender] Pre-rendering ${tools.length} approved tools and skills...`);
+    } catch (err) {
+      console.error('[SEO Prerender] Error fetching tools:', err.message);
+    }
+
+    for (const tool of tools) {
+      const slug = tool.slug;
+      const pagePath = `tools/${slug}`;
+      const canonicalUrl = `${SITE_URL}/${pagePath}`;
+      const typeLabel = tool.item_type === 'tool_skill' ? 'Tool + Skill' : tool.item_type === 'skill' ? 'Skill' : 'Tool';
+      const title = `${tool.name} — ZYR0 ToolHub`;
+      const description = tool.tagline || `Discover ${tool.name}, a ${typeLabel.toLowerCase()} in the ZYR0 ToolHub.`;
+      const keywords = [
+        tool.name,
+        tool.category,
+        tool.source,
+        ...(tool.tags || []),
+        'ZYR0 ToolHub',
+        'developer tools',
+        'AI tools'
+      ].filter(Boolean).join(', ');
+
+      const toolStructuredData = [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'SoftwareApplication',
+          name: tool.name,
+          description: tool.tagline,
+          applicationCategory: 'DeveloperApplication',
+          operatingSystem: 'Cross-platform',
+          url: tool.source_url,
+          image: tool.image_url || undefined,
+          author: tool.author_name ? {
+            '@type': 'Person',
+            name: tool.author_name,
+            url: tool.author_url || undefined,
+          } : undefined,
+          offers: {
+            '@type': 'Offer',
+            price: '0',
+            priceCurrency: 'USD',
+          },
+          softwareVersion: tool.version || undefined,
+          dateModified: tool.updated_at || tool.created_at,
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/` },
+            { '@type': 'ListItem', position: 2, name: 'ToolHub', item: `${SITE_URL}/tools` },
+            { '@type': 'ListItem', position: 3, name: tool.name, item: canonicalUrl },
+          ],
+        },
+      ];
+
+      const meta = {
+        title,
+        description,
+        keywords,
+        canonicalUrl,
+        image: tool.image_url || undefined,
+        structuredData: toolStructuredData,
+        path: 'tool_detail',
+        data: { tool },
+      };
+
+      const pageHtml = renderTemplate(indexHtml, meta);
+      const routeDir = path.join(distDir, 'tools', slug);
+      fs.mkdirSync(routeDir, { recursive: true });
+      fs.writeFileSync(path.join(routeDir, 'index.html'), pageHtml, 'utf-8');
+    }
+
     // Append dynamic URLs to the sitemap now that real data is available
-    writeEnhancedSitemap(companies, internships, blogs);
+    writeEnhancedSitemap(companies, internships, blogs, tools);
 
   } catch (err) {
     console.error('[SEO Prerender] Dynamic pre-rendering failed:', err);

@@ -89,6 +89,26 @@ export async function getAllPublicTools(): Promise<ToolItem[]> {
 }
 
 /**
+ * Fetch a single approved tool by its URL slug for the detail page.
+ * Returns null if the tool does not exist or is not approved (prevents detail pages for pending/rejected).
+ */
+export async function getToolBySlug(slug: string): Promise<ToolItem | null> {
+  try {
+    const { data, error } = await supabase
+      .from('tools')
+      .select('*')
+      .eq('slug', slug)
+      .eq('status', 'approved')
+      .single();
+
+    if (error || !data) return null;
+    return mapDbToolToToolItem(data as DbTool);
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Submit a tool or skill by an authenticated student or company user.
  */
 export async function submitTool(input: SubmitToolInput, ownerId: string): Promise<DbTool> {

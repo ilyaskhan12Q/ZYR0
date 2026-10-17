@@ -152,28 +152,41 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
         .map((c) => c.trim())
         .filter(Boolean);
 
+      let cleanSourceUrl = sourceUrl.trim();
+      if (cleanSourceUrl && !/^https?:\/\//i.test(cleanSourceUrl)) {
+        cleanSourceUrl = `https://${cleanSourceUrl}`;
+      }
+      let cleanDocUrl = docUrl.trim();
+      if (cleanDocUrl && !/^https?:\/\//i.test(cleanDocUrl)) {
+        cleanDocUrl = `https://${cleanDocUrl}`;
+      }
+      let cleanAuthorUrl = authorUrl.trim();
+      if (cleanAuthorUrl && !/^https?:\/\//i.test(cleanAuthorUrl)) {
+        cleanAuthorUrl = `https://${cleanAuthorUrl}`;
+      }
+
       const input: SubmitToolInput = {
-        name,
-        tagline,
-        description,
+        name: name.trim(),
+        tagline: tagline.trim(),
+        description: description.trim(),
         item_type: itemType,
         category,
         tags: tags.length > 0 ? tags : ['Developer'],
-        source,
-        source_url: sourceUrl,
-        documentation_url: docUrl || undefined,
-        image_url: imageUrl || undefined,
+        source: source.trim(),
+        source_url: cleanSourceUrl,
+        documentation_url: cleanDocUrl || undefined,
+        image_url: imageUrl.trim() || undefined,
         capabilities: capabilities.length > 0 ? capabilities : ['Fast workflow execution'],
-        install_command: installCommand || undefined,
-        install_instructions: installInstructions || undefined,
-        version: version || undefined,
-        author_name: authorName || profile?.full_name || 'Community Builder',
-        author_url: authorUrl || undefined,
+        install_command: installCommand.trim() || undefined,
+        install_instructions: installInstructions.trim() || undefined,
+        version: version.trim() || undefined,
+        author_name: authorName.trim() || profile?.full_name || 'Community Builder',
+        author_url: cleanAuthorUrl || undefined,
         ...(isAdmin
           ? {
               status: adminStatus,
               featured: adminFeatured,
-              badge: adminBadge || undefined,
+              badge: adminBadge.trim() || undefined,
               cover_color: adminCoverColor.trim() || undefined,
             }
           : {}),
@@ -427,8 +440,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                       >
                         <option value="GitHub">GitHub</option>
                         <option value="Hugging Face">Hugging Face</option>
-                        <option value="Web">Official Website</option>
+                        <option value="ZYR0 Native">ZYR0 Native (Built-in)</option>
                         <option value="GitLab">GitLab</option>
+                        <option value="Web">Official Website</option>
                       </select>
                     </div>
 
@@ -546,14 +560,26 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                       {/* Install command / Skill prompt */}
                       <div className="space-y-1.5">
                         <label htmlFor="st-install" className="text-xs font-semibold text-foreground flex items-center justify-between">
-                          <span>{itemType === 'skill' ? 'Skill Invocation / Execution Command' : 'Quick Install Command'}</span>
+                          <span>
+                            {itemType === 'skill'
+                              ? 'Skill Invocation / Execution Command'
+                              : itemType === 'tool_skill'
+                              ? 'Install or Execution Command'
+                              : 'Quick Install Command'}
+                          </span>
                         </label>
                         <div className="relative">
                           <Terminal className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                           <input
                             id="st-install"
                             type="text"
-                            placeholder={itemType === 'skill' ? '/skill run --input ...' : 'npm install @example/tool or pip install ...'}
+                            placeholder={
+                              itemType === 'skill'
+                                ? '/skill run --input ... or npx skill-pkg'
+                                : itemType === 'tool_skill'
+                                ? 'npx ecc-universal install --guided'
+                                : 'npm install @example/tool or pip install ... or cargo install ...'
+                            }
                             value={installCommand}
                             onChange={(e) => setInstallCommand(e.target.value)}
                             className={`${inputCls} pl-9 font-mono`}
@@ -584,11 +610,29 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                           <input
                             id="st-tags"
                             type="text"
-                            placeholder="LLM, Agent, Rust, CLI"
+                            placeholder="Agent, Skills, CLI, LLM"
                             value={tagsInput}
                             onChange={(e) => setTagsInput(e.target.value)}
                             className={inputCls}
                           />
+                          <div className="flex flex-wrap items-center gap-1 pt-1">
+                            <span className="text-[10px] text-muted-foreground mr-0.5">Quick add:</span>
+                            {['Agent', 'Skills', 'CLI', 'LLM', 'MCP', 'Productivity', 'Python', 'TypeScript', 'Rust'].map((tag) => (
+                              <button
+                                type="button"
+                                key={tag}
+                                onClick={() => {
+                                  const existing = tagsInput.split(',').map((t) => t.trim().replace(/^#/, '')).filter(Boolean);
+                                  if (!existing.includes(tag)) {
+                                    setTagsInput(existing.length > 0 ? `${existing.join(', ')}, ${tag}` : tag);
+                                  }
+                                }}
+                                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/50 hover:border-[var(--zyro-accent)]/50 hover:text-[var(--zyro-accent)] transition-all cursor-pointer"
+                              >
+                                +{tag}
+                              </button>
+                            ))}
+                          </div>
                         </div>
 
                         <div className="space-y-1.5">
@@ -627,11 +671,14 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                         <textarea
                           id="st-caps"
                           rows={3}
-                          placeholder="Feature 1&#10;Feature 2"
+                          placeholder="Agents - 71&#10;Skills - 302&#10;OpenAI-compatible drop-in server"
                           value={capabilitiesInput}
                           onChange={(e) => setCapabilitiesInput(e.target.value)}
                           className={inputCls}
                         />
+                        <span className="text-[10px] text-muted-foreground block mt-0.5">
+                          Tip: Use "Feature - Metric" pairs (e.g. Agents - 71) or plain feature bullet points.
+                        </span>
                       </div>
                     </div>
                   )}
@@ -687,11 +734,28 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                         <input
                           id="st-badge"
                           type="text"
-                          placeholder="e.g. Official, Staff Pick, Verified"
+                          placeholder="e.g. Verified, Official, Staff Pick"
                           value={adminBadge}
                           onChange={(e) => setAdminBadge(e.target.value)}
                           className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent text-foreground"
                         />
+                        <div className="flex flex-wrap items-center gap-1 pt-1">
+                          <span className="text-[10px] text-muted-foreground mr-0.5">Presets:</span>
+                          {['Verified', 'Official', 'Staff Pick', 'Trending', 'Popular', 'Beta'].map((b) => (
+                            <button
+                              type="button"
+                              key={b}
+                              onClick={() => setAdminBadge(b)}
+                              className={`text-[10px] px-1.5 py-0.5 rounded border transition-all cursor-pointer ${
+                                adminBadge === b
+                                  ? 'bg-[var(--zyro-accent)] text-white border-[var(--zyro-accent)] font-semibold'
+                                  : 'bg-card text-muted-foreground border-border/70 hover:bg-muted/40'
+                              }`}
+                            >
+                              {b}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
@@ -809,10 +873,24 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                       </>
                     )}
                     <div className="absolute inset-0 p-3 flex flex-col justify-between">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm border border-white/25">
+                          {source}
+                        </span>
                         <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm capitalize border border-white/25">
                           {itemType === 'tool_skill' ? 'Tool + Skill' : itemType}
                         </span>
+                        {isAdmin && adminBadge.trim() && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[var(--zyro-accent)] text-white shadow-sm">
+                            {adminBadge.trim()}
+                          </span>
+                        )}
+                        {isAdmin && adminFeatured && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-white bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/25">
+                            <Sparkles className="w-2.5 h-2.5" />
+                            Featured
+                          </span>
+                        )}
                       </div>
                       <div>
                         <span className={`text-base font-bold tracking-tight block line-clamp-1 ${imageUrl.trim() && imgState === 'ok' ? 'text-white drop-shadow-md' : 'text-white'}`}>

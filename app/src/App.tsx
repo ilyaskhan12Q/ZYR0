@@ -53,8 +53,12 @@ const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
 const BlogHome = lazy(() => import('@/pages/public/BlogHome'));
 const BlogPostDetail = lazy(() => import('@/pages/public/BlogPostDetail'));
 
-// ZYR0 ToolHub Discovery Page
+// ZYR0 Pricing
+const Pricing = lazy(() => import('@/pages/public/Pricing'));
+
+// ZYR0 ToolHub Discovery + Detail Pages
 const ToolHub = lazy(() => import('@/pages/public/ToolHub'));
+const ToolDetail = lazy(() => import('@/pages/public/ToolDetail'));
 
 // ZYR0 Work / Internship Public Pages
 const InternshipsLanding = lazy(() => import('@/pages/public/InternshipsLanding'));
@@ -71,6 +75,7 @@ const TermsOfService = lazy(() => import('@/pages/public/TermsOfService'));
 const CookiePolicy = lazy(() => import('@/pages/public/CookiePolicy'));
 const FAQ = lazy(() => import('@/pages/public/FAQ'));
 const HelpCenter = lazy(() => import('@/pages/public/HelpCenter'));
+const BillingHelp = lazy(() => import('@/pages/public/BillingHelp'));
 const Careers = lazy(() => import('@/pages/public/Careers'));
 const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
@@ -306,7 +311,11 @@ export default function App() {
               <Route path="/blog" element={<BlogHome />} />
               <Route path="/blog/:slug" element={<BlogPostDetail />} />
               <Route path="/tools" element={<ToolHub />} />
+              <Route path="/tools/:slug" element={<ToolDetail />} />
               <Route path="/toolhub" element={<Navigate to="/tools" replace />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/billing-help" element={<BillingHelp />} />
+              <Route path="/help/billing" element={<Navigate to="/billing-help" replace />} />
             </Route>
 
             {/* Auth Routes */}

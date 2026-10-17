@@ -96,21 +96,21 @@ const FAQ_DATA: FAQItem[] = [
     category: 'billing',
     question: 'Is there a free plan?',
     answer:
-      'Yes — the Starter plan is free forever, including ZYR0 Work access, standard Research queries, 2 ZYR0 Studio projects, and verifiable digital credentials.',
+      'Yes — the Free plan is $0 forever, including ZYR0 Work internship discovery and applications, standard AI research (20 req/min), Studio interactive simulator, and verifiable digital certificates.',
   },
   {
     id: 'b2',
     category: 'billing',
-    question: 'What does Builder Pro include?',
+    question: 'What does ZYR0 Pro include?',
     answer:
-      'Builder Pro is $24/month and unlocks unlimited Studio apps and code export, high-depth Research runs, custom domains, priority API processing, and 24/7 developer support.',
+      'ZYR0 Pro is $9.99/month (or $95.90/year, saving ~20%) and covers eligible benefits across the ecosystem — including deep multi-step Research synthesis, priority compute queue, unlimited session history, and VIP early access to upcoming ZYR0 Studio app builder features.',
   },
   {
     id: 'b3',
     category: 'billing',
-    question: 'Are there team or enterprise plans?',
+    question: 'Are there team or institutional plans?',
     answer:
-      'Yes. The Enterprise / School OS plan is an annual license with full School OS deployment, biometric and fee gateway integrations, dedicated onboarding, and SOC 2 compliant security.',
+      'Yes. The Custom plan is tailored for companies managing interns and schools deploying SchoolOS. It includes unlimited internship postings, applicant reviews, custom SLAs, and institutional invoicing.',
   },
   {
     id: 'b4',
