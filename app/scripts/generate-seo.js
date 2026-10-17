@@ -1470,12 +1470,20 @@ async function prerenderDynamicPages(indexHtml) {
     console.log('[SEO Prerender] Fetching approved tools from Supabase...');
     try {
       tools = await supabaseQuery('tools', {
-        select: 'slug,name,tagline,description,item_type,category,tags,source,source_url,author_name,author_url,version,install_command,capabilities,image_url,cover_color,badge,featured,updated_at,created_at',
+        select: '*',
         status: 'eq.approved',
       });
       console.log(`[SEO Prerender] Pre-rendering ${tools.length} approved tools and skills...`);
-    } catch (err) {
-      console.error('[SEO Prerender] Error fetching tools:', err.message);
+    } catch {
+      try {
+        tools = await supabaseQuery('tools', {
+          select: 'slug,name,tagline,description,item_type,category,tags,source,source_url,status',
+          status: 'eq.approved',
+        });
+        console.log(`[SEO Prerender] Pre-rendering ${tools.length} approved tools (base columns)...`);
+      } catch (err) {
+        console.error('[SEO Prerender] Error fetching tools:', err.message);
+      }
     }
 
     for (const tool of tools) {
