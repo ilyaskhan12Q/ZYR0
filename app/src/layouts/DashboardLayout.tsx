@@ -6,7 +6,8 @@ import {
   Home, FolderOpen, FileCheck, FileText, ClipboardList, CheckSquare, Award,
   Briefcase, BarChart3, Users, UserCog, Shield, MessageSquare,
   Building2, ChevronLeft, ChevronRight,
-  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone, Compass, BookOpen, Wrench
+  TrendingUp, Star, Flag, Lock, AlertTriangle, Bookmark, Rocket, Megaphone, Compass, BookOpen, Wrench,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess, type CompanyAccessValue } from '@/contexts/CompanyAccessContext';
@@ -23,6 +24,10 @@ import ThemeToggle from '@/components/ThemeToggle';
 import { TourProvider, useTour } from '@/components/onboarding/tour/TourProvider';
 import { TourSpotlight } from '@/components/onboarding/tour/TourSpotlight';
 import { useSidebarCounts } from '@/hooks/useSidebarCounts';
+import PlanStatusModal from '@/components/pricing/PlanStatusModal';
+import UpgradePlanModal from '@/components/pricing/UpgradePlanModal';
+import { useActivePlan } from '@/hooks/useActivePlan';
+import type { BillingInterval } from '@/components/pricing/BillingToggle';
 
 interface NavItem {
   label: string;
@@ -158,6 +163,11 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const navigate = useNavigate();
   const navItems = useCompanyNavItems(role, companyAccess);
   const sidebarCounts = useSidebarCounts(role === 'company' ? companyAccess?.company?.id ?? null : null);
+  const planMeta = useActivePlan();
+  const [planStatusOpen, setPlanStatusOpen] = useState(false);
+  const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>('yearly');
+  const [upgradeInitialPlan, setUpgradeInitialPlan] = useState<'go' | 'plus'>('plus');
 
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
@@ -566,6 +576,66 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                 </button>
               ))
           )}
+
+          {/* Plan Indicator / Upgrade trigger (Linear / Vercel precision) */}
+          {collapsed ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (planMeta.isPaid) {
+                  setPlanStatusOpen(true);
+                } else {
+                  setUpgradeInitialPlan('plus');
+                  setUpgradeModalOpen(true);
+                }
+              }}
+              className="w-full flex items-center justify-center p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer mb-1 border border-border"
+              title={`${planMeta.name} (${planMeta.badge}) — Click to view plan details`}
+            >
+              <span className={`w-2 h-2 rounded-full ${planMeta.isPaid ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
+            </button>
+          ) : !planMeta.isPaid ? (
+            <button
+              type="button"
+              onClick={() => {
+                setUpgradeInitialPlan('plus');
+                setUpgradeModalOpen(true);
+              }}
+              className="w-full mb-2 p-2.5 rounded-xl border border-border bg-muted/40 hover:bg-muted/70 text-left transition-colors cursor-pointer group"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-foreground">Free Plan</p>
+                  <p className="text-[11px] text-muted-foreground">Standard compute</p>
+                </div>
+                <span className="text-[11px] font-semibold text-foreground bg-card border border-border px-2 py-0.5 rounded-md shadow-2xs group-hover:border-foreground/30 transition-colors">
+                  Upgrade
+                </span>
+              </div>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlanStatusOpen(true)}
+              className="w-full mb-2 p-2.5 rounded-xl border border-border bg-card hover:bg-muted/50 text-left transition-colors cursor-pointer shadow-2xs"
+            >
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 inline-block" />
+                    <p className="text-xs font-semibold text-foreground truncate">{planMeta.name}</p>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    {planMeta.isManualGrant ? 'Granted tier' : 'Active subscription'}
+                  </p>
+                </div>
+                <span className="text-[10px] font-medium text-muted-foreground bg-muted border border-border px-1.5 py-0.5 rounded shrink-0 ml-1">
+                  {planMeta.badge}
+                </span>
+              </div>
+            </button>
+          )}
+
           <Link
             to="/"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -726,6 +796,20 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       <p className="text-xs text-muted-foreground capitalize">
                         {companyAccess?.isOwner ? 'Owner' : companyAccess?.memberRole ? teamRoleLabel(companyAccess.memberRole) : role} Account
                       </p>
+                      <div className="mt-2.5 pt-2 border-t border-border/60 flex items-center justify-between">
+                        <span className="text-[11px] text-muted-foreground font-medium">Plan</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProfileOpen(false);
+                            setPlanStatusOpen(true);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium border border-border bg-muted/50 hover:bg-muted text-foreground cursor-pointer transition-colors"
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${planMeta.isPaid ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
+                          <span>{planMeta.name}</span>
+                        </button>
+                      </div>
                     </div>
                     <div className="py-1">
                       <button onClick={() => { setProfileOpen(false); navigate(`/${role}/profile`); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-muted transition-colors">
@@ -955,6 +1039,25 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
       />
 
       <TourSpotlight />
+
+      <PlanStatusModal
+        open={planStatusOpen}
+        onOpenChange={setPlanStatusOpen}
+        onOpenUpgrade={() => {
+          setUpgradeInitialPlan('plus');
+          setUpgradeModalOpen(true);
+        }}
+        plan={planMeta.tier}
+        isManualGrant={planMeta.isManualGrant}
+      />
+
+      <UpgradePlanModal
+        open={upgradeModalOpen}
+        onOpenChange={setUpgradeModalOpen}
+        initialPlan={upgradeInitialPlan}
+        interval={billingInterval}
+        onIntervalChange={setBillingInterval}
+      />
       </div>
     </TourProvider>
   );

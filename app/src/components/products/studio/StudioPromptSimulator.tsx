@@ -215,7 +215,13 @@ export default function StudioPromptSimulator() {
   };
 
   return (
-    <div className="rounded-3xl bg-neutral-900/80 border border-white/15 p-4 sm:p-8 backdrop-blur-xl shadow-2xl shadow-black/80">
+    <div
+      className="rounded-3xl border p-4 sm:p-8 backdrop-blur-xl shadow-xl transition-colors duration-200"
+      style={{
+        background: 'var(--zyro-surface)',
+        borderColor: 'var(--zyro-border)',
+      }}
+    >
       {/* Header & Preset Selector */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">

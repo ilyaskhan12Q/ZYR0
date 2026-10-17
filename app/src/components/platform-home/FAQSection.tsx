@@ -21,7 +21,7 @@ export default function FAQSection() {
               <span>Questions & Answers</span>
             </div>
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold mb-4 tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal mb-4 tracking-tight"
               style={{ color: 'var(--zyro-text)' }}
             >
               Common questions.
@@ -46,7 +46,7 @@ export default function FAQSection() {
               Have a specific institutional or technical question?{' '}
               <Link
                 to="/contact"
-                className="text-[#7B7BDC] hover:underline font-medium inline-flex items-center gap-1"
+                className="text-[var(--zyro-accent)] hover:underline font-medium inline-flex items-center gap-1"
               >
                 Contact our engineering team <ArrowRight className="w-3 h-3" />
               </Link>

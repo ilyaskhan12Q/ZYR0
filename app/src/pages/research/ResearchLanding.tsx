@@ -1,5 +1,4 @@
 import { SEO } from '@/components/SEO';
-import Header from '@/components/nav/Header';
 import { HeroSection } from '@/components/research-landing/HeroSection';
 import { EditorialStatement } from '@/components/research-landing/EditorialStatement';
 import { ResearchEngine } from '@/components/research-landing/ResearchEngine';
@@ -12,7 +11,6 @@ import { AudienceSection } from '@/components/research-landing/AudienceSection';
 import { ModelsSection } from '@/components/research-landing/ModelsSection';
 import { PricingSection } from '@/components/research-landing/PricingSection';
 import { FinalCta } from '@/components/research-landing/FinalCta';
-import { ResearchFooter } from '@/components/research-landing/ResearchFooter';
 import '@/styles/research-landing.css';
 
 export default function ResearchLanding() {
@@ -23,7 +21,6 @@ export default function ResearchLanding() {
         description="Deep research, verified sources, structured reports. One question at a time."
         path="/research"
       />
-      <Header />
       <main>
         <HeroSection />
         <EditorialStatement />
@@ -38,7 +35,6 @@ export default function ResearchLanding() {
         <PricingSection />
         <FinalCta />
       </main>
-      <ResearchFooter />
     </div>
   );
 }

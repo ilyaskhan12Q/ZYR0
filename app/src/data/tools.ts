@@ -17,6 +17,7 @@ export interface ToolItem {
   sourceUrl: string;
   documentationUrl?: string;
   imageUrl?: string;
+  coverColor?: string; // Admin-picked hex for the gradient card hero (no image case)
   badge?: string; // 'Official', 'Trending', 'Popular', 'Beta'
   featured?: boolean;
   capabilities: string[];
@@ -39,3 +40,15 @@ export const TOOL_CATEGORIES: ToolCategory[] = [
 ];
 
 export const TOOLS_DATA: ToolItem[] = [];
+
+/**
+ * Gradient background for card/preview heroes. Custom admin color wins when valid;
+ * otherwise the branded twilight → periwinkle → sapphire ramp.
+ */
+export function coverGradient(coverColor?: string): string {
+  if (coverColor && /^#[0-9a-fA-F]{3,8}$/.test(coverColor.trim())) {
+    const c = coverColor.trim();
+    return `linear-gradient(135deg, ${c} 0%, ${c}dd 55%, #120159 135%)`;
+  }
+  return 'linear-gradient(135deg, #120159 0%, rgba(123,123,220,0.85) 55%, #0051C3 110%)';
+}

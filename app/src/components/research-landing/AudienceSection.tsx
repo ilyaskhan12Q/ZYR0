@@ -5,13 +5,13 @@ const AUDIENCES = [
     title: 'Students',
     description: 'Literature reviews, thesis research, understanding complex topics.',
     list: ['Literature reviews', 'Thesis research', 'Topic exploration', 'Source verification'],
-    gradient: 'from-[#657C68] to-[#455A49]',
+    gradient: 'from-[#0051C3] to-[#120159]',
   },
   {
     title: 'Researchers',
     description: 'Rapid landscape surveys, cross-domain exploration, finding connections.',
     list: ['Landscape surveys', 'Cross-domain exploration', 'Gap identification', 'Citation tracking'],
-    gradient: 'from-[#455A49] to-[#333]',
+    gradient: 'from-[#7B7BDC] to-[#0051C3]',
   },
   {
     title: 'Developers',

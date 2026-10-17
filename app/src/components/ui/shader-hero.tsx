@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 import { HeroLineArtCycle } from "@/components/lineart"
+import { SonarGrid } from "@/components/ui/sonar-grid"
 
 const letterAnimation = {
   hidden: { opacity: 0, y: 35, filter: "blur(6px)" },
@@ -24,13 +25,28 @@ const containerAnimation = {
 
 export const ShaderHero = () => {
   return (
-    <div
-      className="relative min-h-[92vh] md:min-h-screen overflow-hidden w-full flex flex-col justify-center items-center select-none transition-colors duration-200"
+    <SonarGrid
+      id="hero-sonar-grid"
+      spacing={26}
+      dotRadius={1.4}
+      baseOpacity={1}
+      ringWidth={200}
+      speed={260}
+      amplitude={2.2}
+      pingEvery={2.4}
+      interactive={true}
+      color="var(--zyro-accent)"
+      className="relative min-h-[92vh] md:min-h-screen overflow-hidden w-full flex flex-col justify-center items-center select-none transition-colors duration-200 cursor-default"
       style={{ background: 'var(--zyro-bg)' }}
     >
+      {/* Soft wash behind the copy keeps text crisp while wave rings expand */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_50%_at_50%_45%,var(--zyro-bg)_25%,transparent_100%)] opacity-85"
+      />
       {/* Subtle background static gradient depth */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-40"
+        className="absolute inset-0 pointer-events-none opacity-30 -z-10"
         style={{
           background: 'radial-gradient(circle at 65% 35%, var(--zyro-accent-muted) 0%, transparent 70%)'
         }}
@@ -64,7 +80,7 @@ export const ShaderHero = () => {
                 color: 'var(--zyro-text-secondary)',
               }}
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#7B7BDC]" />
+              <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
               <span>ZYR0 2.0 — The Unified Platform</span>
             </m.div>
 
@@ -87,7 +103,7 @@ export const ShaderHero = () => {
               variants={containerAnimation}
               initial="hidden"
               animate="visible"
-              className="mt-4 md:mt-5 text-2xl sm:text-3xl md:text-4xl font-semibold tracking-[-0.03em] flex flex-wrap justify-center lg:justify-start leading-tight font-display transition-colors"
+              className="mt-4 md:mt-5 text-2xl sm:text-3xl md:text-4xl font-serif font-normal tracking-[-0.02em] flex flex-wrap justify-center lg:justify-start leading-tight transition-colors"
               style={{ color: 'var(--zyro-text)' }}
             >
               {"Think. Build. Scale to ∞.".split("").map((char, index) => (
@@ -186,7 +202,7 @@ export const ShaderHero = () => {
         className="absolute bottom-0 left-0 right-0 h-px"
         style={{ background: 'var(--zyro-border)', opacity: 0.5 }}
       />
-    </div>
+    </SonarGrid>
   )
 }
 

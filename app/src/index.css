@@ -49,18 +49,18 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --background: 60 15% 95%;        /* #F4F4F0 - Global Canvas */
+    --foreground: 60 6% 13%;         /* #242420 - High-legibility warm charcoal */
+    --card: 60 17% 98%;              /* #FAFAF8 - Warm ivory card surface */
+    --card-foreground: 60 6% 13%;    /* #242420 - Card text */
+    --popover: 60 17% 98%;           /* #FAFAF8 - Popover surface */
+    --popover-foreground: 60 6% 13%; /* #242420 - Popover text */
     --primary: 213 52% 24%;
     --primary-foreground: 0 0% 100%;
     --secondary: 215 16% 47%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 60 12% 91%;             /* #EAEAE4 - Toggle track & subtle surfaces */
+    --muted-foreground: 60 3% 45%;   /* #757570 - Sub-labels & secondary text */
     --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
@@ -69,17 +69,17 @@
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 60 9% 87%;             /* #E2E2DC - Warm sand border */
+    --input: 60 9% 87%;              /* #E2E2DC - Inputs */
     --ring: 217 91% 60%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
+    --sidebar-background: 60 17% 98%;
+    --sidebar-foreground: 60 6% 13%;
     --sidebar-primary: 213 52% 24%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 214 32% 91%;
+    --sidebar-accent: 60 12% 91%;
+    --sidebar-accent-foreground: 60 6% 13%;
+    --sidebar-border: 60 9% 87%;
     --sidebar-ring: 217 91% 60%;
 
     /* Color Scale Tokens (Light Mode) */
@@ -144,15 +144,15 @@
     --accent-950: #060118;
 
     /* ZYR0 Brand Tokens (Light Mode) */
-    --zyro-bg: #FFFFFF;
-    --zyro-surface: #F8F8FA;
-    --zyro-elevated: #ECECEE;
-    --zyro-text: #313131;
-    --zyro-text-secondary: #5A5A6E;
-    --zyro-text-muted: #8A8A9E;
+    --zyro-bg: #F4F4F0;
+    --zyro-surface: #FAFAF8;
+    --zyro-elevated: #FFFFFF;
+    --zyro-text: #242420;
+    --zyro-text-secondary: #585852;
+    --zyro-text-muted: #82827A;
     --zyro-accent: #7B7BDC;
     --zyro-accent-muted: rgba(123, 123, 220, 0.1);
-    --zyro-border: #E2E2EA;
+    --zyro-border: #E2E2DC;
     --zyro-sapphire: #0051C3;
     --zyro-sapphire-muted: rgba(0, 81, 195, 0.12);
     --zyro-twilight: #120159;
@@ -160,32 +160,32 @@
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 98%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 98%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 213 31% 98%;
+    --background: 60 16% 8%;         /* #191912 - Global Canvas */
+    --foreground: 48 10% 94%;        /* #F0EFEB - Eye-comfortable soft white */
+    --card: 30 2% 16%;               /* #2B2A29 - Warm stone card surface */
+    --card-foreground: 48 10% 94%;   /* #F0EFEB - Card text */
+    --popover: 30 2% 16%;            /* #2B2A29 - Popover surface */
+    --popover-foreground: 48 10% 94%;/* #F0EFEB - Popover text */
     --primary: 210 40% 98%;
     --primary-foreground: 222 47% 11%;
     --secondary: 222 47% 11.2%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --muted: 30 3% 20%;              /* #343332 - Toggle track & subtle surfaces */
+    --muted-foreground: 36 4% 65%;   /* #A6A5A0 - Sub-labels & secondary text */
     --accent: 217.2 91.2% 59.8%;
     --accent-foreground: 222 47% 11%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
+    --border: 40 3% 23%;             /* #3D3C3A - Warm stone border */
+    --input: 40 3% 23%;              /* #3D3C3A - Inputs */
     --ring: 217.2 91.2% 59.8%;
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 213 31% 98%;
+    --sidebar-background: 30 2% 16%;
+    --sidebar-foreground: 48 10% 94%;
     --sidebar-primary: 217.2 91.2% 59.8%;
     --sidebar-primary-foreground: 222 47% 11%;
-    --sidebar-accent: 223 47% 11%;
-    --sidebar-accent-foreground: 213 31% 98%;
-    --sidebar-border: 216 34% 17%;
+    --sidebar-accent: 30 3% 20%;
+    --sidebar-accent-foreground: 48 10% 94%;
+    --sidebar-border: 40 3% 23%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     /* Color Scale Tokens (Dark Mode) */
@@ -250,15 +250,15 @@
     --accent-950: #ece7fe;
 
     /* ZYR0 Brand Tokens (Dark Mode) */
-    --zyro-bg: #07070D;
-    --zyro-surface: #101018;
-    --zyro-elevated: #181824;
+    --zyro-bg: #191912;
+    --zyro-surface: #2B2A29;
+    --zyro-elevated: #363533;
     --zyro-text: #FFFFFF;
     --zyro-text-secondary: #A0A0B8;
-    --zyro-text-muted: #6E6E88;
+    --zyro-text-muted: #8E8D8A;
     --zyro-accent: #7B7BDC;
     --zyro-accent-muted: rgba(123, 123, 220, 0.15);
-    --zyro-border: #1E1E2C;
+    --zyro-border: #3D3C3A;
     --zyro-sapphire: #0051C3;
     --zyro-sapphire-muted: rgba(0, 81, 195, 0.2);
     --zyro-twilight: #120159;
@@ -348,14 +348,14 @@
   }
 
   .glass-card-v3 {
-    @apply rounded-3xl border border-slate-200/80 dark:border-white/10 backdrop-blur-md;
-    background: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.2);
+    @apply rounded-3xl border border-border backdrop-blur-md;
+    background: rgba(250, 250, 248, 0.85);
+    box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.08);
   }
 
   .dark .glass-card-v3 {
-    background: rgba(15, 23, 42, 0.6);
-    box-shadow: 0 20px 45px -20px rgba(2, 6, 23, 0.35);
+    background: rgba(43, 42, 41, 0.75);
+    box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.4);
   }
 
   .chip-v3 {
@@ -593,17 +593,17 @@
 
 /* Stat card */
 .stat-card {
-  @apply bg-white/80 dark:bg-slate-900/80 rounded-2xl border border-slate-200 dark:border-white/10 p-4 sm:p-6 shadow-xl transition-all duration-300;
+  @apply bg-card rounded-2xl border border-border p-4 sm:p-6 shadow-xl transition-all duration-300;
 }
 
 /* Feature card */
 .feature-card {
-  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-xl transition-all duration-300;
+  @apply bg-card backdrop-blur-xl rounded-2xl border border-border p-6 shadow-xl transition-all duration-300;
 }
 
 /* Internship card */
 .internship-card {
-  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl overflow-hidden transition-all duration-300;
+  @apply bg-card backdrop-blur-xl rounded-2xl border border-border shadow-xl overflow-hidden transition-all duration-300;
 }
 
 /* QR scanner frame */
@@ -626,15 +626,15 @@
   }
 
   .stat-card:hover {
-    @apply shadow-xl -translate-y-1 border-slate-300 dark:border-white/20;
+    @apply shadow-xl -translate-y-1 border-foreground/20;
   }
 
   .feature-card:hover {
-    @apply shadow-xl -translate-y-1 border-slate-300 dark:border-white/20;
+    @apply shadow-xl -translate-y-1 border-foreground/20;
   }
 
   .internship-card:hover {
-    @apply shadow-xl -translate-y-1 border-slate-300 dark:border-white/20;
+    @apply shadow-xl -translate-y-1 border-foreground/20;
   }
 
   .table-row-hover:hover {

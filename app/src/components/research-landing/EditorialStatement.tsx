@@ -11,7 +11,7 @@ const STEPS = [
   },
   {
     label: 'DEPTH',
-    text: 'ZYROO digs deeper. Academic papers, web sources, real-time data. Every citation verified.',
+    text: 'ZYR0 digs deeper. Academic papers, web sources, real-time data. Every citation verified.',
   },
 ];
 
@@ -23,7 +23,7 @@ export function EditorialStatement() {
           {STEPS.map((step) => (
             <StaggerItem key={step.label} variant="fade-up">
               <div className="border-t border-[#333] pt-4">
-                <p className="rl-eyebrow-light text-[#657C68] mb-2">{step.label}</p>
+                <p className="rl-eyebrow-light mb-2" style={{ color: 'var(--zyro-accent)' }}>{step.label}</p>
                 <p className="text-[#cccccc] text-sm leading-relaxed">{step.text}</p>
               </div>
             </StaggerItem>

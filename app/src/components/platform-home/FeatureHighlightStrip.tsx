@@ -15,7 +15,7 @@ export default function FeatureHighlightStrip() {
               ARCHITECTURAL INTEGRITY & COMMITMENTS
             </p>
             <h2
-              className="text-3xl sm:text-4xl md:text-5xl font-display font-semibold tracking-tight mb-4"
+              className="text-3xl sm:text-4xl md:text-5xl font-serif font-normal tracking-tight mb-4"
               style={{ color: 'var(--zyro-text)' }}
             >
               Engineered for sovereignty. Zero captive runtimes.
@@ -43,7 +43,7 @@ export default function FeatureHighlightStrip() {
         backgroundColor="var(--zyro-bg)"
         textColor="var(--zyro-text)"
         mutedTextColor="var(--zyro-text-secondary)"
-        activeColor="#7B7BDC"
+        activeColor="var(--zyro-accent)"
         imageUrl="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
         imageAlt="Team collaborating around a table in a bright studio"
         duration={1.4}

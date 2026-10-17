@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { ExternalLink, Terminal, Copy, Check, BookOpen, Layers, ShieldCheck } from 'lucide-react';
+import {
+  ExternalLink, Terminal, Copy, Check, BookOpen, Tag,
+  Layers, Info, FileText, ArrowUpRight
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { ToolItem } from '@/data/tools';
+import { coverGradient } from '@/data/tools';
 import { toast } from 'sonner';
 
 interface ToolPreviewDialogProps {
@@ -18,8 +22,16 @@ interface ToolPreviewDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const SectionTitle = ({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) => (
+  <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-2.5">
+    <Icon className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
+    {children}
+  </h4>
+);
+
 export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialogProps) {
   const [copied, setCopied] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
 
   if (!tool) return null;
 
@@ -28,7 +40,7 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
     try {
       await navigator.clipboard.writeText(tool.installCommand);
       setCopied(true);
-      toast.success('Install command copied to clipboard');
+      toast.success('Copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error('Failed to copy command');
@@ -39,200 +51,297 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
     switch (tool.source) {
       case 'ZYR0 Native':
         return (
-          <Badge variant="outline" className="border-accent/40 bg-accent/10 text-accent font-medium text-xs">
+          <Badge variant="outline" className="border-white/30 bg-white/15 text-white backdrop-blur-sm font-medium text-[11px]">
             ZYR0 Native
           </Badge>
         );
       case 'GitHub':
         return (
-          <Badge variant="secondary" className="font-mono text-xs">
+          <Badge variant="outline" className="border-white/30 bg-white/15 text-white backdrop-blur-sm font-mono text-[11px]">
             GitHub
           </Badge>
         );
       case 'Hugging Face':
         return (
-          <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 font-medium text-xs">
+          <Badge variant="outline" className="border-amber-300/40 bg-amber-500/25 text-amber-100 backdrop-blur-sm font-medium text-[11px]">
             Hugging Face
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="border-white/30 bg-white/15 text-white backdrop-blur-sm text-[11px]">
             {tool.source}
           </Badge>
         );
     }
   };
 
+  const showImage = Boolean(tool.imageUrl) && !imgFailed;
+  const initials = tool.name
+    .split(/\s+/).map((n) => n[0]).slice(0, 2).join('').toUpperCase();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto p-6 bg-card border border-border shadow-2xl">
-        <DialogHeader className="space-y-3 text-left">
-          <div className="flex flex-wrap items-center justify-between gap-2 pr-6">
-            <div className="flex items-center gap-2">
-              {getSourceBadge()}
-              {tool.item_type && (
-                <Badge
-                  variant="outline"
-                  className={`text-[11px] font-mono capitalize ${
-                    tool.item_type === 'skill'
-                      ? 'border-purple-500/40 bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                      : tool.item_type === 'tool_skill'
-                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      : 'border-border/60 bg-muted/40 text-muted-foreground'
-                  }`}
-                >
-                  {tool.item_type === 'tool_skill' ? 'Tool + Skill' : tool.item_type}
-                </Badge>
-              )}
-              {tool.badge && (
-                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                  {tool.badge}
-                </span>
-              )}
-              {tool.version && (
-                <span className="text-[11px] font-mono text-muted-foreground/80">
-                  {tool.version}
-                </span>
-              )}
-            </div>
-            {tool.author && (
-              <span className="text-xs text-muted-foreground">
-                By{' '}
-                {tool.author.url ? (
-                  <a
-                    href={tool.author.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline font-medium text-foreground"
-                  >
-                    {tool.author.name}
-                  </a>
-                ) : (
-                  <span className="font-medium text-foreground">{tool.author.name}</span>
-                )}
+      <DialogContent className="sm:max-w-3xl max-h-[92vh] overflow-y-auto p-0 bg-card border border-border shadow-2xl [&_[data-slot=dialog-close]]:text-white [&_[data-slot=dialog-close]]:drop-shadow-md [&_[data-slot=dialog-close]]:z-10">
+        {/* ============ HERO / MEDIA BAND ============ */}
+        <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] overflow-hidden bg-[var(--zyro-twilight)]">
+          {showImage ? (
+            <>
+              <img
+                src={tool.imageUrl}
+                alt={`${tool.name} cover`}
+                onError={() => setImgFailed(true)}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {/* Bottom scrim for text legibility over photos */}
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
+            </>
+          ) : (
+            <>
+              {/* Branded (or admin-custom) gradient + dot texture fallback */}
+              <div className="absolute inset-0" style={{ background: coverGradient(tool.coverColor) }} aria-hidden="true" />
+              <div
+                className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(circle,var(--zyro-accent)_1px,transparent_1px)] [background-size:18px_18px]"
+                aria-hidden="true"
+              />
+              <div className="absolute top-5 right-6 w-32 h-32 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className="text-7xl sm:text-8xl font-serif text-white/15 select-none">{initials}</span>
+              </div>
+            </>
+          )}
+
+          {/* Badges row */}
+          <div className="absolute top-4 left-5 flex flex-wrap items-center gap-2">
+            {getSourceBadge()}
+            {tool.item_type && (
+              <Badge
+                variant="outline"
+                className={`text-[11px] font-mono capitalize border-white/30 bg-white/15 text-white backdrop-blur-sm ${
+                  tool.item_type === 'skill'
+                    ? '!border-purple-300/40 !bg-purple-500/30 !text-purple-100'
+                    : tool.item_type === 'tool_skill'
+                    ? '!border-emerald-300/40 !bg-emerald-500/30 !text-emerald-100'
+                    : ''
+                }`}
+              >
+                {tool.item_type === 'tool_skill' ? 'Tool + Skill' : tool.item_type}
+              </Badge>
+            )}
+            {tool.badge && (
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[var(--zyro-accent)] text-white shadow-sm">
+                {tool.badge}
               </span>
             )}
           </div>
 
-          <div>
-            <DialogTitle className="text-2xl font-bold tracking-tight text-foreground font-sans">
+          {/* Name + tagline overlaid at band bottom */}
+          <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+            <DialogTitle className={`text-2xl sm:text-3xl font-serif tracking-tight leading-tight ${showImage ? 'text-white drop-shadow-md' : 'text-white'}`}>
               {tool.name}
             </DialogTitle>
-            <DialogDescription className="text-sm font-medium text-foreground/80 mt-1">
+            <DialogDescription className={`text-sm mt-1 max-w-2xl ${showImage ? 'text-white/85' : 'text-white/80'}`}>
               {tool.tagline}
             </DialogDescription>
           </div>
-        </DialogHeader>
-
-        {/* Description Body */}
-        <div className="mt-4 space-y-5 text-sm text-foreground/90 leading-relaxed">
-          <p>{tool.description}</p>
-
-          {/* Key Capabilities */}
-          {tool.capabilities && tool.capabilities.length > 0 && (
-            <div className="space-y-2 pt-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-accent" />
-                Key Capabilities
-              </h4>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                {tool.capabilities.map((cap, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2 p-2 rounded-lg bg-muted/40 border border-border/50 text-foreground/80"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
-                    <span>{cap}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Installation Section */}
-          {tool.installCommand && (
-            <div className="space-y-2 pt-2">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <Terminal className="w-3.5 h-3.5 text-accent" />
-                  Quick Install
-                </h4>
-                {tool.installInstructions && (
-                  <span className="text-[11px] text-muted-foreground">
-                    {tool.installInstructions}
-                  </span>
-                )}
-              </div>
-
-              <div className="relative group">
-                <pre className="p-3 bg-neutral-950 text-neutral-100 rounded-lg font-mono text-xs overflow-x-auto border border-white/10 flex items-center justify-between gap-4">
-                  <span className="select-all">{tool.installCommand}</span>
-                  <button
-                    onClick={handleCopyCommand}
-                    className="shrink-0 p-1.5 rounded bg-white/10 hover:bg-white/20 text-white transition-colors"
-                    aria-label="Copy installation command"
-                    title="Copy to clipboard"
-                  >
-                    {copied ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-                </pre>
-              </div>
-            </div>
-          )}
-
-          {/* Tags */}
-          <div className="pt-2 flex flex-wrap gap-1.5">
-            {tool.tags.map((t) => (
-              <span
-                key={t}
-                className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/40"
-              >
-                #{t}
-              </span>
-            ))}
-          </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="mt-6 pt-4 border-t border-border flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-            className="w-full sm:w-auto text-xs"
-          >
-            Close
-          </Button>
+        {/* ============ BODY ============ */}
+        <div className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-7">
+            {/* LEFT: narrative */}
+            <div className="space-y-6 min-w-0">
+              <section>
+                <SectionTitle icon={FileText}>About</SectionTitle>
+                <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
+                  {tool.description}
+                </p>
+              </section>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {tool.documentationUrl && (
-              <a
-                href={tool.documentationUrl}
-                target={tool.documentationUrl.startsWith('http') ? '_blank' : undefined}
-                rel={tool.documentationUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-border bg-card hover:bg-muted text-foreground transition-colors flex-1 sm:flex-none"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
-                Docs
-              </a>
-            )}
+              {tool.capabilities && tool.capabilities.length > 0 && (
+                <section>
+                  <SectionTitle icon={Layers}>Key Capabilities</SectionTitle>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {tool.capabilities.map((cap, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2.5 p-2.5 rounded-lg bg-[var(--zyro-accent-muted)] border border-[var(--zyro-accent)]/15 text-xs text-foreground/85"
+                      >
+                        <span className="w-4 h-4 mt-0.5 rounded-full bg-[var(--zyro-accent)] flex items-center justify-center shrink-0">
+                          <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                        </span>
+                        <span className="leading-snug">{cap}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Install command — full width in content column so long commands breathe */}
+              {tool.installCommand && (
+                <section>
+                  <SectionTitle icon={Terminal}>
+                    {tool.item_type === 'skill' ? 'Invocation' : 'Quick Install'}
+                  </SectionTitle>
+                  <div className="relative group rounded-xl overflow-hidden border border-neutral-800">
+                    <div className="flex items-center justify-between px-3 py-1.5 bg-neutral-900 border-b border-neutral-800">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">terminal</span>
+                      <button
+                        onClick={handleCopyCommand}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+                        aria-label="Copy installation command"
+                      >
+                        {copied ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span>Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <pre className="p-3.5 bg-neutral-950 text-emerald-300 font-mono text-xs overflow-x-auto">
+                      <span className="select-all break-all">
+                        <span className="text-neutral-500 select-none">$ </span>{tool.installCommand}
+                      </span>
+                    </pre>
+                  </div>
+                  {tool.installInstructions && (
+                    <p className="mt-2 text-xs text-muted-foreground flex items-start gap-1.5">
+                      <Info className="w-3.5 h-3.5 text-[var(--zyro-accent)] shrink-0 mt-px" />
+                      <span>{tool.installInstructions}</span>
+                    </p>
+                  )}
+                </section>
+              )}
+
+              {/* Install notes without command */}
+              {!tool.installCommand && tool.installInstructions && (
+                <section>
+                  <SectionTitle icon={Info}>Install Notes</SectionTitle>
+                  <p className="text-xs text-muted-foreground p-3 rounded-lg bg-muted/40 border border-border/50">
+                    {tool.installInstructions}
+                  </p>
+                </section>
+              )}
+            </div>
+
+            {/* RIGHT: details card */}
+            <aside className="lg:sticky lg:top-0 self-start">
+              <div className="rounded-xl border border-border/70 bg-muted/25 overflow-hidden">
+                <div className="px-4 py-2.5 border-b border-border/60 bg-muted/40">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Details
+                  </span>
+                </div>
+                <dl className="p-4 space-y-3 text-xs">
+                  {[
+                    { label: 'Category', value: <span className="font-medium text-foreground">{tool.category}</span> },
+                    { label: 'Source', value: <span className="font-medium text-foreground">{tool.source}</span> },
+                    tool.version
+                      ? { label: 'Version', value: <span className="font-mono font-medium text-foreground">{tool.version}</span> }
+                      : null,
+                    tool.author?.name
+                      ? {
+                          label: 'Author',
+                          value: tool.author.url ? (
+                            <a
+                              href={tool.author.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-foreground hover:text-[var(--zyro-accent)] hover:underline inline-flex items-center gap-1"
+                            >
+                              {tool.author.name}
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <span className="font-medium text-foreground">{tool.author.name}</span>
+                          ),
+                        }
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .map((row) => {
+                      const r = row as { label: string; value: React.ReactNode };
+                      return (
+                        <div key={r.label} className="flex items-baseline justify-between gap-3">
+                          <dt className="text-muted-foreground shrink-0">{r.label}</dt>
+                          <dd className="text-right">{r.value}</dd>
+                        </div>
+                      );
+                    })}
+                </dl>
+
+                {tool.tags.length > 0 && (
+                  <div className="px-4 pb-4">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-2">
+                      <Tag className="w-3 h-3" />
+                      Tags
+                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {tool.tags.map((t) => (
+                        <span
+                          key={t}
+                          className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-card text-muted-foreground border border-border/60"
+                        >
+                          #{t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {tool.documentationUrl && (
+                  <div className="px-4 pb-4">
+                    <a
+                      href={tool.documentationUrl}
+                      target={tool.documentationUrl.startsWith('http') ? '_blank' : undefined}
+                      rel={tool.documentationUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground hover:text-[var(--zyro-accent)] transition-colors cursor-pointer"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span className="underline underline-offset-2">Documentation</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+            </aside>
+          </div>
+
+          {/* ============ FOOTER ============ */}
+          <div className="mt-7 pt-4 border-t border-border flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              className="w-full sm:w-auto text-xs"
+            >
+              Close
+            </Button>
+
+            <Link
+              to={`/tools/${tool.slug}`}
+              className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-[var(--zyro-accent)] transition-colors w-full sm:w-auto justify-center"
+            >
+              <ArrowUpRight className="w-3.5 h-3.5" />
+              Full Page
+            </Link>
 
             <a
               href={tool.sourceUrl}
               target={tool.sourceUrl.startsWith('http') ? '_blank' : undefined}
               rel={tool.sourceUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium bg-accent text-white hover:bg-accent/90 transition-colors flex-1 sm:flex-none"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] transition-colors w-full sm:w-auto shadow-md cursor-pointer"
             >
               <span>
                 {tool.source === 'ZYR0 Native'
                   ? 'Launch Native Tool'
                   : tool.source === 'GitHub'
-                  ? 'Open GitHub'
+                  ? 'View on GitHub'
                   : tool.source === 'Hugging Face'
                   ? 'Open Hugging Face'
                   : 'Open Official Source'}

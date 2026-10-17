@@ -5,7 +5,8 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type UserRole = 'student' | 'company' | 'mentor' | 'admin';
-export type UserStatus = 'active' | 'inactive' | 'pending';
+export type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended';
+export type PlanTier = 'free' | 'go' | 'plus' | 'enterprise';
 export type CompanyStatus = 'pending' | 'approved' | 'rejected' | 'suspended';
 export type InternshipStatus = 'Active' | 'Closed' | 'Draft';
 export type ApplicationStatus = 'Applied' | 'Under Review' | 'Shortlisted' | 'Accepted' | 'Rejected' | 'Withdrawn';
@@ -47,6 +48,13 @@ export interface Profile {
   role_interest?: string | null;
   onboarding_tours: string[];
   settings?: StudentSettings | null;
+  plan_tier?: PlanTier;
+  plan_granted_by?: string | null;
+  plan_granted_at?: string | null;
+  plan_expires_at?: string | null;
+  status_reason?: string | null;
+  suspended_at?: string | null;
+  suspended_by?: string | null;
   created_at: string;
   updated_at: string;
   company?: Company | null;
@@ -398,8 +406,12 @@ export interface ActivityLog {
   target_type: string | null;
   details: string | null;
   ip_address: string | null;
+  actor_id?: string | null;
+  reason?: string | null;
+  metadata?: Record<string, any> | null;
   created_at: string;
   user?: Profile;
+  actor?: Profile;
 }
 
 export interface WorkspaceEvent {
@@ -450,6 +462,7 @@ export interface DbTool {
   source_url: string;
   documentation_url: string | null;
   image_url: string | null;
+  cover_color: string | null;
   badge: string | null;
   featured: boolean;
   capabilities: string[];

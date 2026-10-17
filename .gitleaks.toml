@@ -1,0 +1,14 @@
+title = "ZYR0 gitleaks policy"
+
+[allowlist]
+description = """
+Known-safe, reviewed exceptions:
+- Supabase anon key (role=anon JWT): public by design, ships in the browser bundle as VITE_SUPABASE_ANON_KEY.
+- The same key shown truncated ("...") as a placeholder in *.env.example files.
+- Cloudflare web analytics beacon token, already removed in commit 6254b33.
+"""
+regexes = [
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24i''',
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.\.\.''',
+  '''a254ead2f9524b6f8e64695dc07f23d7''',
+]
