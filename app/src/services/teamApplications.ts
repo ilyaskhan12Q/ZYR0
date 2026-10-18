@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { TeamApplicationStatus } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+import { signedFileUrl } from '@/lib/storage';
 import { createNotification } from '@/services/notifications';
 
 const TEAM_ROLE_TITLES: Record<string, string> = {
@@ -67,8 +68,8 @@ export async function submitTeamApplication(payload: TeamApplicationPayload) {
     if (uploadErr) {
       return { data: null, error: new Error(uploadErr.message) };
     }
-    const { data } = supabase.storage.from('team-resumes').getPublicUrl(path);
-    resumeUrl = data.publicUrl;
+    // Store the object name, not a link: the bucket is private now.
+    resumeUrl = path;
     resumeFilename = payload.resume.name;
     resumeSize = payload.resume.size;
   }
@@ -136,6 +137,13 @@ export async function getTeamApplications(status?: TeamApplicationStatus | 'All'
   }
 
   const { data, error } = await query;
+  if (data) {
+    await Promise.all(
+      (data as any[]).map(async (row) => {
+        if (row.resume_url) row.resume_url = await signedFileUrl('team-resumes', row.resume_url);
+      }),
+    );
+  }
   return { data: (data ?? []) as any[], error };
 }
 
