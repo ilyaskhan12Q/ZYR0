@@ -176,7 +176,7 @@ export default function Verify() {
   const certRevoked = verifiedCert?.status === 'Revoked';
 
   return (
-    <div className="pt-20 pb-16 px-4 min-h-screen">
+    <div className="pb-16 px-4 min-h-page">
       <SEO
         title={activeTab === 'offer' ? 'Verify Offer Letter — Authenticate ZYR0 Offers' : 'Verify Certificate — Authenticate ZYR0 Credentials'}
         description={

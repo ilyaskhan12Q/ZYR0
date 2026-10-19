@@ -32,7 +32,7 @@ const cookieTypes = [
 
 export default function CookiePolicy() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="Cookie Policy — How ZYR0 Uses Cookies"
         description="Learn how ZYR0 uses cookies to keep you logged in, remember your preferences, and improve your experience. Find out which cookies are strictly necessary and which are optional."

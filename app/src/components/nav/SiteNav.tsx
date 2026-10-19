@@ -13,11 +13,13 @@ import { productsNav, resourcesNav, companyNav } from '@/config/navigation';
 // Dark translucent glass pill (the "/" look): blur layer over the hero so the
 // page background bleeds through and the nav feels part of the page, not on top
 // of it. Frosts denser on scroll for readability over busy content.
+// Padding stays constant across both states: the height drives the page's top
+// offset (--zyro-header-h), so a scrolled shrink would shift the whole page.
 const pillClass = (scrolled: boolean) =>
-  `rounded-2xl border backdrop-blur-xl transition-all duration-300 flex items-center justify-between gap-3 px-4 sm:px-5 ${
+  `rounded-2xl border backdrop-blur-xl transition-all duration-300 flex items-center justify-between gap-3 px-4 sm:px-5 py-3 ${
     scrolled
-      ? 'bg-black/85 dark:bg-black/85 border-white/15 shadow-2xl shadow-black/80 py-2.5'
-      : 'bg-black/50 dark:bg-black/40 border-white/10 shadow-lg shadow-black/40 py-3'
+      ? 'bg-black/85 dark:bg-black/85 border-white/15 shadow-2xl shadow-black/80'
+      : 'bg-black/50 dark:bg-black/40 border-white/10 shadow-lg shadow-black/40'
   }`;
 
 const triggerClass = (open: boolean) =>

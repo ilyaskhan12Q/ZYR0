@@ -226,7 +226,7 @@ export default function FAQ() {
   ];
 
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="FAQ — Frequently Asked Questions About ZYR0"
         description="Find answers to the most common questions about the ZYR0 internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, account management, and data security."

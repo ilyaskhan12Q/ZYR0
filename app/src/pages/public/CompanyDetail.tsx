@@ -88,7 +88,7 @@ export default function CompanyDetail() {
 
   if (!company) {
     return (
-      <div className="pt-20 pb-16 px-4 text-center max-w-md mx-auto space-y-4">
+      <div className="pb-16 px-4 text-center max-w-md mx-auto space-y-4">
         <h1 className="text-xl font-bold">Company Profile Not Found</h1>
         <p className="text-muted-foreground">The company you are looking for does not exist or has been deactivated.</p>
         <Link to="/companies" className="inline-flex items-center gap-2 text-sm text-accent hover:underline">
@@ -119,7 +119,7 @@ export default function CompanyDetail() {
   ];
 
   return (
-    <div className="pt-20 pb-16 px-4">
+    <div className="pb-16 px-4">
       <SEO
         title={`${company.name} — Careers, Internships & Company Profile`}
         description={company.description || `Learn more about ${company.name}, view their available internship programs, project categories, and contact information on ZYR0.`}

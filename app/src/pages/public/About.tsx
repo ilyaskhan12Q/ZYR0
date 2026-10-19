@@ -44,7 +44,7 @@ const milestones = [
 
 export default function About() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="About ZYR0 — Mission, Vision & Philosophy"
         description="Learn about ZYR0's mission to bridge the gap between education and industry in Pakistan. Discover our structured internship platform connecting students, companies, and mentors with verified digital certificates."

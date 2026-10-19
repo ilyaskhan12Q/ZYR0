@@ -77,7 +77,7 @@ const topics = [
 
 export default function HelpCenter() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="Help Center — Getting Started Guides for ZYR0"
         description="Step-by-step guides for students, companies, and mentors. Learn how to browse internships, review applicants, submit project work, issue certificates, and verify credentials on ZYR0."

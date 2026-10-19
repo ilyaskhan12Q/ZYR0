@@ -305,6 +305,12 @@
     text-wrap: balance;
   }
 
+  /* Fills the viewport under the fixed public header (PublicLayout publishes
+     --zyro-header-h). Use instead of min-h-screen inside PublicLayout. */
+  .min-h-page {
+    min-height: calc(100dvh - var(--zyro-header-h, 5rem));
+  }
+
   /* ── Landing V3 design system ─────────────────────────────────────── */
   .font-accent {
     font-family: 'Fraunces', Georgia, serif;

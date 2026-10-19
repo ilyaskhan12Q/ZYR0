@@ -154,7 +154,7 @@ export default function BlogHome() {
       />
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
 
         {/* Header Section — Editorial Swiss Modernism 2.0 */}
         <div className="border-b border-border/70 pb-10 mb-12">

@@ -112,7 +112,7 @@ export default function BlogPostDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background text-foreground pt-32 pb-24">
+      <div className="min-h-page bg-background text-foreground pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 animate-pulse">
           <div className="h-4 w-28 bg-muted rounded mb-8" />
           <div className="h-12 w-full bg-muted rounded mb-4" />
@@ -131,7 +131,7 @@ export default function BlogPostDetail() {
   // Graceful 404 state
   if (notFound || !post) {
     return (
-      <div className="min-h-screen bg-background text-foreground pt-32 pb-24 flex items-center justify-center">
+      <div className="min-h-page bg-background text-foreground pb-24 flex items-center justify-center">
         <div className="max-w-md mx-auto px-4 text-center">
           <BookOpen className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
           <h1 className="text-2xl font-heading font-bold text-foreground mb-2">
@@ -193,7 +193,7 @@ export default function BlogPostDetail() {
         ]}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
         
         {/* Navigation Breadcrumb */}
         <div className="mb-8">

@@ -3,7 +3,7 @@ import { Reveal } from './Reveal';
 export function HeroSection() {
   return (
     <section className="rl-dark-section relative overflow-hidden">
-      <div className="rl-section relative z-10 flex flex-col items-center justify-center min-h-[85vh] text-center px-4">
+      <div className="rl-section relative z-10 flex flex-col items-center justify-center min-h-[calc(85vh+var(--zyro-header-h,5rem))] pt-[var(--zyro-header-h,5rem)] text-center px-4">
         <Reveal variant="fade-up">
           <p className="rl-eyebrow-light mb-4 text-[#999999]">Deep research, verified sources</p>
         </Reveal>

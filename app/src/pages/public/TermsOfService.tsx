@@ -73,7 +73,7 @@ const sections = [
 
 export default function TermsOfService() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="Terms of Service — ZYR0 Platform Usage Agreement"
         description="Review ZYR0's Terms of Service. These terms govern your access and use of the ZYR0 internship management platform, including rights, responsibilities, and limitations for students, companies, and mentors."

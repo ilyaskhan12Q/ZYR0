@@ -75,7 +75,7 @@ const sections = [
 
 export default function PrivacyPolicy() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="Privacy Policy — How ZYR0 Handles Your Data"
         description="Read ZYR0's Privacy Policy to understand how we collect, use, and protect your personal information. We are committed to transparency and data security for all platform users."

@@ -101,7 +101,7 @@ export default function InternshipDetail() {
 
   if (error || !internship) {
     return (
-      <div className="flex items-center justify-center min-h-screen pt-20">
+      <div className="flex items-center justify-center min-h-page">
         <div className="text-center">
           <h2 className="text-xl font-bold">Internship not found</h2>
           <Link to="/internships" className="text-accent hover:underline mt-4 inline-block">Browse all internships</Link>
@@ -283,7 +283,7 @@ export default function InternshipDetail() {
   ];
 
   return (
-    <div className="pt-20 pb-16 px-4">
+    <div className="pb-16 px-4">
       <SEO
         title={`${internship.title} Internship at ${company?.name || 'ZYR0 Partner'}`}
         description={`${internship.title} internship opportunity. Domain: ${internship.domain}. Duration: ${internship.duration}. Location: ${internship.location_type}. Learn more and apply on ZYR0.`}
