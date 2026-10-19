@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
         keywords="ZYR0 privacy policy, data privacy, GDPR, personal data, user privacy, internship platform privacy"
       />
       {/* Hero */}
-      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
+      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <Shield className="w-12 h-12 mx-auto mb-4 text-white/70" />

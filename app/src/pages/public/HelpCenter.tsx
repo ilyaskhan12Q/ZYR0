@@ -85,7 +85,7 @@ export default function HelpCenter() {
         keywords="ZYR0 help center, getting started guide, internship platform help, student guide, company guide, mentor guide"
       />
       {/* Hero */}
-      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
+      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-white/70" />
