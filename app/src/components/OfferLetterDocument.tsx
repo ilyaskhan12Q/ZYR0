@@ -149,7 +149,9 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
         id={`offer-letter-sheet-${offer.id}`}
         className="offer-letter-print-root relative overflow-hidden shadow-xl print:shadow-none print:rounded-none print:m-0"
         style={{
-          background: `${paperLayers.noise}, ${paperLayers.mottle}, ${paperLayers.fiber}, radial-gradient(ellipse at 50% 32%, #fffdf5 0%, #f7f0dd 68%, #efe5ca 100%)`,
+          backgroundImage: `${paperLayers.noise}, ${paperLayers.fiber}, ${paperLayers.mottle}, radial-gradient(ellipse at 50% 32%, #fffdf5 0%, #f7f0dd 68%, #efe5ca 100%)`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           border: `9px double ${GOLD}`,
           outline: `1px solid ${GOLD}`,
           outlineOffset: '-13px',
@@ -174,7 +176,7 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
 
         {/* Soft purple glow behind the guilloché watermark */}
         <div
-          className="absolute pointer-events-none"
+          className="offer-letter-glow absolute pointer-events-none"
           style={{
             left: '50%', top: '46%', width: 720, height: 540,
             transform: 'translate(-50%, -50%)',

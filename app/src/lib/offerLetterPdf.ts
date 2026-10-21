@@ -96,10 +96,8 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
-  // Paper grain layers (noise / mottle / fibers)
-  drawTiled(ctx, paperTex[0], 0.5);
-  drawTiled(ctx, paperTex[1], 0.5);
-  drawTiled(ctx, paperTex[2], 0.4);
+  // Paper grain layers (noise / mottle / fibers), one continuous draw each
+  paperTex.forEach(tex => drawTiled(ctx, tex, 1));
 
   // ── Soft purple glow behind the watermark ─────────────────────────────────
   const glow = ctx.createRadialGradient(800, 940, 40, 800, 940, 760);
@@ -549,16 +547,12 @@ function svgToImage(svg: string): Promise<HTMLImageElement | null> {
 }
 
 /** Tile a texture image across the page at the given global alpha. */
+/** Draw a full-page texture once (no tiles → no seams). */
 function drawTiled(ctx: CanvasRenderingContext2D, img: HTMLImageElement | null, alpha: number) {
   if (!img) return;
   ctx.save();
   ctx.globalAlpha = alpha;
-  const tile = 320;
-  for (let ty = 0; ty < PAGE_HEIGHT; ty += tile) {
-    for (let tx = 0; tx < PAGE_WIDTH; tx += tile) {
-      ctx.drawImage(img, tx, ty, tile, tile);
-    }
-  }
+  ctx.drawImage(img, 0, 0, PAGE_WIDTH, PAGE_HEIGHT);
   ctx.restore();
 }
 

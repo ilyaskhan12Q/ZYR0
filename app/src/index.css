@@ -917,8 +917,7 @@
   }
 
   /* Pin Certificate (landscape A4) */
-  .certificate-print-root {
-    position: fixed !important;
+  .certificate-print-root {    position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 297mm !important;
@@ -947,6 +946,9 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+
+  /* Purple glow is the print dark-middle culprit. */
+  .offer-letter-glow { display: none !important; }
 
   /* Suppress action bar inside printable roots */
   .certificate-print-root .no-print,
