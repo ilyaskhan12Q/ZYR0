@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, Printer, Building2, ExternalLink, FileCheck, FileCode, Loader2 } from 'lucide-react';
+import { Printer, Building2, FileCheck, FileCode, Loader2 } from 'lucide-react';
 import type { OfferLetter } from '@/lib/database.types';
 import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg, guillocheSvg } from '@/components/certificateTemplate';
 import {
@@ -49,13 +49,6 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
 
   const signatoryInfo = 'Program Coordinator';
 
-  const verifyUrl = useMemo(() => {
-    return `${window.location.origin}/verify-offer/${offer.id}`;
-  }, [offer.id]);
-
-  const qrCodeUrl = useMemo(() => {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(verifyUrl)}`;
-  }, [verifyUrl]);
 
   // ── Preload the premium font families once ───────────────────────────────────
   useEffect(() => {
@@ -85,10 +78,7 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
   const handlePreviewPdfCanvas = async () => {
     try {
       setPreviewingPdf(true);
-      const pdfBlob = await generateOfferLetterPdf({
-        offer,
-        verificationUrl: verifyUrl,
-      });
+      const pdfBlob = await generateOfferLetterPdf({ offer });
       const blobUrl = URL.createObjectURL(pdfBlob);
       window.open(blobUrl, '_blank');
     } catch (err) {
@@ -395,44 +385,6 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                   </div>
                   <p className="text-xs pt-2" style={{ color: '#6b645a' }}>Program Coordinator</p>
                   <p className="text-xs font-semibold" style={{ color: NAVY }}>{companyName}</p>
-                </div>
-              </div>
-
-              {/* Verification QR Box */}
-              <div
-                className="flex items-center gap-4 p-4 rounded-xl"
-                style={{
-                  background: 'rgba(255,253,245,.7)',
-                  border: '1.5px solid rgba(184,156,86,.65)',
-                  boxShadow: 'inset 0 0 0 1px rgba(184,156,86,.35)',
-                }}
-              >
-                <img
-                  src={qrCodeUrl}
-                  alt="Verification QR Code"
-                  className="w-20 h-20 rounded-md bg-white"
-                  style={{ border: '1px solid #cbb880', padding: 3 }}
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1 font-bold" style={{ color: NAVY, fontFamily: FONT_SANS }}>
-                    <ShieldCheck className="w-3.5 h-3.5" style={{ color: GOLD }} />
-                    Verified Credential
-                  </div>
-                  <p className="text-[11px] leading-tight max-w-[150px]" style={{ color: '#5a7a4a' }}>
-                    Scan the QR code to authenticate this offer on the ZYR0 platform.
-                  </p>
-                  <a
-                    href={verifyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold"
-                    style={{ color: NAVY }}
-                  >
-                    Verify URL <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
                 </div>
               </div>
             </div>

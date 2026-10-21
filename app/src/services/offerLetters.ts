@@ -55,40 +55,6 @@ export async function getMyOfferLetters(useCache = true) {
   return res;
 }
 
-/** Get a single offer letter by id or human-readable offer code (student, company, admin, or public verify). */
-export async function getOfferLetterById(id: string, useCache = true) {
-  await expireStaleOffers();
-  const cacheKey = createRequestKey('offer_letter', id);
-  if (useCache) {
-    const cached = getCachedData<any>(cacheKey);
-    if (cached) return cached;
-  }
-
-  const trimmed = id.trim();
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed);
-
-  const fetchFn = () => {
-    if (isUuid) {
-      return supabase
-        .from('offer_letters')
-        .select(OFFER_LETTER_SELECT)
-        .eq('id', trimmed)
-        .single();
-    }
-    // Human-readable code (ZYRO-OF-…), case-insensitive
-    return supabase
-      .from('offer_letters')
-      .select(OFFER_LETTER_SELECT)
-      .ilike('offer_code', trimmed)
-      .single();
-  };
-
-  const res = await dedupRequest(cacheKey, fetchFn);
-
-  if (!res.error) setCachedData(cacheKey, res);
-  return res;
-}
-
 /** Check whether an offer letter already exists for a given application. */
 export async function getOfferLetterByApplication(application_id: string, useCache = true) {
   const cacheKey = createRequestKey('offer_letter_by_application', application_id);

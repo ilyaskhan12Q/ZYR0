@@ -110,7 +110,7 @@ export default function Pricing() {
       features: [
         { highlight: 'Zero platform fees:', text: 'Post unlimited verified internship listings with custom screening' },
         { highlight: 'PR evaluation suite:', text: 'Review candidate GitHub pull requests, code & portfolios' },
-        { highlight: 'Cryptographic offers:', text: 'Issue signed, verifiable offer letters and contracts' },
+        { highlight: 'Cryptographic offers:', text: 'Issue signed, downloadable offer letters and contracts' },
         { highlight: 'Tamper-proof credentials:', text: 'Award cryptographic completion certificates (SHA-256)' },
         { highlight: 'Hiring team roles:', text: 'Granular permissions for Owners, Admins, and Reviewers' },
         { highlight: 'Real-time telemetry:', text: 'Live applicant pipeline dashboards and scoring analytics' },
