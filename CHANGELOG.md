@@ -7,7 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-All 156 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 2.75.2).
+All 188 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 2.80.4).
+
+### 2026-10-19
+
+- **`3963387`** 2.80.4 — feat(agent): peek the sidebar open when hovering the collapsed rail (PR #150)
+
+### 2026-10-18
+
+- **`77f65b8`** 2.80.3 — feat(agent): trim the About pane to WhatsApp support, log the release (PR #150)
+- **`7222d2c`** 2.80.2 — feat(agent): make the panel shortcuts toggles (PR #150)
+- **`f42f76d`** 2.80.1 — feat(agent): keyboard shortcuts with hover hints, drop the quick-actions FAB (PR #150)
+- **`f81d2f1`** 2.80.0 — feat(agent): floating quick-actions button with hover flyout (PR #150)
+- **`2bd576f`** 2.79.5 — feat(agent): render chat replies as markdown and answer conversationally (PR #150)
+- **`fb6b2bf`** 2.79.4 — feat(agent): ChatGPT-style account section in settings (PR #150)
+- **`50422d2`** 2.79.3 — feat(agent): rich About section in settings with version, links and diagnostics (PR #150)
+- **`14d0f12`** 2.79.2 — fix(agent): voice input transcribes speech instead of fabricating it (PR #150)
+- **`a83fb17`** 2.79.1 — fix(agent): always identify as ZYR0's Research Agent (PR #150)
+- **`5815ebf`** 2.79.0 — style(agent): redo the delete-history confirmation popup (PR #150)
+- **`8aee962`** 2.78.5 — style(agent): blue settings switches with a white thumb in both states (PR #150)
+- **`e3f8cf1`** 2.78.4 — feat(agent): confirmation popup for deleting chat history (PR #150)
+- **`ef0ac97`** 2.78.3 — feat(agent): keep Settings in the collapsed sidebar rail (PR #150)
+- **`b8c0ec1`** 2.78.2 — feat(agent): light theme by default, and settings that act on the spot (PR #150)
+- **`8a54a85`** 2.78.1 — feat(agent): working ChatGPT-style settings sheet (PR #150)
+- **`b93d593`** 2.78.0 — feat(agent): icon-only temporary toggle in the top-right corner (PR #150)
+- **`21e1d10`** 2.77.5 — feat(agent): temporary chat that never touches history (PR #150)
+- **`0f566f1`** 2.77.4 — feat(agent): move sidebar search into a top-bar button (PR #150)
+- **`233ea91`** 2.77.3 — feat(agent): premium gradient icons for Recent list items (PR #150)
+- **`6fcef17`** 2.77.2 — feat(agent): collapsible Recent section and the ZYR0 Research mark (PR #150)
+- **`b763cf3`** 2.77.1 — feat(agent): enlarge and brighten the add-photo button (PR #150)
+- **`182f3f9`** 2.77.0 — fix(agent): brand the sidebar as ZYR0 Research (PR #150)
+- **`d52e6b9`** 2.76.5 — fix(agent): consolidate the sidebar toggles into the sidebar (PR #150)
+- **`5f16791`** 2.76.4 — fix(agent): show the sidebar close button on desktop (PR #150)
+- **`8861092`** 2.76.3 — feat(agent): move the Chat/Research selector into the top bar (PR #150)
+- **`a23334f`** 2.76.2 — feat(agent): move the Chat/Research mode pills above the composer (PR #150)
+- **`0643da9`** 2.76.1 — refactor(agent): drop the duplicate New button from the thread header (PR #150)
+- **`c4c6f7d`** 2.76.0 — fix(agent): restore wheel/touchpad scrolling in the research workspace (PR #150)
+- **`d397fc4`** 2.75.5 — fix(agent): use ZYR0 brand and add the ZYRO Studio logo to the sidebar (PR #150)
+- **`7f92eae`** 2.75.4 — fix(agent): follow the reply in the thread without blocking manual scrolling (PR #150)
+- **`4fd9fd6`** 2.75.3 — fix(agent): forward attachments with the message instead of dropping them (PR #150)
 
 ### 2026-10-05
 

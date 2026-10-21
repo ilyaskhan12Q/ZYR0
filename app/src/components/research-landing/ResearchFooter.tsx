@@ -28,7 +28,7 @@ export function ResearchFooter() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <span className="rl-display text-xl font-bold text-white">ZYROO</span>
+              <span className="rl-display text-xl font-bold text-white">ZYR0</span>
               <p className="text-xs text-[#666] mt-2 max-w-xs leading-relaxed">
                 Deep research, verified sources, structured reports.
               </p>
