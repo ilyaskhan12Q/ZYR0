@@ -354,7 +354,7 @@ export default function Verify() {
                   </span>
                 </div>
               </div>
-              <CertificateDocument certificate={verifiedCert} />
+              <CertificateDocument certificate={verifiedCert} showActions={false} />
             </m.div>
           )}
           {activeTab === 'certificate' && certResult === 'invalid' && (

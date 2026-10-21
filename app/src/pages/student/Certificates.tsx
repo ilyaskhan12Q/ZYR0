@@ -113,7 +113,7 @@ export default function StudentCertificates() {
                   className="flex-1 flex items-center justify-center gap-2 py-2 border border-border rounded-lg text-xs font-semibold hover:bg-muted transition-colors">
                   <Eye className="w-3.5 h-3.5" /> View Certificate
                 </button>
-                <a href={`/verify?id=${cert.credential_id}`} target="_blank" rel="noopener noreferrer"
+                <a href={`/verify/${cert.credential_id}`} target="_blank" rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 py-2 bg-accent text-white rounded-lg text-xs font-semibold hover:bg-accent/90 transition-colors">
                   <ExternalLink className="w-3.5 h-3.5" /> Public Link
                 </a>

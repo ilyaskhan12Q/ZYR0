@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Printer } from 'lucide-react';
+import { toast } from 'sonner';
 import { buildCertificateHTML, CERT_WIDTH, CERT_HEIGHT } from './certificateTemplate';
 
 interface CertificateDocumentProps {
@@ -31,6 +32,8 @@ interface CertificateDocumentProps {
       department?: string;
     } | any;
   };
+  /** Public verification pages pass false so only the dashboard can print/download. */
+  showActions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -43,7 +46,7 @@ interface CertificateDocumentProps {
 //   eliminated from the print window).
 // ---------------------------------------------------------------------------
 
-export default function CertificateDocument({ certificate }: CertificateDocumentProps) {
+export default function CertificateDocument({ certificate, showActions = true }: CertificateDocumentProps) {
   const recipientName = certificate.recipient?.full_name || certificate.recipientName || '[INSERT FULL NAME]';
   const companyName = certificate.company?.name || '[INSERT COMPANY NAME]';
   const internshipTitle = certificate.internship?.title || certificate.title || '[INSERT INTERNSHIP TITLE]';
@@ -212,6 +215,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       sigSrc: LOGO_URLS.sig,
       dirSigSrc: LOGO_URLS.dirSig,
       sealSrc: LOGO_URLS.seal,
+      paperSrc: `${window.location.origin}/certificate-paper.webp`,
       fontCss: null,
     }),
     [baseOptions, qrCodeUrl, LOGO_URLS]
@@ -219,7 +223,10 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    if (!printWindow) {
+      toast.error('Allow pop-ups in your browser to print or save your certificate.');
+      return;
+    }
 
     const html = buildCertificateHTML({
       ...baseOptions,
@@ -232,6 +239,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       sigSrc: sigDataUrlRef.current ?? LOGO_URLS.sig,
       dirSigSrc: dirSigDataUrlRef.current ?? LOGO_URLS.dirSig,
       sealSrc: sealDataUrlRef.current ?? LOGO_URLS.seal,
+      paperSrc: `${window.location.origin}/certificate-paper.webp`,
       fontCss: fontCssRef.current,
     });
 
@@ -281,14 +289,16 @@ export default function CertificateDocument({ certificate }: CertificateDocument
         />
       </div>
 
-      <div className="flex justify-end gap-3 mt-6 no-print">
-        <button
-          onClick={handlePrint}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
-        >
-          <Printer className="w-4 h-4" /> Print Certificate
-        </button>
-      </div>
+      {showActions && (
+        <div className="flex justify-end gap-3 mt-6 no-print">
+          <button
+            onClick={handlePrint}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+          >
+            <Printer className="w-4 h-4" /> Print Certificate
+          </button>
+        </div>
+      )}
     </div>
   );
 }
