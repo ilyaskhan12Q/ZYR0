@@ -1,6 +1,9 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Printer } from 'lucide-react';
-import { toast } from 'sonner';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { buildCertificateHTML, CERT_WIDTH, CERT_HEIGHT } from './certificateTemplate';
 
 interface CertificateDocumentProps {
@@ -60,6 +63,7 @@ export default function CertificateDocument({ certificate, showActions = true }:
   const supervisorName = certificate.issuer?.full_name || '[INSERT ISSUER NAME]';
   const credentialId = certificate.credential_id || '[INSERT CREDENTIAL ID]';
   const skills = useMemo(() => certificate.skills || [], [certificate.skills]);
+  const [popupBlocked, setPopupBlocked] = useState(false);
 
   // Real internship period: certificate snapshot → internship → placeholder.
   const formatDate = (d?: string | null) => d
@@ -224,7 +228,7 @@ export default function CertificateDocument({ certificate, showActions = true }:
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
-      toast.error('Allow pop-ups in your browser to print or save your certificate.');
+      setPopupBlocked(true);
       return;
     }
 
@@ -299,6 +303,21 @@ export default function CertificateDocument({ certificate, showActions = true }:
           </button>
         </div>
       )}
+
+      <AlertDialog open={popupBlocked} onOpenChange={setPopupBlocked}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Couldn't open the print window</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your browser blocked the pop-up that prepares the certificate for printing.
+              Allow pop-ups for this site, then click <strong>Print Certificate</strong> again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setPopupBlocked(false)}>Got it</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
