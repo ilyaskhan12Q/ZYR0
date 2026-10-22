@@ -20,6 +20,7 @@ import {
 } from '@/services/offerLetters';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
 import OfferLetterDocument from '@/components/OfferLetterDocument';
+import PrintErrorDialog from '@/components/PrintErrorDialog';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
@@ -273,6 +274,7 @@ export default function CompanyOfferLetters() {
   const [resending, setResending]       = useState<string | null>(null);
   const [resendFeedback, setResendFeedback] = useState<{ offerId: string; ok: boolean; message: string } | null>(null);
   const [error, setError]               = useState<string | null>(null);
+  const [printError, setPrintError]     = useState<string | null>(null);
   const [successMsg, setSuccessMsg]     = useState<string | null>(null);
 
   // ── Bulk selection state ─────────────────────────────────────────────────────
@@ -540,7 +542,9 @@ export default function CompanyOfferLetters() {
     try {
       const pdfBlob = await generateOfferLetterPdf({ offer });
       const blobUrl = URL.createObjectURL(pdfBlob);
-      window.open(blobUrl, '_blank');
+      if (!window.open(blobUrl, '_blank')) {
+        setPrintError('Your browser blocked the PDF pop-up. Allow pop-ups for this site, then try again.');
+      }
     } catch (err) {
       console.error('Failed to generate PDF canvas preview:', err);
       setError('Could not generate PDF canvas preview.');
@@ -939,6 +943,12 @@ export default function CompanyOfferLetters() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PrintErrorDialog
+        open={printError !== null}
+        onOpenChange={(open) => !open && setPrintError(null)}
+        description={printError ?? ''}
+      />
     </div>
   );
 }

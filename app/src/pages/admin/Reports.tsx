@@ -11,6 +11,7 @@ import {
   FileText 
 } from 'lucide-react';
 import { ButtonLoader } from '@/components/common/Loader';
+import PrintErrorDialog from '@/components/PrintErrorDialog';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -59,6 +60,7 @@ const reportsList = [
 
 export default function AdminReports() {
   const [generating, setGenerating] = useState<Record<string, 'csv' | 'pdf' | null>>({});
+  const [popupBlocked, setPopupBlocked] = useState(false);
 
   // Helper to compile data from Supabase
   const fetchReportData = async (reportId: string) => {
@@ -137,7 +139,10 @@ export default function AdminReports() {
   const triggerPDFPrint = (reportId: string, data: any[]) => {
     const reportTitle = reportsList.find(r => r.id === reportId)?.title || 'Platform Report';
     const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    if (!printWindow) {
+      setPopupBlocked(true);
+      return;
+    }
 
     let tableHeaders: string[] = [];
     let tableRows: string[][] = [];
@@ -357,6 +362,12 @@ export default function AdminReports() {
           );
         })}
       </div>
+
+      <PrintErrorDialog
+        open={popupBlocked}
+        onOpenChange={setPopupBlocked}
+        description="Your browser blocked the pop-up that prepares this report for printing. Allow pop-ups for this site, then click Export PDF again."
+      />
     </div>
   );
 }

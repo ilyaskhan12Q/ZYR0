@@ -1,9 +1,6 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Printer } from 'lucide-react';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import PrintErrorDialog from './PrintErrorDialog';
 import { buildCertificateHTML, CERT_WIDTH, CERT_HEIGHT } from './certificateTemplate';
 
 interface CertificateDocumentProps {
@@ -304,20 +301,11 @@ export default function CertificateDocument({ certificate, showActions = true }:
         </div>
       )}
 
-      <AlertDialog open={popupBlocked} onOpenChange={setPopupBlocked}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Couldn't open the print window</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your browser blocked the pop-up that prepares the certificate for printing.
-              Allow pop-ups for this site, then click <strong>Print Certificate</strong> again.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setPopupBlocked(false)}>Got it</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <PrintErrorDialog
+        open={popupBlocked}
+        onOpenChange={setPopupBlocked}
+        description="Your browser blocked the pop-up that prepares the certificate for printing. Allow pop-ups for this site, then click Print Certificate again."
+      />
     </div>
   );
 }

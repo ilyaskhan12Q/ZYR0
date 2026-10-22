@@ -12,6 +12,7 @@ import {
   buildOfferDetails,
 } from '@/lib/offerLetterConfig';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
+import PrintErrorDialog from './PrintErrorDialog';
 
 interface OfferLetterDocumentProps {
   offer: OfferLetter;
@@ -28,6 +29,7 @@ const {
 
 export default function OfferLetterDocument({ offer, showActions = true }: OfferLetterDocumentProps) {
   const [previewingPdf, setPreviewingPdf] = useState(false);
+  const [printError, setPrintError] = useState<{ title: string; description: string } | null>(null);
   const student = offer.student;
   const company = offer.company;
   const internship = offer.internship;
@@ -80,9 +82,18 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
       setPreviewingPdf(true);
       const pdfBlob = await generateOfferLetterPdf({ offer });
       const blobUrl = URL.createObjectURL(pdfBlob);
-      window.open(blobUrl, '_blank');
+      if (!window.open(blobUrl, '_blank')) {
+        setPrintError({
+          title: "Couldn't open the PDF",
+          description: 'Your browser blocked the pop-up. Allow pop-ups for this site, then try again.',
+        });
+      }
     } catch (err) {
       console.error('Failed to render PDF preview canvas:', err);
+      setPrintError({
+        title: "Couldn't generate the PDF",
+        description: 'The offer letter PDF could not be created. Try again, or use Print / Save PDF instead.',
+      });
     } finally {
       setPreviewingPdf(false);
     }
@@ -404,6 +415,13 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
           </footer>
         </div>
       </div>
+
+      <PrintErrorDialog
+        open={printError !== null}
+        onOpenChange={(open) => !open && setPrintError(null)}
+        title={printError?.title}
+        description={printError?.description ?? ''}
+      />
     </div>
   );
 }
