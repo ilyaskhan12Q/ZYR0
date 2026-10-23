@@ -86,7 +86,7 @@ export default function Companies() {
   }, [search, selectedIndustry, selectedSize]);
 
   return (
-    <div className="pt-20 pb-16 px-4">
+    <div className="pb-16 px-4">
       <SEO
         title="Partner Companies — Internship Opportunities from Top Organizations"
         description="Discover internship opportunities from verified companies across technology, design, data science, fintech, and more. Explore company profiles, active listings, and team culture."

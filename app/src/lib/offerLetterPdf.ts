@@ -14,7 +14,6 @@
 
 import { jsPDF } from 'jspdf';
 import type { OfferLetter } from '@/lib/database.types';
-import QRCode from 'qrcode';
 import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg } from '@/components/certificateTemplate';
 import {
   OFFER_LETTER_COLORS,
@@ -31,7 +30,6 @@ import {
 
 export interface OfferLetterPdfData {
   offer: OfferLetter;
-  verificationUrl: string;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -61,7 +59,7 @@ const FOOTER_H = 54;
  * avatars to guarantee success.
  */
 export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<Blob> {
-  const { offer, verificationUrl } = data;
+  const { offer } = data;
 
   const internship = offer.internship;
   const student    = offer.student;
@@ -96,10 +94,8 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT);
 
-  // Paper grain layers (noise / mottle / fibers)
-  drawTiled(ctx, paperTex[0], 0.5);
-  drawTiled(ctx, paperTex[1], 0.5);
-  drawTiled(ctx, paperTex[2], 0.4);
+  // Paper grain layers (noise / mottle / fibers), one continuous draw each
+  paperTex.forEach(tex => drawTiled(ctx, tex, 1));
 
   // ── Soft purple glow behind the watermark ─────────────────────────────────
   const glow = ctx.createRadialGradient(800, 940, 40, 800, 940, 760);
@@ -428,31 +424,6 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.font = `400 11.5px ${FONT_SANS}`;
   ctx.fillText(company?.name ?? 'Company Name', MARGIN, sigY + 44);
 
-  // Verification QR box (gold-framed, right side)
-  const qrBoxW = 240;
-  const qrBoxH = 104;
-  const qrBoxX = PAGE_WIDTH - MARGIN - qrBoxW;
-  const qrBoxY = sigY - 6;
-
-  ctx.fillStyle = 'rgba(255,253,245,.8)';
-  ctx.strokeStyle = GOLD;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  roundRect(ctx, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 10);
-  ctx.fill();
-  ctx.stroke();
-
-  renderSafeCanvasQr(ctx, verificationUrl, qrBoxX + 14, qrBoxY + 12, 80);
-
-  ctx.fillStyle = NAVY;
-  ctx.font = `700 11.5px ${FONT_SANS}`;
-  ctx.fillText('VERIFIED OFFER', qrBoxX + 106, qrBoxY + 32);
-
-  ctx.fillStyle = TEXT_MUTED;
-  ctx.font = `400 10px ${FONT_SANS}`;
-  ctx.fillText('Scan to authenticate', qrBoxX + 106, qrBoxY + 52);
-  ctx.fillText('via ZYR0 Platform', qrBoxX + 106, qrBoxY + 66);
-
   // ── Bottom navy security footer with gold rule ─────────────────────────────
   const footerY = PAGE_HEIGHT - FOOTER_H;
 
@@ -471,10 +442,6 @@ export async function generateOfferLetterPdf(data: OfferLetterPdfData): Promise<
   ctx.fillStyle = '#FFFFFF';
   ctx.font = `400 10px ${FONT_SANS}`;
   ctx.fillText(footerOfferLabel, PAGE_WIDTH / 2, footerY + 22);
-
-  ctx.fillStyle = 'rgba(255,255,255,.85)';
-  ctx.font = `400 9.5px ${FONT_SANS}`;
-  ctx.fillText(`Verify at ${verificationUrl}`, PAGE_WIDTH / 2, footerY + 37);
 
   ctx.fillStyle = 'rgba(255,255,255,.7)';
   ctx.font = `400 9px ${FONT_SANS}`;
@@ -549,16 +516,12 @@ function svgToImage(svg: string): Promise<HTMLImageElement | null> {
 }
 
 /** Tile a texture image across the page at the given global alpha. */
+/** Draw a full-page texture once (no tiles → no seams). */
 function drawTiled(ctx: CanvasRenderingContext2D, img: HTMLImageElement | null, alpha: number) {
   if (!img) return;
   ctx.save();
   ctx.globalAlpha = alpha;
-  const tile = 320;
-  for (let ty = 0; ty < PAGE_HEIGHT; ty += tile) {
-    for (let tx = 0; tx < PAGE_WIDTH; tx += tile) {
-      ctx.drawImage(img, tx, ty, tile, tile);
-    }
-  }
+  ctx.drawImage(img, 0, 0, PAGE_WIDTH, PAGE_HEIGHT);
   ctx.restore();
 }
 
@@ -702,43 +665,3 @@ function roundRect(
   ctx.closePath();
 }
 
-/**
- * Render a real, scannable QR Code directly onto Canvas context.
- * Uses the pure-JS `qrcode` encoder, so it stays 100% offline —
- * zero network calls & zero CORS errors, while remaining machine-readable.
- */
-function renderSafeCanvasQr(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number, y: number,
-  size: number
-) {
-  const qr = QRCode.create(text, { errorCorrectionLevel: 'M' });
-  const count = qr.modules.size;
-  const quiet = 3;
-
-  const cellSize = size / (count + quiet * 2);
-
-  ctx.save();
-
-  // White background (required for reliable scanning)
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillRect(x, y, size, size);
-
-  // Draw data modules
-  ctx.fillStyle = INK;
-  for (let r = 0; r < count; r++) {
-    for (let c = 0; c < count; c++) {
-      if (qr.modules.get(r, c)) {
-        ctx.fillRect(
-          Math.floor(x + (c + quiet) * cellSize),
-          Math.floor(y + (r + quiet) * cellSize),
-          Math.ceil(cellSize),
-          Math.ceil(cellSize)
-        );
-      }
-    }
-  }
-
-  ctx.restore();
-}

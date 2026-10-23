@@ -44,7 +44,7 @@ const milestones = [
 
 export default function About() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="About ZYR0 — Mission, Vision & Philosophy"
         description="Learn about ZYR0's mission to bridge the gap between education and industry in Pakistan. Discover our structured internship platform connecting students, companies, and mentors with verified digital certificates."
@@ -53,7 +53,7 @@ export default function About() {
         structuredData={aboutStructuredData}
       />
       {/* Hero */}
-      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
+      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-4xl sm:text-5xl font-bold">About ZYR0</h1>

@@ -305,6 +305,22 @@
     text-wrap: balance;
   }
 
+  /* Fills the viewport under the fixed public header (PublicLayout publishes
+     --zyro-header-h). Use instead of min-h-screen inside PublicLayout. */
+  .min-h-page {
+    min-height: calc(100dvh - var(--zyro-header-h, 5rem));
+  }
+
+  /* For a page's first section whose own background must run under the fixed
+     header — otherwise the header floats over a body-coloured strip and the
+     nav reads as a separate block. Replaces py-16 (pair with pb-16).
+     shortcut: assumes 4rem top breathing room; a hero with other padding needs
+     its own calc instead. */
+  .hero-under-header {
+    margin-top: calc(var(--zyro-header-h, 5rem) * -1);
+    padding-top: calc(var(--zyro-header-h, 5rem) + 4rem);
+  }
+
   /* ── Landing V3 design system ─────────────────────────────────────── */
   .font-accent {
     font-family: 'Fraunces', Georgia, serif;
@@ -901,8 +917,7 @@
   }
 
   /* Pin Certificate (landscape A4) */
-  .certificate-print-root {
-    position: fixed !important;
+  .certificate-print-root {    position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     width: 297mm !important;
@@ -931,6 +946,9 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
+
+  /* Purple glow is the print dark-middle culprit. */
+  .offer-letter-glow { display: none !important; }
 
   /* Suppress action bar inside printable roots */
   .certificate-print-root .no-print,

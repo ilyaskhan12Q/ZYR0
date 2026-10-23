@@ -31,6 +31,8 @@ export interface CertificateTemplateOptions {
   /** Optional seal image; falls back to the engraved ZYRO seal when empty. */
   sealSrc?: string | null;
   fontCss?: string | null;
+  /** Pre-baked paper texture (single image → fast, identical screen + print). */
+  paperSrc?: string | null;
 }
 
 // ── SVG assets (generated as strings, injected into the print window) ──────
@@ -92,30 +94,30 @@ export function filigreeSvg(): string {
 </svg>`;
 }
 
-/** Soft mottled clouds — low-frequency noise for cotton-paper feel. */
-export function mottleSvg(): string {
+/** Soft mottled clouds — one continuous layer (no tiles, so no rectangular seams). */
+export function mottleSvg(opacity = 0.5, width = CERT_WIDTH, height = CERT_HEIGHT): string {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
-  <filter id="m"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
-  <rect width="320" height="320" filter="url(#m)" opacity="0.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <filter id="m"><feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="3"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="${width}" height="${height}" filter="url(#m)" opacity="${opacity}"/>
 </svg>`;
 }
 
-/** Fine streaky cotton fibers. */
-export function fiberSvg(): string {
+/** Fine streaky cotton fibers — continuous, for paper depth. */
+export function fiberSvg(opacity = 0.35, width = CERT_WIDTH, height = CERT_HEIGHT): string {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320">
-  <filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.22" numOctaves="2" seed="11" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
-  <rect width="320" height="320" filter="url(#f)" opacity="0.35"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <filter id="f"><feTurbulence type="fractalNoise" baseFrequency="0.02 0.22" numOctaves="2" seed="11"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="${width}" height="${height}" filter="url(#f)" opacity="${opacity}"/>
 </svg>`;
 }
 
-/** Subtle paper grain (feTurbulence noise tile). */
-export function noiseSvg(): string {
+/** Subtle paper grain (continuous). */
+export function noiseSvg(opacity = 0.05, width = CERT_WIDTH, height = CERT_HEIGHT): string {
   return `
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
-  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
-  <rect width="160" height="160" filter="url(#n)" opacity="0.05"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+  <filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2"/><feColorMatrix type="saturate" values="0"/></filter>
+  <rect width="${width}" height="${height}" filter="url(#n)" opacity="${opacity}"/>
 </svg>`;
 }
 
@@ -154,11 +156,10 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     dirSigSrc,
     sealSrc,
     fontCss,
+    paperSrc,
   } = opts;
 
-  const noiseDataUri = `url("data:image/svg+xml,${encodeURIComponent(noiseSvg())}")`;
-  const mottleDataUri = `url("data:image/svg+xml,${encodeURIComponent(mottleSvg())}")`;
-  const fiberDataUri = `url("data:image/svg+xml,${encodeURIComponent(fiberSvg())}")`;
+  const paperDataUri = `url("${paperSrc ?? '/certificate-paper.webp'}")`;
 
   const css = `
     * { box-sizing: border-box; }
@@ -179,15 +180,15 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       overflow: hidden;
     }
 
-    /* ── Cream cotton-paper texture (fine grain + soft mottle + fibers) ── */
+    /* ── Cream cotton-paper texture (pre-baked, one image) ── */
     .paper {
       position: absolute;
       inset: 0;
-      background:
-        ${noiseDataUri},
-        ${mottleDataUri},
-        ${fiberDataUri},
+      background-image:
+        ${paperDataUri},
         radial-gradient(ellipse at 50% 36%, #fffdf5 0%, #f7f0dd 68%, #efe5ca 100%);
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
       border: 9px double #b89c56;
       outline: 1px solid #b89c56;
       outline-offset: -13px;
@@ -388,8 +389,12 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
     .qr-verify-url { font-family: 'Montserrat', sans-serif; font-size: 8.5px; font-weight: 600; color: #777; letter-spacing: 0.5px; }
 
     @media print {
-      body { width: 297mm; height: 210mm; }
-      .cert-page { width: 297mm; height: 210mm; }
+      body { width: 297mm; height: 210mm; overflow: hidden; background: #fff; }
+      /* Purple glow is the print dark-middle culprit; textures stay as-is. */
+      .glow { display: none; }
+      /* shortcut: fixed 2.5% shrink keeps the gold border clear of printer
+         unprintable margins; upgrade to per-printer margins if ever needed. */
+      .cert-page { width: 297mm; height: 210mm; transform: scale(.975); transform-origin: top center; }
       .footer-row, .skills, .title-wrap { break-inside: avoid; page-break-inside: avoid; }
     }
   `;

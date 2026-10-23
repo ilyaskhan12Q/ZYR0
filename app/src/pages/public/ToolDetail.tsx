@@ -27,7 +27,7 @@ function getTypeLabel(type?: string) {
 
 function ToolDetailSkeleton() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 space-y-8">
       <Skeleton className="h-5 w-48" />
       <Skeleton className="w-full aspect-[21/9] rounded-2xl" />
       <div className="space-y-3">
@@ -53,7 +53,7 @@ function ToolDetailSkeleton() {
 
 function ToolNotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-page bg-background flex items-center justify-center px-4">
       <SEO
         title="Tool Not Found — ZYR0 ToolHub"
         description="The tool or skill you are looking for does not exist or is no longer available."
@@ -331,7 +331,7 @@ export default function ToolDetail() {
 
   if (tool === 'loading') {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-page bg-background">
         <ToolDetailSkeleton />
       </div>
     );
@@ -360,7 +360,7 @@ export default function ToolDetail() {
         path={canonicalPath}
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">

@@ -21,7 +21,10 @@ import {
   Activity,
 } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, BarChart, Bar, LabelList,
+} from 'recharts';
 import { supabase } from '@/lib/supabase';
 
 const systemHealth = [
@@ -112,12 +115,14 @@ export default function AdminDashboard() {
       try {
         const settled = await Promise.race([
           Promise.allSettled([
-            supabase.from('profiles').select('id, role, plan_tier, status, created_at'),
+            // select('*'): an optional column missing in prod (e.g. plan_tier) would fail
+            // the whole query and silently zero out every user stat on this page.
+            supabase.from('profiles').select('*'),
             supabase.from('companies').select('id, status, created_at'),
             supabase.from('internships').select('id', { count: 'exact' }),
             supabase.from('certificates').select('id', { count: 'exact' }),
             supabase.from('applications').select('id', { count: 'exact' }),
-            supabase.from('agent_usage').select('input_tokens, output_tokens, model, latency_ms').limit(500),
+            supabase.from('agent_usage').select('input_tokens, output_tokens, model, latency_ms, created_at').limit(500),
             supabase.from('tools').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           ]),
           new Promise<never>((_, reject) =>
@@ -139,6 +144,12 @@ export default function AdminDashboard() {
 
         const fetchedProfiles = profilesRes.status === 'fulfilled' ? profilesRes.value.data || [] : [];
         const fetchedCompanies = companiesRes.status === 'fulfilled' ? companiesRes.value.data || [] : [];
+
+        // Supabase resolves with { error } instead of throwing, so allSettled hides
+        // failures. Surface a failed profiles read (the source of every user KPI).
+        if (profilesRes.status === 'fulfilled' && profilesRes.value.error) {
+          console.error('Admin dashboard: profiles query failed:', profilesRes.value.error.message);
+        }
 
         setProfiles(fetchedProfiles);
         setCompanies(fetchedCompanies);
@@ -218,12 +229,67 @@ export default function AdminDashboard() {
     const go = profiles.filter((p) => p.plan_tier === 'go').length;
     const plus = profiles.filter((p) => p.plan_tier === 'plus').length;
     const enterprise = profiles.filter((p) => p.plan_tier === 'enterprise').length;
-    const total = profiles.length || 1;
+    const total = profiles.length;
     const paid = go + plus + enterprise;
     const mrr = go * 4.99 + plus * 9.99;
-    const conversion = Math.round((paid / total) * 1000) / 10;
-    return { free, go, plus, enterprise, paid, mrr, conversion, total: profiles.length };
+    const conversion = total > 0 ? Math.round((paid / total) * 1000) / 10 : 0;
+    return { free, go, plus, enterprise, paid, mrr, conversion, total };
   }, [profiles]);
+
+  // Role mix for the composition donut
+  const roleBreakdown = useMemo(() => {
+    const roles = [
+      { name: 'Students', value: profiles.filter((p) => p.role === 'student').length, color: '#3B82F6' },
+      { name: 'Mentors', value: profiles.filter((p) => p.role === 'mentor').length, color: '#8B5CF6' },
+      { name: 'Companies', value: profiles.filter((p) => p.role === 'company').length, color: '#10B981' },
+      { name: 'Admins', value: profiles.filter((p) => p.role === 'admin').length, color: '#F59E0B' },
+    ];
+    return { roles, active: roles.filter((r) => r.value > 0), total: profiles.length };
+  }, [profiles]);
+
+  // Platform funnel: postings -> applications -> certificates
+  const funnelData = useMemo(
+    () => [
+      { stage: 'Internships', value: internshipsCount, color: '#3B82F6' },
+      { stage: 'Applications', value: appsCount, color: '#8B5CF6' },
+      { stage: 'Certificates', value: certsCount, color: '#10B981' },
+    ],
+    [internshipsCount, appsCount, certsCount]
+  );
+
+  // Paid-tier distribution for the revenue bar chart
+  const tierData = useMemo(
+    () => [
+      { tier: 'Free', users: planBreakdown.free, mrr: 0 },
+      { tier: 'GO', users: planBreakdown.go, mrr: planBreakdown.go * 4.99 },
+      { tier: 'PLUS', users: planBreakdown.plus, mrr: planBreakdown.plus * 9.99 },
+      { tier: 'Ent.', users: planBreakdown.enterprise, mrr: 0 },
+    ],
+    [planBreakdown]
+  );
+
+  // AI usage trend: tokens per day over the last 7 days
+  const aiTrend = useMemo(() => {
+    const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - (6 - i));
+      return {
+        key: dayKey(d),
+        day: d.toLocaleString('default', { weekday: 'short' }),
+        tokens: 0,
+      };
+    });
+    const buckets = new Map(days.map((d) => [d.key, d]));
+    agentUsageRows.forEach((row) => {
+      if (!row.created_at) return;
+      const bucket = buckets.get(dayKey(new Date(row.created_at)));
+      if (bucket) bucket.tokens += (row.input_tokens || 0) + (row.output_tokens || 0);
+    });
+    return days;
+  }, [agentUsageRows]);
+
 
   // Compute AI Compute & Gateway Telemetry
   const aiTelemetry = useMemo(() => {
@@ -317,6 +383,8 @@ export default function AdminDashboard() {
     return result;
   }, [profiles, companies]);
 
+  const pct = (n: number) => (planBreakdown.total > 0 ? (n / planBreakdown.total) * 100 : 0);
+
   if (loading) {
     return <Loader variant="page" text="Loading admin control center..." />;
   }
@@ -403,84 +471,79 @@ export default function AdminDashboard() {
             </div>
             <div className="h-2.5 w-full rounded-md bg-muted overflow-hidden flex border border-border/60">
               <div
-                style={{ width: `${(planBreakdown.free / planBreakdown.total) * 100}%` }}
+                style={{ width: `${pct(planBreakdown.free)}%` }}
                 className="bg-muted-foreground/30 hover:opacity-90 transition-all"
-                title={`Free: ${planBreakdown.free} (${((planBreakdown.free / planBreakdown.total) * 100).toFixed(1)}%)`}
+                title={`Free: ${planBreakdown.free} (${pct(planBreakdown.free).toFixed(1)}%)`}
               />
               <div
-                style={{ width: `${(planBreakdown.go / planBreakdown.total) * 100}%` }}
+                style={{ width: `${pct(planBreakdown.go)}%` }}
                 className="bg-cyan-500/70 hover:opacity-90 transition-all"
-                title={`GO: ${planBreakdown.go} (${((planBreakdown.go / planBreakdown.total) * 100).toFixed(1)}%)`}
+                title={`GO: ${planBreakdown.go} (${pct(planBreakdown.go).toFixed(1)}%)`}
               />
               <div
-                style={{ width: `${(planBreakdown.plus / planBreakdown.total) * 100}%` }}
+                style={{ width: `${pct(planBreakdown.plus)}%` }}
                 className="bg-foreground hover:opacity-90 transition-all"
-                title={`PLUS: ${planBreakdown.plus} (${((planBreakdown.plus / planBreakdown.total) * 100).toFixed(1)}%)`}
+                title={`PLUS: ${planBreakdown.plus} (${pct(planBreakdown.plus).toFixed(1)}%)`}
               />
               <div
-                style={{ width: `${(planBreakdown.enterprise / planBreakdown.total) * 100}%` }}
+                style={{ width: `${pct(planBreakdown.enterprise)}%` }}
                 className="bg-emerald-500 hover:opacity-90 transition-all"
-                title={`Enterprise: ${planBreakdown.enterprise} (${((planBreakdown.enterprise / planBreakdown.total) * 100).toFixed(1)}%)`}
+                title={`Enterprise: ${planBreakdown.enterprise} (${pct(planBreakdown.enterprise).toFixed(1)}%)`}
               />
             </div>
           </div>
 
-          {/* Descriptive Breakdown Table */}
-          <div className="divide-y divide-border rounded-lg border border-border bg-muted/20">
-            <div className="grid grid-cols-4 p-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-              <span>Tier</span>
-              <span className="text-right">Users</span>
-              <span className="text-right">Share</span>
-              <span className="text-right">MRR Yield</span>
-            </div>
-            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
-              <span className="font-medium text-foreground flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shrink-0" />
-                Free
+          {/* Tier users + MRR bar chart */}
+          <div className="pt-1">
+            <div className="flex items-center gap-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#3B82F6]" /> Users
               </span>
-              <span className="text-right font-mono tabular-nums">{planBreakdown.free}</span>
-              <span className="text-right font-mono text-muted-foreground">
-                {((planBreakdown.free / planBreakdown.total) * 100).toFixed(0)}%
-              </span>
-              <span className="text-right font-mono text-muted-foreground">$0.00</span>
-            </div>
-            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
-              <span className="font-medium text-foreground flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0" />
-                ZYR0 GO
-              </span>
-              <span className="text-right font-mono tabular-nums">{planBreakdown.go}</span>
-              <span className="text-right font-mono text-muted-foreground">
-                {((planBreakdown.go / planBreakdown.total) * 100).toFixed(0)}%
-              </span>
-              <span className="text-right font-mono font-medium text-foreground">
-                ${(planBreakdown.go * 4.99).toFixed(2)}
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#10B981]" /> MRR
               </span>
             </div>
-            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
-              <span className="font-medium text-foreground flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-foreground shrink-0" />
-                ZYR0 PLUS
-              </span>
-              <span className="text-right font-mono tabular-nums">{planBreakdown.plus}</span>
-              <span className="text-right font-mono text-muted-foreground">
-                {((planBreakdown.plus / planBreakdown.total) * 100).toFixed(0)}%
-              </span>
-              <span className="text-right font-mono font-medium text-foreground">
-                ${(planBreakdown.plus * 9.99).toFixed(2)}
-              </span>
-            </div>
-            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
-              <span className="font-medium text-foreground flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                Enterprise
-              </span>
-              <span className="text-right font-mono tabular-nums">{planBreakdown.enterprise}</span>
-              <span className="text-right font-mono text-muted-foreground">
-                {((planBreakdown.enterprise / planBreakdown.total) * 100).toFixed(0)}%
-              </span>
-              <span className="text-right font-mono text-muted-foreground">Custom SLA</span>
-            </div>
+            <ResponsiveContainer width="100%" height={190}>
+              <BarChart data={tierData} margin={{ top: 12, right: 4, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis
+                  dataKey="tier"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={11}
+                  tickLine={false}
+                />
+                <YAxis
+                  yAxisId="left"
+                  allowDecimals={false}
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v: any) => `$${v}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                  }}
+                  formatter={(value: any, name: any) =>
+                    name === 'MRR' ? [`$${Number(value).toFixed(2)}`, name] : [value, name]
+                  }
+                />
+                <Bar yAxisId="left" dataKey="users" name="Users" fill="#3B82F6" radius={[3, 3, 0, 0]} barSize={20} />
+                <Bar yAxisId="right" dataKey="mrr" name="MRR" fill="#10B981" radius={[3, 3, 0, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
@@ -569,9 +632,181 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* 7-day token usage trend */}
+          <div className="pt-1">
+            <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground mb-1">
+              <span>Token Usage · Last 7 Days</span>
+              <span>
+                {aiTelemetry.totalTokens > 0
+                  ? `${(aiTelemetry.totalTokens / 1000).toFixed(1)}k total`
+                  : 'No traffic'}
+              </span>
+            </div>
+            <ResponsiveContainer width="100%" height={110}>
+              <AreaChart data={aiTrend} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={10}
+                  tickLine={false}
+                />
+                <YAxis hide />
+                <Tooltip
+                  contentStyle={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                  }}
+                  formatter={(value: any) => [`${Number(value).toLocaleString()} tokens`, 'Tokens']}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="tokens"
+                  stroke="#8B5CF6"
+                  fill="#8B5CF6"
+                  fillOpacity={0.12}
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
           <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
             <span>Gateway Policy: Max 20 req/min/user</span>
             <span className="text-foreground font-mono">Queue Delay: 0ms (Dedicated)</span>
+          </div>
+        </m.div>
+      </div>
+
+      {/* Ecosystem Composition & Platform Funnel */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Role composition donut */}
+        <m.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22 }}
+          className="p-5 rounded-xl bg-card border border-border shadow-2xs"
+        >
+          <h3 className="font-semibold text-sm text-foreground tracking-tight">Ecosystem Composition</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">User roles across the platform</p>
+          <div className="flex flex-col sm:flex-row items-center gap-6 mt-3">
+            <div className="relative w-[170px] h-[170px] shrink-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={roleBreakdown.active}
+                    dataKey="value"
+                    innerRadius={54}
+                    outerRadius={76}
+                    paddingAngle={3}
+                    stroke="none"
+                  >
+                    {roleBreakdown.active.map((role) => (
+                      <Cell key={role.name} fill={role.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      background: 'hsl(var(--card))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '12px',
+                      fontSize: '12px',
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-xl font-bold font-mono tabular-nums text-foreground">
+                  {roleBreakdown.total}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Users</span>
+              </div>
+            </div>
+            <div className="flex-1 w-full space-y-2.5">
+              {roleBreakdown.roles.map((role) => (
+                <div key={role.name} className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: role.color }} />
+                    {role.name}
+                  </span>
+                  <span className="font-mono tabular-nums text-foreground">
+                    {role.value}
+                    <span className="text-muted-foreground ml-2">
+                      {pct(role.value).toFixed(0)}%
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </m.div>
+
+        {/* Platform funnel */}
+        <m.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.24 }}
+          className="p-5 rounded-xl bg-card border border-border shadow-2xs"
+        >
+          <h3 className="font-semibold text-sm text-foreground tracking-tight">Platform Funnel</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Postings → applications → issued certificates</p>
+          <div className="mt-3">
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart
+                data={funnelData}
+                layout="vertical"
+                margin={{ top: 4, right: 28, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                <XAxis type="number" hide />
+                <YAxis
+                  type="category"
+                  dataKey="stage"
+                  width={92}
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
+                  contentStyle={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '12px',
+                    fontSize: '12px',
+                  }}
+                  formatter={(value: any) => [value, 'Total']}
+                />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
+                  {funnelData.map((stage) => (
+                    <Cell key={stage.stage} fill={stage.color} />
+                  ))}
+                  <LabelList
+                    dataKey="value"
+                    position="right"
+                    fontSize={11}
+                    fill="hsl(var(--foreground))"
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Application rate:{' '}
+              <strong className="text-foreground font-mono">
+                {internshipsCount > 0 ? Math.round((appsCount / internshipsCount) * 100) : 0}%
+              </strong>
+            </span>
+            <span>
+              Certificate rate:{' '}
+              <strong className="text-foreground font-mono">
+                {appsCount > 0 ? Math.round((certsCount / appsCount) * 100) : 0}%
+              </strong>
+            </span>
           </div>
         </m.div>
       </div>

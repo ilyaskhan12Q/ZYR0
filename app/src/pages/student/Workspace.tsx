@@ -1572,7 +1572,7 @@ export default function StudentWorkspace() {
                           to={`/verify/${activeCertificate.credential_id}`}
                           className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-lg text-xs font-semibold shadow transition-colors"
                         >
-                          <ShieldCheck className="w-4 h-4" /> Verify Credential Verification <ExternalLink className="w-3 h-3" />
+                          <ShieldCheck className="w-4 h-4" /> Verify Credential <ExternalLink className="w-3 h-3" />
                         </Link>
                       </div>
                     </div>

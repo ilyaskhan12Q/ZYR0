@@ -158,7 +158,7 @@ export default function ToolHub() {
       />
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         {/* UI/UX Pro Max Open Atmospheric Hero */}
         <div className="relative mb-12">
           {/* Subtle Ambient Radial Lighting (Unboxed & Fluid) */}

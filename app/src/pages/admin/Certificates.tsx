@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { m } from 'framer-motion';
-import { Search, Eye, Download, XCircle } from 'lucide-react';
+import { Search, Eye, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/common/Loader';
 import { supabase } from '@/lib/supabase';
@@ -141,11 +141,11 @@ export default function AdminCertificates() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           <a
-                            href={cert.pdf_url || '#'}
+                            href={`/verify/${cert.credential_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground inline-block"
-                            title="View PDF"
+                            title="View Certificate"
                           >
                             <Eye className="w-4 h-4" />
                           </a>

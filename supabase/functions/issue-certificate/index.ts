@@ -150,13 +150,15 @@ serve(async (req: Request) => {
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px auto; text-align: center;">
                 <tr>
                   <td align="center" style="border-radius: 8px; background-color: #1e3a8a; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);">
-                    <a href="${siteUrl}/verify/${certificate.credential_id}" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">View Verified Certificate</a>
+                    <a href="${siteUrl}/login?redirect=/student/certificates" style="display: inline-block; padding: 16px 36px; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: #ffffff; text-decoration: none; border-radius: 8px; border: 1px solid #b89c56;">View &amp; Download Your Certificate</a>
                   </td>
                 </tr>
               </table>
 
               <p style="margin: 0 0 20px; font-size: 14.5px; line-height: 1.7; color: #475569; text-align: center;">
                 Your credential is publicly verifiable, tamper-proof, and ready to add to your resume or LinkedIn profile!
+                <br />Anyone can verify it at
+                <a href="${siteUrl}/verify/${certificate.credential_id}" style="color: #1e3a8a; text-decoration: underline; font-weight: 600;">${siteUrl}/verify/${certificate.credential_id}</a>
               </p>
 
               <!-- Quick Action Buttons Row -->
@@ -439,16 +441,16 @@ serve(async (req: Request) => {
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">You may view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform at any time.</p>
-              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">Verify Your Credential</p>
+              <p style="margin: 0 0 8px; font-size: 15px; line-height: 1.8; color: #3d372e;">Sign in to your ZYR0 dashboard to view and download your digital certificate at any time.</p>
+              <p style="margin: 22px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #b89c56;">View &amp; Download</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 18px auto;">
                 <tr>
                   <td align="center" style="border-radius: 4px; background-color: #1e3a8a;">
-                    <a href="${siteUrl}/verify/${credentialId}" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View Verified Certificate</a>
+                    <a href="${siteUrl}/login?redirect=/student/certificates" style="display: inline-block; padding: 14px 32px; font-size: 14px; font-weight: 600; letter-spacing: 1px; color: #fffdf5; text-decoration: none; border: 1px solid #b89c56; border-radius: 4px;">View &amp; Download Your Certificate</a>
                   </td>
                 </tr>
               </table>
-              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Having trouble viewing your certificate or need assistance? Our support team is ready to help.</p>
+              <p style="margin: 0 0 8px; font-size: 13.5px; line-height: 1.8; color: #3d372e; text-align: center;">Anyone can verify this credential at <a href="${siteUrl}/verify/${credentialId}" style="color: #1e3a8a; text-decoration: underline; font-weight: 600;">${siteUrl}/verify/${credentialId}</a>.<br />Having trouble viewing your certificate or need assistance? Our support team is ready to help.</p>
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
                   <td align="center" style="border-radius: 4px; background-color: transparent; border: 1.5px solid #b89c56;">
@@ -503,7 +505,9 @@ serve(async (req: Request) => {
         const emailText = `Dear ${student.full_name},\n\n` +
           `Congratulations on completing your internship. Your dedication throughout the program has been recognized, and we are pleased to issue your official digital certificate for ${title}.\n\n` +
           `Credential ID: ${credentialId}\n\n` +
-          `You can view, download, or verify the authenticity of your digital certificate online on the ZYR0 platform:\n` +
+          `View and download your digital certificate from your ZYR0 dashboard:\n` +
+          `${siteUrl}/login?redirect=/student/certificates\n\n` +
+          `Verify this credential:\n` +
           `${siteUrl}/verify/${credentialId}\n\n` +
           `Having trouble viewing your certificate? Contact our support team:\n` +
           `${siteUrl}/contact\n\n` +

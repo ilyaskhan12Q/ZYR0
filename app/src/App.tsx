@@ -67,7 +67,6 @@ const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
 const Companies = lazy(() => import('@/pages/public/Companies'));
 const CompanyDetail = lazy(() => import('@/pages/public/CompanyDetail'));
 const Verify = lazy(() => import('@/pages/public/Verify'));
-const VerifyOffer = lazy(() => import('@/pages/public/VerifyOffer'));
 const About = lazy(() => import('@/pages/public/About'));
 const Contact = lazy(() => import('@/pages/public/Contact'));
 const PrivacyPolicy = lazy(() => import('@/pages/public/PrivacyPolicy'));
@@ -209,8 +208,6 @@ export default function App() {
                 <Route path="/verify/:code" element={<Verify />} />
                 <Route path="/verify-certificate" element={<Verify />} />
                 <Route path="/verify-certificate/:code" element={<Verify />} />
-                <Route path="/verify-offer" element={<VerifyOffer />} />
-                <Route path="/verify-offer/:id" element={<VerifyOffer />} />
               </Route>
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
@@ -297,8 +294,6 @@ export default function App() {
               <Route path="/verify/:code" element={<Verify />} />
               <Route path="/verify-certificate" element={<Verify />} />
               <Route path="/verify-certificate/:code" element={<Verify />} />
-              <Route path="/verify-offer" element={<VerifyOffer />} />
-              <Route path="/verify-offer/:id" element={<VerifyOffer />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />

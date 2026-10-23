@@ -78,7 +78,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="pt-20 pb-16 px-4">
+    <div className="pb-16 px-4">
       <SEO
         title="Contact ZYR0 — Get in Touch with Our Team"
         description="Have questions about ZYR0? Reach out to our support team for help with your account, internship listings, certificate verification, or partnership opportunities. We respond within 24 hours."

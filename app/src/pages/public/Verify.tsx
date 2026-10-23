@@ -1,48 +1,30 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { m, AnimatePresence } from 'framer-motion';
-import { Search, CheckCircle2, XCircle, Award, Shield, QrCode, HelpCircle, BookOpen, FileText } from 'lucide-react';
+import { Search, CheckCircle2, XCircle, Shield, QrCode, HelpCircle, BookOpen } from 'lucide-react';
 import { verifyCertificate } from '@/services/certificates';
-import { getOfferLetterById } from '@/services/offerLetters';
 import { supabase } from '@/lib/supabase';
 import CertificateDocument from '@/components/CertificateDocument';
-import OfferLetterDocument from '@/components/OfferLetterDocument';
 import { QrScanner } from '@/components/QrScanner';
 import { SEO } from '@/components/SEO';
 import { ButtonLoader } from '@/components/common/Loader';
 
-type VerifyTab = 'certificate' | 'offer';
-
-/** Pull a credential/offer ID out of a scanned QR payload (full URL or raw ID). */
+/** Pull a credential ID out of a scanned QR payload (full URL or raw ID). */
 function extractId(decodedText: string): string | null {
   const candidate = decodedText.split('/').filter(Boolean).pop()?.split('?')[0]?.trim();
   return candidate || null;
 }
 
-function isOfferUrl(decodedText: string): boolean {
-  return decodedText.includes('/verify-offer/');
-}
-
 export default function Verify() {
   const { code } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const urlType = searchParams.get('type');
+  const [searchParams] = useSearchParams();
   const idQuery = searchParams.get('id');
 
-  const [activeTab, setActiveTab] = useState<VerifyTab>(urlType === 'offer' ? 'offer' : 'certificate');
-
-  // ── Certificate state ────────────────────────────────────────────────────────
   const [certId, setCertId] = useState('');
   const [certResult, setCertResult] = useState<'idle' | 'valid' | 'invalid'>('idle');
   const [certLoading, setCertLoading] = useState(false);
   const [verifiedCert, setVerifiedCert] = useState<any>(null);
   const [sampleCerts, setSampleCerts] = useState<string[]>([]);
-
-  // ── Offer letter state ───────────────────────────────────────────────────────
-  const [offerId, setOfferId] = useState('');
-  const [offerResult, setOfferResult] = useState<'idle' | 'valid' | 'invalid'>('idle');
-  const [offerLoading, setOfferLoading] = useState(false);
-  const [verifiedOffer, setVerifiedOffer] = useState<any>(null);
 
   const lastScanRef = useRef(0);
 
@@ -59,7 +41,6 @@ export default function Verify() {
     loadSamples();
   }, []);
 
-  // ── Certificate verification ────────────────────────────────────────────────
   const handleVerifyCert = async (idToVerify?: string) => {
     const targetId = idToVerify || certId;
     if (!targetId.trim()) return;
@@ -82,47 +63,15 @@ export default function Verify() {
     }
   };
 
-  // ── Offer letter verification ───────────────────────────────────────────────
-  const handleVerifyOffer = async (idToVerify?: string) => {
-    const targetId = idToVerify || offerId;
-    if (!targetId.trim()) return;
-    setOfferLoading(true);
-    setOfferResult('idle');
-    setVerifiedOffer(null);
-
-    try {
-      const { data, error } = await getOfferLetterById(targetId.trim(), false);
-      if (error || !data) {
-        setOfferResult('invalid');
-      } else {
-        setOfferResult('valid');
-        setVerifiedOffer(data);
-      }
-    } catch (err) {
-      setOfferResult('invalid');
-    } finally {
-      setOfferLoading(false);
-    }
-  };
-
-  // ── URL-driven entry: /verify?type=certificate|offer&id=… or /verify/:code ─
+  // ── URL-driven entry: /verify/:code or /verify?id=… ─────────────────────────
   useEffect(() => {
-    if (urlType === 'offer') {
-      setActiveTab('offer');
-      if (idQuery) {
-        setOfferId(idQuery);
-        handleVerifyOffer(idQuery);
-      }
-    } else if (urlType === 'certificate') {
-      setActiveTab('certificate');
-      if (idQuery) setCertId(idQuery);
-    } else if (code) {
-      setActiveTab('certificate');
-      setCertId(code);
-      handleVerifyCert(code);
+    const id = code || idQuery;
+    if (id) {
+      setCertId(id);
+      handleVerifyCert(id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlType, idQuery, code]);
+  }, [idQuery, code]);
 
   /** Handle a QR scan result — extracts the ID and verifies immediately. */
   const handleScanned = (decodedText: string) => {
@@ -133,59 +82,19 @@ export default function Verify() {
     const scannedId = extractId(decodedText);
     if (!scannedId) return;
 
-    if (isOfferUrl(decodedText)) {
-      switchTab('offer');
-      setTimeout(() => {
-        setOfferId(scannedId);
-        handleVerifyOffer(scannedId);
-      }, 0);
-    } else {
-      switchTab('certificate');
-      setTimeout(() => {
-        setCertId(scannedId);
-        handleVerifyCert(scannedId);
-      }, 0);
-    }
+    setCertId(scannedId);
+    handleVerifyCert(scannedId);
   };
-
-  const switchTab = (tab: VerifyTab) => {
-    setActiveTab(tab);
-    setSearchParams(tab === 'offer' ? { type: 'offer' } : {}, { replace: true });
-  };
-
-  // Expired = stored status, or past deadline (Accepted offers stay verifiable —
-  // they were accepted before the deadline).
-  const isOfferExpired =
-    verifiedOffer?.status === 'Expired' ||
-    (!!verifiedOffer?.expires_at &&
-      new Date(verifiedOffer.expires_at) < new Date() &&
-      verifiedOffer.status !== 'Accepted');
-
-  const offerStatusLabel = verifiedOffer?.status === 'Revoked'
-    ? 'This offer has been revoked'
-    : verifiedOffer?.status === 'Rejected'
-    ? 'This offer was declined'
-    : verifiedOffer?.status === 'Accepted'
-    ? 'This offer has been accepted'
-    : isOfferExpired
-    ? 'This offer has expired'
-    : 'This offer matches ZYR0&apos;s official record for this offer ID.';
-
-  const offerInactive = !!verifiedOffer && (['Revoked', 'Expired'].includes(verifiedOffer.status) || isOfferExpired);
 
   const certRevoked = verifiedCert?.status === 'Revoked';
 
   return (
-    <div className="pt-20 pb-16 px-4 min-h-screen">
+    <div className="pb-16 px-4 min-h-page">
       <SEO
-        title={activeTab === 'offer' ? 'Verify Offer Letter — Authenticate ZYR0 Offers' : 'Verify Certificate — Authenticate ZYR0 Credentials'}
-        description={
-          activeTab === 'offer'
-            ? 'Instantly verify the authenticity of any ZYR0-issued internship offer letter using its unique offer ID. Verification for students, employers, and institutions.'
-            : 'Instantly verify the authenticity of any ZYR0-issued internship certificate using its unique credential ID. Blockchain-backed verification for students, employers, and institutions.'
-        }
+        title="Verify Certificate — Authenticate ZYR0 Credentials"
+        description="Instantly verify the authenticity of any ZYR0-issued internship certificate using its unique credential ID. Verification for students, employers, and institutions."
         path="/verify"
-        keywords="verify certificate, internship certificate verification, verify offer letter, offer verification, credential verification, ZYR0"
+        keywords="verify certificate, internship certificate verification, credential verification, ZYR0"
       />
       <div className="max-w-4xl mx-auto">
         <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
@@ -193,143 +102,69 @@ export default function Verify() {
             <Shield className="w-8 h-8 text-accent" aria-hidden="true" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold">Verify Credentials</h1>
-          <p className="mt-3 text-muted-foreground">Verify the authenticity of ZYR0 certificates and offer letters</p>
+          <p className="mt-3 text-muted-foreground">Verify the authenticity of ZYR0 certificates</p>
         </m.div>
 
-        {/* Tab Switcher */}
-        <m.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="max-w-2xl mx-auto mb-4">
-          <div className="flex items-center bg-muted rounded-xl p-1 gap-1">
-            <button
-              onClick={() => switchTab('certificate')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible-ring ${
-                activeTab === 'certificate' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Award className="w-4 h-4" aria-hidden="true" />
-              Certificate
-            </button>
-            <button
-              onClick={() => switchTab('offer')}
-              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible-ring ${
-                activeTab === 'offer'
-                  ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <FileText className="w-4 h-4" aria-hidden="true" />
-              Offer Letter
-            </button>
-          </div>
-        </m.div>
-
-        <m.div initial={{ opacity: activeTab === 'offer' ? 0 : 1 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
+        <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
           className="bg-card rounded-xl border border-border p-6 shadow-sm max-w-2xl mx-auto">
 
-          {/* ── Certificate tab: search card ── */}
-          {activeTab === 'certificate' && (
-            <>
-              <div className="flex gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-                <label htmlFor="cert-id" className="sr-only">Certificate ID</label>
-                <input
-                  id="cert-id"
-                  type="text"
-                  value={certId}
-                  onChange={(e) => { setCertId(e.target.value); setCertResult('idle'); }}
-                  placeholder="Enter Certificate ID (e.g., ZYR0-SE-2024-001234)"
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
-                  onKeyDown={(e) => e.key === 'Enter' && handleVerifyCert()}
-                />
-              </div>
-              <button
-                onClick={() => handleVerifyCert()}
-                disabled={certLoading || !certId.trim()}
-                className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus-visible-ring"
-              >
-                {certLoading ? (
-                  <ButtonLoader size={16} dotSize={2.5} />
-                ) : (
-                  'Verify'
-                )}
-              </button>
-            </div>
-            <div className="mt-4 flex flex-col items-center gap-3">
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <QrCode className="w-4 h-4" aria-hidden="true" />
-                <span>Or scan a QR code</span>
-              </div>
-              <QrScanner onScan={handleScanned} />
-            </div>
-
-            {/* Sample IDs */}
-            {sampleCerts.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-border">
-                <p className="text-xs text-muted-foreground mb-2">Try these sample IDs:</p>
-                <div className="flex flex-wrap gap-2">
-                  {sampleCerts.map(id => (
-                    <button
-                      key={id}
-                      onClick={() => { setCertId(id); setCertResult('idle'); }}
-                      className="text-xs px-2.5 py-1 bg-muted rounded-full hover:bg-accent/10 hover:text-accent transition-colors focus-visible-ring"
-                    >
-                      {id}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            </>
-          )}
-
-          {/* ── Offer letter tab: search card ── */}
-          {activeTab === 'offer' && (
-            <div className="flex gap-3">
+          <div className="flex gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-              <label htmlFor="offer-id" className="sr-only">Offer ID</label>
+              <label htmlFor="cert-id" className="sr-only">Certificate ID</label>
               <input
-                id="offer-id"
+                id="cert-id"
                 type="text"
-                value={offerId}
-                onChange={(e) => { setOfferId(e.target.value); setOfferResult('idle'); }}
-                placeholder="Enter Offer Code (e.g., ZYRO-OF-2026-123456) or Offer ID"
+                value={certId}
+                onChange={(e) => { setCertId(e.target.value); setCertResult('idle'); }}
+                placeholder="Enter Certificate ID (e.g., ZYR0-SE-2024-001234)"
                 className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent focus-visible-ring"
-                onKeyDown={(e) => e.key === 'Enter' && handleVerifyOffer()}
+                onKeyDown={(e) => e.key === 'Enter' && handleVerifyCert()}
               />
             </div>
             <button
-              onClick={() => handleVerifyOffer()}
-              disabled={offerLoading || !offerId.trim()}
+              onClick={() => handleVerifyCert()}
+              disabled={certLoading || !certId.trim()}
               className="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 focus-visible-ring"
             >
-              {offerLoading ? (
-                <ButtonLoader size={16} dotSize={2.5} />
-              ) : (
-                'Verify'
-              )}
+              {certLoading ? <ButtonLoader size={16} dotSize={2.5} /> : 'Verify'}
             </button>
           </div>
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <QrCode className="w-4 h-4" aria-hidden="true" />
+              <span>Or scan a QR code</span>
+            </div>
+            <QrScanner onScan={handleScanned} />
+          </div>
+
+          {sampleCerts.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Try these sample IDs:</p>
+              <div className="flex flex-wrap gap-2">
+                {sampleCerts.map(id => (
+                  <button
+                    key={id}
+                    onClick={() => { setCertId(id); setCertResult('idle'); }}
+                    className="text-xs px-2.5 py-1 bg-muted rounded-full hover:bg-accent/10 hover:text-accent transition-colors focus-visible-ring"
+                  >
+                    {id}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </m.div>
 
         {/* Result status for screen readers */}
         <div className="sr-only" role="status" aria-live="polite">
-          {activeTab === 'offer'
-            ? (offerLoading && 'Verifying offer letter...')
-            : (certLoading && 'Verifying certificate...')}
-          {activeTab === 'offer'
-            ? (offerResult === 'valid' && 'Offer letter successfully verified.') || (offerResult === 'invalid' && 'Offer letter verification failed.')
-            : null}
-          {activeTab === 'certificate'
-            ? (certResult === 'valid' && 'Certificate successfully verified.') || (certResult === 'invalid' && 'Certificate verification failed.')
-            : null}
+          {certLoading && 'Verifying certificate...'}
+          {certResult === 'valid' && 'Certificate successfully verified.'}
+          {certResult === 'invalid' && 'Certificate verification failed.'}
         </div>
 
-        {/* Result visual layout */}
         <AnimatePresence mode="wait">
-          {/* Certificate result */}
-          {activeTab === 'certificate' && certResult === 'valid' && verifiedCert && (
+          {certResult === 'valid' && verifiedCert && (
             <m.div key="valid-cert" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
               className="mt-8 space-y-6">
               <div className={`${certRevoked ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'} border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4`}>
@@ -354,10 +189,10 @@ export default function Verify() {
                   </span>
                 </div>
               </div>
-              <CertificateDocument certificate={verifiedCert} />
+              <CertificateDocument certificate={verifiedCert} showActions={false} />
             </m.div>
           )}
-          {activeTab === 'certificate' && certResult === 'invalid' && (
+          {certResult === 'invalid' && (
             <m.div key="invalid-cert" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
               className="mt-8 bg-card rounded-xl border-2 border-red-200 dark:border-red-900/30 shadow-lg overflow-hidden max-w-2xl mx-auto" role="alert">
               <div className="bg-red-50 dark:bg-red-950/20 p-6 text-center">
@@ -371,61 +206,6 @@ export default function Verify() {
                 <p className="text-muted-foreground text-sm mb-4">Please check the ID and try again. If you believe this is an error, please contact support.</p>
                 <button
                   onClick={() => { setCertId(''); setCertResult('idle'); }}
-                  className="px-6 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors focus-visible-ring"
-                >
-                  Try Again
-                </button>
-              </div>
-            </m.div>
-          )}
-
-          {/* Offer letter result */}
-          {activeTab === 'offer' && offerResult === 'valid' && verifiedOffer && (
-            <m.div key="valid-offer" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-              className="mt-8 space-y-6">
-              <div className={`rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 ${
-                offerInactive ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-emerald-500/10 border border-emerald-500/20'
-              }`}>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    offerInactive ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                  }`}>
-                    <CheckCircle2 className="w-6 h-6" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className={`font-bold ${offerInactive ? 'text-amber-800 dark:text-amber-400' : 'text-emerald-800 dark:text-emerald-400'}`}>
-                      {offerInactive ? 'Offer Found — Inactive' : 'Verified Authentic'}
-                    </h3>
-                    <p className={`text-xs ${offerInactive ? 'text-amber-700/80 dark:text-amber-500/80' : 'text-emerald-700/80 dark:text-emerald-500/80'}`}>{offerStatusLabel}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                    offerInactive ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white'
-                  }`}>
-                    {offerInactive ? 'Inactive' : 'Verified'}
-                  </span>
-                </div>
-              </div>
-              <div className="flex justify-center">
-                <OfferLetterDocument offer={verifiedOffer} />
-              </div>
-            </m.div>
-          )}
-          {activeTab === 'offer' && offerResult === 'invalid' && (
-            <m.div key="invalid-offer" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="mt-8 bg-card rounded-xl border-2 border-red-200 dark:border-red-900/30 shadow-lg overflow-hidden max-w-2xl mx-auto" role="alert">
-              <div className="bg-red-50 dark:bg-red-950/20 p-6 text-center">
-                <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', delay: 0.2 }}>
-                  <XCircle className="w-16 h-16 text-red-500 mx-auto" aria-hidden="true" />
-                </m.div>
-                <h2 className="mt-4 text-2xl font-bold text-red-700 dark:text-red-400">Offer Letter Not Found</h2>
-                <p className="text-sm text-red-600 dark:text-red-300 mt-1">The offer ID you entered could not be verified.</p>
-              </div>
-              <div className="p-6 text-center">
-                <p className="text-muted-foreground text-sm mb-4">Please check the ID and try again. If you believe this is an error, please contact support.</p>
-                <button
-                  onClick={() => { setOfferId(''); setOfferResult('idle'); }}
                   className="px-6 py-2.5 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors focus-visible-ring"
                 >
                   Try Again

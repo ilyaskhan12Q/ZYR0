@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/lib/database.types';
 import { getCachedData, setCachedData } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
+import { signedFileUrl } from '@/lib/storage';
 
 /** Get the current user's profile */
 export async function getMyProfile(useCache = true) {
@@ -16,6 +17,10 @@ export async function getMyProfile(useCache = true) {
 
   const fetchFn = () => supabase.from('profiles').select('*').eq('id', user.id).single();
   const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (res.data?.resume_url) {
+    res.data.resume_url = await signedFileUrl('resumes', res.data.resume_url);
+  }
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;
@@ -71,12 +76,10 @@ export async function uploadResume(file: File) {
 
   if (error) throw error;
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('resumes')
-    .getPublicUrl(path);
-
-  await updateMyProfile({ resume_url: publicUrl });
-  return publicUrl;
+  // Store the object name, not a link: the bucket is private now, so links are
+  // minted on demand and expire.
+  await updateMyProfile({ resume_url: path });
+  return (await signedFileUrl('resumes', path)) ?? path;
 }
 
 /** Get a user's public profile */
@@ -89,6 +92,10 @@ export async function getUserProfile(userId: string, useCache = true) {
 
   const fetchFn = () => supabase.from('profiles').select('*').eq('id', userId).single();
   const res = await dedupRequest(cacheKey, fetchFn);
+
+  if (res.data?.resume_url) {
+    res.data.resume_url = await signedFileUrl('resumes', res.data.resume_url);
+  }
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;
