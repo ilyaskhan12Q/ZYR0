@@ -15,18 +15,29 @@ import { productsNav, productsMegaColumns, resourcesNav, companyNav } from '@/co
 // of it. Frosts denser on scroll for readability over busy content.
 // Padding stays constant across both states: the height drives the page's top
 // offset (--zyro-header-h), so a scrolled shrink would shift the whole page.
-const pillClass = (scrolled: boolean) =>
+const desktopPillClass = (scrolled: boolean) =>
+  `relative transition-all duration-300 flex items-center justify-between gap-4 ${
+    scrolled
+      ? 'w-full max-w-[1560px] mx-auto rounded-2xl border border-white/15 bg-black/80 supports-[backdrop-filter]:bg-black/65 backdrop-blur-2xl ring-1 ring-inset ring-white/5 shadow-2xl shadow-black/80 px-5 sm:px-8 py-2.5'
+      : 'w-full max-w-full rounded-none border-b border-border/10 dark:border-white/5 bg-background/10 dark:bg-black/15 supports-[backdrop-filter]:bg-background/5 dark:supports-[backdrop-filter]:bg-black/10 backdrop-blur-md px-5 sm:px-10 py-3.5'
+  }`;
+
+const mobilePillClass = (scrolled: boolean) =>
   `relative rounded-2xl border ring-1 ring-inset ring-white/5 backdrop-blur-2xl transition-all duration-300 flex items-center justify-between gap-3 px-4 sm:px-5 py-3 ${
     scrolled
       ? 'bg-black/80 supports-[backdrop-filter]:bg-black/65 border-white/15 shadow-2xl shadow-black/80'
       : 'bg-black/60 supports-[backdrop-filter]:bg-black/35 border-white/10 shadow-lg shadow-black/40'
   }`;
 
-const triggerClass = (open: boolean) =>
+const triggerClass = (open: boolean, scrolled: boolean = false) =>
   `flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-    open
-      ? 'text-white bg-white/10'
-      : 'text-neutral-300 hover:text-white hover:bg-white/5'
+    scrolled
+      ? open
+        ? 'text-white bg-white/10 font-medium'
+        : 'text-neutral-300 hover:text-white hover:bg-white/5'
+      : open
+        ? 'text-foreground bg-foreground/10 font-medium'
+        : 'text-foreground/85 hover:text-foreground hover:bg-foreground/5'
   }`;
 
 const panelClass = (width: string, align: 'left' | 'right' = 'left') =>
@@ -61,7 +72,7 @@ export default function SiteNav() {
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -119,7 +130,7 @@ export default function SiteNav() {
       aria-haspopup="true"
       aria-expanded={openMenu === id}
       aria-controls={`nav-${id}-menu`}
-      className={triggerClass(openMenu === id)}
+      className={triggerClass(openMenu === id, scrolled)}
     >
       {label}
       <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${openMenu === id ? 'rotate-180' : ''}`} />
@@ -127,14 +138,15 @@ export default function SiteNav() {
   );
 
   return (
-    <div ref={navRef} className="pointer-events-none relative">
-      {/* Desktop / tablet pill */}
-      <div className="hidden md:block max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pointer-events-auto">
-        <div className={pillClass(scrolled)}>
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <img src="/zyro-logo.webp" alt="" width="28" height="28" className="w-7 h-7 object-contain rounded-md" />
-            <span className="text-xl font-display tracking-tight text-white">ZYR0</span>
-          </Link>
+    <div ref={navRef} className="pointer-events-none relative w-full">
+      {/* Desktop / tablet nav */}
+      <div className="hidden md:flex items-center pointer-events-auto w-full transition-all duration-300">
+        <div className={`w-full transition-all duration-300 ${scrolled ? 'max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 pt-3' : 'px-0 pt-0'}`}>
+          <div className={desktopPillClass(scrolled)}>
+            <Link to="/" className="flex items-center gap-2.5 shrink-0">
+              <img src="/zyro-logo.webp" alt="" width="28" height="28" className="w-7 h-7 object-contain rounded-md" />
+              <span className={`text-xl font-display tracking-tight transition-colors ${scrolled ? 'text-white' : 'text-foreground'}`}>ZYR0</span>
+            </Link>
 
           <nav className="flex items-center gap-0.5" aria-label="Primary">
             <div>
@@ -157,7 +169,10 @@ export default function SiteNav() {
                     >
                       {productsMegaColumns.map((column, i) => (
                         <div key={i} className="flex flex-col gap-0.5">
-                          {column.map((product) => (
+                          <div className="px-3 pt-2 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 select-none">
+                            {column.title}
+                          </div>
+                          {column.items.map((product) => (
                             <Link
                               key={product.id}
                               to={product.href}
@@ -224,7 +239,7 @@ export default function SiteNav() {
 
             <Link
               to="/pricing"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${location.pathname === '/pricing' ? 'text-accent bg-accent/10' : triggerClass(false)}`}
+              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${location.pathname === '/pricing' ? 'text-accent bg-accent/10' : triggerClass(false, scrolled)}`}
             >
               Pricing
             </Link>
@@ -283,11 +298,33 @@ export default function SiteNav() {
 
           <div className="flex items-center gap-2 shrink-0">
             <button
+              type="button"
               aria-label="Toggle color theme"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+              className={`relative inline-flex items-center justify-center w-9 h-9 rounded-xl transition-all duration-200 shadow-2xs hover:scale-105 active:scale-95 group shrink-0 ${
+                scrolled
+                  ? 'border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white'
+                  : 'border border-border/60 hover:border-border bg-foreground/5 hover:bg-foreground/10 text-foreground'
+              }`}
             >
-              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {mounted ? (
+                <m.div
+                  key={theme === 'dark' ? 'dark' : 'light'}
+                  initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.7 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="flex items-center justify-center"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="w-4 h-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
+                  ) : (
+                    <Moon className={`w-4 h-4 transition-colors ${scrolled ? 'text-sky-200 group-hover:text-white' : 'text-foreground/80 group-hover:text-foreground'}`} />
+                  )}
+                </m.div>
+              ) : (
+                <div className="w-4 h-4" />
+              )}
             </button>
 
             {user ? (
@@ -370,7 +407,11 @@ export default function SiteNav() {
               <>
                 <Link
                   to={`/login?redirect=${redirect}`}
-                  className="px-3.5 py-2 text-sm font-medium text-neutral-300 hover:text-white transition-colors"
+                  className={`px-3.5 py-2 text-sm font-medium transition-colors ${
+                    scrolled
+                      ? 'text-neutral-300 hover:text-white'
+                      : 'text-foreground/85 hover:text-foreground'
+                  }`}
                 >
                   Sign In
                 </Link>
@@ -385,31 +426,72 @@ export default function SiteNav() {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Mobile compact pill */}
       <div className="md:hidden max-w-7xl mx-auto px-4 pt-4 pointer-events-auto">
-        <div className={pillClass(scrolled)}>
+        <div className={mobilePillClass(scrolled)}>
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src="/zyro-logo.webp" alt="" width="24" height="24" className="w-6 h-6 object-contain rounded-md" />
             <span className="text-lg font-display tracking-tight text-white">ZYR0</span>
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <button
+              type="button"
               aria-label="Toggle color theme"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="relative inline-flex items-center justify-center w-9 h-9 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white transition-all duration-200 shadow-2xs hover:scale-105 active:scale-95 group shrink-0"
             >
-              {mounted && theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {mounted ? (
+                <m.div
+                  key={theme === 'dark' ? 'dark' : 'light'}
+                  initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.7 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="flex items-center justify-center"
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="w-4 h-4 text-amber-300 group-hover:text-amber-200 transition-colors" />
+                  ) : (
+                    <Moon className="w-4 h-4 text-sky-200 group-hover:text-white transition-colors" />
+                  )}
+                </m.div>
+              ) : (
+                <div className="w-4 h-4" />
+              )}
             </button>
+
+            {user ? (
+              <Link
+                to={effectiveRole ? `/${effectiveRole}/dashboard` : '/'}
+                aria-label="Account Dashboard"
+                className="relative inline-flex items-center justify-center w-8 h-8 rounded-full overflow-hidden ring-1 ring-white/20 hover:ring-accent transition-all shrink-0"
+              >
+                <img
+                  src={user.user_metadata?.avatar_url || 'https://ui-avatars.com/api/?name=User'}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <Link
+                to={`/login?redirect=${redirect}`}
+                className="inline-flex items-center px-3.5 py-1.5 text-xs font-semibold text-white bg-accent hover:bg-accent/90 rounded-xl transition-all shadow-sm hover:shadow-md hover:scale-102 active:scale-98 shrink-0"
+              >
+                Sign In
+              </Link>
+            )}
+
             <button
               onClick={() => setMobileOpen(true)}
               aria-label="Open menu"
               aria-haspopup="true"
               aria-expanded={mobileOpen}
               aria-controls="mobile-nav-sheet"
-              className="inline-flex items-center justify-center min-w-10 min-h-10 rounded-lg text-white bg-white/10 border border-white/15 hover:bg-white/20 transition-colors"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-xl text-white bg-white/10 border border-white/15 hover:bg-white/20 transition-all shrink-0"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-4 h-4" />
             </button>
           </div>
         </div>

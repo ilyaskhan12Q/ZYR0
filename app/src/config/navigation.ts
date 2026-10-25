@@ -2,7 +2,7 @@ import type React from 'react';
 import {
   Code, School, BrainCircuit, Briefcase, Compass,
   HelpCircle, MessageCircle, BookOpen, BadgeCheck, Shield, FileText, Cookie,
-  Building2, Mail, CreditCard,
+  Building2, Mail, CreditCard, Users,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -22,6 +22,11 @@ export interface ProductNavItem {
   icon?: React.ElementType;
 }
 
+export interface ProductMegaColumn {
+  title: string;
+  items: ProductNavItem[];
+}
+
 // Single source of truth for every nav/footer link.
 // All routes verified live in App.tsx.
 export const productsNav: ProductNavItem[] = [
@@ -32,45 +37,70 @@ export const productsNav: ProductNavItem[] = [
     description: 'Autonomous AI website & full-stack app builder with one-click deploy.',
     logo: '/logos/studio.png',
     icon: Code,
-  },
-  {
-    id: 'edu',
-    name: 'ZYR0 Edu',
-    href: '/school',
-    description: 'Modern operating system for schools and colleges.',
-    logo: '/logos/schoolOS.png',
-    icon: School,
+    badge: 'Popular',
   },
   {
     id: 'research',
     name: 'ZYR0 Research',
     href: '/research',
-    description: 'Autonomous deep research with verified citations.',
+    description: 'Autonomous deep research agent with verified multi-source citations.',
     logo: '/logos/research.png',
     icon: BrainCircuit,
-  },
-  {
-    id: 'work',
-    name: 'ZYR0 Work',
-    href: '/internships',
-    description: 'Project-driven internships with verifiable certificates.',
-    icon: Briefcase,
   },
   {
     id: 'toolhub',
     name: 'ZYR0 ToolHub',
     href: '/tools',
-    description: 'Curated directory of AI utilities and developer tools.',
+    description: 'Curated directory of AI utilities, community skills, and dev tools.',
     icon: Compass,
+    badge: 'New',
+  },
+  {
+    id: 'edu',
+    name: 'ZYR0 Edu',
+    href: '/school',
+    description: 'Modern operating system for schools and academic institutions.',
+    logo: '/logos/schoolOS.png',
+    icon: School,
+  },
+  {
+    id: 'work',
+    name: 'ZYR0 Work',
+    href: '/internships',
+    description: 'Project-driven internships with verifiable proof-of-work certificates.',
+    icon: Briefcase,
+  },
+  {
+    id: 'employers',
+    name: 'For Employers',
+    href: '/join#employers',
+    description: 'Launch internship cohorts, track milestones, and issue certificates.',
+    icon: Building2,
+    badge: 'Hiring',
+  },
+  {
+    id: 'mentors',
+    name: 'For Mentors',
+    href: '/join#mentors',
+    description: 'Guide emerging engineers, review projects, and build leadership proof.',
+    icon: Users,
   },
 ];
 
-// Mega-menu layout: one array per column, so columns can be added or removed
-// here without touching the nav. The nav renders one preview panel after them.
-export const productsMegaColumns: ProductNavItem[][] = [
-  productsNav.slice(0, 2),
-  productsNav.slice(2, 4),
-  productsNav.slice(4),
+// Mega-menu layout: 3 categorized columns with titles + 1 live preview card
+export const productsMegaColumns: ProductMegaColumn[] = [
+  {
+    title: 'AI & Platforms',
+    items: [productsNav[0], productsNav[1], productsNav[2]],
+  },
+  {
+    title: 'Education & Career',
+    items: [productsNav[3], productsNav[4]],
+  },
+  {
+    title: 'Partners & Programs',
+    items: [productsNav[5], productsNav[6]],
+  },
 ];
 
 export const resourcesNav: NavItem[] = [
@@ -110,6 +140,7 @@ export const footerNav = {
     { label: 'Verify Certificate', href: '/verify' },
   ],
   companies: [
+    { label: 'Partner Onboarding', href: '/join' },
     { label: 'Post Internship', href: '/company/internships/new' },
     { label: 'Dashboard', href: '/company/dashboard' },
     { label: 'Browse Companies', href: '/companies' },

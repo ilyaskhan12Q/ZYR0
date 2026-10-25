@@ -80,6 +80,7 @@ const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const CompleteProfileRedirect = lazy(() => import('@/pages/public/CompleteProfileRedirect'));
 const AcceptInvite = lazy(() => import('@/pages/public/AcceptInvite'));
+const Join = lazy(() => import('@/pages/public/Join'));
 
 // Auth Pages
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
@@ -308,6 +309,7 @@ export default function App() {
               <Route path="/tools" element={<ToolHub />} />
               <Route path="/tools/:slug" element={<ToolDetail />} />
               <Route path="/toolhub" element={<Navigate to="/tools" replace />} />
+              <Route path="/join" element={<Join />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/billing-help" element={<BillingHelp />} />
               <Route path="/help/billing" element={<Navigate to="/billing-help" replace />} />
