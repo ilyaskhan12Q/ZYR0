@@ -68,7 +68,7 @@ export default function BrowseInternships() {
   });
 
   return (
-    <div className="pb-16 px-4">
+    <div className="pt-8 sm:pt-12 lg:pt-14 pb-16 px-4">
       <SEO
         title="Browse Internships — Find Your Perfect Opportunity"
         description="Explore hundreds of verified internship opportunities across technology, design, data science, and more. Filter by domain, location, and type to find the internship that fits your career goals."

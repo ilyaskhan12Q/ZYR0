@@ -89,7 +89,7 @@ export default function Verify() {
   const certRevoked = verifiedCert?.status === 'Revoked';
 
   return (
-    <div className="pb-16 px-4 min-h-page">
+    <div className="pt-8 sm:pt-12 lg:pt-14 pb-16 px-4 min-h-page">
       <SEO
         title="Verify Certificate — Authenticate ZYR0 Credentials"
         description="Instantly verify the authenticity of any ZYR0-issued internship certificate using its unique credential ID. Verification for students, employers, and institutions."

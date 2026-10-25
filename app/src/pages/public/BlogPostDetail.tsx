@@ -112,7 +112,7 @@ export default function BlogPostDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-page bg-background text-foreground pb-24">
+      <div className="min-h-page bg-background text-foreground pt-8 sm:pt-12 lg:pt-14 pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 animate-pulse">
           <div className="h-4 w-28 bg-muted rounded mb-8" />
           <div className="h-12 w-full bg-muted rounded mb-4" />
@@ -193,7 +193,7 @@ export default function BlogPostDetail() {
         ]}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-24">
         
         {/* Navigation Breadcrumb */}
         <div className="mb-8">

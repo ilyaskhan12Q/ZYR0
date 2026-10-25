@@ -218,7 +218,7 @@ export default function BillingHelp() {
         path="/billing-help"
       />
 
-      <main className="pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <main className="pt-8 sm:pt-12 lg:pt-14 pb-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         {/* Back Link */}
         <div className="mb-6">
           <Link

@@ -283,7 +283,7 @@ export default function InternshipDetail() {
   ];
 
   return (
-    <div className="pb-16 px-4">
+    <div className="pt-8 sm:pt-12 lg:pt-14 pb-16 px-4">
       <SEO
         title={`${internship.title} Internship at ${company?.name || 'ZYR0 Partner'}`}
         description={`${internship.title} internship opportunity. Domain: ${internship.domain}. Duration: ${internship.duration}. Location: ${internship.location_type}. Learn more and apply on ZYR0.`}
