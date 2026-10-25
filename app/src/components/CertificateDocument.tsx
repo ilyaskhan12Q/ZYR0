@@ -237,6 +237,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
 
     printWindow.document.write(html);
     printWindow.document.close();
+    printWindow.opener = null;
 
     if (printWindow.document.fonts?.ready) {
       printWindow.document.fonts.ready.then(() => {
@@ -268,6 +269,7 @@ export default function CertificateDocument({ certificate }: CertificateDocument
         <iframe
           srcDoc={previewHtml}
           title="Certificate preview"
+          sandbox=""
           style={{
             position: 'absolute',
             top: 0,

@@ -8,6 +8,18 @@
 export const CERT_WIDTH = 1120;
 export const CERT_HEIGHT = 792;
 
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+/** Profile and company text is user-controlled; escape it before templating. */
+const esc = (value: unknown): string =>
+  String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+
 export interface CertificateTemplateOptions {
   recipientName: string;
   internshipTitle: string;
@@ -398,7 +410,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Certificate - ${recipientName}</title>
+    <title>Certificate - ${esc(recipientName)}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Agbalumo&family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,600&display=swap" />
@@ -422,7 +434,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
         <div class="inner">
           <div class="top-row">
             <div class="gov">
-              <div class="cert-meta-top">Certificate ID: <b>${credentialId}</b><br />Issue Date: <b>${issueDateStr}</b></div>
+              <div class="cert-meta-top">Certificate ID: <b>${esc(credentialId)}</b><br />Issue Date: <b>${esc(issueDateStr)}</b></div>
             </div>
             <div class="award-center">
               <img class="logo-top" src="${oLogoSrc}" alt="ZYRO Platform" />
@@ -445,12 +457,12 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
 
             <div class="name-pill">
               <div class="name-pill-inner">
-                <span class="name-text">${recipientName}</span>
+                <span class="name-text">${esc(recipientName)}</span>
               </div>
             </div>
 
             <div class="body-text">
-              <p>In recognition of the successful completion of the <b class="internship-title">${internshipTitle}</b> at <b class="company-name">${companyName}</b>, verified against the official ZYRO credential registry, from <b class="cert-dates">${dates}</b>.</p>
+              <p>In recognition of the successful completion of the <b class="internship-title">${esc(internshipTitle)}</b> at <b class="company-name">${esc(companyName)}</b>, verified against the official ZYRO credential registry, from <b class="cert-dates">${esc(dates)}</b>.</p>
               <p>Throughout the internship, the candidate consistently demonstrated technical competence, proactivity, and responsibility in executing all project deliverables. Congratulations on this milestone and thank you for your meaningful contributions throughout your time with the team.</p>
             </div>
           </div>
@@ -459,7 +471,7 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
             <div class="sig-block">
               <div class="sig-line" aria-hidden="true">${sigSrc ? `<img class="sig-img" src="${sigSrc}" alt="" />` : ''}</div>
               <div class="sig-title">Program Coordinator</div>
-              <div class="sig-company">${companyName}</div>
+              <div class="sig-company">${esc(companyName)}</div>
             </div>
             <div class="center-col">
               <div class="seal-qr">
