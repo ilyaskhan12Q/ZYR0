@@ -91,7 +91,7 @@ function StatusIcon({ status }: { status: ReasoningStep['status'] }) {
     case 'error':
       return <XCircle className="size-4 text-red-400" />;
     default:
-      return <Circle className="size-4 text-[#5a5a5f]" />;
+      return <Circle className="size-4 text-[var(--ag-text-6)]" />;
   }
 }
 
@@ -152,15 +152,15 @@ export function ResearchReasoning({
                     <span className={cn(
                       "text-sm",
                       step.status === 'active' ? 'text-white font-medium' :
-                      step.status === 'completed' ? 'text-[#a0a0a5]' :
+                      step.status === 'completed' ? 'text-[var(--ag-text-3)]' :
                       step.status === 'error' ? 'text-red-400' :
-                      'text-[#5a5a5f]'
+                      'text-[var(--ag-text-6)]'
                     )}>
                       {step.label}
                     </span>
                   </div>
                   {step.detail && (
-                    <p className="text-xs text-[#6a6a6f] ml-6 mt-0.5">{step.detail}</p>
+                    <p className="text-xs text-[var(--ag-text-5)] ml-6 mt-0.5">{step.detail}</p>
                   )}
                 </div>
               </div>

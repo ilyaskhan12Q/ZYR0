@@ -17,6 +17,13 @@ module.exports = {
         label: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
       },
       colors: {
+        // Channel-based so a scope can re-point them without rebuilding
+        // utilities: the agent workspace flips --color-white-rgb to ink
+        // for light mode (see src/styles/agent.css). Defaults come from
+        // the :root vars in src/index.css and are visually identical to
+        // the stock #fff / #000.
+        white: 'rgb(var(--color-white-rgb) / <alpha-value>)',
+        black: 'rgb(var(--color-black-rgb) / <alpha-value>)',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

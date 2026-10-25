@@ -3,8 +3,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, Check, Zap, SendHorizontal, History } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import type { AgentModelInfo } from '@/agent/core/types'
+import { ModeToggle, type AgentMode } from '@/agent/components/ModeToggle'
+import { TemporaryToggle } from '@/agent/components/TemporaryToggle'
+import type { AgentAttachment, AgentModelInfo } from '@/agent/core/types'
 import type { ResearchDepth } from '@/agent/research/types'
 
 // ----------------------------------------------------------------------
@@ -91,7 +94,7 @@ function ChatInput({
   models: AgentModelInfo[]
   selectedModel: string | null
   onSelectModel: (id: string) => void
-  onSend?: (message: string) => void
+  onSend?: (message: string, attachments?: AgentAttachment[]) => void
   onStop?: () => void
   running?: boolean
   depth: ResearchDepth
@@ -111,7 +114,7 @@ function ChatInput({
   const audioContextRef = useRef<AudioContext | null>(null)
   const rafRef = useRef<number | null>(null)
   const recognitionRef = useRef<any>(null)
-  const demoTextIntervalRef = useRef<number | null>(null)
+  const shouldRestartRef = useRef(false)
 
   const [hoverStyle, setHoverStyle] = useState({ opacity: 0, transform: 'translateY(0px) scale(0.95)', transition: 'none' })
   const [containerHeight, setContainerHeight] = useState(116)
@@ -159,11 +162,11 @@ function ChatInput({
   const expand = () => { setIsSmoothResize(false); setExpanded(true) }
 
   const stopRecording = useCallback(() => {
+    shouldRestartRef.current = false
     if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null }
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
     if (streamRef.current) { streamRef.current.getTracks().forEach((t) => t.stop()); streamRef.current = null }
     if (audioContextRef.current) { audioContextRef.current.close(); audioContextRef.current = null }
-    if (demoTextIntervalRef.current) { window.clearInterval(demoTextIntervalRef.current); demoTextIntervalRef.current = null }
     setIsRecording(false)
     setAudioData(new Array(5).fill(0))
   }, [])
@@ -171,64 +174,73 @@ function ChatInput({
   const startRecording = useCallback(async () => {
     setIsSmoothResize(false)
     setExpanded(true)
+    // Real dictation only — never fabricate text on the user's behalf.
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) { toast.error("Voice input isn't supported in this browser"); return }
     let stream: MediaStream | null = null
     try {
       if (navigator.mediaDevices?.getUserMedia) stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    } catch { /* mic denied */ }
+    } catch { /* handled below */ }
+    if (!stream) { toast.error('Microphone access denied — check browser permissions'); return }
     setIsRecording(true)
-    function simulateText() {
-      const fakeText = 'What are the latest advances in quantum computing?'
-      const words = fakeText.split(' ')
-      let i = 0
-      let currentBase = valueRef.current
-      demoTextIntervalRef.current = window.setInterval(() => {
-        if (i < words.length) { currentBase = (currentBase ? currentBase + ' ' : '') + words[i]; handleValueChange(currentBase); i++ }
-        else stopRecording()
-      }, 300)
+    streamRef.current = stream
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+    const audioCtx = new AudioCtx()
+    audioContextRef.current = audioCtx
+    const analyser = audioCtx.createAnalyser()
+    analyser.fftSize = 64
+    const source = audioCtx.createMediaStreamSource(stream)
+    source.connect(analyser)
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    const updateVisualizer = () => {
+      analyser.getByteFrequencyData(dataArray)
+      const bands = new Array(5).fill(0)
+      const step = Math.floor(dataArray.length / 5)
+      for (let i = 0; i < 5; i++) { let sum = 0; for (let j = 0; j < step; j++) sum += dataArray[i * step + j]; bands[i] = sum / step / 255 }
+      setAudioData(bands)
+      rafRef.current = requestAnimationFrame(updateVisualizer)
     }
-    if (stream) {
-      streamRef.current = stream
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
-      const audioCtx = new AudioCtx()
-      audioContextRef.current = audioCtx
-      const analyser = audioCtx.createAnalyser()
-      analyser.fftSize = 64
-      const source = audioCtx.createMediaStreamSource(stream)
-      source.connect(analyser)
-      const dataArray = new Uint8Array(analyser.frequencyBinCount)
-      const updateVisualizer = () => {
-        analyser.getByteFrequencyData(dataArray)
-        const bands = new Array(5).fill(0)
-        const step = Math.floor(dataArray.length / 5)
-        for (let i = 0; i < 5; i++) { let sum = 0; for (let j = 0; j < step; j++) sum += dataArray[i * step + j]; bands[i] = sum / step / 255 }
-        setAudioData(bands)
-        rafRef.current = requestAnimationFrame(updateVisualizer)
+    updateVisualizer()
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    // Recognize in the browser's own language — the locale mismatch was a
+    // major source of garbled transcripts.
+    recognition.lang = navigator.language || 'en-US'
+    let baseline = valueRef.current
+    recognition.onresult = (event: any) => {
+      let interim = '', final = ''
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) final += event.results[i][0].transcript
+        else interim += event.results[i][0].transcript
       }
-      updateVisualizer()
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition()
-        recognition.continuous = true
-        recognition.interimResults = true
-        let baseline = valueRef.current
-        recognition.onresult = (event: any) => {
-          let interim = '', final = ''
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) final += event.results[i][0].transcript
-            else interim += event.results[i][0].transcript
-          }
-          if (final) baseline += (baseline ? ' ' : '') + final
-          handleValueChange((baseline + (interim ? ' ' + interim : '')).trim())
-        }
-        recognition.onerror = () => stopRecording()
-        recognition.onend = () => stopRecording()
-        recognitionRef.current = recognition
-        recognition.start()
-      } else { simulateText() }
-    } else {
-      demoTextIntervalRef.current = window.setInterval(() => { setAudioData(Array.from({ length: 5 }, () => Math.random() * 0.8 + 0.1)) }, 100)
-      simulateText()
+      if (final) baseline += (baseline ? ' ' : '') + final
+      handleValueChange((baseline + (interim ? ' ' + interim : '')).trim())
     }
+    recognition.onerror = (event: any) => {
+      const code = String(event?.error ?? '')
+      // 'no-speech' / 'aborted' are transient — onend decides whether to resume.
+      if (code === 'no-speech' || code === 'aborted') return
+      shouldRestartRef.current = false
+      toast.error(
+        code === 'not-allowed' || code === 'service-not-allowed'
+          ? 'Microphone access denied — check browser permissions'
+          : 'Voice input stopped — speech service unavailable',
+      )
+      stopRecording()
+    }
+    // Chrome silently ends recognition after a short pause; restart it while
+    // the user is still recording so the rest of the sentence isn't dropped.
+    recognition.onend = () => {
+      if (shouldRestartRef.current && recognitionRef.current === recognition) {
+        try { recognition.start() } catch { stopRecording() }
+        return
+      }
+      stopRecording()
+    }
+    shouldRestartRef.current = true
+    recognitionRef.current = recognition
+    recognition.start()
   }, [handleValueChange, stopRecording])
 
   useEffect(() => { if (isRecording && textareaRef.current) textareaRef.current.scrollTop = textareaRef.current.scrollHeight }, [value, isRecording])
@@ -308,7 +320,7 @@ function ChatInput({
             overflow: expanded ? 'visible' : 'hidden',
           }}
           className={cn(
-            'relative w-full border border-white/10 bg-[#1e1e22] shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_2px_20px_rgba(0,0,0,0.4)] focus-within:border-white/20 z-10',
+            'relative w-full border border-white/10 bg-[var(--ag-surface)] shadow-[0_0_0_1px_var(--ag-hairline),0_2px_20px_var(--ag-shadow)] focus-within:border-white/20 z-10',
             expanded ? 'cursor-text' : 'cursor-default'
           )}
         >
@@ -326,17 +338,17 @@ function ChatInput({
             disabled={isRecording}
             style={{ transition: isSmoothResize ? 'height 0.15s ease-out' : 'opacity 0.3s ease-out, transform 0.3s ease-out, height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
             className={cn(
-              'absolute top-0 inset-x-0 z-[1] w-full resize-none bg-transparent pl-5 pr-12 py-4 text-[15px] leading-[22px] text-white outline-none placeholder:font-medium placeholder:text-[#5a5a5f] cursor-text',
+              'absolute top-0 inset-x-0 z-[1] w-full resize-none bg-transparent pl-5 pr-12 py-4 text-[15px] leading-[22px] text-white outline-none placeholder:font-medium placeholder:text-[var(--ag-text-6)] cursor-text',
               expanded ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none',
               isScrolling ? 'overflow-y-auto' : 'overflow-y-hidden',
               isRecording && 'pointer-events-none'
             )}
           />
 
-          <div ref={topFadeRef} className="absolute left-5 right-12 top-0 z-[2] h-8 bg-gradient-to-b from-[#1e1e22] via-[#1e1e22]/90 to-transparent pointer-events-none" />
+          <div ref={topFadeRef} className="absolute left-5 right-12 top-0 z-[2] h-8 bg-gradient-to-b from-[var(--ag-surface)] via-[var(--ag-surface-90)] to-transparent pointer-events-none" />
           <div
             ref={bottomFadeRef}
-            className="absolute left-5 right-12 z-[2] h-8 bg-gradient-to-t from-[#1e1e22] via-[#1e1e22]/90 to-transparent pointer-events-none"
+            className="absolute left-5 right-12 z-[2] h-8 bg-gradient-to-t from-[var(--ag-surface)] via-[var(--ag-surface-90)] to-transparent pointer-events-none"
             style={{ opacity: 0, top: `${textareaHeight - 32}px`, transition: isSmoothResize ? 'top 0.15s ease-out' : 'top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
           />
 
@@ -345,7 +357,7 @@ function ChatInput({
             onClick={expand}
             style={{ transition: isSmoothResize ? 'none' : 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
             className={cn(
-              'absolute inset-x-0 top-0 z-[1] cursor-text pl-5 pr-12 py-4 text-left text-[15px] font-medium leading-[22px] text-[#5a5a5f] outline-none',
+              'absolute inset-x-0 top-0 z-[1] cursor-text pl-5 pr-12 py-4 text-left text-[15px] font-medium leading-[22px] text-[var(--ag-text-6)] outline-none',
               !expanded ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-105 translate-y-1 pointer-events-none'
             )}
             aria-label="Open prompt input"
@@ -377,17 +389,17 @@ function ChatInput({
                   <>
                     <div className="fixed inset-0 z-[9998]" onClick={() => setIsModelSelectOpen(false)} />
                     <div
-                      className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
+                      className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[var(--ag-panel-95)] backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
                       style={{
                         bottom: dropdownPos.bottom,
                         left: dropdownPos.left,
                       }}
                     >
                       <div className="p-1.5">
-                        <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">Select Model</div>
+                        <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--ag-text-6)] sticky top-0 bg-[var(--ag-panel-95)] backdrop-blur-xl z-10">Select Model</div>
                         {models.filter((m) => m.enabled).map((model) => (
                           <button key={model.id} onClick={(e) => { e.stopPropagation(); onSelectModel(model.id); setIsModelSelectOpen(false) }}
-                            className={cn('w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150', selected?.id === model.id ? 'bg-white/10 text-white' : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white')}>
+                            className={cn('w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150', selected?.id === model.id ? 'bg-white/10 text-white' : 'text-[var(--ag-text-3)] hover:bg-white/5 hover:text-white')}>
                             <Zap className="size-3.5 text-emerald-400 shrink-0" />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
@@ -427,7 +439,7 @@ function ChatInput({
               onClick={onActionButtonClick}
               aria-label={showArrow ? 'Send prompt' : showStop ? 'Stop recording' : 'Use voice input'}
               style={{ borderRadius: 9999 }}
-              className="absolute right-2 bottom-2 z-[10] flex h-8 w-8 items-center justify-center bg-[#1488fc] text-white transition-all duration-300 hover:bg-[#1a94ff] outline-none focus-visible:ring-2 focus-visible:ring-white/30 shadow-[0_0_20px_rgba(20,136,252,0.3)]"
+              className="absolute right-2 bottom-2 z-[10] flex h-8 w-8 items-center justify-center bg-[#1488fc] text-[#ffffff] transition-all duration-300 hover:bg-[#1a94ff] outline-none focus-visible:ring-2 focus-visible:ring-white/30 shadow-[0_0_20px_rgba(20,136,252,0.3)]"
             >
               <span className="relative flex h-full w-full items-center justify-center">
                 <span className={cn('absolute inset-0 flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]', showArrow ? 'opacity-100 scale-100 rotate-0 blur-none' : 'opacity-0 scale-50 rotate-45 blur-[1px] pointer-events-none')}>
@@ -450,22 +462,22 @@ function ChatInput({
 function RayBackground() {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none">
-      <div className="absolute inset-0 bg-[#0f0f0f]" />
+      <div className="absolute inset-0 bg-[var(--ag-bg)]" />
       <div
         className="absolute left-1/2 -translate-x-1/2 w-[4000px] h-[1800px] sm:w-[6000px]"
         style={{
-          background: `radial-gradient(circle at center 800px, rgba(20, 136, 252, 0.8) 0%, rgba(20, 136, 252, 0.35) 14%, rgba(20, 136, 252, 0.18) 18%, rgba(20, 136, 252, 0.08) 22%, rgba(17, 17, 20, 0.2) 25%)`
+          background: `radial-gradient(circle at center 800px, rgba(20, 136, 252, 0.8) 0%, rgba(20, 136, 252, 0.35) 14%, rgba(20, 136, 252, 0.18) 18%, rgba(20, 136, 252, 0.08) 22%, var(--ag-glow-edge) 25%)`
         }}
       />
       <div
         className="absolute top-[175px] left-1/2 w-[1600px] h-[1600px] sm:top-1/2 sm:w-[3043px] sm:h-[2865px]"
         style={{ transform: 'translate(-50%) rotate(180deg)' }}
       >
-        <div className="absolute w-full h-full rounded-full -mt-[13px]" style={{ background: 'radial-gradient(43.89% 25.74% at 50.02% 97.24%, #111114 0%, #0f0f0f 100%)', border: '16px solid white', transform: 'rotate(180deg)', zIndex: 5 }} />
-        <div className="absolute w-full h-full rounded-full bg-[#0f0f0f] -mt-[11px]" style={{ border: '23px solid #b7d7f6', transform: 'rotate(180deg)', zIndex: 4 }} />
-        <div className="absolute w-full h-full rounded-full bg-[#0f0f0f] -mt-[8px]" style={{ border: '23px solid #8fc1f2', transform: 'rotate(180deg)', zIndex: 3 }} />
-        <div className="absolute w-full h-full rounded-full bg-[#0f0f0f] -mt-[4px]" style={{ border: '23px solid #64acf6', transform: 'rotate(180deg)', zIndex: 2 }} />
-        <div className="absolute w-full h-full rounded-full bg-[#0f0f0f]" style={{ border: '20px solid #1172e2', boxShadow: '0 -15px 24.8px rgba(17, 114, 226, 0.6)', transform: 'rotate(180deg)', zIndex: 1 }} />
+        <div className="absolute w-full h-full rounded-full -mt-[13px]" style={{ background: 'radial-gradient(43.89% 25.74% at 50.02% 97.24%, var(--ag-rail) 0%, var(--ag-bg) 100%)', border: '16px solid var(--ag-bg)', transform: 'rotate(180deg)', zIndex: 5 }} />
+        <div className="absolute w-full h-full rounded-full bg-[var(--ag-bg)] -mt-[11px]" style={{ border: '23px solid #b7d7f6', transform: 'rotate(180deg)', zIndex: 4 }} />
+        <div className="absolute w-full h-full rounded-full bg-[var(--ag-bg)] -mt-[8px]" style={{ border: '23px solid #8fc1f2', transform: 'rotate(180deg)', zIndex: 3 }} />
+        <div className="absolute w-full h-full rounded-full bg-[var(--ag-bg)] -mt-[4px]" style={{ border: '23px solid #64acf6', transform: 'rotate(180deg)', zIndex: 2 }} />
+        <div className="absolute w-full h-full rounded-full bg-[var(--ag-bg)]" style={{ border: '20px solid #1172e2', boxShadow: '0 -15px 24.8px rgba(17, 114, 226, 0.6)', transform: 'rotate(180deg)', zIndex: 1 }} />
       </div>
     </div>
   )
@@ -477,19 +489,26 @@ function RayBackground() {
 interface AgentHeroProps {
   models: AgentModelInfo[]
   selectedModel: string | null
+  mode: AgentMode
+  onModeChange: (m: AgentMode) => void
+  temporary: boolean
+  onToggleTemporary: () => void
   onSelectModel: (id: string) => void
-  onSend: (message: string) => void
+  onSend: (message: string, attachments?: AgentAttachment[]) => void
   onStop?: () => void
   running?: boolean
   depth: ResearchDepth
   onDepthChange: (d: ResearchDepth) => void
   onOpenHistory?: () => void
-  onToggleSidebar?: () => void
 }
 
 export function AgentHero({
   models,
   selectedModel,
+  mode,
+  onModeChange,
+  temporary,
+  onToggleTemporary,
   onSelectModel,
   onSend,
   onStop,
@@ -497,33 +516,32 @@ export function AgentHero({
   depth,
   onDepthChange,
   onOpenHistory,
-  onToggleSidebar,
 }: AgentHeroProps) {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-[#0f0f0f]">
+    <div className="relative flex flex-col items-center justify-center min-h-screen w-full overflow-hidden bg-[var(--ag-bg)]" data-lenis-prevent="">
       <RayBackground />
 
-      {onToggleSidebar && (
-        <button
-          onClick={onToggleSidebar}
-          className="absolute top-5 left-5 z-30 flex items-center justify-center size-10 rounded-full text-[#8a8a8f] hover:text-white hover:bg-white/5 transition-all duration-200 active:scale-95"
-        >
-          <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <path d="M9 3v18" />
-          </svg>
-        </button>
-      )}
+      {/* Top right: temporary chat + history */}
+      <div className="absolute top-5 right-5 z-30 flex items-center gap-2">
+        <TemporaryToggle active={temporary} onToggle={onToggleTemporary} />
 
-      {onOpenHistory && (
-        <button
-          onClick={onOpenHistory}
-          className="absolute top-5 right-5 z-30 flex items-center gap-1.5 px-3 py-3 rounded-full text-xs font-medium text-[#8a8a8f] hover:text-white hover:bg-white/5 transition-all duration-200 active:scale-95"
-        >
-          <History className="size-4" />
-          <span className="hidden sm:inline">History</span>
-        </button>
-      )}
+        {onOpenHistory && (
+          <button
+            onClick={onOpenHistory}
+            className="flex items-center gap-1.5 px-3 py-2.5 rounded-full text-xs font-medium text-[var(--ag-text-4)] hover:text-white hover:bg-white/5 transition-all duration-200 active:scale-95"
+          >
+            <History className="size-4" />
+            <span className="hidden sm:inline">History</span>
+          </button>
+        )}
+      </div>
+
+      {/* Chat / Research — top of the chat bar */}
+      <ModeToggle
+        mode={mode}
+        onModeChange={onModeChange}
+        className="absolute top-5 left-1/2 z-30 -translate-x-1/2"
+      />
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-4">
         <div className="text-center mb-6">
@@ -534,7 +552,7 @@ export function AgentHero({
             </span>
             ?
           </h1>
-          <p className="text-base font-semibold sm:text-lg text-[#8a8a8f]">
+          <p className="text-base font-semibold sm:text-lg text-[var(--ag-text-4)]">
             Explore any topic with deep research, verified sources, and structured reports.
           </p>
         </div>

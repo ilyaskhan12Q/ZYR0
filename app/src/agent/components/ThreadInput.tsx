@@ -4,8 +4,9 @@ import * as React from 'react'
 import { useRef, useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { ChevronDown, Check, Zap, SendHorizontal } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import type { AgentModelInfo } from '@/agent/core/types'
+import type { AgentAttachment, AgentModelInfo } from '@/agent/core/types'
 import type { ResearchDepth } from '@/agent/research/types'
 
 // ----------------------------------------------------------------------
@@ -93,8 +94,8 @@ function StopIcon() {
 
 function PlusIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M7 2.5V11.5M2.5 7H11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <path d="M7 2.5V11.5M2.5 7H11.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
     </svg>
   )
 }
@@ -156,7 +157,7 @@ function AttachmentThumb({
           onMouseDown={(e) => { e.preventDefault(); e.stopPropagation() }}
           onClick={(e) => { e.stopPropagation(); onRemove(attachment.id) }}
           className={cn(
-            'm-1 flex size-4 items-center justify-center rounded-full bg-white/90 text-black shadow-sm transition-all duration-200 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:bg-white hover:scale-110',
+            'm-1 flex size-4 items-center justify-center rounded-full bg-white/90 text-[var(--ag-bg)] shadow-sm transition-all duration-200 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] hover:bg-white hover:scale-110',
             isHovered ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'
           )}
           aria-label={`Remove ${attachment.name}`}
@@ -229,7 +230,7 @@ function AttachmentGalleryModal({
           borderRadius: geometry.radius, transition: flipTransition, overflow: 'hidden',
           boxShadow: isOpen ? '0 24px 60px -12px rgb(0 0 0 / 0.35)' : '0 0px 0px 0px rgb(0 0 0 / 0)',
         }}
-        className="bg-[#1a1a1e]"
+        className="bg-[var(--ag-panel)]"
         onTransitionEnd={() => { if (phase === 'closing') onClose() }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -255,13 +256,12 @@ function AttachmentGalleryModal({
 // ----------------------------------------------------------------------
 export interface ThreadInputProps {
   mode: 'chat' | 'research'
-  onModeChange: (m: 'chat' | 'research') => void
   models: AgentModelInfo[]
   selectedModel: string | null
   onSelectModel: (id: string) => void
   depth: ResearchDepth
   onDepthChange: (d: ResearchDepth) => void
-  onSend: (text: string) => void
+  onSend: (text: string, attachments: AgentAttachment[]) => void
   onStop: () => void
   running: boolean
   disabled?: boolean
@@ -270,7 +270,6 @@ export interface ThreadInputProps {
 
 export function ThreadInput({
   mode,
-  onModeChange,
   models,
   selectedModel,
   onSelectModel,
@@ -297,7 +296,7 @@ export function ThreadInput({
   const audioContextRef = useRef<AudioContext | null>(null)
   const rafRef = useRef<number | null>(null)
   const recognitionRef = useRef<any>(null)
-  const demoTextIntervalRef = useRef<number | null>(null)
+  const shouldRestartRef = useRef(false)
 
   const [hoverStyle, setHoverStyle] = useState({ opacity: 0, transform: 'translateY(0px) scale(0.95)', transition: 'none' })
   const [containerHeight, setContainerHeight] = useState(116)
@@ -362,11 +361,11 @@ export function ThreadInput({
 
   // --- Voice Recording ---
   const stopRecording = useCallback(() => {
+    shouldRestartRef.current = false
     if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null }
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null }
     if (streamRef.current) { streamRef.current.getTracks().forEach((t) => t.stop()); streamRef.current = null }
     if (audioContextRef.current) { audioContextRef.current.close(); audioContextRef.current = null }
-    if (demoTextIntervalRef.current) { window.clearInterval(demoTextIntervalRef.current); demoTextIntervalRef.current = null }
     setIsRecording(false)
     setAudioData(new Array(5).fill(0))
   }, [])
@@ -375,82 +374,90 @@ export function ThreadInput({
     setIsSmoothResize(false)
     setExpanded(true)
 
+    // Real dictation only — never fabricate text on the user's behalf.
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      toast.error("Voice input isn't supported in this browser")
+      return
+    }
+
     let stream: MediaStream | null = null
     try {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       }
-    } catch { /* mic denied */ }
+    } catch { /* handled below */ }
+    if (!stream) {
+      toast.error('Microphone access denied — check browser permissions')
+      return
+    }
 
     setIsRecording(true)
 
-    function simulateText() {
-      const fakeText = 'What are the latest advances in quantum computing?'
-      const words = fakeText.split(' ')
-      let i = 0
-      let currentBase = valueRef.current
-      demoTextIntervalRef.current = window.setInterval(() => {
-        if (i < words.length) {
-          currentBase = (currentBase ? currentBase + ' ' : '') + words[i]
-          handleValueChange(currentBase)
-          i++
-        } else { stopRecording() }
-      }, 300)
-    }
-
-    if (stream) {
-      streamRef.current = stream
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
-      const audioCtx = new AudioCtx()
-      audioContextRef.current = audioCtx
-      const analyser = audioCtx.createAnalyser()
-      analyser.fftSize = 64
-      const source = audioCtx.createMediaStreamSource(stream)
-      source.connect(analyser)
-      const dataArray = new Uint8Array(analyser.frequencyBinCount)
-      const updateVisualizer = () => {
-        analyser.getByteFrequencyData(dataArray)
-        const bands = new Array(5).fill(0)
-        const step = Math.floor(dataArray.length / 5)
-        for (let i = 0; i < 5; i++) {
-          let sum = 0
-          for (let j = 0; j < step; j++) sum += dataArray[i * step + j]
-          bands[i] = sum / step / 255
-        }
-        setAudioData(bands)
-        rafRef.current = requestAnimationFrame(updateVisualizer)
+    streamRef.current = stream
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
+    const audioCtx = new AudioCtx()
+    audioContextRef.current = audioCtx
+    const analyser = audioCtx.createAnalyser()
+    analyser.fftSize = 64
+    const source = audioCtx.createMediaStreamSource(stream)
+    source.connect(analyser)
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    const updateVisualizer = () => {
+      analyser.getByteFrequencyData(dataArray)
+      const bands = new Array(5).fill(0)
+      const step = Math.floor(dataArray.length / 5)
+      for (let i = 0; i < 5; i++) {
+        let sum = 0
+        for (let j = 0; j < step; j++) sum += dataArray[i * step + j]
+        bands[i] = sum / step / 255
       }
-      updateVisualizer()
-
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition()
-        recognition.continuous = true
-        recognition.interimResults = true
-        let baseline = valueRef.current
-        recognition.onresult = (event: any) => {
-          let interimTranscript = ''
-          let finalTranscript = ''
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript
-            else interimTranscript += event.results[i][0].transcript
-          }
-          if (finalTranscript) baseline += (baseline ? ' ' : '') + finalTranscript
-          handleValueChange((baseline + (interimTranscript ? ' ' + interimTranscript : '')).trim())
-        }
-        recognition.onerror = () => stopRecording()
-        recognition.onend = () => stopRecording()
-        recognitionRef.current = recognition
-        recognition.start()
-      } else {
-        simulateText()
-      }
-    } else {
-      demoTextIntervalRef.current = window.setInterval(() => {
-        setAudioData(Array.from({ length: 5 }, () => Math.random() * 0.8 + 0.1))
-      }, 100)
-      simulateText()
+      setAudioData(bands)
+      rafRef.current = requestAnimationFrame(updateVisualizer)
     }
+    updateVisualizer()
+
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    // Recognize in the browser's own language — the locale mismatch was a
+    // major source of garbled transcripts.
+    recognition.lang = navigator.language || 'en-US'
+    let baseline = valueRef.current
+    recognition.onresult = (event: any) => {
+      let interimTranscript = ''
+      let finalTranscript = ''
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) finalTranscript += event.results[i][0].transcript
+        else interimTranscript += event.results[i][0].transcript
+      }
+      if (finalTranscript) baseline += (baseline ? ' ' : '') + finalTranscript
+      handleValueChange((baseline + (interimTranscript ? ' ' + interimTranscript : '')).trim())
+    }
+    recognition.onerror = (event: any) => {
+      const code = String(event?.error ?? '')
+      // 'no-speech' / 'aborted' are transient — onend decides whether to resume.
+      if (code === 'no-speech' || code === 'aborted') return
+      shouldRestartRef.current = false
+      toast.error(
+        code === 'not-allowed' || code === 'service-not-allowed'
+          ? 'Microphone access denied — check browser permissions'
+          : 'Voice input stopped — speech service unavailable',
+      )
+      stopRecording()
+    }
+    // Chrome silently ends recognition after a short pause; restart it while
+    // the user is still recording so the rest of the sentence isn't dropped.
+    recognition.onend = () => {
+      if (shouldRestartRef.current && recognitionRef.current === recognition) {
+        try { recognition.start() } catch { stopRecording() }
+        return
+      }
+      stopRecording()
+    }
+    shouldRestartRef.current = true
+    recognitionRef.current = recognition
+    recognition.start()
   }, [handleValueChange, stopRecording])
 
   useEffect(() => {
@@ -514,7 +521,8 @@ export function ThreadInput({
   const handleSubmit = () => {
     if (value.trim() === '' && !hasAttachments) return
     setIsSmoothResize(false)
-    onSend(value)
+    // Forward the attachments with the message so they are not silently dropped.
+    onSend(value, attachments.map(({ id, name, url }) => ({ id, name, url })))
     handleValueChange('')
     attachments.forEach((a) => URL.revokeObjectURL(a.url))
     setAttachments([])
@@ -622,7 +630,7 @@ export function ThreadInput({
                     ? 'transform 0.15s ease-out, opacity 0.15s ease-out'
                     : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease-out',
                 }}
-                className="border border-white/10 border-b-0 bg-[#1a1a1e] rounded-t-2xl px-2 pt-2 pb-1 flex items-start gap-2 overflow-x-auto"
+                className="border border-white/10 border-b-0 bg-[var(--ag-panel)] rounded-t-2xl px-2 pt-2 pb-1 flex items-start gap-2 overflow-x-auto"
               >
                 {attachments.map((attachment, index) => (
                   <AttachmentThumb key={attachment.id} attachment={attachment} index={index} onRemove={removeAttachment} />
@@ -643,7 +651,7 @@ export function ThreadInput({
                 overflow: expanded ? 'visible' : 'hidden',
               }}
               className={cn(
-                'relative w-full border border-white/10 bg-[#1a1a1e] shadow-lg shadow-black/20 focus-within:border-white/20 focus-within:ring-1 focus-within:ring-white/10 hover:border-white/15 z-10',
+                'relative w-full border border-white/10 bg-[var(--ag-panel)] shadow-lg shadow-black/20 focus-within:border-white/20 focus-within:ring-1 focus-within:ring-white/10 hover:border-white/15 z-10',
                 expanded ? 'cursor-text' : 'cursor-default'
               )}
             >
@@ -665,17 +673,17 @@ export function ThreadInput({
                     : 'opacity 0.3s ease-out, transform 0.3s ease-out, height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                 }}
                 className={cn(
-                  'absolute top-0 inset-x-0 z-[1] w-full resize-none bg-transparent pl-4 pr-12 py-3.5 text-sm leading-[22px] text-white outline-none placeholder:font-medium placeholder:text-[#5a5a5f] cursor-text',
+                  'absolute top-0 inset-x-0 z-[1] w-full resize-none bg-transparent pl-4 pr-12 py-3.5 text-sm leading-[22px] text-white outline-none placeholder:font-medium placeholder:text-[var(--ag-text-6)] cursor-text',
                   expanded ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 -translate-y-1 pointer-events-none',
                   isScrolling ? 'overflow-y-auto' : 'overflow-y-hidden',
                   isRecording && 'pointer-events-none'
                 )}
               />
 
-              <div ref={topFadeRef} className="absolute left-4 right-12 top-0 z-[2] h-8 bg-gradient-to-b from-[#1a1a1e] via-[#1a1a1e]/90 to-transparent pointer-events-none" />
+              <div ref={topFadeRef} className="absolute left-4 right-12 top-0 z-[2] h-8 bg-gradient-to-b from-[var(--ag-panel)] via-[var(--ag-panel-90)] to-transparent pointer-events-none" />
               <div
                 ref={bottomFadeRef}
-                className="absolute left-4 right-12 z-[2] h-8 bg-gradient-to-t from-[#1a1a1e] via-[#1a1a1e]/90 to-transparent pointer-events-none"
+                className="absolute left-4 right-12 z-[2] h-8 bg-gradient-to-t from-[var(--ag-panel)] via-[var(--ag-panel-90)] to-transparent pointer-events-none"
                 style={{
                   opacity: 0,
                   top: `${textareaHeight - 32}px`,
@@ -688,7 +696,7 @@ export function ThreadInput({
                 onClick={expand}
                 style={{ transition: isSmoothResize ? 'none' : 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' }}
                 className={cn(
-                  'absolute inset-x-0 top-0 z-[1] cursor-text pl-4 pr-12 py-[15px] text-left text-sm font-medium leading-[17px] text-[#5a5a5f] outline-none',
+                  'absolute inset-x-0 top-0 z-[1] cursor-text pl-4 pr-12 py-[15px] text-left text-sm font-medium leading-[17px] text-[var(--ag-text-6)] outline-none',
                   !expanded ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-105 translate-y-1 pointer-events-none'
                 )}
                 aria-label="Open prompt input"
@@ -725,14 +733,14 @@ export function ThreadInput({
                     <>
                       <div className="fixed inset-0 z-[9998]" onClick={() => setIsModelSelectOpen(false)} />
                       <div
-                        className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
+                        className="fixed z-[9999] w-[260px] max-h-[320px] max-w-[calc(100vw-32px)] overflow-y-auto bg-[var(--ag-panel-95)] backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl shadow-black/50 animate-in fade-in duration-150"
                         style={{
                           bottom: dropdownPos.bottom,
                           left: dropdownPos.left,
                         }}
                       >
                         <div className="p-1.5">
-                          <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#5a5a5f] sticky top-0 bg-[#1a1a1e]/95 backdrop-blur-xl z-10">
+                          <div className="px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--ag-text-6)] sticky top-0 bg-[var(--ag-panel-95)] backdrop-blur-xl z-10">
                             Select Model
                           </div>
                           {models.filter((m) => m.enabled).map((model) => (
@@ -741,7 +749,7 @@ export function ThreadInput({
                               onClick={(e) => { e.stopPropagation(); onSelectModel(model.id); setIsModelSelectOpen(false) }}
                               className={cn(
                                 'w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg text-left transition-all duration-150',
-                                selected?.id === model.id ? 'bg-white/10 text-white' : 'text-[#a0a0a5] hover:bg-white/5 hover:text-white'
+                                selected?.id === model.id ? 'bg-white/10 text-white' : 'text-[var(--ag-text-3)] hover:bg-white/5 hover:text-white'
                               )}
                             >
                               <Zap className="size-3.5 text-emerald-400 shrink-0" />
@@ -782,7 +790,9 @@ export function ThreadInput({
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={openFileChooser}
                   disabled={attachments.length >= maxAttachments}
-                  className="ml-auto flex size-7 items-center justify-center rounded-full text-white/50 transition-all duration-200 hover:bg-white/5 hover:text-white outline-none disabled:opacity-40 disabled:pointer-events-none"
+                  aria-label="Add photos"
+                  title="Add photos"
+                  className="ml-auto mr-2 flex size-9 items-center justify-center rounded-full bg-white text-[var(--ag-bg)] shadow-lg shadow-black/40 transition-all duration-200 hover:bg-white/90 hover:scale-105 active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-white/40 disabled:opacity-40 disabled:pointer-events-none"
                 >
                   <PlusIcon />
                 </button>
@@ -811,7 +821,7 @@ export function ThreadInput({
                 onClick={onActionButtonClick}
                 aria-label={showArrow ? 'Send prompt' : showStop ? 'Stop recording' : 'Use voice input'}
                 style={{ borderRadius: 9999 }}
-                className="absolute right-2 bottom-2 z-[10] flex h-8 w-8 items-center justify-center bg-[#1488fc] text-white transition-all duration-300 hover:bg-[#1a94ff] outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                className="absolute right-2 bottom-2 z-[10] flex h-8 w-8 items-center justify-center bg-[#1488fc] text-[#ffffff] transition-all duration-300 hover:bg-[#1a94ff] outline-none focus-visible:ring-2 focus-visible:ring-white/30"
               >
                 <span className="relative flex h-full w-full items-center justify-center">
                   <span className={cn('absolute inset-0 flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]', showArrow ? 'opacity-100 scale-100 rotate-0 blur-none' : 'opacity-0 scale-50 rotate-45 blur-[1px] pointer-events-none')}>
@@ -825,33 +835,7 @@ export function ThreadInput({
             </div>
           </div>
 
-          {/* Mode Toggle */}
-          <div className="flex justify-center mt-3">
-            <div className="flex rounded-full border border-white/10 text-xs overflow-hidden">
-              <button
-                type="button"
-                onClick={() => onModeChange('chat')}
-                className={cn(
-                  'px-4 py-2 transition-all duration-150',
-                  mode === 'chat' ? 'bg-white/10 text-white' : 'text-[#6a6a6f] hover:text-white hover:bg-white/5'
-                )}
-              >
-                Chat
-              </button>
-              <button
-                type="button"
-                onClick={() => onModeChange('research')}
-                className={cn(
-                  'px-4 py-2 transition-all duration-150',
-                  mode === 'research' ? 'bg-white/10 text-white' : 'text-[#6a6a6f] hover:text-white hover:bg-white/5'
-                )}
-              >
-                Research
-              </button>
-            </div>
-          </div>
-
-          <p className="mt-2 text-center text-[11px] text-[#5a5a5f]">
+          <p className="mt-2 text-center text-[11px] text-[var(--ag-text-6)]">
             Free-tier models are shared and rate-limited — the gateway falls back automatically when one is throttled.
           </p>
         </div>
