@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@bible-strong/avatar-react": "^0.1.0",
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "^6.0.0",
     "@paper-design/shaders-react": "^0.0.80",
     "@posthog/react": "^1.11.3",
     "@radix-ui/react-accordion": "^1.2.12",
