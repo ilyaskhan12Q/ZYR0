@@ -134,7 +134,7 @@ export default function AdminReports() {
     let csv = '';
     const reportTitle = reportsList.find(r => r.id === reportId)?.title || 'Platform Report';
     
-    csv += `${csvField(reportTitle)} Summary Export\n`;
+    csv += `${csvField(`${reportTitle} Summary Export`)}\n`;
     csv += `"Generated at",${csvField(new Date().toLocaleString())}\n`;
     csvContentGenerator(reportId, data, (headers, rows) => {
       csv += `${headers.map(csvField).join(',')}\n`;

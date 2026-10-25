@@ -7,11 +7,13 @@
 // Resend → email id), so callers can persist a single traceable id.
 //
 // Security model:
-// - Non-contact (internal) sends require EITHER an authenticated admin/company JWT
-//   (browser flows: TeamApplications shortlists, company offer letters) OR the
-//   server-only `x-internal-token` == EMAIL_INTERNAL_TOKEN (server-to-server:
-//   issue-certificate). The token is never shipped to browsers; clients rely on
-//   their session JWT, attached automatically by supabase.functions.invoke.
+// - Non-contact (internal) sends require EITHER the server-only
+//   `x-internal-token` == EMAIL_INTERNAL_TOKEN (server-to-server:
+//   issue-certificate) OR a signed-in caller that may reach the recipients:
+//   admins anyone; a company owner/team admin an invited member of their own
+//   company (kind: 'invite'); a company owner/team member the student on their
+//   own offer (kind: 'offer'). Clients rely on their session JWT, attached
+//   automatically by supabase.functions.invoke. The token never ships to browsers.
 // - Contact sends (kind: 'contact') are public (contact/support form):
 //   * `to` is allowlisted to ZYR0's own mailboxes (no open relay)
 //   * `allowUserReplyTo: true` permits the submitter's email as reply-to
