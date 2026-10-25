@@ -25,7 +25,7 @@ function markDismissed(id: string) {
 }
 
 interface SiteBannerBarProps {
-  onVisibilityChange: (visible: boolean) => void;
+  onVisibilityChange?: (visible: boolean) => void;
 }
 
 export function SiteBannerBar({ onVisibilityChange }: SiteBannerBarProps) {
@@ -37,7 +37,7 @@ export function SiteBannerBar({ onVisibilityChange }: SiteBannerBarProps) {
       if (cancelled) return;
       const visible = result !== null && !isDismissed(result.id);
       setBanner(visible ? result : null);
-      onVisibilityChange(visible);
+      onVisibilityChange?.(visible);
     });
     return () => {
       cancelled = true;
@@ -47,7 +47,7 @@ export function SiteBannerBar({ onVisibilityChange }: SiteBannerBarProps) {
   const dismiss = () => {
     if (banner) markDismissed(banner.id);
     setBanner(null);
-    onVisibilityChange(false);
+    onVisibilityChange?.(false);
   };
 
   const linkUrl = banner?.link_url ?? SITE_CONFIG.social.whatsappSupportGroup;

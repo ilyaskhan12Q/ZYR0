@@ -474,7 +474,7 @@ export default function Timeline({
                         {item.body}
                       </p>
                       <div className="pt-[0.2vw]">
-                        <span className="inline-block text-[0.68vw] max-[600px]:text-[2.4vw] font-mono px-2 py-0.5 rounded border border-white/10 bg-white/5 text-white/70">
+                        <span className="inline-block text-[0.68vw] max-[600px]:text-[2.4vw] font-mono px-2 py-0.5 rounded border border-[var(--zyro-border)] bg-[var(--zyro-surface)] text-[var(--zyro-text-secondary)]">
                           {item.badge}
                         </span>
                       </div>
@@ -530,7 +530,7 @@ export default function Timeline({
                         {item.body}
                       </p>
                       <div className="pt-[0.2vw]">
-                        <span className="inline-block text-[0.68vw] max-[600px]:text-[2.2vw] font-mono px-2 py-0.5 rounded border border-white/10 bg-white/5 text-white/70">
+                        <span className="inline-block text-[0.68vw] max-[600px]:text-[2.2vw] font-mono px-2 py-0.5 rounded border border-[var(--zyro-border)] bg-[var(--zyro-surface)] text-[var(--zyro-text-secondary)]">
                           {item.badge}
                         </span>
                       </div>

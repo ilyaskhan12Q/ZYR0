@@ -2,25 +2,34 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Search, X, Sparkles, Compass, Plus, ChevronDown, Check,
-  Terminal, Wrench, ShieldCheck, ArrowUpRight, Zap
+  ArrowUpDown, Filter
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
-import { TOOL_CATEGORIES, type ToolItem, type ToolCategory, type ToolItemType } from '@/data/tools';
+import { TOOL_CATEGORIES, type ToolItem, type ToolCategory } from '@/data/tools';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { FeaturedToolCard } from '@/components/tools/FeaturedToolCard';
 import { ToolPreviewDialog } from '@/components/tools/ToolPreviewDialog';
 import { SubmitToolDialog } from '@/components/tools/SubmitToolDialog';
 import { ToolEmptyState } from '@/components/tools/ToolEmptyState';
 import { getAllPublicTools } from '@/services/tools';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const ITEMS_PER_PAGE = 9;
+
+type SortOption = 'featured' | 'newest' | 'az' | 'popular';
 
 export default function ToolHub() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = (searchParams.get('category') as ToolCategory) || 'All';
   const activeType = (searchParams.get('type') as 'all' | 'tool' | 'skill') || 'all';
   const searchQuery = searchParams.get('q') || '';
+  const sortBy = (searchParams.get('sort') as SortOption) || 'featured';
 
   const [tools, setTools] = useState<ToolItem[]>([]);
   const [previewTool, setPreviewTool] = useState<ToolItem | null>(null);
@@ -40,6 +49,16 @@ export default function ToolHub() {
     };
   }, []);
 
+  // Deep-link: /tools?submit=1 opens the submit dialog (e.g. from "Publish a Skill")
+  useEffect(() => {
+    if (searchParams.get('submit') === '1') {
+      setSubmitDialogOpen(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete('submit');
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   const handleCategoryChange = (cat: ToolCategory) => {
     if (cat === 'All') {
       searchParams.delete('category');
@@ -55,6 +74,16 @@ export default function ToolHub() {
       searchParams.delete('type');
     } else {
       searchParams.set('type', type);
+    }
+    setSearchParams(searchParams);
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
+
+  const handleSortChange = (sort: SortOption) => {
+    if (sort === 'featured') {
+      searchParams.delete('sort');
+    } else {
+      searchParams.set('sort', sort);
     }
     setSearchParams(searchParams);
     setVisibleCount(ITEMS_PER_PAGE);
@@ -80,9 +109,9 @@ export default function ToolHub() {
     setDialogOpen(true);
   };
 
-  // Filtered tools
+  // Filtered & sorted tools
   const filteredTools = useMemo(() => {
-    return tools.filter((tool) => {
+    const list = tools.filter((tool) => {
       // Type filter (all, tool, skill)
       if (activeType === 'tool') {
         if (tool.item_type && tool.item_type !== 'tool' && tool.item_type !== 'tool_skill') {
@@ -106,7 +135,7 @@ export default function ToolHub() {
         return false;
       }
 
-      // Search query filter (matches name, tagline, description, tags, source)
+      // Search query filter (matches name, tagline, description, tags, source, author, capabilities)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matchesName = tool.name.toLowerCase().includes(q);
@@ -114,12 +143,32 @@ export default function ToolHub() {
         const matchesDesc = tool.description.toLowerCase().includes(q);
         const matchesTags = tool.tags.some((t) => t.toLowerCase().includes(q));
         const matchesSource = tool.source.toLowerCase().includes(q);
-        return matchesName || matchesTagline || matchesDesc || matchesTags || matchesSource;
+        const matchesAuthor = (tool.author?.name || '').toLowerCase().includes(q);
+        const matchesCaps = (tool.capabilities || []).some((c) => c.toLowerCase().includes(q));
+        return matchesName || matchesTagline || matchesDesc || matchesTags || matchesSource || matchesAuthor || matchesCaps;
       }
 
       return true;
     });
-  }, [tools, activeCategory, activeType, searchQuery]);
+
+    return [...list].sort((a, b) => {
+      if (sortBy === 'featured') {
+        return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      }
+      if (sortBy === 'newest') {
+        return b.id.localeCompare(a.id);
+      }
+      if (sortBy === 'az') {
+        return a.name.localeCompare(b.name);
+      }
+      if (sortBy === 'popular') {
+        const popA = (a.badge === 'Popular' || a.badge === 'Trending' || a.badge === 'Official') ? 1 : 0;
+        const popB = (b.badge === 'Popular' || b.badge === 'Trending' || b.badge === 'Official') ? 1 : 0;
+        return popB - popA;
+      }
+      return 0;
+    });
+  }, [tools, activeCategory, activeType, searchQuery, sortBy]);
 
   // Paginated visible tools (9 initial, Load More adds 9)
   const displayedTools = useMemo(() => {
@@ -133,7 +182,7 @@ export default function ToolHub() {
   };
 
   // Featured flagship tools for top showcase (only on default All view with no active search or filter)
-  const isDefaultView = activeCategory === 'All' && activeType === 'all' && !searchQuery.trim();
+  const isDefaultView = activeCategory === 'All' && activeType === 'all' && !searchQuery.trim() && sortBy === 'featured';
   const featuredTools = useMemo(() => {
     return tools.filter((t) => t.featured);
   }, [tools]);
@@ -147,26 +196,26 @@ export default function ToolHub() {
       />
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-20">
         {/* UI/UX Pro Max Open Atmospheric Hero */}
         <div className="relative mb-12">
           {/* Subtle Ambient Radial Lighting (Unboxed & Fluid) */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-gradient-to-b from-blue-600/15 via-indigo-600/10 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-gradient-to-b from-[var(--zyro-accent)]/15 via-[var(--zyro-accent)]/8 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
           {/* Top Bar: Live Status Pill & Independent Submit CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 backdrop-blur-md shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-[var(--zyro-accent-muted)] text-[var(--zyro-accent)] border border-[var(--zyro-accent)]/20 backdrop-blur-md shadow-xs">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600 dark:bg-sky-400"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--zyro-accent)] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--zyro-accent)]"></span>
               </span>
-              <span>ZYR0 Open Tools & Agent Registry</span>
+              <span>TOOLS & SKILLS</span>
             </div>
 
             {/* Separated Submit Action Button */}
             <Button
               onClick={() => setSubmitDialogOpen(true)}
-              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-md hover:shadow-lg transition-all rounded-xl px-4 py-2 text-xs sm:text-sm h-9"
+              className="gap-2 bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] text-white font-medium shadow-md hover:shadow-lg transition-all rounded-xl px-4 py-2 text-xs sm:text-sm h-9"
             >
               <Plus className="w-4 h-4" />
               <span>Submit Tool / Skill</span>
@@ -175,27 +224,27 @@ export default function ToolHub() {
 
           {/* Main Title & Editorial Pitch */}
           <div className="text-center max-w-4xl mx-auto space-y-4 mb-8">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground font-sans leading-[1.12]">
-              Discover & Deploy <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                Tools, Utilities & Agent Skills
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground font-sans leading-[1.14]">
+              Find the right tools for your{' '}
+              <span className="bg-gradient-to-r from-[var(--zyro-hyacinth)] via-[var(--zyro-accent)] to-[var(--zyro-sapphire)] bg-clip-text text-transparent">
+                next Project
               </span>
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Curated autonomous workflows, developer libraries, and AI agent skills from ZYR0, GitHub, and Hugging Face.
+              Discover and explore AI tools, developer utilities, frameworks and skills to help you build faster and better.
             </p>
           </div>
 
           {/* Centered Command Search Input */}
           <div className="max-w-2xl mx-auto">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 rounded-2xl blur-md opacity-20 group-hover:opacity-35 group-focus-within:opacity-50 transition duration-300 pointer-events-none" />
-              <div className="relative flex items-center bg-card border border-border/80 group-focus-within:border-blue-500 rounded-2xl shadow-xl overflow-hidden transition-all p-1.5">
-                <Search className="w-5 h-5 ml-3.5 text-muted-foreground group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400 transition-colors shrink-0" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-[var(--zyro-hyacinth)] via-[var(--zyro-accent)] to-[var(--zyro-sapphire)] rounded-2xl blur-md opacity-20 group-hover:opacity-35 group-focus-within:opacity-50 transition duration-300 pointer-events-none" />
+              <div className="relative flex items-center bg-card border border-border/80 group-focus-within:border-[var(--zyro-accent)] rounded-2xl shadow-xl overflow-hidden transition-all p-1.5">
+                <Search className="w-5 h-5 ml-3.5 text-muted-foreground group-focus-within:text-[var(--zyro-accent)] transition-colors shrink-0" />
                 <input
                   id="toolhub-search"
                   type="text"
-                  placeholder="Search by tool name, Python/Rust, skill protocol, or tag..."
+                  placeholder="Search tools, skills, frameworks, tags..."
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="w-full px-3.5 py-3 bg-transparent text-sm sm:text-base focus:outline-none text-foreground placeholder:text-muted-foreground/60"
@@ -215,34 +264,16 @@ export default function ToolHub() {
                 </kbd>
               </div>
             </div>
-
-            {/* Value Metric Badges with 'Powerful Tools & Skills' */}
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-5 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span><strong>{tools.length}</strong> Curated Packages</span>
-              </div>
-              <div className="w-1 h-1 rounded-full bg-border" />
-              <div className="flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span><strong>Powerful Tools & Skills</strong></span>
-              </div>
-              <div className="w-1 h-1 rounded-full bg-border" />
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Instant 1-Click Copy</span>
-              </div>
-            </div>
           </div>
 
-          {/* Unified Discovery Toolbar: Segmented Type Filter + Category Pills */}
-          <div className="mt-10 pt-6 border-t border-border/60 flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Discovery Toolbar: Type Toggle (Left) + Category & Sort Dropdowns (Right) */}
+          <div className="mt-8 pt-6 border-t border-border/60 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             {/* Segmented Type Toggle (All vs Tools vs Skills) */}
-            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-xl shrink-0">
+            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-xl shrink-0 self-start md:self-auto">
               {[
-                { id: 'all', label: 'All Catalog' },
-                { id: 'tool', label: 'Tools & Utilities' },
-                { id: 'skill', label: 'Agent Skills' },
+                { id: 'all', label: 'All' },
+                { id: 'tool', label: 'Tools' },
+                { id: 'skill', label: 'Skills' },
               ].map((t) => (
                 <button
                   key={t.id}
@@ -258,24 +289,42 @@ export default function ToolHub() {
               ))}
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-1 md:pb-0">
-              {TOOL_CATEGORIES.map((cat) => {
-                const isActive = activeCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => handleCategoryChange(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                      isActive
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-blue-500/40'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
+            {/* Right Controls: Category Dropdown & Sort Selector */}
+            <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">
+              {/* Category Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Category:</span>
+                <Select value={activeCategory} onValueChange={(val: any) => handleCategoryChange(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[145px]">
+                    <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="text-xs">
+                    {TOOL_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat === 'All' ? 'All Categories' : cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Sort:</span>
+                <Select value={sortBy} onValueChange={(val: any) => handleSortChange(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[140px]">
+                    <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="text-xs">
+                    <SelectItem value="featured">Featured First</SelectItem>
+                    <SelectItem value="newest">Newest Added</SelectItem>
+                    <SelectItem value="az">Alphabetical (A-Z)</SelectItem>
+                    <SelectItem value="popular">Most Popular</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -285,13 +334,13 @@ export default function ToolHub() {
           <div className="mb-14 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-accent" />
+                <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
                 Featured Flagships
               </h2>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredTools.map((tool) => (
-                <FeaturedToolCard
+                <ToolCard
                   key={tool.id}
                   tool={tool}
                   onPreview={handleOpenPreview}
@@ -312,7 +361,7 @@ export default function ToolHub() {
             </span>
           </div>
 
-          {(activeCategory !== 'All' || activeType !== 'all' || searchQuery) && (
+          {(activeCategory !== 'All' || activeType !== 'all' || searchQuery || sortBy !== 'featured') && (
             <button
               onClick={handleClearFilters}
               className="text-xs text-muted-foreground hover:text-foreground hover:underline"
@@ -363,14 +412,14 @@ export default function ToolHub() {
         )}
 
         {/* Community Submission Spotlight Card */}
-        <div className="mt-16 p-8 rounded-2xl border border-blue-500/30 bg-gradient-to-r from-blue-700 via-indigo-700 to-violet-700 text-white shadow-2xl shadow-blue-900/20 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="mt-16 p-8 rounded-2xl border border-[var(--zyro-accent)]/30 bg-gradient-to-r from-[var(--zyro-twilight)] via-[var(--zyro-accent)] to-[var(--zyro-sapphire)] text-white shadow-2xl shadow-[var(--zyro-twilight)]/20 relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           {/* Ambient Lighting Orbs */}
-          <div className="absolute -right-12 -top-12 w-64 h-64 bg-sky-400/25 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -left-12 -bottom-12 w-64 h-64 bg-violet-400/25 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -right-12 -top-12 w-64 h-64 bg-[var(--zyro-hyacinth)]/30 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -left-12 -bottom-12 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="space-y-2.5 relative z-10">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-white/15 text-white border border-white/20 w-fit backdrop-blur-sm shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-sky-200" />
+              <Sparkles className="w-3.5 h-3.5 text-white/90" />
               <span className="font-semibold text-white">Community Submissions</span>
             </div>
             <h4 className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-sans drop-shadow-xs">

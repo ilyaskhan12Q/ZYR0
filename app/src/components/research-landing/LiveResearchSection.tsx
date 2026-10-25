@@ -40,13 +40,17 @@ export function LiveResearchSection() {
               {/* Content */}
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-2 w-2 rounded-full bg-[#657C68] animate-pulse" />
-                  <span className="text-[#657C68] text-xs font-medium">Researching...</span>
+                  <div className="h-2 w-2 rounded-full animate-pulse" style={{ background: 'var(--zyro-accent)' }} />
+                  <span className="text-xs font-medium" style={{ color: 'var(--zyro-accent)' }}>Researching...</span>
                 </div>
                 {/* Pipeline dots */}
                 <div className="flex items-center gap-1.5 mb-4">
                   {['Q', 'U', 'P', 'A', 'E', 'V', 'S', 'R'].map((l, i) => (
-                    <div key={i} className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${i < 4 ? 'bg-[#657C68] text-white' : 'bg-[#222] text-[#666]'}`}>
+                    <div
+                      key={l}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${i < 4 ? 'text-white' : 'text-[#666]'}`}
+                      style={{ background: i < 4 ? 'var(--zyro-accent)' : '#222' }}
+                    >
                       {l}
                     </div>
                   ))}

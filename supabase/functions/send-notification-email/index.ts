@@ -192,6 +192,26 @@ serve(async (req) => {
       });
     }
 
+    // Only the browser calls this (services/notificationsSim.ts) and it already
+    // sends the caller's session token, so require one: without it any anonymous
+    // visitor could use this function to mail any user from our domain.
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const callerClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: { user: caller } } = await callerClient.auth.getUser();
+    if (!caller) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    // shortcut: proves a real logged-in user is asking, not that this user may
+    // notify that recipient, and throttles nothing. The real check arrives when
+    // notifications are created server-side and this function becomes service-role-only.
+
     const serviceRole = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     if (!serviceRole || !supabaseUrl) {

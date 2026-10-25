@@ -1,13 +1,11 @@
 import { lazy, Suspense } from 'react';
 import { SEO } from '@/components/SEO';
-import Header from '@/components/nav/Header';
 import { ShaderHero } from '@/components/ui/shader-hero';
 import LogoWall from '@/components/platform-home/LogoWall';
 import PlaygroundShowcase from '@/components/platform-home/PlaygroundShowcase';
 import SkillsSection from '@/components/platform-home/SkillsSection';
 import BlogPreviewSection from '@/components/platform-home/BlogPreviewSection';
 import CTASection from '@/components/platform-home/CTASection';
-import PlatformFooter from '@/components/nav/PlatformFooter';
 
 const FAQSection = lazy(() => import('@/components/platform-home/FAQSection'));
 // ponytail: lazy — keeps gsap+ScrollTrigger+SplitText out of the initial homepage chunk
@@ -40,8 +38,6 @@ export default function PlatformHome() {
         description="Build full-stack apps with ZYR0 Studio, manage institutions with School OS, run autonomous deep research with the Research Agent, and gain verified experience with ZYR0 Work."
         path="/"
       />
-      {/* Header — preserved untouched */}
-      <Header />
 
       <main>
         {/* Clean Hero with 2-column layout & 3D line-art cycle */}
@@ -72,9 +68,6 @@ export default function PlatformHome() {
         {/* Minimal Statement CTA */}
         <CTASection />
       </main>
-
-      {/* Footer — preserved untouched */}
-      <PlatformFooter />
     </div>
   );
 }

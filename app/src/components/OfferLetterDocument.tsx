@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, Printer, Building2, ExternalLink, FileCheck, FileCode, Loader2 } from 'lucide-react';
+import { Printer, Building2, FileCheck, FileCode, Loader2 } from 'lucide-react';
 import type { OfferLetter } from '@/lib/database.types';
 import { noiseSvg, mottleSvg, fiberSvg, filigreeSvg, guillocheSvg } from '@/components/certificateTemplate';
 import {
@@ -12,6 +12,7 @@ import {
   buildOfferDetails,
 } from '@/lib/offerLetterConfig';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
+import PrintErrorDialog from './PrintErrorDialog';
 
 interface OfferLetterDocumentProps {
   offer: OfferLetter;
@@ -28,6 +29,7 @@ const {
 
 export default function OfferLetterDocument({ offer, showActions = true }: OfferLetterDocumentProps) {
   const [previewingPdf, setPreviewingPdf] = useState(false);
+  const [printError, setPrintError] = useState<{ title: string; description: string } | null>(null);
   const student = offer.student;
   const company = offer.company;
   const internship = offer.internship;
@@ -49,13 +51,6 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
 
   const signatoryInfo = 'Program Coordinator';
 
-  const verifyUrl = useMemo(() => {
-    return `${window.location.origin}/verify-offer/${offer.id}`;
-  }, [offer.id]);
-
-  const qrCodeUrl = useMemo(() => {
-    return `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(verifyUrl)}`;
-  }, [verifyUrl]);
 
   // ── Preload the premium font families once ───────────────────────────────────
   useEffect(() => {
@@ -85,14 +80,20 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
   const handlePreviewPdfCanvas = async () => {
     try {
       setPreviewingPdf(true);
-      const pdfBlob = await generateOfferLetterPdf({
-        offer,
-        verificationUrl: verifyUrl,
-      });
+      const pdfBlob = await generateOfferLetterPdf({ offer });
       const blobUrl = URL.createObjectURL(pdfBlob);
-      window.open(blobUrl, '_blank');
+      if (!window.open(blobUrl, '_blank')) {
+        setPrintError({
+          title: "Couldn't open the PDF",
+          description: 'Your browser blocked the pop-up. Allow pop-ups for this site, then try again.',
+        });
+      }
     } catch (err) {
       console.error('Failed to render PDF preview canvas:', err);
+      setPrintError({
+        title: "Couldn't generate the PDF",
+        description: 'The offer letter PDF could not be created. Try again, or use Print / Save PDF instead.',
+      });
     } finally {
       setPreviewingPdf(false);
     }
@@ -149,7 +150,9 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
         id={`offer-letter-sheet-${offer.id}`}
         className="offer-letter-print-root relative overflow-hidden shadow-xl print:shadow-none print:rounded-none print:m-0"
         style={{
-          background: `${paperLayers.noise}, ${paperLayers.mottle}, ${paperLayers.fiber}, radial-gradient(ellipse at 50% 32%, #fffdf5 0%, #f7f0dd 68%, #efe5ca 100%)`,
+          backgroundImage: `${paperLayers.noise}, ${paperLayers.fiber}, ${paperLayers.mottle}, radial-gradient(ellipse at 50% 32%, #fffdf5 0%, #f7f0dd 68%, #efe5ca 100%)`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '100% 100%',
           border: `9px double ${GOLD}`,
           outline: `1px solid ${GOLD}`,
           outlineOffset: '-13px',
@@ -174,7 +177,7 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
 
         {/* Soft purple glow behind the guilloché watermark */}
         <div
-          className="absolute pointer-events-none"
+          className="offer-letter-glow absolute pointer-events-none"
           style={{
             left: '50%', top: '46%', width: 720, height: 540,
             transform: 'translate(-50%, -50%)',
@@ -395,44 +398,6 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
                   <p className="text-xs font-semibold" style={{ color: NAVY }}>{companyName}</p>
                 </div>
               </div>
-
-              {/* Verification QR Box */}
-              <div
-                className="flex items-center gap-4 p-4 rounded-xl"
-                style={{
-                  background: 'rgba(255,253,245,.7)',
-                  border: '1.5px solid rgba(184,156,86,.65)',
-                  boxShadow: 'inset 0 0 0 1px rgba(184,156,86,.35)',
-                }}
-              >
-                <img
-                  src={qrCodeUrl}
-                  alt="Verification QR Code"
-                  className="w-20 h-20 rounded-md bg-white"
-                  style={{ border: '1px solid #cbb880', padding: 3 }}
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1 font-bold" style={{ color: NAVY, fontFamily: FONT_SANS }}>
-                    <ShieldCheck className="w-3.5 h-3.5" style={{ color: GOLD }} />
-                    Verified Credential
-                  </div>
-                  <p className="text-[11px] leading-tight max-w-[150px]" style={{ color: '#5a7a4a' }}>
-                    Scan the QR code to authenticate this offer on the ZYR0 platform.
-                  </p>
-                  <a
-                    href={verifyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-0.5 font-mono text-[10px] font-semibold"
-                    style={{ color: NAVY }}
-                  >
-                    Verify URL <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
-                </div>
-              </div>
             </div>
           </main>
 
@@ -450,6 +415,13 @@ export default function OfferLetterDocument({ offer, showActions = true }: Offer
           </footer>
         </div>
       </div>
+
+      <PrintErrorDialog
+        open={printError !== null}
+        onOpenChange={(open) => !open && setPrintError(null)}
+        title={printError?.title}
+        description={printError?.description ?? ''}
+      />
     </div>
   );
 }

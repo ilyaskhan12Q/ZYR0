@@ -9,7 +9,10 @@ import {
   Star, 
   Download, 
   Filter, 
-  RefreshCw 
+  RefreshCw,
+  CreditCard,
+  Cpu,
+  Sparkles
 } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import { 
@@ -44,9 +47,12 @@ export default function AdminAnalytics() {
   const [rawInternships, setRawInternships] = useState<any[]>([]);
   const [rawApplications, setRawApplications] = useState<any[]>([]);
   const [rawCertificates, setRawCertificates] = useState<any[]>([]);
+  const [rawAgentUsage, setRawAgentUsage] = useState<any[]>([]);
 
   // Filtered/Computed State
   const [stats, setStats] = useState<any[]>([]);
+  const [planBreakdown, setPlanBreakdown] = useState<any>({ free: 0, go: 0, plus: 0, enterprise: 0, mrr: 0, conversion: 0 });
+  const [aiMetrics, setAiMetrics] = useState<any>({ tokens: 0, inputTokens: 0, outputTokens: 0, invocations: 0, avgLatency: 0, topModel: 'Zen / Gemini' });
   const [domainData, setDomainData] = useState<any[]>([]);
   const [topInternships, setTopInternships] = useState<any[]>([]);
   const [userGrowthData, setUserGrowthData] = useState<any[]>([]);
@@ -59,20 +65,22 @@ export default function AdminAnalytics() {
     try {
       const settled = await Promise.race([
         Promise.allSettled([
-          supabase.from('profiles').select('id, role, created_at'),
+          supabase.from('profiles').select('id, role, plan_tier, created_at'),
           supabase.from('internships').select('id, title, domain, status, created_at, company:companies(name)'),
           supabase.from('applications').select('id, internship_id, status, created_at'),
           supabase.from('certificates').select('id, created_at'),
+          supabase.from('agent_usage').select('id, input_tokens, output_tokens, model, latency_ms, created_at').limit(1000),
         ]),
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Analytics timeout')), 10000))
       ]);
 
-      const [profilesRes, internshipsRes, appsRes, certsRes] = settled;
+      const [profilesRes, internshipsRes, appsRes, certsRes, usageRes] = settled;
 
       setRawProfiles(profilesRes.status === 'fulfilled' ? (profilesRes.value.data || []) : []);
       setRawInternships(internshipsRes.status === 'fulfilled' ? (internshipsRes.value.data || []) : []);
       setRawApplications(appsRes.status === 'fulfilled' ? (appsRes.value.data || []) : []);
       setRawCertificates(certsRes.status === 'fulfilled' ? (certsRes.value.data || []) : []);
+      setRawAgentUsage(usageRes.status === 'fulfilled' ? (usageRes.value.data || []) : []);
     } catch (err) {
       console.error('Error loading analytics:', err);
     } finally {
@@ -119,12 +127,39 @@ export default function AdminAnalytics() {
     });
 
     const filteredCertificates = rawCertificates.filter(c => filterByTimeframe(c.created_at));
+    const filteredUsage = rawAgentUsage.filter(u => filterByTimeframe(u.created_at));
 
     // Stats Calculations
     const totalUsers = filteredProfiles.length;
     const studentCount = filteredProfiles.filter(p => p.role === 'Student' || p.role === 'student').length;
     const companyCount = filteredProfiles.filter(p => p.role === 'Company' || p.role === 'company').length;
     const mentorCount = filteredProfiles.filter(p => p.role === 'Mentor' || p.role === 'mentor').length;
+
+    // Plan & Monetization breakdown
+    const freeUsers = filteredProfiles.filter(p => !p.plan_tier || p.plan_tier === 'free').length;
+    const goUsers = filteredProfiles.filter(p => p.plan_tier === 'go').length;
+    const plusUsers = filteredProfiles.filter(p => p.plan_tier === 'plus').length;
+    const enterpriseUsers = filteredProfiles.filter(p => p.plan_tier === 'enterprise').length;
+    const paidUsers = goUsers + plusUsers + enterpriseUsers;
+    const mrr = (goUsers * 4.99) + (plusUsers * 9.99);
+    const conversion = Math.round((paidUsers / (totalUsers || 1)) * 1000) / 10;
+    setPlanBreakdown({ free: freeUsers, go: goUsers, plus: plusUsers, enterprise: enterpriseUsers, paid: paidUsers, mrr, conversion });
+
+    // AI Compute & Gateway Telemetry
+    let totalInput = 0;
+    let totalOutput = 0;
+    let totalLatency = 0;
+    const modelFreq: Record<string, number> = {};
+    filteredUsage.forEach(u => {
+      totalInput += u.input_tokens || 0;
+      totalOutput += u.output_tokens || 0;
+      totalLatency += u.latency_ms || 0;
+      if (u.model) modelFreq[u.model] = (modelFreq[u.model] || 0) + 1;
+    });
+    const topModel = Object.entries(modelFreq).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Zen / Gemini';
+    const totalTokens = totalInput + totalOutput;
+    const avgLatency = filteredUsage.length > 0 ? Math.round(totalLatency / filteredUsage.length) : 0;
+    setAiMetrics({ tokens: totalTokens, inputTokens: totalInput, outputTokens: totalOutput, invocations: filteredUsage.length, avgLatency, topModel });
 
     const activeInternshipsCount = filteredInternships.filter(i => i.status === 'Active').length;
     const draftInternshipsCount = filteredInternships.filter(i => i.status === 'Draft').length;
@@ -137,29 +172,37 @@ export default function AdminAnalytics() {
         label: 'Total Users',
         value: totalUsers.toString(),
         icon: Users,
-        subtext: `${studentCount} Interns • ${mentorCount} Mentors • ${companyCount} Org`,
-        color: 'border-blue-500/20'
+        subtext: `${studentCount} Interns · ${mentorCount} Mentors · ${companyCount} Org`,
+      },
+      {
+        label: 'Est. Monthly Revenue',
+        value: `$${mrr.toFixed(2)}`,
+        icon: CreditCard,
+        subtext: `${paidUsers} Paid · ${conversion}% Conv.`,
+      },
+      {
+        label: 'AI Tokens Burned',
+        value: `${(totalTokens / 1000).toFixed(1)}k`,
+        icon: Cpu,
+        subtext: `${filteredUsage.length} Invocations · ${avgLatency}ms`,
       },
       {
         label: 'Active Internships',
         value: activeInternshipsCount.toString(),
         icon: FolderOpen,
         subtext: `${draftInternshipsCount} Drafts / Templates`,
-        color: 'border-purple-500/20'
       },
       {
         label: 'Applications',
         value: filteredApplications.length.toString(),
         icon: FileCheck,
-        subtext: `${pendingApps} Pending • ${acceptedApps} Accepted`,
-        color: 'border-emerald-500/20'
+        subtext: `${pendingApps} Pending · ${acceptedApps} Accepted`,
       },
       {
         label: 'Certificates Issued',
         value: filteredCertificates.length.toString(),
         icon: Award,
-        subtext: '100% Secure & Verified',
-        color: 'border-amber-500/20'
+        subtext: 'Verified Credentials',
       },
     ]);
 
@@ -365,28 +408,222 @@ export default function AdminAnalytics() {
       </div>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
         {stats.map((stat, i) => (
           <m.div 
             key={i} 
-            initial={{ opacity: 0, y: 15 }} 
+            initial={{ opacity: 0, y: 10 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ delay: i * 0.05 }} 
-            className={`bg-card rounded-xl p-5 border border-border hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden group ${stat.color}`}
+            transition={{ delay: i * 0.03 }} 
+            className="bg-card rounded-xl p-4 border border-border shadow-2xs hover:bg-muted/30 transition-colors flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-lg bg-accent/5 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
-                <stat.icon className="w-5 h-5 text-accent" />
-              </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                {stat.label}
+              </span>
+              <stat.icon className="w-3.5 h-3.5 text-muted-foreground/70" />
             </div>
             
-            <div className="mt-4">
-              <p className="text-3xl font-extrabold tracking-tight">{stat.value}</p>
-              <p className="text-sm font-semibold text-foreground mt-1">{stat.label}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.subtext}</p>
+            <div className="mt-3">
+              <p className="text-2xl font-bold tracking-tight text-foreground font-mono tabular-nums">{stat.value}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{stat.subtext}</p>
             </div>
           </m.div>
         ))}
+      </div>
+
+      {/* Subscription Breakdown & AI Telemetry Overview (Linear/Datadog Operational Command Center) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Plan Breakdown Card */}
+        <m.div 
+          initial={{ opacity: 0, y: 10 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.15 }}
+          className="p-5 rounded-xl bg-card border border-border shadow-2xs space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-sm text-foreground tracking-tight">Monetization & Plan Distribution</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Active subscriptions within selected timeframe</p>
+            </div>
+            <span className="text-xs font-mono font-medium px-2 py-0.5 rounded border border-border bg-muted/50 text-foreground">
+              {planBreakdown.conversion}% Conversion
+            </span>
+          </div>
+
+          {/* Segmented Proportional Visual Distribution Bar */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
+              <span>Tier Distribution</span>
+              <span>{planBreakdown.free + planBreakdown.paid} Filtered Users</span>
+            </div>
+            <div className="h-2.5 w-full rounded-md bg-muted overflow-hidden flex border border-border/60">
+              <div
+                style={{ width: `${((planBreakdown.free) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100}%` }}
+                className="bg-muted-foreground/30 hover:opacity-90 transition-all"
+                title={`Free: ${planBreakdown.free}`}
+              />
+              <div
+                style={{ width: `${((planBreakdown.go) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100}%` }}
+                className="bg-cyan-500/70 hover:opacity-90 transition-all"
+                title={`GO: ${planBreakdown.go}`}
+              />
+              <div
+                style={{ width: `${((planBreakdown.plus) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100}%` }}
+                className="bg-foreground hover:opacity-90 transition-all"
+                title={`PLUS: ${planBreakdown.plus}`}
+              />
+              <div
+                style={{ width: `${((planBreakdown.enterprise) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100}%` }}
+                className="bg-emerald-500 hover:opacity-90 transition-all"
+                title={`Enterprise: ${planBreakdown.enterprise}`}
+              />
+            </div>
+          </div>
+
+          {/* Descriptive Breakdown Table */}
+          <div className="divide-y divide-border rounded-lg border border-border bg-muted/20">
+            <div className="grid grid-cols-4 p-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              <span>Tier</span>
+              <span className="text-right">Users</span>
+              <span className="text-right">Share</span>
+              <span className="text-right">MRR Yield</span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/40 shrink-0" />
+                Free
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.free}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {(((planBreakdown.free) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono text-muted-foreground">$0.00</span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0" />
+                ZYR0 GO
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.go}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {(((planBreakdown.go) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono font-medium text-foreground">${(planBreakdown.go * 4.99).toFixed(2)}</span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-foreground shrink-0" />
+                ZYR0 PLUS
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.plus}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {(((planBreakdown.plus) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono font-medium text-foreground">${(planBreakdown.plus * 9.99).toFixed(2)}</span>
+            </div>
+            <div className="grid grid-cols-4 p-2.5 text-xs items-center">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                Enterprise
+              </span>
+              <span className="text-right font-mono tabular-nums">{planBreakdown.enterprise}</span>
+              <span className="text-right font-mono text-muted-foreground">
+                {(((planBreakdown.enterprise) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100).toFixed(0)}%
+              </span>
+              <span className="text-right font-mono text-muted-foreground">Custom SLA</span>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Total Paid Accounts: <strong className="text-foreground font-mono">{planBreakdown.paid}</strong>
+            </span>
+            <span>
+              Annualized Run-Rate: <strong className="text-foreground font-mono">${(planBreakdown.mrr * 12).toFixed(2)}/yr</strong>
+            </span>
+          </div>
+        </m.div>
+
+        {/* AI Compute Telemetry Card */}
+        <m.div 
+          initial={{ opacity: 0, y: 10 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.2 }}
+          className="p-5 rounded-xl bg-card border border-border shadow-2xs space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-sm text-foreground tracking-tight">AI Compute & Gateway Telemetry</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Real-time compute volume & token consumption</p>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-xs font-mono font-medium px-2 py-0.5 rounded border border-border bg-muted/50 text-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Gateway Live</span>
+            </span>
+          </div>
+
+          {/* Contextual Metrics Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Invocations</p>
+              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{aiMetrics.invocations}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Agent queries</p>
+            </div>
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Total Tokens</p>
+              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{(aiMetrics.tokens / 1000).toFixed(1)}k</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {aiMetrics.invocations > 0 ? Math.round(aiMetrics.tokens / aiMetrics.invocations) : 0} tok/req avg
+              </p>
+            </div>
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Avg Latency</p>
+              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{aiMetrics.avgLatency}ms</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {aiMetrics.avgLatency < 500 ? 'Optimal response' : 'Standard lane'}
+              </p>
+            </div>
+            <div className="p-3 rounded-lg border border-border bg-muted/20">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Top Engine</p>
+              <p className="text-xs font-bold font-mono truncate mt-2 text-foreground" title={aiMetrics.topModel}>
+                {aiMetrics.topModel.replace('gemini-', '').replace('llama-', '')}
+              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Primary model</p>
+            </div>
+          </div>
+
+          {/* Token Breakdown Bar */}
+          <div className="p-3 rounded-lg border border-border bg-muted/10 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-muted-foreground">Prompt vs Completion Tokens</span>
+              <span className="text-foreground">
+                In: {((aiMetrics.inputTokens || 0) / 1000).toFixed(1)}k · Out: {((aiMetrics.outputTokens || 0) / 1000).toFixed(1)}k
+              </span>
+            </div>
+            <div className="h-2 w-full rounded bg-muted overflow-hidden flex border border-border/50">
+              <div
+                style={{
+                  width: `${aiMetrics.tokens > 0 ? ((aiMetrics.inputTokens || 0) / aiMetrics.tokens) * 100 : 50}%`,
+                }}
+                className="bg-muted-foreground/60 transition-all"
+                title="Input/Prompt tokens"
+              />
+              <div
+                style={{
+                  width: `${aiMetrics.tokens > 0 ? ((aiMetrics.outputTokens || 0) / aiMetrics.tokens) * 100 : 50}%`,
+                }}
+                className="bg-foreground transition-all"
+                title="Output/Completion tokens"
+              />
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+            <span>Gateway Policy: Max 20 req/min/user</span>
+            <span className="text-foreground font-mono">Queue Delay: 0ms (Dedicated)</span>
+          </div>
+        </m.div>
       </div>
 
       {/* Charts Grid */}
