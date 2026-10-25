@@ -134,9 +134,8 @@ async function callerMayReachRecipients(
     }
     if (!canManage) return false;
     const { data: invites } = await client
-      .from('company_team_members').select('email')
-      .eq('company_id', companyId).in('email', recipients);
-    const invited = new Set((invites ?? []).map((row) => String(row.email ?? '').toLowerCase()));
+      .from('company_team_members').select('email').eq('company_id', companyId);
+    const invited = new Set((invites ?? []).map((row) => String(row.email ?? '').trim().toLowerCase()));
     return recipients.every((recipient) => invited.has(recipient));
   }
 
