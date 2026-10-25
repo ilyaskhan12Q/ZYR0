@@ -171,6 +171,11 @@ export async function addTeamMember(data: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  const inviteEmail = data.email?.trim().toLowerCase();
+  if (!inviteEmail) {
+    throw new Error('An email address is required to invite a team member.');
+  }
+
   const { data: company } = await supabase
     .from('companies')
     .select('owner_id, name')
@@ -205,7 +210,7 @@ export async function addTeamMember(data: {
       company_id: data.company_id,
       name: data.name.trim(),
       role: data.role,
-      email: data.email?.trim().toLowerCase() || null,
+      email: inviteEmail,
       status: 'invited',
       invite_token: crypto.randomUUID(),
       invited_by: user.id,
@@ -307,7 +312,7 @@ export async function acceptTeamInvite(token: string) {
 export async function lookupInviteByToken(token: string) {
   const { data, error } = await supabase.rpc('lookup_invite_by_token', { p_token: token });
   if (error) return null;
-  return data as { email?: string; company_name?: string } | null;
+  return data as { company_name?: string; status?: string } | null;
 }
 
 /** Check if the current user is already an accepted team member in any company. */
