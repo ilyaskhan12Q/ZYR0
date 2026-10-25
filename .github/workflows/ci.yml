@@ -170,12 +170,15 @@ jobs:
       - name: Verify RLS is enabled on all tables
         run: |
           echo "=== Checking RLS policies ==="
-          # Extract tables created in migrations
-          TABLES=$(grep -rh "CREATE TABLE" supabase/migrations/ | grep -oP "(?<=CREATE TABLE (IF NOT EXISTS )?)public\.\w+|\w+(?= \()" | sort -u)
-          RLS_TABLES=$(grep -h "ENABLE ROW LEVEL SECURITY" supabase/migrations/ | grep -oP "\w+(?=;)" | sort -u)
-          echo "Tables created: $TABLES"
-          echo "Tables with RLS: $RLS_TABLES"
-          echo "✅ RLS check passed (verify in 011_rls_policies.sql)"
+          TABLES=$(grep -rhoP "CREATE TABLE(?: IF NOT EXISTS)? public\.\w+" supabase/migrations/ | grep -oP "public\.\w+$" | sort -u)
+          RLS_TABLES=$(grep -rhoP "ALTER TABLE public\.\w+\s+ENABLE ROW LEVEL SECURITY" supabase/migrations/ | grep -oP "public\.\w+" | sort -u)
+          MISSING=$(comm -23 <(printf '%s\n' "$TABLES") <(printf '%s\n' "$RLS_TABLES"))
+          if [ -n "$MISSING" ]; then
+            echo "❌ Tables created in migrations without RLS enabled:"
+            echo "$MISSING"
+            exit 1
+          fi
+          echo "✅ All $(echo "$TABLES" | wc -l) tables created in migrations have RLS enabled"
 
   # ── Job 5: Edge Functions Lint ─────────────────────────────────────────────
   edge-functions:
