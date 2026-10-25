@@ -30,7 +30,7 @@ const toMessage = (m: StoredMessage): AgentChatMessage => ({
     : undefined,
 });
 
-export function useAgentChat(modelId: string | null) {
+export function useAgentChat(modelId: string | null, persistHistory = true) {
   const [messages, setMessages] = useState<AgentChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -156,8 +156,11 @@ export function useAgentChat(modelId: string | null) {
 
       let sid = sessionId;
       try {
-        sid = await persistUser(text, sid);
-        if (sid && sid !== sessionId) setSessionId(sid);
+        // Temporary chats stay in memory only: no session row, no messages.
+        if (persistHistory) {
+          sid = await persistUser(text, sid);
+          if (sid && sid !== sessionId) setSessionId(sid);
+        }
 
         const result = await streamChat(history, {
           model: modelId ?? undefined,
@@ -195,12 +198,12 @@ export function useAgentChat(modelId: string | null) {
         const message = err instanceof Error ? err.message : 'Request failed';
         patch((m) => ({ ...m, error: message, streaming: false }));
       } finally {
-        void persistAssistant(sid, acc, accMeta);
+        if (persistHistory) void persistAssistant(sid, acc, accMeta);
         setStreaming(false);
         abortRef.current = null;
       }
     },
-    [messages, modelId, sessionId, streaming, persistUser, persistAssistant]
+    [messages, modelId, sessionId, streaming, persistUser, persistAssistant, persistHistory]
   );
 
   const abort = useCallback(() => {
