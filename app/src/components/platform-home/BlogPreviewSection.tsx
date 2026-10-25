@@ -47,6 +47,7 @@ export default function BlogPreviewSection() {
         <Blog7
           tagline="Editorial & Insights"
           heading="Latest from the blog."
+          headingClassName="font-serif font-normal text-3xl md:text-5xl tracking-tight text-[var(--zyro-text)]"
           description="Engineering notes, EdTech deep dives, and career research from the team building the ZYR0 ecosystem."
           buttonText="View all articles"
           buttonUrl="/blog"

@@ -8,6 +8,7 @@ import { ButtonLoader } from '@/components/common/Loader';
 import { useTheme } from 'next-themes';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+import SubscriptionPlanCard from '@/components/pricing/SubscriptionPlanCard';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -140,6 +141,8 @@ export default function MentorSettings() {
           )}
         </button>
       </div>
+ 
+      <SubscriptionPlanCard />
 
       {/* Notifications */}
       <Section title="Notifications">

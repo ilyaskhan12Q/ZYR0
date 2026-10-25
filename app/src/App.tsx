@@ -53,17 +53,20 @@ const ResearchLanding = lazy(() => import('@/pages/research/ResearchLanding'));
 const BlogHome = lazy(() => import('@/pages/public/BlogHome'));
 const BlogPostDetail = lazy(() => import('@/pages/public/BlogPostDetail'));
 
-// ZYR0 ToolHub Discovery Page
+// ZYR0 Pricing
+const Pricing = lazy(() => import('@/pages/public/Pricing'));
+
+// ZYR0 ToolHub Discovery + Detail Pages
 const ToolHub = lazy(() => import('@/pages/public/ToolHub'));
+const ToolDetail = lazy(() => import('@/pages/public/ToolDetail'));
 
 // ZYR0 Work / Internship Public Pages
-const Landing = lazy(() => import('@/pages/public/Landing'));
+const InternshipsLanding = lazy(() => import('@/pages/public/InternshipsLanding'));
 const BrowseInternships = lazy(() => import('@/pages/public/BrowseInternships'));
 const InternshipDetail = lazy(() => import('@/pages/public/InternshipDetail'));
 const Companies = lazy(() => import('@/pages/public/Companies'));
 const CompanyDetail = lazy(() => import('@/pages/public/CompanyDetail'));
 const Verify = lazy(() => import('@/pages/public/Verify'));
-const VerifyOffer = lazy(() => import('@/pages/public/VerifyOffer'));
 const About = lazy(() => import('@/pages/public/About'));
 const Contact = lazy(() => import('@/pages/public/Contact'));
 const PrivacyPolicy = lazy(() => import('@/pages/public/PrivacyPolicy'));
@@ -71,11 +74,13 @@ const TermsOfService = lazy(() => import('@/pages/public/TermsOfService'));
 const CookiePolicy = lazy(() => import('@/pages/public/CookiePolicy'));
 const FAQ = lazy(() => import('@/pages/public/FAQ'));
 const HelpCenter = lazy(() => import('@/pages/public/HelpCenter'));
+const BillingHelp = lazy(() => import('@/pages/public/BillingHelp'));
 const Careers = lazy(() => import('@/pages/public/Careers'));
 const TeamApply = lazy(() => import('@/pages/public/TeamApply'));
 const NotFound = lazy(() => import('@/pages/public/NotFound'));
 const CompleteProfileRedirect = lazy(() => import('@/pages/public/CompleteProfileRedirect'));
 const AcceptInvite = lazy(() => import('@/pages/public/AcceptInvite'));
+const Join = lazy(() => import('@/pages/public/Join'));
 
 // Auth Pages
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback'));
@@ -111,7 +116,9 @@ export default function App() {
           <ScrollToTop />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<ResearchLanding />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<ResearchLanding />} />
+              </Route>
               <Route
                 path="/research-agent"
                 element={
@@ -142,7 +149,9 @@ export default function App() {
           <ScrollToTop />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<StudioLanding />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<StudioLanding />} />
+              </Route>
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -165,7 +174,9 @@ export default function App() {
           <ScrollToTop />
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-              <Route path="/" element={<SchoolOSLanding />} />
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<SchoolOSLanding />} />
+              </Route>
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
               <Route path="/auth/callback" element={<AuthCallback />} />
@@ -189,7 +200,7 @@ export default function App() {
           <Suspense fallback={<RouteLoading />}>
             <Routes>
               <Route element={<PublicLayout />}>
-                <Route path="/" element={<Landing />} />
+                <Route path="/" element={<InternshipsLanding />} />
                 <Route path="/browse" element={<BrowseInternships />} />
                 <Route path="/:id" element={<InternshipDetail />} />
                 <Route path="/companies" element={<Companies />} />
@@ -198,8 +209,6 @@ export default function App() {
                 <Route path="/verify/:code" element={<Verify />} />
                 <Route path="/verify-certificate" element={<Verify />} />
                 <Route path="/verify-certificate/:code" element={<Verify />} />
-                <Route path="/verify-offer" element={<VerifyOffer />} />
-                <Route path="/verify-offer/:id" element={<VerifyOffer />} />
               </Route>
               <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
               <Route path="/register" element={<PublicOnlyRoute><Register /></PublicOnlyRoute>} />
@@ -249,18 +258,7 @@ export default function App() {
         <ErrorBoundary>
           <Suspense fallback={<RouteLoading />}>
             <Routes>
-            {/* Platform Master Homepage (Bento Grid SaaS Ecosystem) */}
-            <Route path="/" element={<PlatformHome />} />
-
-            {/* ZYR0 Studio Dedicated Product Route */}
-            <Route path="/studio" element={<StudioLanding />} />
-
-            {/* ZYR0 Edu / School OS Dedicated Product Routes */}
-            <Route path="/school" element={<SchoolOSLanding />} />
-            <Route path="/edu" element={<SchoolOSLanding />} />
-
-            {/* ZYR0 Research Routes */}
-            <Route path="/research" element={<ResearchLanding />} />
+            {/* ZYR0 Research Agent (protected app page — no public chrome) */}
             <Route
               path="/research-agent"
               element={
@@ -270,10 +268,24 @@ export default function App() {
               }
             />
 
-            {/* ZYR0 Work / Internships Dedicated Routes & Public Portal with PublicLayout */}
+            {/* All public/marketing pages share one nav + footer */}
             <Route element={<PublicLayout />}>
+              {/* Platform Master Homepage (Bento Grid SaaS Ecosystem) */}
+              <Route path="/" element={<PlatformHome />} />
+
+              {/* ZYR0 Studio Dedicated Product Route */}
+              <Route path="/studio" element={<StudioLanding />} />
+
+              {/* ZYR0 Edu / School OS Dedicated Product Routes */}
+              <Route path="/school" element={<SchoolOSLanding />} />
+              <Route path="/edu" element={<SchoolOSLanding />} />
+
+              {/* ZYR0 Research Landing */}
+              <Route path="/research" element={<ResearchLanding />} />
+
+              {/* ZYR0 Work / Internships Dedicated Routes & Public Portal */}
               {/* /internships is the ZYR0 Work overview/landing page */}
-              <Route path="/internships" element={<Landing />} />
+              <Route path="/internships" element={<InternshipsLanding />} />
               {/* /internships/browse is the uploaded internships searchable catalog */}
               <Route path="/internships/browse" element={<BrowseInternships />} />
               <Route path="/internships/:id" element={<InternshipDetail />} />
@@ -283,8 +295,6 @@ export default function App() {
               <Route path="/verify/:code" element={<Verify />} />
               <Route path="/verify-certificate" element={<Verify />} />
               <Route path="/verify-certificate/:code" element={<Verify />} />
-              <Route path="/verify-offer" element={<VerifyOffer />} />
-              <Route path="/verify-offer/:id" element={<VerifyOffer />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -297,7 +307,12 @@ export default function App() {
               <Route path="/blog" element={<BlogHome />} />
               <Route path="/blog/:slug" element={<BlogPostDetail />} />
               <Route path="/tools" element={<ToolHub />} />
+              <Route path="/tools/:slug" element={<ToolDetail />} />
               <Route path="/toolhub" element={<Navigate to="/tools" replace />} />
+              <Route path="/join" element={<Join />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/billing-help" element={<BillingHelp />} />
+              <Route path="/help/billing" element={<Navigate to="/billing-help" replace />} />
             </Route>
 
             {/* Auth Routes */}
@@ -334,8 +349,10 @@ export default function App() {
               <Route path="*" element={<Suspense fallback={<RouteLoading />}><AdminPortal /></Suspense>} />
             </Route>
 
-            {/* Fallback 404 */}
-            <Route path="*" element={<NotFound />} />
+            {/* Fallback 404 (with public chrome) */}
+            <Route element={<PublicLayout />}>
+              <Route path="*" element={<NotFound />} />
+            </Route>
           </Routes>
           <Toaster />
         </Suspense>

@@ -16,7 +16,7 @@ export function SourceUniverse() {
     <section id="sources" className="rl-dark-section rl-section-full overflow-hidden">
       <div className="rl-section">
         <Reveal variant="fade-up">
-          <p className="rl-eyebrow-light text-[#657C68] mb-3">Trusted sources</p>
+          <p className="rl-eyebrow-light mb-3" style={{ color: 'var(--zyro-accent)' }}>Trusted sources</p>
         </Reveal>
         <Reveal variant="fade-up" delay={0.05}>
           <h2 className="rl-display rl-heading-text text-white mb-8">
@@ -31,8 +31,8 @@ export function SourceUniverse() {
               {[...SOURCES, ...SOURCES].map((source, i) => (
                 <span
                   key={`${source}-${i}`}
-                  className="text-lg md:text-xl font-medium text-[#444] whitespace-nowrap tracking-tight"
-                  style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}
+                  className="text-lg md:text-xl font-medium text-[#777] dark:text-[#999] whitespace-nowrap tracking-tight"
+                  style={{ fontFamily: "var(--font-serif, 'DM Serif Text', Georgia, serif)" }}
                 >
                   {source}
                 </span>

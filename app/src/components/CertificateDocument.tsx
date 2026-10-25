@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useMemo, useState } from 'react';
 import { Printer } from 'lucide-react';
+import PrintErrorDialog from './PrintErrorDialog';
 import { buildCertificateHTML, CERT_WIDTH, CERT_HEIGHT } from './certificateTemplate';
+import { Loader } from '@/components/common/Loader';
 
 interface CertificateDocumentProps {
   certificate: {
@@ -31,6 +33,8 @@ interface CertificateDocumentProps {
       department?: string;
     } | any;
   };
+  /** Public verification pages pass false so only the dashboard can print/download. */
+  showActions?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -43,7 +47,7 @@ interface CertificateDocumentProps {
 //   eliminated from the print window).
 // ---------------------------------------------------------------------------
 
-export default function CertificateDocument({ certificate }: CertificateDocumentProps) {
+export default function CertificateDocument({ certificate, showActions = true }: CertificateDocumentProps) {
   const recipientName = certificate.recipient?.full_name || certificate.recipientName || '[INSERT FULL NAME]';
   const companyName = certificate.company?.name || '[INSERT COMPANY NAME]';
   const internshipTitle = certificate.internship?.title || certificate.title || '[INSERT INTERNSHIP TITLE]';
@@ -57,6 +61,15 @@ export default function CertificateDocument({ certificate }: CertificateDocument
   const supervisorName = certificate.issuer?.full_name || '[INSERT ISSUER NAME]';
   const credentialId = certificate.credential_id || '[INSERT CREDENTIAL ID]';
   const skills = useMemo(() => certificate.skills || [], [certificate.skills]);
+  const [popupBlocked, setPopupBlocked] = useState(false);
+  /** All inlined assets; null until every font/logo/signature/QR is ready. */
+  const [inlineAssets, setInlineAssets] = useState<{
+    fontCss: string | null;
+    qr: string | null;
+    logos: Record<string, string>;
+    paper: string | null;
+  } | null>(null);
+  const assetsReady = inlineAssets !== null;
 
   // Real internship period: certificate snapshot → internship → placeholder.
   const formatDate = (d?: string | null) => d
@@ -73,18 +86,6 @@ export default function CertificateDocument({ certificate }: CertificateDocument
     return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(verifyUrl)}`;
   }, [certificate.credential_id]);
 
-  // Inline @font-face CSS built from base64-encoded woff2 files.
-  const fontCssRef = useRef<string | null>(null);
-  const qrDataUrlRef = useRef<string | null>(null);
-  const crestDataUrlRef = useRef<string | null>(null);
-  const isoDataUrlRef = useRef<string | null>(null);
-  const qcaDataUrlRef = useRef<string | null>(null);
-  const oLogoDataUrlRef = useRef<string | null>(null);
-  const sigDataUrlRef = useRef<string | null>(null);
-  const dirSigDataUrlRef = useRef<string | null>(null);
-  const sealDataUrlRef = useRef<string | null>(null);
-  const watermarkDataUrlRef = useRef<string | null>(null);
-
   // Real logo assets (all prefetched → inlined into the print window).
   const LOGO_URLS = useMemo(() => ({
     watermark: `${window.location.origin}/zyro-logo.png`,
@@ -96,18 +97,11 @@ export default function CertificateDocument({ certificate }: CertificateDocument
     dirSig: `${window.location.origin}/signatures/director.png`,
     seal: `${window.location.origin}/seal_ZYR0.png`,
   }), []);
-  const logoRefs = {
-    watermark: watermarkDataUrlRef,
-    crest: crestDataUrlRef,
-    iso: isoDataUrlRef,
-    qca: qcaDataUrlRef,
-    o: oLogoDataUrlRef,
-    sig: sigDataUrlRef,
-    dirSig: dirSigDataUrlRef,
-    seal: sealDataUrlRef,
-  } as const;
 
   useEffect(() => {
+    let cancelled = false;
+    setInlineAssets(null);
+
     async function toDataUrl(url: string): Promise<string> {
       const r = await fetch(url);
       if (!r.ok) throw new Error(`Asset fetch ${r.status}: ${url}`);
@@ -120,6 +114,13 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       });
     }
 
+    // A stalled request must not keep the certificate hidden forever.
+    const withTimeout = <T,>(p: Promise<T>, ms = 20000) =>
+      Promise.race([
+        p,
+        new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Asset timeout')), ms)),
+      ]);
+
     const FONTS_CSS_URL =
       'https://fonts.googleapis.com/css2?family=Agbalumo' +
       '&family=Cinzel:wght@500;700' +
@@ -127,53 +128,80 @@ export default function CertificateDocument({ certificate }: CertificateDocument
       '&family=Playfair+Display:ital,wght@1,600&display=swap';
 
     (async () => {
-      try {
-        const cssRes = await fetch(FONTS_CSS_URL, {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-          },
-        });
-        if (!cssRes.ok) throw new Error(`Fonts CSS fetch: ${cssRes.status}`);
-        let css = await cssRes.text();
+      const result: {
+        fontCss: string | null;
+        qr: string | null;
+        logos: Record<string, string>;
+        paper: string | null;
+      } = { fontCss: null, qr: null, logos: {}, paper: null };
 
-        const woff2Regex = /url\((https:\/\/fonts\.gstatic\.com[^)]+)\)/g;
-        const woff2Urls: string[] = [];
-        let m: RegExpExecArray | null;
-        while ((m = woff2Regex.exec(css)) !== null) woff2Urls.push(m[1]);
+      const jobs: Promise<unknown>[] = [];
 
-        const dataUrls = await Promise.all(woff2Urls.map(toDataUrl));
-        woff2Urls.forEach((url, i) => {
-          css = css.replaceAll(url, dataUrls[i]);
-        });
+      jobs.push((async () => {
+        try {
+          const cssRes = await withTimeout(fetch(FONTS_CSS_URL, {
+            headers: {
+              'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+          }));
+          if (!cssRes.ok) throw new Error(`Fonts CSS fetch: ${cssRes.status}`);
+          let css = await cssRes.text();
 
-        fontCssRef.current = css;
-      } catch (e) {
-        console.warn('[cert-save-perf] Font prefetch failed, falling back to <link>:', e);
-      }
-    })();
+          const woff2Regex = /url\((https:\/\/fonts\.gstatic\.com[^)]+)\)/g;
+          const woff2Urls: string[] = [];
+          let m: RegExpExecArray | null;
+          while ((m = woff2Regex.exec(css)) !== null) woff2Urls.push(m[1]);
 
-    toDataUrl(qrCodeUrl)
-      .then(dataUrl => {
-        qrDataUrlRef.current = dataUrl;
-      })
-      .catch(e => {
-        console.warn('[cert-save-perf] QR prefetch failed, falling back to remote URL:', e);
-      });
+          const dataUrls = await Promise.all(woff2Urls.map(url => withTimeout(toDataUrl(url))));
+          woff2Urls.forEach((url, i) => {
+            css = css.replaceAll(url, dataUrls[i]);
+          });
 
-    // Prefetch all real logo assets in parallel → zero network in print window.
-    (Object.keys(LOGO_URLS) as Array<keyof typeof LOGO_URLS>).forEach(key => {
-      toDataUrl(LOGO_URLS[key])
+          result.fontCss = css;
+        } catch (e) {
+          console.warn('[cert-save-perf] Font prefetch failed, falling back to <link>:', e);
+        }
+      })());
+
+      jobs.push(withTimeout(toDataUrl(qrCodeUrl))
         .then(dataUrl => {
-          logoRefs[key].current = dataUrl;
+          result.qr = dataUrl;
         })
         .catch(e => {
-          console.warn(`[cert-save-perf] Logo prefetch failed (${key}), falling back to origin URL:`, e);
-        });
-    });
-    // Only re-run if the certificate identity changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [certificate.credential_id]);
+          console.warn('[cert-save-perf] QR prefetch failed, falling back to remote URL:', e);
+        }));
+
+      // Prefetch all real logo assets in parallel → zero network in print window.
+      (Object.keys(LOGO_URLS) as Array<keyof typeof LOGO_URLS>).forEach(key => {
+        jobs.push(withTimeout(toDataUrl(LOGO_URLS[key]))
+          .then(dataUrl => {
+            result.logos[key] = dataUrl;
+          })
+          .catch(e => {
+            console.warn(`[cert-save-perf] Logo prefetch failed (${key}), falling back to origin URL:`, e);
+          }));
+      });
+
+      // Paper texture is the largest asset — inline it too so slow connections
+      // never reveal a half-textured certificate.
+      jobs.push(withTimeout(toDataUrl(`${window.location.origin}/certificate-paper.webp`))
+        .then(dataUrl => {
+          result.paper = dataUrl;
+        })
+        .catch(e => {
+          console.warn('[cert-save-perf] Paper texture prefetch failed, falling back to URL:', e);
+        }));
+
+      // Reveal the certificate only once everything has settled.
+      await Promise.allSettled(jobs);
+      if (!cancelled) setInlineAssets(result);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [certificate.credential_id, qrCodeUrl, LOGO_URLS]);
 
   const baseOptions = useMemo(() => ({
     recipientName,
@@ -203,53 +231,72 @@ export default function CertificateDocument({ certificate }: CertificateDocument
   const previewHtml = useMemo(
     () => buildCertificateHTML({
       ...baseOptions,
-      qrSrc: qrCodeUrl,
-      logoSrc: LOGO_URLS.watermark,
-      crestSrc: LOGO_URLS.crest,
-      isoSrc: LOGO_URLS.iso,
-      oLogoSrc: LOGO_URLS.o,
-      qcaSrc: LOGO_URLS.qca,
-      sigSrc: LOGO_URLS.sig,
-      dirSigSrc: LOGO_URLS.dirSig,
-      sealSrc: LOGO_URLS.seal,
-      fontCss: null,
+      qrSrc: inlineAssets?.qr ?? qrCodeUrl,
+      logoSrc: inlineAssets?.logos.watermark ?? LOGO_URLS.watermark,
+      crestSrc: inlineAssets?.logos.crest ?? LOGO_URLS.crest,
+      isoSrc: inlineAssets?.logos.iso ?? LOGO_URLS.iso,
+      oLogoSrc: inlineAssets?.logos.o ?? LOGO_URLS.o,
+      qcaSrc: inlineAssets?.logos.qca ?? LOGO_URLS.qca,
+      sigSrc: inlineAssets?.logos.sig ?? LOGO_URLS.sig,
+      dirSigSrc: inlineAssets?.logos.dirSig ?? LOGO_URLS.dirSig,
+      sealSrc: inlineAssets?.logos.seal ?? LOGO_URLS.seal,
+      paperSrc: inlineAssets?.paper ?? `${window.location.origin}/certificate-paper.webp`,
+      fontCss: inlineAssets?.fontCss ?? null,
     }),
-    [baseOptions, qrCodeUrl, LOGO_URLS]
+    [baseOptions, qrCodeUrl, LOGO_URLS, inlineAssets]
   );
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
+    if (!inlineAssets) return;
+
     const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+    if (!printWindow) {
+      setPopupBlocked(true);
+      return;
+    }
 
     const html = buildCertificateHTML({
       ...baseOptions,
-      qrSrc: qrDataUrlRef.current ?? qrCodeUrl,
-      logoSrc: watermarkDataUrlRef.current ?? LOGO_URLS.watermark,
-      crestSrc: crestDataUrlRef.current ?? LOGO_URLS.crest,
-      isoSrc: isoDataUrlRef.current ?? LOGO_URLS.iso,
-      oLogoSrc: oLogoDataUrlRef.current ?? LOGO_URLS.o,
-      qcaSrc: qcaDataUrlRef.current ?? LOGO_URLS.qca,
-      sigSrc: sigDataUrlRef.current ?? LOGO_URLS.sig,
-      dirSigSrc: dirSigDataUrlRef.current ?? LOGO_URLS.dirSig,
-      sealSrc: sealDataUrlRef.current ?? LOGO_URLS.seal,
-      fontCss: fontCssRef.current,
+      qrSrc: inlineAssets.qr ?? qrCodeUrl,
+      logoSrc: inlineAssets.logos.watermark ?? LOGO_URLS.watermark,
+      crestSrc: inlineAssets.logos.crest ?? LOGO_URLS.crest,
+      isoSrc: inlineAssets.logos.iso ?? LOGO_URLS.iso,
+      oLogoSrc: inlineAssets.logos.o ?? LOGO_URLS.o,
+      qcaSrc: inlineAssets.logos.qca ?? LOGO_URLS.qca,
+      sigSrc: inlineAssets.logos.sig ?? LOGO_URLS.sig,
+      dirSigSrc: inlineAssets.logos.dirSig ?? LOGO_URLS.dirSig,
+      sealSrc: inlineAssets.logos.seal ?? LOGO_URLS.seal,
+      paperSrc: inlineAssets.paper ?? `${window.location.origin}/certificate-paper.webp`,
+      fontCss: inlineAssets.fontCss,
     });
 
     printWindow.document.write(html);
     printWindow.document.close();
     printWindow.opener = null;
 
-    if (printWindow.document.fonts?.ready) {
-      printWindow.document.fonts.ready.then(() => {
-        printWindow.focus();
-        printWindow.print();
-      });
-    } else {
-      setTimeout(() => {
-        printWindow.focus();
-        printWindow.print();
-      }, 600);
-    }
+    // Wait for every image and font inside the print window before opening the
+    // dialog — otherwise slow connections print a sheet with missing assets.
+    const doc = printWindow.document;
+    const imagesDone = Promise.all(
+      Array.from(doc.images).map(img =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise<void>(resolve => {
+              img.addEventListener('load', () => resolve(), { once: true });
+              img.addEventListener('error', () => resolve(), { once: true });
+            })
+      )
+    );
+    const fontsDone = doc.fonts?.ready ?? Promise.resolve();
+
+    await Promise.race([
+      Promise.all([imagesDone, fontsDone]),
+      new Promise(resolve => setTimeout(resolve, 15000)),
+    ]);
+
+    if (printWindow.closed) return;
+    printWindow.focus();
+    printWindow.print();
   };
 
   return (
@@ -266,31 +313,47 @@ export default function CertificateDocument({ certificate }: CertificateDocument
           background: '#f1ece0',
         }}
       >
-        <iframe
-          srcDoc={previewHtml}
-          title="Certificate preview"
-          sandbox=""
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: CERT_WIDTH,
-            height: CERT_HEIGHT,
-            border: 0,
-            transform: `scale(${previewScale})`,
-            transformOrigin: 'top left',
-          }}
-        />
+        {assetsReady ? (
+          <iframe
+            srcDoc={previewHtml}
+            title="Certificate preview"
+            sandbox=""
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: CERT_WIDTH,
+              height: CERT_HEIGHT,
+              border: 0,
+              transform: `scale(${previewScale})`,
+              transformOrigin: 'top left',
+            }}
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-600 dark:text-slate-300">
+            <Loader variant="container" label="Preparing certificate…" />
+            <p className="text-xs font-medium">Loading fonts, signature and seal</p>
+          </div>
+        )}
       </div>
 
-      <div className="flex justify-end gap-3 mt-6 no-print">
-        <button
-          onClick={handlePrint}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
-        >
-          <Printer className="w-4 h-4" /> Print Certificate
-        </button>
-      </div>
+      {showActions && (
+        <div className="flex justify-end gap-3 mt-6 no-print">
+          <button
+            onClick={handlePrint}
+            disabled={!assetsReady}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Printer className="w-4 h-4" /> {assetsReady ? 'Print Certificate' : 'Preparing…'}
+          </button>
+        </div>
+      )}
+
+      <PrintErrorDialog
+        open={popupBlocked}
+        onOpenChange={setPopupBlocked}
+        description="Your browser blocked the pop-up that prepares the certificate for printing. Allow pop-ups for this site, then click Print Certificate again."
+      />
     </div>
   );
 }

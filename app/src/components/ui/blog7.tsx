@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -23,6 +24,7 @@ interface Post {
 interface Blog7Props {
   tagline: string;
   heading: string;
+  headingClassName?: string;
   description: string;
   buttonText: string;
   buttonUrl: string;
@@ -32,6 +34,7 @@ interface Blog7Props {
 const Blog7 = ({
   tagline = "Latest Updates",
   heading = "Blog Posts",
+  headingClassName,
   description = "Discover the latest trends, tips, and best practices in modern web development. From UI components to design systems, stay updated with our expert insights.",
   buttonText = "View all articles",
   buttonUrl = "https://shadcnblocks.com",
@@ -44,7 +47,7 @@ const Blog7 = ({
           <Badge variant="secondary" className="mb-6">
             {tagline}
           </Badge>
-          <h2 className="mb-3 text-pretty text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6 lg:max-w-3xl lg:text-5xl">
+          <h2 className={cn("mb-3 text-pretty text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6 lg:max-w-3xl lg:text-5xl", headingClassName)}>
             {heading}
           </h2>
           <p className="mb-8 text-muted-foreground md:text-base lg:max-w-2xl lg:text-lg">

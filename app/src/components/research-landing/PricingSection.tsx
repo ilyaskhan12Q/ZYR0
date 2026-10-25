@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Reveal, StaggerContainer, StaggerItem } from './Reveal';
 
 const PLANS = [
@@ -5,27 +6,30 @@ const PLANS = [
     name: 'Free',
     price: '$0',
     period: '',
-    description: 'Explore the research agent with basic capabilities.',
-    features: ['Quick research mode', 'Basic source verification', '5 research sessions/day', 'Standard report format'],
-    cta: 'Get started',
+    description: 'Explore the research agent with standard capabilities.',
+    features: ['Standard research queries', 'Academic citation verification', 'Standard AI limits (20 req/min)', 'Markdown & PDF export'],
+    cta: 'Start Researching',
+    href: '/research-agent',
     highlighted: false,
   },
   {
     name: 'Pro',
-    price: '$X',
+    price: '$9.99',
     period: '/mo',
-    description: 'Full research capabilities for serious work.',
-    features: ['All research depths', 'Full source verification', 'Unlimited sessions', 'Export reports (Markdown)', 'Research history'],
-    cta: 'Start free trial',
+    description: 'Extended depth and priority model compute across the ecosystem.',
+    features: ['Deep multi-step reasoning', 'Full academic & web ledger', 'Priority compute queue', 'Unlimited session history', 'Studio & Work early access'],
+    cta: 'Choose Pro',
+    href: '/pricing',
     highlighted: true,
   },
   {
-    name: 'Advanced',
-    price: '$X',
-    period: '/mo',
-    description: 'For teams and institutions.',
-    features: ['Everything in Pro', 'Custom source domains', 'API access', 'Priority processing', 'Team collaboration', 'Dedicated support'],
-    cta: 'Contact sales',
+    name: 'Custom',
+    price: 'Custom',
+    period: '',
+    description: 'Tailored institutional deployments for universities and enterprise teams.',
+    features: ['Everything in Pro', 'Custom source domains', 'SchoolOS & Work integrations', 'Dedicated account manager', 'Custom SLA & invoicing'],
+    cta: 'Book a Demo',
+    href: '/pricing',
     highlighted: false,
   },
 ];
@@ -44,7 +48,10 @@ export function PricingSection() {
         </Reveal>
         <Reveal variant="fade-up" delay={0.1}>
           <p className="text-[var(--rl-muted)] text-sm mb-8 max-w-md">
-            Start for free. Upgrade when you need more depth, more sources, or more sessions.
+            Start for free. Upgrade to Pro for high-depth reasoning, or view our{' '}
+            <Link to="/pricing" className="text-[var(--rl-accent)] underline hover:opacity-80 transition-opacity">
+              complete ecosystem pricing
+            </Link>.
           </p>
         </Reveal>
 
@@ -75,8 +82,8 @@ export function PricingSection() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="/research-agent"
+                <Link
+                  to={plan.href}
                   className={`text-center text-sm py-2.5 rounded-full transition-all ${
                     plan.highlighted
                       ? 'bg-[var(--rl-ink)] text-[var(--rl-bg)] hover:bg-[#333]'
@@ -84,7 +91,7 @@ export function PricingSection() {
                   }`}
                 >
                   {plan.cta}
-                </a>
+                </Link>
               </div>
             </StaggerItem>
           ))}

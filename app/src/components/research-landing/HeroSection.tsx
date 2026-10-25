@@ -3,7 +3,7 @@ import { Reveal } from './Reveal';
 export function HeroSection() {
   return (
     <section className="rl-dark-section relative overflow-hidden">
-      <div className="rl-section relative z-10 flex flex-col items-center justify-center min-h-[85vh] text-center px-4">
+      <div className="relative z-10 max-w-[1200px] mx-auto w-full flex flex-col items-center justify-center min-h-[calc(85vh+var(--zyro-header-h,5rem))] text-center px-4 sm:px-6 lg:px-8 pt-[calc(var(--zyro-header-h,5rem)+2rem)] sm:pt-[calc(var(--zyro-header-h,5rem)+3rem)] lg:pt-[calc(var(--zyro-header-h,5rem)+3.5rem)] pb-16 sm:pb-20 lg:pb-24">
         <Reveal variant="fade-up">
           <p className="rl-eyebrow-light mb-4 text-[#999999]">Deep research, verified sources</p>
         </Reveal>

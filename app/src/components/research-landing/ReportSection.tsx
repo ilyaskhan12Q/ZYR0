@@ -19,7 +19,7 @@ export function ReportSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           {/* Left: copy */}
           <Reveal variant="fade-left">
-            <p className="rl-eyebrow-light text-[#657C68] mb-3">Report</p>
+            <p className="rl-eyebrow-light mb-3" style={{ color: 'var(--zyro-accent)' }}>Report</p>
             <h2 className="rl-display text-[clamp(2rem,3.5vw,3rem)] text-white mb-3 leading-[0.95]">
               FROM RESEARCH<br />TO UNDERSTANDING.
             </h2>
@@ -38,7 +38,7 @@ export function ReportSection() {
               {/* Header */}
               <div className="px-5 py-4 border-b border-[#333] flex items-center justify-between">
                 <div>
-                  <p className="rl-eyebrow-light text-[#657C68] mb-1">RESEARCH REPORT</p>
+                  <p className="rl-eyebrow-light mb-1" style={{ color: 'var(--zyro-accent)' }}>RESEARCH REPORT</p>
                   <p className="text-white text-sm font-medium">Generative AI &amp; University Education</p>
                 </div>
                 <span className="rl-chip-dark">18 sources</span>
@@ -63,7 +63,7 @@ export function ReportSection() {
                       <div className="space-y-3">
                         {FINDINGS.map((f) => (
                           <div key={f.id} className="flex gap-3">
-                            <span className="rl-display text-base text-[#657C68] shrink-0">{f.id}</span>
+                            <span className="rl-display text-base shrink-0" style={{ color: 'var(--zyro-accent)' }}>{f.id}</span>
                             <div>
                               <p className="text-xs font-medium text-white mb-0.5">{f.title}</p>
                               <p className="text-[11px] text-[#777] leading-relaxed">{f.summary}</p>

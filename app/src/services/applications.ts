@@ -2,6 +2,21 @@ import { supabase } from '@/lib/supabase';
 import type { Application, ApplicationStatus } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+import { signedFileUrl } from '@/lib/storage';
+
+/** Resumes live in a private bucket: swap each row's nested student.resume_url for
+ *  a short-lived link before it reaches the page. */
+async function signStudentResumes<T extends { student?: { resume_url?: string | null } | null }>(
+  rows: T[],
+): Promise<T[]> {
+  await Promise.all(
+    rows.map(async (row) => {
+      const stored = row.student?.resume_url;
+      if (stored) row.student!.resume_url = await signedFileUrl('resumes', stored);
+    }),
+  );
+  return rows;
+}
 
 export const APPLICATION_STATUSES: ApplicationStatus[] = [
   'Applied',
@@ -127,6 +142,8 @@ export async function getApplicationById(id: string, useCache = true) {
 
   const res = await dedupRequest(cacheKey, fetchFn);
 
+  if (res.data) await signStudentResumes([res.data]);
+
   if (!res.error) {
     setCachedData(cacheKey, res);
   }
@@ -226,6 +243,8 @@ export async function getApplicationsForInternship(internship_id: string, useCac
 
   const res = await dedupRequest(cacheKey, fetchFn);
 
+  if (res.data) await signStudentResumes(res.data);
+
   if (!res.error) setCachedData(cacheKey, res);
   return res;
 }
@@ -258,6 +277,8 @@ export async function getAllCompanyApplications(company_id: string) {
 
   const res = await dedupRequest(cacheKey, fetchFn);
 
+  if (res.data) await signStudentResumes(res.data);
+
   if (!res.error) setCachedData(cacheKey, res);
   return res;
 }
@@ -281,6 +302,7 @@ export async function getAllAdminApplications(status?: ApplicationStatus | 'All'
   }
 
   const { data, error } = await query;
+  if (data) await signStudentResumes(data);
   return { data: (data ?? []) as any[], error };
 }
 

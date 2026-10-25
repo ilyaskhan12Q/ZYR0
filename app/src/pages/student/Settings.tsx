@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { getStudentSettings, updateStudentSettings, STUDENT_SETTINGS_DEFAULTS } from '@/services/settings';
 import type { StudentSettings } from '@/lib/database.types';
+import SubscriptionPlanCard from '@/components/pricing/SubscriptionPlanCard';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -120,6 +121,8 @@ export default function StudentSettings() {
           <Save className="w-4 h-4" /> {saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
+ 
+      <SubscriptionPlanCard />
 
       <Section title="Notifications">
         <div className="space-y-4">

@@ -12,6 +12,7 @@ import { getMyActiveInternships, getInternshipById } from '@/services/internship
 import { getMyTasks, submitTask, uploadSubmissionFile } from '@/services/tasks';
 import type { TaskAttachment } from '@/lib/database.types';
 import { getMyCertificates } from '@/services/certificates';
+import CertificateDocument from '@/components/CertificateDocument';
 import { getWorkspaceEvents, clearWorkspaceEventsCache } from '@/services/workspaceEvents';
 import { useRealtimeInsert } from '@/hooks/useRealtime';
 import { clearCache } from '@/lib/cache';
@@ -1484,99 +1485,17 @@ export default function StudentWorkspace() {
                 </div>
 
                 {activeCertificate ? (
-                  // Renders real certificate mockup
-                  <m.div
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="max-w-3xl mx-auto bg-white dark:bg-slate-900 border-8 border-double border-accent/25 rounded-2xl p-8 shadow-lg text-center relative overflow-hidden"
-                  >
-                    {/* Background seal watermarks */}
-                    <div className="absolute right-4 bottom-4 w-40 h-40 bg-accent/5 rounded-full border-4 border-dashed border-accent/10 flex items-center justify-center -rotate-12 pointer-events-none">
-                      <ShieldCheck className="w-20 h-20 text-accent/10" />
+                  <div className="space-y-4">
+                    <CertificateDocument certificate={activeCertificate} />
+                    <div className="flex justify-center">
+                      <Link
+                        to={`/verify/${activeCertificate.credential_id}`}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-lg text-xs font-semibold shadow transition-colors"
+                      >
+                        <ShieldCheck className="w-4 h-4" /> Verify Credential <ExternalLink className="w-3 h-3" />
+                      </Link>
                     </div>
-
-                    <div className="space-y-6">
-                      <div className="flex justify-between items-center pb-4 border-b border-border">
-                        <div className="text-left">
-                          <h4 className="text-xl font-bold tracking-tight text-accent italic">ZYRO</h4>
-                          <span className="text-[10px] text-muted-foreground block uppercase tracking-widest mt-0.5">Global Placements Network</span>
-                        </div>
-                        <div className="w-12 h-12 bg-muted rounded-xl flex items-center justify-center border overflow-hidden">
-                          {company?.logo_url ? (
-                            <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <Building2 className="w-6 h-6 text-muted-foreground" />
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <span className="text-xs text-muted-foreground uppercase tracking-widest font-semibold block">
-                          Certificate of Completion
-                        </span>
-                        <p className="text-sm italic text-muted-foreground">This is to officially certify that</p>
-                        <h2 className="text-2xl font-bold text-foreground font-serif tracking-wide py-2">
-                          {user?.email?.split('@')[0].toUpperCase() || 'STUDENT INTERN'}
-                        </h2>
-                        <p className="text-sm max-w-md mx-auto text-muted-foreground leading-relaxed">
-                          has successfully completed the <strong>{internship?.title}</strong> program. The participant demonstrated outstanding professionalism, completed all assigned code tasks, and achieved full grading criteria under the supervision of <strong>{company?.name}</strong>.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 pt-6 text-xs text-muted-foreground max-w-sm mx-auto">
-                        <div>
-                          <span className="block font-semibold text-foreground">
-                            {new Date(activeCertificate.issue_date).toLocaleDateString()}
-                          </span>
-                          <span className="text-[10px]">Date of Issuance</span>
-                        </div>
-                        <div>
-                          <span className="block font-mono text-foreground font-semibold">
-                            {activeCertificate.credential_id}
-                          </span>
-                          <span className="text-[10px]">Credential Identifier</span>
-                        </div>
-                      </div>
-
-                      {/* Digital Signatures */}
-                      <div className="grid grid-cols-2 gap-8 pt-8 pb-4 max-w-lg mx-auto border-t border-border">
-                        <div className="flex flex-col items-center">
-                          <div className="h-10 flex items-center justify-center relative select-none">
-                            <svg className="w-28 h-10 text-accent/70 absolute -top-2" viewBox="0 0 100 40" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M10 25 C 20 5, 40 35, 50 15 C 60 5, 70 30, 85 20 C 90 15, 95 10, 99 22" strokeLinecap="round" strokeLinejoin="round" />
-                              <path d="M30 22 L 75 22" strokeLinecap="round" />
-                            </svg>
-                            <span className="font-serif italic text-sm text-foreground/80 mt-4">{company?.name || 'Supervisor'}</span>
-                          </div>
-                          <div className="w-32 border-t border-border mt-2 pt-1 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
-                            Company Director
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col items-center">
-                          <div className="h-10 flex items-center justify-center relative select-none">
-                            <svg className="w-28 h-10 text-accent/70 absolute -top-2" viewBox="0 0 100 40" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M5 20 Q 20 5, 35 25 T 60 15 T 80 20 T 95 10" strokeLinecap="round" strokeLinejoin="round" />
-                              <path d="M15 15 C 25 25, 45 5, 55 25" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <span className="font-serif italic text-sm text-foreground/80 mt-4">Zyro Verifier</span>
-                          </div>
-                          <div className="w-32 border-t border-border mt-2 pt-1 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
-                            Program Director
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-4 flex flex-wrap justify-center gap-4">
-                        <Link
-                          to={`/verify/${activeCertificate.credential_id}`}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent/90 text-white rounded-lg text-xs font-semibold shadow transition-colors"
-                        >
-                          <ShieldCheck className="w-4 h-4" /> Verify Credential Verification <ExternalLink className="w-3 h-3" />
-                        </Link>
-                      </div>
-                    </div>
-                  </m.div>
+                  </div>
                 ) : (
                   // Lock screen
                   <div className="max-w-md mx-auto text-center py-12 px-6 bg-muted/30 border border-border rounded-2xl space-y-5">

@@ -65,12 +65,6 @@ export async function getMyOfferLetters(useCache = true) {
   return res;
 }
 
-/** Verify an offer by id or human-readable code. Public and code-keyed. */
-export async function getOfferLetterById(id: string, useCache = true) {
-  void useCache;
-  const { data, error } = await supabase.rpc('verify_offer_public', { p_code: id.trim() });
-  return { data: data ?? null, error };
-}
 
 /** Check whether an offer letter already exists for a given application. */
 export async function getOfferLetterByApplication(application_id: string, useCache = true) {
