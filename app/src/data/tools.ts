@@ -1,3 +1,5 @@
+import type { ToolInstallCommand } from '@/lib/database.types';
+
 export type ToolSource = 'ZYR0 Native' | 'GitHub' | 'Hugging Face' | 'Web';
 
 export type ToolItemType = 'tool' | 'skill' | 'tool_skill';
@@ -22,6 +24,7 @@ export interface ToolItem {
   featured?: boolean;
   capabilities: string[];
   installCommand?: string;
+  installCommands?: ToolInstallCommand[];
   installInstructions?: string;
   version?: string;
   author?: {

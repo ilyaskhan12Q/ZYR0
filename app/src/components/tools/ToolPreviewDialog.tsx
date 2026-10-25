@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   ExternalLink, Terminal, Copy, Check, BookOpen, Tag,
   Layers, Info, FileText, ArrowUpRight
@@ -13,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { ToolItem } from '@/data/tools';
+import type { ToolInstallCommand } from '@/lib/database.types';
 import { coverGradient } from '@/data/tools';
 import { toast } from 'sonner';
 
@@ -32,13 +35,28 @@ const SectionTitle = ({ icon: Icon, children }: { icon: React.ElementType; child
 export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialogProps) {
   const [copied, setCopied] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+  const [activeCmdIdx, setActiveCmdIdx] = useState(0);
+
+  const commands: ToolInstallCommand[] = tool
+    ? (tool.installCommands && tool.installCommands.length > 0)
+      ? tool.installCommands
+      : tool.installCommand
+      ? [{ label: tool.item_type === 'skill' ? 'Invocation' : 'Quick Install', command: tool.installCommand }]
+      : []
+    : [];
+
+  const activeCommand = commands[activeCmdIdx] || commands[0];
+
+  useEffect(() => {
+    setActiveCmdIdx(0);
+  }, [tool?.id]);
 
   if (!tool) return null;
 
   const handleCopyCommand = async () => {
-    if (!tool.installCommand) return;
+    if (!activeCommand?.command) return;
     try {
-      await navigator.clipboard.writeText(tool.installCommand);
+      await navigator.clipboard.writeText(activeCommand.command);
       setCopied(true);
       toast.success('Copied to clipboard');
       setTimeout(() => setCopied(false), 2000);
@@ -153,9 +171,11 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
             <div className="space-y-6 min-w-0">
               <section>
                 <SectionTitle icon={FileText}>About</SectionTitle>
-                <p className="text-sm text-foreground/90 leading-relaxed whitespace-pre-line">
-                  {tool.description}
-                </p>
+                <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed text-sm [&>p]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-3 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:mb-3 [&>h1]:text-base [&>h1]:font-bold [&>h1]:mb-2 [&>h2]:text-sm [&>h2]:font-bold [&>h2]:mb-2 [&>h3]:text-xs [&>h3]:font-bold [&>h3]:mb-1 [&>pre]:bg-neutral-950 [&>pre]:text-emerald-300 [&>pre]:p-3 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&_code]:font-mono [&_code]:text-xs [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:bg-muted/60">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {tool.description}
+                  </ReactMarkdown>
+                </div>
               </section>
 
               {tool.capabilities && tool.capabilities.length > 0 && (
@@ -177,15 +197,38 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                 </section>
               )}
 
-              {/* Install command — full width in content column so long commands breathe */}
-              {tool.installCommand && (
+              {/* Install command(s) — full width in content column so long commands breathe */}
+              {commands.length > 0 && (
                 <section>
                   <SectionTitle icon={Terminal}>
                     {tool.item_type === 'skill' ? 'Invocation' : 'Quick Install'}
                   </SectionTitle>
+
+                  {/* Multi-command tab switcher */}
+                  {commands.length > 1 && (
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                      {commands.map((cmd, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setActiveCmdIdx(idx)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                            activeCmdIdx === idx
+                              ? 'bg-[var(--zyro-accent)] text-white shadow-xs'
+                              : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground border border-border/50'
+                          }`}
+                        >
+                          {cmd.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="relative group rounded-xl overflow-hidden border border-neutral-800">
                     <div className="flex items-center justify-between px-3 py-1.5 bg-neutral-900 border-b border-neutral-800">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">terminal</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-neutral-400">
+                        {activeCommand?.label ? activeCommand.label.toLowerCase() : 'terminal'}
+                      </span>
                       <button
                         onClick={handleCopyCommand}
                         className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
@@ -206,7 +249,7 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                     </div>
                     <pre className="p-3.5 bg-neutral-950 text-emerald-300 font-mono text-xs overflow-x-auto">
                       <span className="select-all break-all">
-                        <span className="text-neutral-500 select-none">$ </span>{tool.installCommand}
+                        <span className="text-neutral-500 select-none">$ </span>{activeCommand?.command}
                       </span>
                     </pre>
                   </div>
@@ -220,7 +263,7 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
               )}
 
               {/* Install notes without command */}
-              {!tool.installCommand && tool.installInstructions && (
+              {commands.length === 0 && tool.installInstructions && (
                 <section>
                   <SectionTitle icon={Info}>Install Notes</SectionTitle>
                   <p className="text-xs text-muted-foreground p-3 rounded-lg bg-muted/40 border border-border/50">

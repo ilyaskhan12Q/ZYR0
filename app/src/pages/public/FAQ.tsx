@@ -43,10 +43,6 @@ const faqData: FAQCategory[] = [
         a: 'Upon successful completion of all assigned tasks and your mentor\'s final approval, ZYR0 automatically generates a digital certificate with a unique credential ID. You can download it from your Certificates dashboard. Anyone can verify the authenticity of your certificate at zyroo.org/verify by entering the credential ID.',
       },
       {
-        q: 'How are offer letters verified?',
-        a: 'Every offer letter issued through ZYR0 carries a unique offer code (e.g. ZYRO-OF-2026-123456), a unique offer ID, and a scannable QR code. Anyone can verify the authenticity of an offer letter at zyroo.org/verify — switch to the "Offer Letter" tab and enter either the offer code or offer ID, or simply scan the QR code printed on the document. The page shows the offer\'s current status, including accepted, rejected, expired, or revoked.',
-      },
-      {
         q: 'Can I apply to multiple internships at once?',
         a: 'Yes. You can apply to as many internships as you are qualified for. There is no limit on the number of simultaneous applications. However, once you accept an offer letter, you are expected to commit to that internship for its duration.',
       },
@@ -226,7 +222,7 @@ export default function FAQ() {
   ];
 
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="FAQ — Frequently Asked Questions About ZYR0"
         description="Find answers to the most common questions about the ZYR0 internship platform. Get help for students, companies, and mentors on applications, task submissions, certificates, account management, and data security."
@@ -235,7 +231,7 @@ export default function FAQ() {
         structuredData={faqStructuredData}
       />
       {/* Hero */}
-      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
+      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <HelpCircle className="w-12 h-12 mx-auto mb-4 text-white/70" />

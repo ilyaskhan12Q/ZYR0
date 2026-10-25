@@ -20,6 +20,7 @@ import {
 } from '@/services/offerLetters';
 import { generateOfferLetterPdf } from '@/lib/offerLetterPdf';
 import OfferLetterDocument from '@/components/OfferLetterDocument';
+import PrintErrorDialog from '@/components/PrintErrorDialog';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
@@ -79,8 +80,6 @@ async function sendOfferLetterEmail(opts: {
     : '30 days from issuance';
   const offerCodeStr = offerCode ?? offerId.slice(0, 8).toUpperCase();
   const offerLettersDashboardUrl = `${siteUrl}/student/offer-letters`;
-  const publicVerifyUrl = `${siteUrl}/verify`;
-  const verifyOfferUrl = `${siteUrl}/verify?type=offer&id=${encodeURIComponent(offerCodeStr)}`;
 
   const emailHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -118,10 +117,6 @@ async function sendOfferLetterEmail(opts: {
                     <p style="margin: 0 0 8px; font-size: 13px; color: #334155;">
                       <strong>Unique Offer Code:</strong> <span style="color: #1e3a8a; font-family: monospace; font-size: 14px; font-weight: 700;">${offerCodeStr}</span>
                     </p>
-                    <p style="margin: 0; font-size: 13px; color: #334155;">
-                      <strong>Credential Verification URL:</strong><br>
-                      <a href="${verifyOfferUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${verifyOfferUrl}</a>
-                    </p>
                   </td>
                 </tr>
               </table>
@@ -129,19 +124,9 @@ async function sendOfferLetterEmail(opts: {
               <!-- How to Access Offer Letter Section -->
               <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px 24px; margin: 24px 0; background-color: #ffffff;">
                 <p style="margin: 0 0 12px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #1e3a8a;">How to Download & Respond to Your Offer Letter</p>
-                <p style="margin: 0 0 12px; font-size: 14px; line-height: 1.7; color: #334155;">
-                  Your official, printable Offer Letter document is stored on the ZYR0 platform. You can access and download your document through either of the following methods:
+                <p style="margin: 0; font-size: 14px; line-height: 1.7; color: #334155;">
+                  Your official, printable Offer Letter document is stored on the ZYR0 platform. Log in to your student account at <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${offerLettersDashboardUrl}</a> to view complete offer terms, accept or decline the offer, and download your official PDF document.
                 </p>
-                <ol style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: #334155;">
-                  <li style="margin-bottom: 10px;">
-                    <strong>ZYR0 Student Dashboard:</strong><br>
-                    Log in to your student account at <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${offerLettersDashboardUrl}</a> to view complete offer terms, accept or decline the offer, and download your official PDF document.
-                  </li>
-                  <li style="margin-bottom: 0;">
-                    <strong>Public Verification Portal:</strong><br>
-                    Visit <a href="${publicVerifyUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${publicVerifyUrl}</a> or use your direct verification link <a href="${verifyOfferUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${verifyOfferUrl}</a> and enter your unique Offer Code <strong>${offerCodeStr}</strong> to instantly verify and download your offer letter.
-                  </li>
-                </ol>
               </div>
 
               <!-- Expiry Alert -->
@@ -157,15 +142,11 @@ async function sendOfferLetterEmail(opts: {
 
               <!-- Direct Platform Links -->
               <div style="border-top: 1px solid #e2e8f0; margin: 28px 0 24px; padding-top: 24px;">
-                <p style="margin: 0 0 14px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b;">Direct Links & Verification</p>
+                <p style="margin: 0 0 14px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #64748b;">Direct Links</p>
                 <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: #334155;">
                   <li style="margin-bottom: 8px;">
                     <strong>Student Offer Letters Dashboard:</strong><br>
                     <a href="${offerLettersDashboardUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${offerLettersDashboardUrl}</a>
-                  </li>
-                  <li style="margin-bottom: 8px;">
-                    <strong>Public Credential Verification:</strong><br>
-                    <a href="${verifyOfferUrl}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; text-decoration: underline; font-weight: 600; word-break: break-all;">${verifyOfferUrl}</a>
                   </li>
                   <li style="margin-bottom: 8px;">
                     <strong>ZYR0 Career Hub:</strong><br>
@@ -216,19 +197,16 @@ async function sendOfferLetterEmail(opts: {
     `- Company: ${companyName}`,
     `- Position: ${internshipTitle}`,
     `- Offer Code: ${offerCodeStr}`,
-    `- Credential Verification URL: ${verifyOfferUrl}`,
     '',
     `How to Download & Respond to Your Offer Letter:`,
-    `Your official, printable Offer Letter document is stored on the ZYR0 platform. You can access and download your document through either of the following methods:`,
-    `1. ZYR0 Student Dashboard: ${offerLettersDashboardUrl} (log in to review terms, accept/decline, and download PDF)`,
-    `2. Public Verification Portal: ${publicVerifyUrl} (enter Offer Code: ${offerCodeStr} to verify and download)`,
+    `Your official, printable Offer Letter document is stored on the ZYR0 platform. Log in to your student account to review terms, accept/decline, and download the PDF:`,
+    `${offerLettersDashboardUrl}`,
     '',
     `Action Required: This offer remains valid until ${expiryDateStr}. Please access your student dashboard to review and respond before the expiration date:`,
     `${offerLettersDashboardUrl}`,
     '',
     `Direct Links:`,
     `- Student Offer Letters Dashboard: ${offerLettersDashboardUrl}`,
-    `- Public Credential Verification: ${verifyOfferUrl}`,
     `- ZYR0 Career Hub: ${siteUrl}/careers`,
     `- Contact Support: ${siteUrl}/contact`,
     '',
@@ -296,6 +274,7 @@ export default function CompanyOfferLetters() {
   const [resending, setResending]       = useState<string | null>(null);
   const [resendFeedback, setResendFeedback] = useState<{ offerId: string; ok: boolean; message: string } | null>(null);
   const [error, setError]               = useState<string | null>(null);
+  const [printError, setPrintError]     = useState<string | null>(null);
   const [successMsg, setSuccessMsg]     = useState<string | null>(null);
 
   // ── Bulk selection state ─────────────────────────────────────────────────────
@@ -390,7 +369,6 @@ export default function CompanyOfferLetters() {
     };
     const pdfBlob = await generateOfferLetterPdf({
       offer: fullOffer,
-      verificationUrl: `${window.location.origin}/verify-offer/${newOffer!.id}`,
     });
 
     // 4. Upload to Storage
@@ -562,13 +540,11 @@ export default function CompanyOfferLetters() {
   // ── Preview Canvas PDF (debug & instant verification) ────────────────────────
   async function handlePreviewCanvasPdf(offer: OfferLetter) {
     try {
-      const verificationUrl = `${window.location.origin}/verify-offer/${offer.id}`;
-      const pdfBlob = await generateOfferLetterPdf({
-        offer,
-        verificationUrl,
-      });
+      const pdfBlob = await generateOfferLetterPdf({ offer });
       const blobUrl = URL.createObjectURL(pdfBlob);
-      window.open(blobUrl, '_blank');
+      if (!window.open(blobUrl, '_blank')) {
+        setPrintError('Your browser blocked the PDF pop-up. Allow pop-ups for this site, then try again.');
+      }
     } catch (err) {
       console.error('Failed to generate PDF canvas preview:', err);
       setError('Could not generate PDF canvas preview.');
@@ -967,6 +943,12 @@ export default function CompanyOfferLetters() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <PrintErrorDialog
+        open={printError !== null}
+        onOpenChange={(open) => !open && setPrintError(null)}
+        description={printError ?? ''}
+      />
     </div>
   );
 }

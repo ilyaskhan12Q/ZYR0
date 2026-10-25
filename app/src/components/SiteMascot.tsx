@@ -203,7 +203,7 @@ export function SiteMascot() {
     <div
       aria-hidden="true"
       onClick={() => reactFor('laughing')}
-      className="pointer-events-none fixed bottom-24 right-6 z-30 select-none"
+      className="pointer-events-none fixed bottom-24 right-6 z-30 select-none origin-bottom-right scale-[0.65] sm:scale-100"
     >
       <Mascot
         ref={avatar}

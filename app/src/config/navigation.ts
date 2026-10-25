@@ -30,7 +30,6 @@ export const productsNav: ProductNavItem[] = [
     name: 'ZYR0 Studio',
     href: '/studio',
     description: 'Autonomous AI website & full-stack app builder with one-click deploy.',
-    badge: 'AI Builder',
     logo: '/logos/studio.png',
     icon: Code,
   },
@@ -39,7 +38,6 @@ export const productsNav: ProductNavItem[] = [
     name: 'ZYR0 Edu',
     href: '/school',
     description: 'Modern operating system for schools and colleges.',
-    badge: 'Institutions',
     logo: '/logos/schoolOS.png',
     icon: School,
   },
@@ -48,7 +46,6 @@ export const productsNav: ProductNavItem[] = [
     name: 'ZYR0 Research',
     href: '/research',
     description: 'Autonomous deep research with verified citations.',
-    badge: 'Deep AI',
     logo: '/logos/research.png',
     icon: BrainCircuit,
   },
@@ -57,7 +54,6 @@ export const productsNav: ProductNavItem[] = [
     name: 'ZYR0 Work',
     href: '/internships',
     description: 'Project-driven internships with verifiable certificates.',
-    badge: 'Internships',
     icon: Briefcase,
   },
   {
@@ -65,9 +61,16 @@ export const productsNav: ProductNavItem[] = [
     name: 'ZYR0 ToolHub',
     href: '/tools',
     description: 'Curated directory of AI utilities and developer tools.',
-    badge: 'Directory',
     icon: Compass,
   },
+];
+
+// Mega-menu layout: one array per column, so columns can be added or removed
+// here without touching the nav. The nav renders one preview panel after them.
+export const productsMegaColumns: ProductNavItem[][] = [
+  productsNav.slice(0, 2),
+  productsNav.slice(2, 4),
+  productsNav.slice(4),
 ];
 
 export const resourcesNav: NavItem[] = [

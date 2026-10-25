@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
-  Sparkles, Terminal, CheckCircle2,
+  Sparkles, Terminal, CheckCircle2, Plus, Trash2, Check,
   Loader2, Lock, ShieldCheck, ArrowRight, UserCheck, ChevronDown, ImageIcon, AlertCircle
 } from 'lucide-react';
 import {
@@ -14,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { submitTool, type SubmitToolInput } from '@/services/tools';
 import { coverGradient } from '@/data/tools';
+import type { ToolInstallCommand } from '@/lib/database.types';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
@@ -38,6 +41,27 @@ function FieldError({ msg }: { msg?: string }) {
   ) : null;
 }
 
+/**
+ * Normalizes URLs: handles missing https:// and GitHub short repo names (e.g. "org/repo")
+ */
+function normalizeUrl(url: string, platform?: string): string {
+  let clean = url.trim();
+  if (!clean) return '';
+  if (platform === 'GitHub' && !clean.includes('github.com') && !clean.startsWith('http')) {
+    const parts = clean.split('/').map((s) => s.trim()).filter(Boolean);
+    if (parts.length === 2 && !clean.includes('.')) {
+      return `https://github.com/${clean}`;
+    }
+  }
+  if (clean.startsWith('github.com/')) {
+    return `https://${clean}`;
+  }
+  if (!/^https?:\/\//i.test(clean)) {
+    return `https://${clean}`;
+  }
+  return clean;
+}
+
 export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDialogProps) {
   const { user, profile } = useAuth();
 
@@ -50,7 +74,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const [sourceUrl, setSourceUrl] = useState('');
   const [docUrl, setDocUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [installCommand, setInstallCommand] = useState('');
+  const [commands, setCommands] = useState<ToolInstallCommand[]>([
+    { label: 'CLI', command: '' }
+  ]);
   const [installInstructions, setInstallInstructions] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [capabilitiesInput, setCapabilitiesInput] = useState('');
@@ -58,6 +84,8 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const [authorName, setAuthorName] = useState(profile?.full_name || '');
   const [authorUrl, setAuthorUrl] = useState(profile?.github || profile?.portfolio_url || '');
 
+  // Live preview mode: card or full dialog
+  const [previewMode, setPreviewMode] = useState<'card' | 'dialog'>('card');
   // Collapsible optional section
   const [showOptional, setShowOptional] = useState(false);
   // Image preview state: idle | loading | ok | error
@@ -74,6 +102,22 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const [submitting, setSubmitting] = useState(false);
   const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
+  const handleAddCommand = () => {
+    setCommands((prev) => [...prev, { label: itemType === 'skill' ? 'Agent Setup' : 'CLI', command: '' }]);
+  };
+
+  const handleRemoveCommand = (idx: number) => {
+    setCommands((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== idx) : [{ label: 'CLI', command: '' }]));
+  };
+
+  const handleCommandChange = (idx: number, field: 'label' | 'command', val: string) => {
+    setCommands((prev) => {
+      const copy = [...prev];
+      copy[idx] = { ...copy[idx], [field]: val };
+      return copy;
+    });
+  };
+
   const resetForm = () => {
     setName('');
     setTagline('');
@@ -84,7 +128,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setSourceUrl('');
     setDocUrl('');
     setImageUrl('');
-    setInstallCommand('');
+    setCommands([{ label: 'CLI', command: '' }]);
     setInstallInstructions('');
     setTagsInput('');
     setCapabilitiesInput('');
@@ -97,6 +141,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setErrors({});
     setShowOptional(false);
     setImgState('idle');
+    setPreviewMode('card');
   };
 
   const validate = (): FieldErrors => {
@@ -104,7 +149,12 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     if (!name.trim()) errs.name = 'Name is required';
     if (!tagline.trim()) errs.tagline = 'Tagline is required';
     if (!description.trim()) errs.description = 'Description is required';
-    if (!sourceUrl.trim()) errs.sourceUrl = 'Source URL is required';
+    const cleanSource = normalizeUrl(sourceUrl, source);
+    if (!cleanSource) {
+      errs.sourceUrl = 'Source URL is required';
+    } else if (!/^https?:\/\/.+/i.test(cleanSource)) {
+      errs.sourceUrl = 'Must be a valid URL';
+    }
     if (imageUrl.trim() && !/^https?:\/\/.+/i.test(imageUrl.trim())) {
       errs.imageUrl = 'Must be a valid http(s) URL';
     }
@@ -152,18 +202,13 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
         .map((c) => c.trim())
         .filter(Boolean);
 
-      let cleanSourceUrl = sourceUrl.trim();
-      if (cleanSourceUrl && !/^https?:\/\//i.test(cleanSourceUrl)) {
-        cleanSourceUrl = `https://${cleanSourceUrl}`;
-      }
-      let cleanDocUrl = docUrl.trim();
-      if (cleanDocUrl && !/^https?:\/\//i.test(cleanDocUrl)) {
-        cleanDocUrl = `https://${cleanDocUrl}`;
-      }
-      let cleanAuthorUrl = authorUrl.trim();
-      if (cleanAuthorUrl && !/^https?:\/\//i.test(cleanAuthorUrl)) {
-        cleanAuthorUrl = `https://${cleanAuthorUrl}`;
-      }
+      const cleanSourceUrl = normalizeUrl(sourceUrl, source);
+      const cleanDocUrl = docUrl.trim() ? normalizeUrl(docUrl) : '';
+      const cleanAuthorUrl = authorUrl.trim() ? normalizeUrl(authorUrl) : '';
+
+      const validCommands = commands
+        .map((c) => ({ label: c.label.trim() || 'Install', command: c.command.trim() }))
+        .filter((c) => Boolean(c.command));
 
       const input: SubmitToolInput = {
         name: name.trim(),
@@ -177,7 +222,8 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
         documentation_url: cleanDocUrl || undefined,
         image_url: imageUrl.trim() || undefined,
         capabilities: capabilities.length > 0 ? capabilities : ['Fast workflow execution'],
-        install_command: installCommand.trim() || undefined,
+        install_command: validCommands[0]?.command || undefined,
+        install_commands: validCommands.length > 0 ? validCommands : undefined,
         install_instructions: installInstructions.trim() || undefined,
         version: version.trim() || undefined,
         author_name: authorName.trim() || profile?.full_name || 'Community Builder',
@@ -412,13 +458,18 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
                   {/* Description */}
                   <div className="space-y-1.5">
-                    <label htmlFor="st-desc" className="text-xs font-semibold text-foreground">
-                      Detailed Description *
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="st-desc" className="text-xs font-semibold text-foreground">
+                        Detailed Description *
+                      </label>
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        Markdown supported (headings, lists, code, bold)
+                      </span>
+                    </div>
                     <textarea
                       id="st-desc"
-                      rows={3}
-                      placeholder="Explain what problem this tool solves, how it works, and why developers should use it..."
+                      rows={6}
+                      placeholder="Explain what problem this tool solves, how it works, practical agent prompts, and why developers should use it..."
                       value={description}
                       onChange={(e) => { setDescription(e.target.value); clearError('description'); }}
                       className={`${inputCls} ${errors.description ? inputErrorCls : ''}`}
@@ -557,33 +608,85 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                         </div>
                       </div>
 
-                      {/* Install command / Skill prompt */}
-                      <div className="space-y-1.5">
-                        <label htmlFor="st-install" className="text-xs font-semibold text-foreground flex items-center justify-between">
-                          <span>
-                            {itemType === 'skill'
-                              ? 'Skill Invocation / Execution Command'
-                              : itemType === 'tool_skill'
-                              ? 'Install or Execution Command'
-                              : 'Quick Install Command'}
-                          </span>
-                        </label>
-                        <div className="relative">
-                          <Terminal className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                          <input
-                            id="st-install"
-                            type="text"
-                            placeholder={
-                              itemType === 'skill'
-                                ? '/skill run --input ... or npx skill-pkg'
+                      {/* Installation / Execution Commands */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                            <Terminal className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
+                            <span>
+                              {itemType === 'skill'
+                                ? 'Skill Invocation Commands'
                                 : itemType === 'tool_skill'
-                                ? 'npx ecc-universal install --guided'
-                                : 'npm install @example/tool or pip install ... or cargo install ...'
-                            }
-                            value={installCommand}
-                            onChange={(e) => setInstallCommand(e.target.value)}
-                            className={`${inputCls} pl-9 font-mono`}
-                          />
+                                ? 'Install & Execution Commands'
+                                : 'Installation Commands'}
+                            </span>
+                          </label>
+                          <button
+                            type="button"
+                            onClick={handleAddCommand}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--zyro-accent)] hover:underline cursor-pointer"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span>Add Command</span>
+                          </button>
+                        </div>
+
+                        <datalist id="command-labels">
+                          <option value="Agent Setup" />
+                          <option value="CLI" />
+                          <option value="npm" />
+                          <option value="pnpm" />
+                          <option value="yarn" />
+                          <option value="bun" />
+                          <option value="pip" />
+                          <option value="cargo" />
+                          <option value="Docker" />
+                          <option value="Brew" />
+                        </datalist>
+
+                        <div className="space-y-2">
+                          {commands.map((cmd, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                list="command-labels"
+                                value={cmd.label}
+                                onChange={(e) => handleCommandChange(idx, 'label', e.target.value)}
+                                placeholder="Label"
+                                className="w-28 shrink-0 px-2.5 py-1.5 bg-muted/40 border border-border rounded-lg text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--zyro-accent)]"
+                              />
+                              <div className="relative flex-1">
+                                <Terminal className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                <input
+                                  type="text"
+                                  value={cmd.command}
+                                  onChange={(e) => handleCommandChange(idx, 'command', e.target.value)}
+                                  placeholder={
+                                    cmd.label === 'Agent Setup'
+                                      ? 'npx rea-agents setup'
+                                      : cmd.label === 'npm'
+                                      ? 'npm install -g example'
+                                      : cmd.label === 'pip'
+                                      ? 'pip install example'
+                                      : cmd.label === 'Docker'
+                                      ? 'docker run -p 8080:8080 example'
+                                      : 'e.g. npx tool-pkg or cargo install ...'
+                                  }
+                                  className={`${inputCls} pl-8 py-1.5 font-mono text-xs`}
+                                />
+                              </div>
+                              {commands.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveCommand(idx)}
+                                  className="p-1.5 text-muted-foreground hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
+                                  title="Remove command"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       </div>
 
@@ -841,94 +944,201 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
               {/* ============ RIGHT: LIVE PREVIEW ============ */}
               <div className="lg:sticky lg:top-0 self-start w-full">
                 <div className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-hidden">
-                  <div className="px-4 py-2.5 border-b border-border/60 bg-muted/30">
+                  <div className="px-3.5 py-2 border-b border-border/60 bg-muted/30 flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Live Preview — Directory Card
+                      Live Preview
                     </span>
+                    <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg border border-border/50 text-[10px] font-medium">
+                      <button
+                        type="button"
+                        onClick={() => setPreviewMode('card')}
+                        className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                          previewMode === 'card'
+                            ? 'bg-card text-foreground shadow-xs font-semibold'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Card
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPreviewMode('dialog')}
+                        className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
+                          previewMode === 'dialog'
+                            ? 'bg-card text-foreground shadow-xs font-semibold'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        Full Dialog
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Media area — mirrors ToolCard hero */}
-                  <div className="relative w-full aspect-video bg-[var(--zyro-twilight)] border-b border-border/40 overflow-hidden">
-                    {!(imageUrl.trim() && imgState === 'ok') && (
-                      <>
-                        <div className="absolute inset-0" style={{ background: coverGradient(isAdmin ? adminCoverColor : undefined) }} aria-hidden="true" />
-                        <div
-                          className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:18px_18px]"
-                          aria-hidden="true"
-                        />
-                        <div className="absolute top-2 right-3 w-16 h-16 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <span className="text-4xl font-serif text-white/15 select-none">{previewInitials}</span>
+                  {previewMode === 'card' ? (
+                    <div>
+                      {/* Media area — mirrors ToolCard hero */}
+                      <div className="relative w-full aspect-video bg-[var(--zyro-twilight)] border-b border-border/40 overflow-hidden">
+                        {!(imageUrl.trim() && imgState === 'ok') && (
+                          <>
+                            <div className="absolute inset-0" style={{ background: coverGradient(isAdmin ? adminCoverColor : undefined) }} aria-hidden="true" />
+                            <div
+                              className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:18px_18px]"
+                              aria-hidden="true"
+                            />
+                            <div className="absolute top-2 right-3 w-16 h-16 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                              <span className="text-4xl font-serif text-white/15 select-none">{previewInitials}</span>
+                            </div>
+                          </>
+                        )}
+                        {imageUrl.trim() && imgState === 'ok' && (
+                          <>
+                            <img
+                              src={imageUrl}
+                              alt=""
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
+                          </>
+                        )}
+                        <div className="absolute inset-0 p-3 flex flex-col justify-between">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm border border-white/25">
+                              {source}
+                            </span>
+                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm capitalize border border-white/25">
+                              {itemType === 'tool_skill' ? 'Tool + Skill' : itemType}
+                            </span>
+                            {isAdmin && adminBadge.trim() && (
+                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[var(--zyro-accent)] text-white shadow-sm">
+                                {adminBadge.trim()}
+                              </span>
+                            )}
+                            {isAdmin && adminFeatured && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-white bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/25">
+                                <Sparkles className="w-2.5 h-2.5" />
+                                Featured
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            <span className={`text-base font-bold tracking-tight block line-clamp-1 ${imageUrl.trim() && imgState === 'ok' ? 'text-white drop-shadow-md' : 'text-white'}`}>
+                              {name.trim() || 'Your tool name'}
+                            </span>
+                            <span className={`text-[10px] font-mono uppercase tracking-wider block ${imageUrl.trim() && imgState === 'ok' ? 'text-white/85' : 'text-white/75'}`}>
+                              {category}
+                            </span>
+                          </div>
                         </div>
-                      </>
-                    )}
-                    {imageUrl.trim() && imgState === 'ok' && (
-                      <>
-                        <img
-                          src={imageUrl}
-                          alt=""
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
-                      </>
-                    )}
-                    <div className="absolute inset-0 p-3 flex flex-col justify-between">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm border border-white/25">
-                          {source}
-                        </span>
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm capitalize border border-white/25">
-                          {itemType === 'tool_skill' ? 'Tool + Skill' : itemType}
-                        </span>
-                        {isAdmin && adminBadge.trim() && (
-                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[var(--zyro-accent)] text-white shadow-sm">
-                            {adminBadge.trim()}
-                          </span>
-                        )}
-                        {isAdmin && adminFeatured && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-white bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/25">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            Featured
-                          </span>
-                        )}
                       </div>
-                      <div>
-                        <span className={`text-base font-bold tracking-tight block line-clamp-1 ${imageUrl.trim() && imgState === 'ok' ? 'text-white drop-shadow-md' : 'text-white'}`}>
-                          {name.trim() || 'Your tool name'}
-                        </span>
-                        <span className={`text-[10px] font-mono uppercase tracking-wider block ${imageUrl.trim() && imgState === 'ok' ? 'text-white/85' : 'text-white/75'}`}>
-                          {category}
-                        </span>
+
+                      {/* Body */}
+                      <div className="p-4 space-y-3">
+                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                          {tagline.trim() || 'Your one-sentence tagline will show here.'}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1">
+                          {(previewTags.length > 0 ? previewTags.slice(0, 4) : ['tag']).map((t, i) => (
+                            <span
+                              key={`${t}-${i}`}
+                              className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/40"
+                            >
+                              #{t}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-border/40 text-[11px]">
+                          <span className="text-muted-foreground">
+                            {previewCaps.length > 0
+                              ? `${previewCaps.length} capabilities`
+                              : 'Capabilities optional'}
+                          </span>
+                          <span className="text-[var(--zyro-accent)] font-medium">View Details →</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* Full Modal Detail Preview */
+                    <div className="p-3.5 space-y-4 max-h-[75vh] overflow-y-auto">
+                      {/* Mini Hero */}
+                      <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[var(--zyro-twilight)] p-3 flex flex-col justify-between">
+                        {!(imageUrl.trim() && imgState === 'ok') ? (
+                          <div className="absolute inset-0" style={{ background: coverGradient(isAdmin ? adminCoverColor : undefined) }} />
+                        ) : (
+                          <>
+                            <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                          </>
+                        )}
+                        <div className="relative z-10 flex flex-wrap gap-1">
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/20 text-white font-medium backdrop-blur-xs">
+                            {source}
+                          </span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/20 text-white font-medium backdrop-blur-xs capitalize">
+                            {itemType === 'tool_skill' ? 'Tool + Skill' : itemType}
+                          </span>
+                        </div>
+                        <div className="relative z-10 text-white">
+                          <div className="text-sm font-bold leading-tight">{name.trim() || 'Tool Name'}</div>
+                          <div className="text-[10px] opacity-85 line-clamp-1">{tagline.trim() || 'Tagline'}</div>
+                        </div>
+                      </div>
 
-                  {/* Body */}
-                  <div className="p-4 space-y-3">
-                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                      {tagline.trim() || 'Your one-sentence tagline will show here.'}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1">
-                      {(previewTags.length > 0 ? previewTags.slice(0, 4) : ['tag']).map((t, i) => (
-                        <span
-                          key={`${t}-${i}`}
-                          className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/40"
-                        >
-                          #{t}
+                      {/* About / Rendered Markdown */}
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                          About (Markdown Rendered)
                         </span>
-                      ))}
-                    </div>
+                        <div className="p-2.5 rounded-lg bg-muted/30 border border-border/60 prose prose-xs dark:prose-invert max-w-none text-foreground/90 leading-relaxed text-[11px] max-h-44 overflow-y-auto [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:mb-2 [&>ol]:list-decimal [&>ol]:pl-4 [&>ol]:mb-2 [&>h1]:text-xs [&>h1]:font-bold [&>h1]:mb-1 [&>h2]:text-[11px] [&>h2]:font-bold [&>h2]:mb-1 [&>pre]:bg-neutral-950 [&>pre]:text-emerald-300 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&_code]:font-mono [&_code]:text-[10px]">
+                          {description.trim() ? (
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {description}
+                            </ReactMarkdown>
+                          ) : (
+                            <span className="text-muted-foreground italic">Type in the description to see markdown formatted here...</span>
+                          )}
+                        </div>
+                      </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-border/40 text-[11px]">
-                      <span className="text-muted-foreground">
-                        {previewCaps.length > 0
-                          ? `${previewCaps.length} capabilities`
-                          : 'Capabilities optional'}
-                      </span>
-                      <span className="text-[var(--zyro-accent)] font-medium">View Details →</span>
+                      {/* Commands Preview */}
+                      {commands.some((c) => Boolean(c.command.trim())) && (
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                            Install Command Preview
+                          </span>
+                          <div className="space-y-1.5">
+                            {commands.filter((c) => Boolean(c.command.trim())).map((c, i) => (
+                              <div key={i} className="rounded-lg overflow-hidden border border-neutral-800 bg-neutral-950 p-2 text-emerald-300 font-mono text-[10px]">
+                                <div className="text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">{c.label}</div>
+                                <span className="text-neutral-500 select-none">$ </span>{c.command}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Capabilities Preview */}
+                      {previewCaps.length > 0 && (
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                            Key Capabilities ({previewCaps.length})
+                          </span>
+                          <div className="space-y-1">
+                            {previewCaps.map((cap, i) => (
+                              <div key={i} className="flex items-start gap-1.5 p-1.5 rounded-lg bg-[var(--zyro-accent-muted)] border border-[var(--zyro-accent)]/15 text-[10px] text-foreground/85">
+                                <span className="w-3 h-3 mt-0.5 rounded-full bg-[var(--zyro-accent)] flex items-center justify-center shrink-0">
+                                  <Check className="w-2 h-2 text-white" strokeWidth={3} />
+                                </span>
+                                <span className="leading-snug">{cap}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <p className="text-[11px] text-muted-foreground mt-3 leading-relaxed">

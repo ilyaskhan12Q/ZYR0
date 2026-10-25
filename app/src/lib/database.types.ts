@@ -449,6 +449,11 @@ export interface BlogPost {
 
 export type ToolSubmissionStatus = 'pending' | 'approved' | 'rejected';
 
+export interface ToolInstallCommand {
+  label: string;
+  command: string;
+}
+
 export interface DbTool {
   id: string;
   slug: string;
@@ -467,6 +472,7 @@ export interface DbTool {
   featured: boolean;
   capabilities: string[];
   install_command: string | null;
+  install_commands?: ToolInstallCommand[] | null;
   install_instructions: string | null;
   version: string | null;
   author_name: string;

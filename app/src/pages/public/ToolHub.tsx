@@ -2,24 +2,34 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Search, X, Sparkles, Compass, Plus, ChevronDown, Check,
-  Terminal, Wrench, ShieldCheck, ArrowUpRight, Zap
+  ArrowUpDown, Filter
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
-import { TOOL_CATEGORIES, type ToolItem, type ToolCategory, type ToolItemType } from '@/data/tools';
+import { TOOL_CATEGORIES, type ToolItem, type ToolCategory } from '@/data/tools';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { ToolPreviewDialog } from '@/components/tools/ToolPreviewDialog';
 import { SubmitToolDialog } from '@/components/tools/SubmitToolDialog';
 import { ToolEmptyState } from '@/components/tools/ToolEmptyState';
 import { getAllPublicTools } from '@/services/tools';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const ITEMS_PER_PAGE = 9;
+
+type SortOption = 'featured' | 'newest' | 'az' | 'popular';
 
 export default function ToolHub() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = (searchParams.get('category') as ToolCategory) || 'All';
   const activeType = (searchParams.get('type') as 'all' | 'tool' | 'skill') || 'all';
   const searchQuery = searchParams.get('q') || '';
+  const sortBy = (searchParams.get('sort') as SortOption) || 'featured';
 
   const [tools, setTools] = useState<ToolItem[]>([]);
   const [previewTool, setPreviewTool] = useState<ToolItem | null>(null);
@@ -69,6 +79,16 @@ export default function ToolHub() {
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
+  const handleSortChange = (sort: SortOption) => {
+    if (sort === 'featured') {
+      searchParams.delete('sort');
+    } else {
+      searchParams.set('sort', sort);
+    }
+    setSearchParams(searchParams);
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
+
   const handleSearchChange = (val: string) => {
     if (!val) {
       searchParams.delete('q');
@@ -89,9 +109,9 @@ export default function ToolHub() {
     setDialogOpen(true);
   };
 
-  // Filtered tools
+  // Filtered & sorted tools
   const filteredTools = useMemo(() => {
-    return tools.filter((tool) => {
+    const list = tools.filter((tool) => {
       // Type filter (all, tool, skill)
       if (activeType === 'tool') {
         if (tool.item_type && tool.item_type !== 'tool' && tool.item_type !== 'tool_skill') {
@@ -130,7 +150,25 @@ export default function ToolHub() {
 
       return true;
     });
-  }, [tools, activeCategory, activeType, searchQuery]);
+
+    return [...list].sort((a, b) => {
+      if (sortBy === 'featured') {
+        return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      }
+      if (sortBy === 'newest') {
+        return b.id.localeCompare(a.id);
+      }
+      if (sortBy === 'az') {
+        return a.name.localeCompare(b.name);
+      }
+      if (sortBy === 'popular') {
+        const popA = (a.badge === 'Popular' || a.badge === 'Trending' || a.badge === 'Official') ? 1 : 0;
+        const popB = (b.badge === 'Popular' || b.badge === 'Trending' || b.badge === 'Official') ? 1 : 0;
+        return popB - popA;
+      }
+      return 0;
+    });
+  }, [tools, activeCategory, activeType, searchQuery, sortBy]);
 
   // Paginated visible tools (9 initial, Load More adds 9)
   const displayedTools = useMemo(() => {
@@ -144,7 +182,7 @@ export default function ToolHub() {
   };
 
   // Featured flagship tools for top showcase (only on default All view with no active search or filter)
-  const isDefaultView = activeCategory === 'All' && activeType === 'all' && !searchQuery.trim();
+  const isDefaultView = activeCategory === 'All' && activeType === 'all' && !searchQuery.trim() && sortBy === 'featured';
   const featuredTools = useMemo(() => {
     return tools.filter((t) => t.featured);
   }, [tools]);
@@ -158,7 +196,7 @@ export default function ToolHub() {
       />
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-20">
         {/* UI/UX Pro Max Open Atmospheric Hero */}
         <div className="relative mb-12">
           {/* Subtle Ambient Radial Lighting (Unboxed & Fluid) */}
@@ -171,7 +209,7 @@ export default function ToolHub() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--zyro-accent)] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--zyro-accent)]"></span>
               </span>
-              <span>ZYR0 Open Tools & Agent Registry</span>
+              <span>TOOLS & SKILLS</span>
             </div>
 
             {/* Separated Submit Action Button */}
@@ -186,14 +224,14 @@ export default function ToolHub() {
 
           {/* Main Title & Editorial Pitch */}
           <div className="text-center max-w-4xl mx-auto space-y-4 mb-8">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground font-sans leading-[1.12]">
-              Discover & Deploy <br className="hidden sm:inline" />
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-foreground font-sans leading-[1.14]">
+              Find the right tools for your{' '}
               <span className="bg-gradient-to-r from-[var(--zyro-hyacinth)] via-[var(--zyro-accent)] to-[var(--zyro-sapphire)] bg-clip-text text-transparent">
-                Tools, Utilities & Agent Skills
+                next Project
               </span>
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Curated autonomous workflows, developer libraries, and AI agent skills from ZYR0, GitHub, and Hugging Face.
+              Discover and explore AI tools, developer utilities, frameworks and skills to help you build faster and better.
             </p>
           </div>
 
@@ -206,7 +244,7 @@ export default function ToolHub() {
                 <input
                   id="toolhub-search"
                   type="text"
-                  placeholder="Search by tool name, Python/Rust, skill protocol, or tag..."
+                  placeholder="Search tools, skills, frameworks, tags..."
                   value={searchQuery}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="w-full px-3.5 py-3 bg-transparent text-sm sm:text-base focus:outline-none text-foreground placeholder:text-muted-foreground/60"
@@ -226,34 +264,16 @@ export default function ToolHub() {
                 </kbd>
               </div>
             </div>
-
-            {/* Value Metric Badges with 'Powerful Tools & Skills' */}
-            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-5 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
-                <span><strong>{tools.length}</strong> Curated Packages</span>
-              </div>
-              <div className="w-1 h-1 rounded-full bg-border" />
-              <div className="flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span><strong>Powerful Tools & Skills</strong></span>
-              </div>
-              <div className="w-1 h-1 rounded-full bg-border" />
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>Instant 1-Click Copy</span>
-              </div>
-            </div>
           </div>
 
-          {/* Unified Discovery Toolbar: Segmented Type Filter + Category Pills */}
-          <div className="mt-10 pt-6 border-t border-border/60 flex flex-col md:flex-row items-center justify-between gap-4">
+          {/* Discovery Toolbar: Type Toggle (Left) + Category & Sort Dropdowns (Right) */}
+          <div className="mt-8 pt-6 border-t border-border/60 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             {/* Segmented Type Toggle (All vs Tools vs Skills) */}
-            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-xl shrink-0">
+            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-xl shrink-0 self-start md:self-auto">
               {[
-                { id: 'all', label: 'All Catalog' },
-                { id: 'tool', label: 'Tools & Utilities' },
-                { id: 'skill', label: 'Agent Skills' },
+                { id: 'all', label: 'All' },
+                { id: 'tool', label: 'Tools' },
+                { id: 'skill', label: 'Skills' },
               ].map((t) => (
                 <button
                   key={t.id}
@@ -269,24 +289,42 @@ export default function ToolHub() {
               ))}
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full md:w-auto pb-1 md:pb-0">
-              {TOOL_CATEGORIES.map((cat) => {
-                const isActive = activeCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => handleCategoryChange(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
-                      isActive
-                        ? 'bg-[var(--zyro-accent)] text-white shadow-sm'
-                        : 'bg-card border border-border/60 text-muted-foreground hover:text-foreground hover:border-[var(--zyro-accent)]/40'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
+            {/* Right Controls: Category Dropdown & Sort Selector */}
+            <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">
+              {/* Category Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Category:</span>
+                <Select value={activeCategory} onValueChange={(val: any) => handleCategoryChange(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[145px]">
+                    <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="text-xs">
+                    {TOOL_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat === 'All' ? 'All Categories' : cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Sort:</span>
+                <Select value={sortBy} onValueChange={(val: any) => handleSortChange(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[140px]">
+                    <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="text-xs">
+                    <SelectItem value="featured">Featured First</SelectItem>
+                    <SelectItem value="newest">Newest Added</SelectItem>
+                    <SelectItem value="az">Alphabetical (A-Z)</SelectItem>
+                    <SelectItem value="popular">Most Popular</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -323,7 +361,7 @@ export default function ToolHub() {
             </span>
           </div>
 
-          {(activeCategory !== 'All' || activeType !== 'all' || searchQuery) && (
+          {(activeCategory !== 'All' || activeType !== 'all' || searchQuery || sortBy !== 'featured') && (
             <button
               onClick={handleClearFilters}
               className="text-xs text-muted-foreground hover:text-foreground hover:underline"

@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { TOOLS_DATA, type ToolItem, type ToolCategory, type ToolItemType } from '@/data/tools';
-import type { DbTool, ToolSubmissionStatus } from '@/lib/database.types';
+import type { DbTool, ToolSubmissionStatus, ToolInstallCommand } from '@/lib/database.types';
 
 export interface SubmitToolInput {
   name: string;
@@ -16,6 +16,7 @@ export interface SubmitToolInput {
   cover_color?: string;
   capabilities: string[];
   install_command?: string;
+  install_commands?: ToolInstallCommand[];
   install_instructions?: string;
   version?: string;
   author_name: string;
@@ -29,6 +30,12 @@ export interface SubmitToolInput {
  * Maps a database tool row into the ToolItem representation used across Discovery components.
  */
 export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
+  const installCommands = (dbTool.install_commands && Array.isArray(dbTool.install_commands) && dbTool.install_commands.length > 0)
+    ? dbTool.install_commands
+    : dbTool.install_command
+    ? [{ label: 'Install', command: dbTool.install_command }]
+    : [];
+
   return {
     id: dbTool.id,
     slug: dbTool.slug,
@@ -46,7 +53,8 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
     badge: dbTool.badge || undefined,
     featured: dbTool.featured,
     capabilities: dbTool.capabilities || [],
-    installCommand: dbTool.install_command || undefined,
+    installCommand: dbTool.install_command || installCommands[0]?.command || undefined,
+    installCommands: installCommands.length > 0 ? installCommands : undefined,
     installInstructions: dbTool.install_instructions || undefined,
     version: dbTool.version || undefined,
     author: {
@@ -132,7 +140,12 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
     image_url: input.image_url?.trim() || null,
     ...(input.cover_color ? { cover_color: input.cover_color.trim() } : {}),
     capabilities: input.capabilities,
-    install_command: input.install_command?.trim() || null,
+    install_command: (input.install_commands && input.install_commands.length > 0)
+      ? input.install_commands[0].command
+      : input.install_command?.trim() || null,
+    ...(input.install_commands && input.install_commands.length > 0
+      ? { install_commands: input.install_commands }
+      : {}),
     install_instructions: input.install_instructions?.trim() || null,
     version: input.version?.trim() || null,
     author_name: input.author_name.trim(),

@@ -36,7 +36,7 @@ export const ShaderHero = () => {
       pingEvery={2.4}
       interactive={true}
       color="var(--zyro-accent)"
-      className="relative min-h-[92vh] md:min-h-screen overflow-hidden w-full flex flex-col justify-center items-center select-none transition-colors duration-200 cursor-default"
+      className="relative -mt-[var(--zyro-header-h,5rem)] min-h-[92vh] md:min-h-screen overflow-hidden w-full flex flex-col justify-center items-center select-none transition-colors duration-200 cursor-default"
       style={{ background: 'var(--zyro-bg)' }}
     >
       {/* Soft wash behind the copy keeps text crisp while wave rings expand */}
@@ -53,7 +53,7 @@ export const ShaderHero = () => {
       />
 
       {/* Main 2-column container: Content on the Left, 3D Line Art on the Right */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20 sm:pt-24 lg:pt-28 pb-10 sm:pb-14 md:py-24">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-[calc(var(--zyro-header-h,5rem)+1.5rem)] pb-10 sm:pb-14 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-center">
           
           {/* 3D Cycling Line Art — on Mobile: Top (order-1); on Desktop: Right (order-2) */}

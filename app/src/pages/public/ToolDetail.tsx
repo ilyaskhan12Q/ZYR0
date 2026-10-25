@@ -27,7 +27,7 @@ function getTypeLabel(type?: string) {
 
 function ToolDetailSkeleton() {
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-20 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-20 space-y-8">
       <Skeleton className="h-5 w-48" />
       <Skeleton className="w-full aspect-[21/9] rounded-2xl" />
       <div className="space-y-3">
@@ -53,7 +53,7 @@ function ToolDetailSkeleton() {
 
 function ToolNotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-page bg-background flex items-center justify-center px-4">
       <SEO
         title="Tool Not Found — ZYR0 ToolHub"
         description="The tool or skill you are looking for does not exist or is no longer available."
@@ -279,26 +279,33 @@ export default function ToolDetail() {
         getAllPublicTools().then((all) => {
           if (!mounted) return;
           // Calculate relevance score using category, shared tags, and compatibility
-          const matches = all
-            .filter((t) => t.slug !== data.slug)
+          const others = all.filter((t) => t.slug !== data.slug);
+          let scored = others
             .map((candidate) => {
               let score = 0;
-              // 1. Same category (+3)
-              if (candidate.category === data.category) score += 3;
+              // 1. Same category (+4)
+              if (candidate.category === data.category) score += 4;
               // 2. Shared tags (+2 each)
               const currentTags = new Set(data.tags.map((t) => t.toLowerCase()));
               const shared = candidate.tags.filter((t) => currentTags.has(t.toLowerCase())).length;
               score += shared * 2;
               // 3. Same item type (+1)
               if (candidate.item_type && candidate.item_type === data.item_type) score += 1;
+              if (candidate.featured) score += 1;
               return { candidate, score };
             })
-            .filter(({ score }) => score > 0)
             .sort((a, b) => b.score - a.score)
-            .slice(0, 4)
+            .filter(({ score }) => score > 0)
             .map(({ candidate }) => candidate);
 
-          setRecommended(matches);
+          // Guaranteed fallback: If fewer than 3 relevant matches, pad with other available tools
+          if (scored.length < 3 && others.length > 0) {
+            const addedIds = new Set(scored.map((s) => s.id));
+            const remaining = others.filter((t) => !addedIds.has(t.id));
+            scored = [...scored, ...remaining];
+          }
+
+          setRecommended(scored.slice(0, 3));
         });
       }
     });
@@ -331,7 +338,7 @@ export default function ToolDetail() {
 
   if (tool === 'loading') {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-page bg-background">
         <ToolDetailSkeleton />
       </div>
     );
@@ -360,7 +367,7 @@ export default function ToolDetail() {
         path={canonicalPath}
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 lg:pt-14 pb-24">
 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
@@ -725,29 +732,29 @@ export default function ToolDetail() {
           </div>
         </div>
 
-        {/* ── Recommended Tools & Skills Section ──── */}
+        {/* ── Suggested Tools & Skills Section ──── */}
         {recommended.length > 0 && (
           <section className="mt-14 pt-10 border-t border-border/60">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
               <div>
                 <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-[var(--zyro-accent)]" />
-                  Recommended Tools &amp; Skills
+                  Suggested Tools &amp; Skills
                 </h2>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                  Related to {tool.name} in {tool.category}
+                  Explore related packages and developer utilities
                 </p>
               </div>
               <Link
-                to={`/tools?category=${encodeURIComponent(tool.category)}`}
+                to="/tools"
                 className="text-xs sm:text-sm font-medium text-[var(--zyro-accent)] hover:underline flex items-center gap-1 shrink-0"
               >
-                View all in {tool.category}
+                Browse all tools
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {recommended.map((item) => (
                 <RecommendedCard key={item.id} tool={item} />
               ))}

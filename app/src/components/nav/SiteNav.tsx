@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type CSSProperties } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -8,16 +8,18 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptionalCompanyAccess } from '@/contexts/CompanyAccessContext';
-import { productsNav, resourcesNav, companyNav } from '@/config/navigation';
+import { productsNav, productsMegaColumns, resourcesNav, companyNav } from '@/config/navigation';
 
 // Dark translucent glass pill (the "/" look): blur layer over the hero so the
 // page background bleeds through and the nav feels part of the page, not on top
 // of it. Frosts denser on scroll for readability over busy content.
+// Padding stays constant across both states: the height drives the page's top
+// offset (--zyro-header-h), so a scrolled shrink would shift the whole page.
 const pillClass = (scrolled: boolean) =>
-  `rounded-2xl border backdrop-blur-xl transition-all duration-300 flex items-center justify-between gap-3 px-4 sm:px-5 ${
+  `relative rounded-2xl border ring-1 ring-inset ring-white/5 backdrop-blur-2xl transition-all duration-300 flex items-center justify-between gap-3 px-4 sm:px-5 py-3 ${
     scrolled
-      ? 'bg-black/85 dark:bg-black/85 border-white/15 shadow-2xl shadow-black/80 py-2.5'
-      : 'bg-black/50 dark:bg-black/40 border-white/10 shadow-lg shadow-black/40 py-3'
+      ? 'bg-black/80 supports-[backdrop-filter]:bg-black/65 border-white/15 shadow-2xl shadow-black/80'
+      : 'bg-black/60 supports-[backdrop-filter]:bg-black/35 border-white/10 shadow-lg shadow-black/40'
   }`;
 
 const triggerClass = (open: boolean) =>
@@ -49,6 +51,7 @@ export default function SiteNav() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<'products' | 'resources' | 'company' | 'profile' | null>(null);
+  const [previewId, setPreviewId] = useState(productsNav[0]?.id);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState<'products' | 'resources' | 'company' | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
@@ -106,6 +109,7 @@ export default function SiteNav() {
   };
 
   const redirect = encodeURIComponent(location.pathname);
+  const previewProduct = productsNav.find((p) => p.id === previewId) ?? productsNav[0];
 
   const dropdownButton = (id: 'products' | 'resources' | 'company', label: string) => (
     <button
@@ -125,7 +129,7 @@ export default function SiteNav() {
   return (
     <div ref={navRef} className="pointer-events-none relative">
       {/* Desktop / tablet pill */}
-      <div className="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pointer-events-auto">
+      <div className="hidden md:block max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pointer-events-auto">
         <div className={pillClass(scrolled)}>
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img src="/zyro-logo.webp" alt="" width="28" height="28" className="w-7 h-7 object-contain rounded-md" />
@@ -133,45 +137,86 @@ export default function SiteNav() {
           </Link>
 
           <nav className="flex items-center gap-0.5" aria-label="Primary">
-            <div className="relative">
+            <div>
               {dropdownButton('products', 'Products')}
               <AnimatePresence>
                 {openMenu === 'products' && (
                   <m.div
-                    initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
                     id="nav-products-menu"
-                    className={panelClass('w-[340px] sm:w-[420px]')}
+                    className="absolute inset-x-0 top-full mt-2 rounded-3xl bg-card border border-border shadow-[0_28px_90px_-20px_rgba(0,0,0,0.65)] ring-1 ring-black/5 dark:ring-white/5 backdrop-blur-xl z-50 overflow-hidden"
                   >
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent rounded-t-xl" />
-                    {productsNav.map((product) => (
-                      <Link
-                        key={product.id}
-                        to={product.href}
-                        onClick={() => setOpenMenu(null)}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/70 transition-colors group"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-muted ring-1 ring-border flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-transform">
-                          {product.logo ? (
-                            <img src={product.logo} alt="" className="w-full h-full object-cover" />
-                          ) : product.icon ? (
-                            <product.icon className="w-5 h-5 text-accent" />
-                          ) : (
-                            <span className="font-display text-sm text-muted-foreground">{product.name.charAt(0)}</span>
-                          )}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
+                    <div className="pointer-events-none absolute -top-24 right-0 h-56 w-72 bg-accent/10 blur-3xl" />
+                    <div
+                      className="relative grid grid-cols-1 gap-2 p-2.5 lg:[grid-template-columns:var(--mega-cols)]"
+                      style={{ '--mega-cols': `repeat(${productsMegaColumns.length}, minmax(0, 1fr)) minmax(240px, 300px)` } as CSSProperties}
+                    >
+                      {productsMegaColumns.map((column, i) => (
+                        <div key={i} className="flex flex-col gap-0.5">
+                          {column.map((product) => (
+                            <Link
+                              key={product.id}
+                              to={product.href}
+                              onClick={() => setOpenMenu(null)}
+                              onMouseEnter={() => setPreviewId(product.id)}
+                              onFocus={() => setPreviewId(product.id)}
+                              className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/60 focus-visible:bg-muted/60 focus-visible:outline-none transition-colors group"
+                            >
+                              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-muted to-muted/40 shadow-sm flex items-center justify-center shrink-0 overflow-hidden group-hover:scale-105 transition-all">
+                                {product.logo ? (
+                                  <img src={product.logo} alt="" className="w-full h-full object-cover" />
+                                ) : product.icon ? (
+                                  <product.icon className="w-4 h-4 text-accent" />
+                                ) : (
+                                  <span className="font-display text-sm text-muted-foreground">{product.name.charAt(0)}</span>
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium tracking-tight text-foreground group-hover:text-accent transition-colors">{product.name}</span>
+                                  {product.badge && <Badge text={product.badge} />}
+                                </div>
+                                <p className="block text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{product.description}</p>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 mt-1 shrink-0 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                            </Link>
+                          ))}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-foreground group-hover:text-accent transition-colors">{product.name}</span>
-                            {product.badge && <Badge text={product.badge} />}
+                      ))}
+
+                      {/* Preview column: mirrors whichever product is hovered/focused */}
+                      {previewProduct && (
+                        <Link
+                          to={previewProduct.href}
+                          onClick={() => setOpenMenu(null)}
+                          aria-hidden
+                          tabIndex={-1}
+                          className="hidden lg:flex flex-col rounded-2xl bg-gradient-to-br from-accent/10 via-muted/40 to-transparent border border-border p-3 shadow-sm hover:border-accent/40 transition-colors"
+                        >
+                          <div className="aspect-[4/3] rounded-xl bg-gradient-to-b from-muted/80 to-muted/30 ring-1 ring-border shadow-inner overflow-hidden flex items-center justify-center p-5">
+                            {previewProduct.logo ? (
+                              <img src={previewProduct.logo} alt="" className="w-full h-full object-contain drop-shadow-sm" />
+                            ) : previewProduct.icon ? (
+                              <previewProduct.icon className="w-14 h-14 text-accent" />
+                            ) : (
+                              <span className="font-display text-4xl text-muted-foreground">{previewProduct.name.charAt(0)}</span>
+                            )}
                           </div>
-                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{product.description}</p>
-                        </div>
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/50 mt-1 shrink-0 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                      </Link>
-                    ))}
+                          <div className="flex items-center gap-2 mt-3">
+                            <span className="text-sm font-semibold tracking-tight text-foreground">{previewProduct.name}</span>
+                            {previewProduct.badge && <Badge text={previewProduct.badge} />}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-3">{previewProduct.description}</p>
+                          <span className="mt-auto pt-3 inline-flex items-center gap-1 text-xs font-semibold text-accent">
+                            Explore <ChevronRight className="w-3 h-3" />
+                          </span>
+                        </Link>
+                      )}
+                    </div>
                   </m.div>
                 )}
               </AnimatePresence>
@@ -436,7 +481,7 @@ export default function SiteNav() {
 
                 {/* Accordions */}
                 {([
-                  { id: 'products' as const, label: 'Products', items: productsNav.map((p) => ({ key: p.id, label: p.name, href: p.href, logo: p.logo, icon: p.icon, badge: p.badge })) },
+                  { id: 'products' as const, label: 'Products', items: productsNav.map((p) => ({ key: p.id, label: p.name, href: p.href, description: p.description, logo: p.logo, icon: p.icon, badge: p.badge })) },
                   { id: 'resources' as const, label: 'Resources', items: resourcesNav.map((r) => ({ key: r.href, label: r.label, href: r.href, icon: r.icon, badge: r.badge })) },
                   { id: 'company' as const, label: 'Company', items: companyNav.map((c) => ({ key: c.href, label: c.label, href: c.href, icon: c.icon })) },
                 ]).map((section) => (
@@ -461,12 +506,20 @@ export default function SiteNav() {
                             className="flex items-center gap-3 min-h-11 px-3 rounded-lg text-sm font-medium text-foreground/90 hover:bg-muted transition-colors"
                           >
                             {'logo' in item && item.logo ? (
-                              <img src={item.logo} alt="" className="w-6 h-6 rounded object-cover" />
+                              <span className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+                                <img src={item.logo} alt="" className="w-full h-full object-cover" />
+                              </span>
                             ) : 'icon' in item && item.icon ? (
-                              <item.icon className="w-4 h-4 text-muted-foreground" />
+                              <item.icon className="w-4 h-4 text-muted-foreground shrink-0" />
                             ) : null}
-                            <span className="flex-1">{item.label}</span>
+                            <span className="flex-1 min-w-0">
+                              <span className="block">{item.label}</span>
+                              {'description' in item && item.description && (
+                                <span className="block text-xs font-normal text-muted-foreground mt-0.5 leading-relaxed line-clamp-2">{item.description}</span>
+                              )}
+                            </span>
                             {'badge' in item && item.badge && <Badge text={item.badge} />}
+                            {section.id === 'products' && <ChevronRight className="w-4 h-4 text-muted-foreground/50 shrink-0" />}
                           </Link>
                         ))}
                       </div>

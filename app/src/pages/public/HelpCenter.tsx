@@ -1,6 +1,6 @@
 import { m } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail, Phone, Headphones, Megaphone, FileCheck } from 'lucide-react';
+import { BookOpen, GraduationCap, Building2, UserCheck, ShieldCheck, ArrowRight, Mail, Phone, Headphones, Megaphone } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { SITE_CONFIG } from '@/config/site';
 import { WhatsAppIcon } from '@/components/icons/BrandIcons';
@@ -53,17 +53,6 @@ const guides = [
       'A green verification badge confirms the certificate is authentic and has not been revoked.',
     ],
   },
-  {
-    icon: FileCheck,
-    title: 'Offer Letter Verification',
-    desc: 'Verify the authenticity of any ZYR0-issued offer letter using its offer code, offer ID, or QR code.',
-    steps: [
-      'Navigate to zyroo.org/verify and switch to the "Offer Letter" tab.',
-      'Enter the offer code (e.g. ZYRO-OF-2026-123456) or offer ID printed on the offer letter, or scan its QR code.',
-      'The full offer letter document is displayed with its current status.',
-      'The badge shows Verified, or marks the offer as Expired / Revoked where applicable.',
-    ],
-  },
 ];
 
 const topics = [
@@ -77,7 +66,7 @@ const topics = [
 
 export default function HelpCenter() {
   return (
-    <div className="pt-20 pb-16">
+    <div className="pb-16">
       <SEO
         title="Help Center — Getting Started Guides for ZYR0"
         description="Step-by-step guides for students, companies, and mentors. Learn how to browse internships, review applicants, submit project work, issue certificates, and verify credentials on ZYR0."
@@ -85,7 +74,7 @@ export default function HelpCenter() {
         keywords="ZYR0 help center, getting started guide, internship platform help, student guide, company guide, mentor guide"
       />
       {/* Hero */}
-      <section className="px-4 py-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
+      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BookOpen className="w-12 h-12 mx-auto mb-4 text-white/70" />

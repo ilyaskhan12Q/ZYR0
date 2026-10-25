@@ -15,7 +15,7 @@ import '@/styles/research-landing.css';
 
 export default function ResearchLanding() {
   return (
-    <div className="rl-root min-h-screen">
+    <div className="rl-root min-h-page -mt-[var(--zyro-header-h)]">
       <SEO
         title="ZYR0 Research Agent — Research without the guesswork"
         description="Deep research, verified sources, structured reports. One question at a time."
