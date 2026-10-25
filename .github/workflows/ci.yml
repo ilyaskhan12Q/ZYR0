@@ -109,7 +109,7 @@ jobs:
           echo "✅ All chunks within size limit"
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist-${{ github.sha }}
           path: app/dist
