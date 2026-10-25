@@ -260,17 +260,89 @@ const VERIFY_TIMEOUT_MS = 5_000;
 const VERIFY_CONCURRENCY = 5;
 const VERIFY_MAX_URLS = 25;
 
+function isPrivateIpv4(ip: string): boolean {
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return false;
+  const [a, b] = parts;
+  return a === 0 || a === 10 || a === 127
+    || (a === 169 && b === 254)
+    || (a === 172 && b >= 16 && b <= 31)
+    || (a === 192 && b === 168)
+    || (a === 100 && b >= 64 && b <= 127)
+    || a >= 224;
+}
+
+function isPrivateHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host.endsWith('.internal')) {
+    return true;
+  }
+  if (host === '::1' || host === '::' || host.startsWith('fe80:') || host.startsWith('fc') || host.startsWith('fd')) {
+    return true;
+  }
+  return /^[0-9.]+$/.test(host) ? isPrivateIpv4(host) : false;
+}
+
+/** Reject anything that is not a plain public http(s) URL. */
+async function assertPublicUrl(raw: string): Promise<URL | null> {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+  if (url.username || url.password) return null;
+  if (isPrivateHost(url.hostname)) return null;
+
+  // shortcut: literal and localhost checks plus manual redirect validation; a
+  // public name that resolves to a private address is only blocked when the
+  // runtime exposes resolveDns. Upgrade to a pinned-IP fetch if that matters.
+  try {
+    const records = await Deno.resolveDns(url.hostname, 'A');
+    if (records.some(isPrivateIpv4)) return null;
+  } catch {
+    // Resolution unavailable or failed — the fetch below will fail on its own.
+  }
+
+  return url;
+}
+
+async function probeUrl(
+  raw: string,
+  method: 'HEAD' | 'GET',
+  signal: AbortSignal,
+): Promise<{ ok: boolean; status: number }> {
+  let current = await assertPublicUrl(raw);
+  if (!current) return { ok: false, status: 0 };
+
+  for (let hop = 0; hop < 4; hop += 1) {
+    const res = await fetch(current, {
+      method,
+      redirect: 'manual',
+      signal,
+      headers: method === 'GET' ? { Range: 'bytes=0-0' } : undefined,
+    });
+    if (res.status < 300 || res.status >= 400) {
+      return { ok: res.ok, status: res.status };
+    }
+    const location = res.headers.get('location');
+    if (!location) return { ok: false, status: res.status };
+    current = await assertPublicUrl(new URL(location, current).toString());
+    if (!current) return { ok: false, status: 0 };
+  }
+  return { ok: false, status: 0 };
+}
+
 async function checkOneUrl(url: string): Promise<{ url: string; ok: boolean; status: number }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), VERIFY_TIMEOUT_MS);
   try {
     try {
-      const res = await fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
-      return { url, ok: res.ok, status: res.status };
+      return { url, ...(await probeUrl(url, 'HEAD', controller.signal)) };
     } catch {
       // Some servers reject HEAD — fall back to a ranged GET.
-      const res = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: controller.signal });
-      return { url, ok: res.ok, status: res.status };
+      return { url, ...(await probeUrl(url, 'GET', controller.signal)) };
     }
   } catch {
     return { url, ok: false, status: 0 };
@@ -1001,6 +1073,15 @@ serve(async (req) => {
       });
     }
 
+    // Rate-limit every authenticated action, including the network probes below.
+    const allowed = await rateLimitCheck(admin, user.id);
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again in a moment.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Action: verify — server-side URL/DOI liveness for the research verifier.
     if (chatReq.action === 'verify') {
       const urls = Array.isArray(chatReq.urls)
@@ -1044,14 +1125,6 @@ serve(async (req) => {
     if (!Array.isArray(chatReq.messages) || chatReq.messages.length === 0) {
       return new Response(JSON.stringify({ error: 'messages is required' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const allowed = await rateLimitCheck(admin, user.id);
-    if (!allowed) {
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again in a moment.' }), {
-        status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
