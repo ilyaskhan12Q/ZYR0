@@ -392,9 +392,9 @@ export function buildCertificateHTML(opts: CertificateTemplateOptions): string {
       body { width: 297mm; height: 210mm; overflow: hidden; background: #fff; }
       /* Purple glow is the print dark-middle culprit; textures stay as-is. */
       .glow { display: none; }
-      /* shortcut: fixed 2.5% shrink keeps the gold border clear of printer
-         unprintable margins; upgrade to per-printer margins if ever needed. */
-      .cert-page { width: 297mm; height: 210mm; transform: scale(.975); transform-origin: top center; }
+      /* Full-bleed: the sheet must match the A4 landscape page exactly.
+         The old 2.5% scale left a visible white border, so it is gone. */
+      .cert-page { width: 297mm; height: 210mm; }
       .footer-row, .skills, .title-wrap { break-inside: avoid; page-break-inside: avoid; }
     }
   `;
