@@ -130,6 +130,8 @@ async function sendInviteEmail(member: CompanyTeamMember, companyName: string) {
 
   const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
     body: {
+      kind: 'invite',
+      company_id: member.company_id,
       to: member.email,
       from: 'ZYR0 Team <team@zyroo.org>',
       replyTo: 'team@zyroo.org',

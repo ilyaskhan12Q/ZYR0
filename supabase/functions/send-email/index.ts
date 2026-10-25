@@ -83,16 +83,85 @@ function isPlainEmail(value: unknown): boolean {
   return typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+const ALLOWED_FROM_ADDRESSES = [
+  'team@zyroo.org',
+  'support@zyroo.org',
+  'info@zyroo.org',
+  'careers@zyroo.org',
+  'partnerships@zyroo.org',
+];
+const MAX_INTERNAL_RECIPIENTS = 20;
+
 function sanitizedFrom(from: unknown): string {
-  let s = from;
-  if (!s ||
-      String(s).includes('onboarding@resend.dev') ||
-      String(s).includes('noreply@') ||
-      String(s).includes('example.com') ||
-      !String(s).includes('zyroo.org')) {
-    s = 'ZYR0 Team <team@zyroo.org>';
+  const raw = String(from ?? '').trim();
+  const bracketed = raw.match(/<([^>]+)>/);
+  const address = (bracketed ? bracketed[1] : raw).trim().toLowerCase();
+  const name = bracketed ? raw.slice(0, raw.indexOf('<')).trim() : '';
+  if (!ALLOWED_FROM_ADDRESSES.includes(address)) {
+    return 'ZYR0 Team <team@zyroo.org>';
   }
-  return String(s);
+  return name ? `${name} <${address}>` : address;
+}
+
+/**
+ * Non-admin callers may only reach recipients they already have a workflow
+ * relationship with: an invited team member of their company, or the student
+ * on one of their own offer letters. Anything else requires an admin or the
+ * server-only internal token.
+ */
+async function callerMayReachRecipients(
+  client: ReturnType<typeof createClient>,
+  userId: string,
+  kind: unknown,
+  body: Record<string, unknown>,
+  recipients: string[],
+): Promise<boolean> {
+  const companyId = String(body.company_id ?? '').trim();
+
+  if (kind === 'invite') {
+    if (!companyId) return false;
+    const { data: company } = await client
+      .from('companies').select('id, owner_id').eq('id', companyId).single();
+    if (!company) return false;
+    let canManage = company.owner_id === userId;
+    if (!canManage) {
+      const { data: member } = await client
+        .from('company_team_members').select('role')
+        .eq('company_id', companyId).eq('user_id', userId).eq('status', 'accepted').maybeSingle();
+      canManage = member?.role === 'admin';
+    }
+    if (!canManage) return false;
+    const { data: invites } = await client
+      .from('company_team_members').select('email')
+      .eq('company_id', companyId).in('email', recipients);
+    const invited = new Set((invites ?? []).map((row) => String(row.email ?? '').toLowerCase()));
+    return recipients.every((recipient) => invited.has(recipient));
+  }
+
+  if (kind === 'offer') {
+    const offerId = String(body.offer_id ?? '').trim();
+    if (!offerId) return false;
+    const { data: offer } = await client
+      .from('offer_letters').select('company_id, student_id').eq('id', offerId).single();
+    if (!offer) return false;
+    const { data: company } = await client
+      .from('companies').select('owner_id').eq('id', offer.company_id).single();
+    if (!company) return false;
+    let canManage = company.owner_id === userId;
+    if (!canManage) {
+      const { data: member } = await client
+        .from('company_team_members').select('id')
+        .eq('company_id', offer.company_id).eq('user_id', userId).eq('status', 'accepted').limit(1);
+      canManage = !!member && member.length > 0;
+    }
+    if (!canManage) return false;
+    const { data: student } = await client
+      .from('profiles').select('email').eq('id', offer.student_id).single();
+    const studentEmail = String(student?.email ?? '').toLowerCase();
+    return recipients.length === 1 && recipients[0] === studentEmail;
+  }
+
+  return false;
 }
 
 function sanitizedReplyTo(replyTo: unknown): string {
@@ -292,45 +361,66 @@ serve(async (req) => {
       mailReplyTo = senderEmail; // replies go back to the submitter
     } else {
       // Internal (authenticated) mode. Accept the call when EITHER:
-      //  1. a valid JWT whose profile role is admin or company
-      //     (browser flows: TeamApplications shortlists, company offer letters), or
-      //  2. the server-only token `x-internal-token` == EMAIL_INTERNAL_TOKEN
-      //     (reserved for server-to-server callers such as issue-certificate).
+      //  1. the server-only token `x-internal-token` == EMAIL_INTERNAL_TOKEN
+      //     (reserved for server-to-server callers such as issue-certificate), or
+      //  2. an authenticated JWT whose caller may reach the recipients:
+      //     platform admins may mail anyone; company owners/team admins may mail
+      //     an invited team member (kind 'invite') or the student on their own
+      //     offer letter (kind 'offer').
       const providedToken = req.headers.get('x-internal-token');
       const tokenOk = !!INTERNAL_TOKEN && !!providedToken && providedToken === INTERNAL_TOKEN;
 
-      let jwtOk = false;
+      let callerId: string | null = null;
+      let callerRole: string | null = null;
+      let adminClient: ReturnType<typeof createClient> | null = null;
       const authHeader = req.headers.get('Authorization');
       const serviceRole = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
       const supabaseUrl = Deno.env.get('SUPABASE_URL');
-      if (authHeader?.startsWith('Bearer ') && serviceRole && supabaseUrl) {
+
+      if (!tokenOk && authHeader?.startsWith('Bearer ') && serviceRole && supabaseUrl) {
         try {
-          const adminClient = createClient(supabaseUrl, serviceRole);
+          adminClient = createClient(supabaseUrl, serviceRole);
           const { data: { user }, error: authError } = await adminClient.auth.getUser(authHeader.replace('Bearer ', ''));
           if (!authError && user) {
+            callerId = user.id;
             const { data: profile } = await adminClient
               .from('profiles').select('role').eq('id', user.id).single();
-            jwtOk = profile?.role === 'admin' || profile?.role === 'company';
-            if (!jwtOk) {
-              // Accepted company team members (admin/hr/mentor/reviewer) may also
-              // send workflow emails such as team invitations.
-              const { data: member } = await adminClient
-                .from('company_team_members').select('id').eq('user_id', user.id).eq('status', 'accepted').limit(1);
-              jwtOk = !!member && member.length > 0;
-            }
+            callerRole = profile?.role ?? null;
           }
         } catch (authErr) {
           console.warn('[send-email] JWT auth check failed:', authErr);
         }
       }
 
-      if (!tokenOk && !jwtOk) {
-        console.warn('[send-email] Internal send rejected: missing/invalid JWT or x-internal-token.');
-        return new Response(JSON.stringify({ error: 'Forbidden' }), {
-          status: 403,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+      if (!tokenOk) {
+        if (!callerId || !adminClient) {
+          console.warn('[send-email] Internal send rejected: missing/invalid JWT or x-internal-token.');
+          return new Response(JSON.stringify({ error: 'Forbidden' }), {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const recipients = mailTo.map((r) => String(r ?? '').trim().toLowerCase());
+        if (recipients.length === 0 || recipients.length > MAX_INTERNAL_RECIPIENTS || !recipients.every(isPlainEmail)) {
+          return new Response(JSON.stringify({ error: 'Invalid recipients' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (callerRole !== 'admin') {
+          const allowed = await callerMayReachRecipients(adminClient, callerId, kind, body, recipients);
+          if (!allowed) {
+            console.warn(`[send-email] Rejected send to unauthorized recipient(s): ${JSON.stringify(recipients)}`);
+            return new Response(JSON.stringify({ error: 'Recipient not permitted for this account' }), {
+              status: 403,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+        }
       }
+
       mailReplyTo = allowUserReplyTo === true
         ? (replyTo || reply_to || 'team@zyroo.org')
         : sanitizedReplyTo(replyTo || reply_to);

@@ -244,6 +244,8 @@ async function sendOfferLetterEmail(opts: {
 
   const { data: resData, error: invokeErr } = await supabase.functions.invoke('send-email', {
     body: {
+      kind: 'offer',
+      offer_id: offerId,
       to: studentEmail,
       from: 'ZYR0 Team <team@zyroo.org>',
       replyTo: 'team@zyroo.org',
