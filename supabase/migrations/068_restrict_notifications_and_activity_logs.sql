@@ -76,3 +76,6 @@ drop policy if exists "Activity logs: insert authenticated" on public.activity_l
 revoke insert on public.notifications from anon, authenticated;
 grant insert on public.notifications to authenticated;
 revoke insert on public.activity_logs from anon, authenticated;
+
+revoke all on function public.can_notify(uuid) from public;
+grant execute on function public.can_notify(uuid) to authenticated, service_role;
