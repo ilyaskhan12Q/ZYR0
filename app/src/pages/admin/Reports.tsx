@@ -14,6 +14,26 @@ import { ButtonLoader } from '@/components/common/Loader';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+/** Database text is untrusted: escape before it reaches document.write. */
+const escapeHtml = (value: unknown): string =>
+  String(value ?? '').replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
+
+/** Stop spreadsheet formula execution in exported cells. */
+const neutralizeCsvCell = (value: unknown): string => {
+  const cell = String(value ?? '');
+  return /^[=+\-@\t\r]/.test(cell) ? `'${cell}` : cell;
+};
+
+const csvField = (value: unknown): string => `"${neutralizeCsvCell(value).replace(/"/g, '""')}"`;
+
 const reportsList = [
   { 
     id: 'user_growth',
@@ -114,12 +134,12 @@ export default function AdminReports() {
     let csv = '';
     const reportTitle = reportsList.find(r => r.id === reportId)?.title || 'Platform Report';
     
-    csv += `"${reportTitle} Summary Export"\n`;
-    csv += `"Generated at","${new Date().toLocaleString()}"\n`;
+    csv += `${csvField(reportTitle)} Summary Export\n`;
+    csv += `"Generated at",${csvField(new Date().toLocaleString())}\n`;
     csvContentGenerator(reportId, data, (headers, rows) => {
-      csv += `${headers.map(h => `"${h}"`).join(',')}\n`;
+      csv += `${headers.map(csvField).join(',')}\n`;
       rows.forEach((row: string[]) => {
-        csv += `${row.map(cell => `"${cell || ''}"`).join(',')}\n`;
+        csv += `${row.map(csvField).join(',')}\n`;
       });
     });
 
@@ -149,7 +169,7 @@ export default function AdminReports() {
     const htmlContent = `
       <html>
         <head>
-          <title>${reportTitle}</title>
+          <title>${escapeHtml(reportTitle)}</title>
           <style>
             body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 40px; color: #1e293b; }
             .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; margin-bottom: 30px; }
@@ -170,7 +190,7 @@ export default function AdminReports() {
         <body>
           <div class="header">
             <div>
-              <h1>${reportTitle}</h1>
+              <h1>${escapeHtml(reportTitle)}</h1>
               <div style="font-size: 13px; color: #64748b; margin-top: 5px;">Platform Analytics & Telemetry Log</div>
             </div>
             <div class="meta">
@@ -183,13 +203,13 @@ export default function AdminReports() {
           <table>
             <thead>
               <tr>
-                ${tableHeaders.map(h => `<th>${h}</th>`).join('')}
+                ${tableHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join('')}
               </tr>
             </thead>
             <tbody>
               ${tableRows.map(row => `
                 <tr>
-                  ${row.map(cell => `<td>${cell || 'N/A'}</td>`).join('')}
+                  ${row.map(cell => `<td>${cell ? escapeHtml(cell) : 'N/A'}</td>`).join('')}
                 </tr>
               `).join('')}
             </tbody>
@@ -210,6 +230,8 @@ export default function AdminReports() {
 
     printWindow.document.write(htmlContent);
     printWindow.document.close();
+    // The report document never needs to reach back into the admin window.
+    printWindow.opener = null;
   };
 
   // Standardized generator for mapping DB columns to printable columns
