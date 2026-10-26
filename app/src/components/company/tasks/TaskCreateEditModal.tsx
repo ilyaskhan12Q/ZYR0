@@ -5,6 +5,7 @@ import {
   Upload, FileText, Trash2, Plus,
 } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
+import { toast } from 'sonner';
 import { createTask, updateTask, updateMasterDeliverable, bulkCreateTasks, uploadTaskDocument } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import type { TaskAttachment } from '@/lib/database.types';
@@ -31,7 +32,10 @@ export function TaskCreateEditModal({
   existingTasks,
   onSuccess,
 }: TaskCreateEditModalProps) {
-  const isEditMode = !!taskToEdit;
+  const isMasterEdit = Boolean(taskToEdit?.isMasterEdit);
+  const isSingleTaskEdit = Boolean(taskToEdit?.id && taskToEdit.id !== 'undefined');
+  const isEditMode = isMasterEdit || isSingleTaskEdit;
+  const isAssigningExisting = Boolean(taskToEdit && !isEditMode);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState('');
@@ -63,12 +67,14 @@ export function TaskCreateEditModal({
   const prevTaskToEditIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Only re-initialize when modal opens (false -> true) or when taskToEdit ID changes.
+    // Only re-initialize when modal opens (false -> true) or when taskToEdit changes.
     // Do NOT wipe user form state on redundant re-renders while the modal remains open.
     const isOpening = isOpen && !prevIsOpenRef.current;
-    const taskChanged = (taskToEdit?.id || null) !== prevTaskToEditIdRef.current;
+    const taskKey = taskToEdit?.id 
+      || (taskToEdit?.isMasterEdit ? `master_${taskToEdit.internship_id}_${taskToEdit.title}` : (taskToEdit ? `template_${taskToEdit.internship_id}_${taskToEdit.title}` : null));
+    const taskChanged = taskKey !== prevTaskToEditIdRef.current;
     prevIsOpenRef.current = isOpen;
-    prevTaskToEditIdRef.current = taskToEdit?.id || null;
+    prevTaskToEditIdRef.current = taskKey;
 
     if (!isOpen) return;
     if (!isOpening && !taskChanged) return;
@@ -78,9 +84,18 @@ export function TaskCreateEditModal({
       setDescription(taskToEdit.description || '');
       setPriority(taskToEdit.priority || 'Medium');
       setDueDate(taskToEdit.due_date ? taskToEdit.due_date.split('T')[0] : '');
-      setInternshipId(taskToEdit.internship_id || '');
+      const initialInternshipId = taskToEdit.internship_id || '';
+      setInternshipId(initialInternshipId);
       setAssignedTo(taskToEdit.assigned_to || '');
       setAssignmentScope('individual');
+      setBulkInternshipId(initialInternshipId);
+      if (initialInternshipId) {
+        const eligible = interns.filter((app: any) => app.internship_id === initialInternshipId && app.status === 'Accepted');
+        setBulkEligibleInterns(eligible);
+      } else {
+        setBulkEligibleInterns([]);
+      }
+      setBulkResult(null);
       setAttachments(taskToEdit.attachments || []);
       setObjectives(taskToEdit.objectives?.length ? taskToEdit.objectives : ['']);
       setAcceptanceCriteria(taskToEdit.acceptance_criteria?.length ? taskToEdit.acceptance_criteria : ['']);
@@ -104,7 +119,7 @@ export function TaskCreateEditModal({
       setEstimatedDuration('');
     }
     setValidationErrors({});
-  }, [taskToEdit, isOpen]);
+  }, [taskToEdit, isOpen, interns]);
 
   const handleBulkInternshipChange = (id: string) => {
     setBulkInternshipId(id);
@@ -192,11 +207,11 @@ export function TaskCreateEditModal({
       errors.description = 'Description must be at least 10 characters';
     }
 
-    if (taskToEdit?.isMasterEdit) {
+    if (isMasterEdit) {
       if (!internshipId) {
         errors.internship = 'Please select an internship project';
       }
-    } else if (assignmentScope === 'individual' || isEditMode) {
+    } else if (assignmentScope === 'individual' || isSingleTaskEdit) {
       if (!internshipId) {
         errors.internship = 'Please select an internship project';
       }
@@ -227,7 +242,11 @@ export function TaskCreateEditModal({
     }
 
     setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    if (Object.keys(errors).length > 0) {
+      toast.error('Please resolve the highlighted form errors');
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -249,31 +268,37 @@ export function TaskCreateEditModal({
     };
 
     try {
-      if (isEditMode) {
-        if (taskToEdit.isMasterEdit) {
-          const { error } = await updateMasterDeliverable(
-            taskToEdit.internship_id || internshipId,
-            taskToEdit.originalTitle || taskToEdit.title,
-            taskData,
-            true
-          );
+      if (isMasterEdit) {
+        const { error } = await updateMasterDeliverable(
+          taskToEdit.internship_id || internshipId,
+          taskToEdit.originalTitle || taskToEdit.title,
+          taskData,
+          true
+        );
 
-          if (!error) {
-            onSuccess();
-            onClose();
-          }
-        } else {
-          const { error } = await updateTask(taskToEdit.id, {
-            ...taskData,
-            internship_id: internshipId,
-            assigned_to: assignedTo,
-          });
-
-          if (!error) {
-            onSuccess();
-            onClose();
-          }
+        if (error) {
+          toast.error(error.message || 'Failed to update master deliverable');
+          return;
         }
+
+        toast.success('Master deliverable updated successfully');
+        onSuccess();
+        onClose();
+      } else if (isSingleTaskEdit) {
+        const { error } = await updateTask(taskToEdit.id, {
+          ...taskData,
+          internship_id: internshipId,
+          assigned_to: assignedTo,
+        });
+
+        if (error) {
+          toast.error(error.message || 'Failed to update task');
+          return;
+        }
+
+        toast.success('Task specifications updated successfully');
+        onSuccess();
+        onClose();
       } else if (assignmentScope === 'bulk') {
         const internIds = bulkEligibleInterns.map((app: any) => app.student?.id || app.student_id);
         const { created, skipped, error } = await bulkCreateTasks(
@@ -282,30 +307,36 @@ export function TaskCreateEditModal({
           existingTasks
         );
 
-        if (!error) {
-          setBulkResult({ created, skipped });
-
-          for (const app of bulkEligibleInterns) {
-            const internId = app.student?.id || app.student_id;
-            try {
-              await dispatchNotificationWithSimulation({
-                userId: internId,
-                title: 'New Task Assigned',
-                message: `You have been assigned a new task: "${title.trim()}"`,
-                type: 'task',
-                actionUrl: '/student/workspace',
-                studentEmail: app.student?.email,
-              });
-            } catch (notifErr) {
-              console.error('Bulk notification failed for', internId, notifErr);
-            }
-          }
-
-          setTimeout(() => {
-            onSuccess();
-            onClose();
-          }, 2000);
+        if (error) {
+          toast.error(error.message || 'Failed to assign tasks in bulk');
+          return;
         }
+
+        setBulkResult({ created, skipped });
+        toast.success(
+          `Assigned task to ${created} intern${created === 1 ? '' : 's'}${skipped > 0 ? ` (${skipped} already assigned)` : ''}`
+        );
+
+        for (const app of bulkEligibleInterns) {
+          const internId = app.student?.id || app.student_id;
+          try {
+            await dispatchNotificationWithSimulation({
+              userId: internId,
+              title: 'New Task Assigned',
+              message: `You have been assigned a new task: "${title.trim()}"`,
+              type: 'task',
+              actionUrl: '/student/workspace',
+              studentEmail: app.student?.email,
+            });
+          } catch (notifErr) {
+            console.error('Bulk notification failed for', internId, notifErr);
+          }
+        }
+
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 1200);
       } else {
         const { error } = await createTask({
           ...taskData,
@@ -314,29 +345,34 @@ export function TaskCreateEditModal({
           status: 'Pending',
         });
 
-        if (!error) {
-          const assignedIntern = interns.find((i) => (i.student?.id || i.student_id) === assignedTo);
-          if (assignedIntern) {
-            try {
-              await dispatchNotificationWithSimulation({
-                userId: assignedTo,
-                title: 'New Task Assigned',
-                message: `You have been assigned a task: "${title.trim()}"`,
-                type: 'task',
-                actionUrl: '/student/workspace',
-                studentEmail: assignedIntern.student?.email,
-              });
-            } catch (notifErr) {
-              console.error('Task assignment notification error:', notifErr);
-            }
-          }
-
-          onSuccess();
-          onClose();
+        if (error) {
+          toast.error(error.message || 'Failed to assign task');
+          return;
         }
+
+        const assignedIntern = interns.find((i) => (i.student?.id || i.student_id) === assignedTo);
+        if (assignedIntern) {
+          try {
+            await dispatchNotificationWithSimulation({
+              userId: assignedTo,
+              title: 'New Task Assigned',
+              message: `You have been assigned a task: "${title.trim()}"`,
+              type: 'task',
+              actionUrl: '/student/workspace',
+              studentEmail: assignedIntern.student?.email,
+            });
+          } catch (notifErr) {
+            console.error('Task assignment notification error:', notifErr);
+          }
+        }
+
+        toast.success('Task assigned successfully');
+        onSuccess();
+        onClose();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      toast.error(err.message || 'An unexpected error occurred while saving the task');
     } finally {
       setSubmitting(false);
     }
@@ -361,17 +397,21 @@ export function TaskCreateEditModal({
           <div className="flex items-center justify-between px-6 py-4 border-b border-border">
             <div>
               <h2 className="font-bold text-lg text-foreground">
-                {taskToEdit?.isMasterEdit
+                {isMasterEdit
                   ? 'Edit Master Deliverable'
-                  : isEditMode
+                  : isSingleTaskEdit
                   ? 'Edit Task Specifications'
+                  : taskToEdit
+                  ? 'Assign Task to Intern'
                   : 'Assign New Task'}
               </h2>
               <p className="text-xs text-muted-foreground">
-                {taskToEdit?.isMasterEdit
+                {isMasterEdit
                   ? 'Updates will sync across all assigned interns in this project'
-                  : isEditMode
+                  : isSingleTaskEdit
                   ? 'Modify task requirements & details'
+                  : taskToEdit
+                  ? 'Assign this deliverable to an enrolled intern or team'
                   : 'Delegate work to enrolled interns'}
               </p>
             </div>
@@ -590,7 +630,7 @@ export function TaskCreateEditModal({
                   )}
                 </div>
 
-                {taskToEdit?.isMasterEdit ? (
+                {isMasterEdit ? (
                   <div>
                     <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">
                       Target Scope
@@ -876,10 +916,14 @@ export function TaskCreateEditModal({
               >
                 {submitting ? (
                   <Loader variant="button" />
-                ) : isEditMode ? (
+                ) : isMasterEdit ? (
+                  'Save Deliverable Changes'
+                ) : isSingleTaskEdit ? (
                   'Save Task Changes'
                 ) : assignmentScope === 'bulk' ? (
                   `Assign to ${bulkEligibleInterns.length} Interns`
+                ) : taskToEdit ? (
+                  'Assign Task'
                 ) : (
                   'Create Task'
                 )}

@@ -215,6 +215,9 @@ export async function getCompanyTasks(companyId: string, useCache = true) {
 
 /** Get a single task with full details */
 export async function getTaskById(id: string, useCache = true) {
+  if (!id || id === 'undefined') {
+    return { data: null, error: new Error('Task ID is required') };
+  }
   const cacheKey = `task_${id}`;
   if (useCache) {
     const cached = getCachedData<any>(cacheKey);
@@ -282,6 +285,13 @@ export async function createTask(data: Partial<Task>) {
 
 /** Update a task */
 export async function updateTask(id: string, data: Partial<Task>) {
+  if (!id || id === 'undefined') {
+    return {
+      data: null,
+      error: new Error('Task ID is required for updating a task'),
+    };
+  }
+
   // If reassigning project or intern, enforce enrollment invariant
   if (data.internship_id && data.assigned_to) {
     const { data: enrollment, error: enrollError } = await supabase
