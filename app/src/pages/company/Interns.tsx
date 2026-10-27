@@ -23,12 +23,9 @@ export default function CompanyInterns() {
         const { data: co } = await getMyCompany();
         if (co) {
           setCompany(co);
-          const settled = await Promise.race([
-            Promise.allSettled([
-              getAllCompanyApplications(co.id),
-              getCompanyTasks(co.id),
-            ]),
-            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Interns load timeout')), 10000))
+          const settled = await Promise.allSettled([
+            getAllCompanyApplications(co.id),
+            getCompanyTasks(co.id, true, false),
           ]);
 
           if (cancelled) return;

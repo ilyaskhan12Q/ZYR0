@@ -26,11 +26,15 @@ export async function resolvePrivateUrl(url?: string | null): Promise<string | u
     path = pathParts.join('/');
   }
 
-  const { data } = await supabase.storage
-    .from(bucket)
-    .createSignedUrl(path, 3600);
-
-  return data?.signedUrl ?? url;
+  try {
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, 3600);
+    if (error) return url;
+    return data?.signedUrl ?? url;
+  } catch {
+    return url;
+  }
 }
 
 /** Stored values are object names, but rows written before the buckets went private

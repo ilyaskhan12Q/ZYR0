@@ -27,13 +27,10 @@ export default function CompanyCertificates() {
       const { data: co } = await getMyCompany();
       if (co) {
         setCompany(co);
-        const settled = await Promise.race([
-          Promise.allSettled([
-            getAllCompanyApplications(co.id),
-            getCompanyTasks(co.id),
-            getCompanyCertificates(co.id)
-          ]),
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Certificates load timeout')), 10000))
+        const settled = await Promise.allSettled([
+          getAllCompanyApplications(co.id),
+          getCompanyTasks(co.id, true, false),
+          getCompanyCertificates(co.id),
         ]);
 
         const [appsRes, tasksRes, certsRes] = settled;
