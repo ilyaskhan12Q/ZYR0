@@ -192,11 +192,11 @@ export async function getTasksAssignedByMe(useCache = true) {
 }
 
 /** Get tasks for the user's company (all tasks across all team members) */
-export async function getCompanyTasks(companyId: string, useCache = true) {
+export async function getCompanyTasks(companyId: string, useCache = true, signUrls = false) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: new Error('Not authenticated') };
 
-  const cacheKey = `company_tasks_${companyId}`;
+  const cacheKey = `company_tasks_${companyId}_${signUrls ? 'signed' : 'raw'}`;
   if (useCache) {
     const cached = getCachedData<any>(cacheKey);
     if (cached) return cached;
@@ -224,7 +224,8 @@ export async function getCompanyTasks(companyId: string, useCache = true) {
     .in('internship_id', internshipIds)
     .order('created_at', { ascending: false });
 
-  const res = await signAttachmentUrls(await dedupRequest(cacheKey, fetchFn));
+  const raw = await dedupRequest(cacheKey, fetchFn);
+  const res = signUrls ? await signAttachmentUrls(raw) : raw;
 
   if (!res.error) {
     setCachedData(cacheKey, res);

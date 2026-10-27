@@ -21,6 +21,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { updateTask, reviewSubmission } from '@/services/tasks';
+import { resolvePrivateUrl } from '@/lib/storage';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 
 interface TaskReviewDrawerProps {
@@ -357,6 +358,13 @@ export function TaskReviewDrawer({ task, onClose, onSuccess }: TaskReviewDrawerP
                         <a
                           key={idx}
                           href={file.url || '#'}
+                          onClick={async (e) => {
+                            if (file.url && file.url.includes('/storage/v1/object/public/')) {
+                              e.preventDefault();
+                              const signed = await resolvePrivateUrl(file.url);
+                              if (signed) window.open(signed, '_blank', 'noreferrer');
+                            }
+                          }}
                           target="_blank"
                           rel="noreferrer"
                           className="p-3 bg-muted/50 border border-border hover:border-accent rounded-xl text-xs font-medium flex items-center justify-between transition-all group"
