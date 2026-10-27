@@ -32,7 +32,7 @@ export async function uploadTaskDocument(file: File): Promise<TaskAttachment> {
   if (!user) throw new Error('Not authenticated');
 
   const safeName = sanitizeFilename(file.name);
-  const path = `task-documents/${user.id}/${Date.now()}-${safeName}`;
+  const path = `${user.id}/${Date.now()}-${safeName}`;
 
   const { error } = await supabase.storage
     .from('task-documents')
@@ -59,7 +59,7 @@ export async function uploadSubmissionFile(file: File): Promise<TaskAttachment> 
   if (!user) throw new Error('Not authenticated');
 
   const safeName = sanitizeFilename(file.name);
-  const path = `task-documents/${user.id}/${Date.now()}-${safeName}`;
+  const path = `${user.id}/${Date.now()}-${safeName}`;
 
   const { error } = await supabase.storage
     .from('task-documents')

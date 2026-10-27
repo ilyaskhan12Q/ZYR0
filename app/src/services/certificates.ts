@@ -40,15 +40,7 @@ export async function verifyCertificate(credentialId: string, useCache = true) {
   }
 
   const fetchFn = () => supabase
-    .from('certificates')
-    .select(`
-      *,
-      recipient:profiles!recipient_id (id, full_name, avatar_url),
-      company:companies!company_id (id, name, logo_url),
-      internship:internships!internship_id (id, title, start_date, end_date),
-      issuer:profiles!issued_by (id, full_name, role, title, department)
-    `)
-    .eq('credential_id', credentialId)
+    .rpc('verify_certificate_public', { p_credential_id: credentialId })
     .single();
 
   const res = await dedupRequest(cacheKey, fetchFn);
