@@ -89,9 +89,9 @@ export async function getOfferLetterByApplication(application_id: string, useCac
 // ── Company: read ─────────────────────────────────────────────────────────────
 
 /** Get all offer letters issued by the logged-in company. */
-export async function getCompanyOfferLetters(company_id: string, useCache = true) {
+export async function getCompanyOfferLetters(company_id: string, useCache = true, signUrls = true) {
   await expireStaleOffers();
-  const cacheKey = createRequestKey('company_offer_letters', company_id);
+  const cacheKey = createRequestKey('company_offer_letters', company_id, signUrls ? 'signed' : 'raw');
   if (useCache) {
     const cached = getCachedData<any>(cacheKey);
     if (cached) return cached;
@@ -103,7 +103,8 @@ export async function getCompanyOfferLetters(company_id: string, useCache = true
     .eq('company_id', company_id)
     .order('created_at', { ascending: false });
 
-  const res = await signPdfUrls(await dedupRequest(cacheKey, fetchFn));
+  const raw = await dedupRequest(cacheKey, fetchFn);
+  const res = signUrls ? await signPdfUrls(raw) : raw;
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;

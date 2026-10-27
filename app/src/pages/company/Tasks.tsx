@@ -65,15 +65,10 @@ export default function CompanyTasks() {
       const { data: co } = await getMyCompany();
       if (co) {
         setCompany(co);
-        const settled = await Promise.race([
-          Promise.allSettled([
-            getCompanyTasks(co.id, useCache),
-            getCompanyOfferLetters(co.id, useCache),
-            getInternships({ company_id: co.id, status: 'Active' }),
-          ]),
-          new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error('Company tasks timeout')), 10000)
-          ),
+        const settled = await Promise.allSettled([
+          getCompanyTasks(co.id, useCache),
+          getCompanyOfferLetters(co.id, useCache, false),
+          getInternships({ company_id: co.id, status: 'Active' }),
         ]);
 
         const [tasksRes, offersRes, internshipsRes] = settled;
