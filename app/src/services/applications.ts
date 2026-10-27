@@ -250,8 +250,8 @@ export async function getApplicationsForInternship(internship_id: string, useCac
 }
 
 /** Get all applications across company's internships (company dashboard) */
-export async function getAllCompanyApplications(company_id: string) {
-  const cacheKey = `all_company_applications_${company_id}`;
+export async function getAllCompanyApplications(company_id: string, signUrls = false) {
+  const cacheKey = `all_company_applications_${company_id}_${signUrls}`;
   const cached = getCachedData<any>(cacheKey);
   if (cached) return cached;
 
@@ -277,7 +277,7 @@ export async function getAllCompanyApplications(company_id: string) {
 
   const res = await dedupRequest(cacheKey, fetchFn);
 
-  if (res.data) await signStudentResumes(res.data);
+  if (signUrls && res.data) await signStudentResumes(res.data);
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;

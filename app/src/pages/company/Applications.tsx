@@ -7,6 +7,7 @@ import { applicationStatusClass } from '@/components/applications/status';
 import ApplicationDetailDialog from '@/components/applications/ApplicationDetailDialog';
 import { cn } from '@/lib/utils';
 import { withTimeout } from '@/lib/timeout';
+import { signedFileUrl } from '@/lib/storage';
 import { toast } from 'sonner';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
 import type { ApplicationStatus } from '@/lib/database.types';
@@ -24,6 +25,23 @@ export default function CompanyApplications() {
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<any | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [openingResume, setOpeningResume] = useState<string | null>(null);
+
+  const handleViewResume = async (resumePath: string) => {
+    setOpeningResume(resumePath);
+    try {
+      const url = resumePath.startsWith('http') ? resumePath : await signedFileUrl('resumes', resumePath);
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        toast.error('Unable to open resume');
+      }
+    } catch {
+      toast.error('Error opening resume');
+    } finally {
+      setOpeningResume(null);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -239,10 +257,15 @@ export default function CompanyApplications() {
                                   <XCircle className="w-4 h-4" />
                                 </button>
                                 {student?.resume_url && (
-                                  <a href={student.resume_url} target="_blank" rel="noreferrer"
-                                    className="p-1.5 hover:bg-muted rounded-lg" title="View Resume">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleViewResume(student.resume_url!)}
+                                    disabled={openingResume === student.resume_url}
+                                    className="p-1.5 hover:bg-muted rounded-lg disabled:opacity-50"
+                                    title="View Resume"
+                                  >
                                     <Eye className="w-4 h-4 text-muted-foreground" />
-                                  </a>
+                                  </button>
                                 )}
                                 <a href={`/company/messages?internshipId=${app.internship_id}&userId=${student?.id}`}
                                   className="p-1.5 hover:bg-accent/10 rounded-lg text-accent" title="Message Applicant">

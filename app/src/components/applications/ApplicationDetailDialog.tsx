@@ -6,6 +6,7 @@ import {
 import { FileText, GraduationCap, Mail, MapPin, BookOpen, ExternalLink, Phone, Globe, Github, Linkedin, Briefcase } from 'lucide-react';
 import { applicationStatusClass } from '@/components/applications/status';
 import { cn } from '@/lib/utils';
+import { signedFileUrl } from '@/lib/storage';
 
 function toStudent(app: any) {
   return Array.isArray(app?.student) ? app.student[0] : app?.student;
@@ -62,7 +63,24 @@ export default function ApplicationDetailDialog({
 
   const student = fetchedProfile ? { ...rawStudent, ...fetchedProfile } : rawStudent;
   const internship = toInternship(application);
-  const resumeUrl = application?.resume_url || student?.resume_url;
+  const rawResumeUrl = application?.resume_url || student?.resume_url;
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    if (!rawResumeUrl) {
+      setResumeUrl(null);
+      return;
+    }
+    if (rawResumeUrl.startsWith('http://') || rawResumeUrl.startsWith('https://')) {
+      setResumeUrl(rawResumeUrl);
+      return;
+    }
+    signedFileUrl('resumes', rawResumeUrl).then((url) => {
+      if (active) setResumeUrl(url ?? rawResumeUrl);
+    });
+    return () => { active = false; };
+  }, [rawResumeUrl]);
   const meta = student?.raw_user_meta_data || {};
 
   const skills: string[] = Array.isArray(student?.skills) && student.skills.length > 0
