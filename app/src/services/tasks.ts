@@ -2,6 +2,25 @@ import { supabase } from '@/lib/supabase';
 import type { Task, TaskSubmission, TaskAttachment } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest } from '@/lib/cache/requestRegistry';
+import { resolvePrivateUrl } from '@/lib/storage';
+
+/** Task documents are private; stored attachments keep the path inside a public-style URL. */
+async function signAttachmentUrls<T extends { data: any; error: unknown }>(res: T): Promise<T> {
+  const rows = Array.isArray(res.data) ? res.data : res.data ? [res.data] : [];
+  const attachments: any[] = [];
+  for (const row of rows) {
+    if (Array.isArray(row?.attachments)) attachments.push(...row.attachments);
+    if (Array.isArray(row?.submissions)) {
+      for (const submission of row.submissions) {
+        if (Array.isArray(submission?.attachments)) attachments.push(...submission.attachments);
+      }
+    }
+  }
+  await Promise.all(attachments.map(async (attachment: any) => {
+    if (attachment?.url) attachment.url = (await resolvePrivateUrl(attachment.url)) ?? attachment.url;
+  }));
+  return res;
+}
 
 function sanitizeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, '_');
@@ -86,7 +105,7 @@ export async function getMyTasks(useCache = true) {
     .eq('assigned_to', user.id)
     .order('created_at', { ascending: false });
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signAttachmentUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -164,7 +183,7 @@ export async function getTasksAssignedByMe(useCache = true) {
     .eq('assigned_by', user.id)
     .order('created_at', { ascending: false });
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signAttachmentUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -205,7 +224,7 @@ export async function getCompanyTasks(companyId: string, useCache = true) {
     .in('internship_id', internshipIds)
     .order('created_at', { ascending: false });
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signAttachmentUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) {
     setCachedData(cacheKey, res);
@@ -236,7 +255,7 @@ export async function getTaskById(id: string, useCache = true) {
     .eq('id', id)
     .single();
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signAttachmentUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) {
     setCachedData(cacheKey, res);

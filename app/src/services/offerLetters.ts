@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { OfferLetterStatus } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
+import { resolvePrivateUrl } from '@/lib/storage';
 
 
 // ── Common select fragment ────────────────────────────────────────────────────
@@ -29,6 +30,15 @@ const OFFER_LETTER_SELECT = `
   application:applications!application_id (id, status)
 `;
 
+/** The PDF bucket is private; stored rows keep the path inside a public-style URL. */
+async function signPdfUrls<T extends { data: any; error: unknown }>(res: T): Promise<T> {
+  const rows = Array.isArray(res.data) ? res.data : res.data ? [res.data] : [];
+  await Promise.all(rows.map(async (row: any) => {
+    if (row?.pdf_url) row.pdf_url = (await resolvePrivateUrl(row.pdf_url)) ?? row.pdf_url;
+  }));
+  return res;
+}
+
 // ── Student: read ─────────────────────────────────────────────────────────────
 
 /** Get all offer letters for the currently logged-in student. */
@@ -49,11 +59,12 @@ export async function getMyOfferLetters(useCache = true) {
     .eq('student_id', user.id)
     .order('created_at', { ascending: false });
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signPdfUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;
 }
+
 
 /** Check whether an offer letter already exists for a given application. */
 export async function getOfferLetterByApplication(application_id: string, useCache = true) {
@@ -69,7 +80,7 @@ export async function getOfferLetterByApplication(application_id: string, useCac
     .eq('application_id', application_id)
     .maybeSingle();
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signPdfUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;
@@ -92,7 +103,7 @@ export async function getCompanyOfferLetters(company_id: string, useCache = true
     .eq('company_id', company_id)
     .order('created_at', { ascending: false });
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signPdfUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;
@@ -281,7 +292,7 @@ export async function getAllOfferLetters(status?: OfferLetterStatus, useCache = 
     return query;
   };
 
-  const res = await dedupRequest(cacheKey, fetchFn);
+  const res = await signPdfUrls(await dedupRequest(cacheKey, fetchFn));
 
   if (!res.error) setCachedData(cacheKey, res);
   return res;

@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { revokeOfferLetter } from '@/services/offerLetters';
 import { withTimeout } from '@/lib/timeout';
+import { resolvePrivateUrl } from '@/lib/storage';
 import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 
 // ── Status config ─────────────────────────────────────────────────────────────
@@ -57,9 +58,15 @@ export default function AdminOfferLetters() {
     }
 
     withTimeout(Promise.resolve(query), 10000, { data: [], error: null }, 'AdminOfferLetters')
-      .then((result) => {
+      .then(async (result) => {
         if (result.error) throw result.error;
-        if (result.data && !cancelled) setOffers(result.data as OfferLetter[]);
+        if (result.data && !cancelled) {
+          const rows = await Promise.all((result.data as OfferLetter[]).map(async (offer) => ({
+            ...offer,
+            pdf_url: (await resolvePrivateUrl(offer.pdf_url)) ?? offer.pdf_url,
+          })));
+          if (!cancelled) setOffers(rows);
+        }
       })
       .catch((err) => {
         console.error('Error loading offer letters:', err);

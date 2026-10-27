@@ -272,6 +272,7 @@ export default function CertificateDocument({ certificate, showActions = true }:
 
     printWindow.document.write(html);
     printWindow.document.close();
+    printWindow.opener = null;
 
     // Wait for every image and font inside the print window before opening the
     // dialog — otherwise slow connections print a sheet with missing assets.
@@ -316,6 +317,7 @@ export default function CertificateDocument({ certificate, showActions = true }:
           <iframe
             srcDoc={previewHtml}
             title="Certificate preview"
+            sandbox=""
             style={{
               position: 'absolute',
               top: 0,

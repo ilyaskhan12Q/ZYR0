@@ -223,6 +223,46 @@ serve(async (req) => {
 
     const adminClient = createClient(supabaseUrl, serviceRole);
 
+    // Only the caller who could create this in-app notification may also email
+    // it: the server-only internal token, or a signed-in user with an existing
+    // workflow relationship to the recipient (same rule as notifications RLS).
+    const internalToken = Deno.env.get('EMAIL_INTERNAL_TOKEN') ?? '';
+    const providedToken = req.headers.get('x-internal-token') ?? '';
+    if (!internalToken || providedToken !== internalToken) {
+      const authHeader = req.headers.get('Authorization');
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
+      if (!authHeader?.startsWith('Bearer ') || !anonKey) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: authError } = await userClient.auth.getUser(
+        authHeader.replace('Bearer ', ''),
+      );
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const { data: allowed, error: allowError } = await userClient.rpc('can_notify', {
+        p_target: userId,
+      });
+      if (allowError || allowed !== true) {
+        console.warn(`[send-notification-email] Rejected ${user.id} -> ${userId}`);
+        return new Response(JSON.stringify({ error: 'Recipient not permitted for this account' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     // Fetch user profile with settings
     const { data: profile, error: profileErr } = await adminClient
       .from('profiles')

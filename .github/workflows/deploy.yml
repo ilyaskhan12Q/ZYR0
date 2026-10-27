@@ -10,6 +10,9 @@ concurrency:
 
 env:
   NODE_VERSION: '20'
+  SUPABASE_URL: "https://iczhrvgzbnuvlgjfzeol.supabase.co"
+  # Public anon key: shipped in the browser bundle by design.
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTYxOTgsImV4cCI6MjA5ODg5MjE5OH0.XVlrp-DDrPtxRbcr52nmHvgIv_XZ6CZaBImgZQMmlOo"
 
 jobs:
   # ── Gate: CI must pass before we touch production ─────────────────────────
@@ -21,7 +24,7 @@ jobs:
   deploy-production:
     name: Deploy to Vercel (Production)
     runs-on: ubuntu-latest
-    needs: [ci-check]
+    needs: [ci-check, migrate-production]
     environment:
       name: production
       url: ${{ steps.deploy.outputs.prod_url }}
@@ -55,8 +58,8 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VITE_SUPABASE_URL: "https://iczhrvgzbnuvlgjfzeol.supabase.co"
-          VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljemhydmd6Ym51dmxnamZ6ZW9sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzMTYxOTgsImV4cCI6MjA5ODg5MjE5OH0.XVlrp-DDrPtxRbcr52nmHvgIv_XZ6CZaBImgZQMmlOo"
+          VITE_SUPABASE_URL: ${{ env.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
 
       - name: Deploy to production
         id: deploy
@@ -77,7 +80,8 @@ jobs:
     name: Apply Supabase Migrations
     runs-on: ubuntu-latest
     needs: [ci-check]
-    # Run in parallel with frontend deploy (migrations don't need the build)
+    # Frontend and functions wait for this job, so a failed migration blocks the
+    # deploy instead of shipping code that expects a schema the database lacks.
 
     steps:
       - name: Checkout
@@ -95,6 +99,18 @@ jobs:
             --include-seed
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Verify anonymous reads are closed
+        run: |
+          BODY=$(curl -sS "$SUPABASE_URL/rest/v1/profiles?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "anon profiles response: $BODY"
+          if echo "$BODY" | grep -q '"id"'; then
+            echo "❌ Anonymous callers can still read profiles — migration 063 is not in effect."
+            exit 1
+          fi
+          echo "✅ Anonymous profile reads blocked"
 
       - name: Notify on migration failure
         if: failure()

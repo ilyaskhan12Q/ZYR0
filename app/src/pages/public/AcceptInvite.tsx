@@ -15,7 +15,6 @@ export default function AcceptInvite() {
   const token = searchParams.get('token');
   const [state, setState] = useState<'idle' | 'confirm' | 'working' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [inviteEmail, setInviteEmail] = useState('');
   const [companyName, setCompanyName] = useState('');
   const started = useRef(false);
 
@@ -36,12 +35,10 @@ export default function AcceptInvite() {
 
     async function loadInvite() {
       const lookup = await lookupInviteByToken(token ?? '');
-      const email = lookup?.email ?? '';
       const company = lookup?.company_name ?? '';
-      setInviteEmail(email);
       setCompanyName(company);
 
-      if (!email) {
+      if (!company || lookup?.status !== 'invited') {
         setState('error');
         setErrorMsg('This invitation link is invalid or has already been accepted.');
         return;
@@ -67,14 +64,7 @@ export default function AcceptInvite() {
         if (refreshProfile) await refreshProfile();
         setState('success');
       } else {
-        if (inviteEmail) {
-          setErrorMsg(
-            `This invitation is for ${inviteEmail}${companyName ? ` (${companyName})` : ''}. ` +
-            `Sign in with that email to accept it.`
-          );
-        } else {
-          setErrorMsg('This invitation is invalid or has already been accepted.');
-        }
+        setErrorMsg('This invitation is invalid or has already been accepted. Sign in with the invited email address to accept it.');
         setState('error');
       }
     } catch (err: any) {
@@ -108,9 +98,9 @@ export default function AcceptInvite() {
             <p className="text-sm text-muted-foreground mt-2">
               You've been invited to join{companyName ? ` ${companyName}` : ' a company'} on ZYR0 as a team member.
             </p>
-            {inviteEmail && (
+            {companyName && (
               <p className="text-xs text-muted-foreground mt-1">
-                Invitation sent to <span className="font-medium text-foreground">{inviteEmail}</span>
+                Invitation for <span className="font-medium text-foreground">{companyName}</span>
               </p>
             )}
             <button
