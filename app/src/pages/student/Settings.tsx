@@ -63,7 +63,6 @@ export default function StudentSettings() {
   const [showPass, setShowPass] = useState(false);
   const [saved, setSaved] = useState(false);
   const [password, setPassword] = useState('');
-  const [updatingPassword, setUpdatingPassword] = useState(false);
   const [settings, setSettings] = useState<StudentSettings>(STUDENT_SETTINGS_DEFAULTS);
 
   useEffect(() => {
@@ -79,31 +78,32 @@ export default function StudentSettings() {
   }, [settings.theme, setTheme]);
 
   const handleSave = async () => {
+    // Validate the password before persisting anything, so a rejected password
+    // can't leave the user thinking the whole save failed when it did not.
+    if (password && password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
+    const changingPassword = Boolean(password);
+
     try {
       const { error } = await updateStudentSettings(settings);
       if (error) throw error;
 
-      if (password) {
-        if (password.length < 6) {
-          toast.error('Password must be at least 6 characters long');
-          return;
-        }
-        setUpdatingPassword(true);
+      if (changingPassword) {
         const { error: passErr } = await supabase.auth.updateUser({ password });
         if (passErr) throw passErr;
         setPassword('');
-        toast.success('Password updated successfully!');
       }
 
       await refreshProfile();
       setSaved(true);
-      toast.success('Settings saved successfully!');
+      toast.success(changingPassword ? 'Password and settings updated!' : 'Settings saved successfully!');
       setTimeout(() => setSaved(false), 2000);
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || 'Failed to save settings');
-    } finally {
-      setUpdatingPassword(false);
     }
   };
 

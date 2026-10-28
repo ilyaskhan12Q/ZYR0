@@ -7,6 +7,7 @@ import { getMyCertificates } from '@/services/certificates';
 import { getMyTasks } from '@/services/tasks';
 import { getMyApplications } from '@/services/applications';
 import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 export default function StudentPortfolio() {
   const { profile } = useAuth();
@@ -52,6 +53,7 @@ export default function StudentPortfolio() {
         if (evalsRes.status === 'fulfilled' && evalsRes.value.data) setTestimonials(evalsRes.value.data);
       } catch (err) {
         console.error('Error loading portfolio data:', err);
+        toast.error('Failed to load your portfolio. Please refresh the page.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -236,9 +238,13 @@ export default function StudentPortfolio() {
             <input type="text" readOnly value={`${window.location.origin}/verify/portfolio/${profile.id}`} className="w-full p-2.5 bg-muted border border-border rounded-lg text-sm mb-4 focus:outline-none" />
             <div className="flex justify-end gap-2">
               <button onClick={() => setShareModal(false)} className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted transition-colors">Close</button>
-              <button onClick={() => {
-                navigator.clipboard.writeText(`${window.location.origin}/verify/portfolio/${profile.id}`);
-                alert('Copied to clipboard!');
+              <button onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(`${window.location.origin}/verify/portfolio/${profile.id}`);
+                  toast.success('Portfolio link copied!');
+                } catch {
+                  toast.error('Could not copy the link. Copy it from the field above instead.');
+                }
               }} className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">Copy Link</button>
             </div>
           </m.div>

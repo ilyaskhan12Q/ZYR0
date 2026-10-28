@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { m, AnimatePresence } from 'framer-motion';
 import {
-  Menu, X, Bell, Search, ChevronDown, LogOut, User, Settings,
+  Menu, X, Bell, ChevronDown, LogOut, User, Settings,
   Home, FolderOpen, FileCheck, FileText, ClipboardList, CheckSquare, Award,
   Briefcase, BarChart3, Users, UserCog, Shield, MessageSquare,
   Building2, ChevronLeft, ChevronRight,
@@ -661,7 +661,11 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             {!collapsed && <span>Settings</span>}
           </Link>
           <button
-            onClick={() => navigate('/')}
+            onClick={async () => {
+              await signOut();
+              navigate('/');
+              toast.success('Signed out');
+            }}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 transition-colors"
             title={collapsed ? 'Sign Out' : undefined}
           >
@@ -691,9 +695,6 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
               <ThemeToggle />
             </span>
             <TourHelpButton />
-            <button className="relative inline-flex items-center justify-center min-w-11 min-h-11 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-              <Search className="w-5 h-5" />
-            </button>
             <div className="relative">
               <button
                 onClick={() => { setNotificationsOpen(!notificationsOpen); setProfileOpen(false); }}
@@ -719,10 +720,14 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       {unreadCount > 0 && (
                         <button
                           onClick={async () => {
-                            await markAllNotificationsRead();
-                            setUnreadCount(0);
-                            const updated = notifications.map(n => ({ ...n, read: true }));
-                            setNotifications(updated);
+                            try {
+                              await markAllNotificationsRead();
+                              setUnreadCount(0);
+                              setNotifications(notifications.map(n => ({ ...n, read: true })));
+                            } catch (err) {
+                              console.error('Failed to mark notifications read:', err);
+                              toast.error('Could not mark notifications as read');
+                            }
                           }}
                           className="text-[11px] text-accent hover:underline font-medium"
                         >
@@ -741,7 +746,12 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                             key={notif.id}
                             onClick={async () => {
                               if (!notif.read && !notif.id.startsWith('mock-')) {
-                                await markNotificationRead(notif.id);
+                                try {
+                                  await markNotificationRead(notif.id);
+                                } catch (err) {
+                                  console.error('Failed to mark notification read:', err);
+                                  toast.error('Could not update notification');
+                                }
                               }
                               setUnreadCount(prev => Math.max(0, prev - 1));
                               setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
@@ -877,7 +887,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       )}
                     </div>
                     <div className="border-t border-border pt-1">
-                      <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
+                      <button onClick={async () => { await signOut(); navigate('/'); toast.success('Signed out'); }} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors">
                         <LogOut className="w-4 h-4" /> Sign Out
                       </button>
                     </div>

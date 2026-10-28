@@ -284,7 +284,11 @@ export default function StudentWorkspace() {
 
       if (error) throw error;
 
-      toast.success('Task submitted successfully for review!');
+      toast.success(
+        isEditingSubmission
+          ? 'Submission updated and sent for review!'
+          : 'Task submitted successfully for review!'
+      );
       setGithubUrl('');
       setDemoUrl('');
       setNotes('');
