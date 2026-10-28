@@ -215,7 +215,9 @@ export default function EditInternshipModal({
       onClose();
     } catch (err: any) {
       console.error('Failed to update internship:', err);
-      setError(err.message || 'Failed to update internship.');
+      const msg = err.message || 'Failed to update internship.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

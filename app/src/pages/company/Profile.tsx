@@ -77,9 +77,12 @@ export default function CompanyProfile() {
         setCompany(data);
       }
       setSaved(true);
+      toast.success('Company profile saved successfully');
       setTimeout(() => setSaved(false), 3000);
     } catch (err: any) {
-      setError(err.message || 'Failed to save changes');
+      const msg = err.message || 'Failed to save changes';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSaving(false);
     }
@@ -93,8 +96,11 @@ export default function CompanyProfile() {
     try {
       const publicUrl = await uploadCompanyLogo(company.id, file);
       setCompany((prev: any) => ({ ...prev, logo_url: publicUrl }));
+      toast.success('Company logo updated');
     } catch (err: any) {
-      setError(err.message || 'Failed to upload logo');
+      const msg = err.message || 'Failed to upload logo';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setUploadingLogo(false);
     }

@@ -8,6 +8,7 @@ import { getCompanyTasks } from '@/services/tasks';
 import { getCompanyCertificates, issueCertificate, resendCertificateEmail } from '@/services/certificates';
 import { createWorkspaceEvent } from '@/services/workspaceEvents';
 import { clearCache } from '@/lib/cache';
+import { toast } from 'sonner';
 
 export default function CompanyCertificates() {
   const { user } = useAuth();
@@ -78,6 +79,9 @@ export default function CompanyCertificates() {
 
       if (data?.email_error) {
         setError(`Certificate generated, but email notification failed to send: ${data.email_error}. You can retry sending using the "Resend Email" button.`);
+        toast.warning('Certificate issued, but email delivery failed');
+      } else {
+        toast.success(`Certificate issued for ${student.full_name || 'intern'}`);
       }
 
       await createWorkspaceEvent({
@@ -95,7 +99,9 @@ export default function CompanyCertificates() {
       if (updatedCerts) setCertificates(updatedCerts);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to issue certificate. Please check Edge Function logs.');
+      const msg = err.message || 'Failed to issue certificate. Please check Edge Function logs.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIssuingId(null);
     }
@@ -116,9 +122,12 @@ export default function CompanyCertificates() {
       // Refresh certificates
       const { data: updatedCerts } = await getCompanyCertificates(company.id);
       if (updatedCerts) setCertificates(updatedCerts);
+      toast.success('Certificate email resent successfully');
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to resend email. Please check Edge Function logs.');
+      const msg = err.message || 'Failed to resend email. Please check Edge Function logs.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setResendingId(null);
     }

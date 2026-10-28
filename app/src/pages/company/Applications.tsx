@@ -113,8 +113,10 @@ export default function CompanyApplications() {
       const { error } = await updateApplicationStatus(id, status);
       if (error) throw error;
       setApplications((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-    } catch (err) {
+      toast.success(`Application marked as ${status}`);
+    } catch (err: any) {
       console.error(err);
+      toast.error(err?.message || 'Failed to update application status');
     } finally {
       setBusy(null);
     }
