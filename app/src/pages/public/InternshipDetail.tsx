@@ -72,7 +72,7 @@ export default function InternshipDetail() {
 
     // Must be a student to apply
     if (profile?.role !== 'student') {
-      alert("Only student accounts can apply for internships.");
+      toast.error('Only student accounts can apply for internships.');
       return;
     }
 
@@ -88,8 +88,9 @@ export default function InternshipDetail() {
       // Refresh status
       const applied = await hasApplied(id!);
       setApplicationStatus(applied);
+      toast.success('Application submitted! The company will review it shortly.');
     } catch (err: any) {
-      alert(err.message || "Failed to submit application.");
+      toast.error(err.message || "Failed to submit application.");
     } finally {
       setApplying(false);
     }
@@ -403,12 +404,23 @@ export default function InternshipDetail() {
                   <SaveButton internshipId={internship.id} />
                 </div>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (navigator.share) {
-                      navigator.share({ title: internship.title, url: window.location.href }).catch(() => {});
+                      try {
+                        await navigator.share({ title: internship.title, url: window.location.href });
+                      } catch (err) {
+                        // AbortError = the user closed the share sheet, not a failure
+                        if ((err as Error)?.name !== 'AbortError') {
+                          toast.error('Could not share this internship. Try copying the link instead.');
+                        }
+                      }
                     } else {
-                      navigator.clipboard.writeText(window.location.href);
-                      toast.success('Link copied!');
+                      try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        toast.success('Link copied!');
+                      } catch {
+                        toast.error('Could not copy the link. Copy it from the address bar instead.');
+                      }
                     }
                   }}
                   className="flex-1 flex items-center justify-center gap-2 py-2.5 border border-border rounded-lg text-sm hover:bg-muted transition-colors"

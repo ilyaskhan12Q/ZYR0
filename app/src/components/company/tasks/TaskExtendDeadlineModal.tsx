@@ -3,6 +3,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { Calendar, Clock, AlertTriangle, CheckCircle2, X, Send, Sparkles, Loader2, Users } from 'lucide-react';
 import { bulkExtendTaskDeadlines } from '@/services/tasks';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
+import { toast } from 'sonner';
 
 interface TaskExtendDeadlineModalProps {
   isOpen: boolean;
@@ -97,10 +98,13 @@ export function TaskExtendDeadlineModal({
         }
       }
 
+      toast.success(`Deadline extended for ${tasksToExtend.length} task${tasksToExtend.length !== 1 ? 's' : ''}`);
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to extend task deadline');
+      const msg = err.message || 'Failed to extend task deadline';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

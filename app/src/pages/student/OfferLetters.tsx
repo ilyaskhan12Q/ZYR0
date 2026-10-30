@@ -18,6 +18,16 @@ import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
@@ -45,6 +55,7 @@ export default function StudentOfferLetters() {
   const [selected, setSelected]     = useState<OfferLetter | null>(null);
   const [responding, setResponding] = useState<string | null>(null);
   const [error, setError]           = useState<string | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<string | null>(null);
 
   // ── Load ────────────────────────────────────────────────────────────────────
   const load = useCallback(async () => {
@@ -97,6 +108,7 @@ export default function StudentOfferLetters() {
 
       setOffers((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'Accepted', accepted_at: data?.accepted_at ?? null } : o)));
       setSelected((prev) => prev?.id === id ? { ...prev, status: 'Accepted' } : prev);
+      toast.success('Offer accepted! Next step: your workspace is now unlocked.');
     } catch (e: unknown) {
       setError((e as Error).message ?? 'Failed to accept offer. Please try again.');
     } finally {
@@ -105,7 +117,6 @@ export default function StudentOfferLetters() {
   }
 
   async function handleReject(id: string) {
-    if (!confirm('Are you sure you want to reject this offer letter? This cannot be undone.')) return;
     setResponding(id);
     setError(null);
     try {
@@ -129,6 +140,7 @@ export default function StudentOfferLetters() {
 
       setOffers((prev) => prev.map((o) => (o.id === id ? { ...o, status: 'Rejected', rejected_at: data?.rejected_at ?? null } : o)));
       setSelected((prev) => prev?.id === id ? { ...prev, status: 'Rejected' } : prev);
+      toast.success('Offer declined.');
     } catch (e: unknown) {
       setError((e as Error).message ?? 'Failed to reject offer. Please try again.');
     } finally {
@@ -335,7 +347,7 @@ export default function StudentOfferLetters() {
                         {responding === offer.id ? <ButtonLoader loading={true} loadingText="Accepting..." /> : <><CheckCircle2 className="w-4 h-4" /> Accept</>}
                       </button>
                       <button
-                        onClick={() => handleReject(offer.id)}
+                        onClick={() => setRejectTarget(offer.id)}
                         disabled={responding === offer.id}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm hover:bg-red-200 dark:hover:bg-red-950/50 transition-colors disabled:opacity-50"
                       >
@@ -358,12 +370,37 @@ export default function StudentOfferLetters() {
             offer={selected}
             onClose={() => setSelected(null)}
             onAccept={handleAccept}
-            onReject={handleReject}
+            onReject={(id) => { setSelected(null); setRejectTarget(id); }}
             onDownload={handleDownload}
             responding={responding}
           />
         )}
       </AnimatePresence>
+
+      {/* Reject confirmation */}
+      <AlertDialog open={rejectTarget !== null} onOpenChange={(open) => { if (!open) setRejectTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reject this offer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This cannot be undone. The company will be notified that you declined the offer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep offer</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const id = rejectTarget;
+                setRejectTarget(null);
+                if (id) handleReject(id);
+              }}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              Reject offer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -374,7 +411,7 @@ interface ModalProps {
   offer: OfferLetter;
   onClose: () => void;
   onAccept: (id: string) => Promise<void>;
-  onReject: (id: string) => Promise<void>;
+  onReject: (id: string) => void;
   onDownload: (offer: OfferLetter) => void;
   responding: string | null;
 }

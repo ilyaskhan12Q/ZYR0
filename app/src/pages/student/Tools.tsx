@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyToolSubmissions } from '@/services/tools';
 import { SubmitToolDialog } from '@/components/tools/SubmitToolDialog';
+import { toast } from 'sonner';
 import type { DbTool } from '@/lib/database.types';
 
 export default function StudentTools() {
@@ -25,6 +26,7 @@ export default function StudentTools() {
       setSubmissions(data);
     } catch (err) {
       console.error('Failed to load submissions:', err);
+      toast.error('Failed to load your submissions. Please refresh the page.');
     } finally {
       setLoading(false);
     }

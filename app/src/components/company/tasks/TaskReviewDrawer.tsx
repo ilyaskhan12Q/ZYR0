@@ -23,6 +23,7 @@ import {
 import { updateTask, reviewSubmission } from '@/services/tasks';
 import { resolvePrivateUrl } from '@/lib/storage';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
+import { toast } from 'sonner';
 
 interface TaskReviewDrawerProps {
   task: any | null;
@@ -86,6 +87,7 @@ export function TaskReviewDrawer({ task, onClose, onSuccess }: TaskReviewDrawerP
   const handleCopyLink = (url: string) => {
     navigator.clipboard.writeText(url);
     setCopiedLink(url);
+    toast.success('Link copied to clipboard');
     setTimeout(() => setCopiedLink(null), 2000);
   };
 
@@ -132,11 +134,15 @@ export function TaskReviewDrawer({ task, onClose, onSuccess }: TaskReviewDrawerP
           console.error('Notification simulation failed:', notifErr);
         }
 
+        toast.success(status === 'Approved' ? 'Submission approved' : 'Revision requested');
         onSuccess();
         onClose();
+      } else {
+        toast.error(reviewErr.message || 'Failed to submit review');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      toast.error(err?.message || 'Failed to submit review');
     } finally {
       setReviewing(false);
     }

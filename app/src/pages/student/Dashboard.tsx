@@ -11,6 +11,7 @@ import { getMyTeamApplications } from '@/services/teamApplications';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useRefreshOnFocus } from '@/hooks/useRefreshOnFocus';
+import { toast } from 'sonner';
 
 const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, Award, Briefcase };
 
@@ -46,8 +47,12 @@ export default function StudentDashboard() {
         setConversations(convos.status === 'fulfilled' ? (convos.value?.data || []) : []);
         setCertificates(certs.status === 'fulfilled' ? (certs.value?.data || []) : []);
         setTeamApplications(teamApps.status === 'fulfilled' ? (teamApps.value?.data || []) : []);
+        if ([apps, myTasks, unread, convos, certs, teamApps].some((r) => r.status === 'rejected')) {
+          toast.error('Some dashboard data could not be loaded.');
+        }
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
+        toast.error('Failed to load your dashboard. Please refresh the page.');
       } finally {
         setLoading(false);
       }

@@ -7,6 +7,7 @@ import { getMyCertificates } from '@/services/certificates';
 import { getMyTasks } from '@/services/tasks';
 import { getMyApplications } from '@/services/applications';
 import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 export default function StudentProgress() {
   const { profile } = useAuth();
@@ -45,6 +46,7 @@ export default function StudentProgress() {
         if (logsRes.status === 'fulfilled' && logsRes.value.data) setActivities(logsRes.value.data);
       } catch (err) {
         console.error('Error loading progress data:', err);
+        toast.error('Failed to load your progress. Please refresh the page.');
       } finally {
         if (!cancelled) setLoading(false);
       }

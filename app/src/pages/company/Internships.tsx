@@ -8,6 +8,7 @@ import { getInternships, closeInternship } from '@/services/internships';
 import { getAllCompanyApplications } from '@/services/applications';
 import EditInternshipModal from './EditInternshipModal';
 import type { Internship } from '@/lib/database.types';
+import { toast } from 'sonner';
 
 const tabs = ['All', 'Active', 'Closed', 'Draft'];
 
@@ -70,6 +71,9 @@ export default function CompanyInternships() {
     const { error } = await closeInternship(id, company?.id);
     if (!error) {
       setInternships(prev => prev.map(i => i.id === id ? { ...i, status: 'Closed' } : i));
+      toast.success('Internship closed successfully');
+    } else {
+      toast.error(error.message || 'Failed to close internship');
     }
     setUpdating(null);
   }

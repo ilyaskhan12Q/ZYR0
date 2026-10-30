@@ -96,6 +96,7 @@ export default function StudentMessages() {
         await markMessagesRead(selectedConv);
       } catch (err) {
         console.error('Error loading messages:', err);
+        toast.error('Failed to load messages');
       } finally {
         setLoadingMessages(false);
       }
@@ -135,7 +136,6 @@ export default function StudentMessages() {
     if (!messageText.trim() || !selectedConv || !profile) return;
 
     const content = messageText.trim();
-    setMessageText('');
 
     try {
       const { data, error } = await sendMessage({
@@ -143,10 +143,10 @@ export default function StudentMessages() {
         content,
       });
 
-      if (error) {
-        console.error('Send error:', error);
-        return;
-      }
+      if (error) throw error;
+
+      // Clear the input only once the message is confirmed sent
+      setMessageText('');
 
       if (data) {
         setMessages((prev) => [...prev, data]);
@@ -163,6 +163,7 @@ export default function StudentMessages() {
       );
     } catch (err) {
       console.error('Error sending message:', err);
+      toast.error('Message not sent. Your text is still here, please try again.');
     }
   };
 

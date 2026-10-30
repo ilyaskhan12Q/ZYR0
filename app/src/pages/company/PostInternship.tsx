@@ -6,6 +6,7 @@ import { getMyCompany } from '@/services/companies';
 import { createInternship } from '@/services/internships';
 import { useAuth } from '@/contexts/AuthContext';
 import { INTERNSHIP_DOMAINS, DEFAULT_DOMAIN } from '@/lib/internshipDomains';
+import { toast } from 'sonner';
 
 export default function PostInternship() {
   const navigate = useNavigate();
@@ -112,9 +113,12 @@ export default function PostInternship() {
       });
 
       if (err) throw err;
+      toast.success(status === 'Active' ? 'Internship published successfully!' : 'Internship saved as draft!');
       navigate('/company/internships');
     } catch (err: any) {
-      setError(err.message || 'Failed to submit internship.');
+      const msg = err.message || 'Failed to submit internship.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

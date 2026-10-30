@@ -25,6 +25,7 @@ import type { OfferLetter, OfferLetterStatus } from '@/lib/database.types';
 import { dispatchNotificationWithSimulation } from '@/services/notificationsSim';
 import { supabase } from '@/lib/supabase';
 import { SITE_CONFIG } from '@/config/site';
+import { toast } from 'sonner';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -421,12 +422,16 @@ export default function CompanyOfferLetters() {
       const result = await generateAndSendOffer(application);
       if (!result.ok) {
         setError(result.message);
+        toast.error(result.message);
         return;
       }
       setSuccessMsg(result.message);
+      toast.success(result.message);
       await load();
     } catch (e: unknown) {
-      setError((e as Error).message ?? 'Failed to generate offer letter.');
+      const msg = (e as Error).message ?? 'Failed to generate offer letter.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setGenerating(null);
     }
@@ -483,9 +488,13 @@ export default function CompanyOfferLetters() {
     const okCount = results.filter((r) => r.ok).length;
     const failed = results.filter((r) => !r.ok);
     if (failed.length === 0) {
-      setSuccessMsg(`Offer letters generated and sent to ${okCount} student${okCount === 1 ? '' : 's'}!`);
+      const msg = `Offer letters generated and sent to ${okCount} student${okCount === 1 ? '' : 's'}!`;
+      setSuccessMsg(msg);
+      toast.success(msg);
     } else {
-      setError(`${okCount} sent, ${failed.length} failed. Failed: ${failed.map((r) => r.name).join(', ')}`);
+      const msg = `${okCount} sent, ${failed.length} failed. Failed: ${failed.map((r) => r.name).join(', ')}`;
+      setError(msg);
+      toast.error(msg);
     }
   }
 
@@ -501,8 +510,11 @@ export default function CompanyOfferLetters() {
       if (err) throw err;
       setOffers((prev) => prev.map((o) => o.id === offerId ? { ...o, status: 'Revoked' } : o));
       setSelected((prev) => prev?.id === offerId ? { ...prev, status: 'Revoked' } : prev);
+      toast.success('Offer letter revoked successfully');
     } catch (e: unknown) {
-      setError((e as Error).message ?? 'Failed to revoke offer letter.');
+      const msg = (e as Error).message ?? 'Failed to revoke offer letter.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setRevoking(null);
     }
@@ -519,17 +531,22 @@ export default function CompanyOfferLetters() {
       if (err) throw err;
       setOffers((prev) => prev.map((o) => o.id === offerId ? { ...o, expires_at: iso } : o));
       setSelected((prev) => prev?.id === offerId ? { ...prev, expires_at: iso } : prev);
+      toast.success('Expiry date updated');
       return { ok: true, message: 'Expiry date updated.' };
     } catch (e: unknown) {
       const msg = (e as Error).message ?? 'Failed to update expiry date.';
       setError(msg);
+      toast.error(msg);
       return { ok: false, message: msg };
     }
   }
 
   // ── Download ──────────────────────────────────────────────────────────────────
   function handleDownload(offer: OfferLetter) {
-    if (!offer.pdf_url) return;
+    if (!offer.pdf_url) {
+      toast.error('Offer letter PDF is not ready yet');
+      return;
+    }
     const a = document.createElement('a');
     a.href     = offer.pdf_url;
     a.download = `offer-letter-${offer.id.slice(0, 8)}.pdf`;
@@ -583,12 +600,14 @@ export default function CompanyOfferLetters() {
       const okMsg = `Offer letter email resent to ${student.full_name}!`;
       setSuccessMsg(okMsg);
       setResendFeedback({ offerId: offer.id, ok: true, message: okMsg });
+      toast.success(okMsg);
       await load();
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Failed to resend email.';
       console.error('Failed to resend email:', err);
       setError(errMsg);
       setResendFeedback({ offerId: offer.id, ok: false, message: errMsg });
+      toast.error(errMsg);
     } finally {
       setResending(null);
     }
