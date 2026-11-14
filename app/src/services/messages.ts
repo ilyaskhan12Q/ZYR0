@@ -91,6 +91,7 @@ export async function sendMessage(data: {
 
   if (!res.error) {
     clearCache(`conversations_${user.id}`);
+    clearCache(`messages_${data.conversation_id}`);
     clearCache(`unread_count_${user.id}`);
   }
   return res;
@@ -128,6 +129,8 @@ export async function markMessagesRead(conversation_id: string) {
     p_user_id: user.id,
   });
 
+  // read_by lives on the message rows, so the thread cache must go too.
+  clearCache(`messages_${conversation_id}`);
   clearCache(`conversations_${user.id}`);
   clearCache(`unread_count_${user.id}`);
 }

@@ -116,8 +116,9 @@ export default function StudentMessages() {
           filter: `conversation_id=eq.${selectedConv}`,
         },
         async () => {
-          // Re-fetch messages to get full sender profiles
-          const res = await getMessages(selectedConv);
+          // Re-fetch messages to get full sender profiles. Bypass the cache so
+          // the new row isn't swallowed by a stale cached list.
+          const res = await getMessages(selectedConv, false);
           if (res.data) {
             setMessages(res.data);
             setTimeout(scrollToBottom, 50);
