@@ -53,6 +53,37 @@ export function parseLines(value: string): string[] {
   return value.split('\n').map((line) => line.trim()).filter(Boolean);
 }
 
+export const SEO_TITLE_MAX = 60;
+export const SEO_DESCRIPTION_MAX = 160;
+
+function seoTypePhrase(itemType: ToolItemType): string {
+  if (itemType === 'skill') return 'Agent Skill';
+  if (itemType === 'tool_skill') return 'Developer Tool & Agent Skill';
+  return 'Developer Tool';
+}
+
+/** Search-facing title from verified listing fields only: name, type, category, ZYR0. */
+export function buildSeoTitle(name: string, category: string, itemType: ToolItemType): string {
+  const cleanName = name.trim() || 'Untitled listing';
+  const audience = category === 'Developer Tools' ? '' : ` for ${category}`;
+  return `${cleanName} — ${seoTypePhrase(itemType)}${audience} | ZYR0`;
+}
+
+/** Meta description from the submitted tagline plus listing facts. No invented claims. */
+export function buildSeoDescription(
+  name: string,
+  tagline: string,
+  category: string,
+  itemType: ToolItemType
+): string {
+  const cleanName = name.trim() || 'This listing';
+  const cleanTagline = tagline.trim().replace(/[.!?]+$/, '');
+  const kind = seoTypePhrase(itemType).toLowerCase();
+  const article = /^[aeiou]/.test(kind) ? 'an' : 'a';
+  const intro = cleanTagline ? `${cleanTagline}.` : '';
+  return `${intro} ${cleanName} is ${article} ${kind} listed in ZYR0's ${category} directory.`.trim();
+}
+
 export type MarkdownAction =
   | { kind: 'inline'; before: string; after: string; placeholder: string }
   | { kind: 'line'; prefix: string };
@@ -106,6 +137,9 @@ export interface ToolDraft {
   version: string;
   authorName: string;
   authorUrl: string;
+  slug: string;
+  seoTitle: string;
+  seoDescription: string;
   adminStatus: 'approved' | 'pending';
   adminFeatured: boolean;
   adminBadge: string;
@@ -126,6 +160,9 @@ export function isDraftEmpty(draft: ToolDraft): boolean {
     !draft.version.trim() &&
     !draft.installInstructions.trim() &&
     !draft.authorUrl.trim() &&
+    !draft.slug.trim() &&
+    !draft.seoTitle.trim() &&
+    !draft.seoDescription.trim() &&
     !draft.adminBadge.trim() &&
     parseTags(draft.tagsInput).length === 0 &&
     parseLines(draft.capabilitiesInput).length === 0 &&
@@ -199,6 +236,9 @@ export function loadToolDraft(userId: string): ToolDraft | null {
       version: text('version'),
       authorName: text('authorName'),
       authorUrl: text('authorUrl'),
+      slug: text('slug'),
+      seoTitle: text('seoTitle'),
+      seoDescription: text('seoDescription'),
       adminStatus: data.adminStatus === 'pending' ? 'pending' : 'approved',
       adminFeatured: data.adminFeatured === true,
       adminBadge: text('adminBadge'),

@@ -1,6 +1,6 @@
 import type { ToolInstallCommand } from '@/lib/database.types';
 
-export type ToolSource = 'ZYR0 Native' | 'GitHub' | 'Hugging Face' | 'Web';
+export type ToolSource = 'ZYR0 Native' | 'GitHub' | 'Hugging Face' | 'GitLab' | 'Web';
 
 export type ToolItemType = 'tool' | 'skill' | 'tool_skill';
 
@@ -27,6 +27,8 @@ export interface ToolItem {
   installCommands?: ToolInstallCommand[];
   installInstructions?: string;
   version?: string;
+  seoTitle?: string;
+  seoDescription?: string;
   author?: {
     name: string;
     url?: string;

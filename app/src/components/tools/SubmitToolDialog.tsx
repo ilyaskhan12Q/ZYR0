@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import {
   Sparkles, Terminal, CheckCircle2, Plus, Trash2, Check, Loader2, Lock, ShieldCheck,
   ArrowRight, UserCheck, ChevronDown, ChevronLeft, ImageIcon, AlertCircle, Save,
   Heading2, Bold, Italic, List, ListOrdered, Link2, Code2, Tag, UserRound, FolderGit2,
-  RotateCcw, X, Eye, Pencil, Info
+  RotateCcw, X, Eye, Pencil, Info, Search, Globe
 } from 'lucide-react';
 import {
   Dialog,
@@ -21,12 +19,20 @@ import { useAuth } from '@/contexts/AuthContext';
 import { submitTool, type SubmitToolInput } from '@/services/tools';
 import { coverGradient } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
+import { slugify } from '@/lib/slug';
+import { splitCapability } from '@/lib/capability';
+import { MarkdownContent } from '@/components/markdown/MarkdownContent';
+import { BASE_URL } from '@/config/seo';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 import {
   TOOL_FORM_CATEGORIES,
   TOOL_FORM_SOURCES,
+  SEO_DESCRIPTION_MAX,
+  SEO_TITLE_MAX,
   applyMarkdownAction,
+  buildSeoDescription,
+  buildSeoTitle,
   clearToolDraft,
   isDraftEmpty,
   loadToolDraft,
@@ -46,14 +52,13 @@ interface SubmitToolDialogProps {
 
 type Stage = 1 | 2 | 3;
 type ItemType = 'tool' | 'skill' | 'tool_skill';
-type FieldKey = 'name' | 'tagline' | 'description' | 'sourceUrl' | 'imageUrl';
+type FieldKey = 'name' | 'tagline' | 'description' | 'sourceUrl' | 'imageUrl' | 'slug';
 type FieldErrors = Partial<Record<FieldKey, string>>;
 
 const inputCls =
   'w-full rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20';
 const inputErrorCls = 'border-red-500/70 focus-visible:border-red-500 focus-visible:ring-red-500/20';
-const markdownCls =
-  'prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed text-[13px] [&_p]:mb-2.5 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-2.5 [&_h1]:text-base [&_h1]:font-bold [&_h1]:mb-2 [&_h2]:text-sm [&_h2]:font-bold [&_h2]:mb-1.5 [&_h3]:text-[13px] [&_h3]:font-bold [&_h3]:mb-1 [&_pre]:bg-neutral-950 [&_pre]:text-emerald-300 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_code]:font-mono [&_code]:text-[11px] [&_a]:text-[var(--zyro-accent)] [&_a]:underline [&_strong]:font-semibold [&_blockquote]:border-l-2 [&_blockquote]:border-border [&_blockquote]:pl-3 [&_blockquote]:text-muted-foreground';
+const SEARCH_PREVIEW_DOMAIN = BASE_URL.replace(/^https?:\/\//, '').replace(/\/+$/, '');
 
 const STAGES: { id: Stage; label: string; hint: string }[] = [
   { id: 1, label: 'Basics', hint: 'Source, name, tagline' },
@@ -273,9 +278,7 @@ function ListingPreview({
         <section>
           <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">About</h4>
           {draft.description.trim() ? (
-            <div className={markdownCls}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{draft.description}</ReactMarkdown>
-            </div>
+            <MarkdownContent content={draft.description} className="text-[13px]" />
           ) : (
             <p className="text-xs italic text-muted-foreground">
               Your rendered Markdown description will appear here.
@@ -286,20 +289,30 @@ function ListingPreview({
         {capabilities.length > 0 && (
           <section>
             <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              Key capabilities
+              {draft.itemType === 'skill' ? 'Capabilities' : 'Key features'}
             </h4>
             <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-              {capabilities.map((capability) => (
-                <li
-                  key={capability}
-                  className="flex items-start gap-1.5 rounded-lg border border-[var(--zyro-accent)]/15 bg-[var(--zyro-accent-muted)] p-2 text-[11px] text-foreground/85"
-                >
-                  <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[var(--zyro-accent)]">
-                    <Check className="h-2 w-2 text-white" strokeWidth={3} />
-                  </span>
-                  <span className="leading-snug">{capability}</span>
-                </li>
-              ))}
+              {capabilities.map((capability) => {
+                const [label, value] = splitCapability(capability);
+                return (
+                  <li
+                    key={capability}
+                    className="flex items-start justify-between gap-2 rounded-lg border border-[var(--zyro-accent)]/15 bg-[var(--zyro-accent-muted)] p-2 text-[11px] text-foreground/85"
+                  >
+                    <span className="flex min-w-0 items-start gap-1.5">
+                      <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[var(--zyro-accent)]">
+                        <Check className="h-2 w-2 text-white" strokeWidth={3} />
+                      </span>
+                      <span className="leading-snug">{label}</span>
+                    </span>
+                    {value && (
+                      <span className="shrink-0 rounded border border-border/50 bg-background/60 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-foreground">
+                        {value}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}
@@ -418,6 +431,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const [version, setVersion] = useState('');
   const [authorName, setAuthorName] = useState(profile?.full_name || '');
   const [authorUrl, setAuthorUrl] = useState(profile?.github || profile?.portfolio_url || '');
+  const [slug, setSlug] = useState('');
+  const [seoTitle, setSeoTitle] = useState('');
+  const [seoDescription, setSeoDescription] = useState('');
 
   const [mdTab, setMdTab] = useState<'write' | 'preview'>('write');
   const [tagDraft, setTagDraft] = useState('');
@@ -458,6 +474,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
       version,
       authorName,
       authorUrl,
+      slug,
+      seoTitle,
+      seoDescription,
       adminStatus,
       adminFeatured,
       adminBadge,
@@ -466,7 +485,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     [
       itemType, name, tagline, description, category, source, sourceUrl, docUrl, imageUrl,
       commands, installInstructions, tagsInput, capabilitiesInput, version, authorName,
-      authorUrl, adminStatus, adminFeatured, adminBadge, adminCoverColor,
+      authorUrl, slug, seoTitle, seoDescription, adminStatus, adminFeatured, adminBadge, adminCoverColor,
     ]
   );
 
@@ -476,6 +495,13 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
     .filter((command) => Boolean(command.command));
   const hasContent = !isDraftEmpty(draft);
+
+  const derivedSlug = slugify(name);
+  const effectiveSlug = slugify(slug || name);
+  const derivedSeoTitle = buildSeoTitle(name, category, itemType);
+  const derivedSeoDescription = buildSeoDescription(name, tagline, category, itemType);
+  const effectiveSeoTitle = seoTitle.trim() || derivedSeoTitle;
+  const effectiveSeoDescription = seoDescription.trim() || derivedSeoDescription;
 
   const requiredDone = [name, tagline, sourceUrl, description].filter((value) => value.trim()).length;
   const optionalDone = [
@@ -495,6 +521,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   if (!tagline.trim()) missingRequired.push({ label: 'One-sentence tagline', stage: 1 });
   if (!sourceUrl.trim()) missingRequired.push({ label: 'Source URL', stage: 1 });
   if (!description.trim()) missingRequired.push({ label: 'Detailed description', stage: 2 });
+  if (!effectiveSlug) missingRequired.push({ label: 'URL slug', stage: 2 });
 
   const validationErrors = (Object.entries(errors) as [FieldKey, string | undefined][]).filter(
     ([, message]) => Boolean(message)
@@ -505,6 +532,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     description: 'Detailed description',
     sourceUrl: 'Source URL',
     imageUrl: 'Cover image URL',
+    slug: 'URL slug',
   };
 
   const resetForm = () => {
@@ -523,6 +551,11 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setTagsInput('');
     setCapabilitiesInput('');
     setVersion('');
+    setAuthorName(profile?.full_name || '');
+    setAuthorUrl(profile?.github || profile?.portfolio_url || '');
+    setSlug('');
+    setSeoTitle('');
+    setSeoDescription('');
     setAdminStatus('approved');
     setAdminFeatured(false);
     setAdminBadge('');
@@ -565,6 +598,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setVersion(saved.version);
     setAuthorName(saved.authorName || profile?.full_name || '');
     setAuthorUrl(saved.authorUrl || profile?.github || profile?.portfolio_url || '');
+    setSlug(saved.slug);
+    setSeoTitle(saved.seoTitle);
+    setSeoDescription(saved.seoDescription);
     setAdminStatus(saved.adminStatus);
     setAdminFeatured(saved.adminFeatured);
     setAdminBadge(saved.adminBadge);
@@ -601,11 +637,30 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     if (imageUrl.trim() && !/^https?:\/\/.+/i.test(imageUrl.trim())) {
       next.imageUrl = 'Must be a valid http(s) URL';
     }
+    const cleanSlug = slugify(slug || name);
+    if (!cleanSlug) {
+      next.slug = 'Add a URL slug using letters, numbers, and hyphens';
+    } else if (cleanSlug.length < 2) {
+      next.slug = 'Use at least 2 characters';
+    }
     return next;
   };
 
   const clearError = (field: FieldKey) => {
     setErrors((previous) => (previous[field] ? { ...previous, [field]: undefined } : previous));
+  };
+
+  const generateSeo = () => {
+    setSlug(derivedSlug);
+    setSeoTitle(derivedSeoTitle);
+    setSeoDescription(derivedSeoDescription);
+    clearError('slug');
+  };
+
+  const handleSlugBlur = () => {
+    const clean = slugify(slug);
+    if (clean) setSlug(clean);
+    clearError('slug');
   };
 
   const handleImageUrlChange = (value: string) => {
@@ -724,12 +779,15 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
         description: description.trim(),
         item_type: itemType,
         category,
-        tags: previewTags.length > 0 ? previewTags : ['Developer'],
+        slug: effectiveSlug,
+        seo_title: effectiveSeoTitle,
+        seo_description: effectiveSeoDescription,
+        tags: previewTags,
         source: source.trim(),
         source_url: normalizeUrl(sourceUrl, source),
         documentation_url: docUrl.trim() ? normalizeUrl(docUrl) : undefined,
         image_url: imageUrl.trim() || undefined,
-        capabilities: previewCapabilities.length > 0 ? previewCapabilities : ['Fast workflow execution'],
+        capabilities: previewCapabilities,
         install_command: validCommands[0]?.command || undefined,
         install_commands: validCommands.length > 0 ? validCommands : undefined,
         install_instructions: installInstructions.trim() || undefined,
@@ -1134,9 +1192,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                           <div className={mdTab === 'write' ? 'hidden md:block' : ''}>
                             <div className="h-full max-h-[520px] min-h-[300px] overflow-y-auto p-4 md:min-h-[420px]">
                               {description.trim() ? (
-                                <div className={markdownCls}>
-                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{description}</ReactMarkdown>
-                                </div>
+                                <MarkdownContent content={description} className="text-[13px]" />
                               ) : (
                                 <p className="text-xs italic text-muted-foreground">
                                   Formatted Markdown appears here as you type.
@@ -1516,6 +1572,121 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                         </p>
                       </div>
                     </FormSection>
+
+                    <FormSection
+                      icon={Search}
+                      title="SEO settings"
+                      hint="Search title, meta description, and URL"
+                      summary={`/tools/${effectiveSlug || '…'}`}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="max-w-md text-[11px] leading-relaxed text-muted-foreground">
+                          Generated from your listing details. Edit only if you need a different search phrase —
+                          never add claims the listing does not support.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={generateSeo}
+                          disabled={!name.trim()}
+                          className="h-7 shrink-0 gap-1.5 text-[11px]"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          Generate from listing
+                        </Button>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel
+                          htmlFor="st-seo-title"
+                          hint={`${effectiveSeoTitle.length}/${SEO_TITLE_MAX} recommended`}
+                        >
+                          SEO page title
+                        </FieldLabel>
+                        <input
+                          id="st-seo-title"
+                          type="text"
+                          value={seoTitle || derivedSeoTitle}
+                          onChange={(event) => setSeoTitle(event.target.value)}
+                          className={inputCls}
+                        />
+                        {effectiveSeoTitle.length > SEO_TITLE_MAX && (
+                          <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                            Search engines may shorten this title.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel
+                          htmlFor="st-seo-description"
+                          hint={`${effectiveSeoDescription.length}/${SEO_DESCRIPTION_MAX} recommended`}
+                        >
+                          Meta description
+                        </FieldLabel>
+                        <textarea
+                          id="st-seo-description"
+                          rows={3}
+                          value={seoDescription || derivedSeoDescription}
+                          onChange={(event) => setSeoDescription(event.target.value)}
+                          className={`${inputCls} resize-y`}
+                        />
+                        {effectiveSeoDescription.length > SEO_DESCRIPTION_MAX && (
+                          <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                            Search engines may truncate this description.
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-slug" hint="Lowercase letters, numbers, hyphens">
+                          URL slug
+                        </FieldLabel>
+                        <div className={`flex items-stretch overflow-hidden rounded-lg border bg-background/60 focus-within:ring-2 focus-within:ring-[var(--zyro-accent)]/20 ${errors.slug ? inputErrorCls : 'border-border focus-within:border-[var(--zyro-accent)]'}`}>
+                          <span className="flex items-center border-r border-border/60 bg-muted/40 px-2.5 font-mono text-[11px] text-muted-foreground">
+                            /tools/
+                          </span>
+                          <input
+                            id="st-slug"
+                            type="text"
+                            value={slug || derivedSlug}
+                            onChange={(event) => {
+                              setSlug(event.target.value);
+                              clearError('slug');
+                            }}
+                            onBlur={handleSlugBlur}
+                            placeholder="your-listing"
+                            aria-invalid={Boolean(errors.slug)}
+                            className="min-w-0 flex-1 border-0 bg-transparent px-2.5 py-2 font-mono text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                          />
+                        </div>
+                        <FieldError msg={errors.slug} />
+                        <p className="text-[10px] text-muted-foreground">
+                          Page H1 stays the official listing name: <span className="font-medium text-foreground">{name.trim() || 'your listing name'}</span>
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl border border-border/70 bg-background p-3">
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Search engine preview
+                        </p>
+                        <div className="space-y-0.5">
+                          <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+                            <Globe className="h-3 w-3 shrink-0" />
+                            <span className="truncate">
+                              {SEARCH_PREVIEW_DOMAIN} › tools › {effectiveSlug || 'your-listing'}
+                            </span>
+                          </p>
+                          <p className="line-clamp-2 break-words text-[15px] font-medium leading-snug text-[#1a0dab] dark:text-blue-400">
+                            {effectiveSeoTitle}
+                          </p>
+                          <p className="line-clamp-2 break-words text-[12px] leading-relaxed text-muted-foreground">
+                            {effectiveSeoDescription}
+                          </p>
+                        </div>
+                      </div>
+                    </FormSection>
                   </div>
 
                   <aside className="hidden lg:block">
@@ -1547,6 +1718,37 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                         <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                           {requiredDone} of 4 required details · {optionalDone} of 8 optional details
                         </p>
+                      </section>
+
+                      <section className="space-y-2 rounded-xl border border-border/70 bg-card p-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-xs font-semibold text-foreground">SEO metadata</h4>
+                          <button
+                            type="button"
+                            onClick={() => setStage(2)}
+                            className="text-[11px] font-medium text-[var(--zyro-accent)] hover:underline"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <dl className="space-y-1 text-[11px]">
+                          <div className="flex items-baseline justify-between gap-3">
+                            <dt className="text-muted-foreground">Title</dt>
+                            <dd className={effectiveSeoTitle.length > SEO_TITLE_MAX ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}>
+                              {effectiveSeoTitle.length} chars
+                            </dd>
+                          </div>
+                          <div className="flex items-baseline justify-between gap-3">
+                            <dt className="text-muted-foreground">Meta description</dt>
+                            <dd className={effectiveSeoDescription.length > SEO_DESCRIPTION_MAX ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}>
+                              {effectiveSeoDescription.length} chars
+                            </dd>
+                          </div>
+                          <div className="flex items-baseline justify-between gap-3">
+                            <dt className="shrink-0 text-muted-foreground">URL</dt>
+                            <dd className="truncate text-right font-mono text-foreground">/tools/{effectiveSlug || '—'}</dd>
+                          </div>
+                        </dl>
                       </section>
 
                       <section className="space-y-2">

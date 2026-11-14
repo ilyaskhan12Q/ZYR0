@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { MarkdownContent } from '@/components/markdown/MarkdownContent';
+import { copyToClipboard } from '@/lib/clipboard';
 import {
   ExternalLink, Terminal, Copy, Check, BookOpen, Tag,
   Layers, Info, FileText, ArrowUpRight
@@ -55,14 +55,13 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
 
   const handleCopyCommand = async () => {
     if (!activeCommand?.command) return;
-    try {
-      await navigator.clipboard.writeText(activeCommand.command);
-      setCopied(true);
-      toast.success('Copied to clipboard');
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
+    if (!(await copyToClipboard(activeCommand.command))) {
       toast.error('Failed to copy command');
+      return;
     }
+    setCopied(true);
+    toast.success('Copied to clipboard');
+    window.setTimeout(() => setCopied(false), 2000);
   };
 
   const getSourceBadge = () => {
@@ -171,11 +170,7 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
             <div className="space-y-6 min-w-0">
               <section>
                 <SectionTitle icon={FileText}>About</SectionTitle>
-                <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 leading-relaxed text-sm [&>p]:mb-3 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:mb-3 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:mb-3 [&>h1]:text-base [&>h1]:font-bold [&>h1]:mb-2 [&>h2]:text-sm [&>h2]:font-bold [&>h2]:mb-2 [&>h3]:text-xs [&>h3]:font-bold [&>h3]:mb-1 [&>pre]:bg-neutral-950 [&>pre]:text-emerald-300 [&>pre]:p-3 [&>pre]:rounded-lg [&>pre]:overflow-x-auto [&_code]:font-mono [&_code]:text-xs [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:bg-muted/60">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {tool.description}
-                  </ReactMarkdown>
-                </div>
+                <MarkdownContent content={tool.description} />
               </section>
 
               {tool.capabilities && tool.capabilities.length > 0 && (

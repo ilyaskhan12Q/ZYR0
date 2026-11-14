@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { slugify } from '@/lib/slug';
 import { TOOLS_DATA, type ToolItem, type ToolCategory, type ToolItemType } from '@/data/tools';
 import type { DbTool, ToolSubmissionStatus, ToolInstallCommand } from '@/lib/database.types';
 
@@ -8,6 +9,9 @@ export interface SubmitToolInput {
   description: string;
   item_type: ToolItemType;
   category: 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
+  slug?: string;
+  seo_title?: string;
+  seo_description?: string;
   tags: string[];
   source: string;
   source_url: string;
@@ -57,6 +61,8 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
     installCommands: installCommands.length > 0 ? installCommands : undefined,
     installInstructions: dbTool.install_instructions || undefined,
     version: dbTool.version || undefined,
+    seoTitle: dbTool.seo_title || undefined,
+    seoDescription: dbTool.seo_description || undefined,
     author: {
       name: dbTool.author_name,
       url: dbTool.author_url || undefined,
@@ -120,11 +126,10 @@ export async function getToolBySlug(slug: string): Promise<ToolItem | null> {
  * Submit a tool or skill by an authenticated student or company user.
  */
 export async function submitTool(input: SubmitToolInput, ownerId: string): Promise<DbTool> {
-  const slug = input.name
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/\s+/g, '-') + '-' + Math.random().toString(36).substring(2, 6);
+  const requestedSlug = slugify(input.slug?.trim() || '');
+  const generatedSlug = slugify(input.name) || 'listing';
+  // Callers that provide a slug get a clean URL; older callers keep the collision-resistant suffix.
+  const slug = requestedSlug || `${generatedSlug}-${Math.random().toString(36).substring(2, 6)}`;
 
   const payload: Partial<DbTool> = {
     slug,
@@ -139,6 +144,8 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
     documentation_url: input.documentation_url?.trim() || null,
     image_url: input.image_url?.trim() || null,
     ...(input.cover_color ? { cover_color: input.cover_color.trim() } : {}),
+    seo_title: input.seo_title?.trim() || null,
+    seo_description: input.seo_description?.trim() || null,
     capabilities: input.capabilities,
     install_command: (input.install_commands && input.install_commands.length > 0)
       ? input.install_commands[0].command
@@ -163,6 +170,9 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
     .single();
 
   if (error) {
+    if ((error as { code?: string }).code === '23505' && /slug/i.test(error.message)) {
+      throw new Error('That URL slug is already in use. Choose a different one under SEO settings.');
+    }
     throw new Error(error.message || 'Failed to submit tool for review');
   }
 
