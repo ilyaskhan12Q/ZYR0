@@ -1142,3 +1142,156 @@
     backface-visibility: hidden;
   }
 }
+/* Shared Markdown rendering — editor preview, listing preview, public detail page. */
+.zyro-markdown {
+  color: hsl(var(--foreground) / 0.88);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.zyro-markdown > *:first-child {
+  margin-top: 0;
+}
+
+.zyro-markdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.zyro-markdown h2,
+.zyro-markdown h3,
+.zyro-markdown h4,
+.zyro-markdown h5,
+.zyro-markdown h6 {
+  color: hsl(var(--foreground));
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+  scroll-margin-top: 5rem;
+}
+
+.zyro-markdown h2 {
+  font-size: 1.25rem;
+  margin: 1.75rem 0 0.6rem;
+}
+
+.zyro-markdown h3 {
+  font-size: 1.05rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.zyro-markdown h4,
+.zyro-markdown h5,
+.zyro-markdown h6 {
+  font-size: 0.95rem;
+  margin: 1.25rem 0 0.4rem;
+}
+
+.zyro-markdown p,
+.zyro-markdown ul,
+.zyro-markdown ol,
+.zyro-markdown blockquote,
+.zyro-markdown .zyro-table-wrap {
+  margin: 0.75rem 0;
+}
+
+.zyro-markdown ul,
+.zyro-markdown ol {
+  padding-left: 1.35rem;
+}
+
+.zyro-markdown ul {
+  list-style: disc;
+}
+
+.zyro-markdown ol {
+  list-style: decimal;
+}
+
+.zyro-markdown li {
+  margin: 0.25rem 0;
+  padding-left: 0.15rem;
+}
+
+.zyro-markdown li > ul,
+.zyro-markdown li > ol {
+  margin: 0.25rem 0;
+}
+
+.zyro-markdown a {
+  color: var(--zyro-accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.zyro-markdown strong {
+  color: hsl(var(--foreground));
+  font-weight: 650;
+}
+
+.zyro-markdown blockquote {
+  border-left: 3px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
+  padding-left: 1rem;
+}
+
+.zyro-markdown hr {
+  border: 0;
+  border-top: 1px solid hsl(var(--border));
+  margin: 1.5rem 0;
+}
+
+.zyro-markdown :not(pre) > code {
+  background: hsl(var(--muted));
+  border: 1px solid hsl(var(--border) / 0.7);
+  border-radius: 0.3rem;
+  color: hsl(var(--foreground));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.84em;
+  padding: 0.1rem 0.3rem;
+}
+
+.zyro-markdown pre code,
+.zyro-markdown pre code.hljs {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: inherit;
+}
+
+.zyro-markdown table {
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.zyro-markdown th,
+.zyro-markdown td {
+  border-bottom: 1px solid hsl(var(--border) / 0.7);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.zyro-markdown th {
+  background: hsl(var(--muted) / 0.5);
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.zyro-markdown tr:last-child td {
+  border-bottom: 0;
+}
+
+.zyro-markdown img {
+  border-radius: 0.75rem;
+  height: auto;
+  max-width: 100%;
+}
+
+.zyro-markdown input[type='checkbox'] {
+  margin-right: 0.4rem;
+}

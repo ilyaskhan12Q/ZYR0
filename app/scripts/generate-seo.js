@@ -89,6 +89,101 @@ function escapeXml(str) {
     .replace(/'/g, '&apos;');
 }
 
+function inlineMarkdown(value) {
+  return escapeXml(value)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" rel="noopener noreferrer">$1</a>');
+}
+
+/**
+ * Minimal Markdown -> semantic HTML for crawlers without JavaScript.
+ * The React app renders the full document; this keeps the pre-rendered page readable
+ * (headings, lists, quotes, code) and always escapes author content.
+ */
+function markdownToBodyHtml(markdown) {
+  const lines = String(markdown || '').replace(/\r\n/g, '\n').split('\n');
+  const html = [];
+  let paragraph = [];
+  let listType = null;
+  let inCode = false;
+  let codeLines = [];
+
+  const flushParagraph = () => {
+    if (paragraph.length) {
+      html.push(`<p style="line-height:1.8; margin:0 0 1rem;">${inlineMarkdown(paragraph.join(' '))}</p>`);
+      paragraph = [];
+    }
+  };
+  const closeList = () => {
+    if (listType) {
+      html.push(`</${listType}>`);
+      listType = null;
+    }
+  };
+
+  for (const line of lines) {
+    if (line.trim().startsWith('```')) {
+      flushParagraph();
+      closeList();
+      if (inCode) {
+        html.push(`<pre style="background:#0d1117; color:#e6edf3; padding:1rem; border-radius:0.5rem; overflow-x:auto;"><code>${escapeXml(codeLines.join('\n'))}</code></pre>`);
+        codeLines = [];
+      }
+      inCode = !inCode;
+      continue;
+    }
+    if (inCode) {
+      codeLines.push(line);
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    if (heading) {
+      flushParagraph();
+      closeList();
+      const level = Math.min(heading[1].length + 1, 6);
+      html.push(`<h${level} style="margin:1.5rem 0 0.5rem;">${inlineMarkdown(heading[2])}</h${level}>`);
+      continue;
+    }
+
+    const listItem = line.match(/^\s*([-*+]|\d+\.)\s+(.+)$/);
+    if (listItem) {
+      flushParagraph();
+      const nextType = /^\d+\.$/.test(listItem[1]) ? 'ol' : 'ul';
+      if (listType !== nextType) {
+        closeList();
+        html.push(`<${nextType} style="padding-left:1.5rem; line-height:1.8;">`);
+        listType = nextType;
+      }
+      html.push(`<li>${inlineMarkdown(listItem[2])}</li>`);
+      continue;
+    }
+
+    if (line.trim().startsWith('>')) {
+      flushParagraph();
+      closeList();
+      html.push(`<blockquote style="border-left:3px solid #cbd5e1; padding-left:1rem; color:#475569; margin:1rem 0;">${inlineMarkdown(line.replace(/^\s*>\s?/, ''))}</blockquote>`);
+      continue;
+    }
+
+    if (!line.trim()) {
+      flushParagraph();
+      closeList();
+      continue;
+    }
+
+    paragraph.push(line.trim());
+  }
+
+  flushParagraph();
+  closeList();
+  if (inCode && codeLines.length) {
+    html.push(`<pre style="background:#0d1117; color:#e6edf3; padding:1rem; border-radius:0.5rem; overflow-x:auto;"><code>${escapeXml(codeLines.join('\n'))}</code></pre>`);
+  }
+  return html.join('\n');
+}
+
 function isoDate(value) {
   if (!value) return '';
   const d = new Date(value);
@@ -1056,6 +1151,79 @@ function generateBodyHtml(routePath, data = {}) {
         </div>
       </section>
     `;
+  } else if (routePath === 'tool_detail') {
+    const t = data.tool || {};
+    const slug = t.slug || '';
+    const typeLabel = t.item_type === 'tool_skill' ? 'Tool + Skill' : t.item_type === 'skill' ? 'Skill' : 'Tool';
+    const canonical = `${SITE_URL}/tools/${slug}`;
+    const tags = Array.isArray(t.tags) ? t.tags : [];
+    const capabilities = Array.isArray(t.capabilities) ? t.capabilities : [];
+    const commands = Array.isArray(t.install_commands) && t.install_commands.length > 0
+      ? t.install_commands
+      : t.install_command
+        ? [{ label: typeLabel === 'Skill' ? 'Invocation' : 'Quick install', command: t.install_command }]
+        : [];
+    const sourceUrl = /^https?:\/\//i.test(t.source_url || '') ? t.source_url : '';
+    const docUrl = /^https?:\/\//i.test(t.documentation_url || '') ? t.documentation_url : '';
+    const authorUrl = /^https?:\/\//i.test(t.author_url || '') ? t.author_url : '';
+
+    contentHtml = `
+      <article style="padding: 3rem 2rem; max-width: 960px; margin: 0 auto; font-family: sans-serif;">
+        <nav aria-label="Breadcrumb" style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem;">
+          <a href="/" style="color: #475569; text-decoration: none;">Home</a> &rsaquo;
+          <a href="/tools" style="color: #475569; text-decoration: none;">ToolHub</a> &rsaquo;
+          <span>${escapeXml(t.name || '')}</span>
+        </nav>
+
+        <header style="border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 2rem;">
+          <p style="font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: #64748b; margin: 0 0 0.75rem;">
+            ${escapeXml(typeLabel)}${t.category ? ` &middot; ${escapeXml(t.category)}` : ''}${t.source ? ` &middot; ${escapeXml(t.source)}` : ''}
+          </p>
+          <h1 style="font-size: 2.5rem; font-weight: 800; color: #0f172a; margin: 0 0 0.75rem; line-height: 1.15;">${escapeXml(t.name || '')}</h1>
+          <p style="font-size: 1.15rem; color: #475569; line-height: 1.6; margin: 0 0 1rem;">${escapeXml(t.tagline || '')}</p>
+          ${tags.length ? `<p style="font-size: 0.85rem; color: #64748b; margin: 0 0 1rem;">${tags.map((tag) => `#${escapeXml(tag)}`).join(' &middot; ')}</p>` : ''}
+          <p style="margin: 0;">
+            ${sourceUrl ? `<a href="${escapeXml(sourceUrl)}" rel="noopener noreferrer" style="display:inline-block; margin-right:0.75rem; color:#2563eb; font-weight:600;">View source</a>` : ''}
+            ${docUrl ? `<a href="${escapeXml(docUrl)}" rel="noopener noreferrer" style="display:inline-block; color:#2563eb; font-weight:600;">Documentation</a>` : ''}
+          </p>
+        </header>
+
+        <section>
+          <h2 style="font-size: 1.5rem; color: #0f172a; margin: 0 0 1rem;">Overview</h2>
+          ${markdownToBodyHtml(t.description)}
+        </section>
+
+        ${capabilities.length ? `
+        <section style="margin-top: 2rem;">
+          <h2 style="font-size: 1.5rem; color: #0f172a; margin: 0 0 1rem;">${typeLabel === 'Skill' ? 'Capabilities' : 'Key features'}</h2>
+          <ul style="line-height: 1.8; color: #334155; padding-left: 1.5rem;">
+            ${capabilities.map((capability) => `<li>${escapeXml(capability)}</li>`).join('')}
+          </ul>
+        </section>` : ''}
+
+        ${commands.length ? `
+        <section style="margin-top: 2rem;">
+          <h2 style="font-size: 1.5rem; color: #0f172a; margin: 0 0 1rem;">${typeLabel === 'Skill' ? 'Setup &amp; usage' : 'Installation'}</h2>
+          ${commands.map((command) => `
+            <h3 style="font-size: 0.95rem; color: #475569; margin: 1rem 0 0.5rem;">${escapeXml(command.label || 'Install')}</h3>
+            <pre style="background:#0d1117; color:#e6edf3; padding:1rem; border-radius:0.5rem; overflow-x:auto;"><code>${escapeXml(command.command || '')}</code></pre>
+          `).join('')}
+          ${t.install_instructions ? `<p style="color:#475569; line-height:1.7; white-space:pre-wrap;">${escapeXml(t.install_instructions)}</p>` : ''}
+        </section>` : ''}
+
+        ${!commands.length && t.install_instructions ? `
+        <section style="margin-top: 2rem;">
+          <h2 style="font-size: 1.5rem; color: #0f172a; margin: 0 0 1rem;">Requirements &amp; setup notes</h2>
+          <p style="color:#475569; line-height:1.7; white-space:pre-wrap;">${escapeXml(t.install_instructions)}</p>
+        </section>` : ''}
+
+        <aside style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0; color: #475569; font-size: 0.9rem; line-height: 1.8;">
+          ${t.author_name ? `<p style="margin:0;">Author: ${authorUrl ? `<a href="${escapeXml(authorUrl)}" rel="noopener noreferrer" style="color:#2563eb;">${escapeXml(t.author_name)}</a>` : escapeXml(t.author_name)}</p>` : ''}
+          ${t.version ? `<p style="margin:0;">Version: ${escapeXml(t.version)}</p>` : ''}
+          <p style="margin:0;">Listing: <a href="${escapeXml(canonical)}" style="color:#2563eb;">${escapeXml(canonical)}</a></p>
+        </aside>
+      </article>
+    `;
   }
 
   return `
@@ -1074,20 +1242,20 @@ function renderTemplate(html, meta) {
     return text.replace(/\b[Zz]yro\b/g, 'ZYR0');
   };
 
-  const title = normalizeBranding(meta.title);
-  const description = normalizeBranding(meta.description);
-  const keywords = meta.keywords ? normalizeBranding(meta.keywords) : '';
-  const canonicalUrl = meta.canonicalUrl;
-  const image = meta.image || `${SITE_URL}/og-image.png`;
-  const type = meta.type || 'website';
+  const title = escapeXml(normalizeBranding(meta.title));
+  const description = escapeXml(normalizeBranding(meta.description));
+  const keywords = meta.keywords ? escapeXml(normalizeBranding(meta.keywords)) : '';
+  const canonicalUrl = escapeXml(meta.canonicalUrl || '');
+  const image = escapeXml(meta.image || `${SITE_URL}/og-image.png`);
+  const type = escapeXml(meta.type || 'website');
   const noIndex = !!meta.noIndex;
 
   let structuredDataHtml = '';
   if (meta.structuredData) {
     const list = typeof meta.structuredData === 'function' ? meta.structuredData(SITE_URL) : meta.structuredData;
     if (Array.isArray(list)) {
-      structuredDataHtml = list.map(schema => 
-        `<script type="application/ld+json">${JSON.stringify(schema)}</script>`
+      structuredDataHtml = list.map(schema =>
+        `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>`
       ).join('\n    ');
     }
   }
@@ -1491,8 +1659,8 @@ async function prerenderDynamicPages(indexHtml) {
       const pagePath = `tools/${slug}`;
       const canonicalUrl = `${SITE_URL}/${pagePath}`;
       const typeLabel = tool.item_type === 'tool_skill' ? 'Tool + Skill' : tool.item_type === 'skill' ? 'Skill' : 'Tool';
-      const title = `${tool.name} — ZYR0 ToolHub`;
-      const description = tool.tagline || `Discover ${tool.name}, a ${typeLabel.toLowerCase()} in the ZYR0 ToolHub.`;
+      const title = tool.seo_title || `${tool.name} — ${typeLabel} in ${tool.category}`;
+      const description = tool.seo_description || tool.tagline || `Discover ${tool.name}, a ${typeLabel.toLowerCase()} in the ZYR0 ToolHub.`;
       const keywords = [
         tool.name,
         tool.category,
@@ -1508,23 +1676,19 @@ async function prerenderDynamicPages(indexHtml) {
           '@context': 'https://schema.org',
           '@type': 'SoftwareApplication',
           name: tool.name,
-          description: tool.tagline,
-          applicationCategory: 'DeveloperApplication',
-          operatingSystem: 'Cross-platform',
-          url: tool.source_url,
-          image: tool.image_url || undefined,
-          author: tool.author_name ? {
-            '@type': 'Person',
-            name: tool.author_name,
-            url: tool.author_url || undefined,
-          } : undefined,
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD',
-          },
+          description,
+          url: canonicalUrl,
+          applicationCategory: tool.category,
+          applicationSubCategory: typeLabel,
+          sameAs: tool.source_url ? [tool.source_url] : undefined,
+          image: /^https?:\/\//i.test(tool.image_url || '') ? tool.image_url : undefined,
           softwareVersion: tool.version || undefined,
           dateModified: tool.updated_at || tool.created_at,
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'ZYR0 ToolHub',
+            url: `${SITE_URL}/tools`,
+          },
         },
         {
           '@context': 'https://schema.org',
@@ -1542,7 +1706,7 @@ async function prerenderDynamicPages(indexHtml) {
         description,
         keywords,
         canonicalUrl,
-        image: tool.image_url || undefined,
+        image: /^https?:\/\//i.test(tool.image_url || '') ? tool.image_url : undefined,
         structuredData: toolStructuredData,
         path: 'tool_detail',
         data: { tool },

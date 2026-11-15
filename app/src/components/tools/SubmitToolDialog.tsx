@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Sparkles, Terminal, CheckCircle2, Plus, Trash2, Check,
-  Loader2, Lock, ShieldCheck, ArrowRight, UserCheck, ChevronDown, ImageIcon, AlertCircle
+  Sparkles, Terminal, CheckCircle2, Plus, Trash2, Check, Loader2, Lock, ShieldCheck,
+  ArrowRight, UserCheck, ChevronDown, ChevronLeft, ImageIcon, AlertCircle, Save,
+  Heading2, Bold, Italic, List, ListOrdered, Link2, Code2, Tag, UserRound, FolderGit2,
+  RotateCcw, X, Eye, Pencil, Info, Search, Globe
 } from 'lucide-react';
 import {
   Dialog,
@@ -13,12 +13,36 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { submitTool, type SubmitToolInput } from '@/services/tools';
 import { coverGradient } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
+import { slugify } from '@/lib/slug';
+import { splitCapability } from '@/lib/capability';
+import { MarkdownContent } from '@/components/markdown/MarkdownContent';
+import { BASE_URL } from '@/config/seo';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import {
+  TOOL_FORM_CATEGORIES,
+  TOOL_FORM_SOURCES,
+  SEO_DESCRIPTION_MAX,
+  SEO_TITLE_MAX,
+  applyMarkdownAction,
+  buildSeoDescription,
+  buildSeoTitle,
+  clearToolDraft,
+  isDraftEmpty,
+  loadToolDraft,
+  normalizeUrl,
+  parseLines,
+  parseTags,
+  saveToolDraft,
+  type MarkdownAction,
+  type ToolDraft,
+} from './submitToolForm';
 
 interface SubmitToolDialogProps {
   open: boolean;
@@ -26,103 +50,497 @@ interface SubmitToolDialogProps {
   onSuccess?: () => void;
 }
 
-type FieldErrors = Partial<Record<'name' | 'tagline' | 'description' | 'sourceUrl' | 'imageUrl', string>>;
+type Stage = 1 | 2 | 3;
+type ItemType = 'tool' | 'skill' | 'tool_skill';
+type FieldKey = 'name' | 'tagline' | 'description' | 'sourceUrl' | 'imageUrl' | 'slug';
+type FieldErrors = Partial<Record<FieldKey, string>>;
 
 const inputCls =
-  'w-full px-3.5 py-2 bg-muted/40 border border-border rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--zyro-accent)] text-foreground';
-const inputErrorCls = 'border-red-500/70 focus:ring-red-500';
+  'w-full rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20';
+const inputErrorCls = 'border-red-500/70 focus-visible:border-red-500 focus-visible:ring-red-500/20';
+const SEARCH_PREVIEW_DOMAIN = BASE_URL.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+
+const STAGES: { id: Stage; label: string; hint: string }[] = [
+  { id: 1, label: 'Basics', hint: 'Source, name, tagline' },
+  { id: 2, label: 'Listing content', hint: 'Description, install, details' },
+  { id: 3, label: 'Review', hint: 'Completeness & preview' },
+];
+
+const ITEM_TYPES: { id: ItemType; label: string; desc: string }[] = [
+  { id: 'tool', label: 'Developer Tool', desc: 'CLI, library, package, UI kit' },
+  { id: 'skill', label: 'Agent Skill', desc: 'Automated skill or prompt protocol' },
+  { id: 'tool_skill', label: 'Tool + Skill', desc: 'Hybrid tool with agent capabilities' },
+];
+
+const QUICK_TAGS = ['Agent', 'Skills', 'CLI', 'LLM', 'MCP', 'Productivity', 'Python', 'TypeScript', 'Rust'];
+
+const MARKDOWN_TOOLS: { label: string; icon: React.ElementType; action: MarkdownAction }[] = [
+  { label: 'Heading', icon: Heading2, action: { kind: 'line', prefix: '## ' } },
+  { label: 'Bold', icon: Bold, action: { kind: 'inline', before: '**', after: '**', placeholder: 'bold text' } },
+  { label: 'Italic', icon: Italic, action: { kind: 'inline', before: '*', after: '*', placeholder: 'italic text' } },
+  { label: 'Bulleted list', icon: List, action: { kind: 'line', prefix: '- ' } },
+  { label: 'Numbered list', icon: ListOrdered, action: { kind: 'line', prefix: '1. ' } },
+  { label: 'Link', icon: Link2, action: { kind: 'inline', before: '[', after: '](https://)', placeholder: 'link text' } },
+  { label: 'Code block', icon: Code2, action: { kind: 'inline', before: '```\n', after: '\n```', placeholder: 'code' } },
+];
 
 function FieldError({ msg }: { msg?: string }) {
   return msg ? (
-    <p className="text-[11px] text-red-500 flex items-center gap-1 mt-1">
-      <AlertCircle className="w-3 h-3 shrink-0" />
+    <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
+      <AlertCircle className="h-3 w-3 shrink-0" />
       {msg}
     </p>
   ) : null;
 }
 
-/**
- * Normalizes URLs: handles missing https:// and GitHub short repo names (e.g. "org/repo")
- */
-function normalizeUrl(url: string, platform?: string): string {
-  let clean = url.trim();
-  if (!clean) return '';
-  if (platform === 'GitHub' && !clean.includes('github.com') && !clean.startsWith('http')) {
-    const parts = clean.split('/').map((s) => s.trim()).filter(Boolean);
-    if (parts.length === 2 && !clean.includes('.')) {
-      return `https://github.com/${clean}`;
-    }
-  }
-  if (clean.startsWith('github.com/')) {
-    return `https://${clean}`;
-  }
-  if (!/^https?:\/\//i.test(clean)) {
-    return `https://${clean}`;
-  }
-  return clean;
+function FieldLabel({
+  htmlFor,
+  children,
+  required,
+  hint,
+}: {
+  htmlFor?: string;
+  children: React.ReactNode;
+  required?: boolean;
+  hint?: string;
+}) {
+  return (
+    <div className="mb-1.5 flex items-baseline justify-between gap-3">
+      <label htmlFor={htmlFor} className="text-xs font-semibold text-foreground">
+        {children}
+        {required && <span className="ml-0.5 text-red-500">*</span>}
+      </label>
+      {hint && <span className="shrink-0 text-[10px] text-muted-foreground">{hint}</span>}
+    </div>
+  );
+}
+
+function StageHeading({ step, title, description }: { step: Stage; title: string; description: string }) {
+  return (
+    <div className="space-y-1">
+      <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
+        Step {step} of 3
+      </span>
+      <h3 className="text-lg font-semibold tracking-tight text-foreground">{title}</h3>
+      <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+function FormSection({
+  icon: Icon,
+  title,
+  hint,
+  summary,
+  defaultOpen,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  hint?: string;
+  summary?: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Collapsible defaultOpen={defaultOpen} className="group rounded-xl border border-border/70 bg-card">
+      <CollapsibleTrigger className="flex w-full items-center gap-2.5 px-4 py-3 text-left outline-none transition-colors hover:bg-muted/30 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--zyro-accent)]/30 rounded-xl">
+        <Icon className="h-4 w-4 shrink-0 text-[var(--zyro-accent)]" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold text-foreground">{title}</span>
+          {hint && <span className="block text-[11px] text-muted-foreground">{hint}</span>}
+        </span>
+        {summary && (
+          <span className="hidden max-w-[45%] truncate text-[11px] text-muted-foreground sm:block">{summary}</span>
+        )}
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="space-y-4 border-t border-border/60 px-4 py-4">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+interface ListingPreviewProps {
+  draft: ToolDraft;
+  imageState: 'idle' | 'loading' | 'ok' | 'error';
+  onImageLoad: () => void;
+  onImageError: () => void;
+  badge?: string;
+  featured?: boolean;
+  coverColor?: string;
+}
+
+/** Mirrors the public directory listing (ToolPreviewDialog) using only form state. */
+function ListingPreview({
+  draft,
+  imageState,
+  onImageLoad,
+  onImageError,
+  badge,
+  featured,
+  coverColor,
+}: ListingPreviewProps) {
+  const tags = parseTags(draft.tagsInput);
+  const capabilities = parseLines(draft.capabilitiesInput);
+  const commands = draft.commands
+    .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
+    .filter((command) => command.command);
+  const initials = (draft.name.trim() || '?')
+    .split(/\s+/)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  const showImage = Boolean(draft.imageUrl.trim()) && imageState !== 'error';
+  const typeLabel = draft.itemType === 'tool_skill' ? 'Tool + Skill' : draft.itemType;
+  const author = draft.authorName.trim() || 'Community Builder';
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+      {/* Hero — same language as ToolCard / ToolPreviewDialog */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-border/40 bg-[var(--zyro-twilight)]">
+        {showImage ? (
+          <>
+            <img
+              src={draft.imageUrl}
+              alt={`${draft.name || 'Listing'} cover`}
+              onLoad={onImageLoad}
+              onError={onImageError}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0" style={{ background: coverGradient(coverColor) }} aria-hidden="true" />
+            <div
+              className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:18px_18px]"
+              aria-hidden="true"
+            />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <span className="select-none font-serif text-5xl text-white/15 sm:text-6xl">{initials}</span>
+            </div>
+          </>
+        )}
+
+        <div className="absolute left-3 top-3 flex flex-wrap items-center gap-1.5">
+          <span className="rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+            {draft.source}
+          </span>
+          <span
+            className={`rounded-full border px-2 py-0.5 text-[10px] font-mono capitalize backdrop-blur-sm ${
+              draft.itemType === 'skill'
+                ? 'border-purple-300/40 bg-purple-500/30 text-purple-100'
+                : draft.itemType === 'tool_skill'
+                ? 'border-emerald-300/40 bg-emerald-500/30 text-emerald-100'
+                : 'border-white/25 bg-white/15 text-white'
+            }`}
+          >
+            {typeLabel}
+          </span>
+          {badge && (
+            <span className="rounded-full bg-[var(--zyro-accent)] px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+              {badge}
+            </span>
+          )}
+          {featured && (
+            <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-white/15 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+              <Sparkles className="h-2.5 w-2.5" />
+              Featured
+            </span>
+          )}
+        </div>
+
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+          <h3 className={`font-serif text-xl leading-tight tracking-tight sm:text-2xl ${showImage ? 'text-white drop-shadow-md' : 'text-white'}`}>
+            {draft.name.trim() || 'Your tool or skill'}
+          </h3>
+          <p className={`mt-1 line-clamp-2 text-xs sm:text-sm ${showImage ? 'text-white/85' : 'text-white/80'}`}>
+            {draft.tagline.trim() || 'Your one-sentence tagline will appear here.'}
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-5 p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="rounded-full border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
+            {draft.category}
+          </span>
+          {draft.version.trim() && (
+            <span className="rounded-full border border-border/60 bg-muted/50 px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
+              {draft.version.trim()}
+            </span>
+          )}
+        </div>
+
+        <section>
+          <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">About</h4>
+          {draft.description.trim() ? (
+            <MarkdownContent content={draft.description} className="text-[13px]" />
+          ) : (
+            <p className="text-xs italic text-muted-foreground">
+              Your rendered Markdown description will appear here.
+            </p>
+          )}
+        </section>
+
+        {capabilities.length > 0 && (
+          <section>
+            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              {draft.itemType === 'skill' ? 'Capabilities' : 'Key features'}
+            </h4>
+            <ul className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+              {capabilities.map((capability) => {
+                const [label, value] = splitCapability(capability);
+                return (
+                  <li
+                    key={capability}
+                    className="flex items-start justify-between gap-2 rounded-lg border border-[var(--zyro-accent)]/15 bg-[var(--zyro-accent-muted)] p-2 text-[11px] text-foreground/85"
+                  >
+                    <span className="flex min-w-0 items-start gap-1.5">
+                      <span className="mt-0.5 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[var(--zyro-accent)]">
+                        <Check className="h-2 w-2 text-white" strokeWidth={3} />
+                      </span>
+                      <span className="leading-snug">{label}</span>
+                    </span>
+                    {value && (
+                      <span className="shrink-0 rounded border border-border/50 bg-background/60 px-1.5 py-0.5 font-mono text-[10px] font-semibold text-foreground">
+                        {value}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
+
+        {commands.length > 0 && (
+          <section>
+            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              {draft.itemType === 'skill' ? 'Invocation' : 'Installation'}
+            </h4>
+            <div className="space-y-1.5">
+              {commands.map((command) => (
+                <div key={`${command.label}-${command.command}`} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950">
+                  <div className="border-b border-neutral-800 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-400">
+                    {command.label}
+                  </div>
+                  <pre className="overflow-x-auto p-2.5 font-mono text-[11px] text-emerald-300">
+                    <span className="select-none text-neutral-500">$ </span>
+                    {command.command}
+                  </pre>
+                </div>
+              ))}
+            </div>
+            {draft.installInstructions.trim() && (
+              <p className="mt-2 flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                <Info className="mt-px h-3 w-3 shrink-0 text-[var(--zyro-accent)]" />
+                <span>{draft.installInstructions}</span>
+              </p>
+            )}
+          </section>
+        )}
+
+        {tags.length > 0 && (
+          <section>
+            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Tags</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {tags.map((tag) => (
+                <span key={tag} className="rounded border border-border/60 bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="border-t border-border/50 pt-4">
+          <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Details</h4>
+          <dl className="space-y-1.5 text-[11px]">
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-muted-foreground">Author</dt>
+              <dd className="text-right font-medium text-foreground">{author}</dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-3">
+              <dt className="text-muted-foreground">Source</dt>
+              <dd className="text-right font-medium text-foreground">{draft.source}</dd>
+            </div>
+            {draft.version.trim() && (
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-muted-foreground">Version</dt>
+                <dd className="text-right font-mono font-medium text-foreground">{draft.version.trim()}</dd>
+              </div>
+            )}
+            {draft.docUrl.trim() && (
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-muted-foreground">Documentation</dt>
+                <dd className="truncate text-right font-medium text-[var(--zyro-accent)]">{draft.docUrl.trim()}</dd>
+              </div>
+            )}
+            {draft.authorUrl.trim() && (
+              <div className="flex items-baseline justify-between gap-3">
+                <dt className="text-muted-foreground">Author profile</dt>
+                <dd className="truncate text-right font-medium text-[var(--zyro-accent)]">{draft.authorUrl.trim()}</dd>
+              </div>
+            )}
+          </dl>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function PreviewColumn(props: ListingPreviewProps) {
+  return (
+    <div className="lg:sticky lg:top-0 lg:self-start">
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          Live listing preview
+        </span>
+        <span className="text-[10px] text-muted-foreground">Updates as you type</span>
+      </div>
+      <ListingPreview {...props} />
+      <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+        This is how your listing appears in the public directory once approved.
+      </p>
+    </div>
+  );
 }
 
 export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDialogProps) {
   const { user, profile } = useAuth();
+  const userId = user?.id;
 
-  const [itemType, setItemType] = useState<'tool' | 'skill' | 'tool_skill'>('tool');
+  const [stage, setStage] = useState<Stage>(1);
+  const [itemType, setItemType] = useState<ItemType>('tool');
   const [name, setName] = useState('');
   const [tagline, setTagline] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity'>('AI & Agents');
-  const [source, setSource] = useState('GitHub');
+  const [category, setCategory] = useState<(typeof TOOL_FORM_CATEGORIES)[number]>('AI & Agents');
+  const [source, setSource] = useState<string>('GitHub');
   const [sourceUrl, setSourceUrl] = useState('');
   const [docUrl, setDocUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [commands, setCommands] = useState<ToolInstallCommand[]>([
-    { label: 'CLI', command: '' }
-  ]);
+  const [commands, setCommands] = useState<ToolInstallCommand[]>([{ label: 'CLI', command: '' }]);
   const [installInstructions, setInstallInstructions] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [capabilitiesInput, setCapabilitiesInput] = useState('');
   const [version, setVersion] = useState('');
   const [authorName, setAuthorName] = useState(profile?.full_name || '');
   const [authorUrl, setAuthorUrl] = useState(profile?.github || profile?.portfolio_url || '');
+  const [slug, setSlug] = useState('');
+  const [seoTitle, setSeoTitle] = useState('');
+  const [seoDescription, setSeoDescription] = useState('');
 
-  // Live preview mode: card or full dialog
-  const [previewMode, setPreviewMode] = useState<'card' | 'dialog'>('card');
-  // Collapsible optional section
-  const [showOptional, setShowOptional] = useState(false);
-  // Image preview state: idle | loading | ok | error
-  const [imgState, setImgState] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
+  const [mdTab, setMdTab] = useState<'write' | 'preview'>('write');
+  const [tagDraft, setTagDraft] = useState('');
+  const [imageState, setImageState] = useState<'idle' | 'loading' | 'ok' | 'error'>('idle');
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [draftSavedAt, setDraftSavedAt] = useState<Date | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submittedSuccess, setSubmittedSuccess] = useState(false);
 
-  // Admin controls (unchanged permissions)
+  // Admin publishing controls (unchanged permissions)
   const isAdmin = profile?.role === 'admin';
   const [adminStatus, setAdminStatus] = useState<'approved' | 'pending'>('approved');
   const [adminFeatured, setAdminFeatured] = useState(false);
   const [adminBadge, setAdminBadge] = useState('');
   const [adminCoverColor, setAdminCoverColor] = useState('#7B7BDC');
 
-  const [submitting, setSubmitting] = useState(false);
-  const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const descRef = useRef<HTMLTextAreaElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
-  const handleAddCommand = () => {
-    setCommands((prev) => [...prev, { label: itemType === 'skill' ? 'Agent Setup' : 'CLI', command: '' }]);
-  };
+  // Single derived draft — the form state is the only source of truth.
+  const draft = useMemo<ToolDraft>(
+    () => ({
+      itemType,
+      name,
+      tagline,
+      description,
+      category,
+      source,
+      sourceUrl,
+      docUrl,
+      imageUrl,
+      commands,
+      installInstructions,
+      tagsInput,
+      capabilitiesInput,
+      version,
+      authorName,
+      authorUrl,
+      slug,
+      seoTitle,
+      seoDescription,
+      adminStatus,
+      adminFeatured,
+      adminBadge,
+      adminCoverColor,
+    }),
+    [
+      itemType, name, tagline, description, category, source, sourceUrl, docUrl, imageUrl,
+      commands, installInstructions, tagsInput, capabilitiesInput, version, authorName,
+      authorUrl, slug, seoTitle, seoDescription, adminStatus, adminFeatured, adminBadge, adminCoverColor,
+    ]
+  );
 
-  const handleRemoveCommand = (idx: number) => {
-    setCommands((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== idx) : [{ label: 'CLI', command: '' }]));
-  };
+  const previewTags = parseTags(tagsInput);
+  const previewCapabilities = parseLines(capabilitiesInput);
+  const validCommands = commands
+    .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
+    .filter((command) => Boolean(command.command));
+  const hasContent = !isDraftEmpty(draft);
 
-  const handleCommandChange = (idx: number, field: 'label' | 'command', val: string) => {
-    setCommands((prev) => {
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], [field]: val };
-      return copy;
-    });
+  const derivedSlug = slugify(name);
+  const effectiveSlug = slugify(slug || name);
+  const derivedSeoTitle = buildSeoTitle(name, category, itemType);
+  const derivedSeoDescription = buildSeoDescription(name, tagline, category, itemType);
+  const effectiveSeoTitle = seoTitle.trim() || derivedSeoTitle;
+  const effectiveSeoDescription = seoDescription.trim() || derivedSeoDescription;
+
+  const requiredDone = [name, tagline, sourceUrl, description].filter((value) => value.trim()).length;
+  const optionalDone = [
+    imageUrl,
+    docUrl,
+    version,
+    previewTags.length > 0 ? 'tags' : '',
+    validCommands.length > 0 ? 'commands' : '',
+    installInstructions,
+    previewCapabilities.length > 0 ? 'capabilities' : '',
+    authorUrl,
+  ].filter((value) => Boolean(typeof value === 'string' ? value.trim() : value)).length;
+  const completeness = Math.round((requiredDone / 4) * 60 + (optionalDone / 8) * 40);
+
+  const missingRequired: { label: string; stage: 1 | 2 }[] = [];
+  if (!name.trim()) missingRequired.push({ label: 'Tool / Skill name', stage: 1 });
+  if (!tagline.trim()) missingRequired.push({ label: 'One-sentence tagline', stage: 1 });
+  if (!sourceUrl.trim()) missingRequired.push({ label: 'Source URL', stage: 1 });
+  if (!description.trim()) missingRequired.push({ label: 'Detailed description', stage: 2 });
+  if (!effectiveSlug) missingRequired.push({ label: 'URL slug', stage: 2 });
+
+  const validationErrors = (Object.entries(errors) as [FieldKey, string | undefined][]).filter(
+    ([, message]) => Boolean(message)
+  );
+  const errorLabels: Record<FieldKey, string> = {
+    name: 'Tool / Skill name',
+    tagline: 'One-sentence tagline',
+    description: 'Detailed description',
+    sourceUrl: 'Source URL',
+    imageUrl: 'Cover image URL',
+    slug: 'URL slug',
   };
 
   const resetForm = () => {
+    setStage(1);
+    setItemType('tool');
     setName('');
     setTagline('');
     setDescription('');
-    setItemType('tool');
     setCategory('AI & Agents');
     setSource('GitHub');
     setSourceUrl('');
@@ -133,101 +551,249 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setTagsInput('');
     setCapabilitiesInput('');
     setVersion('');
+    setAuthorName(profile?.full_name || '');
+    setAuthorUrl(profile?.github || profile?.portfolio_url || '');
+    setSlug('');
+    setSeoTitle('');
+    setSeoDescription('');
     setAdminStatus('approved');
     setAdminFeatured(false);
     setAdminBadge('');
     setAdminCoverColor('#7B7BDC');
-    setSubmittedSuccess(false);
+    setMdTab('write');
+    setTagDraft('');
+    setImageState('idle');
+    setDraftRestored(false);
+    setDraftSavedAt(null);
     setErrors({});
-    setShowOptional(false);
-    setImgState('idle');
-    setPreviewMode('card');
+    setSubmitError(null);
+    setSubmitting(false);
+    setSubmittedSuccess(false);
   };
+
+  // Each stage starts at the top of the scroll area.
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: 0 });
+  }, [stage]);
+
+  // Restore a browser-local draft when the dialog opens.
+  useEffect(() => {
+    if (!open || !userId) return;
+    const saved = loadToolDraft(userId);
+    if (!saved) return;
+    setItemType(saved.itemType);
+    setName(saved.name);
+    setTagline(saved.tagline);
+    setDescription(saved.description);
+    setCategory(saved.category);
+    setSource(saved.source);
+    setSourceUrl(saved.sourceUrl);
+    setDocUrl(saved.docUrl);
+    setImageUrl(saved.imageUrl);
+    setImageState(saved.imageUrl.trim() ? 'loading' : 'idle');
+    setCommands(saved.commands.length > 0 ? saved.commands : [{ label: 'CLI', command: '' }]);
+    setInstallInstructions(saved.installInstructions);
+    setTagsInput(saved.tagsInput);
+    setCapabilitiesInput(saved.capabilitiesInput);
+    setVersion(saved.version);
+    setAuthorName(saved.authorName || profile?.full_name || '');
+    setAuthorUrl(saved.authorUrl || profile?.github || profile?.portfolio_url || '');
+    setSlug(saved.slug);
+    setSeoTitle(saved.seoTitle);
+    setSeoDescription(saved.seoDescription);
+    setAdminStatus(saved.adminStatus);
+    setAdminFeatured(saved.adminFeatured);
+    setAdminBadge(saved.adminBadge);
+    setAdminCoverColor(saved.adminCoverColor);
+    setDraftRestored(true);
+    // Draft is loaded once per open; profile only supplies optional author defaults.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, userId]);
+
+  // Autosave (debounced) so closing or reloading never silently loses work.
+  useEffect(() => {
+    if (!open || !userId || submittedSuccess) return;
+    const id = window.setTimeout(() => {
+      if (isDraftEmpty(draft)) {
+        clearToolDraft(userId);
+        return;
+      }
+      if (saveToolDraft(userId, draft)) setDraftSavedAt(new Date());
+    }, 800);
+    return () => window.clearTimeout(id);
+  }, [open, userId, draft, submittedSuccess]);
 
   const validate = (): FieldErrors => {
-    const errs: FieldErrors = {};
-    if (!name.trim()) errs.name = 'Name is required';
-    if (!tagline.trim()) errs.tagline = 'Tagline is required';
-    if (!description.trim()) errs.description = 'Description is required';
+    const next: FieldErrors = {};
+    if (!name.trim()) next.name = 'Name is required';
+    if (!tagline.trim()) next.tagline = 'Tagline is required';
+    if (!description.trim()) next.description = 'Description is required';
     const cleanSource = normalizeUrl(sourceUrl, source);
     if (!cleanSource) {
-      errs.sourceUrl = 'Source URL is required';
+      next.sourceUrl = 'Source URL is required';
     } else if (!/^https?:\/\/.+/i.test(cleanSource)) {
-      errs.sourceUrl = 'Must be a valid URL';
+      next.sourceUrl = 'Must be a valid URL';
     }
     if (imageUrl.trim() && !/^https?:\/\/.+/i.test(imageUrl.trim())) {
-      errs.imageUrl = 'Must be a valid http(s) URL';
+      next.imageUrl = 'Must be a valid http(s) URL';
     }
-    return errs;
+    const cleanSlug = slugify(slug || name);
+    if (!cleanSlug) {
+      next.slug = 'Add a URL slug using letters, numbers, and hyphens';
+    } else if (cleanSlug.length < 2) {
+      next.slug = 'Use at least 2 characters';
+    }
+    return next;
   };
 
-  const clearError = (field: keyof FieldErrors) => {
-    setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
+  const clearError = (field: FieldKey) => {
+    setErrors((previous) => (previous[field] ? { ...previous, [field]: undefined } : previous));
   };
 
-  const handleImageUrlChange = (val: string) => {
-    setImageUrl(val);
+  const generateSeo = () => {
+    setSlug(derivedSlug);
+    setSeoTitle(derivedSeoTitle);
+    setSeoDescription(derivedSeoDescription);
+    clearError('slug');
+  };
+
+  const handleSlugBlur = () => {
+    const clean = slugify(slug);
+    if (clean) setSlug(clean);
+    clearError('slug');
+  };
+
+  const handleImageUrlChange = (value: string) => {
+    setImageUrl(value);
     clearError('imageUrl');
-    if (!val.trim()) {
-      setImgState('idle');
+    setImageState(value.trim() ? 'loading' : 'idle');
+  };
+
+  const goToStage = (next: Stage) => {
+    if (next === 3) setErrors(validate());
+    setSubmitError(null);
+    setStage(next);
+  };
+
+  const continueFromBasics = () => {
+    const next = validate();
+    const basics: FieldErrors = { name: next.name, tagline: next.tagline, sourceUrl: next.sourceUrl };
+    setErrors((previous) => ({ ...previous, ...basics }));
+    if (basics.name || basics.tagline || basics.sourceUrl) {
+      toast.error('Add the required basic details to continue');
+      return;
+    }
+    setStage(2);
+  };
+
+  const formatDescription = (action: MarkdownAction) => {
+    const element = descRef.current;
+    const start = element?.selectionStart ?? description.length;
+    const end = element?.selectionEnd ?? description.length;
+    const result = applyMarkdownAction(description, start, end, action);
+    setDescription(result.value);
+    clearError('description');
+    window.requestAnimationFrame(() => {
+      if (!element) return;
+      element.focus();
+      element.setSelectionRange(result.selectionStart, result.selectionEnd);
+    });
+  };
+
+  const handleAddCommand = () => {
+    setCommands((previous) => [...previous, { label: itemType === 'skill' ? 'Agent Setup' : 'CLI', command: '' }]);
+  };
+
+  const handleRemoveCommand = (index: number) => {
+    setCommands((previous) => previous.filter((_, i) => i !== index));
+  };
+
+  const handleCommandChange = (index: number, field: 'label' | 'command', value: string) => {
+    setCommands((previous) => {
+      const next = [...previous];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  };
+
+  const commitTag = () => {
+    const tag = tagDraft.trim().replace(/^#/, '');
+    setTagDraft('');
+    if (!tag) return;
+    if (previewTags.some((existing) => existing.toLowerCase() === tag.toLowerCase())) return;
+    setTagsInput([...previewTags, tag].join(', '));
+  };
+
+  const addTag = (tag: string) => {
+    if (previewTags.some((existing) => existing.toLowerCase() === tag.toLowerCase())) return;
+    setTagsInput([...previewTags, tag].join(', '));
+  };
+
+  const removeTag = (tag: string) => {
+    setTagsInput(previewTags.filter((existing) => existing !== tag).join(', '));
+  };
+
+  const handleSaveDraft = () => {
+    if (!user) return;
+    if (saveToolDraft(user.id, draft)) {
+      setDraftSavedAt(new Date());
+      toast.success('Draft saved on this device');
     } else {
-      setImgState('loading');
+      toast.error('This browser blocked local storage, so the draft could not be saved');
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleStartOver = () => {
+    if (user) clearToolDraft(user.id);
+    resetForm();
+  };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    onOpenChange(nextOpen);
+    if (nextOpen) return;
+    if (user && hasContent && !submittedSuccess) saveToolDraft(user.id, draft);
+    window.setTimeout(resetForm, 200);
+  };
+
+  const submitListing = async () => {
     if (!user) {
       toast.error('Please sign in to submit a tool or skill');
       return;
     }
 
-    const errs = validate();
-    setErrors(errs);
-    if (Object.values(errs).some(Boolean)) {
+    const nextErrors = validate();
+    setErrors(nextErrors);
+    if (Object.values(nextErrors).some(Boolean)) {
+      setStage(3);
+      setSubmitError('Some required details are missing or invalid. Review the checklist above.');
       toast.error('Please fix the highlighted fields');
       return;
     }
 
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      const tags = tagsInput
-        .split(',')
-        .map((t) => t.trim().replace(/^#/, ''))
-        .filter(Boolean);
-
-      const capabilities = capabilitiesInput
-        .split('\n')
-        .map((c) => c.trim())
-        .filter(Boolean);
-
-      const cleanSourceUrl = normalizeUrl(sourceUrl, source);
-      const cleanDocUrl = docUrl.trim() ? normalizeUrl(docUrl) : '';
-      const cleanAuthorUrl = authorUrl.trim() ? normalizeUrl(authorUrl) : '';
-
-      const validCommands = commands
-        .map((c) => ({ label: c.label.trim() || 'Install', command: c.command.trim() }))
-        .filter((c) => Boolean(c.command));
-
       const input: SubmitToolInput = {
         name: name.trim(),
         tagline: tagline.trim(),
         description: description.trim(),
         item_type: itemType,
         category,
-        tags: tags.length > 0 ? tags : ['Developer'],
+        slug: effectiveSlug,
+        seo_title: effectiveSeoTitle,
+        seo_description: effectiveSeoDescription,
+        tags: previewTags,
         source: source.trim(),
-        source_url: cleanSourceUrl,
-        documentation_url: cleanDocUrl || undefined,
+        source_url: normalizeUrl(sourceUrl, source),
+        documentation_url: docUrl.trim() ? normalizeUrl(docUrl) : undefined,
         image_url: imageUrl.trim() || undefined,
-        capabilities: capabilities.length > 0 ? capabilities : ['Fast workflow execution'],
+        capabilities: previewCapabilities,
         install_command: validCommands[0]?.command || undefined,
         install_commands: validCommands.length > 0 ? validCommands : undefined,
         install_instructions: installInstructions.trim() || undefined,
         version: version.trim() || undefined,
         author_name: authorName.trim() || profile?.full_name || 'Community Builder',
-        author_url: cleanAuthorUrl || undefined,
+        author_url: authorUrl.trim() ? normalizeUrl(authorUrl) : undefined,
         ...(isAdmin
           ? {
               status: adminStatus,
@@ -239,6 +805,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
       };
 
       await submitTool(input, user.id);
+      clearToolDraft(user.id);
       setSubmittedSuccess(true);
       if (isAdmin && adminStatus === 'approved') {
         toast.success('Tool has been created and published live directly!');
@@ -248,904 +815,1206 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
       if (onSuccess) onSuccess();
     } catch (err: any) {
       console.error('Submission error:', err);
-      toast.error(err.message || 'Failed to submit tool');
+      const message = err?.message || 'Failed to submit tool';
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Derive preview data from form state
-  const previewTags = tagsInput.split(',').map((t) => t.trim().replace(/^#/, '')).filter(Boolean);
-  const previewCaps = capabilitiesInput.split('\n').map((c) => c.trim()).filter(Boolean);
-  const previewInitials = (name.trim() || '?')
-    .split(/\s+/).map((n) => n[0]).slice(0, 2).join('').toUpperCase();
+  const onFormSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (stage === 1) {
+      continueFromBasics();
+    } else if (stage === 2) {
+      goToStage(3);
+    } else {
+      submitListing();
+    }
+  };
+
+  const stageItem = (id: Stage) => {
+    const done = id < stage;
+    return (
+      <button
+        key={id}
+        type="button"
+        onClick={() => goToStage(id)}
+        aria-current={stage === id ? 'step' : undefined}
+        className={`flex min-w-0 items-center gap-2 rounded-lg border px-2 py-2 text-left outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/40 sm:px-3 ${
+          stage === id
+            ? 'border-[var(--zyro-accent)]/40 bg-[var(--zyro-accent-muted)]'
+            : 'border-transparent hover:bg-muted/50'
+        }`}
+      >
+        <span
+          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold ${
+            stage === id || done
+              ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent)] text-white'
+              : 'border-border text-muted-foreground'
+          }`}
+        >
+          {done ? <Check className="h-3 w-3" strokeWidth={3} /> : id}
+        </span>
+        <span className="min-w-0">
+          <span className={`block truncate text-xs font-semibold ${stage === id ? 'text-foreground' : 'text-muted-foreground'}`}>
+            <span className="sm:hidden">{id === 1 ? 'Basics' : id === 2 ? 'Content' : 'Review'}</span>
+            <span className="hidden sm:inline">{STAGES[id - 1].label}</span>
+          </span>
+          <span className="hidden truncate text-[10px] text-muted-foreground sm:block">{STAGES[id - 1].hint}</span>
+        </span>
+      </button>
+    );
+  };
+
+  const draftBanner = draftRestored ? (
+    <div className="flex items-start gap-2 rounded-lg border border-[var(--zyro-accent)]/25 bg-[var(--zyro-accent-muted)] px-3 py-2 text-[11px] text-foreground/90">
+      <RotateCcw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--zyro-accent)]" />
+      <p className="flex-1">
+        A draft saved in this browser was restored.{' '}
+        <button type="button" onClick={handleStartOver} className="font-semibold underline underline-offset-2">
+          Start over
+        </button>
+      </p>
+      <button
+        type="button"
+        onClick={() => setDraftRestored(false)}
+        className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+        aria-label="Dismiss draft notice"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  ) : null;
+
+  const previewProps: ListingPreviewProps = {
+    draft,
+    imageState,
+    onImageLoad: () => setImageState('ok'),
+    onImageError: () => setImageState('error'),
+    badge: isAdmin ? adminBadge.trim() : '',
+    featured: isAdmin && adminFeatured,
+    coverColor: isAdmin ? adminCoverColor : undefined,
+  };
 
   return (
-    <Dialog open={open} onOpenChange={(val) => {
-      onOpenChange(val);
-      if (!val) {
-        setTimeout(resetForm, 200);
-      }
-    }}>
-      <DialogContent className="sm:max-w-5xl max-h-[92vh] overflow-y-auto bg-card border-border/80 p-6 sm:p-8">
-        <DialogHeader className="text-left space-y-2">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-mono uppercase tracking-wider bg-[var(--zyro-accent-muted)] text-[var(--zyro-accent)] border border-[var(--zyro-accent)]/20 w-fit">
-            <Sparkles className="w-3.5 h-3.5" />
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="flex max-h-[94vh] flex-col gap-0 overflow-hidden border-border/80 bg-card p-0 sm:max-w-6xl">
+        <DialogHeader className="shrink-0 space-y-1.5 border-b border-border/60 px-5 pb-3 pt-5 pr-14 text-left sm:px-7">
+          <div className="inline-flex w-fit items-center gap-1.5 rounded-md border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
+            <Sparkles className="h-3 w-3" />
             <span>Community Registry</span>
           </div>
-          <DialogTitle className="text-2xl font-bold tracking-tight text-foreground font-sans">
+          <DialogTitle className="font-sans text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             Submit a Tool or Agent Skill
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            Share an open-source tool, Hugging Face model interface, or agent skill with developers and researchers across ZYR0.
+          <DialogDescription className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
+            {!user
+              ? 'Sign in to publish a tool or skill to the ZYR0 directory.'
+              : submittedSuccess
+              ? isAdmin && adminStatus === 'approved'
+                ? 'Your listing is published and live in the ToolHub catalog.'
+                : 'Your listing is queued for moderator review.'
+              : 'Three short steps: basics, listing content, then a final review before submitting.'}
           </DialogDescription>
+
+          {user && !submittedSuccess && (
+            <nav aria-label="Submission steps" className="grid grid-cols-3 gap-1 pt-1.5">
+              {STAGES.map((item) => stageItem(item.id))}
+            </nav>
+          )}
         </DialogHeader>
 
         {!user ? (
-          <div className="py-6 sm:py-8 space-y-6">
-            {/* Visual Attention Shield */}
-            <div className="p-6 rounded-2xl border border-[var(--zyro-accent)]/25 bg-[var(--zyro-accent-muted)] text-center relative overflow-hidden">
-              <div className="w-12 h-12 rounded-2xl bg-[var(--zyro-accent)]/10 border border-[var(--zyro-accent)]/30 flex items-center justify-center mx-auto mb-3.5 shadow-xs">
-                <Lock className="w-6 h-6 text-[var(--zyro-accent)]" />
+          <div className="space-y-5 overflow-y-auto px-5 py-6 sm:px-7">
+            <div className="rounded-xl border border-[var(--zyro-accent)]/25 bg-[var(--zyro-accent-muted)] p-5 text-center">
+              <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--zyro-accent)]/30 bg-[var(--zyro-accent)]/10">
+                <Lock className="h-5 w-5 text-[var(--zyro-accent)]" />
               </div>
-
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono uppercase tracking-wider bg-[var(--zyro-accent)]/15 text-[var(--zyro-accent)] border border-[var(--zyro-accent)]/25 mb-2">
-                <span>Authentication Required</span>
-              </div>
-
-              <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground font-sans">
-                Sign in to Submit Your Tool
-              </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground max-w-md mx-auto mt-1 leading-relaxed">
-                You must have an active Student or Company account on ZYR0 to publish packages, verify ownership, and track moderation updates.
+              <h3 className="text-lg font-semibold text-foreground">Sign in to submit your tool</h3>
+              <p className="mx-auto mt-1 max-w-md text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                You need an active ZYR0 account to publish packages, verify ownership, and track moderation.
               </p>
-
-              {/* Value Reasons Pill List */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-4 pt-4 border-t border-border/60 text-left text-xs">
-                <div className="flex items-center gap-2 text-foreground/90">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                  <span>Verified developer profile credit</span>
-                </div>
-                <div className="flex items-center gap-2 text-foreground/90">
-                  <UserCheck className="w-4 h-4 text-[var(--zyro-accent)] shrink-0" />
-                  <span>Real-time moderation tracking</span>
-                </div>
+              <div className="mx-auto mt-4 grid max-w-md grid-cols-1 gap-2 border-t border-border/60 pt-4 text-left text-xs sm:grid-cols-2">
+                <span className="flex items-center gap-2 text-foreground/90">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-500" />
+                  Developer profile credit
+                </span>
+                <span className="flex items-center gap-2 text-foreground/90">
+                  <UserCheck className="h-4 w-4 shrink-0 text-[var(--zyro-accent)]" />
+                  Moderation tracking
+                </span>
               </div>
             </div>
-
-            {/* Direct Primary & Secondary Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => onOpenChange(false)}
-                className="text-xs"
-              >
+            <div className="flex flex-col justify-end gap-2 sm:flex-row sm:items-center">
+              <Button type="button" variant="ghost" onClick={() => handleOpenChange(false)} className="text-xs">
                 Cancel
               </Button>
               <Button asChild variant="outline" className="gap-2">
-                <Link to="/register?redirect=%2Ftools">
-                  <span>Create Free Account</span>
-                </Link>
+                <Link to="/register?redirect=%2Ftools">Create free account</Link>
               </Button>
-              <Button asChild className="gap-2 bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] text-white font-medium shadow-sm">
+              <Button asChild className="gap-2 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)]">
                 <Link to="/login?redirect=%2Ftools">
-                  <span>Sign In to Continue</span>
-                  <ArrowRight className="w-4 h-4" />
+                  Sign in to continue
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
           </div>
         ) : submittedSuccess ? (
-          <div className="py-8 text-center space-y-4">
-            <CheckCircle2 className="w-14 h-14 text-emerald-500 mx-auto" />
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-12 text-center">
+            <CheckCircle2 className="h-14 w-14 text-emerald-500" />
             <h3 className="text-xl font-bold text-foreground">
-              {isAdmin && adminStatus === 'approved' ? 'Tool Published Live!' : 'Submission Queued!'}
+              {isAdmin && adminStatus === 'approved' ? 'Tool published live!' : 'Submission queued!'}
             </h3>
-            <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+            <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
               {isAdmin && adminStatus === 'approved'
-                ? 'Your tool or skill is now live in the ToolHub catalog. Developers and researchers can discover, inspect, and install it immediately.'
-                : 'Thank you for contributing! Your tool is now in the verification queue. Once approved by ZYR0 moderators, it will automatically appear live in the ToolHub catalog.'}
+                ? 'Your tool or skill is now live in the ToolHub catalog and can be discovered immediately.'
+                : 'Thank you for contributing! Once a moderator approves your listing, it will appear in the ToolHub catalog.'}
             </p>
-            <div className="flex justify-center gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  resetForm();
-                  onOpenChange(false);
-                }}
-              >
+            <div className="flex gap-3 pt-3">
+              <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 Close
               </Button>
-              <Button
-                onClick={() => {
-                  resetForm();
-                }}
-              >
-                Submit Another
-              </Button>
+              <Button onClick={resetForm}>Submit another</Button>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="pt-2">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-8">
-              {/* ============ LEFT: FORM ============ */}
-              <div className="space-y-5 min-w-0">
-                {/* Essentials */}
-                <div className="space-y-5">
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border/60 pb-1.5">
-                    Essentials
-                  </h4>
+          <form onSubmit={onFormSubmit} className="flex min-h-0 flex-1 flex-col">
+            <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-7">
+              {stage === 1 && (
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+                  <div className="min-w-0 space-y-5">
+                    <StageHeading
+                      step={1}
+                      title="Basic information"
+                      description="Start with the source and the essentials people will see first."
+                    />
+                    {draftBanner}
 
-                  {/* Item Type Selector */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground">
-                      Item Classification *
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { id: 'tool', label: 'Developer Tool', desc: 'CLI, library, package, UI kit' },
-                        { id: 'skill', label: 'Agent Skill', desc: 'Automated skill or prompt protocol' },
-                        { id: 'tool_skill', label: 'Tool + Skill', desc: 'Hybrid tool with agent capabilities' },
-                      ].map((type) => (
-                        <button
-                          type="button"
-                          key={type.id}
-                          onClick={() => setItemType(type.id as any)}
-                          className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
-                            itemType === type.id
-                              ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent-muted)] ring-1 ring-[var(--zyro-accent)] text-foreground'
-                              : 'border-border/70 bg-card hover:bg-muted/40 text-muted-foreground'
-                          }`}
-                        >
-                          <div className="text-xs font-bold font-sans text-foreground">{type.label}</div>
-                          <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{type.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Name & Tagline */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label htmlFor="st-name" className="text-xs font-semibold text-foreground">
-                        Tool / Skill Name *
-                      </label>
+                      <FieldLabel htmlFor="st-source-url" required hint="GitHub shorthand like org/repo works">
+                        Source URL
+                      </FieldLabel>
                       <input
-                        id="st-name"
+                        id="st-source-url"
                         type="text"
-                        placeholder="e.g. Ripgrep or Claude Coder"
-                        value={name}
-                        onChange={(e) => { setName(e.target.value); clearError('name'); }}
-                        className={`${inputCls} ${errors.name ? inputErrorCls : ''}`}
-                      />
-                      <FieldError msg={errors.name} />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label htmlFor="st-category" className="text-xs font-semibold text-foreground">
-                        Category *
-                      </label>
-                      <select
-                        id="st-category"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value as any)}
-                        className={`${inputCls} bg-card cursor-pointer`}
-                      >
-                        <option value="AI & Agents">AI & Agents</option>
-                        <option value="Developer Tools">Developer Tools</option>
-                        <option value="Research & Docs">Research & Docs</option>
-                        <option value="Productivity">Productivity</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Tagline */}
-                  <div className="space-y-1.5">
-                    <label htmlFor="st-tagline" className="text-xs font-semibold text-foreground">
-                      One-Sentence Tagline *
-                    </label>
-                    <input
-                      id="st-tagline"
-                      type="text"
-                      placeholder="A blazingly fast utility for..."
-                      value={tagline}
-                      onChange={(e) => { setTagline(e.target.value); clearError('tagline'); }}
-                      className={`${inputCls} ${errors.tagline ? inputErrorCls : ''}`}
-                    />
-                    <FieldError msg={errors.tagline} />
-                  </div>
-
-                  {/* Description */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="st-desc" className="text-xs font-semibold text-foreground">
-                        Detailed Description *
-                      </label>
-                      <span className="text-[10px] text-muted-foreground font-mono">
-                        Markdown supported (headings, lists, code, bold)
-                      </span>
-                    </div>
-                    <textarea
-                      id="st-desc"
-                      rows={6}
-                      placeholder="Explain what problem this tool solves, how it works, practical agent prompts, and why developers should use it..."
-                      value={description}
-                      onChange={(e) => { setDescription(e.target.value); clearError('description'); }}
-                      className={`${inputCls} ${errors.description ? inputErrorCls : ''}`}
-                    />
-                    <FieldError msg={errors.description} />
-                  </div>
-
-                  {/* Source & URL */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label htmlFor="st-source" className="text-xs font-semibold text-foreground">
-                        Source Platform *
-                      </label>
-                      <select
-                        id="st-source"
-                        value={source}
-                        onChange={(e) => setSource(e.target.value)}
-                        className={`${inputCls} bg-card cursor-pointer`}
-                      >
-                        <option value="GitHub">GitHub</option>
-                        <option value="Hugging Face">Hugging Face</option>
-                        <option value="ZYR0 Native">ZYR0 Native (Built-in)</option>
-                        <option value="GitLab">GitLab</option>
-                        <option value="Web">Official Website</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label htmlFor="st-url" className="text-xs font-semibold text-foreground">
-                        Repository or Primary URL *
-                      </label>
-                      <input
-                        id="st-url"
-                        type="url"
+                        inputMode="url"
                         placeholder="https://github.com/org/repo"
                         value={sourceUrl}
-                        onChange={(e) => { setSourceUrl(e.target.value); clearError('sourceUrl'); }}
+                        onChange={(event) => {
+                          setSourceUrl(event.target.value);
+                          clearError('sourceUrl');
+                        }}
+                        aria-invalid={Boolean(errors.sourceUrl)}
+                        aria-describedby={errors.sourceUrl ? 'st-source-url-error' : undefined}
                         className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
                       />
-                      <FieldError msg={errors.sourceUrl} />
+                      <div id="st-source-url-error">
+                        <FieldError msg={errors.sourceUrl} />
+                      </div>
+                      <p className="text-[11px] leading-relaxed text-muted-foreground">
+                        The repository, package, or official page this listing is based on.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <FieldLabel required>Item classification</FieldLabel>
+                      <div role="radiogroup" aria-label="Item classification" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        {ITEM_TYPES.map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={itemType === type.id}
+                            onClick={() => setItemType(type.id)}
+                            className={`rounded-xl border p-3 text-left transition-colors ${
+                              itemType === type.id
+                                ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent-muted)] ring-1 ring-[var(--zyro-accent)]'
+                                : 'border-border/70 bg-card hover:bg-muted/40'
+                            }`}
+                          >
+                            <span className="block text-xs font-semibold text-foreground">{type.label}</span>
+                            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{type.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-name" required>
+                          Tool / Skill name
+                        </FieldLabel>
+                        <input
+                          id="st-name"
+                          type="text"
+                          placeholder="e.g. Ripgrep or Claude Coder"
+                          value={name}
+                          onChange={(event) => {
+                            setName(event.target.value);
+                            clearError('name');
+                          }}
+                          aria-invalid={Boolean(errors.name)}
+                          className={`${inputCls} ${errors.name ? inputErrorCls : ''}`}
+                        />
+                        <FieldError msg={errors.name} />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-category" required>
+                          Category
+                        </FieldLabel>
+                        <select
+                          id="st-category"
+                          value={category}
+                          onChange={(event) => setCategory(event.target.value as (typeof TOOL_FORM_CATEGORIES)[number])}
+                          className={`${inputCls} cursor-pointer`}
+                        >
+                          {TOOL_FORM_CATEGORIES.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <FieldLabel htmlFor="st-tagline" required hint="One sentence">
+                        Tagline
+                      </FieldLabel>
+                      <input
+                        id="st-tagline"
+                        type="text"
+                        placeholder="A blazingly fast search tool for code and text"
+                        value={tagline}
+                        onChange={(event) => {
+                          setTagline(event.target.value);
+                          clearError('tagline');
+                        }}
+                        aria-invalid={Boolean(errors.tagline)}
+                        className={`${inputCls} ${errors.tagline ? inputErrorCls : ''}`}
+                      />
+                      <FieldError msg={errors.tagline} />
                     </div>
                   </div>
+
+                  <aside className="hidden lg:block">
+                    <PreviewColumn {...previewProps} />
+                  </aside>
                 </div>
+              )}
 
-                {/* Optional details (collapsible) */}
-                <div className="border border-border/70 rounded-xl overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setShowOptional((v) => !v)}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
-                    aria-expanded={showOptional}
-                  >
-                    <span className="text-xs font-bold uppercase tracking-wider text-foreground">
-                      Add more details
-                      <span className="ml-2 font-normal text-muted-foreground normal-case tracking-normal">
-                        Optional — image, install, tags & capabilities
-                      </span>
-                    </span>
-                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showOptional ? 'rotate-180' : ''}`} />
-                  </button>
+              {stage === 2 && (
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+                  <div className="min-w-0 space-y-5">
+                    <StageHeading
+                      step={2}
+                      title="Listing content"
+                      description="Write the description first. Installation, discovery, and technical details stay tucked away until you need them."
+                    />
+                    {draftBanner}
 
-                  {showOptional && (
-                    <div className="p-4 space-y-5 border-t border-border/60">
-                      {/* Image URL with live thumbnail */}
+                    <section className="space-y-2">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <FieldLabel htmlFor="st-desc" required>
+                          Detailed description
+                        </FieldLabel>
+                        <span className="shrink-0 text-[10px] font-mono text-muted-foreground">
+                          {description.length} characters
+                        </span>
+                      </div>
+
+                      <div className="overflow-hidden rounded-xl border border-border bg-background/60 transition-shadow focus-within:border-[var(--zyro-accent)] focus-within:ring-2 focus-within:ring-[var(--zyro-accent)]/15">
+                        <div className="flex flex-wrap items-center gap-0.5 border-b border-border/60 bg-muted/30 px-1.5 py-1">
+                          {MARKDOWN_TOOLS.map((tool) => {
+                            const Icon = tool.icon;
+                            return (
+                              <button
+                                key={tool.label}
+                                type="button"
+                                onClick={() => formatDescription(tool.action)}
+                                title={tool.label}
+                                aria-label={tool.label}
+                                className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/40"
+                              >
+                                <Icon className="h-3.5 w-3.5" />
+                              </button>
+                            );
+                          })}
+                          <div className="ml-auto flex items-center gap-0.5 rounded-md border border-border/60 bg-background/70 p-0.5 md:hidden">                            <button
+                              type="button"
+                              onClick={() => setMdTab('write')}
+                              aria-pressed={mdTab === 'write'}
+                              className={`flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium ${
+                                mdTab === 'write' ? 'bg-muted text-foreground' : 'text-muted-foreground'
+                              }`}
+                            >
+                              <Pencil className="h-3 w-3" />
+                              Write
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setMdTab('preview')}
+                              aria-pressed={mdTab === 'preview'}
+                              className={`flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium ${
+                                mdTab === 'preview' ? 'bg-muted text-foreground' : 'text-muted-foreground'
+                              }`}
+                            >
+                              <Eye className="h-3 w-3" />
+                              Preview
+                            </button>
+                          </div>
+                          <span className="ml-auto hidden pr-1.5 text-[10px] text-muted-foreground md:block">
+                            Markdown
+                          </span>
+                        </div>
+
+                        <div className="md:grid md:grid-cols-2 md:divide-x md:divide-border/60">
+                          <div className={mdTab === 'preview' ? 'hidden md:block' : ''}>
+                            <textarea
+                              id="st-desc"
+                              ref={descRef}
+                              rows={16}
+                              placeholder={'Explain the problem this solves, how it works, and why developers should use it.\n\n## Highlights\n- Feature one\n- Feature two'}
+                              value={description}
+                              onChange={(event) => {
+                                setDescription(event.target.value);
+                                clearError('description');
+                              }}
+                              aria-invalid={Boolean(errors.description)}
+                              aria-describedby="st-desc-help"
+                              className="min-h-[300px] w-full resize-y border-0 bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground md:min-h-[420px]"
+                            />
+                          </div>
+                          <div className={mdTab === 'write' ? 'hidden md:block' : ''}>
+                            <div className="h-full max-h-[520px] min-h-[300px] overflow-y-auto p-4 md:min-h-[420px]">
+                              {description.trim() ? (
+                                <MarkdownContent content={description} className="text-[13px]" />
+                              ) : (
+                                <p className="text-xs italic text-muted-foreground">
+                                  Formatted Markdown appears here as you type.
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p id="st-desc-help" className="text-[11px] leading-relaxed text-muted-foreground">
+                        Markdown supported: <span className="font-mono">**bold**</span>,{' '}
+                        <span className="font-mono">*italic*</span>, <span className="font-mono">## headings</span>,{' '}
+                        <span className="font-mono">- lists</span>, <span className="font-mono">`code`</span>, and{' '}
+                        <span className="font-mono">[links](url)</span>. The original Markdown is saved as written.
+                      </p>
+                      <FieldError msg={errors.description} />
+                    </section>
+
+                    <FormSection
+                      icon={Terminal}
+                      title="Installation"
+                      hint="How people add or invoke this tool"
+                      summary={validCommands.length > 0 ? `${validCommands.length} method${validCommands.length > 1 ? 's' : ''}` : 'Optional'}
+                      defaultOpen
+                    >
+                      <div>
+                        <div className="mb-2 flex items-center justify-between gap-3">
+                          <p className="text-xs font-semibold text-foreground">
+                            {itemType === 'skill'
+                              ? 'Skill invocation commands'
+                              : itemType === 'tool_skill'
+                              ? 'Install & execution commands'
+                              : 'Installation commands'}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={handleAddCommand}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--zyro-accent)] hover:underline"
+                          >
+                            <Plus className="h-3 w-3" />
+                            Add method
+                          </button>
+                        </div>
+
+                        <datalist id="command-labels">
+                          {['Agent Setup', 'CLI', 'npm', 'pnpm', 'yarn', 'bun', 'pip', 'cargo', 'Docker', 'Brew'].map(
+                            (label) => (
+                              <option key={label} value={label} />
+                            )
+                          )}
+                        </datalist>
+
+                        <div className="space-y-2.5">
+                          {commands.map((command, index) => (
+                            <div key={index} className="rounded-lg border border-border/70 bg-muted/20 p-2.5">
+                              <div className="mb-1.5 flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  list="command-labels"
+                                  value={command.label}
+                                  onChange={(event) => handleCommandChange(index, 'label', event.target.value)}
+                                  placeholder="Label"
+                                  aria-label={`Installation method ${index + 1} label`}
+                                  className="w-32 shrink-0 rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-foreground outline-none focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20"
+                                />
+                                <span className="flex-1 text-[10px] text-muted-foreground">
+                                  {command.label === 'Agent Setup'
+                                    ? 'Agent setup step'
+                                    : command.label.toLowerCase().includes('npm') || command.label.toLowerCase().includes('bun')
+                                    ? 'Package manager command'
+                                    : 'Terminal command'}
+                                </span>
+                                {commands.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveCommand(index)}
+                                    className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500"
+                                    aria-label={`Remove installation method ${index + 1}`}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                              <textarea
+                                rows={2}
+                                value={command.command}
+                                onChange={(event) => handleCommandChange(index, 'command', event.target.value)}
+                                placeholder={
+                                  command.label === 'Agent Setup'
+                                    ? 'npx rea-agents setup'
+                                    : command.label === 'npm'
+                                    ? 'npm install -g example'
+                                    : command.label === 'pip'
+                                    ? 'pip install example'
+                                    : command.label === 'Docker'
+                                    ? 'docker run -p 8080:8080 example'
+                                    : 'npx tool-pkg'
+                                }
+                                aria-label={`Installation method ${index + 1} command`}
+                                className="w-full resize-y rounded-md border border-neutral-800 bg-neutral-950 px-2.5 py-2 font-mono text-xs text-emerald-300 outline-none placeholder:text-neutral-600 focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/40"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
                       <div className="space-y-1.5">
-                        <label htmlFor="st-image" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                          <ImageIcon className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
-                          Cover Image URL
-                          <span className="text-[11px] font-normal text-muted-foreground">Optional — shown on cards & preview</span>
-                        </label>
+                        <FieldLabel htmlFor="st-install-notes" hint="Optional">
+                          Install notes
+                        </FieldLabel>
+                        <textarea
+                          id="st-install-notes"
+                          rows={2}
+                          placeholder="Requires Node 20+ and a GitHub token."
+                          value={installInstructions}
+                          onChange={(event) => setInstallInstructions(event.target.value)}
+                          className={`${inputCls} resize-y`}
+                        />
+                      </div>
+                    </FormSection>
+
+                    <FormSection
+                      icon={Tag}
+                      title="Discovery"
+                      hint="Help people find this listing"
+                      summary={previewTags.length > 0 ? `${previewTags.length} tag${previewTags.length > 1 ? 's' : ''}` : 'Optional'}
+                    >
+                      <div className="space-y-2">
+                        <FieldLabel htmlFor="st-tags" hint="Optional">
+                          Tags
+                        </FieldLabel>
+                        <div className="flex gap-2">
+                          <input
+                            id="st-tags"
+                            type="text"
+                            placeholder="Type a tag and press Enter"
+                            value={tagDraft}
+                            onChange={(event) => setTagDraft(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter' || event.key === ',') {
+                                event.preventDefault();
+                                commitTag();
+                              } else if (event.key === 'Backspace' && !tagDraft && previewTags.length > 0) {
+                                removeTag(previewTags[previewTags.length - 1]);
+                              }
+                            }}
+                            onBlur={commitTag}
+                            className={inputCls}
+                          />
+                          <Button type="button" variant="outline" size="sm" onClick={commitTag} className="shrink-0">
+                            Add
+                          </Button>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground">
+                          Use relevant tags only — duplicates are ignored.
+                        </p>
+
+                        {previewTags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 pt-0.5">
+                            {previewTags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="inline-flex items-center gap-1 rounded-full border border-[var(--zyro-accent)]/25 bg-[var(--zyro-accent-muted)] py-0.5 pl-2 pr-1 text-[11px] text-foreground/90"
+                              >
+                                #{tag}
+                                <button
+                                  type="button"
+                                  onClick={() => removeTag(tag)}
+                                  className="rounded-full p-0.5 text-muted-foreground hover:bg-background hover:text-foreground"
+                                  aria-label={`Remove tag ${tag}`}
+                                >
+                                  <X className="h-3 w-3" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {QUICK_TAGS.some(
+                          (tag) => !previewTags.some((existing) => existing.toLowerCase() === tag.toLowerCase())
+                        ) && (
+                          <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                            <span className="mr-0.5 text-[10px] text-muted-foreground">Suggestions:</span>
+                            {QUICK_TAGS.filter(
+                              (tag) => !previewTags.some((existing) => existing.toLowerCase() === tag.toLowerCase())
+                            ).map((tag) => (
+                              <button
+                                key={tag}
+                                type="button"
+                                onClick={() => addTag(tag)}
+                                className="rounded border border-border/60 bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground transition-colors hover:border-[var(--zyro-accent)]/50 hover:text-[var(--zyro-accent)]"
+                              >
+                                +{tag}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </FormSection>
+
+                    <FormSection
+                      icon={FolderGit2}
+                      title="Technical & source details"
+                      hint="Platform, links, version, cover image"
+                      summary={`${source}${version.trim() ? ` · ${version.trim()}` : ''}`}
+                    >
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div className="space-y-1.5">
+                          <FieldLabel htmlFor="st-source" required>
+                            Source platform
+                          </FieldLabel>
+                          <select
+                            id="st-source"
+                            value={source}
+                            onChange={(event) => setSource(event.target.value)}
+                            className={`${inputCls} cursor-pointer`}
+                          >
+                            {TOOL_FORM_SOURCES.map((option) => (
+                              <option key={option} value={option}>
+                                {option === 'ZYR0 Native' ? 'ZYR0 Native (Built-in)' : option === 'Web' ? 'Official website' : option}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <FieldLabel htmlFor="st-repo-url" required hint="Same as Source URL">
+                            Repository or primary URL
+                          </FieldLabel>
+                          <input
+                            id="st-repo-url"
+                            type="text"
+                            inputMode="url"
+                            placeholder="https://github.com/org/repo"
+                            value={sourceUrl}
+                            onChange={(event) => {
+                              setSourceUrl(event.target.value);
+                              clearError('sourceUrl');
+                            }}
+                            aria-invalid={Boolean(errors.sourceUrl)}
+                            className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
+                          />
+                          <FieldError msg={errors.sourceUrl} />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <FieldLabel htmlFor="st-doc" hint="Optional">
+                            Documentation URL
+                          </FieldLabel>
+                          <input
+                            id="st-doc"
+                            type="text"
+                            inputMode="url"
+                            placeholder="https://docs.example.com"
+                            value={docUrl}
+                            onChange={(event) => setDocUrl(event.target.value)}
+                            className={`${inputCls} font-mono`}
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <FieldLabel htmlFor="st-version" hint="Optional">
+                            Version / release
+                          </FieldLabel>
+                          <input
+                            id="st-version"
+                            type="text"
+                            placeholder="e.g. v1.2.0"
+                            value={version}
+                            onChange={(event) => setVersion(event.target.value)}
+                            className={`${inputCls} font-mono`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-image" hint="Optional">
+                          <span className="inline-flex items-center gap-1.5">
+                            <ImageIcon className="h-3.5 w-3.5 text-[var(--zyro-accent)]" />
+                            Cover image URL
+                          </span>
+                        </FieldLabel>
                         <input
                           id="st-image"
-                          type="url"
+                          type="text"
+                          inputMode="url"
                           placeholder="https://example.com/preview.png"
                           value={imageUrl}
-                          onChange={(e) => handleImageUrlChange(e.target.value)}
+                          onChange={(event) => handleImageUrlChange(event.target.value)}
+                          aria-invalid={Boolean(errors.imageUrl)}
                           className={`${inputCls} font-mono ${errors.imageUrl ? inputErrorCls : ''}`}
                         />
                         <FieldError msg={errors.imageUrl} />
                         {imageUrl.trim() && (
-                          <div className="mt-2 relative w-full max-w-xs aspect-video rounded-lg overflow-hidden border border-border/70 bg-muted/40">
-                            {imgState !== 'ok' && imgState !== 'error' && (
+                          <div className="relative mt-1 aspect-video w-full max-w-[220px] overflow-hidden rounded-lg border border-border/70 bg-muted/40">
+                            {imageState === 'loading' && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+                                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                               </div>
                             )}
-                            <img
-                              src={imageUrl}
-                              alt="Cover image preview"
-                              onLoad={() => setImgState('ok')}
-                              onError={() => setImgState('error')}
-                              className={`w-full h-full object-cover ${imgState === 'ok' ? '' : 'opacity-0'}`}
-                            />
-                            {imgState === 'error' && (
-                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-muted/60 text-[11px] text-amber-600 dark:text-amber-400">
-                                <AlertCircle className="w-4 h-4" />
+                            {imageState === 'error' ? (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-muted/60 text-[10px] text-amber-600 dark:text-amber-400">
+                                <AlertCircle className="h-4 w-4" />
                                 <span>Image failed to load</span>
                               </div>
+                            ) : (
+                              <img
+                                src={imageUrl}
+                                alt="Cover image preview"
+                                onLoad={() => setImageState('ok')}
+                                onError={() => setImageState('error')}
+                                className={`h-full w-full object-cover ${imageState === 'ok' ? '' : 'opacity-0'}`}
+                              />
                             )}
-                            {imgState === 'ok' && (
-                              <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-mono">
+                            {imageState === 'ok' && (
+                              <span className="absolute bottom-1.5 left-1.5 rounded bg-black/60 px-1.5 py-0.5 font-mono text-[9px] text-white">
                                 Preview OK
                               </span>
                             )}
                           </div>
                         )}
                       </div>
+                    </FormSection>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormSection
+                      icon={UserRound}
+                      title="Creator & capabilities"
+                      hint="Who made it and what it can do"
+                      summary={authorName.trim() || 'Optional'}
+                    >
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="space-y-1.5">
-                          <label htmlFor="st-doc" className="text-xs font-semibold text-foreground">
-                            Documentation URL
-                          </label>
-                          <input
-                            id="st-doc"
-                            type="url"
-                            placeholder="https://docs.example.com"
-                            value={docUrl}
-                            onChange={(e) => setDocUrl(e.target.value)}
-                            className={`${inputCls} font-mono`}
-                          />
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label htmlFor="st-version" className="text-xs font-semibold text-foreground">
-                            Version / Release
-                          </label>
-                          <input
-                            id="st-version"
-                            type="text"
-                            placeholder="e.g. v1.2.0"
-                            value={version}
-                            onChange={(e) => setVersion(e.target.value)}
-                            className={`${inputCls} font-mono`}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Installation / Execution Commands */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                            <Terminal className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
-                            <span>
-                              {itemType === 'skill'
-                                ? 'Skill Invocation Commands'
-                                : itemType === 'tool_skill'
-                                ? 'Install & Execution Commands'
-                                : 'Installation Commands'}
-                            </span>
-                          </label>
-                          <button
-                            type="button"
-                            onClick={handleAddCommand}
-                            className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--zyro-accent)] hover:underline cursor-pointer"
-                          >
-                            <Plus className="w-3 h-3" />
-                            <span>Add Command</span>
-                          </button>
-                        </div>
-
-                        <datalist id="command-labels">
-                          <option value="Agent Setup" />
-                          <option value="CLI" />
-                          <option value="npm" />
-                          <option value="pnpm" />
-                          <option value="yarn" />
-                          <option value="bun" />
-                          <option value="pip" />
-                          <option value="cargo" />
-                          <option value="Docker" />
-                          <option value="Brew" />
-                        </datalist>
-
-                        <div className="space-y-2">
-                          {commands.map((cmd, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                              <input
-                                type="text"
-                                list="command-labels"
-                                value={cmd.label}
-                                onChange={(e) => handleCommandChange(idx, 'label', e.target.value)}
-                                placeholder="Label"
-                                className="w-28 shrink-0 px-2.5 py-1.5 bg-muted/40 border border-border rounded-lg text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--zyro-accent)]"
-                              />
-                              <div className="relative flex-1">
-                                <Terminal className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                <input
-                                  type="text"
-                                  value={cmd.command}
-                                  onChange={(e) => handleCommandChange(idx, 'command', e.target.value)}
-                                  placeholder={
-                                    cmd.label === 'Agent Setup'
-                                      ? 'npx rea-agents setup'
-                                      : cmd.label === 'npm'
-                                      ? 'npm install -g example'
-                                      : cmd.label === 'pip'
-                                      ? 'pip install example'
-                                      : cmd.label === 'Docker'
-                                      ? 'docker run -p 8080:8080 example'
-                                      : 'e.g. npx tool-pkg or cargo install ...'
-                                  }
-                                  className={`${inputCls} pl-8 py-1.5 font-mono text-xs`}
-                                />
-                              </div>
-                              {commands.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => handleRemoveCommand(idx)}
-                                  className="p-1.5 text-muted-foreground hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
-                                  title="Remove command"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label htmlFor="st-install-notes" className="text-xs font-semibold text-foreground">
-                          Install Notes
-                          <span className="ml-2 text-[11px] font-normal text-muted-foreground">Extra prose shown near the command</span>
-                        </label>
-                        <textarea
-                          id="st-install-notes"
-                          rows={2}
-                          placeholder="Requires Node 20+ and a GitHub token..."
-                          value={installInstructions}
-                          onChange={(e) => setInstallInstructions(e.target.value)}
-                          className={inputCls}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <label htmlFor="st-tags" className="text-xs font-semibold text-foreground">
-                            Tags (comma separated)
-                          </label>
-                          <input
-                            id="st-tags"
-                            type="text"
-                            placeholder="Agent, Skills, CLI, LLM"
-                            value={tagsInput}
-                            onChange={(e) => setTagsInput(e.target.value)}
-                            className={inputCls}
-                          />
-                          <div className="flex flex-wrap items-center gap-1 pt-1">
-                            <span className="text-[10px] text-muted-foreground mr-0.5">Quick add:</span>
-                            {['Agent', 'Skills', 'CLI', 'LLM', 'MCP', 'Productivity', 'Python', 'TypeScript', 'Rust'].map((tag) => (
-                              <button
-                                type="button"
-                                key={tag}
-                                onClick={() => {
-                                  const existing = tagsInput.split(',').map((t) => t.trim().replace(/^#/, '')).filter(Boolean);
-                                  if (!existing.includes(tag)) {
-                                    setTagsInput(existing.length > 0 ? `${existing.join(', ')}, ${tag}` : tag);
-                                  }
-                                }}
-                                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/50 hover:border-[var(--zyro-accent)]/50 hover:text-[var(--zyro-accent)] transition-all cursor-pointer"
-                              >
-                                +{tag}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <label htmlFor="st-author" className="text-xs font-semibold text-foreground">
-                            Author / Organization Name
-                          </label>
+                          <FieldLabel htmlFor="st-author" hint="Optional">
+                            Author / organization name
+                          </FieldLabel>
                           <input
                             id="st-author"
                             type="text"
-                            placeholder="Author or Maintainer"
+                            placeholder="Author or maintainer"
                             value={authorName}
-                            onChange={(e) => setAuthorName(e.target.value)}
+                            onChange={(event) => setAuthorName(event.target.value)}
                             className={inputCls}
+                          />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <FieldLabel htmlFor="st-author-url" hint="Optional">
+                            Author profile URL
+                          </FieldLabel>
+                          <input
+                            id="st-author-url"
+                            type="text"
+                            inputMode="url"
+                            placeholder="https://github.com/username"
+                            value={authorUrl}
+                            onChange={(event) => setAuthorUrl(event.target.value)}
+                            className={`${inputCls} font-mono`}
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label htmlFor="st-author-url" className="text-xs font-semibold text-foreground">
-                          Author Profile URL
-                        </label>
-                        <input
-                          id="st-author-url"
-                          type="url"
-                          placeholder="https://github.com/username"
-                          value={authorUrl}
-                          onChange={(e) => setAuthorUrl(e.target.value)}
-                          className={`${inputCls} font-mono`}
-                        />
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <label htmlFor="st-caps" className="text-xs font-semibold text-foreground">
-                          Key Capabilities (1 per line)
-                        </label>
+                        <FieldLabel htmlFor="st-caps" hint="One per line, optional">
+                          Key capabilities
+                        </FieldLabel>
                         <textarea
                           id="st-caps"
-                          rows={3}
-                          placeholder="Agents - 71&#10;Skills - 302&#10;OpenAI-compatible drop-in server"
+                          rows={4}
+                          placeholder={'Agents - 71\nSkills - 302\nOpenAI-compatible drop-in server'}
                           value={capabilitiesInput}
-                          onChange={(e) => setCapabilitiesInput(e.target.value)}
+                          onChange={(event) => setCapabilitiesInput(event.target.value)}
+                          className={`${inputCls} resize-y`}
+                        />
+                        <p className="text-[10px] text-muted-foreground">
+                          Tip: use "Feature - Metric" pairs (e.g. Agents - 71) or plain feature bullets.
+                        </p>
+                      </div>
+                    </FormSection>
+
+                    <FormSection
+                      icon={Search}
+                      title="SEO settings"
+                      hint="Search title, meta description, and URL"
+                      summary={`/tools/${effectiveSlug || '…'}`}
+                    >
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="max-w-md text-[11px] leading-relaxed text-muted-foreground">
+                          Generated from your listing details. Edit only if you need a different search phrase —
+                          never add claims the listing does not support.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={generateSeo}
+                          disabled={!name.trim()}
+                          className="h-7 shrink-0 gap-1.5 text-[11px]"
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          Generate from listing
+                        </Button>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel
+                          htmlFor="st-seo-title"
+                          hint={`${effectiveSeoTitle.length}/${SEO_TITLE_MAX} recommended`}
+                        >
+                          SEO page title
+                        </FieldLabel>
+                        <input
+                          id="st-seo-title"
+                          type="text"
+                          value={seoTitle || derivedSeoTitle}
+                          onChange={(event) => setSeoTitle(event.target.value)}
                           className={inputCls}
                         />
-                        <span className="text-[10px] text-muted-foreground block mt-0.5">
-                          Tip: Use "Feature - Metric" pairs (e.g. Agents - 71) or plain feature bullet points.
-                        </span>
+                        {effectiveSeoTitle.length > SEO_TITLE_MAX && (
+                          <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                            Search engines may shorten this title.
+                          </p>
+                        )}
                       </div>
-                    </div>
-                  )}
-                </div>
 
-                {/* Admin Publishing Controls (Only visible to Administrators) */}
-                {isAdmin && (
-                  <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-blue-500" />
-                      <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                        Administrator Publishing Powers
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {/* Publication Mode */}
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">
-                          Publication Status
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setAdminStatus('approved')}
-                            className={`px-3 py-2 rounded-lg text-xs font-medium border text-center transition-all cursor-pointer ${
-                              adminStatus === 'approved'
-                                ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold'
-                                : 'border-border/70 bg-card text-muted-foreground hover:bg-muted/40'
-                            }`}
-                          >
-                            Publish Live
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setAdminStatus('pending')}
-                            className={`px-3 py-2 rounded-lg text-xs font-medium border text-center transition-all cursor-pointer ${
-                              adminStatus === 'pending'
-                                ? 'border-amber-500 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold'
-                                : 'border-border/70 bg-card text-muted-foreground hover:bg-muted/40'
-                            }`}
-                          >
-                            Save as Pending
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Custom Badge */}
-                      <div className="space-y-1.5">
-                        <label htmlFor="st-badge" className="text-xs font-semibold text-foreground">
-                          Custom Badge (Optional)
-                        </label>
-                        <input
-                          id="st-badge"
-                          type="text"
-                          placeholder="e.g. Verified, Official, Staff Pick"
-                          value={adminBadge}
-                          onChange={(e) => setAdminBadge(e.target.value)}
-                          className="w-full px-3 py-2 bg-card border border-border rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-accent text-foreground"
-                        />
-                        <div className="flex flex-wrap items-center gap-1 pt-1">
-                          <span className="text-[10px] text-muted-foreground mr-0.5">Presets:</span>
-                          {['Verified', 'Official', 'Staff Pick', 'Trending', 'Popular', 'Beta'].map((b) => (
-                            <button
-                              type="button"
-                              key={b}
-                              onClick={() => setAdminBadge(b)}
-                              className={`text-[10px] px-1.5 py-0.5 rounded border transition-all cursor-pointer ${
-                                adminBadge === b
-                                  ? 'bg-[var(--zyro-accent)] text-white border-[var(--zyro-accent)] font-semibold'
-                                  : 'bg-card text-muted-foreground border-border/70 hover:bg-muted/40'
-                              }`}
-                            >
-                              {b}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card Hero Color */}
-                    <div className="space-y-1.5">
-                      <label htmlFor="st-cover-color" className="text-xs font-semibold text-foreground">
-                        Card Hero Color
-                        <span className="ml-2 text-[11px] font-normal text-muted-foreground">Gradient shown when no cover image is set</span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          id="st-cover-color"
-                          type="color"
-                          value={adminCoverColor}
-                          onChange={(e) => setAdminCoverColor(e.target.value)}
-                          className="w-10 h-9 p-1 rounded-lg border border-border bg-card cursor-pointer"
-                        />
-                        <input
-                          type="text"
-                          value={adminCoverColor}
-                          onChange={(e) => setAdminCoverColor(e.target.value)}
-                          placeholder="#7B7BDC"
-                          className="flex-1 px-3 py-2 bg-card border border-border rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-accent text-foreground"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setAdminCoverColor('#7B7BDC')}
-                          className="px-2.5 py-2 rounded-lg text-[11px] font-medium border border-border/70 bg-card text-muted-foreground hover:bg-muted/40 cursor-pointer"
+                        <FieldLabel
+                          htmlFor="st-seo-description"
+                          hint={`${effectiveSeoDescription.length}/${SEO_DESCRIPTION_MAX} recommended`}
                         >
-                          Reset
-                        </button>
+                          Meta description
+                        </FieldLabel>
+                        <textarea
+                          id="st-seo-description"
+                          rows={3}
+                          value={seoDescription || derivedSeoDescription}
+                          onChange={(event) => setSeoDescription(event.target.value)}
+                          className={`${inputCls} resize-y`}
+                        />
+                        {effectiveSeoDescription.length > SEO_DESCRIPTION_MAX && (
+                          <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                            Search engines may truncate this description.
+                          </p>
+                        )}
                       </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-slug" hint="Lowercase letters, numbers, hyphens">
+                          URL slug
+                        </FieldLabel>
+                        <div className={`flex items-stretch overflow-hidden rounded-lg border bg-background/60 focus-within:ring-2 focus-within:ring-[var(--zyro-accent)]/20 ${errors.slug ? inputErrorCls : 'border-border focus-within:border-[var(--zyro-accent)]'}`}>
+                          <span className="flex items-center border-r border-border/60 bg-muted/40 px-2.5 font-mono text-[11px] text-muted-foreground">
+                            /tools/
+                          </span>
+                          <input
+                            id="st-slug"
+                            type="text"
+                            value={slug || derivedSlug}
+                            onChange={(event) => {
+                              setSlug(event.target.value);
+                              clearError('slug');
+                            }}
+                            onBlur={handleSlugBlur}
+                            placeholder="your-listing"
+                            aria-invalid={Boolean(errors.slug)}
+                            className="min-w-0 flex-1 border-0 bg-transparent px-2.5 py-2 font-mono text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                          />
+                        </div>
+                        <FieldError msg={errors.slug} />
+                        <p className="text-[10px] text-muted-foreground">
+                          Page H1 stays the official listing name: <span className="font-medium text-foreground">{name.trim() || 'your listing name'}</span>
+                        </p>
+                      </div>
+
+                      <div className="rounded-xl border border-border/70 bg-background p-3">
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Search engine preview
+                        </p>
+                        <div className="space-y-0.5">
+                          <p className="flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+                            <Globe className="h-3 w-3 shrink-0" />
+                            <span className="truncate">
+                              {SEARCH_PREVIEW_DOMAIN} › tools › {effectiveSlug || 'your-listing'}
+                            </span>
+                          </p>
+                          <p className="line-clamp-2 break-words text-[15px] font-medium leading-snug text-[#1a0dab] dark:text-blue-400">
+                            {effectiveSeoTitle}
+                          </p>
+                          <p className="line-clamp-2 break-words text-[12px] leading-relaxed text-muted-foreground">
+                            {effectiveSeoDescription}
+                          </p>
+                        </div>
+                      </div>
+                    </FormSection>
+                  </div>
+
+                  <aside className="hidden lg:block">
+                    <PreviewColumn {...previewProps} />
+                  </aside>
+                </div>
+              )}
+
+              {stage === 3 && (
+                <div className="space-y-5">
+                  <StageHeading
+                    step={3}
+                    title="Review and submit"
+                    description="Check completeness, fix anything flagged, then confirm the final listing."
+                  />
+                  {draftBanner}
+
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-[330px_minmax(0,1fr)]">
+                    <div className="min-w-0 space-y-4">
+                      <section className="rounded-xl border border-border/70 bg-card p-4">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <h4 className="text-xs font-semibold text-foreground">Listing completeness</h4>
+                          <span className="text-2xl font-semibold tracking-tight text-foreground">{completeness}%</span>
+                        </div>
+                        <Progress
+                          value={completeness}
+                          className="mt-2 h-1.5 bg-muted [&_[data-slot=progress-indicator]]:bg-[var(--zyro-accent)]"
+                        />
+                        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                          {requiredDone} of 4 required details · {optionalDone} of 8 optional details
+                        </p>
+                      </section>
+
+                      <section className="space-y-2 rounded-xl border border-border/70 bg-card p-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-xs font-semibold text-foreground">SEO metadata</h4>
+                          <button
+                            type="button"
+                            onClick={() => setStage(2)}
+                            className="text-[11px] font-medium text-[var(--zyro-accent)] hover:underline"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <dl className="space-y-1 text-[11px]">
+                          <div className="flex items-baseline justify-between gap-3">
+                            <dt className="text-muted-foreground">Title</dt>
+                            <dd className={effectiveSeoTitle.length > SEO_TITLE_MAX ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}>
+                              {effectiveSeoTitle.length} chars
+                            </dd>
+                          </div>
+                          <div className="flex items-baseline justify-between gap-3">
+                            <dt className="text-muted-foreground">Meta description</dt>
+                            <dd className={effectiveSeoDescription.length > SEO_DESCRIPTION_MAX ? 'text-amber-600 dark:text-amber-400' : 'text-foreground'}>
+                              {effectiveSeoDescription.length} chars
+                            </dd>
+                          </div>
+                          <div className="flex items-baseline justify-between gap-3">
+                            <dt className="shrink-0 text-muted-foreground">URL</dt>
+                            <dd className="truncate text-right font-mono text-foreground">/tools/{effectiveSlug || '—'}</dd>
+                          </div>
+                        </dl>
+                      </section>
+
+                      <section className="space-y-2">
+                        <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Before you submit
+                        </h4>
+                        {missingRequired.length === 0 ? (
+                          <p className="flex items-start gap-2 rounded-lg border border-emerald-500/25 bg-emerald-500/5 px-3 py-2 text-[11px] text-emerald-700 dark:text-emerald-400">
+                            <CheckCircle2 className="mt-px h-3.5 w-3.5 shrink-0" />
+                            All required fields are in place.
+                          </p>
+                        ) : (
+                          <ul className="space-y-1.5">
+                            {missingRequired.map((item) => (
+                              <li key={item.label}>
+                                <button
+                                  type="button"
+                                  onClick={() => setStage(item.stage)}
+                                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2 text-left text-[11px] text-amber-700 transition-colors hover:bg-amber-500/10 dark:text-amber-400"
+                                >
+                                  <span className="flex items-center gap-1.5">
+                                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                                    {item.label} is required
+                                  </span>
+                                  <span className="font-semibold">Add</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+
+                        {validationErrors.length > 0 && (
+                          <div className="rounded-lg border border-red-500/30 bg-red-500/5 p-3">
+                            <p className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold text-red-600 dark:text-red-400">
+                              <AlertCircle className="h-3.5 w-3.5" />
+                              Validation errors
+                            </p>
+                            <ul className="list-disc space-y-0.5 pl-4 text-[11px] text-red-600/90 dark:text-red-400/90">
+                              {validationErrors.map(([field, message]) => (
+                                <li key={field}>
+                                  {errorLabels[field]}: {message}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {submitError && (
+                          <p className="flex items-start gap-1.5 rounded-lg border border-red-500/30 bg-red-500/5 px-3 py-2 text-[11px] text-red-600 dark:text-red-400">
+                            <AlertCircle className="mt-px h-3.5 w-3.5 shrink-0" />
+                            {submitError}
+                          </p>
+                        )}
+                      </section>
+
+                      <section className="rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-[11px] text-muted-foreground">
+                        <p>
+                          Submissions are reviewed by moderators before appearing publicly. Your work is also saved as a
+                          draft on this device while you edit.
+                          {draftSavedAt && ` Last saved ${draftSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`}
+                        </p>
+                      </section>
+
+                      {isAdmin && (
+                        <section className="space-y-4 rounded-xl border border-blue-500/25 bg-blue-500/5 p-4">
+                          <div className="flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-blue-500" />
+                            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                              Administrator publishing controls
+                            </span>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <span className="text-xs font-semibold text-foreground">Publication status</span>
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setAdminStatus('approved')}
+                                aria-pressed={adminStatus === 'approved'}
+                                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                                  adminStatus === 'approved'
+                                    ? 'border-emerald-500 bg-emerald-500/10 font-bold text-emerald-600 dark:text-emerald-400'
+                                    : 'border-border/70 bg-card text-muted-foreground hover:bg-muted/40'
+                                }`}
+                              >
+                                Publish live
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAdminStatus('pending')}
+                                aria-pressed={adminStatus === 'pending'}
+                                className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                                  adminStatus === 'pending'
+                                    ? 'border-amber-500 bg-amber-500/10 font-bold text-amber-600 dark:text-amber-400'
+                                    : 'border-border/70 bg-card text-muted-foreground hover:bg-muted/40'
+                                }`}
+                              >
+                                Save as pending
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <FieldLabel htmlFor="st-badge" hint="Optional">
+                              Custom badge
+                            </FieldLabel>
+                            <input
+                              id="st-badge"
+                              type="text"
+                              placeholder="e.g. Verified, Official, Staff Pick"
+                              value={adminBadge}
+                              onChange={(event) => setAdminBadge(event.target.value)}
+                              className="w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20"
+                            />
+                            <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                              {['Verified', 'Official', 'Staff Pick', 'Trending', 'Popular', 'Beta'].map((badge) => (
+                                <button
+                                  key={badge}
+                                  type="button"
+                                  onClick={() => setAdminBadge(badge)}
+                                  className={`rounded border px-1.5 py-0.5 text-[10px] transition-colors ${
+                                    adminBadge === badge
+                                      ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent)] font-semibold text-white'
+                                      : 'border-border/70 bg-card text-muted-foreground hover:bg-muted/40'
+                                  }`}
+                                >
+                                  {badge}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <FieldLabel htmlFor="st-cover-color" hint="Gradient when no cover image">
+                              Card hero color
+                            </FieldLabel>
+                            <div className="flex items-center gap-2">
+                              <input
+                                id="st-cover-color"
+                                type="color"
+                                value={adminCoverColor}
+                                onChange={(event) => setAdminCoverColor(event.target.value)}
+                                className="h-9 w-10 cursor-pointer rounded-lg border border-border bg-card p-1"
+                              />
+                              <input
+                                type="text"
+                                value={adminCoverColor}
+                                onChange={(event) => setAdminCoverColor(event.target.value)}
+                                placeholder="#7B7BDC"
+                                aria-label="Card hero color hex"
+                                className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-2 font-mono text-xs text-foreground outline-none focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setAdminCoverColor('#7B7BDC')}
+                                className="shrink-0 rounded-lg border border-border/70 bg-card px-2.5 py-2 text-[11px] font-medium text-muted-foreground hover:bg-muted/40"
+                              >
+                                Reset
+                              </button>
+                            </div>
+                          </div>
+
+                          <label className="flex cursor-pointer items-start gap-2.5">
+                            <input
+                              type="checkbox"
+                              checked={adminFeatured}
+                              onChange={(event) => setAdminFeatured(event.target.checked)}
+                              className="mt-0.5 h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-xs">
+                              <span className="font-semibold text-foreground">Featured flagship tool</span>
+                              <span className="ml-1 text-muted-foreground">(pin to the curated showcase on /tools)</span>
+                            </span>
+                          </label>
+                        </section>
+                      )}
                     </div>
 
-                    {/* Featured Switch */}
-                    <label className="flex items-center gap-3 pt-1 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={adminFeatured}
-                        onChange={(e) => setAdminFeatured(e.target.checked)}
-                        className="w-4 h-4 rounded border-border text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="text-xs">
-                        <span className="font-semibold text-foreground">Featured Flagship Tool</span>
-                        <span className="text-muted-foreground ml-1.5">
-                          (Pin to the top curated showcase section on /tools)
+                    <div className="min-w-0">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Final listing preview
                         </span>
+                        <span className="text-[10px] text-muted-foreground">Exactly what visitors will see</span>
                       </div>
-                    </label>
+                      <ListingPreview {...previewProps} />
+                    </div>
                   </div>
-                )}
+                </div>
+              )}
+            </div>
 
-                {/* Modal Actions */}
-                <div className="pt-4 border-t border-border flex items-center justify-end gap-3">
+            <footer className="flex shrink-0 flex-wrap items-center gap-2 border-t border-border/60 bg-muted/20 px-5 py-3 sm:px-7">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleOpenChange(false)}
+                disabled={submitting}
+                className="h-8 text-xs text-muted-foreground"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleSaveDraft}
+                disabled={!hasContent || submitting}
+                className="h-8 gap-1.5 text-xs"
+              >
+                <Save className="h-3.5 w-3.5" />
+                Save draft
+              </Button>
+              {draftSavedAt && (
+                <span className="hidden text-[10px] text-muted-foreground sm:inline">
+                  Saved {draftSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+
+              <div className="ml-auto flex w-full items-center gap-2 sm:w-auto">
+                {stage > 1 && (
                   <Button
                     type="button"
-                    variant="ghost"
-                    onClick={() => onOpenChange(false)}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setStage((stage - 1) as Stage)}
                     disabled={submitting}
+                    className="h-8 flex-1 gap-1 sm:flex-none"
                   >
-                    Cancel
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    Back
                   </Button>
+                )}
+                {stage < 3 ? (
                   <Button
                     type="submit"
+                    size="sm"
                     disabled={submitting}
-                    className="gap-2 bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] text-white"
+                    className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
+                  >
+                    {stage === 1 ? 'Continue' : 'Review listing'}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    size="sm"
+                    disabled={submitting}
+                    className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
                   >
                     {submitting ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Submitting...</span>
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        Submitting...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-4 h-4" />
-                        <span>Submit for Review</span>
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Submit for review
                       </>
                     )}
                   </Button>
-                </div>
+                )}
               </div>
-
-              {/* ============ RIGHT: LIVE PREVIEW ============ */}
-              <div className="lg:sticky lg:top-0 self-start w-full">
-                <div className="rounded-2xl border border-border/80 bg-card shadow-sm overflow-hidden">
-                  <div className="px-3.5 py-2 border-b border-border/60 bg-muted/30 flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                      Live Preview
-                    </span>
-                    <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg border border-border/50 text-[10px] font-medium">
-                      <button
-                        type="button"
-                        onClick={() => setPreviewMode('card')}
-                        className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
-                          previewMode === 'card'
-                            ? 'bg-card text-foreground shadow-xs font-semibold'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Card
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPreviewMode('dialog')}
-                        className={`px-2 py-0.5 rounded-md transition-all cursor-pointer ${
-                          previewMode === 'dialog'
-                            ? 'bg-card text-foreground shadow-xs font-semibold'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        Full Dialog
-                      </button>
-                    </div>
-                  </div>
-
-                  {previewMode === 'card' ? (
-                    <div>
-                      {/* Media area — mirrors ToolCard hero */}
-                      <div className="relative w-full aspect-video bg-[var(--zyro-twilight)] border-b border-border/40 overflow-hidden">
-                        {!(imageUrl.trim() && imgState === 'ok') && (
-                          <>
-                            <div className="absolute inset-0" style={{ background: coverGradient(isAdmin ? adminCoverColor : undefined) }} aria-hidden="true" />
-                            <div
-                              className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:18px_18px]"
-                              aria-hidden="true"
-                            />
-                            <div className="absolute top-2 right-3 w-16 h-16 rounded-full bg-white/10 blur-2xl" aria-hidden="true" />
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                              <span className="text-4xl font-serif text-white/15 select-none">{previewInitials}</span>
-                            </div>
-                          </>
-                        )}
-                        {imageUrl.trim() && imgState === 'ok' && (
-                          <>
-                            <img
-                              src={imageUrl}
-                              alt=""
-                              className="absolute inset-0 w-full h-full object-cover"
-                            />
-                            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
-                          </>
-                        )}
-                        <div className="absolute inset-0 p-3 flex flex-col justify-between">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm border border-white/25">
-                              {source}
-                            </span>
-                            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-white/15 text-white backdrop-blur-sm capitalize border border-white/25">
-                              {itemType === 'tool_skill' ? 'Tool + Skill' : itemType}
-                            </span>
-                            {isAdmin && adminBadge.trim() && (
-                              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-[var(--zyro-accent)] text-white shadow-sm">
-                                {adminBadge.trim()}
-                              </span>
-                            )}
-                            {isAdmin && adminFeatured && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-white bg-white/15 backdrop-blur-sm px-1.5 py-0.5 rounded-full border border-white/25">
-                                <Sparkles className="w-2.5 h-2.5" />
-                                Featured
-                              </span>
-                            )}
-                          </div>
-                          <div>
-                            <span className={`text-base font-bold tracking-tight block line-clamp-1 ${imageUrl.trim() && imgState === 'ok' ? 'text-white drop-shadow-md' : 'text-white'}`}>
-                              {name.trim() || 'Your tool name'}
-                            </span>
-                            <span className={`text-[10px] font-mono uppercase tracking-wider block ${imageUrl.trim() && imgState === 'ok' ? 'text-white/85' : 'text-white/75'}`}>
-                              {category}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Body */}
-                      <div className="p-4 space-y-3">
-                        <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                          {tagline.trim() || 'Your one-sentence tagline will show here.'}
-                        </p>
-
-                        <div className="flex flex-wrap gap-1">
-                          {(previewTags.length > 0 ? previewTags.slice(0, 4) : ['tag']).map((t, i) => (
-                            <span
-                              key={`${t}-${i}`}
-                              className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/40"
-                            >
-                              #{t}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className="flex items-center justify-between pt-2 border-t border-border/40 text-[11px]">
-                          <span className="text-muted-foreground">
-                            {previewCaps.length > 0
-                              ? `${previewCaps.length} capabilities`
-                              : 'Capabilities optional'}
-                          </span>
-                          <span className="text-[var(--zyro-accent)] font-medium">View Details →</span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Full Modal Detail Preview */
-                    <div className="p-3.5 space-y-4 max-h-[75vh] overflow-y-auto">
-                      {/* Mini Hero */}
-                      <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-[var(--zyro-twilight)] p-3 flex flex-col justify-between">
-                        {!(imageUrl.trim() && imgState === 'ok') ? (
-                          <div className="absolute inset-0" style={{ background: coverGradient(isAdmin ? adminCoverColor : undefined) }} />
-                        ) : (
-                          <>
-                            <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                            <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                          </>
-                        )}
-                        <div className="relative z-10 flex flex-wrap gap-1">
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/20 text-white font-medium backdrop-blur-xs">
-                            {source}
-                          </span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/20 text-white font-medium backdrop-blur-xs capitalize">
-                            {itemType === 'tool_skill' ? 'Tool + Skill' : itemType}
-                          </span>
-                        </div>
-                        <div className="relative z-10 text-white">
-                          <div className="text-sm font-bold leading-tight">{name.trim() || 'Tool Name'}</div>
-                          <div className="text-[10px] opacity-85 line-clamp-1">{tagline.trim() || 'Tagline'}</div>
-                        </div>
-                      </div>
-
-                      {/* About / Rendered Markdown */}
-                      <div className="space-y-1.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                          About (Markdown Rendered)
-                        </span>
-                        <div className="p-2.5 rounded-lg bg-muted/30 border border-border/60 prose prose-xs dark:prose-invert max-w-none text-foreground/90 leading-relaxed text-[11px] max-h-44 overflow-y-auto [&>p]:mb-2 [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:mb-2 [&>ol]:list-decimal [&>ol]:pl-4 [&>ol]:mb-2 [&>h1]:text-xs [&>h1]:font-bold [&>h1]:mb-1 [&>h2]:text-[11px] [&>h2]:font-bold [&>h2]:mb-1 [&>pre]:bg-neutral-950 [&>pre]:text-emerald-300 [&>pre]:p-2 [&>pre]:rounded [&>pre]:overflow-x-auto [&_code]:font-mono [&_code]:text-[10px]">
-                          {description.trim() ? (
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {description}
-                            </ReactMarkdown>
-                          ) : (
-                            <span className="text-muted-foreground italic">Type in the description to see markdown formatted here...</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Commands Preview */}
-                      {commands.some((c) => Boolean(c.command.trim())) && (
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                            Install Command Preview
-                          </span>
-                          <div className="space-y-1.5">
-                            {commands.filter((c) => Boolean(c.command.trim())).map((c, i) => (
-                              <div key={i} className="rounded-lg overflow-hidden border border-neutral-800 bg-neutral-950 p-2 text-emerald-300 font-mono text-[10px]">
-                                <div className="text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">{c.label}</div>
-                                <span className="text-neutral-500 select-none">$ </span>{c.command}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Capabilities Preview */}
-                      {previewCaps.length > 0 && (
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                            Key Capabilities ({previewCaps.length})
-                          </span>
-                          <div className="space-y-1">
-                            {previewCaps.map((cap, i) => (
-                              <div key={i} className="flex items-start gap-1.5 p-1.5 rounded-lg bg-[var(--zyro-accent-muted)] border border-[var(--zyro-accent)]/15 text-[10px] text-foreground/85">
-                                <span className="w-3 h-3 mt-0.5 rounded-full bg-[var(--zyro-accent)] flex items-center justify-center shrink-0">
-                                  <Check className="w-2 h-2 text-white" strokeWidth={3} />
-                                </span>
-                                <span className="leading-snug">{cap}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-muted-foreground mt-3 leading-relaxed">
-                  Updates live as you type. Submissions enter the <strong className="text-foreground">moderation queue</strong> and appear on /tools after admin approval.
-                </p>
-              </div>
-            </div>
+            </footer>
           </form>
         )}
       </DialogContent>
