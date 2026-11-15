@@ -1659,7 +1659,7 @@ async function prerenderDynamicPages(indexHtml) {
       const pagePath = `tools/${slug}`;
       const canonicalUrl = `${SITE_URL}/${pagePath}`;
       const typeLabel = tool.item_type === 'tool_skill' ? 'Tool + Skill' : tool.item_type === 'skill' ? 'Skill' : 'Tool';
-      const title = tool.seo_title || `${tool.name} — ${typeLabel} in ${tool.category}`;
+      const title = tool.seo_title || `${tool.name} | ${typeLabel} in ${tool.category}`;
       const description = tool.seo_description || tool.tagline || `Discover ${tool.name}, a ${typeLabel.toLowerCase()} in the ZYR0 ToolHub.`;
       const keywords = [
         tool.name,
