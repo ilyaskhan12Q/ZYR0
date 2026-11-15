@@ -16,9 +16,9 @@ import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
-import { submitTool, type SubmitToolInput } from '@/services/tools';
+import { submitTool, updateTool, type SubmitToolInput } from '@/services/tools';
 import { coverGradient } from '@/data/tools';
-import type { ToolInstallCommand } from '@/lib/database.types';
+import type { DbTool, ToolInstallCommand } from '@/lib/database.types';
 import { slugify } from '@/lib/slug';
 import { splitCapability } from '@/lib/capability';
 import { MarkdownContent } from '@/components/markdown/MarkdownContent';
@@ -48,6 +48,7 @@ interface SubmitToolDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
+  tool?: DbTool | null;
 }
 
 type Stage = 1 | 2 | 3;
@@ -410,7 +411,7 @@ function PreviewColumn(props: ListingPreviewProps) {
   );
 }
 
-export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDialogProps) {
+export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: SubmitToolDialogProps) {
   const { user, profile } = useAuth();
   const userId = user?.id;
 
@@ -454,6 +455,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
   const descRef = useRef<HTMLTextAreaElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const resetTimerRef = useRef<number | null>(null);
 
   // Single derived draft — the form state is the only source of truth.
   const draft = useMemo<ToolDraft>(
@@ -571,6 +573,57 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setSubmittedSuccess(false);
   };
 
+  // Cancel a pending close-reset when the dialog is reopened.
+  useEffect(() => {
+    if (!open || !resetTimerRef.current) return;
+    window.clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = null;
+  }, [open]);
+
+  // Editing starts from the saved listing, never from the browser draft.
+  useEffect(() => {
+    if (!open || !tool) return;
+    setStage(1);
+    setItemType(tool.item_type);
+    setName(tool.name);
+    setTagline(tool.tagline);
+    setDescription(tool.description);
+    setCategory(tool.category);
+    setSource(tool.source);
+    setSourceUrl(tool.source_url);
+    setDocUrl(tool.documentation_url || '');
+    setImageUrl(tool.image_url || '');
+    setImageState(tool.image_url ? 'loading' : 'idle');
+    setCommands(
+      tool.install_commands && tool.install_commands.length > 0
+        ? tool.install_commands
+        : tool.install_command
+          ? [{ label: tool.item_type === 'skill' ? 'Invocation' : 'CLI', command: tool.install_command }]
+          : [{ label: 'CLI', command: '' }]
+    );
+    setInstallInstructions(tool.install_instructions || '');
+    setTagsInput((tool.tags || []).join(', '));
+    setCapabilitiesInput((tool.capabilities || []).join('\n'));
+    setVersion(tool.version || '');
+    setAuthorName(tool.author_name || '');
+    setAuthorUrl(tool.author_url || '');
+    setSlug(tool.slug);
+    setSeoTitle(tool.seo_title || '');
+    setSeoDescription(tool.seo_description || '');
+    setAdminStatus(tool.status === 'approved' ? 'approved' : 'pending');
+    setAdminFeatured(tool.featured);
+    setAdminBadge(tool.badge || '');
+    setAdminCoverColor(tool.cover_color || '#7B7BDC');
+    setMdTab('write');
+    setTagDraft('');
+    setDraftRestored(false);
+    setDraftSavedAt(null);
+    setErrors({});
+    setSubmitError(null);
+    setSubmitting(false);
+    setSubmittedSuccess(false);
+  }, [open, tool]);
+
   // Each stage starts at the top of the scroll area.
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: 0 });
@@ -578,7 +631,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
   // Restore a browser-local draft when the dialog opens.
   useEffect(() => {
-    if (!open || !userId) return;
+    if (!open || !userId || tool) return;
     const saved = loadToolDraft(userId);
     if (!saved) return;
     setItemType(saved.itemType);
@@ -612,7 +665,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
   // Autosave (debounced) so closing or reloading never silently loses work.
   useEffect(() => {
-    if (!open || !userId || submittedSuccess) return;
+    if (!open || !userId || submittedSuccess || tool) return;
     const id = window.setTimeout(() => {
       if (isDraftEmpty(draft)) {
         clearToolDraft(userId);
@@ -621,7 +674,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
       if (saveToolDraft(userId, draft)) setDraftSavedAt(new Date());
     }, 800);
     return () => window.clearTimeout(id);
-  }, [open, userId, draft, submittedSuccess]);
+  }, [open, userId, draft, submittedSuccess, tool]);
 
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
@@ -734,7 +787,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   };
 
   const handleSaveDraft = () => {
-    if (!user) return;
+    if (!user || tool) return;
     if (saveToolDraft(user.id, draft)) {
       setDraftSavedAt(new Date());
       toast.success('Draft saved on this device');
@@ -750,9 +803,13 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
+    if (resetTimerRef.current) window.clearTimeout(resetTimerRef.current);
     if (nextOpen) return;
-    if (user && hasContent && !submittedSuccess) saveToolDraft(user.id, draft);
-    window.setTimeout(resetForm, 200);
+    if (user && hasContent && !submittedSuccess && !tool) saveToolDraft(user.id, draft);
+    resetTimerRef.current = window.setTimeout(() => {
+      resetForm();
+      resetTimerRef.current = null;
+    }, 200);
   };
 
   const submitListing = async () => {
@@ -798,20 +855,29 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
           ? {
               status: adminStatus,
               featured: adminFeatured,
-              badge: adminBadge.trim() || undefined,
-              cover_color: adminCoverColor.trim() || undefined,
+              badge: adminBadge.trim(),
+              cover_color: adminCoverColor.trim(),
             }
           : {}),
       };
 
-      await submitTool(input, user.id);
-      clearToolDraft(user.id);
-      setSubmittedSuccess(true);
-      if (isAdmin && adminStatus === 'approved') {
-        toast.success('Tool has been created and published live directly!');
+      if (tool) {
+        await updateTool(tool.id, input);
+        toast.success(
+          isAdmin && adminStatus === 'approved'
+            ? 'Listing updated and published live!'
+            : 'Listing updated.'
+        );
       } else {
-        toast.success('Your submission has been received and queued for moderation!');
+        await submitTool(input, user.id);
+        clearToolDraft(user.id);
+        if (isAdmin && adminStatus === 'approved') {
+          toast.success('Tool has been created and published live directly!');
+        } else {
+          toast.success('Your submission has been received and queued for moderation!');
+        }
       }
+      setSubmittedSuccess(true);
       if (onSuccess) onSuccess();
     } catch (err: any) {
       console.error('Submission error:', err);
@@ -868,7 +934,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     );
   };
 
-  const draftBanner = draftRestored ? (
+  const draftBanner = !tool && draftRestored ? (
     <div className="flex items-start gap-2 rounded-lg border border-[var(--zyro-accent)]/25 bg-[var(--zyro-accent-muted)] px-3 py-2 text-[11px] text-foreground/90">
       <RotateCcw className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--zyro-accent)]" />
       <p className="flex-1">
@@ -893,10 +959,20 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     imageState,
     onImageLoad: () => setImageState('ok'),
     onImageError: () => setImageState('error'),
-    badge: isAdmin ? adminBadge.trim() : '',
-    featured: isAdmin && adminFeatured,
-    coverColor: isAdmin ? adminCoverColor : undefined,
+    badge: isAdmin ? adminBadge.trim() : tool?.badge || '',
+    featured: isAdmin ? adminFeatured : tool?.featured ?? false,
+    coverColor: isAdmin ? adminCoverColor : tool?.cover_color || undefined,
   };
+
+  const successLive = isAdmin && adminStatus === 'approved';
+  const successTitle = tool ? 'Listing updated!' : successLive ? 'Tool published live!' : 'Submission queued!';
+  const successBody = tool
+    ? successLive
+      ? 'Your changes are live in the ToolHub catalog.'
+      : 'Your changes are saved and remain queued for moderator review.'
+    : successLive
+      ? 'Your tool or skill is now live in the ToolHub catalog and can be discovered immediately.'
+      : 'Thank you for contributing! Once a moderator approves your listing, it will appear in the ToolHub catalog.';
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -907,16 +983,16 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
             <span>Community Registry</span>
           </div>
           <DialogTitle className="font-sans text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-            Submit a Tool or Agent Skill
+            {tool ? 'Edit Tool or Agent Skill' : 'Submit a Tool or Agent Skill'}
           </DialogTitle>
           <DialogDescription className="text-xs leading-relaxed text-muted-foreground sm:text-sm">
             {!user
               ? 'Sign in to publish a tool or skill to the ZYR0 directory.'
               : submittedSuccess
-              ? isAdmin && adminStatus === 'approved'
-                ? 'Your listing is published and live in the ToolHub catalog.'
-                : 'Your listing is queued for moderator review.'
-              : 'Three short steps: basics, listing content, then a final review before submitting.'}
+              ? successBody
+              : tool
+                ? 'Update the listing, then review the changes before saving.'
+                : 'Three short steps: basics, listing content, then a final review before submitting.'}
           </DialogDescription>
 
           {user && !submittedSuccess && (
@@ -965,19 +1041,13 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
         ) : submittedSuccess ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-12 text-center">
             <CheckCircle2 className="h-14 w-14 text-emerald-500" />
-            <h3 className="text-xl font-bold text-foreground">
-              {isAdmin && adminStatus === 'approved' ? 'Tool published live!' : 'Submission queued!'}
-            </h3>
-            <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-              {isAdmin && adminStatus === 'approved'
-                ? 'Your tool or skill is now live in the ToolHub catalog and can be discovered immediately.'
-                : 'Thank you for contributing! Once a moderator approves your listing, it will appear in the ToolHub catalog.'}
-            </p>
+            <h3 className="text-xl font-bold text-foreground">{successTitle}</h3>
+            <p className="max-w-md text-sm leading-relaxed text-muted-foreground">{successBody}</p>
             <div className="flex gap-3 pt-3">
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 Close
               </Button>
-              <Button onClick={resetForm}>Submit another</Button>
+              {!tool && <Button onClick={resetForm}>Submit another</Button>}
             </div>
           </div>
         ) : (
@@ -1699,8 +1769,12 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 <div className="space-y-5">
                   <StageHeading
                     step={3}
-                    title="Review and submit"
-                    description="Check completeness, fix anything flagged, then confirm the final listing."
+                    title={tool ? 'Review changes' : 'Review and submit'}
+                    description={
+                      tool
+                        ? 'Check the updated listing, fix anything flagged, then save your changes.'
+                        : 'Check completeness, fix anything flagged, then confirm the final listing.'
+                    }
                   />
                   {draftBanner}
 
@@ -1958,7 +2032,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 size="sm"
                 onClick={handleSaveDraft}
                 disabled={!hasContent || submitting}
-                className="h-8 gap-1.5 text-xs"
+                className={`h-8 gap-1.5 text-xs ${tool ? 'hidden' : ''}`}
               >
                 <Save className="h-3.5 w-3.5" />
                 Save draft
@@ -1990,7 +2064,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                     disabled={submitting}
                     className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
                   >
-                    {stage === 1 ? 'Continue' : 'Review listing'}
+                    {stage === 1 ? 'Continue' : tool ? 'Review changes' : 'Review listing'}
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Button>
                 ) : (
@@ -2003,12 +2077,12 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                     {submitting ? (
                       <>
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Submitting...
+                        {tool ? 'Saving...' : 'Submitting...'}
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Submit for review
+                        {tool ? <Pencil className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+                        {tool ? 'Save changes' : 'Submit for review'}
                       </>
                     )}
                   </Button>

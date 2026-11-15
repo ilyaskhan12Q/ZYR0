@@ -27,6 +27,8 @@ export default function AdminTools() {
   const [previewItem, setPreviewItem] = useState<ToolItem | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingTool, setEditingTool] = useState<DbTool | null>(null);
   const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<DbTool | null>(null);
   const [moderatorNote, setModeratorNote] = useState('');
@@ -123,6 +125,11 @@ export default function AdminTools() {
   const handlePreview = (tool: DbTool) => {
     setPreviewItem(mapDbToolToToolItem(tool));
     setDialogOpen(true);
+  };
+
+  const handleEdit = (tool: DbTool) => {
+    setEditingTool(tool);
+    setEditModalOpen(true);
   };
 
   return (
@@ -295,6 +302,17 @@ export default function AdminTools() {
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={() => handleEdit(tool)}
+                  className="gap-1 text-xs"
+                  title="Edit listing"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit</span>
+                </Button>
+
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={() => handlePreview(tool)}
                   className="gap-1 text-xs"
                 >
@@ -409,6 +427,19 @@ export default function AdminTools() {
       <SubmitToolDialog
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
+        onSuccess={() => {
+          loadAdminTools();
+        }}
+      />
+
+      {/* Admin Edit Tool / Skill Dialog */}
+      <SubmitToolDialog
+        open={editModalOpen}
+        onOpenChange={(open) => {
+          setEditModalOpen(open);
+          if (!open) setEditingTool(null);
+        }}
+        tool={editingTool}
         onSuccess={() => {
           loadAdminTools();
         }}
