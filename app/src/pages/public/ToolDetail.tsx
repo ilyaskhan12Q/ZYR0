@@ -88,7 +88,7 @@ function ToolNotFound() {
   return (
     <div className="min-h-page flex items-center justify-center bg-background px-4">
       <SEO
-        title="Tool Not Found — ZYR0 ToolHub"
+        title="Tool Not Found | ZYR0 ToolHub"
         description="The tool or skill you are looking for does not exist or is no longer available."
         path="/tools"
         noIndex
@@ -208,7 +208,7 @@ export default function ToolDetail() {
   const active = commands[activeCommand] ?? commands[0];
   const hasCommands = commands.length > 0;
 
-  const seoTitle = tool.seoTitle || `${tool.name} — ${getTypeLabel(tool.item_type)} in ${tool.category}`;
+  const seoTitle = tool.seoTitle || `${tool.name} | ${getTypeLabel(tool.item_type)} in ${tool.category}`;
   const seoDescription = tool.seoDescription || tool.tagline;
   const seoImage = isExternalUrl(tool.imageUrl) ? tool.imageUrl : undefined;
 
