@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { Search, Send, Paperclip, ChevronLeft, CheckCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMyConversations, getMessages, sendMessage, markMessagesRead } from '@/services/messages';
+import { getMyConversations, getMessages, sendMessage, markMessagesRead, getConversationUnreadCounts } from '@/services/messages';
 import { supabase } from '@/lib/supabase';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ export default function StudentMessages() {
   const { profile } = useAuth();
   const [selectedConv, setSelectedConv] = useState<string>(id || '');
   const [conversations, setConversations] = useState<any[]>([]);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [messages, setMessages] = useState<any[]>([]);
   const [messageText, setMessageText] = useState('');
   const [searchText, setSearchText] = useState('');
@@ -36,6 +37,14 @@ export default function StudentMessages() {
         if (!selectedConv && res.data.length > 0) {
           setSelectedConv(res.data[0].id);
         }
+      }
+
+      // Which conversations hold the unread messages (list badges).
+      const counts = await getConversationUnreadCounts();
+      if (!cancelledRef.current) {
+        const map: Record<string, number> = {};
+        for (const row of counts.data ?? []) map[row.id] = row.unread_count ?? 0;
+        setUnreadCounts(map);
       }
     } catch (err) {
       console.error('Error loading conversations:', err);
@@ -94,6 +103,8 @@ export default function StudentMessages() {
           setTimeout(scrollToBottom, 50);
         }
         await markMessagesRead(selectedConv);
+        // The list badge for this conversation is now clear.
+        setUnreadCounts((prev) => (prev[selectedConv] ? { ...prev, [selectedConv]: 0 } : prev));
       } catch (err) {
         console.error('Error loading messages:', err);
         toast.error('Failed to load messages');
@@ -115,7 +126,14 @@ export default function StudentMessages() {
           table: 'messages',
           filter: `conversation_id=eq.${selectedConv}`,
         },
-        async () => {
+        async (payload) => {
+          // A message from the other person that arrives while the thread is
+          // on screen is read immediately — never leave a stuck unread badge.
+          const incoming = (payload as { new?: { sender_id?: string } }).new;
+          if (incoming?.sender_id && profile && incoming.sender_id !== profile.id && !document.hidden) {
+            await markMessagesRead(selectedConv);
+            setUnreadCounts((prev) => ({ ...prev, [selectedConv]: 0 }));
+          }
           // Re-fetch messages to get full sender profiles. Bypass the cache so
           // the new row isn't swallowed by a stale cached list.
           const res = await getMessages(selectedConv, false);
@@ -130,7 +148,7 @@ export default function StudentMessages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [selectedConv]);
+  }, [selectedConv, profile]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -210,6 +228,7 @@ export default function StudentMessages() {
               filteredConvs.map((conv) => {
                 const other = getOtherParticipant(conv);
                 const isSelected = selectedConv === conv.id;
+                const unread = unreadCounts[conv.id] ?? 0;
                 return (
                   <button
                     key={conv.id}
@@ -222,16 +241,23 @@ export default function StudentMessages() {
                       <img src={other.avatar_url || `https://ui-avatars.com/api/?name=${other.full_name}`} alt="" className="w-10 h-10 rounded-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium truncate">{other.full_name}</p>
-                        {conv.last_message_at && (
-                          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                            {new Date(conv.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        )}
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={`text-sm truncate ${unread > 0 ? 'font-semibold text-foreground' : 'font-medium'}`}>{other.full_name}</p>
+                        <span className="flex items-center gap-1.5 flex-shrink-0">
+                          {unread > 0 && (
+                            <span className="min-w-5 h-5 px-1.5 bg-red-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center" title={`${unread} unread`}>
+                              {unread > 99 ? '99+' : unread}
+                            </span>
+                          )}
+                          {conv.last_message_at && (
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                              {new Date(conv.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                        </span>
                       </div>
                       <p className="text-[10px] text-accent truncate mt-0.5 font-medium">{conv.internship?.title || 'General'}</p>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Start chatting...'}</p>
+                      <p className={`text-xs truncate mt-0.5 ${unread > 0 ? 'text-foreground/80' : 'text-muted-foreground'}`}>{conv.last_message || 'Start chatting...'}</p>
                     </div>
                   </button>
                 );

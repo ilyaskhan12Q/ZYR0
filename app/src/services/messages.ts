@@ -93,6 +93,7 @@ export async function sendMessage(data: {
     clearCache(`conversations_${user.id}`);
     clearCache(`messages_${data.conversation_id}`);
     clearCache(`unread_count_${user.id}`);
+    clearCache(`unread_counts_${user.id}`);
   }
   return res;
 }
@@ -133,6 +134,7 @@ export async function markMessagesRead(conversation_id: string) {
   clearCache(`messages_${conversation_id}`);
   clearCache(`conversations_${user.id}`);
   clearCache(`unread_count_${user.id}`);
+  clearCache(`unread_counts_${user.id}`);
 }
 
 /** Count unread messages for current user */
@@ -169,4 +171,33 @@ export async function getUnreadCount(useCache = true) {
   const result = await dedupRequest(cacheKey, fetchFn);
   setCachedData(cacheKey, result);
   return result;
+}
+
+/** Unread message count per conversation (0 for conversations with nothing new) */
+export async function getConversationUnreadCounts(useCache = true) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [] as { id: string; unread_count: number }[], error: null };
+
+  const cacheKey = `unread_counts_${user.id}`;
+  if (useCache) {
+    const cached = getCachedData<{ id: string; unread_count: number }[]>(cacheKey);
+    if (cached) return { data: cached, error: null };
+  }
+
+  const fetchFn = async () => {
+    const { data, error } = await supabase
+      .rpc('get_my_conversations_with_unread')
+      .select('id, unread_count');
+    if (error) throw error;
+    return (data ?? []) as { id: string; unread_count: number }[];
+  };
+
+  try {
+    const result = await dedupRequest(cacheKey, fetchFn);
+    setCachedData(cacheKey, result);
+    return { data: result, error: null };
+  } catch (error) {
+    console.error('Error loading unread counts:', error);
+    return { data: [] as { id: string; unread_count: number }[], error };
+  }
 }
