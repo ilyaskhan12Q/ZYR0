@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { Search, Send, Paperclip, ChevronLeft, CheckCheck, Loader2 } from 'lucide-react';
+import { Search, Send, Paperclip, ChevronLeft, Check, CheckCheck, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyConversations, getMessages, sendMessage, markMessagesRead, getConversationUnreadCounts } from '@/services/messages';
 import { supabase } from '@/lib/supabase';
@@ -299,6 +299,10 @@ export default function StudentMessages() {
               ) : (
                 messages.map((msg) => {
                   const isSent = msg.sender_id === profile.id;
+                  // Read receipt: the other participant's id appearing in
+                  // read_by means they've opened the thread since this message.
+                  const otherId = getOtherParticipant(activeConversation)?.id;
+                  const isRead = isSent && !!otherId && (msg.read_by ?? []).includes(otherId);
                   return (
                     <m.div
                       key={msg.id}
@@ -310,7 +314,11 @@ export default function StudentMessages() {
                         <p className="text-sm whitespace-pre-line">{msg.content}</p>
                         <p className={`text-[10px] mt-1 ${isSent ? 'text-white/70' : 'text-muted-foreground'} flex items-center justify-end gap-1`}>
                           {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          {isSent && <CheckCheck className="w-3 h-3" />}
+                          {isRead ? (
+                            <CheckCheck className="w-3 h-3 text-white" aria-label="Read" />
+                          ) : isSent ? (
+                            <Check className="w-3 h-3 text-white/60" aria-label="Sent" />
+                          ) : null}
                         </p>
                       </div>
                     </m.div>
