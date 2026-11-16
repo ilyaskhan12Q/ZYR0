@@ -270,7 +270,7 @@ export default function ToolDetail() {
         ? [{ label: isSkill ? 'Invocation' : 'Quick install', command: tool.installCommand }]
         : [];
 
-  const seoTitle = tool.seoTitle || `${tool.name} — ${getTypeLabel(tool.item_type)} in ${tool.category}`;
+  const seoTitle = tool.seoTitle || `${tool.name} | ${getTypeLabel(tool.item_type)} in ${tool.category}`;
   const seoDescription = tool.seoDescription || tool.tagline;
   const seoImage = isExternalUrl(tool.imageUrl) ? tool.imageUrl : undefined;
 
