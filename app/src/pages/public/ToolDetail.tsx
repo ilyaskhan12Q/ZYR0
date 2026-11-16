@@ -4,7 +4,7 @@ import {
   ArrowLeft, ExternalLink, Terminal, Copy, Check,
   Sparkles, Tag, ChevronRight, BookOpen, Layers,
   Info, ShieldCheck, User, Globe, Code2, Zap,
-  Package, AlertCircle, Share2
+  AlertCircle, Share2
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { Badge } from '@/components/ui/badge';
@@ -267,8 +267,9 @@ export default function ToolDetail() {
     tool.installCommands && tool.installCommands.length > 0
       ? tool.installCommands
       : tool.installCommand
-        ? [{ label: isSkill ? 'Invocation' : 'Quick install', command: tool.installCommand }]
+        ? [{ label: isSkill ? 'Invocation command' : 'Installation command', command: tool.installCommand }]
         : [];
+  const hasSetupContent = commands.length > 0 || Boolean(tool.installInstructions);
 
   const seoTitle = tool.seoTitle || `${tool.name} — ${getTypeLabel(tool.item_type)} in ${tool.category}`;
   const seoDescription = tool.seoDescription || tool.tagline;
@@ -383,26 +384,6 @@ export default function ToolDetail() {
             </div>
 
             <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/70">
-                <Link
-                  to={`/tools?category=${encodeURIComponent(tool.category)}`}
-                  className="inline-flex items-center gap-1 transition-colors hover:text-white"
-                >
-                  <Package className="h-3 w-3" />
-                  {tool.category}
-                </Link>
-                {tool.version && (
-                  <span className="inline-flex items-center gap-1 font-mono">
-                    <Code2 className="h-3 w-3" />
-                    {tool.version}
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1">
-                  <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                  Approved listing
-                </span>
-              </div>
-
               <h1 className="max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl lg:text-5xl">
                 {tool.name}
               </h1>
@@ -450,8 +431,66 @@ export default function ToolDetail() {
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
           {/* Main content */}
           <div className="min-w-0 space-y-10">
-            {tool.description.trim() && (
+            {commands.length > 0 && (
               <section>
+                <SectionHeading>
+                  <Terminal className="h-4 w-4 text-[var(--zyro-accent)]" />
+                  Commands
+                </SectionHeading>
+                <div className="space-y-3">
+                  {commands.map((command, index) => (
+                    <div key={`${command.label}-${index}`} className="overflow-hidden rounded-xl border border-neutral-800 bg-[#0d1117]">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 px-4 py-2.5">
+                        <span className="inline-flex items-center rounded-md border border-white/15 bg-white/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-white/85">
+                          {command.label || (isSkill ? 'Invocation command' : 'Installation command')}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyCommand(command.command, index)}
+                          className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                          aria-label={`Copy ${command.label || 'command'}`}
+                        >
+                          {copiedIndex === index ? (
+                            <>
+                              <Check className="h-3 w-3 text-emerald-400" />
+                              <span className="text-emerald-400">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              Copy
+                            </>
+                          )}
+                        </button>
+                      </div>
+                      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-emerald-300 sm:text-sm">
+                        <span className="select-none text-neutral-500">$ </span>
+                        {command.command}
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+                {tool.installInstructions && (
+                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-3.5 py-3 text-xs leading-relaxed text-foreground/85">
+                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--zyro-accent)]" />
+                    <p className="whitespace-pre-line">{tool.installInstructions}</p>
+                  </div>
+                )}
+              </section>
+            )}
+
+            {commands.length === 0 && tool.installInstructions && (
+              <section>
+                <SectionHeading>
+                  <Info className="h-4 w-4 text-[var(--zyro-accent)]" />
+                  Requirements &amp; setup notes
+                </SectionHeading>
+                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/85">{tool.installInstructions}</p>
+              </section>
+            )}
+
+            {tool.description.trim() && (
+              <section className={hasSetupContent ? 'border-t border-border/60 pt-8' : undefined}>
                 <SectionHeading>
                   <Info className="h-4 w-4 text-[var(--zyro-accent)]" />
                   Overview
@@ -487,64 +526,6 @@ export default function ToolDetail() {
                     );
                   })}
                 </ul>
-              </section>
-            )}
-
-            {commands.length > 0 && (
-              <section className="border-t border-border/60 pt-8">
-                <SectionHeading>
-                  <Terminal className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  {isSkill ? 'Setup & usage' : 'Installation'}
-                </SectionHeading>
-                <div className="space-y-3">
-                  {commands.map((command, index) => (
-                    <div key={`${command.label}-${index}`} className="overflow-hidden rounded-xl border border-neutral-800 bg-[#0d1117]">
-                      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2">
-                        <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-400">
-                          {command.label || (isSkill ? 'Invocation' : 'Install')}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCommand(command.command, index)}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                          aria-label={`Copy ${command.label || 'install'} command`}
-                        >
-                          {copiedIndex === index ? (
-                            <>
-                              <Check className="h-3 w-3 text-emerald-400" />
-                              <span className="text-emerald-400">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3 w-3" />
-                              Copy
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-emerald-300 sm:text-sm">
-                        <span className="select-none text-neutral-500">$ </span>
-                        {command.command}
-                      </pre>
-                    </div>
-                  ))}
-                </div>
-                {tool.installInstructions && (
-                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-3.5 py-3 text-xs leading-relaxed text-foreground/85">
-                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--zyro-accent)]" />
-                    <p className="whitespace-pre-line">{tool.installInstructions}</p>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {commands.length === 0 && tool.installInstructions && (
-              <section className="border-t border-border/60 pt-8">
-                <SectionHeading>
-                  <Info className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  Requirements &amp; setup notes
-                </SectionHeading>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/85">{tool.installInstructions}</p>
               </section>
             )}
           </div>

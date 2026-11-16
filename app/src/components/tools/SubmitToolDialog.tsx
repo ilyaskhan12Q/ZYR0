@@ -62,7 +62,7 @@ const SEARCH_PREVIEW_DOMAIN = BASE_URL.replace(/^https?:\/\//, '').replace(/\/+$
 
 const STAGES: { id: Stage; label: string; hint: string }[] = [
   { id: 1, label: 'Basics', hint: 'Source, name, tagline' },
-  { id: 2, label: 'Listing content', hint: 'Description, install, details' },
+  { id: 2, label: 'Listing content', hint: 'Description, commands, details' },
   { id: 3, label: 'Review', hint: 'Completeness & preview' },
 ];
 
@@ -83,6 +83,20 @@ const MARKDOWN_TOOLS: { label: string; icon: React.ElementType; action: Markdown
   { label: 'Link', icon: Link2, action: { kind: 'inline', before: '[', after: '](https://)', placeholder: 'link text' } },
   { label: 'Code block', icon: Code2, action: { kind: 'inline', before: '```\n', after: '\n```', placeholder: 'code' } },
 ];
+
+function commandPlaceholder(label: string) {
+  const value = label.toLowerCase();
+  if (value.includes('update')) return 'npm update -g example';
+  if (value.includes('run')) return 'npx example';
+  if (value.includes('invoke')) return 'npx example --help';
+  if (value.includes('uninstall')) return 'npm uninstall -g example';
+  if (value.includes('setup')) return 'npx example setup';
+  if (value.includes('build')) return 'npm run build';
+  if (value.includes('test')) return 'npm test';
+  if (value.includes('pip')) return 'pip install example';
+  if (value.includes('docker')) return 'docker run -p 8080:8080 example';
+  return 'npm install -g example';
+}
 
 function FieldError({ msg }: { msg?: string }) {
   return msg ? (
@@ -185,7 +199,10 @@ function ListingPreview({
   const tags = parseTags(draft.tagsInput);
   const capabilities = parseLines(draft.capabilitiesInput);
   const commands = draft.commands
-    .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
+    .map((command) => ({
+      label: command.label.trim() || (draft.itemType === 'skill' ? 'Invocation command' : 'Installation command'),
+      command: command.command.trim(),
+    }))
     .filter((command) => command.command);
   const initials = (draft.name.trim() || '?')
     .split(/\s+/)
@@ -275,6 +292,31 @@ function ListingPreview({
           )}
         </div>
 
+        {commands.length > 0 && (
+          <section>
+            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Commands</h4>
+            <div className="space-y-1.5">
+              {commands.map((command) => (
+                <div key={`${command.label}-${command.command}`} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950">
+                  <div className="border-b border-neutral-800 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-400">
+                    {command.label}
+                  </div>
+                  <pre className="overflow-x-auto p-2.5 font-mono text-[11px] text-emerald-300">
+                    <span className="select-none text-neutral-500">$ </span>
+                    {command.command}
+                  </pre>
+                </div>
+              ))}
+            </div>
+            {draft.installInstructions.trim() && (
+              <p className="mt-2 flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                <Info className="mt-px h-3 w-3 shrink-0 text-[var(--zyro-accent)]" />
+                <span>{draft.installInstructions}</span>
+              </p>
+            )}
+          </section>
+        )}
+
         <section>
           <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">About</h4>
           {draft.description.trim() ? (
@@ -314,33 +356,6 @@ function ListingPreview({
                 );
               })}
             </ul>
-          </section>
-        )}
-
-        {commands.length > 0 && (
-          <section>
-            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              {draft.itemType === 'skill' ? 'Invocation' : 'Installation'}
-            </h4>
-            <div className="space-y-1.5">
-              {commands.map((command) => (
-                <div key={`${command.label}-${command.command}`} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950">
-                  <div className="border-b border-neutral-800 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-400">
-                    {command.label}
-                  </div>
-                  <pre className="overflow-x-auto p-2.5 font-mono text-[11px] text-emerald-300">
-                    <span className="select-none text-neutral-500">$ </span>
-                    {command.command}
-                  </pre>
-                </div>
-              ))}
-            </div>
-            {draft.installInstructions.trim() && (
-              <p className="mt-2 flex items-start gap-1.5 text-[11px] text-muted-foreground">
-                <Info className="mt-px h-3 w-3 shrink-0 text-[var(--zyro-accent)]" />
-                <span>{draft.installInstructions}</span>
-              </p>
-            )}
           </section>
         )}
 
@@ -492,7 +507,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const previewTags = parseTags(tagsInput);
   const previewCapabilities = parseLines(capabilitiesInput);
   const validCommands = commands
-    .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
+    .map((command) => ({
+      label: command.label.trim() || (itemType === 'skill' ? 'Invocation command' : 'Installation command'),
+      command: command.command.trim(),
+    }))
     .filter((command) => Boolean(command.command));
   const hasContent = !isDraftEmpty(draft);
 
@@ -1214,36 +1232,42 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
                     <FormSection
                       icon={Terminal}
-                      title="Installation"
-                      hint="How people add or invoke this tool"
-                      summary={validCommands.length > 0 ? `${validCommands.length} method${validCommands.length > 1 ? 's' : ''}` : 'Optional'}
+                      title="Commands"
+                      hint="Install, update, run, or invoke"
+                      summary={validCommands.length > 0 ? `${validCommands.length} command${validCommands.length > 1 ? 's' : ''}` : 'Optional'}
                       defaultOpen
                     >
                       <div>
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <p className="text-xs font-semibold text-foreground">
-                            {itemType === 'skill'
-                              ? 'Skill invocation commands'
-                              : itemType === 'tool_skill'
-                              ? 'Install & execution commands'
-                              : 'Installation commands'}
-                          </p>
+                        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-semibold text-foreground">Command labels</p>
+                            <p className="mt-0.5 max-w-md text-[11px] leading-relaxed text-muted-foreground">
+                              Give each command a clear label, like Installation command, Update command, or Run command. Pick a suggestion or type your own.
+                            </p>
+                          </div>
                           <button
                             type="button"
                             onClick={handleAddCommand}
                             className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--zyro-accent)] hover:underline"
                           >
                             <Plus className="h-3 w-3" />
-                            Add method
+                            Add command
                           </button>
                         </div>
 
                         <datalist id="command-labels">
-                          {['Agent Setup', 'CLI', 'npm', 'pnpm', 'yarn', 'bun', 'pip', 'cargo', 'Docker', 'Brew'].map(
-                            (label) => (
-                              <option key={label} value={label} />
-                            )
-                          )}
+                          {[
+                            'Installation command',
+                            'Update command',
+                            'Run command',
+                            'Invoke command',
+                            'Setup command',
+                            'Uninstall command',
+                            'Build command',
+                            'Test command',
+                          ].map((label) => (
+                            <option key={label} value={label} />
+                          ))}
                         </datalist>
 
                         <div className="space-y-2.5">
@@ -1255,23 +1279,16 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                                   list="command-labels"
                                   value={command.label}
                                   onChange={(event) => handleCommandChange(index, 'label', event.target.value)}
-                                  placeholder="Label"
-                                  aria-label={`Installation method ${index + 1} label`}
-                                  className="w-32 shrink-0 rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-foreground outline-none focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20"
+                                  placeholder="Command type"
+                                  aria-label={`Command ${index + 1} type`}
+                                  className="w-full rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-foreground outline-none focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20 sm:w-52"
                                 />
-                                <span className="flex-1 text-[10px] text-muted-foreground">
-                                  {command.label === 'Agent Setup'
-                                    ? 'Agent setup step'
-                                    : command.label.toLowerCase().includes('npm') || command.label.toLowerCase().includes('bun')
-                                    ? 'Package manager command'
-                                    : 'Terminal command'}
-                                </span>
                                 {commands.length > 1 && (
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveCommand(index)}
                                     className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500"
-                                    aria-label={`Remove installation method ${index + 1}`}
+                                    aria-label={`Remove command ${index + 1}`}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </button>
@@ -1281,18 +1298,8 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                                 rows={2}
                                 value={command.command}
                                 onChange={(event) => handleCommandChange(index, 'command', event.target.value)}
-                                placeholder={
-                                  command.label === 'Agent Setup'
-                                    ? 'npx rea-agents setup'
-                                    : command.label === 'npm'
-                                    ? 'npm install -g example'
-                                    : command.label === 'pip'
-                                    ? 'pip install example'
-                                    : command.label === 'Docker'
-                                    ? 'docker run -p 8080:8080 example'
-                                    : 'npx tool-pkg'
-                                }
-                                aria-label={`Installation method ${index + 1} command`}
+                                placeholder={commandPlaceholder(command.label)}
+                                aria-label={`Command ${index + 1} text`}
                                 className="w-full resize-y rounded-md border border-neutral-800 bg-neutral-950 px-2.5 py-2 font-mono text-xs text-emerald-300 outline-none placeholder:text-neutral-600 focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/40"
                               />
                             </div>
