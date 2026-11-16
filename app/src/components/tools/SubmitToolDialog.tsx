@@ -98,6 +98,13 @@ function commandPlaceholder(label: string) {
   return 'npm install -g example';
 }
 
+const COMMAND_LABEL_DEFAULTS = ['Installation command', 'Update command', 'Run command', 'Setup command'];
+
+function defaultCommandLabel(itemType: ItemType, index: number) {
+  if (itemType === 'skill') return index === 0 ? 'Invocation command' : 'Run command';
+  return COMMAND_LABEL_DEFAULTS[Math.min(index, COMMAND_LABEL_DEFAULTS.length - 1)];
+}
+
 function FieldError({ msg }: { msg?: string }) {
   return msg ? (
     <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
@@ -439,7 +446,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   const [sourceUrl, setSourceUrl] = useState('');
   const [docUrl, setDocUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [commands, setCommands] = useState<ToolInstallCommand[]>([{ label: 'CLI', command: '' }]);
+  const [commands, setCommands] = useState<ToolInstallCommand[]>([{ label: 'Installation command', command: '' }]);
   const [installInstructions, setInstallInstructions] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [capabilitiesInput, setCapabilitiesInput] = useState('');
@@ -564,7 +571,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setSourceUrl('');
     setDocUrl('');
     setImageUrl('');
-    setCommands([{ label: 'CLI', command: '' }]);
+    setCommands([{ label: 'Installation command', command: '' }]);
     setInstallInstructions('');
     setTagsInput('');
     setCapabilitiesInput('');
@@ -609,7 +616,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     setDocUrl(saved.docUrl);
     setImageUrl(saved.imageUrl);
     setImageState(saved.imageUrl.trim() ? 'loading' : 'idle');
-    setCommands(saved.commands.length > 0 ? saved.commands : [{ label: 'CLI', command: '' }]);
+    setCommands(saved.commands.length > 0 ? saved.commands : [{ label: defaultCommandLabel(saved.itemType, 0), command: '' }]);
     setInstallInstructions(saved.installInstructions);
     setTagsInput(saved.tagsInput);
     setCapabilitiesInput(saved.capabilitiesInput);
@@ -719,7 +726,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
   };
 
   const handleAddCommand = () => {
-    setCommands((previous) => [...previous, { label: itemType === 'skill' ? 'Agent Setup' : 'CLI', command: '' }]);
+    setCommands((previous) => [...previous, { label: defaultCommandLabel(itemType, previous.length), command: '' }]);
   };
 
   const handleRemoveCommand = (index: number) => {
@@ -1242,7 +1249,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                           <div>
                             <p className="text-xs font-semibold text-foreground">Command labels</p>
                             <p className="mt-0.5 max-w-md text-[11px] leading-relaxed text-muted-foreground">
-                              Give each command a clear label, like Installation command, Update command, or Run command. Pick a suggestion or type your own.
+                              Give each command a clear label. Labels become the public detail page tabs, so use Installation command, Update command, or Run command. Pick a suggestion or type your own.
                             </p>
                           </div>
                           <button

@@ -1,0 +1,589 @@
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200;800;900&family=IBM+Plex+Sans:wght@200;300;500&family=JetBrains+Mono:wght@300;400;800&display=swap');
+
+/*
+  Gruvbox "disassembler listing" theme for the public ToolHub detail page.
+  Everything lives under .tdp so the rest of the app keeps its own theme.
+*/
+.tdp {
+  --bg: #282828;
+  --bg2: #32302f;
+  --fg: #ebdbb2;
+  --mut: #928374;
+  --bd: #504945;
+  --org: #fe8019;
+  --grn: #b8bb26;
+  --blu: #83a598;
+  --aqu: #8ec07c;
+  --d: 'Unbounded', sans-serif;
+  --b: 'IBM Plex Sans', sans-serif;
+  --m: 'JetBrains Mono', monospace;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--fg);
+  font: 300 16px/1.65 var(--b);
+  letter-spacing: .01em;
+}
+
+.tdp[data-theme='light'] {
+  --bg: #fbf1c7;
+  --bg2: #f2e5bc;
+  --fg: #3c3836;
+  --mut: #7c6f64;
+  --bd: #d5c4a1;
+  --org: #af3a03;
+  --grn: #79740e;
+  --blu: #076678;
+  --aqu: #427b58;
+  color-scheme: light;
+}
+
+.tdp *,
+.tdp *::before,
+.tdp *::after {
+  box-sizing: border-box;
+}
+
+.tdp .wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+.tdp .top {
+  font: 300 12px var(--m);
+  color: var(--mut);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+
+.tdp .top a {
+  color: var(--mut);
+}
+
+.tdp .top a:hover {
+  color: var(--org);
+}
+
+.tdp .top-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.tdp .top-actions button {
+  background: none;
+  border: 0;
+  color: var(--mut);
+  font: 300 12px var(--m);
+  padding: 0;
+}
+
+.tdp .top-actions button:hover {
+  color: var(--org);
+}
+
+.tdp h1 {
+  font: 900 clamp(40px, 9vw, 92px)/.95 var(--d);
+  letter-spacing: -.04em;
+  margin: 0 0 18px;
+  overflow-wrap: anywhere;
+}
+
+.tdp .lede {
+  font: 200 clamp(18px, 2.6vw, 26px)/1.4 var(--b);
+  max-width: 34ch;
+  margin: 0 0 36px;
+}
+
+.tdp .in {
+  opacity: 0;
+  animation: tdp-up .8s var(--ease) forwards;
+  animation-delay: var(--t, 0s);
+}
+
+@keyframes tdp-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tdp .in {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.tdp .hero-cmd {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--fg);
+  max-width: 640px;
+}
+
+.tdp .hero-cmd code {
+  flex: 1;
+  padding: 16px 18px;
+  font: 400 clamp(14px, 2.4vw, 20px) var(--m);
+  color: var(--grn);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.tdp .hero-cmd code i {
+  color: var(--mut);
+  font-style: normal;
+}
+
+.tdp button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.tdp .cp {
+  border: 0;
+  border-left: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+  padding: 0 20px;
+  font: 800 13px var(--m);
+}
+
+.tdp .cp.ok {
+  background: var(--org);
+  border-color: var(--org);
+}
+
+.tdp .facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 20px;
+  margin: 36px 0 0;
+  font: 300 13px var(--m);
+}
+
+.tdp .facts dt {
+  color: var(--mut);
+}
+
+.tdp .facts dd {
+  margin: 0;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.tdp .row {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 32px;
+  border-top: 1px solid var(--bd);
+  padding: 40px 0;
+  margin-top: 72px;
+}
+
+.tdp .row:first-of-type {
+  margin-top: 88px;
+}
+
+.tdp .lab {
+  font: 300 13px var(--m);
+  color: var(--mut);
+  position: sticky;
+  top: 16px;
+  align-self: start;
+}
+
+@media (max-width: 760px) {
+  .tdp .row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .tdp .lab {
+    position: static;
+  }
+}
+
+.tdp h2 {
+  font: 800 clamp(22px, 3.4vw, 32px)/1.1 var(--d);
+  letter-spacing: -.03em;
+  margin: 0 0 20px;
+}
+
+.tdp h3 {
+  font: 800 18px/1.2 var(--d);
+  letter-spacing: -.02em;
+  margin: 36px 0 10px;
+}
+
+.tdp p {
+  margin: 0 0 14px;
+  max-width: 62ch;
+}
+
+.tdp .tabs {
+  display: flex;
+  gap: 22px;
+  border-bottom: 1px solid var(--bd);
+  margin-bottom: 22px;
+  overflow-x: auto;
+}
+
+.tdp .tabs button {
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 6px 0 10px;
+  font: 300 14px var(--m);
+  color: var(--mut);
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.tdp .tabs button[aria-selected='true'] {
+  color: var(--fg);
+  border-color: var(--org);
+  font-weight: 800;
+}
+
+.tdp .blk {
+  border-left: 2px solid var(--bd);
+  background: var(--bg2);
+  margin-bottom: 12px;
+}
+
+.tdp .bh {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  font: 300 12px var(--m);
+  color: var(--mut);
+}
+
+.tdp .bh button {
+  background: none;
+  border: 0;
+  color: var(--org);
+  font: 800 12px var(--m);
+  padding: 2px 0;
+}
+
+.tdp pre {
+  margin: 0;
+  padding: 0 14px 14px;
+  overflow-x: auto;
+  font: 400 14px/1.7 var(--m);
+  color: var(--grn);
+}
+
+.tdp pre i {
+  color: var(--mut);
+  font-style: normal;
+  user-select: none;
+}
+
+.tdp pre b {
+  color: var(--blu);
+  font-weight: 400;
+}
+
+.tdp .ask {
+  font: 200 clamp(20px, 3vw, 30px)/1.35 var(--b);
+  max-width: 30ch;
+  margin: 0 0 16px;
+}
+
+.tdp .ask-b {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--org);
+  color: var(--org);
+  font: 800 13px var(--m);
+  padding: 0 0 2px;
+}
+
+.tdp dl.kv {
+  display: grid;
+  grid-template-columns: minmax(140px, 220px) 1fr;
+  gap: 0;
+  margin: 0 0 28px;
+  font-size: 15px;
+}
+
+.tdp dl.kv dt,
+.tdp dl.kv dd {
+  margin: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.tdp dl.kv dt {
+  font: 500 14px var(--b);
+}
+
+.tdp dl.kv dd {
+  font: 300 13px var(--m);
+  color: var(--mut);
+}
+
+.tdp .agents {
+  font: 300 14px/2 var(--m);
+  columns: 2 200px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tdp .agents li::before {
+  content: '+ ';
+  color: var(--aqu);
+}
+
+.tdp details {
+  border-bottom: 1px solid var(--bd);
+}
+
+.tdp details:first-of-type {
+  border-top: 1px solid var(--bd);
+}
+
+.tdp summary {
+  padding: 16px 0;
+  cursor: pointer;
+  font: 500 17px var(--b);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.tdp summary::-webkit-details-marker {
+  display: none;
+}
+
+.tdp summary::after {
+  content: '+';
+  font: 400 20px var(--m);
+  color: var(--org);
+}
+
+.tdp details[open] summary::after {
+  content: '−';
+}
+
+.tdp details p {
+  color: var(--mut);
+}
+
+.tdp .rd table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  margin: 12px 0 20px;
+  display: block;
+  overflow-x: auto;
+}
+
+.tdp .rd th {
+  font: 800 12px var(--m);
+  text-align: left;
+  color: var(--mut);
+}
+
+.tdp .rd th,
+.tdp .rd td {
+  padding: 9px 20px 9px 0;
+  border-bottom: 1px solid var(--bd);
+}
+
+.tdp .rd code {
+  font: 400 13px var(--m);
+  color: var(--blu);
+}
+
+.tdp .rd td code + code {
+  margin-left: 6px;
+}
+
+.tdp .note {
+  font: 300 12px var(--m);
+  color: var(--mut);
+  margin-bottom: 8px;
+}
+
+.tdp a {
+  color: var(--org);
+}
+
+.tdp :focus-visible {
+  outline: 2px solid var(--org);
+  outline-offset: 3px;
+}
+
+.tdp .side {
+  margin-top: 20px;
+  font: 300 13px var(--m);
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+}
+
+.tdp .side a:hover {
+  color: var(--fg);
+}
+
+.tdp .notes {
+  margin-top: 22px;
+  border-top: 1px solid var(--bd);
+  padding-top: 14px;
+}
+
+.tdp .notes .note {
+  margin-bottom: 6px;
+}
+
+.tdp .notes p:last-child {
+  color: var(--mut);
+}
+
+.tdp .pre-line {
+  white-space: pre-line;
+}
+
+.tdp .cap-value {
+  margin-left: 8px;
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.tdp .related {
+  display: grid;
+  gap: 0;
+}
+
+.tdp .related a {
+  display: block;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--bd);
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.tdp .related a:first-child {
+  border-top: 1px solid var(--bd);
+}
+
+.tdp .related a:hover .related-name {
+  color: var(--org);
+}
+
+.tdp .related-name {
+  display: block;
+  font: 800 16px/1.3 var(--d);
+  letter-spacing: -.02em;
+}
+
+.tdp .related-tagline {
+  display: block;
+  margin-top: 3px;
+  font: 300 13px/1.5 var(--b);
+  color: var(--mut);
+}
+
+/* The shared markdown renderer carries app-theme colours. Re-skin it for Gruvbox. */
+.tdp .rd .zyro-markdown {
+  color: var(--fg);
+  font: 300 15px/1.75 var(--b);
+}
+
+.tdp .rd .zyro-markdown h2,
+.tdp .rd .zyro-markdown h3,
+.tdp .rd .zyro-markdown h4,
+.tdp .rd .zyro-markdown h5,
+.tdp .rd .zyro-markdown h6 {
+  color: var(--fg);
+  font-family: var(--d);
+  font-weight: 800;
+  letter-spacing: -.02em;
+}
+
+.tdp .rd .zyro-markdown h2 {
+  font-size: clamp(22px, 3.4vw, 32px);
+  line-height: 1.1;
+  margin: 0 0 20px;
+}
+
+.tdp .rd .zyro-markdown h3 {
+  font-size: 18px;
+  line-height: 1.2;
+  margin: 36px 0 10px;
+}
+
+.tdp .rd .zyro-markdown h4,
+.tdp .rd .zyro-markdown h5,
+.tdp .rd .zyro-markdown h6 {
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 28px 0 8px;
+}
+
+.tdp .rd .zyro-markdown a {
+  color: var(--org);
+  font-weight: 400;
+}
+
+.tdp .rd .zyro-markdown strong {
+  color: var(--fg);
+}
+
+.tdp .rd .zyro-markdown blockquote {
+  border-left-color: var(--bd);
+  color: var(--mut);
+}
+
+.tdp .rd .zyro-markdown hr {
+  border-top-color: var(--bd);
+}
+
+.tdp .rd .zyro-markdown :not(pre) > code {
+  background: var(--bg2);
+  border-color: var(--bd);
+  color: var(--blu);
+  font-family: var(--m);
+}
+
+.tdp .rd .zyro-markdown pre {
+  padding: 16px;
+  color: var(--fg);
+}
+
+.tdp .rd .zyro-table-wrap {
+  border: 0;
+  border-radius: 0;
+}
+
+.tdp .rd .zyro-markdown th,
+.tdp .rd .zyro-markdown td {
+  border-bottom-color: var(--bd);
+}
+
+.tdp .rd .zyro-markdown th {
+  background: var(--bg2);
+  color: var(--fg);
+  font: 800 12px var(--m);
+  white-space: nowrap;
+}
