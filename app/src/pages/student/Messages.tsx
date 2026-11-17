@@ -1,9 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { Search, Send, Paperclip, ChevronLeft, CheckCheck, Loader2 } from 'lucide-react';
+import { Search, Send, Paperclip, ChevronLeft, Check, CheckCheck, Loader2, X, FileText, Download } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getMyConversations, getMessages, sendMessage, markMessagesRead } from '@/services/messages';
+import {
+  getMyConversations,
+  getMessages,
+  sendMessage,
+  markMessagesRead,
+  getConversationUnreadCounts,
+  uploadMessageAttachments,
+  getAttachmentUrls,
+  formatBytes,
+} from '@/services/messages';
 import { supabase } from '@/lib/supabase';
 import { withTimeout } from '@/lib/timeout';
 import { toast } from 'sonner';
@@ -14,6 +23,7 @@ export default function StudentMessages() {
   const { profile } = useAuth();
   const [selectedConv, setSelectedConv] = useState<string>(id || '');
   const [conversations, setConversations] = useState<any[]>([]);
+  const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
   const [messages, setMessages] = useState<any[]>([]);
   const [messageText, setMessageText] = useState('');
   const [searchText, setSearchText] = useState('');
@@ -21,6 +31,33 @@ export default function StudentMessages() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const cancelledRef = useRef(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const signedPathsRef = useRef<Set<string>>(new Set());
+
+  // Attachment picker state
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [attachmentUrls, setAttachmentUrls] = useState<Record<string, string>>({});
+
+  const MAX_FILES_PER_MESSAGE = 5;
+  const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+
+  const handleFilesPicked = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = ''; // allow re-picking the same file later
+    if (!picked.length) return;
+
+    const oversized = picked.filter((f) => f.size > MAX_ATTACHMENT_BYTES);
+    const accepted = picked.filter((f) => f.size <= MAX_ATTACHMENT_BYTES);
+    if (oversized.length) {
+      toast.error(`Too large (10 MB max): ${oversized.map((f) => f.name).join(', ')}`);
+    }
+    setPendingFiles((prev) => {
+      const room = MAX_FILES_PER_MESSAGE - prev.length;
+      if (accepted.length > room) toast.error(`Up to ${MAX_FILES_PER_MESSAGE} files per message`);
+      return [...prev, ...accepted.slice(0, Math.max(0, room))];
+    });
+  };
 
   // Scroll to bottom helper
   const scrollToBottom = () => {
@@ -28,14 +65,22 @@ export default function StudentMessages() {
   };
 
   // Load conversations list
-  async function loadConversations() {
+  async function loadConversations(useCache = true) {
     try {
-      const res = await withTimeout(getMyConversations(), 10000, { data: [] }, 'StudentMessages');
+      const res = await withTimeout(getMyConversations(useCache), 10000, { data: [] }, 'StudentMessages');
       if (res.data) {
         setConversations(res.data);
         if (!selectedConv && res.data.length > 0) {
           setSelectedConv(res.data[0].id);
         }
+      }
+
+      // Which conversations hold the unread messages (list badges).
+      const counts = await getConversationUnreadCounts(useCache);
+      if (!cancelledRef.current) {
+        const map: Record<string, number> = {};
+        for (const row of counts.data ?? []) map[row.id] = row.unread_count ?? 0;
+        setUnreadCounts(map);
       }
     } catch (err) {
       console.error('Error loading conversations:', err);
@@ -94,6 +139,8 @@ export default function StudentMessages() {
           setTimeout(scrollToBottom, 50);
         }
         await markMessagesRead(selectedConv);
+        // The list badge for this conversation is now clear.
+        setUnreadCounts((prev) => (prev[selectedConv] ? { ...prev, [selectedConv]: 0 } : prev));
       } catch (err) {
         console.error('Error loading messages:', err);
         toast.error('Failed to load messages');
@@ -115,9 +162,17 @@ export default function StudentMessages() {
           table: 'messages',
           filter: `conversation_id=eq.${selectedConv}`,
         },
-        async () => {
-          // Re-fetch messages to get full sender profiles
-          const res = await getMessages(selectedConv);
+        async (payload) => {
+          // A message from the other person that arrives while the thread is
+          // on screen is read immediately — never leave a stuck unread badge.
+          const incoming = (payload as { new?: { sender_id?: string } }).new;
+          if (incoming?.sender_id && profile && incoming.sender_id !== profile.id && !document.hidden) {
+            await markMessagesRead(selectedConv);
+            setUnreadCounts((prev) => ({ ...prev, [selectedConv]: 0 }));
+          }
+          // Re-fetch messages to get full sender profiles. Bypass the cache so
+          // the new row isn't swallowed by a stale cached list.
+          const res = await getMessages(selectedConv, false);
           if (res.data) {
             setMessages(res.data);
             setTimeout(scrollToBottom, 50);
@@ -129,18 +184,90 @@ export default function StudentMessages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [selectedConv]);
+  }, [selectedConv, profile]);
+
+  // Live conversation list: a message INSERT in any of our conversations
+  // (ours or theirs — even a brand-new conversation someone just started)
+  // reorders the list, refreshes the preview line and the unread badges.
+  // Debounced so a burst of messages costs one refetch, not one per message.
+  const listRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reloadListRef = useRef(loadConversations);
+  useEffect(() => {
+    reloadListRef.current = loadConversations;
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('messages-list')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        () => {
+          if (listRefreshTimer.current) clearTimeout(listRefreshTimer.current);
+          listRefreshTimer.current = setTimeout(() => {
+            // Bypass the cache: a cached list would hide the new message.
+            reloadListRef.current?.(false);
+          }, 1000);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (listRefreshTimer.current) clearTimeout(listRefreshTimer.current);
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // Sign attachment paths once per message so bubbles can display/download.
+  useEffect(() => {
+    const paths = [
+      ...new Set(
+        messages
+          .flatMap((msg) => (msg.attachments ?? []).map((a: any) => a?.url))
+          .filter((p): p is string => Boolean(p) && !signedPathsRef.current.has(p))
+      ),
+    ];
+    if (!paths.length) return;
+
+    let cancelled = false;
+    getAttachmentUrls(paths).then((map) => {
+      if (cancelled || map.size === 0) return;
+      for (const p of map.keys()) signedPathsRef.current.add(p);
+      setAttachmentUrls((prev) => ({ ...prev, ...Object.fromEntries(map) }));
+    });
+    return () => { cancelled = true; };
+  }, [messages]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageText.trim() || !selectedConv || !profile) return;
+    if ((!messageText.trim() && !pendingFiles.length) || !selectedConv || !profile) return;
 
     const content = messageText.trim();
+
+    // Upload first: if anything fails, nothing is sent and the text stays.
+    let attachments: { name: string; url: string; type: string; size: string }[] | undefined;
+    if (pendingFiles.length) {
+      setUploading(true);
+      try {
+        attachments = await uploadMessageAttachments(pendingFiles, selectedConv);
+      } catch (err) {
+        console.error('Attachment upload failed:', err);
+        toast.error(err instanceof Error && err.message.includes('10 MB')
+          ? err.message
+          : "Couldn't upload the attachments — nothing was sent");
+        setUploading(false);
+        return;
+      } finally {
+        setUploading(false);
+      }
+      setPendingFiles([]);
+    }
 
     try {
       const { data, error } = await sendMessage({
         conversation_id: selectedConv,
         content,
+        attachments,
       });
 
       if (error) throw error;
@@ -209,6 +336,7 @@ export default function StudentMessages() {
               filteredConvs.map((conv) => {
                 const other = getOtherParticipant(conv);
                 const isSelected = selectedConv === conv.id;
+                const unread = unreadCounts[conv.id] ?? 0;
                 return (
                   <button
                     key={conv.id}
@@ -221,16 +349,23 @@ export default function StudentMessages() {
                       <img src={other.avatar_url || `https://ui-avatars.com/api/?name=${other.full_name}`} alt="" className="w-10 h-10 rounded-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium truncate">{other.full_name}</p>
-                        {conv.last_message_at && (
-                          <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                            {new Date(conv.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        )}
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={`text-sm truncate ${unread > 0 ? 'font-semibold text-foreground' : 'font-medium'}`}>{other.full_name}</p>
+                        <span className="flex items-center gap-1.5 flex-shrink-0">
+                          {unread > 0 && (
+                            <span className="min-w-5 h-5 px-1.5 bg-red-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center" title={`${unread} unread`}>
+                              {unread > 99 ? '99+' : unread}
+                            </span>
+                          )}
+                          {conv.last_message_at && (
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                              {new Date(conv.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                        </span>
                       </div>
                       <p className="text-[10px] text-accent truncate mt-0.5 font-medium">{conv.internship?.title || 'General'}</p>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Start chatting...'}</p>
+                      <p className={`text-xs truncate mt-0.5 ${unread > 0 ? 'text-foreground/80' : 'text-muted-foreground'}`}>{conv.last_message || 'Start chatting...'}</p>
                     </div>
                   </button>
                 );
@@ -272,6 +407,10 @@ export default function StudentMessages() {
               ) : (
                 messages.map((msg) => {
                   const isSent = msg.sender_id === profile.id;
+                  // Read receipt: the other participant's id appearing in
+                  // read_by means they've opened the thread since this message.
+                  const otherId = getOtherParticipant(activeConversation)?.id;
+                  const isRead = isSent && !!otherId && (msg.read_by ?? []).includes(otherId);
                   return (
                     <m.div
                       key={msg.id}
@@ -280,10 +419,49 @@ export default function StudentMessages() {
                       className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}
                     >
                       <div className={`max-w-[70%] ${isSent ? 'message-sent' : 'message-received'} px-4 py-2.5`}>
-                        <p className="text-sm whitespace-pre-line">{msg.content}</p>
+                        {msg.content && <p className="text-sm whitespace-pre-line">{msg.content}</p>}
+                        {(msg.attachments ?? []).length > 0 && (
+                          <div className={`space-y-2 ${msg.content ? 'mt-2' : ''}`}>
+                            {(msg.attachments ?? []).map((att: any, i: number) => {
+                              const url = attachmentUrls[att.url];
+                              if (att.type?.startsWith('image/')) {
+                                return url ? (
+                                  <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block">
+                                    <img src={url} alt={att.name} loading="lazy" className="max-h-48 rounded-lg border border-white/10" />
+                                  </a>
+                                ) : (
+                                  <div key={i} className="flex items-center gap-2 text-xs opacity-80">
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    Loading {att.name}…
+                                  </div>
+                                );
+                              }
+                              return (
+                                <a
+                                  key={i}
+                                  href={url || '#'}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs transition-colors ${
+                                    isSent ? 'border-white/20 bg-white/10 text-white hover:bg-white/20' : 'border-border bg-muted text-foreground hover:bg-muted/70'
+                                  }`}
+                                >
+                                  <FileText className="w-4 h-4 shrink-0" />
+                                  <span className="flex-1 min-w-0 truncate">{att.name}</span>
+                                  <span className="shrink-0 opacity-70">{att.size}</span>
+                                  {url && <Download className="w-3.5 h-3.5 shrink-0" aria-label="Download" />}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
                         <p className={`text-[10px] mt-1 ${isSent ? 'text-white/70' : 'text-muted-foreground'} flex items-center justify-end gap-1`}>
                           {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          {isSent && <CheckCheck className="w-3 h-3" />}
+                          {isRead ? (
+                            <CheckCheck className="w-3 h-3 text-white" aria-label="Read" />
+                          ) : isSent ? (
+                            <Check className="w-3 h-3 text-white/60" aria-label="Sent" />
+                          ) : null}
                         </p>
                       </div>
                     </m.div>
@@ -295,8 +473,43 @@ export default function StudentMessages() {
 
             {/* Input */}
             <form onSubmit={handleSend} className="p-4 border-t border-border">
+              {pendingFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {pendingFiles.map((f, i) => (
+                    <span key={i} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted border border-border text-xs">
+                      <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <span className="max-w-40 truncate">{f.name}</span>
+                      <span className="text-muted-foreground shrink-0">{formatBytes(f.size)}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPendingFiles((prev) => prev.filter((_, j) => j !== i))}
+                        aria-label={`Remove ${f.name}`}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                hidden
+                accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain,.doc,.docx"
+                onChange={handleFilesPicked}
+              />
               <div className="flex items-center gap-2">
-                <button type="button" className="p-2 hover:bg-muted rounded-lg transition-colors"><Paperclip className="w-5 h-5 text-muted-foreground" /></button>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  aria-label="Attach files"
+                  title="Attach files (10 MB max)"
+                  className="p-2 hover:bg-muted rounded-lg transition-colors"
+                >
+                  {uploading ? <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" /> : <Paperclip className="w-5 h-5 text-muted-foreground" />}
+                </button>
                 <input
                   type="text"
                   value={messageText}
@@ -304,7 +517,9 @@ export default function StudentMessages() {
                   placeholder="Type a message..."
                   className="flex-1 px-4 py-2.5 bg-muted rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
                 />
-                <button type="submit" disabled={!messageText.trim()}
+                <button
+                  type="submit"
+                  disabled={uploading || (!messageText.trim() && !pendingFiles.length)}
                   className="p-2.5 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50">
                   <Send className="w-4 h-4" />
                 </button>

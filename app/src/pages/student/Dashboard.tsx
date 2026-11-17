@@ -5,7 +5,7 @@ import { FileCheck, ClipboardList, Award, Briefcase, ArrowRight, Clock, MessageS
 import { useAuth } from '@/contexts/AuthContext';
 import { getMyApplications } from '@/services/applications';
 import { getMyTasks } from '@/services/tasks';
-import { getUnreadCount, getMyConversations } from '@/services/messages';
+import { getUnreadCount, getMyConversations, getConversationUnreadCounts } from '@/services/messages';
 import { getMyCertificates } from '@/services/certificates';
 import { getMyTeamApplications } from '@/services/teamApplications';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,6 +17,13 @@ const iconMap: Record<string, React.ElementType> = { FileCheck, ClipboardList, A
 
 const stagger = (isMobile: boolean, delay: number) => ({ delay: isMobile ? 0 : delay });
 
+/** Flatten [{ id, unread_count }] into a conversation-id lookup */
+const toUnreadMap = (data?: { id: string; unread_count: number }[] | null): Record<string, number> => {
+  const map: Record<string, number> = {};
+  for (const row of data ?? []) map[row.id] = row.unread_count ?? 0;
+  return map;
+};
+
 export default function StudentDashboard() {
   const { user, profileCompleted, profileCompletionPercentage, profileCompletionRequirements } = useAuth();
   const isMobile = useIsMobile();
@@ -26,19 +33,21 @@ export default function StudentDashboard() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [conversations, setConversations] = useState<any[]>([]);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadByConv, setUnreadByConv] = useState<Record<string, number>>({});
   const [certificates, setCertificates] = useState<any[]>([]);
   const [teamApplications, setTeamApplications] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.allSettled([
+        const [apps, myTasks, unread, convos, certs, teamApps, counts] = await Promise.allSettled([
           getMyApplications(),
           getMyTasks(),
           getUnreadCount(),
           getMyConversations(),
           getMyCertificates(),
-          getMyTeamApplications()
+          getMyTeamApplications(),
+          getConversationUnreadCounts()
         ]);
         
         setApplications(apps.status === 'fulfilled' ? (apps.value?.data || []) : []);
@@ -47,6 +56,7 @@ export default function StudentDashboard() {
         setConversations(convos.status === 'fulfilled' ? (convos.value?.data || []) : []);
         setCertificates(certs.status === 'fulfilled' ? (certs.value?.data || []) : []);
         setTeamApplications(teamApps.status === 'fulfilled' ? (teamApps.value?.data || []) : []);
+        setUnreadByConv(toUnreadMap(counts.status === 'fulfilled' ? counts.value?.data : undefined));
         if ([apps, myTasks, unread, convos, certs, teamApps].some((r) => r.status === 'rejected')) {
           toast.error('Some dashboard data could not be loaded.');
         }
@@ -65,13 +75,14 @@ export default function StudentDashboard() {
   const refreshOnFocus = useCallback(() => {
     async function refreshDashboard() {
       try {
-        const [apps, myTasks, unread, convos, certs, teamApps] = await Promise.allSettled([
+        const [apps, myTasks, unread, convos, certs, teamApps, counts] = await Promise.allSettled([
           getMyApplications(),
           getMyTasks(),
           getUnreadCount(),
           getMyConversations(),
           getMyCertificates(),
-          getMyTeamApplications()
+          getMyTeamApplications(),
+          getConversationUnreadCounts()
         ]);
         setApplications(apps.status === 'fulfilled' ? (apps.value?.data || []) : []);
         setTasks(myTasks.status === 'fulfilled' ? (myTasks.value?.data || []) : []);
@@ -79,6 +90,7 @@ export default function StudentDashboard() {
         setConversations(convos.status === 'fulfilled' ? (convos.value?.data || []) : []);
         setCertificates(certs.status === 'fulfilled' ? (certs.value?.data || []) : []);
         setTeamApplications(teamApps.status === 'fulfilled' ? (teamApps.value?.data || []) : []);
+        setUnreadByConv(toUnreadMap(counts.status === 'fulfilled' ? counts.value?.data : undefined));
       } catch (error) {
         console.error('Failed to refresh dashboard data:', error);
       }
@@ -478,10 +490,10 @@ export default function StudentDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{otherParticipant?.full_name || 'User'}</p>
-                      <p className="text-xs text-muted-foreground truncate">{conv.last_message?.content || 'No messages yet'}</p>
+                      <p className="text-xs text-muted-foreground truncate">{conv.last_message || 'No messages yet'}</p>
                     </div>
-                    {conv.unread_count > 0 && (
-                      <span className="w-5 h-5 bg-accent text-white text-[10px] rounded-full flex items-center justify-center flex-shrink-0">{conv.unread_count}</span>
+                    {(unreadByConv[conv.id] ?? 0) > 0 && (
+                      <span className="w-5 h-5 bg-accent text-white text-[10px] rounded-full flex items-center justify-center flex-shrink-0">{unreadByConv[conv.id]}</span>
                     )}
                   </Link>
                 );
