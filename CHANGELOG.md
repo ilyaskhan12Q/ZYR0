@@ -5,360 +5,2650 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.96.1] - 2026-11-16
 
-All 188 commits between `main` and `develop` — one entry per commit, versioned per the project's patch-then-minor scheme (0.38.3 → 2.80.4).
+### Changed
+- **Use pipe separators in detail SEO titles (`app/src/pages/public/ToolDetail.tsx`)**:
+  - Use pipe separators in detail SEO titles.
 
-### 2026-10-19
+## [3.96.0] - 2026-11-16
 
-- **`3963387`** 2.80.4 — feat(agent): peek the sidebar open when hovering the collapsed rail (PR #150)
+### Added
+- **Ship Gruvbox detail page and command label defaults (`app/src/components/tools/SubmitToolDialog.tsx, app/src/pages/public/ToolDetail.tsx, app/src/styles/tool-detail.css`)**:
+  - Ship Gruvbox detail page and command label defaults.
 
-### 2026-10-18
+## [3.95.5] - 2026-11-16
 
-- **`77f65b8`** 2.80.3 — feat(agent): trim the About pane to WhatsApp support, log the release (PR #150)
-- **`7222d2c`** 2.80.2 — feat(agent): make the panel shortcuts toggles (PR #150)
-- **`f42f76d`** 2.80.1 — feat(agent): keyboard shortcuts with hover hints, drop the quick-actions FAB (PR #150)
-- **`f81d2f1`** 2.80.0 — feat(agent): floating quick-actions button with hover flyout (PR #150)
-- **`2bd576f`** 2.79.5 — feat(agent): render chat replies as markdown and answer conversationally (PR #150)
-- **`fb6b2bf`** 2.79.4 — feat(agent): ChatGPT-style account section in settings (PR #150)
-- **`50422d2`** 2.79.3 — feat(agent): rich About section in settings with version, links and diagnostics (PR #150)
-- **`14d0f12`** 2.79.2 — fix(agent): voice input transcribes speech instead of fabricating it (PR #150)
-- **`a83fb17`** 2.79.1 — fix(agent): always identify as ZYR0's Research Agent (PR #150)
-- **`5815ebf`** 2.79.0 — style(agent): redo the delete-history confirmation popup (PR #150)
-- **`8aee962`** 2.78.5 — style(agent): blue settings switches with a white thumb in both states (PR #150)
-- **`e3f8cf1`** 2.78.4 — feat(agent): confirmation popup for deleting chat history (PR #150)
-- **`ef0ac97`** 2.78.3 — feat(agent): keep Settings in the collapsed sidebar rail (PR #150)
-- **`b8c0ec1`** 2.78.2 — feat(agent): light theme by default, and settings that act on the spot (PR #150)
-- **`8a54a85`** 2.78.1 — feat(agent): working ChatGPT-style settings sheet (PR #150)
-- **`b93d593`** 2.78.0 — feat(agent): icon-only temporary toggle in the top-right corner (PR #150)
-- **`21e1d10`** 2.77.5 — feat(agent): temporary chat that never touches history (PR #150)
-- **`0f566f1`** 2.77.4 — feat(agent): move sidebar search into a top-bar button (PR #150)
-- **`233ea91`** 2.77.3 — feat(agent): premium gradient icons for Recent list items (PR #150)
-- **`6fcef17`** 2.77.2 — feat(agent): collapsible Recent section and the ZYR0 Research mark (PR #150)
-- **`b763cf3`** 2.77.1 — feat(agent): enlarge and brighten the add-photo button (PR #150)
-- **`182f3f9`** 2.77.0 — fix(agent): brand the sidebar as ZYR0 Research (PR #150)
-- **`d52e6b9`** 2.76.5 — fix(agent): consolidate the sidebar toggles into the sidebar (PR #150)
-- **`5f16791`** 2.76.4 — fix(agent): show the sidebar close button on desktop (PR #150)
-- **`8861092`** 2.76.3 — feat(agent): move the Chat/Research selector into the top bar (PR #150)
-- **`a23334f`** 2.76.2 — feat(agent): move the Chat/Research mode pills above the composer (PR #150)
-- **`0643da9`** 2.76.1 — refactor(agent): drop the duplicate New button from the thread header (PR #150)
-- **`c4c6f7d`** 2.76.0 — fix(agent): restore wheel/touchpad scrolling in the research workspace (PR #150)
-- **`d397fc4`** 2.75.5 — fix(agent): use ZYR0 brand and add the ZYRO Studio logo to the sidebar (PR #150)
-- **`7f92eae`** 2.75.4 — fix(agent): follow the reply in the thread without blocking manual scrolling (PR #150)
-- **`4fd9fd6`** 2.75.3 — fix(agent): forward attachments with the message instead of dropping them (PR #150)
+### Added
+- **Label commands and lead with them on detail pages (`app/src/components/tools/SubmitToolDialog.tsx, app/src/pages/public/ToolDetail.tsx`)**:
+  - Label commands and lead with them on detail pages.
 
-### 2026-10-05
+## [3.95.4] - 2026-11-15
 
-- **`9c65f6f`** feat(certificate): ZYRO brand refresh — new seal, Agbalumo header, verification copy (PR #148)
-- **`b297898`** feat(offer-letter): hide issue/expiry dates on letter, real expiry on /verify, auto-flip + owner-editable expiry (PR #148)
+### Changed
+- **Merge pull request #171 from ilyaskhan12Q/feat/tool-submission-redesign**:
+  - Redesign tool & skill submission as a guided 3-stage editor.
 
-### 2026-10-02
+## [3.95.3] - 2026-11-14
 
-- **`2cf0399`** 2.75.2 — fix(certificate): refine layout, typography scale, vertical positioning, and body copy
-- **`e929f57`** 0.71.4 — fix(nav): replace scroll-shrinking island pill with persistent full-width navbar
-- **`aacfdfc`** 0.71.3 — fix(security): allow images.unsplash.com in CSP and optimize timeline image loading
-- **`18b4515`** 0.71.2 — feat(hero): optimize mobile shape placement and seamless dissolve-converge transitions
-- **`150a882`** 0.71.1 — fix(lineart): avoid ref mutation during render in LineArtCanvas
-- **`5a65f66`** 0.71.0 — feat(hero): integrate 3d line-art continuous cycle with light/dark mode support
-- **`62a10ea`** 0.70.5 — feat(landing): replace timeline story with 4 Defensible Pillars and refine scroll alignment
+### Added
+- **Add listing SEO controls and rebuild public pages (`app/package-lock.json, app/package.json, app/scripts/generate-seo.js, app/src/components/markdown/MarkdownContent.tsx, app/src/components/tools/SubmitToolDialog.tsx`)**:
+  - Add editable SEO title, meta description, and slug to the submission flow; persist SEO fields; render listing Markdown with shared safe component; show every install method; add canonical/OG/JSON-LD and noindex 404; pre-render tool page body content; restore anon read migration and add SEO columns.
 
-### 2026-10-01
+## [3.95.2] - 2026-11-14
 
-- **`f6dfd4c`** 0.73.4 — feat(admin): enable administrators to create, publish live, and feature tools and skills
-- **`80d2f3b`** 0.73.3 — refactor(tools): remove all hardcoded tools and rely strictly on Supabase registry
-- **`70a8191`** 0.73.2 — feat(tools): wire /tools routing, platform navigation, and navbar dropdowns
-- **`90a6353`** 0.73.1 — feat(tools): add Student, Company, and Admin moderation dashboards for ToolHub
-- **`4213c99`** 0.73.0 — feat(tools): add public /tools discovery catalog with search, filtering, and SEO prerendering
-- **`04f683d`** 0.72.5 — feat(tools): add ToolCard, FeaturedToolCard, ToolPreviewDialog, SubmitToolDialog, and EmptyState components
-- **`d60bc8f`** 0.72.4 — feat(tools): add database schema, types, and service layer for ToolHub registry
-- **`78e9f95`** 0.72.3 — fix(blog): eliminate duplicate category tags and titles on fallback cards
-- **`ac18b32`** 0.72.2 — fix(blog): resolve React Compiler useMemo memoization lint error in BlogPostDetail
-- **`5b0b9cb`** 0.72.1 — feat(blog): polish editorial UX, reading layout, TOC, and admin CMS publishing
+### Added
+- **Redesign tool and skill submission as a 3-stage editor (`app/src/components/tools/SubmitToolDialog.tsx, app/src/components/tools/submitToolForm.ts`)**:
+  - Replace the single long form with Basics, Listing Content, and Review stages. Add a Markdown editor with toolbar, split preview and mobile Write/Preview tabs, expandable secondary sections, removable tag chips, a live public-listing preview, completeness and validation review, and browser-local draft autosave/restore.
+  - All 16 publishing fields, submitTool(), admin-only status/featured/badge/cover fields, moderation flow, and schema remain unchanged.
 
-### 2026-09-30
+## [3.95.1] - 2026-10-30
 
-- **`fdf2c0f`** 0.70.4 — feat(home): default the platform to light theme for the playground
-- **`9525f66`** 0.70.3 — fix(molten-ring): end the deck and release the page on phones
-- **`c31413c`** 0.70.2 — feat(home): restore molten ring carousel verbatim and unpin the playground
-- **`6231da4`** 0.70.1 — fix(home): read playground progress in the frame loop instead of on scroll
+### Changed
+- **Merge pull request #169 from ilyaskhan12Q/fix-resume-timeouts**:
+  - Fix(applications): resolve resumes signing timeout by switching to on-demand resolution.
 
-### 2026-09-29
+## [3.95.0] - 2026-10-28
 
-- **`8de0c25`** 0.70.0 — feat(home): pin playground carousel to scroll and adopt reference molten-ring component
+### Fixed
+- **Lift WhatsApp FAB clear of bottom-right toasts (`app/src/pages/student/Tasks.tsx, app/src/pages/student/Workspace.tsx`)**:
+  - Lift WhatsApp FAB clear of bottom-right toasts.
 
-### 2026-09-27
+## [3.94.5] - 2026-10-28
 
-- **`7ed4560`** 0.69.5 — fix: resolve mobile touch scrolling and pointer capture blocking in liquid carousel
-- **`0473ad5`** 0.69.4 — feat: add dynamic island navbar convergence on scroll and centered pill with full build validation
-- **`459393b`** 0.69.3 — feat(home): replace bento grid with WebGL2 molten ring playground carousel
+### Fixed
+- **Surface silent failures and unify toast feedback (`app/src/components/ui/sonner.tsx, app/src/layouts/DashboardLayout.tsx, app/src/pages/public/InternshipDetail.tsx, app/src/pages/student/Dashboard.tsx, app/src/pages/student/Messages.tsx`)**:
+  - Clean bottom-right toast styling shared by all roles.
+  - Sidebar sign out now actually signs the user out.
+  - Messages keep the draft when sending fails.
+  - Apply, offer accept/reject and portfolio copy give feedback.
+  - Replace alert/confirm with toasts and AlertDialog.
+  - Load failures on dashboard, progress, portfolio and tools are reported.
+  - Settings validate the password before saving.
 
-### 2026-09-26
+## [3.94.4] - 2026-10-28
 
-- **`e8256ab`** 0.75.1 — style(certificate): raise QR image above verification label
-- **`745204f`** 0.75.0 — feat(certificate): add director signature, transparent coordinator signature
+### Added
+- **Add toast notifications across company actions and mutations (`app/src/components/company/tasks/TaskExtendDeadlineModal.tsx, app/src/components/company/tasks/TaskReviewDrawer.tsx, app/src/pages/company/Applications.tsx, app/src/pages/company/Certificates.tsx, app/src/pages/company/EditInternshipModal.tsx`)**:
+  - Add toast notifications across company actions and mutations.
 
-### 2026-09-25
+## [3.94.3] - 2026-10-27
 
-- **`8256ac5`** 0.74.5 — feat(certificate): use seal.png image with SVG seal fallback
-- **`7c4bedd`** 0.74.4 — feat(certificate): integrate program coordinator signature image
-- **`f87d02d`** 0.74.3 — style(certificate): engraved golden ZYRO seal and align verification labels
+### Fixed
+- **Resolve resumes signing timeout by switching to on-demand resolution (`app/src/components/applications/ApplicationDetailDialog.tsx, app/src/pages/company/Applications.tsx, app/src/services/applications.ts`)**:
+  - Resolve resumes signing timeout by switching to on-demand resolution.
 
-### 2026-09-23
+## [3.94.2] - 2026-10-27
 
-- **`91baa1c`** 0.74.2 — style(certificate): move cert meta to header, logo above heading, update tagline
-- **`ed1a655`** 0.74.1 — style(certificate): align footer row and enlarge signature meta type
-- **`b8ff797`** 0.74.0 — style(certificate): remove external logos, refine heading and signature lines
-- **`5d0857f`** 0.69.2 — style(timeline): tighten lead-in spacing and adjust mobile sticky layout
-- **`aa83373`** 0.69.1 — feat(home): integrate timeline, blog, skills, and tabbed FAQ sections
-- **`df6db21`** 0.69.0 — style(skills): redesign ecosystem section with asymmetric rail and clickable cards
+### Changed
+- **Merge pull request #168 from ilyaskhan12Q/fix-company-tasks-load**:
+  - Fix(workflow): resolve company task timeouts, storage policies, and public certificate verification.
 
-### 2026-09-22
+## [3.94.1] - 2026-10-27
 
-- **`5020bbb`** 0.68.5 — style(theme): implement full light and dark mode support across homepage sections
-- **`327a380`** 0.68.4 — style(theme): fix footer and dark mode tokens from blue to neutral dark
-- **`a80dd99`** 0.68.3 — feat(products): restore minimal and clear BentoProductGrid for screenshots and gifs
-- **`abc603e`** 0.68.2 — refactor(home): assemble restyled PlatformHome page flow and remove pricing and stats
-- **`3cc276a`** 0.68.1 — style(faq-cta): modernize FAQ accordion and create minimal statement CTA
-- **`a52100f`** 0.68.0 — feat(blog): add latest blog preview section with editorial cards
-- **`e8129f7`** 0.67.5 — feat(skills): add Skills Marketplace section with featured community and official skills
-- **`bb35f66`** 0.67.4 — feat(features): add Linear-style horizontal feature highlight strip (01-04)
-- **`5002936`** 0.67.3 — feat(products): enrich bento grid with UI mockups, prompt bar, and feature badges
-- **`39546f5`** 0.67.2 — feat(logowall): upgrade partner marquee with authentic SVG logos
-- **`a725745`** 0.67.1 — feat(hero): restyle hero with clean dark background, Agbalumo wordmark, and animated tagline
-- **`1c8a963`** 0.67.0 — style(brand): add Agbalumo/Sora font configuration and brand tokens
+### Fixed
+- **Resolve public certificate verification, task storage policies, and company list timeouts (`app/src/pages/company/Certificates.tsx, app/src/pages/company/Interns.tsx, app/src/services/certificates.ts, app/src/services/tasks.ts, supabase/migrations/075_public_certificate_verification.sql`)**:
+  - Resolve public certificate verification, task storage policies, and company list timeouts.
 
-### 2026-09-19
+## [3.94.0] - 2026-10-27
 
-- **`a9d94df`** 0.72.0 — feat(blog): implement blog architecture, clean editorial layout, and admin CMS
+### Fixed
+- **Resolve task attachments on demand instead of eager signing (`app/src/components/company/tasks/TaskReviewDrawer.tsx, app/src/lib/storage.ts, app/src/services/tasks.ts`)**:
+  - Resolve task attachments on demand instead of eager signing.
 
-### 2026-09-09
+## [3.93.5] - 2026-10-27
 
-- **`0dafb09`** 0.66.5 — fix(ai-gateway): make FALLBACK_ORDER lazy so env vars are read per-request
+### Fixed
+- **Resolve CSP worker block and avoid blocking PDF signing in tasks (`app/src/pages/company/Tasks.tsx, app/src/services/offerLetters.ts, app/vercel.json`)**:
+  - Resolve CSP worker block and avoid blocking PDF signing in tasks.
 
-### 2026-09-07
+## [3.93.4] - 2026-10-27
 
-- **`ac0f35c`** 0.66.4 — fix(landing): fix stats count-up animation
-- **`1312d46`** 0.66.3 — feat(landing): add standalone stats section with upgraded visuals
-- **`6fdab38`** 0.66.2 — feat(landing): add Why ZYR0 value proposition section
-- **`265ec34`** 0.66.1 — feat(landing): consolidate feature sections, upgrade bento grid
-- **`3e36c38`** 0.66.0 — feat(landing): replace fake LogoWall with real AI & infra partners
+### Security
+- **Merge pull request #154 from ilyaskhan12Q/fix/security-audit-run-1 (`app/src/services/tasks.ts`)**:
+  - Fix(security): close audit findings and gate deploys on migrations.
 
-### 2026-09-05
+## [3.93.3] - 2026-10-26
 
-- **`ff0ec5f`** 0.65.5 — fix(performance): dynamic-import MeshGradient into lazy chunk to prevent desktop freeze
-- **`07295ae`** 0.65.4 — fix(perf): isolate recharts into lazy chunk, keep vendor-common for shared deps
-- **`e793582`** 0.65.3 — fix(lint): remove try/catch around JSX, use static MeshGradient import
-- **`3f3d154`** 0.65.2 — fix(perf): defer Lenis init to useEffect, add vendor chunks
-- **`f262a88`** 0.65.1 — fix(cleanup): remove dead react-icons dependency
-- **`67b3073`** 0.65.0 — fix(perf): defer Lenis init to useEffect, add vendor chunks
-- **`e9d459c`** 0.64.5 — fix(perf): replace motion with m in 97 files for LazyMotion
-- **`1080dae`** 0.64.4 — fix(desktop): wrap ShaderHero in ErrorBoundary with CSS fallback
-- **`9e0200a`** 0.64.3 — fix(deploy): revert to catch-all rewrite for SPA routing
-- **`3bfa0c7`** 0.64.2 — fix(seo): add IndexNow reference for faster Bing indexing
-- **`bdd20fb`** 0.64.1 — fix(security): remove unsafe-eval from CSP header
-- **`f4b3099`** 0.64.0 — fix(seo): add SoftwareApplication schema for platform entity
-- **`578f823`** 0.63.5 — fix(seo): expand product page descriptions for crawlers
-- **`778a96b`** 0.63.4 — fix(seo): improve Organization schema with ImageObject logo
-- **`6e88f5c`** 0.63.3 — fix(seo): upgrade HSTS header with includeSubDomains and preload
-- **`77840e9`** 0.63.2 — fix(seo): update branding, add llms.txt reference, trim meta description
-- **`4d689d4`** 0.63.1 — fix(seo): configure proper 404 handling in Vercel
-- **`844b749`** 0.63.0 — fix(seo): add pre-rendered homepage content for crawlers
-### 2026-09-02
+### Changed
+- **Merge pull request #166 from ilyaskhan12Q/fix/task-assign-undefined-id**:
+  - Fix(tasks): resolve undefined id error on task assignment and add toast feedback.
 
-- **`e108747`** 0.62.6 — chore: update .gitignore with phases.md and SAAS_REBRAND_PLAN.md
-- **`48b6471`** 0.62.5 — fix(dashboard): always show team role (Owner/Admin/HR Manager/Mentor/Reviewer) in profile dropdown
-- **`43e2e6b`** 0.62.4 — fix(invite): generate fresh token on each resend (invalidate old tokens)
-- **`b779815`** 0.62.3 — fix(invite): block company owner from inviting themselves via client-side check
-- **`4093026`** 0.62.2 — fix(rpc): accept_company_invite verifies invited email matches logged-in user + blocks owner
-- **`473733a`** 0.62.1 — fix(company-access): canAccessTab returns false when memberRole is null for non-owners
-- **`1755ba4`** 0.62.0 — Merge pull request #138 from ilyaskhan12Q/fix-company-invite-workflow
-- **`6402c06`** 0.61.15 — fix(sidebar): add missing cache policy aliases for count keys (use 60s TTL instead of 5s)
-- **`776772d`** 0.61.14 — fix(sidebar): refresh cache-first on mount + visibilitychange listener for tab-return
-- **`639ed38`** 0.61.13 — feat(hooks): add useRefreshOnFocus for tab-return refresh on student and company pages
-- **`d4b24de`** 0.61.12 — fix(public-nav): remove 'student' fallback from all nav components — use profile.role or null + loading guard
-- **`89ff614`** 0.61.11 — fix(profile): add missing profileLoaded guard in AuthContext before navigating
-- **`9cd2215`** 0.61.10 — fix(profile): remove 'student' fallback in PublicOnlyRoute — show loader until profile loads
-- **`1f18390`** 0.61.9 — fix(auth): Login.tsx waits for profileLoaded before navigating to prevent stale role redirect
-- **`495cf5d`** 0.61.8 — fix(invite): one-time data fix to promote team members' profiles to 'company' role + add RPC
-- **`88c0219`** 0.61.7 — fix(invite): accept_company_invite RPC now updates profiles.role to 'company' on accept
-- **`f298199`** 0.61.6 — chore(ci): re-enable ESLint in CI workflow
-- **`4ca0d5c`** 0.61.5 — perf(db): add indexes for profiles, applications, tasks, events, and certificates queries
-- **`319e0c0`** 0.61.4 — perf(workspace): parallelize tasks, certificates, and events fetches with Promise.allSettled
-- **`08c6e9f`** 0.61.3 — perf(shader): throttle mousemove via ref + rAF, single MeshGradient, Lenis on public routes only
-- **`b77816f`** 0.61.2 — perf(fonts): self-host Inter, Agbalumo, DM Serif Text as woff2 with font-display:swap
-- **`6db8bb5`** 0.61.1 — feat(timeout): add configurable timeouts to all data-fetch pages, AuthContext, ErrorBoundary
+## [3.93.2] - 2026-10-25
 
-### 2026-08-29
+### Fixed
+- **Resolve undefined id error on task assignment and add toast feedback (`app/src/components/company/tasks/TaskCreateEditModal.tsx, app/src/services/tasks.ts`)**:
+  - Resolve undefined id error on task assignment and add toast feedback.
 
-- **`fc06a8b`** 0.61.0 — feat: SaaS ecosystem rebrand — homepage redesign, animations, nav update
+## [3.93.1] - 2026-10-25
 
-### 2026-08-28
+### Security
+- **Merge branch 'main' into fix/security-audit-run-1 (`.github/workflows/deploy.yml, app/src/components/CertificateDocument.tsx, app/src/components/certificateTemplate.ts, app/src/lib/storage.ts, app/src/pages/admin/Reports.tsx`)**:
+  - Merge branch 'main' into fix/security-audit-run-1.
 
-- **`3f4684d`** 0.60.5 — fix: resolve TypeScript build errors in shader hero
-- **`7af5f22`** 0.60.4 — feat(hero): integrate shader hero with MeshGradient background
-- **`e987dc4`** 0.60.3 — feat(homepage): add scroll animations and smooth scroll
-- **`3837e31`** 0.60.2 — feat(nav): add Company dropdown and update Products/Resources dropdowns
-- **`d599bea`** 0.60.1 — chore: remove /0-ai route and ZeroAI module completely
-- **`96af704`** 0.60.0 — feat: redesign homepage with Dovetail-inspired design system
+## [3.93.0] - 2026-10-25
 
-### 2026-08-27
+### Fixed
+- **Use --use-api for supabase functions deploy to bypass Docker ECR rate limits (`.github/workflows/deploy.yml`)**:
+  - Use --use-api for supabase functions deploy to bypass Docker ECR rate limits.
 
-- **`57b9ed1`** 0.59.5 — feat(nav): add Header component for product landing pages, restore original PublicLayout
-- **`2278e6a`** 0.59.4 — fix(consistency): align BentoProductGrid product badge with data.ts
-- **`e9ae0fc`** 0.59.3 — chore(cleanup): remove dead Framer components, legacy CSS, unused data
-- **`3e66dff`** 0.59.2 — fix(routing): add work.zyroo.org gateway, fix Landing SEO path
-- **`cdba79d`** 0.59.1 — feat(nav): unify navigation and footer across all pages
-- **`5cce4cc`** 0.59.0 — fix(router): route / to PlatformHome, /internships to Landing, and /internships/browse to BrowseInternships
-- **`59c974b`** 0.58.5 — fix(internships): correctly route /internships to Landing and /internships/browse to BrowseInternships with full link integration
-- **`e20e859`** 0.58.4 — fix(internships): restore BrowseInternships at /internships and /internships/browse with URL query sync
-- **`902437f`** 0.58.3 — fix(router): nest /internships route in PublicLayout to retain dedicated navbar
-- **`085550f`** 0.58.2 — feat(routing): integrate subdomain resolution and multi-product routes in App.tsx and SEO generator
-- **`73660f8`** 0.58.1 — feat(edu): add school os product surface, perspective switcher, and roi calculator
-- **`0c3673d`** 0.58.0 — feat(studio): add zyr0 studio product surface, interactive ai prompt simulator, and lead service
-- **`d9751eb`** 0.57.5 — feat(home): add bento-grid product showcase, solutions, and streamlined sections
-- **`d1e4413`** 0.57.4 — feat(nav): modernize platform navbar and footer with multi-product SaaS dropdown
-- **`c387610`** 0.57.3 — docs: add SaaS transition phases tracker
+## [3.92.5] - 2026-10-25
 
-### 2026-08-26
+### Changed
+- **Merge pull request #155 from ilyaskhan12Q/feat/tools-multi-command-and-preview**:
+  - Feat/tools multi command and preview.
 
-- **`008a4bb`** 0.55.5 — Merge pull request #120 from ilyaskhan12Q/fix/agent-pipeline-optimizations
-- **`d2c51ac`** 0.57.2 — fix(homepage): strip all Framer Motion animation states that hide content
-- **`07102dc`** 0.57.1 — fix(homepage): responsive variants, Suprema branding, footer links
-- **`9b96e5c`** 0.57.0 — fix(homepage): fix React console warnings - srcSet, alt, webkit styles
-- **`3da5ae0`** 0.56.5 — fix(homepage): fix blank page - CSS background, pre-render, srcset paths
-- **`e6a2ae1`** 0.56.4 — fix(homepage): reduce PlatformHome chunk size below 600KB CI limit
-- **`c654be7`** 0.56.3 — feat(homepage): literal Suprema template conversion to React
-- **`53fc71c`** 0.56.2 — feat(homepage): rebuild PlatformHome as Suprema-inspired React homepage
-- **`2d1e06e`** 0.56.1 — feat(homepage): add platform homepage with product grid
-- **`0732004`** 0.56.0 — feat(nav): add multi-product dropdown navigation
+## [3.92.4] - 2026-10-25
 
-### 2026-08-24
+### Changed
+- **Merge remote-tracking branch 'origin/main' into feat/tools-multi-command-and-preview**:
+  - Merge remote-tracking branch 'origin/main' into feat/tools-multi-command-and-preview.
 
-- **`66360c2`** 0.55.4 — fix(agent): fix model switching, button positions, placeholder alignment, mobile layout
-- **`aa55ec2`** 0.55.3 — feat(agent): replace input with polished PromptInput pattern
-- **`2514d6a`** 0.55.2 — fix(agent): mobile responsiveness — touch targets, layout, dropdown positioning
+## [3.92.3] - 2026-10-25
 
-### 2026-08-23
+### Changed
+- **Merge pull request #151 from ilyaskhan12Q/feat/global-ui-architecture**:
+  - Feat(ui): standardize global public UI architecture and brand system.
 
-- **`1cefa68`** 0.54.1 — Merge pull request #118 from ilyaskhan12Q/feature/dayos-style-landing
-- **`3a7911c`** 0.55.1 — feat(agent): sidebar history, PDF export, shared components, bug fixes
-- **`2819d0b`** 0.55.0 — fix(agent): model dropdown via Portal, clickable citations in reports
-- **`5d92338`** 0.54.5 — fix(agent): model dropdown uses fixed positioning, chat history loading
-- **`380a0d6`** 0.54.4 — fix(agent): depth dropdown opens upward to stay visible
-- **`aa2b381`** 0.54.3 — feat(agent): depth dropdown, scrollable model selector, floating input
-- **`c668edd`** 0.54.2 — feat(agent): add Gemini models, optimize planner pipeline
-- **`1937815`** 0.54.0 — fix(landing): increase scrolled nav height 48px → 54px
-- **`f13ff84`** 0.53.5 — fix(landing): morphing navbar — remove Reveal wrapper, fix sticky
-- **`6103e79`** 0.53.4 — feat(landing): morphing navbar — shrinks to pill on scroll
-- **`9ec7783`** 0.53.3 — fix(landing): ReportSection heading overflow — use 2-col grid + smaller clamp
-- **`e28a8e8`** 0.53.2 — feat(landing): complete visual overhaul — tighter density, Dayos-level design
-- **`683a283`** 0.53.1 — feat(landing): self-contained Report, Audience, Pricing sections
-- **`2d2ed5f`** 0.53.0 — feat(landing): update composition, nav, delete unused sections
-- **`1ed4c94`** 0.52.5 — feat(landing): Dayos-style multi-column footer
-- **`b6efe4f`** 0.52.4 — feat(landing): two-column CTA section on dark bg
-- **`3c3a9c7`** 0.52.3 — feat(landing): horizontal scroll depth cards
-- **`685fb74`** 0.52.2 — feat(landing): 3-pillar feature section
-- **`218ad2a`** 0.52.1 — feat(landing): claim trail feature detail section
-- **`45b5728`** 0.52.0 — feat(landing): source logos bar + stats section on dark bg
-- **`83f39fe`** 0.51.5 — feat(landing): revolution statement + product showcase sections
-- **`f17eaa8`** 0.51.4 — feat(landing): dark hero + problem arc sections
-- **`43484cf`** 0.51.3 — style(landing): update CSS for Dayos-inspired design system
+## [3.92.2] - 2026-10-25
 
-### 2026-08-22
+### Changed
+- **Merge branch 'main' into feat/tools-multi-command-and-preview (`app/package.json, app/src/index.css, app/src/main.tsx, app/tailwind.config.js, app/tsconfig.app.json`)**:
+  - Merge branch 'main' into feat/tools-multi-command-and-preview.
 
-- **`789173b`** 0.51.2 — Merge remote-tracking branch 'origin/main' into develop
-- **`3457785`** 0.51.1 — feat(landing): redesign with rich animations, glassmorphism, and scroll effects
+## [3.92.1] - 2026-10-25
 
-### 2026-08-21
+### Changed
+- **Merge branch 'main' into feat/global-ui-architecture (`app/package.json, app/src/index.css, app/src/main.tsx, app/tailwind.config.js, app/tsconfig.app.json`)**:
+  - Merge branch 'main' into feat/global-ui-architecture.
 
-- **`7fee8e7`** 0.49.5 — Merge feature/agent-bolt-redesign: Bolt-style workspace + premium editorial landing + subdomain routing
-- **`755c066`** 0.51.0 — feat(agent): add slide-in animation for history panel
-- **`084e46a`** 0.50.5 — feat(agent): add AnimatePresence transition for hero→thread switch
-- **`82b3307`** 0.50.4 — feat(agent): add persistent sidebar with demo history, new chat, settings
-- **`f50bad7`** 0.50.3 — feat(agent): replace header text links with proper pill buttons
-- **`ac65f11`** 0.50.2 — feat(agent): add ThreadInput with mode toggle, depth pills, model selector
-- **`1aadb14`** 0.50.1 — fix(agent): add min-h-0 to thread area for proper overflow scrolling
-- **`6dfc49f`** 0.50.0 — fix(vercel): remove ignoreCommand to enable Vercel auto-deploy from develop
-- **`d138bf8`** 0.49.4 — feat(agent+landing): Bolt-style workspace + premium editorial landing
+## [3.92.0] - 2026-10-25
 
-### 2026-08-19
+### Added
+- **Desktop morphing navbar, partner onboarding page, and expanded products menu (`app/src/App.tsx, app/src/components/nav/SiteNav.tsx, app/src/config/navigation.ts, app/src/pages/public/Join.tsx`)**:
+  - Desktop morphing navbar, partner onboarding page, and expanded products menu.
 
-- **`be2f21f`** 0.49.3 — Merge feature/agent-single-page: hero-only input + mode-aware landing
-- **`8fcbd5f`** 0.49.1 — Merge feature/agent-single-page: polish, changelog, empty-thread fix
-- **`f0fbce7`** 0.48.5 — Merge feature/agent-single-page: unified single-page thread
-- **`c988968`** 0.48.3 — Merge feature/agent-single-page: composer dock
-- **`2cad0ff`** 0.48.1 — Merge feature/agent-single-page: left AgentSidebar with library
-- **`94aedea`** 0.47.5 — Merge feature/agent-single-page: chat session persistence
-- **`2a0a643`** 0.47.2 — Merge feature/agent-single-page: conversation thread backdrop
-- **`27c3d59`** 0.47.0 — Merge fix/research-pipeline: 24-candidate gather, verified-only citations, two-tier sources
-- **`8032444`** 0.49.2 — feat(agent): single input on new sessions — hero-only, mode-aware
-- **`2fbb2fb`** 0.49.0 — docs(changelog): single-page Research Agent workspace; fix empty-thread hero when prefilled
-- **`6d2a585`** 0.48.4 — feat(agent): unified single-page thread with inline research runs
-- **`816afd5`** 0.48.2 — feat(agent): composer dock with mode toggle, model picker, depth pills
-- **`31c334b`** 0.48.0 — feat(agent): left AgentSidebar with chat + research library
-- **`ececcfd`** 0.47.4 — feat(agent): persist chat sessions and messages (mode='chat')
-- **`1cf6ce4`** 0.47.3 — feat(agent): persist chat sessions and messages (mode='chat')
-- **`781932c`** 0.47.1 — feat(agent): conversation thread backdrop with landing pentagon motif
-- **`4160f61`** 0.46.5 — feat(research-agent): 24-candidate gather, verified-only citations, two-tier source sections
+## [3.91.5] - 2026-10-25
 
-### 2026-08-18
+### Changed
+- **Merge pull request #153 from ilyaskhan12Q/feat/tools-multi-command-and-preview**:
+  - Feat(tools): add multi-command installation, markdown rendering, and live preview switcher.
 
-- **`c5d2b83`** 0.46.4 — Merge fix/research-pipeline: round-robin evidence selection
-- **`06bae78`** 0.46.2 — Merge fix/research-pipeline: server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry
-- **`5edfd73`** 0.46.0 — Merge fix/research-pipeline: scroll fixes for generated text and history
-- **`7f109c5`** 0.45.4 — Merge fix/research-pipeline: restore research pipeline (search, persistence, editorial)
-- **`3678381`** 0.45.1 — Merge feature/agent-ux-redesign: Academic Precision UI/UX redesign
-- **`6303cdb`** 0.44.4 — Merge feature/jina-gateway: Jina web via gateway + empty-platform visibility
-- **`a5680c3`** 0.44.2 — Merge fix/session-refresh: stale JWT refresh — gateway Unauthorized fix
-- **`6f5f1da`** 0.44.0 — Merge feature/gateway-search: Phase 3.5 — keyless-first gateway search (S2 + PubMed + CORE)
-- **`ea37067`** 0.46.3 — fix(research-agent): round-robin evidence selection so one platform can't fill the cap
-- **`77e835b`** 0.46.1 — fix(research-agent): server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry
-- **`8a64723`** 0.45.5 — fix(research-agent): restore scrolling for generated text and history
-- **`71d8943`** 0.45.3 — fix(research-agent): persist runs under user_id (RLS), surface pipeline errors
-- **`9e4ad9a`** 0.45.2 — fix(gateway): restore search on edge — UA header, 30s web timeout, S2 retry, status logging
-- **`8da0b2b`** 0.45.0 — ui: report workspace tabs + source verification panel + editorial structure
-- **`4c563cb`** 0.44.5 — ui: Academic Precision design system — light theme, landing, research progress timeline
-- **`8800599`** 0.44.3 — research: Jina web via gateway (JINA_API_KEY secret) + empty-platform visibility
-- **`fc216f2`** 0.44.1 — fix: refresh stale session before gateway calls — no more silent Unauthorized after idle
-- **`c2cd069`** 0.43.5 — research: gateway search worker — S2 server-side + PubMed + CORE (keyless-first), 6-platform UI
-- **`8d332c3`** 0.43.4 — gateway: /v1/search action — keyless-first S2 + PubMed, CORE env-gated
+## [3.91.4] - 2026-10-25
 
-### 2026-08-17
+### Added
+- **Redesign tool hub hero, add suggested tools, and fix navbar top breathing room (`app/src/components/nav/SiteNav.tsx, app/src/components/research-landing/HeroSection.tsx, app/src/config/navigation.ts, app/src/pages/edu/SchoolOSLanding.tsx, app/src/pages/public/BillingHelp.tsx`)**:
+  - Redesign tool hub hero, add suggested tools, and fix navbar top breathing room.
 
-- **`1458ae0`** 0.43.3 — Merge feature/research-phase3: Phase 3 — 4 parallel realtime workers (8-12s gathering), volume 8-16, PDF export
-- **`7888e1e`** 0.42.5 — Merge feature/research-ux: Phase 3 pre-work — research UX bundle (report rendering, source modal, plan review gate, pipeline polish, continue-from-report, research-mode cleanup)
-- **`8e9961f`** 0.41.4 — Merge feature/research-agent-pipeline: Phase 2 — deep research pipeline (planner, workers, verifier, editorial, workspace UI, migration 044)
-- **`56fb086`** 0.43.2 — feat(agent): PDF export — multi-page A4 report + citation ledger appendix via jsPDF (direct download)
-- **`04e2f76`** 0.43.1 — feat(agent): gathering volume 8-16 — per-platform caps, hard aggregate cap, staggered S2 waves, web cap 4
-- **`91f98b7`** 0.43.0 — feat(agent): four parallel realtime workers — per-platform units with intra-platform query parallelism (gathering ~8-12s)
-- **`8fca9b3`** 0.42.4 — feat(agent): hide model picker in research mode — models belong in Settings, not the research surface
-- **`be5fc6a`** 0.42.3 — feat(agent): continue from report — follow-up chat with report context, prefill new research, regenerate
-- **`9b3c0e4`** 0.42.2 — feat(agent): pipeline view polish — planning skeleton, per-source status rows, verified chips, condensed notes
-- **`3439039`** 0.42.1 — feat(agent): plan review gate — approve/edit/regenerate the research agenda before workers start
-- **`17a07d1`** 0.42.0 — feat(agent): source modal — full evidence record behind every ledger card
-- **`2689f3a`** 0.41.5 — feat(agent): report rendering — safe markdown renderer with clickable citation anchors and verified-first ledger
-- **`87e47d3`** 0.41.3 — fix(agent): exhaust lint warning for loadHistory effect in research page
-- **`c584f2c`** 0.41.2 — feat(agent): research workspace UI — pipeline progress, report + citation ledger, history panel
-- **`d2bb2d7`** 0.41.1 — feat(agent): research pipeline hook — stage state machine with run persistence (agent_researches report_data)
-- **`5159c41`** 0.41.0 — feat(agent): research editorial — ledger-grounded report synthesis with citation keys
-- **`e884f23`** 0.40.5 — feat(agent): research verifier — dedupe, server-side link liveness, deterministic citation ledger
-- **`e739d16`** 0.40.4 — feat(agent): research workers — academic (OpenAlex/arXiv/Semantic Scholar) + web (Jina) with bounded concurrency
-- **`b6c2ce1`** 0.40.3 — feat(agent): research engine contracts + planner (gateway decomposition with schema validation and fallback)
-- **`4eca2c0`** 0.40.2 — feat(agent): gateway /v1/verify action — server-side URL/DOI liveness for research verifier
-- **`7f8cdf6`** 0.40.1 — chore(release): bump to 0.38.3 — research agent phase 1 + repo hygiene changelog
-- **`36f00c4`** 0.40.0 — chore(gitignore): untrack private docs, agent memory, and generated SEO outputs; ignore local agent tooling
-- **`d8d48d2`** 0.39.5 — fix(agent): resolve Deno lint errors in ai-gateway (parens around ?? chain, drop unused catch binding)
-- **`ff6c06b`** 0.39.4 — feat(agent): Phase 1 research agent — ai-gateway edge function with free-tier Zen fallback chain, per-user metering, and isolated /research-agent workspace
+## [3.91.3] - 2026-10-25
 
-### 2026-08-16
+### Fixed
+- **Sign offer PDFs on the admin list too (`app/src/pages/admin/OfferLetters.tsx`)**:
+  - The admin page queried offer_letters directly, so its download links bypassed the read-time signing and pointed at the now-private bucket.
 
-- **`408277c`** 0.39.3 — feat(0-ai): route submissions through chat-first mode with research handoff
-- **`0b8be35`** 0.39.2 — feat(0-ai): chat stage, AUTO/CHAT/RESEARCH mode selector and ambiguity popup
-- **`ae9d185`** 0.39.1 — feat(0-ai): intent router (probe + local rules) and quick-chat engine
-- **`8d3aa68`** 0.39.0 — fix(0-ai): lower submit gate to 2 chars and hint why when too short
-- **`7d4951c`** 0.38.5 — chore(gitignore): ignore private 0-AI architecture doc
-- **`b3d56e1`** 0.38.4 — feat(0-ai): real planner agent with BYOK decomposition engine
-- **`1f0019b`** 0.38.3 — feat(0-ai): add mock deep-research workspace components
+## [3.91.2] - 2026-10-25
+
+### Fixed
+- **Match invited recipients case-insensitively (`supabase/functions/send-email/index.ts`)**:
+  - Older invite rows may keep mixed-case addresses; the relay check lowercased the request but compared against the stored value in SQL. Compare in JS instead.
+
+## [3.91.1] - 2026-10-25
+
+### Fixed
+- **Block client certificate minting and usage-ledger deletes (`supabase/migrations/074_lock_certificate_and_usage_writes.sql`)**:
+  - A company owner/admin/hr could insert an Active certificate for any recipient and another company's internship, bypassing every check in issue-certificate. Certificates are only written by that function (service role), so clients no longer get INSERT.
+  - Users could also delete their own agent_usage rows, which is the only per-user AI throttle; delete is now service-role only.
+
+## [3.91.0] - 2026-10-25
+
+### Fixed
+- **Keep public offer verification working without anon reads (`app/src/pages/admin/Reports.tsx, app/src/services/offerLetters.ts, supabase/functions/send-email/index.ts, supabase/migrations/073_public_offer_verification.sql`)**:
+  - 065 removes anonymous SELECT on offer_letters, but /verify still looked offers up in that table, so the public verification link would stop working. Add a code-keyed SECURITY DEFINER lookup that returns only the fields the offer document renders (no notes, student email or other rows) and call it from the service. Also tidy the CSV title field and the send-email header comment.
+
+## [3.90.5] - 2026-10-25
+
+### Fixed
+- **Require authorization for notification emails (`supabase/functions/send-notification-email/index.ts, supabase/migrations/068_restrict_notifications_and_activity_logs.sql`)**:
+  - Send-notification-email accepted any unauthenticated POST and emailed any userId with attacker-chosen title, body and link from the platform domain. Require the server-only internal token or a signed-in caller that can_notify() allows, matching the new notifications insert rule. can_notify is no longer executable by anon.
+
+## [3.90.4] - 2026-10-25
+
+### Fixed
+- **Gate production deploy on migrations and make the RLS check real (`.github/workflows/ci.yml, .github/workflows/deploy.yml`)**:
+  - The frontend deployed in parallel with the migration job, so code expecting a new schema could ship while the database still lacked it (the live project is missing 063-065). Deploy now waits for migrations, the migration job asserts that anonymous callers can no longer read profiles, and the CI RLS step compares the table and RLS lists instead of printing both and passing.
+
+## [3.90.3] - 2026-10-25
+
+### Security
+- **Carry 060-065 onto the security branch (`supabase/migrations/060_add_tools_cover_color.sql, supabase/migrations/061_admin_security_and_governance.sql, supabase/migrations/062_add_install_commands_to_tools.sql, supabase/migrations/063_restrict_profiles_read.sql, supabase/migrations/064_private_student_files.sql`)**:
+  - The audit fixes for anon profile reads (063), student buckets (064) and public offer-letter reads (065) already existed on the feature branch but not on main, and the CI sequence check requires an unbroken numbering. Carry 060-065 over so this branch is self-contained and the deploy gate can verify them.
+
+## [3.90.2] - 2026-10-25
+
+### Fixed
+- **Stop ai-gateway verifying private addresses (`supabase/functions/ai-gateway/index.ts`)**:
+  - The verify action fetched up to 25 caller-supplied URLs with only a scheme check and followed redirects automatically, giving any signed-in account a reachability oracle for loopback, private and link-local services (including cloud metadata). It also ran before the rate limiter.
+  - Reject non-public hosts, re-validate every redirect hop, cap hops at four, and apply the per-user rate limit to every authenticated action.
+
+## [3.90.1] - 2026-10-25
+
+### Fixed
+- **Privatize student document buckets and scope writes (`app/src/lib/storage.ts, app/src/services/offerLetters.ts, app/src/services/tasks.ts, supabase/migrations/072_private_document_buckets.sql`)**:
+  - Offer-letters and task-documents were public buckets whose write policies only checked bucket_id + authenticated, so any account could overwrite or delete any tenant's file and anonymous visitors could fetch them.
+  - Make both buckets private and serve them through one-hour signed URLs resolved at read time. Reads are limited to the student, the company in the workflow, or an admin; writes to the uploader's own folder (task-documents) or the company that owns the offer (offer-letters). company-assets stays public for logos, with writes scoped to the owning company or an admin.
+
+## [3.90.0] - 2026-10-25
+
+### Fixed
+- **Require an email before a team invite can be accepted (`supabase/migrations/071_require_invite_email.sql`)**:
+  - Accept_company_invite skipped the email comparison when the invite row had no email, so anyone holding the token could claim it. Reject null-email invites in the RPC and require an address when creating one.
+
+## [3.89.5] - 2026-10-25
+
+### Fixed
+- **Stop the public invite lookup leaking the invited email (`app/src/pages/public/AcceptInvite.tsx, app/src/services/companyTeam.ts, supabase/migrations/070_hide_invite_email.sql`)**:
+  - Lookup_invite_by_token is callable without a session and returned the invited address, so a leaked link disclosed who it was sent to. Return only the company name and invite status; the accept page no longer needs the address.
+
+## [3.89.4] - 2026-10-25
+
+### Fixed
+- **Bind mark_messages_read to the caller (`supabase/migrations/069_harden_mark_messages_read.sql`)**:
+  - The RPC trusted p_user_id and p_conversation_id, so any signed-in user could mark messages read in other people's conversations. Require p_user_id to match the JWT and the caller to be a participant.
+
+## [3.89.3] - 2026-10-25
+
+### Fixed
+- **Restrict notification and audit-log inserts (`supabase/migrations/068_restrict_notifications_and_activity_logs.sql`)**:
+  - Any signed-in user could insert a notification for any other user with an arbitrary title, body and action_url, which renders as a trusted in-app message (phishing), and could write activity_logs rows that the admin reports and log viewer display.
+  - Client inserts now require an existing relationship between the two users (conversation, application to either side's company, or task assignment). activity_logs is service-role only.
+
+## [3.89.2] - 2026-10-25
+
+### Fixed
+- **Stop students self-accepting applications (`supabase/migrations/067_restrict_application_status_changes.sql`)**:
+  - The INSERT policy only checked student_id, so an applicant could create a row already marked Accepted, and the UPDATE policy had no WITH CHECK, so they could flip their own status afterwards. New rows must start at Applied and a student update may only keep Applied or set Withdrawn; company and admin paths keep their existing rules.
+
+## [3.89.1] - 2026-10-25
+
+### Fixed
+- **Keep company verification admin-controlled (`supabase/migrations/066_protect_company_verification.sql`)**:
+  - A self-registered company could insert or update its own status, verified_at and verification_notes, so the verified badge and every is_company_verified check could be self-granted without review. A trigger now pins new companies to pending and rejects verification-field changes from non-admins.
+
+## [3.89.0] - 2026-10-25
+
+### Fixed
+- **Escape certificate text and sandbox the preview (`app/src/components/CertificateDocument.tsx, app/src/components/certificateTemplate.ts`)**:
+  - Recipient name, company and internship title were interpolated raw into the certificate HTML, which is rendered in an unsandboxed srcdoc iframe and in a document.write print window. A student could set their name to markup and run script in any staff session that viewed the certificate.
+  - Escape every interpolated field, render the preview in an opaque origin, and drop the print window's opener reference.
+
+## [3.88.5] - 2026-10-25
+
+### Fixed
+- **Escape admin report output before document.write (`app/src/pages/admin/Reports.tsx`)**:
+  - Report headers and cells came from activity_logs and internship fields and were interpolated raw into a same-origin popup, so an anon-writable log entry could run script with the admin's session. Escape every interpolated value, drop the opener link, and neutralise spreadsheet formulas in the CSV export.
+
+## [3.88.4] - 2026-10-25
+
+### Fixed
+- **Scope send-email internal sends to authorized recipients (`app/src/pages/company/OfferLetters.tsx, app/src/services/companyTeam.ts, supabase/functions/send-email/index.ts`)**:
+  - Any self-registered company account (or any accepted team member) could relay arbitrary to/subject/html from the platform domain, and the sender check accepted any address containing 'zyroo.org'.
+  - Non-admin sends now require a workflow relationship: kind='invite' must match a pending invite for a company the caller owns or administers, and kind='offer' must match the student on one of that company's offers. Admins and the server-only internal token keep full reach. Sender is pinned to an exact allowlist of ZYRO0 mailboxes.
+
+## [3.88.3] - 2026-10-25
+
+### Fixed
+- **Remove unauthenticated Resend diagnostics from send-email (`supabase/functions/send-email/index.ts`)**:
+  - The GET branch ran provider lookups with RESEND_API_KEY before any auth check, so anyone holding the public anon key could list domains and read individual message records (including bodies) via CORS-open responses.
+  - No client caller used the diagnostics branches.
+
+## [3.88.2] - 2026-10-25
+
+### Fixed
+- **Show the real certificate in the certificate tab (`app/src/pages/student/Workspace.tsx`)**:
+  - Show the real certificate in the certificate tab.
+
+## [3.88.1] - 2026-10-25
+
+### Fixed
+- **Wait for all assets before revealing or printing (`app/src/components/CertificateDocument.tsx`)**:
+  - Wait for all assets before revealing or printing.
+
+## [3.88.0] - 2026-10-25
+
+### Fixed
+- **Print full-bleed A4 landscape (`app/src/components/certificateTemplate.ts`)**:
+  - Print full-bleed A4 landscape.
+
+## [3.87.5] - 2026-10-23
+
+### Added
+- **Add dashboard charts and fix user stat query (`app/src/pages/admin/Dashboard.tsx`)**:
+  - Add dashboard charts and fix user stat query.
+
+## [3.87.4] - 2026-10-22
+
+### Changed
+- **Reuse a shared dialog for blocked print/PDF windows (`app/src/components/CertificateDocument.tsx, app/src/components/OfferLetterDocument.tsx, app/src/components/PrintErrorDialog.tsx, app/src/pages/admin/Reports.tsx, app/src/pages/company/OfferLetters.tsx`)**:
+  - Reuse a shared dialog for blocked print/PDF windows.
+
+## [3.87.3] - 2026-10-22
+
+### Changed
+- **Show a dialog when the certificate print window is blocked (`app/src/components/CertificateDocument.tsx`)**:
+  - Show a dialog when the certificate print window is blocked.
+
+## [3.87.2] - 2026-10-21
+
+### Changed
+- **Merge pull request #150 from ilyaskhan12Q/fix/research-agent-frontend**:
+  - Fix(agent): research-agent frontend fixes (attachments, auto-scroll, brand, Lenis scrolling).
+
+## [3.87.1] - 2026-10-21
+
+### Removed
+- **Remove offer-letter verification; certificate email links to dashboard (`app/src/App.tsx, app/src/components/OfferLetterDocument.tsx, app/src/lib/offerLetterPdf.ts, app/src/pages/company/OfferLetters.tsx, app/src/pages/public/FAQ.tsx`)**:
+  - Remove offer-letter verification; certificate email links to dashboard.
+
+## [3.87.0] - 2026-10-21
+
+### Fixed
+- **Make printing dashboard-only (`app/src/components/CertificateDocument.tsx, app/src/pages/admin/Certificates.tsx, app/src/pages/public/Verify.tsx, app/src/pages/student/Certificates.tsx`)**:
+  - Hide the print action on the public verification sheet, fix the broken /public link on the student dashboard, point the admin view action at the real verify URL instead of the non-existent pdf_url, and report blocked print pop-ups instead of failing silently.
+
+## [3.86.5] - 2026-10-21
+
+### Changed
+- **Seamless baked paper texture and print-safe layout (`app/public/certificate-paper.webp, app/src/components/OfferLetterDocument.tsx, app/src/components/certificateTemplate.ts, app/src/index.css, app/src/lib/offerLetterPdf.ts`)**:
+  - Replace tiled feTurbulence layers (visible rectangular seams) with one pre-baked continuous paper texture, shared by the certificate and offer letter. Hide the purple glow when printing (it darkened the printed middle) and inset the sheet 2.5% so printer margins cannot clip the gold frame.
+
+## [3.86.4] - 2026-10-19
+
+### Changed
+- **Record the About trim and sidebar hover peek, 2.80.4 (`CHANGELOG.md, app/package.json, app/src/agent/components/AgentSettingsModal.tsx`)**:
+  - Add entries for 77f65b8 (2.80.3) and 3963387 (2.80.4), PR #150.
+  - Bump app/package.json to 2.80.4 and refresh the About pane's What's new.
+
+## [3.86.3] - 2026-10-19
+
+### Fixed
+- **Run page backgrounds under the fixed header again (`app/src/components/SiteMascot.tsx, app/src/components/ui/shader-hero.tsx, app/src/index.css, app/src/pages/public/About.tsx, app/src/pages/public/CookiePolicy.tsx`)**:
+  - Reserving the header height on `main` (e00b6b5) also pushed each page's own background down, leaving a body-coloured strip behind the pill: the nav read as a separate block instead of sitting on the hero. Fix the surface, not the offset.
+  - Index.css: .hero-under-header pulls the first section up under the header and pads its content back down; one utility, driven by the same measured var.
+  - Shader-hero: same treatment for the "/" hero (bg to y=0, copy still clear).
+  - About/FAQ/Help/Privacy/Terms/Cookies: first section uses it (py-16 -> pb-16).
+  - SiteMascot: 120px is oversized on a phone; scale 0.65 below sm, full at sm+.
+  - Verified with screenshots at 1440x900 and 390x844: dot grid and blue heroes reach y=0 behind the pill, headings still clear the header, mascot is 78px on mobile.
+
+## [3.86.2] - 2026-10-19
+
+### Fixed
+- **Reserve the real header height once, for every public page (`app/src/components/nav/SiteNav.tsx, app/src/components/research-landing/HeroSection.tsx, app/src/index.css, app/src/layouts/PublicLayout.tsx, app/src/pages/edu/SchoolOSLanding.tsx`)**:
+  - The banner + pill are a fixed overlay, so they took no space in the flow and each page guessed its own top gap (pt-20 / pt-24 / pt-28 / pt-32). Those guesses only matched a bare pill (80px); with an active banner the header is 118px on desktop and 147px on mobile, so every public page started under it.
+  - PublicLayout now measures the header with a ResizeObserver and publishes it as both `padding-top` on main and `--zyro-header-h`. New pages are correctly offset with no padding of their own; full-bleed heroes pull back up with -mt-[var(--zyro-header-h)] (research) and viewport-tall states use .min-h-page.
+  - PublicLayout: measure header, drop the per-page guess from main.
+  - Index.css: add .min-h-page (100dvh minus header).
+  - SiteNav: constant pill padding; a scrolled shrink would shift the page.
+  - Research HeroSection: reserve the header inside its centered hero.
+  - 22 pages: remove the hardcoded top paddings, min-h-screen -> min-h-page.
+  - Verified in headless Chrome at 1440x900 and 390x844 over 15 routes with the live banner active: content clears the header on all of them, and the offset stays fixed while scrolling.
+
+## [3.86.1] - 2026-10-18
+
+### Fixed
+- **Make student document buckets private (`app/src/lib/storage.ts, app/src/services/applications.ts, app/src/services/teamApplications.ts, app/src/services/users.ts, supabase/migrations/064_private_student_files.sql`)**:
+  - Resumes and team-resumes were public = true, so every file was fetchable by URL with no login at all. Reads are now scoped to the owner, platform admins, and a company the student applied to; team-resumes is admin-only and its anonymous upload/update/delete policies are removed (anyone with the public key could delete team resumes).
+  - App side: uploads store the object name instead of a permanent public link and links are minted on demand via lib/storage.ts. Rows written before this hold full public URLs, which the helper still resolves, so no data migration is needed.
+  - Deploy notes: ship the frontend build BEFORE applying this migration, since it flips the buckets private and invalidates the old public links. offer-letters and task-documents stay public on purpose: offer_letters has its own 'public read' table policy that the public /verify page depends on, so that needs a code-keyed lookup first.
+
+## [3.86.0] - 2026-10-18
+
+### Fixed
+- **Require a caller token for send-notification-email (`supabase/functions/send-notification-email/index.ts`)**:
+  - The function trusted the userId in the request body and sent mail with the service role, so whoever reached it could email any user. It now verifies the caller's session through a user-scoped client and returns 401 without one. The only caller is the browser (services/notificationsSim.ts), which already sends the session token.
+  - Shortcut: this proves a logged-in user is asking, not that they may notify that recipient. The real check lands when notifications move server-side and this function becomes service-role-only.
+
+## [3.85.5] - 2026-10-18
+
+### Fixed
+- **Block anonymous reads of profiles (`supabase/migrations/063_restrict_profiles_read.sql`)**:
+  - The SELECT policy was USING (true) for every role, so anyone holding the public anon key could read all 237 rows including email, phone and resume_url. No anonymous page queries profiles, and the only anon-executable function (expire_stale_offers) is SECURITY DEFINER and never touches the table.
+  - Verified on a replayed schema: anon now gets 'permission denied for table profiles' while authenticated reads are unchanged.
+
+## [3.85.4] - 2026-10-17
+
+### Added
+- **Add multi-command installation, markdown rendering, and live preview switcher (`app/scripts/generate-seo.js, app/src/components/tools/SubmitToolDialog.tsx, app/src/components/tools/ToolPreviewDialog.tsx, app/src/data/tools.ts, app/src/lib/database.types.ts`)**:
+  - Add multi-command installation, markdown rendering, and live preview switcher.
+
+## [3.85.3] - 2026-10-17
+
+### Changed
+- **Merge pull request #152 from ilyaskhan12Q/feat/tools-ux-redesign**:
+  - Feat(tools): dedicated detail pages, recommendations, enhanced search & submission workflow.
+
+## [3.85.2] - 2026-10-16
+
+### Added
+- **Eliminate AI-slop gradients & sparkles in favor of Linear/Vercel precision and Datadog command-center telemetry (`app/src/components/pricing/PlanStatusModal.tsx, app/src/components/pricing/SubscriptionPlanCard.tsx, app/src/components/pricing/UpgradePlanModal.tsx, app/src/hooks/useActivePlan.ts, app/src/layouts/DashboardLayout.tsx`)**:
+  - Eliminate AI-slop gradients & sparkles in favor of Linear/Vercel precision and Datadog command-center telemetry.
+
+## [3.85.1] - 2026-10-15
+
+### Added
+- **Add active plan indicators to sidebar, header dropdown, and settings (`app/src/components/pricing/PlanStatusModal.tsx, app/src/components/pricing/SubscriptionPlanCard.tsx, app/src/components/pricing/UpgradePlanModal.tsx, app/src/hooks/useActivePlan.ts, app/src/layouts/DashboardLayout.tsx`)**:
+  - Add active plan indicators to sidebar, header dropdown, and settings.
+
+## [3.85.0] - 2026-10-15
+
+### Added
+- **Phase 3 - audit log ledger with actor attribution, categorization, and metadata inspection (`app/src/pages/admin/Logs.tsx`)**:
+  - Phase 3 - audit log ledger with actor attribution, categorization, and metadata inspection.
+
+## [3.84.5] - 2026-10-15
+
+### Added
+- **Phase 2 - subscription breakdown, estimated MRR, and AI gateway compute telemetry (`app/src/pages/admin/Analytics.tsx, app/src/pages/admin/Dashboard.tsx`)**:
+  - Phase 2 - subscription breakdown, estimated MRR, and AI gateway compute telemetry.
+
+## [3.84.4] - 2026-10-15
+
+### Added
+- **Phase 1 - user management modal, role switching, plan tier overrides, and suspension workflow (`app/src/components/admin/ManageUserModal.tsx, app/src/pages/admin/Users.tsx`)**:
+  - Phase 1 - user management modal, role switching, plan tier overrides, and suspension workflow.
+
+## [3.84.3] - 2026-10-15
+
+### Added
+- **Phase 0 - admin governance, privilege protection, and suspension enforcement (`app/src/components/ProtectedRoute.tsx, app/src/lib/database.types.ts, app/src/services/users.ts, supabase/migrations/061_admin_security_and_governance.sql`)**:
+  - Phase 0 - admin governance, privilege protection, and suspension enforcement.
+
+## [3.84.2] - 2026-10-14
+
+### Added
+- **Add in-app plan upgrade modal for authenticated users (`app/src/components/pricing/UpgradePlanModal.tsx, app/src/pages/public/Pricing.tsx`)**:
+  - Add in-app plan upgrade modal for authenticated users.
+
+## [3.84.1] - 2026-10-14
+
+### Changed
+- **Migrate pricing cards, toggles, comparison table, and FAQ to semantic design tokens (`app/src/components/pricing/BillingToggle.tsx, app/src/components/pricing/PricingCard.tsx, app/src/pages/public/Pricing.tsx`)**:
+  - Migrate pricing cards, toggles, comparison table, and FAQ to semantic design tokens.
+
+## [2.84.0] - 2026-10-14
+
+### Added
+- **Centralize eye-comfortable color tokens and expose zyro palette (`app/src/index.css, app/tailwind.config.js`)**:
+  - Centralize eye-comfortable color tokens and expose zyro palette.
+
+## [2.83.5] - 2026-10-14
+
+### Added
+- **Add billing help page, audience toggle, and navigation routing (`app/src/App.tsx, app/src/components/pricing/AudienceToggle.tsx, app/src/components/pricing/BookDemoModal.tsx, app/src/config/navigation.ts, app/src/pages/public/BillingHelp.tsx`)**:
+  - Add billing help page, audience toggle, and navigation routing.
+
+## [2.83.4] - 2026-10-14
+
+### Added
+- **Add unified ZYR0 pricing page and update navbar (`app/src/App.tsx, app/src/components/nav/SiteNav.tsx, app/src/components/pricing/BillingToggle.tsx, app/src/components/pricing/BookDemoModal.tsx, app/src/components/pricing/PricingCard.tsx`)**:
+  - Add unified ZYR0 pricing page and update navbar.
+
+## [2.83.3] - 2026-10-13
+
+### Added
+- **Refine tool detail content layout, add recommendations, and enhance submission form (`app/src/components/tools/SubmitToolDialog.tsx, app/src/pages/public/ToolDetail.tsx`)**:
+  - Refine tool detail content layout, add recommendations, and enhance submission form.
+
+## [2.83.2] - 2026-10-13
+
+### Added
+- **Dedicated /tools/:slug detail pages + enhanced search + SSG + sitemap (`app/scripts/generate-seo.js, app/src/App.tsx, app/src/components/tools/ToolCard.tsx, app/src/components/tools/ToolPreviewDialog.tsx, app/src/pages/public/ToolDetail.tsx`)**:
+  - Phase 1 - Directory UX:.
+  - Expand search to match author name and capabilities (ToolHub.tsx).
+  - ToolCard primary action navigates to /tools/:slug instead of modal.
+  - Phase 2 - Dedicated Detail Route:.
+  - Create ToolDetail.tsx: breadcrumb, hero band, metadata strip, about, terminal install block, capabilities bento grid, links sidebar, related tools, 404 fallback -- zero new dependencies.
+  - Add getToolBySlug(slug) to services/tools.ts (approved-only, null-safe).
+  - Register /tools/:slug route in App.tsx with lazy load.
+  - Add Full Page link to ToolPreviewDialog.
+  - Phase 3 - SEO + SSG Pipeline:.
+  - Add ToolHub to llms.txt for AI crawler discovery.
+  - Extend writeEnhancedSitemap() to include approved tool slugs with updated_at lastmod dates.
+  - Add tools fetch + prerender loop in prerenderDynamicPages(): generates dist/tools/:slug/index.html with SoftwareApplication and BreadcrumbList JSON-LD schema.
+
+## [2.83.1] - 2026-10-13
+
+### Changed
+- **Delete dead nav/ui components (`app/src/components/navigation/CommunitySocialNav.tsx, app/src/components/ui/aspect-ratio.tsx, app/src/components/ui/breadcrumb.tsx, app/src/components/ui/button-group.tsx, app/src/components/ui/context-menu.tsx`)**:
+  - CommunitySocialNav (unreferenced after nav unification).
+  - 16 unused shadcn ui primitives (menubar, breadcrumb, dropdown-menu, scroll-area, etc.) — regenerable from shadcn if needed.
+
+## [2.83.0] - 2026-10-13
+
+### Fixed
+- **Dark-glass pill over hero, banner no longer pushes content (`app/src/components/SiteBannerBar.tsx, app/src/components/nav/SiteNav.tsx, app/src/config/navigation.ts, app/src/layouts/PublicLayout.tsx`)**:
+  - SiteNav: revert to dark translucent glass pill (the "/" look) so the hero background bleeds through instead of a separate light box; white text/toggles/hamburger throughout; remove full-width backdrop band.
+  - Navigation: icons on Company dropdown (Building2/Mail/Briefcase).
+  - PublicLayout: drop banner-driven paddingTop on main — fixed banner+pill now purely overlay the hero; pages keep their own top padding.
+  - SiteBannerBar: make onVisibilityChange optional.
+
+## [2.82.5] - 2026-10-13
+
+### Changed
+- **Unify all navs/footers into one SiteNav + SiteFooter (`app/src/App.tsx, app/src/components/nav/CompanyDropdown.tsx, app/src/components/nav/Header.tsx, app/src/components/nav/PlatformFooter.tsx, app/src/components/nav/PlatformNav.tsx`)**:
+  - New config/navigation.ts single source of truth (live routes only).
+  - New SiteNav: theme-aware pill, desktop dropdowns, mobile sheet with accordions, role-aware account menu, full aria.
+  - New SiteFooter: merged columns, newsletter (TODO: wire backend).
+  - PublicLayout slims to banner + SiteNav + Outlet + SiteFooter.
+  - Move /, /studio, /school, /edu, /research, 404 and subdomain gateways under PublicLayout chrome.
+  - Delete Header, PlatformNav, PlatformFooter, ResearchNav, ResearchFooter, 3 dropdowns, dead data.ts (~2700 lines removed).
+
+## [2.82.4] - 2026-10-12
+
+### Fixed
+- **Pillar badge chips invisible in light mode (`app/src/components/ui/timeline.tsx`)**:
+  - Hardcoded border-white/10 bg-white/5 text-white/70 on a white --zyro-bg section; switch to zyro border/surface/text tokens.
+
+## [2.82.3] - 2026-10-12
+
+### Fixed
+- **Hoist FieldError out of SubmitToolDialog render (`app/src/components/tools/SubmitToolDialog.tsx`)**:
+  - React-hooks/static-components: declaring the component inside the function body recreated it every render; move to module scope.
+
+## [2.82.2] - 2026-10-12
+
+### Added
+- **Skills section cards use the branded gradient hero (`app/src/components/platform-home/SkillsSection.tsx, app/src/components/ui/blog8.tsx`)**:
+  - Blog8 media block (only consumer: Publish & install autonomous skills) matches ToolCard: coverGradient background, dot texture, initials watermark, label+title overlay; respects admin coverColor and image covers.
+
+## [2.82.1] - 2026-10-12
+
+### Added
+- **Admin-customizable card hero color (cover_color) (`app/src/components/tools/SubmitToolDialog.tsx, app/src/lib/database.types.ts, app/src/services/tools.ts, supabase/migrations/060_add_tools_cover_color.sql`)**:
+  - Add tools.cover_color column (060 migration).
+  - SubmitToolDialog admin section: color picker + hex field + reset; live preview uses the picked gradient immediately.
+  - Service layer: SubmitToolInput.cover_color, row mapping, insert payload (omitted when empty so pre-migration inserts still work).
+
+## [2.82.0] - 2026-10-12
+
+### Added
+- **Branded gradient hero on cards + featured/directory parity (`app/src/components/tools/FeaturedToolCard.tsx, app/src/components/tools/ToolCard.tsx, app/src/components/tools/ToolPreviewDialog.tsx, app/src/data/tools.ts, app/src/pages/public/ToolHub.tsx`)**:
+  - ToolCard media band matches ToolPreviewDialog: twilight->periwinkle-> sapphire gradient, dot texture, initials watermark, name+tagline overlay.
+  - Featured Flagships render the same ToolCard in the same grid; drop FeaturedToolCard.
+  - Shared coverGradient() helper in data/tools.ts (custom color-aware).
+
+## [2.81.5] - 2026-10-12
+
+### Fixed
+- **Stop Lenis smooth-scroll leaking through dialog overlays (`app/src/components/ui/dialog.tsx, app/src/main.tsx`)**:
+  - Darken overlay to bg-black/40 backdrop-blur-sm.
+  - Track body[data-scroll-locked] and stop/start Lenis so modal scroll lock actually takes effect.
+
+## [2.81.4] - 2026-10-11
+
+### Added
+- **Sonar-grid hero background, site mascot avatar, and security/CI config (`.github/dependabot.yml, .gitleaks.toml, app/package-lock.json, app/package.json, app/public/blusky-home-hero.svg`)**:
+  - Add interactive SonarGrid wave background to ShaderHero.
+  - Add SiteMascot avatar (bible-strong/avatar-react) mounted app-wide.
+  - Add sonar-grid + molten-ring-carousel 21st.dev demos.
+  - Add dependabot config and gitleaks config.
+
+## [2.81.3] - 2026-10-08
+
+### Changed
+- **Harmonize SchoolOS landing with dynamic ZYR0 tokens and DM Serif Text (`app/src/components/products/edu/SchoolPerspectiveSwitcher.tsx, app/src/pages/edu/SchoolOSLanding.tsx`)**:
+  - Harmonize SchoolOS landing with dynamic ZYR0 tokens and DM Serif Text.
+
+## [2.81.2] - 2026-10-08
+
+### Changed
+- **Harmonize Studio landing with dynamic ZYR0 tokens and DM Serif Text (`app/src/components/products/studio/StudioPromptSimulator.tsx, app/src/pages/studio/StudioLanding.tsx`)**:
+  - Harmonize Studio landing with dynamic ZYR0 tokens and DM Serif Text.
+
+## [2.81.1] - 2026-10-08
+
+### Changed
+- **Harmonize Research landing with ZYR0 design system and DM Serif Text (`app/src/components/research-landing/AudienceSection.tsx, app/src/components/research-landing/EditorialStatement.tsx, app/src/components/research-landing/FinalCta.tsx, app/src/components/research-landing/LiveResearchSection.tsx, app/src/components/research-landing/ReportSection.tsx`)**:
+  - Harmonize Research landing with ZYR0 design system and DM Serif Text.
+
+## [2.81.0] - 2026-10-08
+
+### Changed
+- **Rename Landing to InternshipsLanding and harmonize design tokens (`app/src/App.tsx, app/src/pages/public/InternshipsLanding.tsx`)**:
+  - Rename Landing to InternshipsLanding and harmonize design tokens.
+
+## [2.80.5] - 2026-10-08
+
+### Changed
+- **Standardize PlatformHome design taste and clean up legacy sections (`app/src/components/platform-home/BentoProductGrid.tsx, app/src/components/platform-home/BlogPreviewSection.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/CountUp.tsx, app/src/components/platform-home/DeepDiveSection.tsx`)**:
+  - Standardize PlatformHome design taste and clean up legacy sections.
+
+## [2.80.4] - 2026-10-19
+
+### Added
+- **Peek the sidebar open when hovering the collapsed rail (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - Hovering the 48px rail slides the full panel out and leaving collapses it again after a 180ms grace period.
+  - Peeking is separate from the pinned state: hovering never closes a pinned sidebar, and the page's content spacer still follows pinned state only.
+  - The header close button dismisses a peek instead of pinning it open, and New Chat / history / Settings dismiss the peek after acting.
+  - Desktop only (>=1024px); the mobile off-canvas behaviour is unchanged.
+
+## [2.80.3] - 2026-10-18
+
+### Added
+- **Trim the About pane to WhatsApp support, log the release (`CHANGELOG.md, app/package.json, app/src/agent/components/AgentSettingsModal.tsx`)**:
+  - Drop the Diagnostics section (debug-info copy) and the Source code link.
+  - Report an issue now opens the ZYR0 WhatsApp community chat.
+  - CHANGELOG: one entry per commit for PR #150 (30 entries), versions 2.75.3 -> 2.80.2 per the project's patch-then-minor scheme; header range updated to 0.38.3 -> 2.80.2 (186 commits).
+  - Bump app/package.json 0.39.0 -> 2.80.2 (continues upstream 2.75.2) and refresh the About pane's What's new list.
+
+## [2.80.2] - 2026-10-18
+
+### Added
+- **Make the panel shortcuts toggles (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/hooks/useAgentShortcuts.ts`)**:
+  - Alt+S now closes the search box it opened (sidebar stays open) and Alt+L reopens the sidebar it closed, so the same keys open and close each panel. Alt+T was already a toggle; Alt+N stays a one-way action.
+  - Hook actions become onToggleSearch/onToggleSidebar with closeSearch and openSidebar labels.
+  - Search hint label is dynamic (Search / Close search); the collapsed rail chevron gains an 'Open sidebar Alt L' hint instead of a title.
+
+## [2.80.1] - 2026-10-18
+
+### Added
+- **Keyboard shortcuts with hover hints, drop the quick-actions FAB (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentQuickActions.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/components/ShortcutHint.tsx, app/src/agent/components/TemporaryToggle.tsx`)**:
+  - Replace the floating shortcut button with real shortcuts on the existing controls: Alt+N new chat, Alt+T temporary chat, Alt+S search, Alt+L close sidebar. Alt is used because browsers reserve Ctrl+N/T/L and never deliver those keydowns to the page.
+  - New useAgentShortcuts hook (event.code matching, ref-held handlers, preventDefault, ignores auto-repeat).
+  - New ShortcutHint tooltip showing the action plus kbd key caps on hover and keyboard focus; wired to New Chat (sidebar + rail), Temporary chat (header + hero), Search and Close sidebar; native titles removed there to avoid double tooltips.
+  - Remove AgentQuickActions and its render; keep the lifted sidebar search state the Search shortcut needs.
+
+## [2.80.0] - 2026-10-15
+
+### Added
+- **Floating quick-actions button with hover flyout (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentQuickActions.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/components/TemporaryToggle.tsx`)**:
+  - Add a round bottom-right shortcut button that reveals the four most-used workspace actions on hover (click toggles it on touch):.
+  - Close sidebar (hidden when already closed).
+  - Search — unfolds a collapsed sidebar and focuses the search box.
+  - Temporary chat — amber active state with checkmark.
+  - New chat.
+  - Sidebar search visibility is now controlled by the page so the button can reveal it; TemporaryGlyph is exported for reuse; Escape and click-away dismiss the menu, with an invisible bridge keeping hover alive across the button-to-menu gap.
+
+## [2.79.5] - 2026-10-14
+
+### Added
+- **Render chat replies as markdown and answer conversationally (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - Assistant bubbles printed raw markdown verbatim (###, **, *) while streaming, so replies looked like messy pasted source text.
+  - Render assistant messages with react-markdown + remark-gfm (both already app dependencies), styled like the report pane (prose + prose-invert in dark); user bubbles and errors stay plain text.
+  - Typing cursor is now an inline block char appended to the streamed markdown so it sits at the end of the current line.
+  - Chat SYSTEM_PROMPT: lead with the answer, light formatting, no encyclopedic sectioned dumps unless asked, natural ZYR0 voice.
+
+## [2.79.4] - 2026-10-14
+
+### Added
+- **ChatGPT-style account section in settings (`app/src/agent/components/AgentSettingsModal.tsx`)**:
+  - Identity hero with real profile photo (avatar_url) falling back to gradient initials, plus name and email.
+  - Sign-in method row (Google / Email & password / ...) instead of the raw provider value.
+  - Role row from the profile.
+  - Edit-profile button navigating to the role's profile page.
+  - Keep sign-out with its loading state; no unnecessary options added.
+
+## [2.79.3] - 2026-10-14
+
+### Added
+- **Rich About section in settings with version, links and diagnostics (`app/src/agent/components/AgentSettingsModal.tsx, app/tsconfig.app.json`)**:
+  - Brand hero card (gradient mark, ZYR0's Research Agent, tagline) with version chip read from package.json and environment chip.
+  - 'What's new in vX' bullet list from an editable WHATS_NEW const.
+  - Source-code / report-issue link rows (same repo URL) in new tabs.
+  - Copy-debug-info button (version, env, model, user agent) with toast.
+  - Enable resolveJsonModule for the package.json import.
+
+## [2.79.2] - 2026-10-10
+
+### Fixed
+- **Voice input transcribes speech instead of fabricating it (`app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Both inputs had a hidden demo mode: when SpeechRecognition was missing or the mic check failed, they typed a canned 'quantum computing' sentence into the box as if the user had said it — so the agent answered questions the user never asked.
+  - Remove the fake-text simulation; unsupported/denied mic now surfaces a toast.
+  - Set recognition.lang from navigator.language (locale mismatch garbled words).
+  - Restart recognition after silence pauses so sentences aren't cut off.
+  - Ignore transient errors (no-speech/aborted); stop only on real failures.
+
+## [2.79.1] - 2026-10-10
+
+### Fixed
+- **Always identify as ZYR0's Research Agent (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/classifyLocally.ts, app/src/agent/research/editorial.ts`)**:
+  - Identity questions could slip into the research pipeline (whose planner/editorial prompts carry no ZYR0 identity) and the chat prompt was too thin to override the Gemini-first model chain's own pretrained identity, so 'who are you' sometimes answered 'Google agent'.
+  - ClassifyLocally: isIdentityQuestion() routes identity questions to chat.
+  - SYSTEM_PROMPT: explicit identity contract; handleSend pins an identity note on those questions like the attachment note.
+  - Editorial prompt: reports are published for ZYR0's Research Agent.
+
+## [2.79.0] - 2026-10-10
+
+### Changed
+- **Redo the delete-history confirmation popup (`app/src/agent/components/AgentSettingsModal.tsx`)**:
+  - Red trash chip beside 'Delete all chat history.' and the undo warning tinted red so the destructive action reads as destructive.
+
+## [2.78.5] - 2026-10-10
+
+### Changed
+- **Blue settings switches with a white thumb in both states (`app/src/agent/components/AgentSettingsModal.tsx, app/src/styles/agent.css`)**:
+  - The bg-...! utilities were a no-op — Tailwind v3.4 doesn't turn the suffix into !important — so shadcn's bg-input/bg-primary rules won the specificity fight and the off state stayed gray.
+  - Track colours move to agent.css where they outrank every shadcn variant: off is --ag-switch (pale brand blue in light, deep blue in dark), on is #1488fc, and the thumb is pinned white with a soft shadow so the knob reads against the blue in either theme.
+
+## [2.78.4] - 2026-10-09
+
+### Added
+- **Confirmation popup for deleting chat history (`app/src/agent/components/AgentSettingsModal.tsx`)**:
+  - The two-step confirm lived inline in the Data controls row. It is now a proper alertdialog layered over the settings sheet: warning copy, Cancel (default focus) and a red Delete everything button. Escape unwinds one layer at a time and is ignored mid-delete, and the backdrop can't dismiss a delete that's already running; failures keep the popup open with a retry message.
+
+## [2.78.3] - 2026-10-09
+
+### Added
+- **Keep Settings in the collapsed sidebar rail (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - The gear only existed in the expanded panel, so collapsing the sidebar hid it entirely. It now sits at the bottom of the 48px rail with the same border-t separator as the expanded layout, mirroring New Chat / History at the top.
+
+## [2.78.2] - 2026-10-09
+
+### Added
+- **Light theme by default, and settings that act on the spot (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/AgentSettingsModal.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/components/ModeToggle.tsx`)**:
+  - Light mode is now the workspace default, and Settings → General carries a Light/Dark switch that persists.
+  - The palette moves to --ag-* tokens in agent.css: a light block on .agent-root, the original Ray palette under data-ag-theme='dark'.
+  - Tailwind's white/black resolve their channels through --color-white-rgb / --color-black-rgb (config + :root vars, identical values everywhere else), and the agent's light scope re-points white to ink — so text-white, bg-white/5, border-white/10, ring-white/[.08] flip with the theme instead of staying white-on-white; brand accents keep their literal colours, and the few palette text colours that would wash out on white are re-pointed in light scope.
+  - Translucent surfaces get dedicated alpha tokens: Tailwind silently drops /60-style modifiers on var() colours, which would have left the sticky headers, mode track and mobile opener transparent.
+  - Report prose drops prose-invert in light, and the shadcn switches are pinned so they can't inherit the platform's html.dark.
+  - Settings options that previously only took effect on the next new chat or research run — and so read as dead switches — now act immediately on the open workspace (or toast when they defer), every action confirms through the route's sonner Toaster, Restore defaults resets theme, mode, temporary, depth, plan review and model in one go, and a failed sign-out reports instead of failing silently.
+
+## [2.78.1] - 2026-10-09
+
+### Added
+- **Working ChatGPT-style settings sheet (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentSettingsModal.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/lib/preferences.ts`)**:
+  - The sidebar's Settings button was a dead control. It now opens a modal with a section rail and every option wired to real workspace state.
+  - General: default chat mode, temporary-by-default for new threads and a restore-defaults action — preferences persist in localStorage through the new @/agent/lib/preferences module.
+  - Research: default depth (applies wherever depth is picked) and the plan-review switch driving the pipeline's skip-review preference.
+  - Model: Auto + enabled-model radio list that writes the real gateway selection, with provider/context/price detail.
+  - Data controls: export the thread + report as Markdown, clear the current conversation, and a two-step delete-all that removes the account's agent_researches rows (messages cascade) and free-floating messages, then refreshes the sidebar and opens a clean workspace; failures keep the confirm step with an error.
+  - Account: identity from useAuth and a real Supabase sign-out; About with workspace/environment/storage notes.
+  - The sheet closes on Esc, backdrop click or X, and collapses the rail to horizontal tabs on mobile.
+
+## [2.78.0] - 2026-10-09
+
+### Added
+- **Icon-only temporary toggle in the top-right corner (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/TemporaryToggle.tsx`)**:
+  - ChatGPT keeps temporary chat as an unlabelled control in the top-right; ours sat in the top-left and carried the word.
+  - Render it as a round icon-only button (36px, matching the mode pills), moving it into the hero's top-right group beside History and to the far right of the thread header, past the status pill.
+  - Drop the visible "Temporary" text; the name now lives on aria-label and the hover title, so it is still announced and still explained.
+  - Replace the lucide ghost with a custom glyph: speech bubble crossed by a slash, stroked with a state-aware gradient (quiet gray when off, amber with a glow and amber ring when on).
+  - Drop History' py-3 to py-2.5 so it lines up with the 36px neighbour.
+
+## [2.77.5] - 2026-10-08
+
+### Added
+- **Temporary chat that never touches history (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/TemporaryToggle.tsx, app/src/agent/hooks/useAgentChat.ts, app/src/agent/hooks/useResearchPipeline.ts`)**:
+  - Add a ChatGPT-style Temporary switch in the top-left of the chat bar (thread header and the empty-state hero). While it is on, the conversation exists only in memory:.
+  - UseAgentChat takes persistHistory; when false it skips persistUser and persistAssistant, so no agent_researches row and no agent_messages rows are written for the chat path.
+  - UseResearchPipeline takes the same flag and skips its persist()/history refresh, so a completed run is surfaced but not saved (and the "could not save this run" error is gated with it).
+  - Flipping the switch in either direction starts a clean thread, so a temporary conversation never leaks into normal history and leaving the mode does not carry the unsaved thread along.
+
+## [2.77.4] - 2026-10-08
+
+### Added
+- **Move sidebar search into a top-bar button (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - The search field occupied a permanent bordered bar under New Chat even though it is used occasionally. Move it out of the layout:.
+  - Add a search icon button to the top row, beside the close button, with an active state and aria-expanded/aria-controls.
+  - Delete the always-visible bar; the same input now appears at the top of the sidebar on demand, auto-focused, filtering as before.
+  - Escape or re-clicking the button closes it and clears the query, so the list falls back to showing everything.
+
+## [2.77.3] - 2026-10-08
+
+### Added
+- **Premium gradient icons for Recent list items (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - The history rows used flat lucide glyphs (blue FileText for research, gray MessageSquare for chat), which read as placeholders next to the gradient header icon.
+  - ResearchItemIcon: document with folded corner and rule, stroked blue-to-violet with a soft glow.
+  - ChatItemIcon: speech bubble, stroked emerald-to-blue with a mint glow.
+  - Both 14px, round caps, aria-hidden, gradient ids namespaced so they cannot collide with the Recent header mark.
+  - Drop the now-unused FileText / MessageSquare imports.
+
+## [2.77.2] - 2026-10-07
+
+### Added
+- **Collapsible Recent section and the ZYR0 Research mark (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - Sidebar header polish, three parts:.
+  - The "Recent" label becomes a dropdown button that shows and hides the history list (chevron rotates 90deg, aria-expanded/aria-controls wired up, loading and empty states collapsed with it), starting open.
+  - The section gets a custom SVG icon: the history clock stroked with the blue-to-violet gradient plus a soft glow, so it reads as a premium affordance instead of a bare uppercase label.
+  - The ZYRO Studio mark is replaced by the ZYR0 Research mark from /logos/research.png, scaled to 140% and nudged up 5.5% so the sphere fills the box while the baked-in wordmark stays clipped out; the collapsed rail's label follows suit ("ZYR0 Research").
+
+## [2.77.1] - 2026-10-07
+
+### Added
+- **Enlarge and brighten the add-photo button (`app/src/agent/components/ThreadInput.tsx`)**:
+  - The attachment button was a dim, 28px ghost icon that disappeared against the dark composer and sat flush against the mic/send circle.
+  - Grow it to 36px with an 18px glyph.
+  - Give it a solid white disc, shadow and a hover/press scale so it reads as the primary affordance in the row.
+  - Add mr-2 so there is 16px of air between it and the voice/send button.
+  - Label it for assistive tech ("Add photos"), which had no accessible name.
+
+## [2.77.0] - 2026-10-07
+
+### Fixed
+- **Brand the sidebar as ZYR0 Research (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - The workspace is a separate product from the marketing site, so the rail should say what it is: "ZYR0 Research" next to the studio mark, matching the report PDF footer.
+
+## [2.76.5] - 2026-10-07
+
+### Fixed
+- **Consolidate the sidebar toggles into the sidebar (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/AgentSidebar.tsx`)**:
+  - Two controls were fighting over the same action: a chevron inside the sidebar and an ≡ button in the thread header (plus another on the hero), so closing the sidebar still left a second close button on screen.
+  - Drop the ≡ toggle from the thread header and the hero, along with the AgentHero onToggleSidebar prop nobody else needs.
+  - Give the sidebar a chevron in the collapsed rail (top of the 48px rail, above the ZYRO Studio mark) so the control still exists when closed.
+  - Render a floating opener on mobile, where the closed rail is translated off-screen and would otherwise have no way back.
+  - The thread header now only carries the Chat/Research selector and the status pill.
+
+## [2.76.4] - 2026-10-07
+
+### Fixed
+- **Show the sidebar close button on desktop (`app/src/agent/components/AgentSidebar.tsx`)**:
+  - The close control lived in the sidebar's top-right corner but carried lg:hidden, so it only ever rendered as the mobile drawer close and desktop users had no collapse button in the sidebar itself. Drop the breakpoint restriction (and add a title tooltip) so the chevron sits in the top-right of the sidebar at every size.
+
+## [2.76.3] - 2026-10-07
+
+### Added
+- **Move the Chat/Research selector into the top bar (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/ModeToggle.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - The mode toggle belonged at the top of the chat bar, not floating over the composer. Extract it into a shared ModeToggle and render it in the header row of the thread (centred between the sidebar toggle and the status pill) and centred on the empty-state hero, so the mode is chosen before the first prompt is sent — which the composer-level control could never do.
+  - Buttons are bigger (text-sm, px-4 py-2) and carry SVG icons: MessageSquare for Chat, Telescope for Research, with aria-pressed kept on both. The duplicate block is gone from ThreadInput, whose unused onModeChange prop goes with it.
+
+## [2.76.2] - 2026-10-07
+
+### Added
+- **Move the Chat/Research mode pills above the composer (`app/src/agent/components/ThreadInput.tsx`)**:
+  - The mode toggle sat below the input card, which reads as a footnote rather than a choice. Lift it above the composer (ChatGPT-style) so the mode is picked before the prompt is typed, give the pill group a faint backing so it reads as a control, and expose aria-pressed so assistive tech announces which mode is active.
+
+## [2.76.1] - 2026-10-07
+
+### Changed
+- **Drop the duplicate New button from the thread header (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - The active-session header repeated a "+ New" action that already lives in the left sidebar above the Recent list. New Chat is now triggered from a single place, leaving the header to the sidebar toggle and status pill.
+
+## [2.76.0] - 2026-10-07
+
+### Fixed
+- **Restore wheel/touchpad scrolling in the research workspace (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/main.tsx`)**:
+  - Lenis smooth-scroll was swallowing every wheel event on /research-agent. The PUBLIC_PREFIXES check used startsWith('/research'), so the workspace route matched, and the instance was created once at app mount and never destroyed on navigation. Its wrapper is the window, which has nothing to scroll on the h-screen workspace, so its preventDefault() left the inner thread unable to scroll at all (finger touch still worked because syncTouch is off).
+  - Match whole path segments so '/research' no longer matches '/research-agent'.
+  - Create Lenis per public route and destroy it (and cancel its rAF) when the route changes, so it also stops leaking across SPA navigation.
+  - Opt the thread, hero and sidebar history list out via data-lenis-prevent.
+  - Pause the follow-the-reply pin synchronously on wheel/touch gestures, so a streaming render can no longer win the race and snap the view back.
+
+## [2.75.5] - 2026-10-06
+
+### Fixed
+- **Use ZYR0 brand and add the ZYRO Studio logo to the sidebar (`app/src/agent/components/AgentSidebar.tsx, app/src/components/research-landing/EditorialStatement.tsx, app/src/components/research-landing/FinalCta.tsx, app/src/components/research-landing/ResearchFooter.tsx, app/src/components/research-landing/ResearchNav.tsx`)**:
+  - The sidebar header read "ZYROO" while the rest of the product (README, headers, footers) ships as ZYR0; the same typo appeared in four research landing components.
+  - Sidebar header shows the ZYRO Studio mark next to ZYR0, and the mark replaces the generic square icon in the collapsed rail.
+  - StudioLogo crops /logos/studio.png to the circular mark so the baked-in wordmark (illegible and near-invisible on the dark rail) is clipped out.
+  - ZYROO -> ZYR0 in ResearchNav, ResearchFooter, FinalCta, EditorialStatement.
+
+## [2.75.4] - 2026-10-06
+
+### Fixed
+- **Follow the reply in the thread without blocking manual scrolling (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - The thread never scrolled to new content, so replies streamed off-screen while the user had to scroll manually.
+  - Pin the thread to the bottom on every render (streaming tokens, evidence updates, reasoning-card growth, report chunks).
+  - Pause following as soon as the user scrolls up with the wheel or a touch drag, so the reply can keep streaming while they read back.
+  - Resume following when they return within 100px of the bottom.
+  - Re-pin on send, research run/regenerate and history restore.
+  - Overscroll-contain so touch scrolling does not chain to the page.
+
+## [2.75.3] - 2026-10-06
+
+### Fixed
+- **Forward attachments with the message instead of dropping them (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx, app/src/agent/core/types.ts`)**:
+  - ThreadInput accepted image attachments but only forwarded the text, so files were silently discarded and an attachments-only send fired an empty prompt that did nothing.
+  - OnSend now forwards an AgentAttachment[] alongside the text.
+  - Attachments compose into the outgoing message as "📎 Attached: <names>".
+  - An attachments-only send falls back to a default prompt.
+  - Attachments always take the chat path (the research pipeline cannot read files) and the model is told only file names are shared, so it must not invent contents it cannot see.
+
+## [2.75.4] - 2026-10-05
+
+### Added
+- **ZYRO brand refresh — new seal, Agbalumo header, verification copy (`app/public/seal_ZYR0.png, app/src/components/CertificateDocument.tsx, app/src/components/certificateTemplate.ts, app/src/lib/database.types.ts, app/src/pages/public/Verify.tsx`)**:
+  - Replace seal.png with ZYRO Official Gold Seal Badge (transparent, sized to match QR).
+  - Drop VERIFIED SECURE caption (now inside the seal).
+  - Header: Awarded by ZYRO / ZYRO / tagline in Agbalumo #120159.
+  - Dates print as Month Year; body copy: proactivity, company-first sentence, verified against the official ZYRO credential registry.
+  - Signature block: ZYRO (Google-style wordmark).
+  - Fix: verify page flagged revoked certificates as Verified Authentic.
+  - Types: add certificates.start_date/end_date snapshot columns.
+
+## [2.75.3] - 2026-10-05
+
+### Added
+- **Hide issue/expiry dates on letter, real expiry on /verify, auto-flip + owner-editable expiry (`app/src/components/OfferLetterDocument.tsx, app/src/lib/offerLetterConfig.ts, app/src/lib/offerLetterPdf.ts, app/src/pages/company/OfferLetters.tsx, app/src/pages/public/Verify.tsx`)**:
+  - Remove Issued/Expires rows and date from term #3 in document + canvas PDF.
+  - /verify: expired offers show amber inactive message; accepted-before-deadline stays verifiable.
+  - Migration 059: expire_stale_offers() flips Pending/Sent past expires_at to Expired.
+  - Accept flow refuses offers past the deadline.
+  - Company owner can edit expiry date from offer modal.
+
+## [2.75.2] - 2026-10-02
+
+### Fixed
+- **Refine layout, typography scale, vertical positioning, and body copy (`app/src/components/certificateTemplate.ts`)**:
+  - Refine layout, typography scale, vertical positioning, and body copy.
+
+## [0.71.4] - 2026-10-02
+
+### Fixed
+- **Replace scroll-shrinking island pill with persistent full-width navbar (`app/src/components/nav/Header.tsx`)**:
+  - Replace scroll-shrinking island pill with persistent full-width navbar.
+
+## [0.71.3] - 2026-10-02
+
+### Fixed
+- **Allow images.unsplash.com in CSP and optimize timeline image loading (`app/src/components/ui/timeline.tsx, app/vercel.json`)**:
+  - Allow images.unsplash.com in CSP and optimize timeline image loading.
+
+## [0.71.2] - 2026-10-02
+
+### Added
+- **Optimize mobile shape placement and seamless dissolve-converge transitions (`app/src/components/lineart/HeroLineArtCycle.tsx, app/src/components/ui/shader-hero.tsx`)**:
+  - Optimize mobile shape placement and seamless dissolve-converge transitions.
+
+## [0.71.1] - 2026-10-02
+
+### Fixed
+- **Avoid ref mutation during render in LineArtCanvas (`app/src/components/lineart/LineArtCanvas.tsx`)**:
+  - Avoid ref mutation during render in LineArtCanvas.
+
+## [0.71.0] - 2026-10-02
+
+### Added
+- **Integrate 3d line-art continuous cycle with light/dark mode support (`app/src/components/lineart/HeroLineArtCycle.tsx, app/src/components/lineart/LineArtCanvas.tsx, app/src/components/lineart/LineArtShowcase.tsx, app/src/components/lineart/index.ts, app/src/components/lineart/math.ts`)**:
+  - Integrate 3d line-art continuous cycle with light/dark mode support.
+
+## [0.70.5] - 2026-10-02
+
+### Added
+- **Replace timeline story with 4 Defensible Pillars and refine scroll alignment (`app/src/components/platform-home/FeatureHighlightStrip.tsx, app/src/components/ui/timeline.tsx, app/src/pages/public/PlatformHome.tsx`)**:
+  - Replace timeline story with 4 Defensible Pillars and refine scroll alignment.
+
+## [0.73.4] - 2026-10-01
+
+### Added
+- **Enable administrators to create, publish live, and feature tools and skills (`app/src/components/tools/SubmitToolDialog.tsx, app/src/pages/admin/Tools.tsx, app/src/services/tools.ts`)**:
+  - Enable administrators to create, publish live, and feature tools and skills.
+
+## [0.73.3] - 2026-10-01
+
+### Changed
+- **Remove all hardcoded tools and rely strictly on Supabase registry (`app/src/components/tools/ToolEmptyState.tsx, app/src/data/tools.ts, app/src/pages/public/ToolHub.tsx, app/src/services/tools.ts`)**:
+  - Remove all hardcoded tools and rely strictly on Supabase registry.
+
+## [0.73.2] - 2026-10-01
+
+### Added
+- **Wire /tools routing, platform navigation, and navbar dropdowns (`app/src/App.tsx, app/src/components/nav/Header.tsx, app/src/components/nav/ProductsDropdown.tsx, app/src/components/nav/ResourcesDropdown.tsx, app/src/components/platform-home/data.ts`)**:
+  - Wire /tools routing, platform navigation, and navbar dropdowns.
+
+## [0.73.1] - 2026-10-01
+
+### Added
+- **Add Student, Company, and Admin moderation dashboards for ToolHub (`app/src/layouts/DashboardLayout.tsx, app/src/pages/admin/AdminPortal.tsx, app/src/pages/admin/Tools.tsx, app/src/pages/company/CompanyPortal.tsx, app/src/pages/company/Tools.tsx`)**:
+  - Add Student, Company, and Admin moderation dashboards for ToolHub.
+
+## [0.73.0] - 2026-10-01
+
+### Added
+- **Add public /tools discovery catalog with search, filtering, and SEO prerendering (`app/scripts/generate-seo.js, app/src/pages/public/ToolHub.tsx`)**:
+  - Add public /tools discovery catalog with search, filtering, and SEO prerendering.
+
+## [0.72.5] - 2026-10-01
+
+### Added
+- **Add ToolCard, FeaturedToolCard, ToolPreviewDialog, SubmitToolDialog, and EmptyState components (`app/src/components/tools/FeaturedToolCard.tsx, app/src/components/tools/SubmitToolDialog.tsx, app/src/components/tools/ToolCard.tsx, app/src/components/tools/ToolEmptyState.tsx, app/src/components/tools/ToolPreviewDialog.tsx`)**:
+  - Add ToolCard, FeaturedToolCard, ToolPreviewDialog, SubmitToolDialog, and EmptyState components.
+
+## [0.72.4] - 2026-10-01
+
+### Added
+- **Add database schema, types, and service layer for ToolHub registry (`app/src/data/tools.ts, app/src/lib/database.types.ts, app/src/services/companyTeam.ts, app/src/services/tools.ts, supabase/migrations/058_create_tools.sql`)**:
+  - Add database schema, types, and service layer for ToolHub registry.
+
+## [0.72.3] - 2026-10-01
+
+### Fixed
+- **Eliminate duplicate category tags and titles on fallback cards (`app/src/components/blog/BlogCard.tsx`)**:
+  - Eliminate duplicate category tags and titles on fallback cards.
+
+## [0.72.2] - 2026-10-01
+
+### Fixed
+- **Resolve React Compiler useMemo memoization lint error in BlogPostDetail (`app/src/pages/public/BlogPostDetail.tsx`)**:
+  - Resolve React Compiler useMemo memoization lint error in BlogPostDetail.
+
+## [0.72.1] - 2026-10-01
+
+### Added
+- **Polish editorial UX, reading layout, TOC, and admin CMS publishing (`.gitignore, app/scripts/generate-seo.js, app/src/components/blog/BlogCard.tsx, app/src/components/blog/BlogCodeBlock.tsx, app/src/components/blog/BlogReadingProgress.tsx`)**:
+  - Polish editorial UX, reading layout, TOC, and admin CMS publishing.
+
+## [0.70.4] - 2026-09-30
+
+### Added
+- **Default the platform to light theme for the playground (`app/index.html, app/src/components/platform-home/PlaygroundShowcase.tsx, app/src/main.tsx`)**:
+  - Set next-themes defaultTheme to light.
+  - Drop the index.html script that cleared the stored theme each load.
+  - Remove the hardcoded dark stage bg so #products inherits the theme.
+
+## [0.70.3] - 2026-09-30
+
+### Fixed
+- **End the deck and release the page on phones (`app/src/components/ui/molten-ring-carousel.tsx`)**:
+  - End the deck and release the page on phones.
+
+## [0.70.2] - 2026-09-30
+
+### Added
+- **Restore molten ring carousel verbatim and unpin the playground (`app/src/components/platform-home/PlaygroundShowcase.tsx, app/src/components/ui/demo.tsx, app/src/components/ui/molten-ring-carousel.tsx`)**:
+  - Restore molten ring carousel verbatim and unpin the playground.
+
+## [0.70.1] - 2026-09-30
+
+### Fixed
+- **Read playground progress in the frame loop instead of on scroll (`app/src/components/platform-home/PlaygroundShowcase.tsx, app/src/components/ui/molten-ring-carousel.tsx`)**:
+  - Read playground progress in the frame loop instead of on scroll.
+
+## [0.70.0] - 2026-09-29
+
+### Added
+- **Pin playground carousel to scroll and adopt reference molten-ring component (`app/src/components/platform-home/PlaygroundShowcase.tsx, app/src/components/ui/molten-ring-carousel.tsx`)**:
+  - Pin playground carousel to scroll and adopt reference molten-ring component.
+
+## [0.69.5] - 2026-09-27
+
+### Fixed
+- **Resolve mobile touch scrolling and pointer capture blocking in liquid carousel (`app/src/components/platform-home/PlaygroundShowcase.tsx, app/src/components/ui/molten-ring-carousel.tsx`)**:
+  - Resolve mobile touch scrolling and pointer capture blocking in liquid carousel.
+
+## [0.69.4] - 2026-09-27
+
+### Added
+- **Add dynamic island navbar convergence on scroll and centered pill with full build validation (`app/public/images/products/developer.svg, app/public/images/products/research.svg, app/public/images/products/school.svg, app/public/images/products/skills.svg, app/public/images/products/studio.svg`)**:
+  - Add dynamic island navbar convergence on scroll and centered pill with full build validation.
+
+## [0.69.3] - 2026-09-27
+
+### Added
+- **Replace bento grid with WebGL2 molten ring playground carousel (`app/public/images/products/developer.svg, app/public/images/products/research.svg, app/public/images/products/school.svg, app/public/images/products/skills.svg, app/public/images/products/studio.svg`)**:
+  - Add MoltenRingCarousel component with WebGL2 distance field liquid physics and hybrid navigation.
+  - Add PlaygroundShowcase section with casual, approachable copy and sleek framed stage.
+  - Add 6 high-res vector SVG product cover visuals with zero CORS latency.
+  - Replace static BentoProductGrid on PlatformHome while maintaining backward compatibility.
+
+## [0.75.1] - 2026-09-26
+
+### Changed
+- **Raise QR image above verification label (`app/src/components/certificateTemplate.ts`)**:
+  - Raise QR image above verification label.
+
+## [0.75.0] - 2026-09-26
+
+### Added
+- **Add director signature, transparent coordinator signature (`app/public/signatures/director.png, app/public/signatures/program-coordinator.png, app/src/components/CertificateDocument.tsx, app/src/components/certificateTemplate.ts`)**:
+  - Add director signature, transparent coordinator signature.
+
+## [0.74.5] - 2026-09-25
+
+### Added
+- **Use seal.png image with SVG seal fallback (`app/public/seal.png, app/src/components/CertificateDocument.tsx, app/src/components/certificateTemplate.ts`)**:
+  - Use seal.png image with SVG seal fallback.
+
+## [0.74.4] - 2026-09-25
+
+### Added
+- **Integrate program coordinator signature image (`app/src/components/CertificateDocument.tsx, app/src/components/certificateTemplate.ts`)**:
+  - Integrate program coordinator signature image.
+
+## [0.74.3] - 2026-09-25
+
+### Changed
+- **Engraved golden ZYRO seal and align verification labels (`app/src/components/certificateTemplate.ts`)**:
+  - Engraved golden ZYRO seal and align verification labels.
+
+## [0.74.2] - 2026-09-23
+
+### Changed
+- **Move cert meta to header, logo above heading, update tagline (`app/src/components/certificateTemplate.ts`)**:
+  - Move cert meta to header, logo above heading, update tagline.
+
+## [0.74.1] - 2026-09-23
+
+### Changed
+- **Align footer row and enlarge signature meta type (`app/src/components/certificateTemplate.ts`)**:
+  - Align footer row and enlarge signature meta type.
+
+## [0.74.0] - 2026-09-23
+
+### Changed
+- **Remove external logos, refine heading and signature lines (`app/src/components/certificateTemplate.ts`)**:
+  - Remove external logos, refine heading and signature lines.
+
+## [0.69.2] - 2026-09-23
+
+### Changed
+- **Tighten lead-in spacing and adjust mobile sticky layout (`app/src/components/platform-home/FeatureHighlightStrip.tsx, app/src/components/ui/timeline.tsx`)**:
+  - Tighten lead-in spacing and adjust mobile sticky layout.
+
+## [0.69.1] - 2026-09-23
+
+### Added
+- **Integrate timeline, blog, skills, and tabbed FAQ sections (`app/package-lock.json, app/package.json, app/src/components/platform-home/BlogPreviewSection.tsx, app/src/components/platform-home/FAQSection.tsx, app/src/components/platform-home/FeatureHighlightStrip.tsx`)**:
+  - Why ZYR0: GSAP horizontal scroll timeline (lazy-loaded, sticky fix via overflow-x clip).
+  - Blog preview: shadcn Blog7 with real posts.
+  - Skills: Blog8 alternating rows with CTAs.
+  - FAQ: tabbed knowledge-base explorer on existing accordion, ZYR0 content.
+
+## [0.69.0] - 2026-09-23
+
+### Changed
+- **Redesign ecosystem section with asymmetric rail and clickable cards (`app/src/components/platform-home/SkillsSection.tsx`)**:
+  - Redesign ecosystem section with asymmetric rail and clickable cards.
+
+## [0.68.5] - 2026-09-22
+
+### Changed
+- **Implement full light and dark mode support across homepage sections (`app/src/components/platform-home/BlogPreviewSection.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/FAQSection.tsx, app/src/components/platform-home/FeatureHighlightStrip.tsx, app/src/components/platform-home/SkillsSection.tsx`)**:
+  - Implement full light and dark mode support across homepage sections.
+
+## [0.68.4] - 2026-09-22
+
+### Changed
+- **Fix footer and dark mode tokens from blue to neutral dark (`app/src/index.css`)**:
+  - Fix footer and dark mode tokens from blue to neutral dark.
+
+## [0.68.3] - 2026-09-22
+
+### Added
+- **Restore minimal and clear BentoProductGrid for screenshots and gifs (`app/src/components/platform-home/BentoProductGrid.tsx`)**:
+  - Restore minimal and clear BentoProductGrid for screenshots and gifs.
+
+## [0.68.2] - 2026-09-22
+
+### Changed
+- **Assemble restyled PlatformHome page flow and remove pricing and stats (`app/src/pages/public/PlatformHome.tsx`)**:
+  - Assemble restyled PlatformHome page flow and remove pricing and stats.
+
+## [0.68.1] - 2026-09-22
+
+### Changed
+- **Modernize FAQ accordion and create minimal statement CTA (`app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/FAQSection.tsx`)**:
+  - Modernize FAQ accordion and create minimal statement CTA.
+
+## [0.68.0] - 2026-09-22
+
+### Added
+- **Add latest blog preview section with editorial cards (`app/src/components/platform-home/BlogPreviewSection.tsx`)**:
+  - Add latest blog preview section with editorial cards.
+
+## [0.67.5] - 2026-09-22
+
+### Added
+- **Add Skills Marketplace section with featured community and official skills (`app/src/components/platform-home/SkillsSection.tsx`)**:
+  - Add Skills Marketplace section with featured community and official skills.
+
+## [0.67.4] - 2026-09-22
+
+### Added
+- **Add Linear-style horizontal feature highlight strip (01-04) (`app/src/components/platform-home/FeatureHighlightStrip.tsx, app/src/components/platform-home/WhyZyroSection.tsx`)**:
+  - Add Linear-style horizontal feature highlight strip (01-04).
+
+## [0.67.3] - 2026-09-22
+
+### Added
+- **Enrich bento grid with UI mockups, prompt bar, and feature badges (`app/src/components/platform-home/BentoProductGrid.tsx`)**:
+  - Enrich bento grid with UI mockups, prompt bar, and feature badges.
+
+## [0.67.2] - 2026-09-22
+
+### Added
+- **Upgrade partner marquee with authentic SVG logos (`app/src/components/platform-home/LogoWall.tsx`)**:
+  - Upgrade partner marquee with authentic SVG logos.
+
+## [0.67.1] - 2026-09-22
+
+### Added
+- **Restyle hero with clean dark background, Agbalumo wordmark, and animated tagline (`app/src/components/ui/shader-hero.tsx`)**:
+  - Restyle hero with clean dark background, Agbalumo wordmark, and animated tagline.
+
+## [0.67.0] - 2026-09-22
+
+### Changed
+- **Add Agbalumo/Sora font configuration and brand tokens (`app/index.html, app/src/index.css, app/tailwind.config.js`)**:
+  - Add Agbalumo/Sora font configuration and brand tokens.
+
+## [0.72.0] - 2026-09-19
+
+### Added
+- **Implement blog architecture, clean editorial layout, and admin CMS (`app/package-lock.json, app/package.json, app/scripts/generate-seo.js, app/src/App.tsx, app/src/components/nav/ResourcesDropdown.tsx`)**:
+  - Implement blog architecture, clean editorial layout, and admin CMS.
+
+## [0.66.5] - 2026-09-09
+
+### Fixed
+- **Make FALLBACK_ORDER lazy so env vars are read per-request (`supabase/functions/ai-gateway/index.ts`)**:
+  - Make FALLBACK_ORDER lazy so env vars are read per-request.
+
+## [0.66.4] - 2026-09-07
+
+### Fixed
+- **Fix stats count-up animation (`app/src/components/platform-home/StatsSection.tsx`)**:
+  - Remove Reveal wrapper that was blocking CountUp's useInView trigger.
+  - Section now renders immediately, CountUp animates on scroll into view.
+  - Increased count duration to 2.5s for smoother animation.
+  - Ref: PR#142.
+
+## [0.66.3] - 2026-09-07
+
+### Added
+- **Add standalone stats section with upgraded visuals (`app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/StatsSection.tsx, app/src/components/platform-home/data.ts, app/src/pages/public/PlatformHome.tsx`)**:
+  - New StatsSection component with glassmorphic card, accent-colored icons, and animated count-up numbers.
+  - Updated stat labels to trust-focused copy: Integrated Products, Engineers Trust Us, Institutions Partnered, Dependable Uptime.
+  - Corrected stat numbers: 1.0K+ users, 50+ partners.
+  - Removed stats grid from CTASection (now focused CTA only).
+  - Placed between WhyZyroSection and PricingSection.
+  - Ref: PR#142.
+
+## [0.66.2] - 2026-09-07
+
+### Added
+- **Add Why ZYR0 value proposition section (`app/src/components/platform-home/WhyZyroSection.tsx, app/src/pages/public/PlatformHome.tsx`)**:
+  - New section between product grid and pricing: 'One platform. Every advantage.'.
+  - 4 benefit cards with professional copy:.
+  - Unified Ecosystem (interconnected products).
+  - Verifiable Credentials (cryptographic proof-of-work).
+  - Enterprise-Grade Scale (individual to institutional).
+  - Accessible From Day One (free for students, guided onboarding).
+  - Reuses existing Reveal.tsx animation and ZYR0 CSS variable system.
+  - Responsive 4-col → 2-col → 1-col grid.
+  - Ref: PR#142.
+
+## [0.66.1] - 2026-09-07
+
+### Added
+- **Consolidate feature sections, upgrade bento grid (`app/src/components/platform-home/BentoProductGrid.tsx, app/src/pages/public/PlatformHome.tsx`)**:
+  - Remove redundant DeepDiveSection and SolutionsSection from homepage (3 sections showing same 4 products → 1 focused section).
+  - Upgrade BentoProductGrid placeholders: gradient backgrounds using product brand colors, proper Lucide icons instead of letter icons.
+  - Cleaner visual hierarchy with product-colored icon containers.
+  - Ponytail: DeepDiveSection.tsx and SolutionsSection.tsx left as dead code — no other imports. Delete when comfortable.
+  - Ref: PR#142.
+
+## [0.66.0] - 2026-09-07
+
+### Added
+- **Replace fake LogoWall with real AI & infra partners (`app/src/components/platform-home/LogoWall.tsx, app/src/index.css`)**:
+  - Replace 10 fabricated company names with 7 real technology partners.
+  - OpenAI, Anthropic, DeepSeek, Cloudflare, Google, Vercel, Supabase.
+  - Brand-colored text logos with hover glow + scale effect.
+  - Updated section label to 'Powered by industry-leading technology'.
+  - Removed placeholder Unicode symbols, clean text-only logos.
+  - Added partner-item CSS hover with brand color, scale, drop-shadow.
+  - Ref: PR#142.
+
+## [0.65.5] - 2026-09-05
+
+### Fixed
+- **Dynamic-import MeshGradient into lazy chunk to prevent desktop freeze (`app/src/components/ui/shader-hero.tsx`)**:
+  - Dynamic-import MeshGradient into lazy chunk to prevent desktop freeze.
+
+## [0.65.4] - 2026-09-05
+
+### Fixed
+- **Isolate recharts into lazy chunk, keep vendor-common for shared deps (`app/vite.config.ts`)**:
+  - Isolate recharts into lazy chunk, keep vendor-common for shared deps.
+
+## [0.65.3] - 2026-09-05
+
+### Fixed
+- **Remove try/catch around JSX, use static MeshGradient import (`app/src/components/ui/shader-hero.tsx`)**:
+  - Remove try/catch around JSX, use static MeshGradient import.
+
+## [0.65.2] - 2026-09-05
+
+### Fixed
+- **Defer Lenis init to useEffect, add vendor chunks (`app/src/components/ui/shader-hero.tsx, app/src/pages/public/About.tsx, app/vite.config.ts`)**:
+  - Defer Lenis init to useEffect, add vendor chunks.
+
+## [0.65.1] - 2026-09-05
+
+### Fixed
+- **Remove dead react-icons dependency (`app/package-lock.json, app/package.json`)**:
+  - Remove dead react-icons dependency.
+
+## [0.65.0] - 2026-09-05
+
+### Fixed
+- **Defer Lenis init to useEffect, add vendor chunks (`app/src/main.tsx, app/vite.config.ts`)**:
+  - Defer Lenis init to useEffect, add vendor chunks.
+
+## [0.64.5] - 2026-09-05
+
+### Fixed
+- **Replace motion with m in 97 files for LazyMotion (`app/src/agent/ResearchAgentPage.tsx, app/src/components/SiteBannerBar.tsx, app/src/components/company/tasks/MasterDeliverablesList.tsx, app/src/components/company/tasks/TaskBulkActionBar.tsx, app/src/components/company/tasks/TaskCardGrid.tsx`)**:
+  - Replace motion with m in 97 files for LazyMotion.
+
+## [0.64.4] - 2026-09-05
+
+### Fixed
+- **Wrap ShaderHero in ErrorBoundary with CSS fallback (`app/src/components/ui/shader-hero.tsx`)**:
+  - Wrap ShaderHero in ErrorBoundary with CSS fallback.
+
+## [0.64.3] - 2026-09-05
+
+### Fixed
+- **Revert to catch-all rewrite for SPA routing (`app/vercel.json`)**:
+  - Revert to catch-all rewrite for SPA routing.
+
+## [0.64.2] - 2026-09-05
+
+### Fixed
+- **Add IndexNow reference for faster Bing indexing (`app/scripts/generate-seo.js`)**:
+  - Add IndexNow reference for faster Bing indexing.
+
+## [0.64.1] - 2026-09-05
+
+### Fixed
+- **Remove unsafe-eval from CSP header (`app/vercel.json`)**:
+  - Remove unsafe-eval from CSP header.
+
+## [0.64.0] - 2026-09-05
+
+### Fixed
+- **Add SoftwareApplication schema for platform entity (`app/scripts/generate-seo.js`)**:
+  - Add SoftwareApplication schema for platform entity.
+
+## [0.63.5] - 2026-09-05
+
+### Fixed
+- **Expand product page descriptions for crawlers (`app/scripts/generate-seo.js`)**:
+  - Add 300+ words of pre-rendered SSR content for /studio, /school, and /research routes. Previously these pages returned empty text to crawlers, causing thin content issues.
+  - Also added staticPagesMeta entries with optimized titles, descriptions, and BreadcrumbList schema for each product page.
+  - Closes SEO audit finding #6.
+
+## [0.63.4] - 2026-09-05
+
+### Fixed
+- **Improve Organization schema with ImageObject logo (`app/scripts/generate-seo.js`)**:
+  - Change Organization logo from bare URL string to ImageObject format.
+  - Add inLanguage: 'en' to WebSite schema.
+  - Add Twitter/X to sameAs array.
+  - Update descriptions to match new ecosystem positioning.
+  - Closes SEO audit finding #5.
+
+## [0.63.3] - 2026-09-05
+
+### Fixed
+- **Upgrade HSTS header with includeSubDomains and preload (`app/vercel.json`)**:
+  - Add Strict-Transport-Security header with max-age=63072000, includeSubDomains, and preload directives. Prevents subdomain hijacking and enables HSTS preload list submission.
+  - Closes SEO audit finding #3.
+
+## [0.63.2] - 2026-09-05
+
+### Fixed
+- **Update branding, add llms.txt reference, trim meta description (`app/index.html, app/scripts/generate-seo.js`)**:
+  - Update homepage title to 'ZYR0 — Think. Build. Scale to ∞.'.
+  - Update homepage description to match new ecosystem positioning.
+  - Update homepage pre-rendered content with new product messaging.
+  - Add <link rel='alternate'> for llms.txt AI discovery.
+  - Update llms.txt content with new product descriptions.
+  - Trim meta description from 204 to 148 characters.
+  - Closes SEO audit findings #3, #7, #9.
+
+## [0.63.1] - 2026-09-05
+
+### Fixed
+- **Configure proper 404 handling in Vercel (`app/vercel.json`)**:
+  - Replace catch-all rewrite with explicit route rewrites for known SPA paths and add a catch-all route returning 404 for unknown paths. Previously all unknown URLs returned HTTP 200 with index.html, wasting crawl budget and creating index bloat.
+  - Also removed deprecated interest-cohort from permissions-policy.
+  - Closes critical SEO audit finding #2.
+
+## [0.63.0] - 2026-09-05
+
+### Fixed
+- **Add pre-rendered homepage content for crawlers (`app/scripts/generate-seo.js`)**:
+  - Replace empty DOM placeholder with meaningful SSR content including H1 tag, value proposition, product summaries, CTAs, and trust signals. Googlebot now sees full homepage content on first crawl instead of a blank div element.
+  - Closes critical SEO audit finding #1.
+
+## [0.62.6] - 2026-09-02
+
+### Changed
+- **Update .gitignore with phases.md and SAAS_REBRAND_PLAN.md**:
+  - Chore: update .gitignore with phases.md and SAAS_REBRAND_PLAN.md.
+
+## [0.62.5] - 2026-09-02
+
+### Fixed
+- **Always show team role (Owner/Admin/HR Manager/Mentor/Reviewer) in profile dropdown**:
+  - Fix(dashboard): always show team role (Owner/Admin/HR Manager/Mentor/Reviewer) in profile dropdown.
+
+## [0.62.4] - 2026-09-02
+
+### Fixed
+- **Generate fresh token on each resend (invalidate old tokens)**:
+  - Fix(invite): generate fresh token on each resend (invalidate old tokens).
+
+## [0.62.3] - 2026-09-02
+
+### Fixed
+- **Block company owner from inviting themselves via client-side check**:
+  - Fix(invite): block company owner from inviting themselves via client-side check.
+
+## [0.62.2] - 2026-09-02
+
+### Fixed
+- **Accept_company_invite verifies invited email matches logged-in user + blocks owner**:
+  - Fix(rpc): accept_company_invite verifies invited email matches logged-in user + blocks owner.
+
+## [0.62.1] - 2026-09-02
+
+### Fixed
+- **CanAccessTab returns false when memberRole is null for non-owners**:
+  - Fix(company-access): canAccessTab returns false when memberRole is null for non-owners.
+
+## [0.62.0] - 2026-09-02
+
+### Changed
+- **Merge pull request #138 from ilyaskhan12Q/fix-company-invite-workflow**:
+  - Merge pull request #138 from ilyaskhan12Q/fix-company-invite-workflow.
+
+## [0.61.15] - 2026-09-02
+
+### Fixed
+- **Add missing cache policy aliases for count keys (use 60s TTL instead of 5s)**:
+  - Fix(sidebar): add missing cache policy aliases for count keys (use 60s TTL instead of 5s).
+
+## [0.61.14] - 2026-09-02
+
+### Fixed
+- **Refresh cache-first on mount + visibilitychange listener for tab-return**:
+  - Fix(sidebar): refresh cache-first on mount + visibilitychange listener for tab-return.
+
+## [0.61.13] - 2026-09-02
+
+### Added
+- **Add useRefreshOnFocus for tab-return refresh on student and company pages**:
+  - Feat(hooks): add useRefreshOnFocus for tab-return refresh on student and company pages.
+
+## [0.61.12] - 2026-09-02
+
+### Fixed
+- **Remove 'student' fallback from all nav components — use profile.role or null + loading guard**:
+  - Fix(public-nav): remove 'student' fallback from all nav components — use profile.role or null + loading guard.
+
+## [0.61.11] - 2026-09-02
+
+### Fixed
+- **Add missing profileLoaded guard in AuthContext before navigating**:
+  - Fix(profile): add missing profileLoaded guard in AuthContext before navigating.
+
+## [0.61.10] - 2026-09-02
+
+### Fixed
+- **Remove 'student' fallback in PublicOnlyRoute — show loader until profile loads**:
+  - Fix(profile): remove 'student' fallback in PublicOnlyRoute — show loader until profile loads.
+
+## [0.61.9] - 2026-09-02
+
+### Fixed
+- **Login.tsx waits for profileLoaded before navigating to prevent stale role redirect**:
+  - Fix(auth): Login.tsx waits for profileLoaded before navigating to prevent stale role redirect.
+
+## [0.61.8] - 2026-09-02
+
+### Fixed
+- **One-time data fix to promote team members' profiles to 'company' role + add RPC**:
+  - Fix(invite): one-time data fix to promote team members' profiles to 'company' role + add RPC.
+
+## [0.61.7] - 2026-09-02
+
+### Fixed
+- **Accept_company_invite RPC now updates profiles.role to 'company' on accept**:
+  - Fix(invite): accept_company_invite RPC now updates profiles.role to 'company' on accept.
+
+## [0.61.6] - 2026-09-02
+
+### Changed
+- **Re-enable ESLint in CI workflow**:
+  - Chore(ci): re-enable ESLint in CI workflow.
+
+## [0.61.5] - 2026-09-02
+
+### Changed
+- **Add indexes for profiles, applications, tasks, events, and certificates queries**:
+  - Perf(db): add indexes for profiles, applications, tasks, events, and certificates queries.
+
+## [0.61.4] - 2026-09-02
+
+### Changed
+- **Parallelize tasks, certificates, and events fetches with Promise.allSettled**:
+  - Perf(workspace): parallelize tasks, certificates, and events fetches with Promise.allSettled.
+
+## [0.61.3] - 2026-09-02
+
+### Changed
+- **Throttle mousemove via ref + rAF, single MeshGradient, Lenis on public routes only**:
+  - Perf(shader): throttle mousemove via ref + rAF, single MeshGradient, Lenis on public routes only.
+
+## [0.61.2] - 2026-09-02
+
+### Changed
+- **Self-host Inter, Agbalumo, DM Serif Text as woff2 with font-display:swap**:
+  - Perf(fonts): self-host Inter, Agbalumo, DM Serif Text as woff2 with font-display:swap.
+
+## [0.61.1] - 2026-09-02
+
+### Added
+- **Add configurable timeouts to all data-fetch pages, AuthContext, ErrorBoundary**:
+  - Feat(timeout): add configurable timeouts to all data-fetch pages, AuthContext, ErrorBoundary.
+
+## [0.61.0] - 2026-08-29
+
+### Added
+- **SaaS ecosystem rebrand — homepage redesign, animations, nav update**:
+  - Feat: SaaS ecosystem rebrand — homepage redesign, animations, nav update.
+
+## [0.60.5] - 2026-08-28
+
+### Fixed
+- **Resolve TypeScript build errors in shader hero (`app/src/components/platform-home/Reveal.tsx, app/src/components/ui/shader-hero.tsx`)**:
+  - Reveal.tsx: use type-only import for ReactNode (verbatimModuleSyntax).
+  - Shader-hero.tsx: remove invalid backgroundColor and wireframe props from MeshGradient.
+  - Shader-hero.tsx: fix framer-motion ease type (use cubic bezier array instead of string).
+
+## [0.60.4] - 2026-08-28
+
+### Added
+- **Integrate shader hero with MeshGradient background (`app/package-lock.json, app/package.json, app/src/App.tsx, app/src/components/ui/shader-hero.tsx, app/src/pages/demo/ShaderHeroDemo.tsx`)**:
+  - Installed @paper-design/shaders-react for MeshGradient.
+  - Created shader-hero.tsx with animated gradient background, letter-by-letter title, mouse-tracking spotlight, and 3 CTAs (Register, Products, Contact).
+  - Title: ZYR0 (massive) + Think. Build. Scale to ∞. (animated tagline).
+  - Subtitle: Action-focused product pillars.
+  - Replaced HeroSection with ShaderHero on homepage.
+  - Added /demo/shader-hero route for standalone demo.
+
+## [0.60.3] - 2026-08-28
+
+### Added
+- **Add scroll animations and smooth scroll (`app/src/components/platform-home/BentoProductGrid.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/CountUp.tsx, app/src/components/platform-home/DeepDiveSection.tsx, app/src/components/platform-home/FAQSection.tsx`)**:
+  - Installed Lenis for buttery smooth scroll (initialized in main.tsx).
+  - Created Reveal.tsx — scroll-triggered fade/slide/scale wrapper using framer-motion useInView.
+  - Created CountUp.tsx — animated number counter for stats.
+  - HeroSection: staggered entry animation for badge, headline, subtitle, CTAs, screenshot.
+  - BentoProductGrid: staggered card reveal with 80ms delay between cards.
+  - DeepDiveSection: alternating left/right slide reveal for text/image blocks.
+  - SolutionsSection: staggered card reveal with 80ms delay.
+  - PricingSection: staggered card reveal with 100ms delay.
+  - FAQSection: staggered item reveal with 50ms delay.
+  - CTASection: scale+fade reveal with count-up stats animation.
+
+## [0.60.2] - 2026-08-28
+
+### Added
+- **Add Company dropdown and update Products/Resources dropdowns (`app/src/components/nav/CompanyDropdown.tsx, app/src/components/nav/ProductsDropdown.tsx, app/src/components/nav/ResourcesDropdown.tsx, app/src/layouts/PublicLayout.tsx`)**:
+  - Created CompanyDropdown with About, Contact, Careers, Verify Certificate.
+  - Added ZYR0 Edu to ProductsDropdown.
+  - Added Verify Certificate and Cookie Policy to ResourcesDropdown.
+  - Updated PublicLayout desktop nav: Products | Research | Company | Resources.
+  - Updated PublicLayout mobile nav with all routes.
+
+## [0.60.1] - 2026-08-28
+
+### Changed
+- **Remove /0-ai route and ZeroAI module completely (`app/src/App.tsx, app/src/agent/ResearchAgentPage.tsx, app/src/agent/classifyLocally.ts, app/src/components/platform-home/DeepDiveSection.tsx, app/src/components/platform-home/data.ts`)**:
+  - Moved classifyLocally to agent module (used by ResearchAgentPage).
+  - Removed /0-ai route from App.tsx (both public and product route blocks).
+  - Deleted components/zeroai/ (13 files).
+  - Deleted pages/zeroai/ZeroAIWorkspace.tsx.
+  - Deleted lib/zeroai/ (chat, intent, llm, planner).
+  - Deleted hooks/useZeroAiKeys.ts, useZeroAiHistory.ts.
+  - Deleted data/zeroAiFixtures.ts, zeroAiTypes.ts.
+  - Deleted styles/zeroai.css.
+  - Updated display text: removed '0-AI' from product names, descriptions, pricing.
+  - Kept /research and /research-agent routes intact.
+
+## [0.60.0] - 2026-08-28
+
+### Added
+- **Redesign homepage with Dovetail-inspired design system (`app/src/components/nav/Header.tsx, app/src/components/nav/PlatformFooter.tsx, app/src/components/platform-home/BentoProductGrid.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/DeepDiveSection.tsx`)**:
+  - Typography: DM Serif Display + JetBrains Mono + Inter.
+  - Color system: Indigo accent, CSS variables for light/dark adaptive.
+  - Hero: Left-aligned display serif headline with product screenshot slot.
+  - LogoWall: Continuous rolling marquee with logo icons.
+  - BentoProductGrid: Size-as-hierarchy bento grid with image slots.
+  - DeepDiveSection: Per-product narrative sections with alternating layouts.
+  - SolutionsSection: Simplified 4-column row.
+  - PricingSection: Theme-aware, no gradients.
+  - FAQSection: Theme-aware accordion.
+  - CTASection: Clean minimal CTA with stats.
+  - Header: Redesigned with Products/Pricing/Resources/Company nav.
+  - Footer: Premium 3-tier with newsletter strip, 4-column grid, social icons.
+
+## [0.59.5] - 2026-08-27
+
+### Added
+- **Add Header component for product landing pages, restore original PublicLayout (`app/src/components/nav/Header.tsx, app/src/components/nav/ProductsDropdown.tsx, app/src/components/nav/ResourcesDropdown.tsx, app/src/components/ui/menu-toggle-icon.tsx, app/src/layouts/PublicLayout.tsx`)**:
+  - Create Header.tsx with dark floating-pill nav and animated products mega-dropdown.
+  - Create menu-toggle-icon.tsx (animated hamburger/X toggle).
+  - PlatformHome, StudioLanding, SchoolOSLanding now use Header.
+  - Restore full original PublicLayout (575-line inline nav/footer) for /internships routes.
+  - Restore ProductsDropdown and ResourcesDropdown components.
+  - ResearchLanding retains ResearchNav + ResearchFooter.
+
+## [0.59.4] - 2026-08-27
+
+### Fixed
+- **Align BentoProductGrid product badge with data.ts (`app/src/components/platform-home/BentoProductGrid.tsx`)**:
+  - Change Research card badge from 'AI Agent' to 'Deep AI Agent'.
+
+## [0.59.3] - 2026-08-27
+
+### Changed
+- **Remove dead Framer components, legacy CSS, unused data (`SAAS_REBRAND_PLAN.md, app/src/components/nav/ProductsDropdown.tsx, app/src/components/nav/ResourcesDropdown.tsx, app/src/components/platform-home/BenefitsSection.tsx, app/src/components/platform-home/BlogSection.tsx`)**:
+  - Delete 8 orphaned Framer-exported components (never imported).
+  - Delete old PlatformNavbar/PlatformFooter from platform-home/.
+  - Delete old ProductsDropdown/ResourcesDropdown from nav/.
+  - Delete legacy platform-home.css (Framer token system).
+  - Delete empty researchLandingDemo.ts.
+  - Remove unused exports from data.ts (navLinks, hero, clientLogos, accentGradient).
+
+## [0.59.2] - 2026-08-27
+
+### Fixed
+- **Add work.zyroo.org gateway, fix Landing SEO path (`app/src/App.tsx, app/src/pages/public/Landing.tsx`)**:
+  - Add work.zyroo.org subdomain gateway with full internship routes.
+  - Fix Landing.tsx SEO path from / to /internships.
+  - Update breadcrumb structured data to reflect new page hierarchy.
+
+## [0.59.1] - 2026-08-27
+
+### Added
+- **Unify navigation and footer across all pages (`app/src/components/nav/PlatformFooter.tsx, app/src/components/nav/PlatformNav.tsx, app/src/layouts/PublicLayout.tsx, app/src/pages/edu/SchoolOSLanding.tsx, app/src/pages/public/PlatformHome.tsx`)**:
+  - Create shared PlatformNav with mega-dropdown, 4 products, auth controls.
+  - Create shared PlatformFooter with 6-column layout, system status.
+  - Replace PlatformNavbar + PublicLayout inline nav with PlatformNav.
+  - Replace PlatformFooter (platform-home) + PublicLayout inline footer.
+  - All pages now share consistent dark-themed navigation shell.
+
+## [0.59.0] - 2026-08-27
+
+### Fixed
+- **Route / to PlatformHome, /internships to Landing, and /internships/browse to BrowseInternships (`app/src/App.tsx`)**:
+  - Route / to PlatformHome, /internships to Landing, and /internships/browse to BrowseInternships.
+
+## [0.58.5] - 2026-08-27
+
+### Fixed
+- **Correctly route /internships to Landing and /internships/browse to BrowseInternships with full link integration (`app/src/App.tsx, app/src/components/landing/AnimatedSearchMockup.tsx, app/src/components/landing/AudienceSplit.tsx, app/src/components/landing/JourneySection/journey-data.ts, app/src/components/landing/RoleChips.tsx`)**:
+  - Correctly route /internships to Landing and /internships/browse to BrowseInternships with full link integration.
+
+## [0.58.4] - 2026-08-27
+
+### Fixed
+- **Restore BrowseInternships at /internships and /internships/browse with URL query sync (`app/src/App.tsx, app/src/pages/public/BrowseInternships.tsx`)**:
+  - Restore BrowseInternships at /internships and /internships/browse with URL query sync.
+
+## [0.58.3] - 2026-08-27
+
+### Fixed
+- **Nest /internships route in PublicLayout to retain dedicated navbar (`app/src/App.tsx`)**:
+  - Nest /internships route in PublicLayout to retain dedicated navbar.
+
+## [0.58.2] - 2026-08-27
+
+### Added
+- **Integrate subdomain resolution and multi-product routes in App.tsx and SEO generator (`app/scripts/generate-seo.js, app/src/App.tsx`)**:
+  - Integrate subdomain resolution and multi-product routes in App.tsx and SEO generator.
+
+## [0.58.1] - 2026-08-27
+
+### Added
+- **Add school os product surface, perspective switcher, and roi calculator (`app/src/components/products/edu/SchoolPerspectiveSwitcher.tsx, app/src/pages/edu/SchoolOSLanding.tsx`)**:
+  - Add school os product surface, perspective switcher, and roi calculator.
+
+## [0.58.0] - 2026-08-27
+
+### Added
+- **Add zyr0 studio product surface, interactive ai prompt simulator, and lead service (`app/src/components/products/studio/StudioPromptSimulator.tsx, app/src/pages/studio/StudioLanding.tsx, app/src/services/leadService.ts`)**:
+  - Add zyr0 studio product surface, interactive ai prompt simulator, and lead service.
+
+## [0.57.5] - 2026-08-27
+
+### Added
+- **Add bento-grid product showcase, solutions, and streamlined sections (`app/src/components/platform-home/BentoProductGrid.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/FAQSection.tsx, app/src/components/platform-home/HeroSection.tsx, app/src/components/platform-home/PricingSection.tsx`)**:
+  - Add bento-grid product showcase, solutions, and streamlined sections.
+
+## [0.57.4] - 2026-08-27
+
+### Added
+- **Modernize platform navbar and footer with multi-product SaaS dropdown (`app/src/components/platform-home/PlatformFooter.tsx, app/src/components/platform-home/PlatformNavbar.tsx, app/src/components/platform-home/data.ts`)**:
+  - Modernize platform navbar and footer with multi-product SaaS dropdown.
+
+## [0.57.3] - 2026-08-27
+
+### Changed
+- **Add SaaS transition phases tracker (`phases.md`)**:
+  - Add SaaS transition phases tracker.
+
+## [0.55.5] - 2026-08-26
+
+### Changed
+- **Merge pull request #120 from ilyaskhan12Q/fix/agent-pipeline-optimizations**:
+  - Feat(agent): optimize research pipeline with Gemini models.
+
+## [0.57.2] - 2026-08-26
+
+### Fixed
+- **Strip all Framer Motion animation states that hide content (`app/src/components/platform-home/BenefitsSection.tsx, app/src/components/platform-home/BlogSection.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/FAQSection.tsx, app/src/components/platform-home/GlobalSection.tsx`)**:
+  - The Suprema template bakes Framer Motion initial states into inline styles:.
+  - Opacity: 0 / 0.001 on every section wrapper and hero heading letters.
+  - Filter: blur(10px) on individual heading characters.
+  - TranslateY(50px) on section containers Without Framer Motion running, all content stayed invisible (black screen).
+  - Fix: set all opacity to 1, remove blur filters, remove translate animation offsets, remove willChange hints. Also fixed BenefitsSection unquoted opacity:0. Stripped ~185 animation states across 13 component files.
+
+## [0.57.1] - 2026-08-26
+
+### Fixed
+- **Responsive variants, Suprema branding, footer links (`app/src/components/platform-home/BenefitsSection.tsx, app/src/components/platform-home/BlogSection.tsx, app/src/components/platform-home/FAQSection.tsx, app/src/components/platform-home/HeroSection.tsx, app/src/components/platform-home/PlatformFooter.tsx`)**:
+  - Add missing CSS rules for .hidden-19w5p2z, .hidden-72rtr7, .hidden-jueq9p responsive variants (was causing 2-3x content duplication).
+  - Replace all 'Suprema' references with 'ZYR0' across 6 component files.
+  - Fix footer: copyright year 2024→2026, remove 'Powered by Framer', update email to support@zyroo.org.
+  - Fix .html page links to React routes (/contact, /internships, etc.).
+  - Fix truncated '24/7 Suppor' → '24/7 Support' in PricingSection.
+
+## [0.57.0] - 2026-08-26
+
+### Fixed
+- **Fix React console warnings - srcSet, alt, webkit styles (`app/src/components/platform-home/BlogSection.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/GlobalSection.tsx, app/src/components/platform-home/HeroSection.tsx, app/src/components/platform-home/PlatformFooter.tsx`)**:
+  - Fix srcset → srcSet (React JSX camelCase) across all 11 components.
+  - Fix bare alt → alt="" (React treats bare alt as alt={true}) across 108 instances.
+  - Fix -webkit-filter → WebkitFilter, -webkit-mask-image → WebkitMaskImage, -moz-mask-image → MozMaskImage, -webkit-line-clamp → WebkitLineClamp, -webkit-box-orient → WebkitBoxOrient in style props.
+
+## [0.56.5] - 2026-08-26
+
+### Fixed
+- **Fix blank page - CSS background, pre-render, srcset paths (`app/public/images/0SUrTOV64gSW6ef6pQGsodg8h8.2fa88.png, app/public/images/0SUrTOV64gSW6ef6pQGsodg8h8.5f0a3.png, app/public/images/0SUrTOV64gSW6ef6pQGsodg8h8.991fa.png, app/public/images/0iYvC8WBrzeWXjCFjnd7QGcayw.2fa88.png, app/public/images/0iYvC8WBrzeWXjCFjnd7QGcayw.5f0a3.png`)**:
+  - Add black body background to platform-home.css (white text was invisible on white bg).
+  - Remove global body font-size:12px override from platform-home.css.
+  - Fix generate-seo.js to return minimal black placeholder for homepage (was injecting old header/footer).
+  - Fix srcset relative paths (images/ -> /images/) across all components.
+  - Add inline background/color to PlatformHome wrapper div as fallback.
+
+## [0.56.4] - 2026-08-26
+
+### Fixed
+- **Reduce PlatformHome chunk size below 600KB CI limit (`app/src/components/platform-home/BenefitsSection.tsx, app/src/pages/public/PlatformHome.tsx`)**:
+  - Rewrite BenefitsSection: strip 2736 decorative Light ON/OFF grid elements, keep video + heading + stats (1.2MB -> 2.8KB).
+  - Lazy-load PricingSection, BlogSection, TeamSection, GlobalSection, TestimonialsSection, FAQSection via React.lazy() + Suspense.
+  - PlatformHome main chunk: 776KB -> 233KB, all chunks under 600KB.
+
+## [0.56.3] - 2026-08-26
+
+### Added
+- **Literal Suprema template conversion to React (`app/public/suprema-fonts/1K3W8DizY3v4emK8Mb08YHxTbs.abed4.woff2, app/public/suprema-fonts/1ZFS7N918ojhhd0nQWdj3jz4w.abed4.woff2, app/public/suprema-fonts/2A4Xx7CngadFGlVV4xrO06OBHY.abed4.woff2, app/public/suprema-fonts/43sJ6MfOPh1LCJt46OvyDuSbA6o.abed4.woff2, app/public/suprema-fonts/4RAEQdEOrcnDkhHiiCbJOw92Lk.abed4.woff2`)**:
+  - Replace custom platform-home CSS with Suprema's full 260K CSS.
+  - Convert all 15 sections (navbar, hero, products, benefits, pricing, progress, tools, blog, team, global, testimonials, FAQ, CTA, footer) from Suprema's HTML to React JSX with exact same class names/styles.
+  - Copy 69 Suprema font files (Inter Tight, Instrument Sans, etc.).
+  - Root wrapper uses Framer's framer-cLVzK class hierarchy.
+  - Style attributes converted to React objects with camelCase properties.
+  - TypeScript: @ts-nocheck on literal HTML conversions (CSS custom properties and Framer-specific attributes incompatible with TS types).
+
+## [0.56.2] - 2026-08-26
+
+### Added
+- **Rebuild PlatformHome as Suprema-inspired React homepage (`app/src/App.tsx, app/src/components/platform-home/BenefitsSection.tsx, app/src/components/platform-home/BlogSection.tsx, app/src/components/platform-home/CTASection.tsx, app/src/components/platform-home/FAQSection.tsx`)**:
+  - 15 section components: Navbar, Hero, ProductOverview, Benefits, Progress, Tools, Pricing, Blog, Team, Global, Testimonials, FAQ, CTA, Footer.
+  - Dark-mode design with floating pill navbar, glass effect, animated hero.
+  - All content in data.ts for easy updates.
+  - Scoped CSS with decorative animations, dot patterns, gradient backgrounds.
+  - Homepage moved outside PublicLayout (own navbar/footer).
+  - Replaces old PlatformHome and platform-home.css.
+
+## [0.56.1] - 2026-08-26
+
+### Added
+- **Add platform homepage with product grid (`app/src/App.tsx, app/src/components/nav/ProductsDropdown.tsx, app/src/layouts/PublicLayout.tsx, app/src/pages/public/PlatformHome.tsx, app/src/styles/platform-home.css`)**:
+  - Add PlatformHome page with dark hero + light product Bento grid.
+  - Add ProductMockup components (internships, research, studio).
+  - Add dark trust section with verified/secure/student-first badges.
+  - Add light CTA section with register + browse actions.
+  - Route / now shows PlatformHome, /internships shows current Landing.
+  - Update ProductsDropdown to link to /internships/browse.
+  - Add platform-home.css with Stripe/hybrid design system.
+
+## [0.56.0] - 2026-08-26
+
+### Added
+- **Add multi-product dropdown navigation (`app/src/components/nav/ProductsDropdown.tsx, app/src/components/nav/ResourcesDropdown.tsx, app/src/layouts/PublicLayout.tsx`)**:
+  - Add ProductsDropdown with Internships, Research Agent, ZYRO Studio cards.
+  - Add ResourcesDropdown with Help, FAQ, Blog, Legal links.
+  - Restructure desktop nav: Products, Research, About, Resources.
+  - Update mobile nav links for multi-product layout.
+  - Products dropdown opens upward with animated card list.
+
+## [0.55.4] - 2026-08-24
+
+### Fixed
+- **Fix model switching, button positions, placeholder alignment, mobile layout (`app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Remove document-level mousedown outside-click handler that killed model dropdown selection (portal content was outside internalContainerRef).
+  - Reposition action button to absolute right-2 bottom-2 in AgentHero (was flex child sitting 48px from edge).
+  - Fix placeholder padding py-[19px] → py-4 to match textarea alignment.
+  - Hide effort text label on small screens (<640px) to prevent '+' button from being pushed off-screen on iPhone 14 and similar devices.
+
+## [0.55.3] - 2026-08-24
+
+### Added
+- **Replace input with polished PromptInput pattern (`app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx, app/src/agent/components/shared/DepthDropdown.tsx, app/src/agent/components/shared/ModelSelector.tsx`)**:
+  - Rewrite ThreadInput with spring-animated expand/collapse.
+  - Model selector opens upward (absolute bottom-full, no portal).
+  - Effort/depth cycling with animated bars icon.
+  - Voice recording with Web Audio visualizer.
+  - File attachment support with gallery modal.
+  - Morphing text animations for model/effort labels.
+  - Chat/Research mode toggle below input.
+  - Update AgentHero ChatInput to match same pattern.
+  - Delete DepthDropdown.tsx and ModelSelector.tsx (built-in now).
+  - All dropdowns open upward — no more off-screen issues on mobile.
+
+## [0.55.2] - 2026-08-24
+
+### Fixed
+- **Mobile responsiveness — touch targets, layout, dropdown positioning (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/components/ResearchReasoning.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - ThreadInput: add flex-wrap on controls row for narrow screens.
+  - All buttons: enforce 44px+ touch targets (py-2.5/py-3).
+  - DepthDropdown: fix z-index to z-[60]/z-[61] above sidebar.
+  - ModelSelector: clamp dropdown position to viewport bounds, truncate model name.
+  - ModelSelector: add resize listener to reposition on orientation change.
+  - AgentSidebar: default closed on mobile (viewport < 1024px), add max-w-[85vw].
+  - ResearchAgentPage: add padding to report action buttons, flex-wrap on sources.
+  - ResearchReasoning: increase accordion trigger padding to py-3.
+  - AgentHero: increase sidebar toggle and history button to size-10/py-3.
+  - Agent.css: remove unused .agent-history-overlay and .agent-history-panel.
+
+## [0.54.1] - 2026-08-23
+
+### Changed
+- **Merge pull request #118 from ilyaskhan12Q/feature/dayos-style-landing**:
+  - Feat(landing): Dayos-inspired editorial redesign.
+
+## [0.55.1] - 2026-08-23
+
+### Added
+- **Sidebar history, PDF export, shared components, bug fixes (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/api/gateway.ts, app/src/agent/components/AgentHero.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/components/Composer.tsx`)**:
+  - Replace hardcoded demo history with real Supabase data in AgentSidebar.
+  - Pass onSelectHistory callback to sidebar so clicking items loads sessions.
+  - Remove duplicate history overlay panel from ResearchAgentPage.
+  - Add Download PDF button to report section using existing reportPdf.ts.
+  - Extract shared DepthDropdown and ModelSelector components.
+  - Fix accordion text bug showing 'complete' during failed pipeline stages.
+  - Add loading spinner when restoring history sessions.
+  - Fix token refresh edge case for sessions without expires_at.
+  - Delete unused Composer.tsx and SourceModal.tsx files.
+
+## [0.55.0] - 2026-08-23
+
+### Fixed
+- **Model dropdown via Portal, clickable citations in reports (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Model dropdown uses React Portal to document.body — opens next to button, never clipped.
+  - Hero model dropdown opens below button, thread model opens above button.
+  - Replace dangerouslySetInnerHTML with renderReportMarkdown for XSS-safe rendering.
+  - Citations [n] are now clickable buttons that scroll to Sources section.
+  - Added Sources section with clickable links to each source URL.
+  - Verify badge (green/amber) for each citation based on verification status.
+
+## [0.54.5] - 2026-08-23
+
+### Fixed
+- **Model dropdown uses fixed positioning, chat history loading (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Model dropdown uses fixed positioning to avoid clipping inside rounded containers.
+  - Model dropdown opens as a card at bottom-right of viewport (always visible).
+  - Fix chat history loading: destructure loadSession from useAgentChat.
+  - Deploy edge function with Gemini models.
+
+## [0.54.4] - 2026-08-23
+
+### Fixed
+- **Depth dropdown opens upward to stay visible (`app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Depth dropdown opens upward to stay visible.
+
+## [0.54.3] - 2026-08-23
+
+### Added
+- **Depth dropdown, scrollable model selector, floating input (`app/src/agent/components/AgentHero.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Replace depth pills with dropdown menu (Chat/Research toggle + depth dropdown).
+  - Make model dropdown scrollable (max-h-320px, overflow-y-auto, sticky header).
+  - Floating rounded input in thread view (remove border-t, add shadow-lg, rounded-2xl).
+  - Same depth dropdown in hero input for consistency.
+
+## [0.54.2] - 2026-08-23
+
+### Added
+- **Add Gemini models, optimize planner pipeline (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/api/gateway.ts, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/research/planner.ts, app/src/agent/research/workers.ts`)**:
+  - Add 4 Gemini models (3.5-flash-lite, 2.5-flash, 3.5-flash, 3.1-flash-lite) to gateway REGISTRY with reasoning_effort:none for Gemini 2.5+.
+  - Add chatOnce() non-streaming function to gateway client for faster structured output.
+  - Optimize planner: simplified prompt (~600 chars vs ~1500), 8s timeout, Gemini default.
+  - Rewrite contractQueries for search-optimized queries (topic+focus, keywords joined).
+  - Improve fallback contract keywords (remove generic 'definition', 'principles').
+  - Auto-approve research plan by default (skipReview=true).
+  - Stream editorial output to UI for live report preview.
+  - Add intent detection: greetings route to chat in research mode.
+  - Set GEMINI_API_KEY in Supabase secrets.
+
+## [0.54.0] - 2026-08-23
+
+### Fixed
+- **Increase scrolled nav height 48px → 54px (`app/src/styles/research-landing.css`)**:
+  - Increase scrolled nav height 48px → 54px.
+
+## [0.53.5] - 2026-08-23
+
+### Fixed
+- **Morphing navbar — remove Reveal wrapper, fix sticky (`app/src/components/research-landing/ResearchNav.tsx, app/src/styles/research-landing.css`)**:
+  - Remove Reveal wrapper from ResearchNav (breaks position:sticky).
+  - Fix top: 0 (was 0.75rem).
+  - Explicit transition properties instead of 'transition: all'.
+  - Use margin-left/right: auto for centering (not margin shorthand).
+  - Shrinks from 64px → 48px, pill shape, centered floating pill on scroll.
+
+## [0.53.4] - 2026-08-23
+
+### Added
+- **Morphing navbar — shrinks to pill on scroll (`app/src/styles/research-landing.css`)**:
+  - Initial: full-width, 64px height, transparent bg, no rounded corners.
+  - Scrolled: 48px height, pill shape (border-radius: 9999px), centered (max-width: 720px).
+  - Floating shadow + backdrop blur on scroll.
+  - Smooth cubic-bezier transition (0.4s).
+
+## [0.53.3] - 2026-08-23
+
+### Fixed
+- **ReportSection heading overflow — use 2-col grid + smaller clamp (`app/src/components/research-landing/ReportSection.tsx`)**:
+  - Change grid from 5-col to 2-col for equal halves.
+  - Reduce heading size from rl-heading-text (4rem) to clamp(2rem, 3.5vw, 3rem).
+  - Add max-w-sm to description for proper wrapping.
+
+## [0.53.2] - 2026-08-23
+
+### Added
+- **Complete visual overhaul — tighter density, Dayos-level design (`app/src/components/research-landing/AudienceSection.tsx, app/src/components/research-landing/EditorialStatement.tsx, app/src/components/research-landing/EvidenceSection.tsx, app/src/components/research-landing/FeaturesSection.tsx, app/src/components/research-landing/FinalCta.tsx`)**:
+  - CSS: reduce section padding (3rem/5rem → 5rem max), add .rl-chip-dark, .rl-image-placeholder.
+  - Hero: tighter spacing, min-h-85vh, smaller gradient fade.
+  - EditorialStatement: tighter text, less padding.
+  - ResearchEngine: border-top grid with dividers instead of cards, less padding.
+  - LiveResearchSection: 2-column layout (copy + dark mockup with pipeline dots + source cards).
+  - SourceUniverse: tighter stats, smaller text.
+  - EvidenceSection: compact claim cards with inline source chips.
+  - ReportSection: dark bg, 2/5 column split (copy + report mockup), tighter findings.
+  - FeaturesSection: tighter cards, smaller text.
+  - AudienceSection: gradient header cards with pill tags, dense layout.
+  - ModelsSection: tighter cards, smaller text.
+  - PricingSection: tighter cards, bolder pricing, border-2 on highlighted.
+  - FinalCta: tighter 2-column, smaller text.
+  - ResearchFooter: tighter grid, smaller text and icons.
+
+## [0.53.1] - 2026-08-23
+
+### Added
+- **Self-contained Report, Audience, Pricing sections (`app/src/components/research-landing/AudienceSection.tsx, app/src/components/research-landing/PricingSection.tsx, app/src/components/research-landing/ReportSection.tsx, app/src/data/researchLandingDemo.ts`)**:
+  - ReportSection: inline findings + sources, remove demo data import.
+  - AudienceSection: inline audiences data, remove demo data import.
+  - PricingSection: inline pricing plans, remove demo data import.
+  - Clean up researchLandingDemo.ts (remove all unused exports).
+  - All sections now self-contained, no shared demo data dependencies.
+
+## [0.53.0] - 2026-08-23
+
+### Added
+- **Update composition, nav, delete unused sections (`app/src/components/research-landing/LibrarySection.tsx, app/src/components/research-landing/QuestionExploration.tsx, app/src/components/research-landing/ResearchNav.tsx, app/src/pages/research/ResearchLanding.tsx`)**:
+  - Remove LibrarySection and QuestionExploration (redundant).
+  - Update ResearchNav: add Sources link, keep 4 nav links.
+  - Update ResearchLanding.tsx: remove deleted section imports.
+  - Section order: Hero → ProblemArc → Revolution → Product → Logos → Evidence → Report → Pillars → Audience → Depth → Pricing → CTA → Footer.
+
+## [0.52.5] - 2026-08-23
+
+### Added
+- **Dayos-style multi-column footer (`app/src/components/research-landing/ResearchFooter.tsx`)**:
+  - ResearchFooter: dark bg, 4-column layout (brand, product, company, legal).
+  - Social icons (Twitter/X, LinkedIn, GitHub).
+  - Bottom bar with copyright + social links.
+  - Remove old light-bg footer with 2-column layout.
+
+## [0.52.4] - 2026-08-23
+
+### Added
+- **Two-column CTA section on dark bg (`app/src/components/research-landing/FinalCta.tsx`)**:
+  - FinalCta: dark bg, two-column layout (CTA + About card).
+  - Left: 'WHAT WILL YOU RESEARCH NEXT?' + CTA button.
+  - Right: About ZYROO card with description + link.
+  - Remove old concentric rings animation.
+
+## [0.52.3] - 2026-08-23
+
+### Added
+- **Horizontal scroll depth cards (`app/src/components/research-landing/ModelsSection.tsx`)**:
+  - ModelsSection: 'CHOOSE HOW DEEP TO GO.' headline.
+  - 3 depth cards (Quick/Standard/Deep) with source count + time.
+  - Horizontal scroll on mobile, grid on desktop.
+  - Remove old tier hover with scale + shadow.
+
+## [0.52.2] - 2026-08-23
+
+### Added
+- **3-pillar feature section (`app/src/components/research-landing/FeaturesSection.tsx`)**:
+  - FeaturesSection: Research / Verify / Report pillars.
+  - Reduce from 6 feature cards to 3 key pillars.
+  - Border-top cards with accent icons and 'Learn more' links.
+  - Staggered scroll reveal.
+
+## [0.52.1] - 2026-08-23
+
+### Added
+- **Claim trail feature detail section (`app/src/components/research-landing/EvidenceSection.tsx`)**:
+  - EvidenceSection: 'EVERY CLAIM HAS A TRAIL.' headline.
+  - Numbered citation cards with claim text + source chips.
+  - Staggered scroll reveal, card hover effects.
+  - Remove old interactive citation hover highlights.
+
+## [0.52.0] - 2026-08-23
+
+### Added
+- **Source logos bar + stats section on dark bg (`app/src/components/research-landing/SourceUniverse.tsx`)**:
+  - SourceUniverse: dark bg, 'ACADEMIC + WEB SOURCES.' headline.
+  - Horizontal marquee of source names (OpenAlex, arXiv, etc.).
+  - 3-column stats (247 sources, 18 verified, 4 dimensions).
+  - Remove old asymmetric reveal and animated counter.
+
+## [0.51.5] - 2026-08-23
+
+### Added
+- **Revolution statement + product showcase sections (`app/src/components/research-landing/LiveResearchSection.tsx, app/src/components/research-landing/ResearchEngine.tsx`)**:
+  - ResearchEngine: 'FROM QUESTION TO UNDERSTANDING.' headline + 3 feature cards.
+  - ResearchEngine: light bg, staggered reveal, accent icons, border-top cards.
+  - LiveResearchSection: 'THE RESEARCH AGENT.' product showcase.
+  - LiveResearchSection: headline + description + dark workspace mockup placeholder.
+  - LiveResearchSection: remove old animated pipeline dots and source cards.
+
+## [0.51.4] - 2026-08-23
+
+### Added
+- **Dark hero + problem arc sections (`app/src/components/research-landing/EditorialStatement.tsx, app/src/components/research-landing/HeroSection.tsx`)**:
+  - Hero: full-viewport dark bg, bold uppercase headline, subtext, CTA button.
+  - Hero: remove glassmorphism card, typing effect, parallax floating elements.
+  - Hero: bottom gradient fade for smooth transition to light section.
+  - EditorialStatement: 3-step problem arc (Question/Surface/Depth).
+  - EditorialStatement: dark bg, staggered scroll reveal, accent-colored labels.
+
+## [0.51.3] - 2026-08-23
+
+### Changed
+- **Update CSS for Dayos-inspired design system (`app/src/styles/research-landing.css`)**:
+  - Add dark section styles (--rl-dark, --rl-dark-muted).
+  - Add .rl-dark-section, .rl-btn-primary-dark classes.
+  - Add .rl-section-full for full-width dark sections.
+  - Add .rl-logo-marquee horizontal scroll animation.
+  - Add .rl-scroll-carousel snap-scroll for mobile.
+  - Add .rl-eyebrow-light for dark section eyebrows.
+  - Keep all existing utilities (glass, cards, underlines, reduced motion).
+
+## [0.51.2] - 2026-08-22
+
+### Changed
+- **Merge remote-tracking branch 'origin/main' into develop (`CHANGELOG.md`)**:
+  - # Conflicts: #	CHANGELOG.md #	app/package.json.
+
+## [0.51.1] - 2026-08-22
+
+### Added
+- **Redesign with rich animations, glassmorphism, and scroll effects (`app/src/components/research-landing/AudienceSection.tsx, app/src/components/research-landing/EditorialStatement.tsx, app/src/components/research-landing/EvidenceSection.tsx, app/src/components/research-landing/FeaturesSection.tsx, app/src/components/research-landing/FinalCta.tsx`)**:
+  - Reveal.tsx: add parallax, scale, fade-left/right variants + StaggerContainer/StaggerItem.
+  - HeroSection: full viewport, typing effect with cycling phrases, glassmorphism card, parallax floating elements, gradient text, scroll indicator.
+  - EditorialStatement: staggered dramatic text reveal.
+  - QuestionExploration: staggered typographic cascade.
+  - ResearchEngine: animated pipeline with pulsing dots + staggered research area cards.
+  - LiveResearchSection: animated progress stepper, staggered source card entrance.
+  - SourceUniverse: asymmetric reveal with animated counter on stats.
+  - EvidenceSection: interactive citation hover highlights, staggered claim trail.
+  - ReportSection: scale reveal with hover effects on findings.
+  - FeaturesSection: staggered card grid with color-shifting icon hover.
+  - AudienceSection: card hover with border reveal + color transition.
+  - LibrarySection: search bar focus animation with ring effect.
+  - ModelsSection: tier hover with scale + shadow effects.
+  - PricingSection: highlighted plan scale animation.
+  - FinalCta: dramatic scale reveal with animated concentric rings backdrop.
+  - CSS: glassmorphism utilities, card hover effects, underline animation, typing cursor, pulse ring, gradient text, bold typography.
+
+## [0.49.5] - 2026-08-21
+
+### Changed
+- **Merge feature/agent-bolt-redesign: Bolt-style workspace + premium editorial landing + subdomain routing**:
+  - Merge feature/agent-bolt-redesign: Bolt-style workspace + premium editorial landing + subdomain routing.
+
+## [0.51.0] - 2026-08-21
+
+### Added
+- **Add slide-in animation for history panel (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - Overlay fades in/out (200ms).
+  - Panel slides from left with spring animation (damping 25, stiffness 300).
+  - Smooth AnimatePresence exit on close.
+
+## [0.50.5] - 2026-08-21
+
+### Added
+- **Add AnimatePresence transition for hero→thread switch (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - Hero fades out (opacity 0, scale 0.98) in 200ms.
+  - Thread fades in (opacity 0→1) in 300ms with 100ms delay.
+  - Smooth transition when user sends first message.
+
+## [0.50.4] - 2026-08-21
+
+### Added
+- **Add persistent sidebar with demo history, new chat, settings (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentHero.tsx, app/src/agent/components/AgentSidebar.tsx`)**:
+  - Collapsible sidebar: 280px expanded, 48px icon-only on desktop.
+  - Mobile: drawer with overlay backdrop.
+  - Demo history items (placeholder entries for future backend).
+  - Search bar for filtering history.
+  - New Chat button with plus icon.
+  - Settings placeholder at bottom.
+  - Hamburger toggle in hero and active session header.
+  - Sidebar state managed in ResearchAgentPage.
+
+## [0.50.3] - 2026-08-21
+
+### Added
+- **Replace header text links with proper pill buttons (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - New button: plus icon + label, pill shape with border.
+  - History button: clock icon + label, pill shape with border.
+  - Status indicator: animated green dot when active, gray when idle.
+
+## [0.50.2] - 2026-08-21
+
+### Added
+- **Add ThreadInput with mode toggle, depth pills, model selector (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/ThreadInput.tsx`)**:
+  - Replaces the broken uncontrolled textarea in the active session with a proper ThreadInput component featuring:.
+  - Controlled state with auto-resize.
+  - Chat | Research segmented toggle.
+  - Quick / Standard / Deep depth pills (research mode only).
+  - Model selector pill.
+  - Send/Stop button.
+  - Enter to send, Shift+Enter for newline.
+
+## [0.50.1] - 2026-08-21
+
+### Fixed
+- **Add min-h-0 to thread area for proper overflow scrolling (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - Add min-h-0 to thread area for proper overflow scrolling.
+
+## [0.50.0] - 2026-08-21
+
+### Fixed
+- **Remove ignoreCommand to enable Vercel auto-deploy from develop (`app/vercel.json`)**:
+  - Remove ignoreCommand to enable Vercel auto-deploy from develop.
+
+## [0.49.4] - 2026-08-21
+
+### Added
+- **Bolt-style workspace + premium editorial landing (`CHANGELOG.md, app/package-lock.json, app/src/App.tsx, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentChat.tsx`)**:
+  - Agent workspace redesign:.
+  - Dark #0f0f0f background with blue ray gradient (replaces light academic theme).
+  - Centered hero input ('What will you research?') with model selector + depth pills.
+  - ResearchReasoning accordion replaces PipelineView for pipeline progress.
+  - History panel for session management (top-right button).
+  - Removed AgentSidebar, ComposerDock, LandingView, PipelineView, PlanReview, ReportView, AgentChat, ModelPill, AgentSettingsModal, useAgentLibrary.
+  - Research Agent landing page (/research):.
+  - Premium editorial: Instrument Serif + Inter, #F5F5F2 bg, #657C68 accent.
+  - 16 sections: hero, editorial statement, questions, pipeline, live research, sources, evidence, report, features, audience, library, models, pricing ( placeholders), CTA, footer.
+  - All CSS/SVG visuals, no stock images, no fabricated claims.
+  - Sticky nav with scroll-blur, Reveal motion (reduced-motion-aware).
+  - Hostname-aware routing:.
+  - Research.zyroo.org serves landing at / + workspace at /research-agent.
+  - Main site: /research serves the same page for reviewability.
+  - Subdomain non-agent paths redirect to zyroo.org.
+
+## [0.49.3] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: hero-only input + mode-aware landing**:
+  - Merge feature/agent-single-page: hero-only input + mode-aware landing.
+
+## [0.49.1] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: polish, changelog, empty-thread fix**:
+  - Merge feature/agent-single-page: polish, changelog, empty-thread fix.
+
+## [0.48.5] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: unified single-page thread**:
+  - Merge feature/agent-single-page: unified single-page thread.
+
+## [0.48.3] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: composer dock**:
+  - Merge feature/agent-single-page: composer dock.
+
+## [0.48.1] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: left AgentSidebar with library**:
+  - Merge feature/agent-single-page: left AgentSidebar with library.
+
+## [0.47.5] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: chat session persistence**:
+  - Merge feature/agent-single-page: chat session persistence.
+
+## [0.47.2] - 2026-08-19
+
+### Changed
+- **Merge feature/agent-single-page: conversation thread backdrop**:
+  - Merge feature/agent-single-page: conversation thread backdrop.
+
+## [0.47.0] - 2026-08-19
+
+### Changed
+- **Merge fix/research-pipeline: 24-candidate gather, verified-only citations, two-tier sources**:
+  - Merge fix/research-pipeline: 24-candidate gather, verified-only citations, two-tier sources.
+
+## [0.49.2] - 2026-08-19
+
+### Added
+- **Single input on new sessions — hero-only, mode-aware (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/ComposerDock.tsx, app/src/agent/components/LandingView.tsx`)**:
+  - ComposerDock hideInput: collapses to the top strip (toggle + model + mobile trigger) on an empty thread — no second input, no caption.
+  - Dock input appears in real time once a query is sent.
+  - LandingView mode-aware: chat mode drops depth pills and sends a chat message; research mode unchanged (depth pills + pipeline run).
+  - Hero polish: eyebrow capsule, larger tight wordmark, two-line editorial tagline, text-xl underline input, fade-up entrance.
+
+## [0.49.0] - 2026-08-19
+
+### Changed
+- **Single-page Research Agent workspace; fix empty-thread hero when prefilled (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx`)**:
+  - CHANGELOG [Unreleased] Changed: unified thread, sidebar library, composer dock, chat persistence, conversation backdrop.
+  - Empty-thread detection excludes prefill-only runs so the landing hero does not double-render under AgentChat's empty state.
+
+## [0.48.4] - 2026-08-19
+
+### Added
+- **Unified single-page thread with inline research runs (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/ComposerDock.tsx`)**:
+  - Header removed; one thread for chat + research.
+  - Empty thread = LandingView hero; otherwise bubbles + inline run card.
+  - Run shows topic bubble, PipelineView live progress (stepper + evidence), inline PlanReview, then full ReportView; follow-up chat continues below.
+  - Mode now only shapes the composer dock.
+  - Mobile sidebar trigger moved into the dock row.
+
+## [0.48.2] - 2026-08-19
+
+### Added
+- **Composer dock with mode toggle, model picker, depth pills (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/ComposerDock.tsx`)**:
+  - ComposerDock replaces Composer + header nav; always visible bottom dock.
+  - [Chat|Research] segmented toggle + ModelPill (always visible).
+  - Depth pills Quick/Standard/Deep in research mode, wired to pipeline.run.
+  - Research send runs the pipeline directly (clears prior report state).
+  - Header slimmed: hamburger (mobile), wordmark, settings, profile.
+
+## [0.48.0] - 2026-08-19
+
+### Added
+- **Left AgentSidebar with chat + research library (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/AgentSidebar.tsx, app/src/agent/components/HistoryPanel.tsx, app/src/agent/hooks/useAgentLibrary.ts`)**:
+  - Replaces right-side HistoryPanel; ZYROO wordmark, New session, pinned Settings + profile chip at the bottom.
+  - Chats (mode='chat') and Research (mode='research') sections from agent_researches via useAgentLibrary, refetched on session/report change.
+  - New session = fresh chat (resetSession + pipeline clear).
+  - Mobile slide-over drawer + header hamburger (lg:hidden).
+  - Delete HistoryPanel.
+
+## [0.47.4] - 2026-08-19
+
+### Added
+- **Persist chat sessions and messages (mode='chat') (`app/src/agent/hooks/useAgentChat.ts`)**:
+  - Lazy session create on first send (agent_researches, prompt = first message).
+  - User + assistant messages persisted to agent_messages with model + token usage.
+  - Latest completed chat session auto-restored on mount.
+  - LoadSession(id) + resetSession() for the upcoming sidebar library.
+
+## [0.47.3] - 2026-08-19
+
+### Added
+- **Persist chat sessions and messages (mode='chat') (`app/src/agent/hooks/useAgentChat.ts`)**:
+  - Lazy session create on first send (agent_researches, prompt = first message).
+  - User + assistant messages persisted to agent_messages with model + token usage.
+  - Latest completed chat session auto-restored on mount.
+  - LoadSession(id) + resetSession() for the upcoming sidebar library.
+
+## [0.47.1] - 2026-08-19
+
+### Added
+- **Conversation thread backdrop with landing pentagon motif (`app/src/agent/ResearchAgentPage.tsx, app/src/styles/agent.css`)**:
+  - .agent-thread layer: parabolic-pentagon.svg at 15% opacity, mix-blend-multiply over the light surface, soft top/bottom gradient.
+  - Applied to the chat thread and research content areas (sidebar stays solid).
+  - Typography unchanged — contrast verified at 15% blend.
+
+## [0.46.5] - 2026-08-19
+
+### Added
+- **24-candidate gather, verified-only citations, two-tier source sections (`CHANGELOG.md, app/src/agent/components/PipelineView.tsx, app/src/agent/components/ReportView.tsx, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/lib/reportPdf.ts`)**:
+  - Gather cap 16 -> 24 (fits gateway VERIFY_MAX_URLS=25; every candidate checked).
+  - Verifier assigns [1]..[N] keys to verified entries only (key 0 otherwise); editorial receives verified-only ledger so every [n] cites a live source.
+  - Sources tab: 'Verified sources' + 'Additional sources' sections; header and PDF metadata count verified vs additional separately (ledger.length miscounted).
+  - Pipeline/Evidence cards show 'pending verification' chips for unconfirmed items.
+
+## [0.46.4] - 2026-08-18
+
+### Changed
+- **Merge fix/research-pipeline: round-robin evidence selection**:
+  - Merge fix/research-pipeline: round-robin evidence selection.
+
+## [0.46.2] - 2026-08-18
+
+### Changed
+- **Merge fix/research-pipeline: server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry**:
+  - Merge fix/research-pipeline: server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry.
+
+## [0.46.0] - 2026-08-18
+
+### Changed
+- **Merge fix/research-pipeline: scroll fixes for generated text and history**:
+  - Merge fix/research-pipeline: scroll fixes for generated text and history.
+
+## [0.45.4] - 2026-08-18
+
+### Changed
+- **Merge fix/research-pipeline: restore research pipeline (search, persistence, editorial)**:
+  - Merge fix/research-pipeline: restore research pipeline (search, persistence, editorial).
+
+## [0.45.1] - 2026-08-18
+
+### Changed
+- **Merge feature/agent-ux-redesign: Academic Precision UI/UX redesign**:
+  - Merge feature/agent-ux-redesign: Academic Precision UI/UX redesign.
+
+## [0.44.4] - 2026-08-18
+
+### Changed
+- **Merge feature/jina-gateway: Jina web via gateway + empty-platform visibility**:
+  - Merge feature/jina-gateway: Jina web via gateway + empty-platform visibility.
+
+## [0.44.2] - 2026-08-18
+
+### Changed
+- **Merge fix/session-refresh: stale JWT refresh — gateway Unauthorized fix**:
+  - Merge fix/session-refresh: stale JWT refresh — gateway Unauthorized fix.
+
+## [0.44.0] - 2026-08-18
+
+### Changed
+- **Merge feature/gateway-search: Phase 3.5 — keyless-first gateway search (S2 + PubMed + CORE)**:
+  - Merge feature/gateway-search: Phase 3.5 — keyless-first gateway search (S2 + PubMed + CORE).
+
+## [0.46.3] - 2026-08-18
+
+### Fixed
+- **Round-robin evidence selection so one platform can't fill the cap (`CHANGELOG.md, app/src/agent/research/workers.ts`)**:
+  - OpenAlex (60 results) filled all 16 gathered slots before arXiv/PubMed/Web were considered, so real runs showed 'OpenAlex 16, everything else 0'. Selection now interleaves round-robin across platforms (verified live: 60/60/5/0/4 -> OpenAlex 4, arXiv 4, Semantic Scholar 4, Jina Web 4).
+
+## [0.46.1] - 2026-08-18
+
+### Fixed
+- **Server-side arXiv/OpenAlex search, parallel gateway platforms, planner retry (`CHANGELOG.md, app/src/agent/api/gateway.ts, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/research/planner.ts, app/src/agent/research/workers.ts`)**:
+  - ArXiv export.arxiv.org sends no Access-Control-Allow-Origin, so the browser-direct arXiv worker failed in every real run; openalex + arxiv are now gateway search platforms (server-side, no CORS).
+  - SearchPlatforms runs platforms in parallel (Promise.allSettled): ~37s sequential -> ~24s, under the browser's old 15s timeout that silently zeroed gateway/web contributions.
+  - Workers.ts: single gateway search covering all 6 platforms with a 90s timeout that emits a pipeline note on timeout instead of returning [].
+  - StreamChat returns ok:false when an SSE error event arrives.
+  - Planner.decompose retries once on invalid output before the rule fallback (free-tier providers occasionally emit 93-token garbage).
+
+## [0.45.5] - 2026-08-18
+
+### Fixed
+- **Restore scrolling for generated text and history (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/HistoryPanel.tsx, app/src/agent/components/ReportView.tsx`)**:
+  - Both ScrollArea flex items (flex-1) lacked min-h-0, so min-height:auto grew them to full content height and the viewport never overflowed. In chat mode the grown area was clipped by .agent-root's overflow-hidden, leaving long generated answers unscrollable. Verified in headless Chrome: viewport scrollHeight 9616 vs clientHeight 429 after fix. HistoryPanel gets an overflow-y-auto scroll container for long lists.
+
+## [0.45.3] - 2026-08-18
+
+### Fixed
+- **Persist runs under user_id (RLS), surface pipeline errors (`app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/ReportView.tsx, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/research/editorial.ts, app/src/agent/research/workers.ts`)**:
+  - Agent_researches/agent_messages inserts never set user_id, so every run hit 'new row violates row-level security policy' and history was silently empty. Client now writes user_id on both inserts and surfaces persistence failures. OpenAlex/arXiv worker failures emit pipeline notes instead of silent zeros; ReportView shows a collapsible notes/errors banner. Editorial prompt tightened so the report fits the 8192 free-model output cap without truncation.
+
+## [0.45.2] - 2026-08-18
+
+### Fixed
+- **Restore search on edge — UA header, 30s web timeout, S2 retry, status logging (`CHANGELOG.md, supabase/functions/ai-gateway/index.ts`)**:
+  - Semantic Scholar keyless tier 429s datacenter IPs (retry once after 1s backoff), PubMed rejected edge requests without a descriptive User-Agent, and Jina web search (~12s) blew the 10s search timeout, leaving all search platforms empty. extractLinks also now filters junk markdown-image titles and keeps s.jina.ai/... URLs out of results.
+  - Fixes the '0 verified sources / 0 evidence items' report.
+
+## [0.45.0] - 2026-08-18
+
+### Changed
+- **Report workspace tabs + source verification panel + editorial structure (`CHANGELOG.md, app/src/agent/components/ReportView.tsx, app/src/agent/components/SourceModal.tsx, app/src/agent/render/renderReportMarkdown.tsx, app/src/agent/research/editorial.ts`)**:
+  - ReportView: Overview | Findings | Evidence | Sources workspace (desktop top bar, mobile bottom nav); exec summary rule, numbered key findings/dimensions, evidence excerpt grid, ledger source cards.
+  - SourceModal: slide-up sheet (mobile) / right panel (desktop) — Verified / DOI verified / Evidence verified checklist, evidence blockquote, bordered Open original source action; citations [n] open the panel instead of scrolling.
+  - Editorial: report prompt now emits ## Executive Summary / ## Key Findings / ## Conclusion around the four dimension sections (## Sources unchanged); PDF export unaffected (generic heading renderer).
+  - RenderReportMarkdown: citation anchors restyled to primary/amber on light.
+
+## [0.44.5] - 2026-08-18
+
+### Changed
+- **Academic Precision design system — light theme, landing, research progress timeline (`app/index.html, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/HistoryPanel.tsx, app/src/agent/components/LandingView.tsx, app/src/agent/components/PipelineView.tsx`)**:
+  - Agent.css: scoped light 'Academic Precision' palette (surface #f9f9f9, on-surface #1a1c1c, primary #3525cd, 4px radii, flat) + Source Serif 4 / Geist fonts.
+  - LandingView: centered ZYROO home — underline input, Quick/Standard/Deep mode selectors (persisted to depth column), Suggested Research cards.
+  - PipelineView: five-step tracker (Understanding → Building → Searching → Verifying → Writing) with live evidence cards + per-platform counts.
+  - ResearchAgentPage: top nav bar (wordmark, Chat/Research nav, New Research, settings, avatar); PlanReview + HistoryPanel restyled to match.
+
+## [0.44.3] - 2026-08-18
+
+### Changed
+- **Jina web via gateway (JINA_API_KEY secret) + empty-platform visibility (`CHANGELOG.md, app/src/agent/api/gateway.ts, app/src/agent/components/PipelineView.tsx, app/src/agent/research/workers.ts, supabase/functions/ai-gateway/index.ts`)**:
+  - Jina web via gateway (JINA_API_KEY secret) + empty-platform visibility.
+
+## [0.44.1] - 2026-08-18
+
+### Fixed
+- **Refresh stale session before gateway calls — no more silent Unauthorized after idle (`CHANGELOG.md, app/src/agent/api/gateway.ts`)**:
+  - Refresh stale session before gateway calls — no more silent Unauthorized after idle.
+
+## [0.43.5] - 2026-08-18
+
+### Changed
+- **Gateway search worker — S2 server-side + PubMed + CORE (keyless-first), 6-platform UI (`CHANGELOG.md, app/src/agent/api/gateway.ts, app/src/agent/components/PipelineView.tsx, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/research/workers.ts`)**:
+  - Gateway search worker — S2 server-side + PubMed + CORE (keyless-first), 6-platform UI.
+
+## [0.43.4] - 2026-08-18
+
+### Changed
+- **/v1/search action — keyless-first S2 + PubMed, CORE env-gated (`CHANGELOG.md, supabase/functions/ai-gateway/index.ts`)**:
+  - /v1/search action — keyless-first S2 + PubMed, CORE env-gated.
+
+## [0.43.3] - 2026-08-17
+
+### Changed
+- **Merge feature/research-phase3: Phase 3 — 4 parallel realtime workers (8-12s gathering), volume 8-16, PDF export**:
+  - Merge feature/research-phase3: Phase 3 — 4 parallel realtime workers (8-12s gathering), volume 8-16, PDF export.
+
+## [0.42.5] - 2026-08-17
+
+### Changed
+- **Merge feature/research-ux: Phase 3 pre-work — research UX bundle (report rendering, source modal, plan review gate, pipeline polish, continue-from-report, research-mode cleanup)**:
+  - Merge feature/research-ux: Phase 3 pre-work — research UX bundle (report rendering, source modal, plan review gate, pipeline polish, continue-from-report, research-mode cleanup).
+
+## [0.41.4] - 2026-08-17
+
+### Changed
+- **Merge feature/research-agent-pipeline: Phase 2 — deep research pipeline (planner, workers, verifier, editorial, workspace UI, migration 044)**:
+  - Merge feature/research-agent-pipeline: Phase 2 — deep research pipeline (planner, workers, verifier, editorial, workspace UI, migration 044).
+
+## [0.43.2] - 2026-08-17
+
+### Added
+- **PDF export — multi-page A4 report + citation ledger appendix via jsPDF (direct download) (`CHANGELOG.md, app/src/agent/components/ReportView.tsx, app/src/agent/lib/reportPdf.ts`)**:
+  - PDF export — multi-page A4 report + citation ledger appendix via jsPDF (direct download).
+
+## [0.43.1] - 2026-08-17
+
+### Added
+- **Gathering volume 8-16 — per-platform caps, hard aggregate cap, staggered S2 waves, web cap 4 (`CHANGELOG.md, app/src/agent/research/workers.ts`)**:
+  - Gathering volume 8-16 — per-platform caps, hard aggregate cap, staggered S2 waves, web cap 4.
+
+## [0.43.0] - 2026-08-17
+
+### Added
+- **Four parallel realtime workers — per-platform units with intra-platform query parallelism (gathering ~8-12s) (`CHANGELOG.md, app/src/agent/components/PipelineView.tsx, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/research/workers.ts`)**:
+  - Four parallel realtime workers — per-platform units with intra-platform query parallelism (gathering ~8-12s).
+
+## [0.42.4] - 2026-08-17
+
+### Added
+- **Hide model picker in research mode — models belong in Settings, not the research surface (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx`)**:
+  - Hide model picker in research mode — models belong in Settings, not the research surface.
+
+## [0.42.3] - 2026-08-17
+
+### Added
+- **Continue from report — follow-up chat with report context, prefill new research, regenerate (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/PipelineView.tsx, app/src/agent/components/ReportView.tsx`)**:
+  - Continue from report — follow-up chat with report context, prefill new research, regenerate.
+
+## [0.42.2] - 2026-08-17
+
+### Added
+- **Pipeline view polish — planning skeleton, per-source status rows, verified chips, condensed notes (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/PipelineView.tsx, app/src/agent/hooks/useResearchPipeline.ts`)**:
+  - Pipeline view polish — planning skeleton, per-source status rows, verified chips, condensed notes.
+
+## [0.42.1] - 2026-08-17
+
+### Added
+- **Plan review gate — approve/edit/regenerate the research agenda before workers start (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/PlanReview.tsx, app/src/agent/hooks/useResearchPipeline.ts, app/src/agent/research/types.ts`)**:
+  - Plan review gate — approve/edit/regenerate the research agenda before workers start.
+
+## [0.42.0] - 2026-08-17
+
+### Added
+- **Source modal — full evidence record behind every ledger card (`CHANGELOG.md, app/src/agent/components/ReportView.tsx, app/src/agent/components/SourceModal.tsx`)**:
+  - Source modal — full evidence record behind every ledger card.
+
+## [0.41.5] - 2026-08-17
+
+### Added
+- **Report rendering — safe markdown renderer with clickable citation anchors and verified-first ledger (`CHANGELOG.md, app/src/agent/components/ReportView.tsx, app/src/agent/render/renderReportMarkdown.tsx`)**:
+  - Report rendering — safe markdown renderer with clickable citation anchors and verified-first ledger.
+
+## [0.41.3] - 2026-08-17
+
+### Fixed
+- **Exhaust lint warning for loadHistory effect in research page (`app/src/agent/ResearchAgentPage.tsx`)**:
+  - Exhaust lint warning for loadHistory effect in research page.
+
+## [0.41.2] - 2026-08-17
+
+### Added
+- **Research workspace UI — pipeline progress, report + citation ledger, history panel (`CHANGELOG.md, app/src/agent/ResearchAgentPage.tsx, app/src/agent/components/HistoryPanel.tsx, app/src/agent/components/PipelineView.tsx, app/src/agent/components/ReportView.tsx`)**:
+  - Research workspace UI — pipeline progress, report + citation ledger, history panel.
+
+## [0.41.1] - 2026-08-17
+
+### Added
+- **Research pipeline hook — stage state machine with run persistence (agent_researches report_data) (`CHANGELOG.md, app/src/agent/hooks/useResearchPipeline.ts, supabase/migrations/044_research_report_data.sql`)**:
+  - Research pipeline hook — stage state machine with run persistence (agent_researches report_data).
+
+## [0.41.0] - 2026-08-17
+
+### Added
+- **Research editorial — ledger-grounded report synthesis with citation keys (`CHANGELOG.md, app/src/agent/research/editorial.ts`)**:
+  - Research editorial — ledger-grounded report synthesis with citation keys.
+
+## [0.40.5] - 2026-08-17
+
+### Added
+- **Research verifier — dedupe, server-side link liveness, deterministic citation ledger (`CHANGELOG.md, app/src/agent/api/gateway.ts, app/src/agent/research/verifier.ts`)**:
+  - Research verifier — dedupe, server-side link liveness, deterministic citation ledger.
+
+## [0.40.4] - 2026-08-17
+
+### Added
+- **Research workers — academic (OpenAlex/arXiv/Semantic Scholar) + web (Jina) with bounded concurrency (`CHANGELOG.md, app/src/agent/research/workers.ts`)**:
+  - Research workers — academic (OpenAlex/arXiv/Semantic Scholar) + web (Jina) with bounded concurrency.
+
+## [0.40.3] - 2026-08-17
+
+### Added
+- **Research engine contracts + planner (gateway decomposition with schema validation and fallback) (`CHANGELOG.md, app/src/agent/research/planner.ts, app/src/agent/research/types.ts`)**:
+  - Research engine contracts + planner (gateway decomposition with schema validation and fallback).
+
+## [0.40.2] - 2026-08-17
+
+### Added
+- **Gateway /v1/verify action — server-side URL/DOI liveness for research verifier (`CHANGELOG.md, supabase/functions/ai-gateway/index.ts`)**:
+  - Gateway /v1/verify action — server-side URL/DOI liveness for research verifier.
+
+## [0.40.1] - 2026-08-17
+
+### Changed
+- **Bump to 0.38.3 — research agent phase 1 + repo hygiene changelog (`CHANGELOG.md, app/package.json`)**:
+  - Bump to 0.38.3 — research agent phase 1 + repo hygiene changelog.
+
+## [0.40.0] - 2026-08-17
+
+### Changed
+- **Untrack private docs, agent memory, and generated SEO outputs; ignore local agent tooling (`.github/SECRETS_SETUP.md, .gitignore, CLAUDE.md, app/public/llms.txt, app/public/robots.txt`)**:
+  - Untrack private docs, agent memory, and generated SEO outputs; ignore local agent tooling.
+
+## [0.39.5] - 2026-08-17
+
+### Fixed
+- **Resolve Deno lint errors in ai-gateway (parens around ?? chain, drop unused catch binding) (`supabase/functions/ai-gateway/index.ts`)**:
+  - Resolve Deno lint errors in ai-gateway (parens around ?? chain, drop unused catch binding).
+
+## [0.39.4] - 2026-08-17
+
+### Added
+- **Phase 1 research agent — ai-gateway edge function with free-tier Zen fallback chain, per-user metering, and isolated /research-agent workspace (`app/src/App.tsx, app/src/agent/ResearchAgentPage.tsx, app/src/agent/api/gateway.ts, app/src/agent/components/AgentChat.tsx, app/src/agent/components/AgentSettingsModal.tsx`)**:
+  - Supabase/functions/ai-gateway: JWT-gated POST /v1/chat (stream + non-stream) and GET /v1/models catalog; registry with zen/deepseek-v4-flash-free, zen/mimo-v2.5-free, zen/hy3-free (Bearer public) plus dormant BYOK entries; in-memory cooldowns on 429/FreeUsageLimit/5xx; upstream SSE passthrough with usage+done tail events; DB-backed 20 req/min per-user rate limit; usage ledger writes to agent_usage.
+  - Supabase/migrations/043_agent_tables.sql: agent_researches, agent_messages, agent_usage with owner-only RLS (auth.uid()) and hot-path indexes.
+  - App/src/agent/*: isolated module (types, gateway SSE client, useAgentModels, useAgentChat, AgentChat/Composer/ModelPill/AgentSettingsModal, ResearchAgentPage) with scoped dark theme under .agent-root; zero edits to legacy zeroai module.
+  - Route /research-agent behind ProtectedRoute (login required for per-user metering); legacy /0-ai left reachable at its URL (it has no nav entry).
+
+## [0.39.3] - 2026-08-16
+
+### Added
+- **Route submissions through chat-first mode with research handoff (`app/src/pages/zeroai/ZeroAIWorkspace.tsx`)**:
+  - Route submissions through chat-first mode with research handoff.
+
+## [0.39.2] - 2026-08-16
+
+### Added
+- **Chat stage, AUTO/CHAT/RESEARCH mode selector and ambiguity popup (`app/src/components/zeroai/ChatStage.tsx, app/src/components/zeroai/HeroInput.tsx, app/src/components/zeroai/ModeSegment.tsx, app/src/components/zeroai/ResearchPromptDialog.tsx, app/src/styles/zeroai.css`)**:
+  - Chat stage, AUTO/CHAT/RESEARCH mode selector and ambiguity popup.
+
+## [0.39.1] - 2026-08-16
+
+### Added
+- **Intent router (probe + local rules) and quick-chat engine (`app/src/lib/zeroai/chat.ts, app/src/lib/zeroai/intent.ts`)**:
+  - Intent router (probe + local rules) and quick-chat engine.
+
+## [0.39.0] - 2026-08-16
+
+### Fixed
+- **Lower submit gate to 2 chars and hint why when too short (`app/src/components/zeroai/HeroInput.tsx`)**:
+  - Lower submit gate to 2 chars and hint why when too short.
+
+## [0.38.5] - 2026-08-16
+
+### Changed
+- **Ignore private 0-AI architecture doc (`.gitignore`)**:
+  - Ignore private 0-AI architecture doc.
+
+## [0.38.4] - 2026-08-16
+
+### Added
+- **Real planner agent with BYOK decomposition engine (`app/src/App.tsx, app/src/components/zeroai/DecompositionView.tsx, app/src/data/zeroAiTypes.ts, app/src/lib/zeroai/llm.ts, app/src/lib/zeroai/planner.ts`)**:
+  - Workspace shell (/0-ai) orchestrates idle -> planning -> processing -> completed. Planner decomposes the topic into the four research dimensions (contracts, keywords, search boundaries) via the configured BYOK LLM (gemini/openai/anthropic) with schema validation and a deterministic fallback template. Pure-browser runtime, 15s call timeout.
+
+## [0.38.3] - 2026-08-16
+
+### Added
+- **Add mock deep-research workspace components (`app/src/components/zeroai/ByokSettingsModal.tsx, app/src/components/zeroai/CitationPill.tsx, app/src/components/zeroai/ExportToolbar.tsx, app/src/components/zeroai/HeroInput.tsx, app/src/components/zeroai/JsonInspectDialog.tsx`)**:
+  - Phase 1 client-side mock UI: scoped dark theme, chat-style composer, telemetry simulation, citation-graded report canvas, exports, BYOK keys and history persisted in localStorage only. No backend, no new packages.
 
 ## [0.38.2] - 2026-08-13
 

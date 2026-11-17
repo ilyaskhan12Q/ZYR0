@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Wrench, Plus, ExternalLink, Clock, CheckCircle2, XCircle,
-  AlertCircle, Compass
+  AlertCircle, Compass, Pencil
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +17,7 @@ export default function StudentTools() {
   const [submissions, setSubmissions] = useState<DbTool[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [editingSubmission, setEditingSubmission] = useState<DbTool | null>(null);
 
   const loadSubmissions = async () => {
     if (!user) return;
@@ -153,19 +154,32 @@ export default function StudentTools() {
                 )}
               </div>
 
-              <div className="pt-3 border-t border-border/40 flex items-center justify-between text-xs">
+              <div className="pt-3 border-t border-border/40 flex items-center justify-between gap-3 text-xs">
                 <span className="text-muted-foreground text-[11px] font-mono">
                   Submitted {new Date(item.created_at).toLocaleDateString()}
                 </span>
-                <a
-                  href={item.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-medium text-foreground hover:text-accent transition-colors"
-                >
-                  <span>View Source</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+                <div className="flex items-center gap-2">
+                  {item.status === 'pending' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingSubmission(item)}
+                      className="h-7 gap-1 text-[11px]"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Edit
+                    </Button>
+                  )}
+                  <a
+                    href={item.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-medium text-foreground hover:text-accent transition-colors"
+                  >
+                    <span>View Source</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
           ))}
@@ -176,6 +190,16 @@ export default function StudentTools() {
       <SubmitToolDialog
         open={submitDialogOpen}
         onOpenChange={setSubmitDialogOpen}
+        onSuccess={loadSubmissions}
+      />
+
+      {/* Edit Pending Submission */}
+      <SubmitToolDialog
+        open={Boolean(editingSubmission)}
+        onOpenChange={(open) => {
+          if (!open) setEditingSubmission(null);
+        }}
+        tool={editingSubmission}
         onSuccess={loadSubmissions}
       />
     </div>

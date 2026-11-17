@@ -122,17 +122,11 @@ export async function getToolBySlug(slug: string): Promise<ToolItem | null> {
   }
 }
 
-/**
- * Submit a tool or skill by an authenticated student or company user.
- */
-export async function submitTool(input: SubmitToolInput, ownerId: string): Promise<DbTool> {
-  const requestedSlug = slugify(input.slug?.trim() || '');
-  const generatedSlug = slugify(input.name) || 'listing';
-  // Callers that provide a slug get a clean URL; older callers keep the collision-resistant suffix.
-  const slug = requestedSlug || `${generatedSlug}-${Math.random().toString(36).substring(2, 6)}`;
+/** Shared field mapping so inserts and edits cannot drift apart. */
+function buildToolPayload(input: SubmitToolInput, forInsert: boolean): Partial<DbTool> {
+  const hasCommands = Boolean(input.install_commands && input.install_commands.length > 0);
 
-  const payload: Partial<DbTool> = {
-    slug,
+  return {
     name: input.name.trim(),
     tagline: input.tagline.trim(),
     description: input.description.trim(),
@@ -143,24 +137,36 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
     source_url: input.source_url.trim(),
     documentation_url: input.documentation_url?.trim() || null,
     image_url: input.image_url?.trim() || null,
-    ...(input.cover_color ? { cover_color: input.cover_color.trim() } : {}),
     seo_title: input.seo_title?.trim() || null,
     seo_description: input.seo_description?.trim() || null,
     capabilities: input.capabilities,
-    install_command: (input.install_commands && input.install_commands.length > 0)
-      ? input.install_commands[0].command
-      : input.install_command?.trim() || null,
-    ...(input.install_commands && input.install_commands.length > 0
-      ? { install_commands: input.install_commands }
-      : {}),
+    install_command: hasCommands ? input.install_commands![0].command : input.install_command?.trim() || null,
+    install_commands: hasCommands ? input.install_commands : null,
     install_instructions: input.install_instructions?.trim() || null,
     version: input.version?.trim() || null,
     author_name: input.author_name.trim(),
     author_url: input.author_url?.trim() || null,
-    status: input.status || 'pending',
+    ...(forInsert ? { status: input.status || 'pending', featured: input.featured ?? false } : {}),
+    ...(!forInsert && input.status !== undefined ? { status: input.status } : {}),
+    ...(!forInsert && input.featured !== undefined ? { featured: input.featured } : {}),
+    ...(forInsert || input.badge !== undefined ? { badge: input.badge?.trim() || null } : {}),
+    ...(input.cover_color !== undefined ? { cover_color: input.cover_color.trim() || null } : {}),
+  };
+}
+
+/**
+ * Submit a tool or skill by an authenticated student or company user.
+ */
+export async function submitTool(input: SubmitToolInput, ownerId: string): Promise<DbTool> {
+  const requestedSlug = slugify(input.slug?.trim() || '');
+  const generatedSlug = slugify(input.name) || 'listing';
+  // Callers that provide a slug get a clean URL; older callers keep the collision-resistant suffix.
+  const slug = requestedSlug || `${generatedSlug}-${Math.random().toString(36).substring(2, 6)}`;
+
+  const payload: Partial<DbTool> = {
+    ...buildToolPayload(input, true),
+    slug,
     owner_id: ownerId,
-    featured: input.featured ?? false,
-    badge: input.badge?.trim() || null,
   };
 
   const { data, error } = await supabase
@@ -174,6 +180,38 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
       throw new Error('That URL slug is already in use. Choose a different one under SEO settings.');
     }
     throw new Error(error.message || 'Failed to submit tool for review');
+  }
+
+  return data as DbTool;
+}
+
+/**
+ * Update an existing listing. RLS decides who may edit:
+ * owners can update pending submissions, admins can update any listing.
+ */
+export async function updateTool(toolId: string, input: SubmitToolInput): Promise<DbTool> {
+  const slug = slugify(input.slug?.trim() || input.name) || 'listing';
+
+  const { data, error } = await supabase
+    .from('tools')
+    .update({
+      ...buildToolPayload(input, false),
+      slug,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', toolId)
+    .select('*')
+    .single();
+
+  if (error) {
+    const code = (error as { code?: string }).code;
+    if (code === '23505' && /slug/i.test(error.message)) {
+      throw new Error('That URL slug is already in use. Choose a different one under SEO settings.');
+    }
+    if (code === 'PGRST116') {
+      throw new Error('This listing is no longer editable. Refresh the page and try again.');
+    }
+    throw new Error(error.message || 'Failed to update listing');
   }
 
   return data as DbTool;

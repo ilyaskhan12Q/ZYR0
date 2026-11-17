@@ -66,7 +66,7 @@ function seoTypePhrase(itemType: ToolItemType): string {
 export function buildSeoTitle(name: string, category: string, itemType: ToolItemType): string {
   const cleanName = name.trim() || 'Untitled listing';
   const audience = category === 'Developer Tools' ? '' : ` for ${category}`;
-  return `${cleanName} — ${seoTypePhrase(itemType)}${audience} | ZYR0`;
+  return `${cleanName} | ${seoTypePhrase(itemType)}${audience} | ZYR0`;
 }
 
 /** Meta description from the submitted tagline plus listing facts. No invented claims. */
