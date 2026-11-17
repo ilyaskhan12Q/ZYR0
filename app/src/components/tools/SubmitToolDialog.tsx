@@ -624,9 +624,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setCommands(
       tool.install_commands && tool.install_commands.length > 0
         ? tool.install_commands
-        : tool.install_command
-          ? [{ label: tool.item_type === 'skill' ? 'Invocation' : 'CLI', command: tool.install_command }]
-          : [{ label: 'CLI', command: '' }]
+        : [{ label: defaultCommandLabel(tool.item_type, 0), command: tool.install_command || '' }]
     );
     setInstallInstructions(tool.install_instructions || '');
     setTagsInput((tool.tags || []).join(', '));
