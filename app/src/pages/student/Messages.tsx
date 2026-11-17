@@ -65,9 +65,9 @@ export default function StudentMessages() {
   };
 
   // Load conversations list
-  async function loadConversations() {
+  async function loadConversations(useCache = true) {
     try {
-      const res = await withTimeout(getMyConversations(), 10000, { data: [] }, 'StudentMessages');
+      const res = await withTimeout(getMyConversations(useCache), 10000, { data: [] }, 'StudentMessages');
       if (res.data) {
         setConversations(res.data);
         if (!selectedConv && res.data.length > 0) {
@@ -76,7 +76,7 @@ export default function StudentMessages() {
       }
 
       // Which conversations hold the unread messages (list badges).
-      const counts = await getConversationUnreadCounts();
+      const counts = await getConversationUnreadCounts(useCache);
       if (!cancelledRef.current) {
         const map: Record<string, number> = {};
         for (const row of counts.data ?? []) map[row.id] = row.unread_count ?? 0;
@@ -185,6 +185,38 @@ export default function StudentMessages() {
       supabase.removeChannel(channel);
     };
   }, [selectedConv, profile]);
+
+  // Live conversation list: a message INSERT in any of our conversations
+  // (ours or theirs — even a brand-new conversation someone just started)
+  // reorders the list, refreshes the preview line and the unread badges.
+  // Debounced so a burst of messages costs one refetch, not one per message.
+  const listRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reloadListRef = useRef(loadConversations);
+  useEffect(() => {
+    reloadListRef.current = loadConversations;
+  });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('messages-list')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        () => {
+          if (listRefreshTimer.current) clearTimeout(listRefreshTimer.current);
+          listRefreshTimer.current = setTimeout(() => {
+            // Bypass the cache: a cached list would hide the new message.
+            reloadListRef.current?.(false);
+          }, 1000);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (listRefreshTimer.current) clearTimeout(listRefreshTimer.current);
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Sign attachment paths once per message so bubbles can display/download.
   useEffect(() => {
