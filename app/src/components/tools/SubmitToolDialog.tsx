@@ -451,6 +451,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   const [imageUrl, setImageUrl] = useState('');
   const [commands, setCommands] = useState<ToolInstallCommand[]>([{ label: 'Installation command', command: '' }]);
   const [installInstructions, setInstallInstructions] = useState('');
+  const [magicPrompt, setMagicPrompt] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [capabilitiesInput, setCapabilitiesInput] = useState('');
   const [version, setVersion] = useState('');
@@ -495,6 +496,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
       imageUrl,
       commands,
       installInstructions,
+      magicPrompt,
       tagsInput,
       capabilitiesInput,
       version,
@@ -510,7 +512,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     }),
     [
       itemType, name, tagline, description, category, source, sourceUrl, docUrl, imageUrl,
-      commands, installInstructions, tagsInput, capabilitiesInput, version, authorName,
+      commands, installInstructions, magicPrompt, tagsInput, capabilitiesInput, version, authorName,
       authorUrl, slug, seoTitle, seoDescription, adminStatus, adminFeatured, adminBadge, adminCoverColor,
     ]
   );
@@ -627,6 +629,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
         : [{ label: defaultCommandLabel(tool.item_type, 0), command: tool.install_command || '' }]
     );
     setInstallInstructions(tool.install_instructions || '');
+    setMagicPrompt(tool.magic_prompt || '');
     setTagsInput((tool.tags || []).join(', '));
     setCapabilitiesInput((tool.capabilities || []).join('\n'));
     setVersion(tool.version || '');
@@ -671,6 +674,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setImageState(saved.imageUrl.trim() ? 'loading' : 'idle');
     setCommands(saved.commands.length > 0 ? saved.commands : [{ label: defaultCommandLabel(saved.itemType, 0), command: '' }]);
     setInstallInstructions(saved.installInstructions);
+    setMagicPrompt(saved.magicPrompt || '');
     setTagsInput(saved.tagsInput);
     setCapabilitiesInput(saved.capabilitiesInput);
     setVersion(saved.version);
@@ -873,6 +877,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
         install_command: validCommands[0]?.command || undefined,
         install_commands: validCommands.length > 0 ? validCommands : undefined,
         install_instructions: installInstructions.trim() || undefined,
+        magic_prompt: magicPrompt.trim() || undefined,
         version: version.trim() || undefined,
         author_name: authorName.trim() || profile?.full_name || 'Community Builder',
         author_url: authorUrl.trim() ? normalizeUrl(authorUrl) : undefined,
@@ -1443,6 +1448,23 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                           value={installInstructions}
                           onChange={(event) => setInstallInstructions(event.target.value)}
                           className={`${inputCls} resize-y`}
+                        />
+                      </div>
+
+                      <div className="space-y-1.5 pt-2">
+                        <FieldLabel htmlFor="st-magic-prompt" hint="Optional AI Prompt">
+                          Magic Agent Prompt
+                        </FieldLabel>
+                        <p className="text-[11px] text-muted-foreground">
+                          Custom instruction for AI agents (Claude, Gemini, Cursor, etc.). Leave blank to automatically generate one from your listing details.
+                        </p>
+                        <textarea
+                          id="st-magic-prompt"
+                          rows={3}
+                          placeholder="e.g. You are an expert AI assistant. Integrate and invoke this skill by..."
+                          value={magicPrompt}
+                          onChange={(event) => setMagicPrompt(event.target.value)}
+                          className={`${inputCls} resize-y font-mono text-xs`}
                         />
                       </div>
                     </FormSection>

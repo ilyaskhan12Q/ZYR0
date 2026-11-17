@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { AlertCircle, ArrowLeft } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Wand2 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,6 +8,7 @@ import { MarkdownContent } from '@/components/markdown/MarkdownContent';
 import { BASE_URL } from '@/config/seo';
 import { copyToClipboard } from '@/lib/clipboard';
 import { splitCapability } from '@/lib/capability';
+import { getEffectiveMagicPrompt } from '@/lib/magicPrompt';
 import { type ToolItem } from '@/data/tools';
 import { getToolBySlug, getAllPublicTools } from '@/services/tools';
 import { toast } from 'sonner';
@@ -119,6 +120,7 @@ export default function ToolDetail() {
   const [recommended, setRecommended] = useState<ToolItem[]>([]);
   const [activeCommand, setActiveCommand] = useState(0);
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
@@ -130,6 +132,7 @@ export default function ToolDetail() {
     setTool('loading');
     setActiveCommand(0);
     setCopiedCommand(null);
+    setCopiedPrompt(false);
     setLinkCopied(false);
 
     getToolBySlug(slug).then((data) => {
@@ -186,6 +189,16 @@ export default function ToolDetail() {
     window.setTimeout(() => {
       setCopiedCommand((current) => (current === key ? null : current));
     }, 1600);
+  };
+
+  const handleCopyMagicPrompt = async (promptText: string) => {
+    if (!(await copyToClipboard(promptText))) {
+      toast.error('Failed to copy Magic Prompt');
+      return;
+    }
+    setCopiedPrompt(true);
+    toast.success('Magic Prompt copied! Paste into your AI agent.');
+    window.setTimeout(() => setCopiedPrompt(false), 2000);
   };
 
   if (tool === 'loading') {
@@ -377,6 +390,37 @@ export default function ToolDetail() {
             </div>
           </section>
         )}
+
+        <section className="row" id="magic-prompt">
+          <div className="lab">magic prompt</div>
+          <div>
+            <h2>Run with AI Agent</h2>
+            <p>
+              Copy and paste this prompt directly into your AI agent (Claude Code, Gemini CLI, Cursor, Antigravity, or ChatGPT). The agent will configure, execute, and follow best practices automatically.
+            </p>
+            {(() => {
+              const promptText = getEffectiveMagicPrompt(tool);
+              return (
+                <div className="magic-blk">
+                  <div className="magic-bh">
+                    <span className="magic-badge">
+                      <Wand2 className="h-3.5 w-3.5" />
+                      Agent Instructions
+                    </span>
+                    <button
+                      type="button"
+                      className={copiedPrompt ? 'ok' : ''}
+                      onClick={() => handleCopyMagicPrompt(promptText)}
+                    >
+                      {copiedPrompt ? 'copied prompt!' : 'copy magic prompt'}
+                    </button>
+                  </div>
+                  <pre className="magic-pre">{promptText}</pre>
+                </div>
+              );
+            })()}
+          </div>
+        </section>
 
         {!hasCommands && tool.installInstructions && (
           <section className="row" id="notes">

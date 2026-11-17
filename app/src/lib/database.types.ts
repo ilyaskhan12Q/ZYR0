@@ -474,6 +474,7 @@ export interface DbTool {
   install_command: string | null;
   install_commands?: ToolInstallCommand[] | null;
   install_instructions: string | null;
+  magic_prompt?: string | null;
   version: string | null;
   seo_title: string | null;
   seo_description: string | null;

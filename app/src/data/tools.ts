@@ -26,6 +26,7 @@ export interface ToolItem {
   installCommand?: string;
   installCommands?: ToolInstallCommand[];
   installInstructions?: string;
+  magicPrompt?: string;
   version?: string;
   seoTitle?: string;
   seoDescription?: string;

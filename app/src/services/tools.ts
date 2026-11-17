@@ -22,6 +22,7 @@ export interface SubmitToolInput {
   install_command?: string;
   install_commands?: ToolInstallCommand[];
   install_instructions?: string;
+  magic_prompt?: string;
   version?: string;
   author_name: string;
   author_url?: string;
@@ -60,6 +61,7 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
     installCommand: dbTool.install_command || installCommands[0]?.command || undefined,
     installCommands: installCommands.length > 0 ? installCommands : undefined,
     installInstructions: dbTool.install_instructions || undefined,
+    magicPrompt: dbTool.magic_prompt || undefined,
     version: dbTool.version || undefined,
     seoTitle: dbTool.seo_title || undefined,
     seoDescription: dbTool.seo_description || undefined,
@@ -143,6 +145,7 @@ function buildToolPayload(input: SubmitToolInput, forInsert: boolean): Partial<D
     install_command: hasCommands ? input.install_commands![0].command : input.install_command?.trim() || null,
     install_commands: hasCommands ? input.install_commands : null,
     install_instructions: input.install_instructions?.trim() || null,
+    magic_prompt: input.magic_prompt?.trim() || null,
     version: input.version?.trim() || null,
     author_name: input.author_name.trim(),
     author_url: input.author_url?.trim() || null,

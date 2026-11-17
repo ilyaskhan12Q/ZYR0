@@ -497,6 +497,62 @@
   letter-spacing: -.02em;
 }
 
+.tdp .magic-blk {
+  border-left: 2px solid var(--org);
+  background: var(--bg2);
+  margin-bottom: 24px;
+}
+
+.tdp .magic-bh {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bd);
+  font: 300 12px var(--m);
+  color: var(--mut);
+}
+
+.tdp .magic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--org);
+  font: 800 12px var(--m);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.tdp .magic-bh button {
+  background: none;
+  border: 1px solid var(--bd);
+  color: var(--fg);
+  font: 800 12px var(--m);
+  padding: 4px 10px;
+  transition: all .15s ease;
+}
+
+.tdp .magic-bh button:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.tdp .magic-bh button.ok {
+  background: var(--org);
+  border-color: var(--org);
+  color: var(--bg);
+}
+
+.tdp .magic-pre {
+  margin: 0;
+  padding: 14px;
+  overflow-x: auto;
+  font: 400 13px/1.65 var(--m);
+  color: var(--fg);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .tdp .related-tagline {
   display: block;
   margin-top: 3px;
