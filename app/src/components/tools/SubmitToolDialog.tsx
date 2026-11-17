@@ -105,9 +105,9 @@ function defaultCommandLabel(itemType: ItemType, index: number) {
   return COMMAND_LABEL_DEFAULTS[Math.min(index, COMMAND_LABEL_DEFAULTS.length - 1)];
 }
 
-function FieldError({ msg }: { msg?: string }) {
+function FieldError({ id, msg }: { id?: string; msg?: string }) {
   return msg ? (
-    <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
+    <p id={id} className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
       <AlertCircle className="h-3 w-3 shrink-0" />
       {msg}
     </p>
@@ -129,19 +129,21 @@ function FieldLabel({
     <div className="mb-1.5 flex items-baseline justify-between gap-3">
       <label htmlFor={htmlFor} className="text-xs font-semibold text-foreground">
         {children}
-        {required && <span className="ml-0.5 text-red-500">*</span>}
+        {required && (
+          <>
+            <span aria-hidden="true" className="ml-0.5 text-red-500">*</span>
+            <span className="sr-only"> (required)</span>
+          </>
+        )}
       </label>
       {hint && <span className="shrink-0 text-[10px] text-muted-foreground">{hint}</span>}
     </div>
   );
 }
 
-function StageHeading({ step, title, description }: { step: Stage; title: string; description: string }) {
+function StageHeading({ title, description }: { title: string; description: string }) {
   return (
     <div className="space-y-1">
-      <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
-        Step {step} of 3
-      </span>
       <h3 className="text-lg font-semibold tracking-tight text-foreground">{title}</h3>
       <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
     </div>
@@ -923,10 +925,17 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
     coverColor: isAdmin ? adminCoverColor : undefined,
   };
 
+  const reviewTitle = isAdmin && adminStatus === 'approved' ? 'Review and publish' : 'Review and submit';
+  const finalActionLabel = isAdmin
+    ? adminStatus === 'approved'
+      ? 'Publish live'
+      : 'Submit as pending'
+    : 'Submit for review';
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="flex max-h-[94vh] flex-col gap-0 overflow-hidden border-border/80 bg-card p-0 sm:max-w-6xl">
-        <DialogHeader className="shrink-0 space-y-1.5 border-b border-border/60 px-5 pb-3 pt-5 pr-14 text-left sm:px-7">
+        <DialogHeader className="shrink-0 space-y-1.5 border-b border-border/60 bg-gradient-to-br from-[var(--zyro-accent-muted)] via-card to-card px-5 pb-3 pt-5 pr-14 text-left sm:px-7">
           <div className="inline-flex w-fit items-center gap-1.5 rounded-md border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
             <Sparkles className="h-3 w-3" />
             <span>Community Registry</span>
@@ -945,9 +954,20 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
           </DialogDescription>
 
           {user && !submittedSuccess && (
-            <nav aria-label="Submission steps" className="grid grid-cols-3 gap-1 pt-1.5">
-              {STAGES.map((item) => stageItem(item.id))}
-            </nav>
+            <>
+              <p className="pt-1 text-[10px] text-muted-foreground">
+                <span className="text-red-500">*</span> Required field
+              </p>
+              <nav aria-label="Submission steps" className="grid grid-cols-3 gap-1">
+                {STAGES.map((item) => stageItem(item.id))}
+              </nav>
+              <div className="h-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                <div
+                  className="h-full rounded-full bg-[var(--zyro-accent)] transition-all duration-300"
+                  style={{ width: `${(stage / 3) * 100}%` }}
+                />
+              </div>
+            </>
           )}
         </DialogHeader>
 
@@ -1012,60 +1032,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
                   <div className="min-w-0 space-y-5">
                     <StageHeading
-                      step={1}
                       title="Basic information"
-                      description="Start with the source and the essentials people will see first."
+                      description="Name it, describe it in one line, then point to the source."
                     />
                     {draftBanner}
-
-                    <div className="space-y-1.5">
-                      <FieldLabel htmlFor="st-source-url" required hint="GitHub shorthand like org/repo works">
-                        Source URL
-                      </FieldLabel>
-                      <input
-                        id="st-source-url"
-                        type="text"
-                        inputMode="url"
-                        placeholder="https://github.com/org/repo"
-                        value={sourceUrl}
-                        onChange={(event) => {
-                          setSourceUrl(event.target.value);
-                          clearError('sourceUrl');
-                        }}
-                        aria-invalid={Boolean(errors.sourceUrl)}
-                        aria-describedby={errors.sourceUrl ? 'st-source-url-error' : undefined}
-                        className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
-                      />
-                      <div id="st-source-url-error">
-                        <FieldError msg={errors.sourceUrl} />
-                      </div>
-                      <p className="text-[11px] leading-relaxed text-muted-foreground">
-                        The repository, package, or official page this listing is based on.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FieldLabel required>Item classification</FieldLabel>
-                      <div role="radiogroup" aria-label="Item classification" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                        {ITEM_TYPES.map((type) => (
-                          <button
-                            key={type.id}
-                            type="button"
-                            role="radio"
-                            aria-checked={itemType === type.id}
-                            onClick={() => setItemType(type.id)}
-                            className={`rounded-xl border p-3 text-left transition-colors ${
-                              itemType === type.id
-                                ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent-muted)] ring-1 ring-[var(--zyro-accent)]'
-                                : 'border-border/70 bg-card hover:bg-muted/40'
-                            }`}
-                          >
-                            <span className="block text-xs font-semibold text-foreground">{type.label}</span>
-                            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{type.desc}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div className="space-y-1.5">
@@ -1082,9 +1052,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                             clearError('name');
                           }}
                           aria-invalid={Boolean(errors.name)}
+                          aria-describedby={errors.name ? 'st-name-error' : undefined}
                           className={`${inputCls} ${errors.name ? inputErrorCls : ''}`}
                         />
-                        <FieldError msg={errors.name} />
+                        <FieldError id="st-name-error" msg={errors.name} />
                       </div>
 
                       <div className="space-y-1.5">
@@ -1120,9 +1091,81 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                           clearError('tagline');
                         }}
                         aria-invalid={Boolean(errors.tagline)}
+                        aria-describedby={errors.tagline ? 'st-tagline-error' : undefined}
                         className={`${inputCls} ${errors.tagline ? inputErrorCls : ''}`}
                       />
-                      <FieldError msg={errors.tagline} />
+                      <FieldError id="st-tagline-error" msg={errors.tagline} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-foreground">
+                        Item classification
+                        <span aria-hidden="true" className="ml-0.5 text-red-500">*</span>
+                        <span className="sr-only"> (required)</span>
+                      </p>
+                      <div role="radiogroup" aria-label="Item classification" aria-required="true" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        {ITEM_TYPES.map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={itemType === type.id}
+                            onClick={() => setItemType(type.id)}
+                            className={`rounded-xl border p-3 text-left transition-colors ${
+                              itemType === type.id
+                                ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent-muted)] ring-1 ring-[var(--zyro-accent)]'
+                                : 'border-border/70 bg-card hover:bg-muted/40'
+                            }`}
+                          >
+                            <span className="block text-xs font-semibold text-foreground">{type.label}</span>
+                            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{type.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-source" required>
+                          Source platform
+                        </FieldLabel>
+                        <select
+                          id="st-source"
+                          value={source}
+                          onChange={(event) => setSource(event.target.value)}
+                          className={`${inputCls} cursor-pointer`}
+                        >
+                          {TOOL_FORM_SOURCES.map((option) => (
+                            <option key={option} value={option}>
+                              {option === 'ZYR0 Native' ? 'ZYR0 Native (Built-in)' : option === 'Web' ? 'Official website' : option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-source-url" required hint="GitHub shorthand like org/repo works">
+                          Source URL
+                        </FieldLabel>
+                        <input
+                          id="st-source-url"
+                          type="text"
+                          inputMode="url"
+                          placeholder="https://github.com/org/repo"
+                          value={sourceUrl}
+                          onChange={(event) => {
+                            setSourceUrl(event.target.value);
+                            clearError('sourceUrl');
+                          }}
+                          aria-invalid={Boolean(errors.sourceUrl)}
+                          aria-describedby={errors.sourceUrl ? 'st-source-url-error' : undefined}
+                          className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
+                        />
+                        <FieldError id="st-source-url-error" msg={errors.sourceUrl} />
+                        <p className="text-[11px] leading-relaxed text-muted-foreground">
+                          The repository, package, or official page this listing is based on.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -1136,9 +1179,8 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
                   <div className="min-w-0 space-y-5">
                     <StageHeading
-                      step={2}
                       title="Listing content"
-                      description="Write the description first. Installation, discovery, and technical details stay tucked away until you need them."
+                      description="Write the description, then add commands and the details that help people trust and find it."
                     />
                     {draftBanner}
 
@@ -1210,7 +1252,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                                 clearError('description');
                               }}
                               aria-invalid={Boolean(errors.description)}
-                              aria-describedby="st-desc-help"
+                              aria-describedby={errors.description ? 'st-desc-help st-desc-error' : 'st-desc-help'}
                               className="min-h-[300px] w-full resize-y border-0 bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground md:min-h-[420px]"
                             />
                           </div>
@@ -1234,7 +1276,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                         <span className="font-mono">- lists</span>, <span className="font-mono">`code`</span>, and{' '}
                         <span className="font-mono">[links](url)</span>. The original Markdown is saved as written.
                       </p>
-                      <FieldError msg={errors.description} />
+                      <FieldError id="st-desc-error" msg={errors.description} />
                     </section>
 
                     <FormSection
@@ -1410,49 +1452,11 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
                     <FormSection
                       icon={FolderGit2}
-                      title="Technical & source details"
-                      hint="Platform, links, version, cover image"
-                      summary={`${source}${version.trim() ? ` · ${version.trim()}` : ''}`}
+                      title="Links & media"
+                      hint="Docs, version, cover image"
+                      summary={version.trim() || 'Optional'}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="space-y-1.5">
-                          <FieldLabel htmlFor="st-source" required>
-                            Source platform
-                          </FieldLabel>
-                          <select
-                            id="st-source"
-                            value={source}
-                            onChange={(event) => setSource(event.target.value)}
-                            className={`${inputCls} cursor-pointer`}
-                          >
-                            {TOOL_FORM_SOURCES.map((option) => (
-                              <option key={option} value={option}>
-                                {option === 'ZYR0 Native' ? 'ZYR0 Native (Built-in)' : option === 'Web' ? 'Official website' : option}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <FieldLabel htmlFor="st-repo-url" required hint="Same as Source URL">
-                            Repository or primary URL
-                          </FieldLabel>
-                          <input
-                            id="st-repo-url"
-                            type="text"
-                            inputMode="url"
-                            placeholder="https://github.com/org/repo"
-                            value={sourceUrl}
-                            onChange={(event) => {
-                              setSourceUrl(event.target.value);
-                              clearError('sourceUrl');
-                            }}
-                            aria-invalid={Boolean(errors.sourceUrl)}
-                            className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
-                          />
-                          <FieldError msg={errors.sourceUrl} />
-                        </div>
-
                         <div className="space-y-1.5">
                           <FieldLabel htmlFor="st-doc" hint="Optional">
                             Documentation URL
@@ -1498,9 +1502,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                           value={imageUrl}
                           onChange={(event) => handleImageUrlChange(event.target.value)}
                           aria-invalid={Boolean(errors.imageUrl)}
+                          aria-describedby={errors.imageUrl ? 'st-image-error' : undefined}
                           className={`${inputCls} font-mono ${errors.imageUrl ? inputErrorCls : ''}`}
                         />
-                        <FieldError msg={errors.imageUrl} />
+                        <FieldError id="st-image-error" msg={errors.imageUrl} />
                         {imageUrl.trim() && (
                           <div className="relative mt-1 aspect-video w-full max-w-[220px] overflow-hidden rounded-lg border border-border/70 bg-muted/40">
                             {imageState === 'loading' && (
@@ -1672,10 +1677,11 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                             onBlur={handleSlugBlur}
                             placeholder="your-listing"
                             aria-invalid={Boolean(errors.slug)}
+                            aria-describedby={errors.slug ? 'st-slug-error' : undefined}
                             className="min-w-0 flex-1 border-0 bg-transparent px-2.5 py-2 font-mono text-sm text-foreground outline-none placeholder:text-muted-foreground"
                           />
                         </div>
-                        <FieldError msg={errors.slug} />
+                        <FieldError id="st-slug-error" msg={errors.slug} />
                         <p className="text-[10px] text-muted-foreground">
                           Page H1 stays the official listing name: <span className="font-medium text-foreground">{name.trim() || 'your listing name'}</span>
                         </p>
@@ -1712,8 +1718,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
               {stage === 3 && (
                 <div className="space-y-5">
                   <StageHeading
-                    step={3}
-                    title="Review and submit"
+                    title={reviewTitle}
                     description="Check completeness, fix anything flagged, then confirm the final listing."
                   />
                   {draftBanner}
@@ -1767,7 +1772,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
 
                       <section className="space-y-2">
                         <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Before you submit
+                          {isAdmin && adminStatus === 'approved' ? 'Before you publish' : 'Before you submit'}
                         </h4>
                         {missingRequired.length === 0 ? (
                           <p className="flex items-start gap-2 rounded-lg border border-emerald-500/25 bg-emerald-500/5 px-3 py-2 text-[11px] text-emerald-700 dark:text-emerald-400">
@@ -1942,13 +1947,16 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                     </div>
 
                     <div className="min-w-0">
-                      <div className="mb-2 flex items-center justify-between">
+                      <div className="mb-2 flex items-center justify-between gap-3">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Final listing preview
+                          Directory card preview
                         </span>
-                        <span className="text-[10px] text-muted-foreground">Exactly what visitors will see</span>
+                        <span className="text-right text-[10px] text-muted-foreground">How your card appears in ToolHub</span>
                       </div>
                       <ListingPreview {...previewProps} />
+                      <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+                        Your public detail page is generated from these same fields.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1962,7 +1970,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 size="sm"
                 onClick={() => handleOpenChange(false)}
                 disabled={submitting}
-                className="h-8 text-xs text-muted-foreground"
+                className="h-9 text-xs text-muted-foreground"
               >
                 Cancel
               </Button>
@@ -1972,7 +1980,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 size="sm"
                 onClick={handleSaveDraft}
                 disabled={!hasContent || submitting}
-                className="h-8 gap-1.5 text-xs"
+                className="h-9 gap-1.5 text-xs"
               >
                 <Save className="h-3.5 w-3.5" />
                 Save draft
@@ -1991,7 +1999,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                     size="sm"
                     onClick={() => setStage((stage - 1) as Stage)}
                     disabled={submitting}
-                    className="h-8 flex-1 gap-1 sm:flex-none"
+                    className="h-9 flex-1 gap-1 text-xs sm:flex-none"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     Back
@@ -2000,29 +2008,27 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess }: SubmitToolDi
                 {stage < 3 ? (
                   <Button
                     type="submit"
-                    size="sm"
                     disabled={submitting}
-                    className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
+                    className="h-10 flex-1 gap-1.5 px-5 text-sm font-semibold shadow-sm bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
                   >
                     {stage === 1 ? 'Continue' : 'Review listing'}
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    size="sm"
                     disabled={submitting}
-                    className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
+                    className="h-10 flex-1 gap-2 px-5 text-sm font-semibold shadow-sm bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
                   >
                     {submitting ? (
                       <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Submitting...
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {isAdmin && adminStatus === 'approved' ? 'Publishing...' : 'Submitting...'}
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Submit for review
+                        <Sparkles className="h-4 w-4" />
+                        {finalActionLabel}
                       </>
                     )}
                   </Button>

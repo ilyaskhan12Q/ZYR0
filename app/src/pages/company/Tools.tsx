@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Wrench, Plus, ExternalLink, Clock, CheckCircle2, XCircle,
-  AlertCircle, Sparkles, Compass
+  AlertCircle, Compass
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

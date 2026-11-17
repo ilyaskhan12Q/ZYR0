@@ -44,8 +44,6 @@ export const TOOL_CATEGORIES: ToolCategory[] = [
   'Productivity',
 ];
 
-export const TOOLS_DATA: ToolItem[] = [];
-
 /**
  * Gradient background for card/preview heroes. Custom admin color wins when valid;
  * otherwise the branded twilight → periwinkle → sapphire ramp.

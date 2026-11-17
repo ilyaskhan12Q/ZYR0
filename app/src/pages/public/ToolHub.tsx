@@ -1,13 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Search, X, Sparkles, Compass, Plus, ChevronDown, Check,
+  Search, X, Sparkles, Plus, ChevronDown,
   ArrowUpDown, Filter
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { TOOL_CATEGORIES, type ToolItem, type ToolCategory } from '@/data/tools';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { ToolPreviewDialog } from '@/components/tools/ToolPreviewDialog';
 import { SubmitToolDialog } from '@/components/tools/SubmitToolDialog';
 import { ToolEmptyState } from '@/components/tools/ToolEmptyState';
 import { getAllPublicTools } from '@/services/tools';
@@ -32,8 +31,6 @@ export default function ToolHub() {
   const sortBy = (searchParams.get('sort') as SortOption) || 'featured';
 
   const [tools, setTools] = useState<ToolItem[]>([]);
-  const [previewTool, setPreviewTool] = useState<ToolItem | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
 
@@ -102,11 +99,6 @@ export default function ToolHub() {
   const handleClearFilters = () => {
     setSearchParams({});
     setVisibleCount(ITEMS_PER_PAGE);
-  };
-
-  const handleOpenPreview = (tool: ToolItem) => {
-    setPreviewTool(tool);
-    setDialogOpen(true);
   };
 
   // Filtered & sorted tools
@@ -340,11 +332,7 @@ export default function ToolHub() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredTools.map((tool) => (
-                <ToolCard
-                  key={tool.id}
-                  tool={tool}
-                  onPreview={handleOpenPreview}
-                />
+                <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
           </div>
@@ -383,11 +371,7 @@ export default function ToolHub() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {displayedTools.map((tool) => (
-                <ToolCard
-                  key={tool.id}
-                  tool={tool}
-                  onPreview={handleOpenPreview}
-                />
+                <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
 
@@ -440,13 +424,6 @@ export default function ToolHub() {
           </Button>
         </div>
       </div>
-
-      {/* Tool Preview Compact Dialog */}
-      <ToolPreviewDialog
-        tool={previewTool}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
 
       {/* Submit Tool Dialog */}
       <SubmitToolDialog

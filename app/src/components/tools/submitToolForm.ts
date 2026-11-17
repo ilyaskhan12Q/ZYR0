@@ -1,7 +1,7 @@
 import type { ToolItemType } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
 
-export type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
+type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
 
 export const TOOL_FORM_CATEGORIES: ToolFormCategory[] = [
   'AI & Agents',

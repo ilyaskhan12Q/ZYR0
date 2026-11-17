@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { slugify } from '@/lib/slug';
-import { TOOLS_DATA, type ToolItem, type ToolCategory, type ToolItemType } from '@/data/tools';
+import { type ToolItem, type ToolItemType } from '@/data/tools';
 import type { DbTool, ToolSubmissionStatus, ToolInstallCommand } from '@/lib/database.types';
 
 export interface SubmitToolInput {
@@ -74,7 +74,7 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
  * Fetch all approved community tools from Supabase.
  * Falls back gracefully to empty array if table or network is unavailable.
  */
-export async function getApprovedCommunityTools(): Promise<ToolItem[]> {
+async function getApprovedCommunityTools(): Promise<ToolItem[]> {
   try {
     const { data, error } = await supabase
       .from('tools')
