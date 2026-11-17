@@ -201,3 +201,62 @@ export async function getConversationUnreadCounts(useCache = true) {
     return { data: [] as { id: string; unread_count: number }[], error };
   }
 }
+
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // matches the bucket's file_size_limit
+
+const formatBytes = (bytes: number) => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+export { formatBytes };
+
+/**
+ * Upload chat attachments to the private `message-attachments` bucket and
+ * return the metadata shape `sendMessage()` accepts. Files live under
+ * `{conversation_id}/` so the storage RLS can scope reads to participants.
+ */
+export async function uploadMessageAttachments(files: File[], conversation_id: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const uploaded: { name: string; url: string; type: string; size: string }[] = [];
+  for (const file of files) {
+    if (file.size > MAX_ATTACHMENT_BYTES) {
+      throw new Error(`"${file.name}" is larger than the 10 MB limit`);
+    }
+    const safeName = file.name.replace(/[/\\?%*:|"<>]/g, '_');
+    const path = `${conversation_id}/${crypto.randomUUID()}-${safeName}`;
+    const { error } = await supabase.storage
+      .from('message-attachments')
+      .upload(path, file, { cacheControl: '3600', upsert: false });
+    if (error) throw error;
+    uploaded.push({
+      name: file.name,
+      url: path,
+      type: file.type || 'application/octet-stream',
+      size: formatBytes(file.size),
+    });
+  }
+  return uploaded;
+}
+
+/** Short-lived signed URLs for message attachment paths (private bucket). */
+export async function getAttachmentUrls(paths: string[]) {
+  const map = new Map<string, string>();
+  if (!paths.length) return map;
+
+  const { data, error } = await supabase.storage
+    .from('message-attachments')
+    .createSignedUrls(paths, 3600);
+
+  if (error) {
+    console.error('Error signing attachment URLs:', error);
+    return map;
+  }
+  for (const item of data ?? []) {
+    if (item?.path && item.signedUrl) map.set(item.path, item.signedUrl);
+  }
+  return map;
+}
