@@ -204,6 +204,40 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                 </section>
               )}
 
+              {/* Magic Agent Prompt */}
+              {(() => {
+                const promptText = getEffectiveMagicPrompt(tool);
+                return (
+                  <section>
+                    <div className="flex items-center justify-between mb-2">
+                      <SectionTitle icon={Wand2}>Run with AI Agent (Magic Prompt)</SectionTitle>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyMagicPrompt(promptText)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] text-white transition-colors cursor-pointer"
+                      >
+                        {copiedPrompt ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Copied Prompt</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Magic Prompt</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="rounded-xl overflow-hidden border border-border/70 bg-muted/30">
+                      <pre className="p-3 bg-muted/40 text-foreground font-mono text-[11px] leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap select-all">
+                        {promptText}
+                      </pre>
+                    </div>
+                  </section>
+                );
+              })()}
+
               {/* Install command(s) — full width in content column so long commands breathe */}
               {commands.length > 0 && (
                 <section>
@@ -268,40 +302,6 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                   )}
                 </section>
               )}
-
-              {/* Magic Agent Prompt */}
-              {(() => {
-                const promptText = getEffectiveMagicPrompt(tool);
-                return (
-                  <section>
-                    <div className="flex items-center justify-between mb-2">
-                      <SectionTitle icon={Wand2}>Run with AI Agent (Magic Prompt)</SectionTitle>
-                      <button
-                        type="button"
-                        onClick={() => handleCopyMagicPrompt(promptText)}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] text-white transition-colors cursor-pointer"
-                      >
-                        {copiedPrompt ? (
-                          <>
-                            <Check className="w-3.5 h-3.5" />
-                            <span>Copied Prompt</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>Copy Magic Prompt</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <div className="rounded-xl overflow-hidden border border-border/70 bg-muted/30">
-                      <pre className="p-3 bg-muted/40 text-foreground font-mono text-[11px] leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap select-all">
-                        {promptText}
-                      </pre>
-                    </div>
-                  </section>
-                );
-              })()}
 
               {/* Install notes without command */}
               {commands.length === 0 && tool.installInstructions && (

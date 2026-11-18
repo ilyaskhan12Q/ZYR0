@@ -337,6 +337,37 @@ export default function ToolDetail() {
           </dl>
         </header>
 
+        <section className="row" id="magic-prompt">
+          <div className="lab">magic prompt</div>
+          <div>
+            <h2>Run with AI Agent</h2>
+            <p>
+              Copy and paste this prompt directly into your AI agent (Claude Code, Gemini CLI, Cursor, Antigravity, or ChatGPT). The agent will configure, execute, and follow best practices automatically.
+            </p>
+            {(() => {
+              const promptText = getEffectiveMagicPrompt(tool);
+              return (
+                <div className="magic-blk">
+                  <div className="magic-bh">
+                    <span className="magic-badge">
+                      <Wand2 className="h-3.5 w-3.5" />
+                      Agent Instructions
+                    </span>
+                    <button
+                      type="button"
+                      className={copiedPrompt ? 'ok' : ''}
+                      onClick={() => handleCopyMagicPrompt(promptText)}
+                    >
+                      {copiedPrompt ? 'copied prompt!' : 'copy magic prompt'}
+                    </button>
+                  </div>
+                  <pre className="magic-pre">{promptText}</pre>
+                </div>
+              );
+            })()}
+          </div>
+        </section>
+
         {hasCommands && (
           <section className="row" id="install">
             <div className="lab">install</div>
@@ -390,37 +421,6 @@ export default function ToolDetail() {
             </div>
           </section>
         )}
-
-        <section className="row" id="magic-prompt">
-          <div className="lab">magic prompt</div>
-          <div>
-            <h2>Run with AI Agent</h2>
-            <p>
-              Copy and paste this prompt directly into your AI agent (Claude Code, Gemini CLI, Cursor, Antigravity, or ChatGPT). The agent will configure, execute, and follow best practices automatically.
-            </p>
-            {(() => {
-              const promptText = getEffectiveMagicPrompt(tool);
-              return (
-                <div className="magic-blk">
-                  <div className="magic-bh">
-                    <span className="magic-badge">
-                      <Wand2 className="h-3.5 w-3.5" />
-                      Agent Instructions
-                    </span>
-                    <button
-                      type="button"
-                      className={copiedPrompt ? 'ok' : ''}
-                      onClick={() => handleCopyMagicPrompt(promptText)}
-                    >
-                      {copiedPrompt ? 'copied prompt!' : 'copy magic prompt'}
-                    </button>
-                  </div>
-                  <pre className="magic-pre">{promptText}</pre>
-                </div>
-              );
-            })()}
-          </div>
-        </section>
 
         {!hasCommands && tool.installInstructions && (
           <section className="row" id="notes">
