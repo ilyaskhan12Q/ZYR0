@@ -1,38 +1,57 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { Fragment, useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
-import {
-  Users,
-  FolderOpen,
-  FileCheck,
-  Award,
-  Shield,
-  Zap,
-  TrendingUp,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  CreditCard,
-  Cpu,
-  Sparkles,
-  Clock,
-  Wrench,
-  Building2,
-  Activity,
-} from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Users } from 'lucide-react';
 import { Loader } from '@/components/common/Loader';
 import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar, LabelList,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { supabase } from '@/lib/supabase';
 
-const systemHealth = [
-  { name: 'Database & RLS', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
-  { name: 'Authentication', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
-  { name: 'AI Gateway Engine', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
-  { name: 'Storage Vault', status: 'Operational', icon: CheckCircle2, color: 'text-emerald-500' },
-];
+const nf = new Intl.NumberFormat('en-US');
+const money = (n: number) => `$${nf.format(Math.round(n))}`;
+const compact = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : nf.format(n));
+const shortDate = (iso: string) =>
+  new Date(iso).toLocaleString('en-US', {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+
+const tooltipStyle = {
+  background: 'hsl(var(--card))',
+  border: '1px solid hsl(var(--border))',
+  borderRadius: 8,
+  padding: '8px 10px',
+  fontSize: 12,
+};
+
+/** A panel: section title over a hairline rule, mono meta on the right. */
+function Panel({ title, meta, action, className = '', children }: {
+  title: string;
+  meta?: string;
+  action?: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={`rounded-xl border border-border bg-card ${className}`}>
+      <header className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
+        <h2 className="text-[13px] font-medium">{title}</h2>
+        {action ?? (meta && <span className="font-mono text-[11px] text-muted-foreground">{meta}</span>)}
+      </header>
+      <div className="px-6 py-5">{children}</div>
+    </section>
+  );
+}
+
+/** Thin neutral bar; the accent is left for the figures that matter. */
+function Meter({ value, max }: { value: number; max: number }) {
+  const width = max > 0 ? Math.round((value / max) * 100) : 0;
+  return (
+    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+      <div className="h-full rounded-full bg-foreground/25" style={{ width: `${width}%` }} />
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -223,7 +242,7 @@ export default function AdminDashboard() {
     };
   }, []);
 
-  // Compute Subscription & Revenue Telemetry
+  // Subscription & revenue telemetry
   const planBreakdown = useMemo(() => {
     const free = profiles.filter((p) => !p.plan_tier || p.plan_tier === 'free').length;
     const go = profiles.filter((p) => p.plan_tier === 'go').length;
@@ -236,34 +255,24 @@ export default function AdminDashboard() {
     return { free, go, plus, enterprise, paid, mrr, conversion, total };
   }, [profiles]);
 
-  // Role mix for the composition donut
+  // Role mix
   const roleBreakdown = useMemo(() => {
     const roles = [
-      { name: 'Students', value: profiles.filter((p) => p.role === 'student').length, color: '#3B82F6' },
-      { name: 'Mentors', value: profiles.filter((p) => p.role === 'mentor').length, color: '#8B5CF6' },
-      { name: 'Companies', value: profiles.filter((p) => p.role === 'company').length, color: '#10B981' },
-      { name: 'Admins', value: profiles.filter((p) => p.role === 'admin').length, color: '#F59E0B' },
+      { name: 'Students', value: profiles.filter((p) => p.role === 'student').length },
+      { name: 'Mentors', value: profiles.filter((p) => p.role === 'mentor').length },
+      { name: 'Companies', value: profiles.filter((p) => p.role === 'company').length },
+      { name: 'Admins', value: profiles.filter((p) => p.role === 'admin').length },
     ];
-    return { roles, active: roles.filter((r) => r.value > 0), total: profiles.length };
+    return { roles, total: profiles.length };
   }, [profiles]);
 
-  // Platform funnel: postings -> applications -> certificates
-  const funnelData = useMemo(
-    () => [
-      { stage: 'Internships', value: internshipsCount, color: '#3B82F6' },
-      { stage: 'Applications', value: appsCount, color: '#8B5CF6' },
-      { stage: 'Certificates', value: certsCount, color: '#10B981' },
-    ],
-    [internshipsCount, appsCount, certsCount]
-  );
-
-  // Paid-tier distribution for the revenue bar chart
+  // Paid-tier distribution
   const tierData = useMemo(
     () => [
       { tier: 'Free', users: planBreakdown.free, mrr: 0 },
       { tier: 'GO', users: planBreakdown.go, mrr: planBreakdown.go * 4.99 },
       { tier: 'PLUS', users: planBreakdown.plus, mrr: planBreakdown.plus * 9.99 },
-      { tier: 'Ent.', users: planBreakdown.enterprise, mrr: 0 },
+      { tier: 'Enterprise', users: planBreakdown.enterprise, mrr: 0 },
     ],
     [planBreakdown]
   );
@@ -290,8 +299,7 @@ export default function AdminDashboard() {
     return days;
   }, [agentUsageRows]);
 
-
-  // Compute AI Compute & Gateway Telemetry
+  // AI compute telemetry
   const aiTelemetry = useMemo(() => {
     let totalInput = 0;
     let totalOutput = 0;
@@ -327,29 +335,61 @@ export default function AdminDashboard() {
     [companies]
   );
 
-  const stats = useMemo(() => {
-    const studentsCount = profiles.filter((p) => p.role === 'student').length;
-    const mentorsCount = profiles.filter((p) => p.role === 'mentor').length;
+  // New accounts in the last 30 days, for the change line under each figure
+  const last30 = useMemo(() => {
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+    const recent = (iso?: string) => !!iso && new Date(iso).getTime() >= cutoff;
+    return {
+      users: profiles.filter((p) => recent(p.created_at)).length,
+      students: profiles.filter((p) => p.role === 'student' && recent(p.created_at)).length,
+      mentors: profiles.filter((p) => p.role === 'mentor' && recent(p.created_at)).length,
+      companies: companies.filter((c) => recent(c.created_at)).length,
+    };
+  }, [profiles, companies]);
 
+  const vitals = useMemo(() => [
+    { label: 'Users', value: nf.format(profiles.length), note: `+${last30.users} in 30 days` },
+    {
+      label: 'Students',
+      value: nf.format(profiles.filter((p) => p.role === 'student').length),
+      note: `+${last30.students} in 30 days`,
+    },
+    {
+      label: 'Mentors',
+      value: nf.format(profiles.filter((p) => p.role === 'mentor').length),
+      note: `+${last30.mentors} in 30 days`,
+    },
+    {
+      label: 'Companies',
+      value: nf.format(companies.length),
+      note: `${pendingCompanies} pending review`,
+    },
+    {
+      label: 'Est. MRR',
+      value: money(planBreakdown.mrr),
+      note: `${planBreakdown.paid} paid of ${planBreakdown.total}`,
+    },
+    {
+      label: 'AI tokens',
+      value: compact(aiTelemetry.totalTokens),
+      note: `${aiTelemetry.requests} calls · ${aiTelemetry.avgLatency}ms avg`,
+    },
+  ], [profiles, companies, last30, pendingCompanies, planBreakdown, aiTelemetry]);
+
+  // Postings → applications → certificates
+  const pipeline = useMemo(() => {
+    // Applications can outnumber postings, so a bare % reads wrong above 100
+    const ratio = (part: number, whole: number) => {
+      if (whole <= 0) return '—';
+      const value = part / whole;
+      return value > 1 ? `${value.toFixed(1)}× per posting` : `${Math.round(value * 100)}%`;
+    };
     return [
-      { label: 'Students', value: studentsCount.toString(), subtext: 'Registered learners', icon: Users },
-      { label: 'Mentors', value: mentorsCount.toString(), subtext: 'Industry guides', icon: Shield },
-      { label: 'Companies', value: companies.length.toString(), subtext: 'Partner orgs', icon: FolderOpen },
-      { label: 'Internships', value: internshipsCount.toString(), subtext: 'Active postings', icon: Zap },
-      {
-        label: 'Est. MRR',
-        value: `$${planBreakdown.mrr.toFixed(2)}`,
-        subtext: `${planBreakdown.paid} paid accounts`,
-        icon: CreditCard,
-      },
-      {
-        label: 'AI Tokens',
-        value: `${(aiTelemetry.totalTokens / 1000).toFixed(1)}k`,
-        subtext: `${aiTelemetry.requests} invocations`,
-        icon: Cpu,
-      },
+      { label: 'Internships', value: internshipsCount, rate: '' },
+      { label: 'Applications', value: appsCount, rate: ratio(appsCount, internshipsCount) },
+      { label: 'Certificates', value: certsCount, rate: ratio(certsCount, appsCount), seal: true },
     ];
-  }, [profiles, companies, internshipsCount, planBreakdown, aiTelemetry]);
+  }, [internshipsCount, appsCount, certsCount]);
 
   const userGrowthData = useMemo(() => {
     const result = [];
@@ -384,655 +424,349 @@ export default function AdminDashboard() {
   }, [profiles, companies]);
 
   const pct = (n: number) => (planBreakdown.total > 0 ? (n / planBreakdown.total) * 100 : 0);
+  const peakDayTokens = useMemo(() => Math.max(...aiTrend.map((d) => d.tokens), 0), [aiTrend]);
 
   if (loading) {
-    return <Loader variant="page" text="Loading admin control center..." />;
+    return <Loader variant="page" text="Loading platform overview..." />;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <m.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      className="mx-auto max-w-[1600px] space-y-6"
+    >
+      {/* Page header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Admin Control Center</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Ecosystem telemetry, subscriptions, compute metrics, and platform health
+          <h1 className="font-heading text-[28px] font-medium leading-[1.15] tracking-[-0.01em]">
+            Platform overview
+          </h1>
+          <p className="mt-1 text-[13px] text-muted-foreground">
+            Users, revenue, compute and review load across ZYR0
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link
-            to="/admin/users"
-            className="px-3.5 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-2xs"
-          >
-            <Shield className="w-3.5 h-3.5 text-accent" />
-            <span>Manage Users</span>
-          </Link>
-          <Link
-            to="/admin/analytics"
-            className="px-3.5 py-1.5 rounded-xl bg-accent text-accent-foreground text-xs font-semibold hover:opacity-90 transition-opacity flex items-center gap-1.5 shadow-xs"
-          >
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Deep Analytics</span>
-          </Link>
+        <Link
+          to="/admin/users"
+          className="inline-flex h-9 items-center gap-2 self-start rounded-lg border border-border bg-card px-3.5 text-[13px] font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:self-auto"
+        >
+          <Users className="h-4 w-4" strokeWidth={1.5} />
+          Manage users
+        </Link>
+      </div>
+
+      {/* Vitals */}
+      <section className="rounded-xl border border-border bg-card">
+        <div className="flex flex-col divide-y divide-border xl:flex-row xl:divide-x xl:divide-y-0">
+          {vitals.map((vital) => (
+            <div key={vital.label} className="flex-1 px-6 py-5">
+              <p className="font-mono text-[11px] text-muted-foreground">{vital.label}</p>
+              <p className="mt-2 font-mono text-[26px] font-medium leading-none tabular-nums">
+                {vital.value}
+              </p>
+              <p className="mt-2 text-[12px] text-muted-foreground">{vital.note}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
 
-      {/* KPI Top Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
-        {stats.map((stat, i) => (
-          <m.div
-            key={i}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.03 }}
-            className="p-4 rounded-xl bg-card border border-border shadow-2xs flex flex-col justify-between"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                {stat.label}
-              </span>
-              <stat.icon className="w-3.5 h-3.5 text-muted-foreground/70" />
-            </div>
-            <div className="mt-3">
-              <p className="text-2xl font-bold tracking-tight text-foreground font-mono tabular-nums">
-                {stat.value}
-              </p>
-              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                {stat.subtext}
-              </p>
-            </div>
-          </m.div>
-        ))}
-      </div>
-
-      {/* Monetization & AI Compute Telemetry Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Subscription & Monetization Card (Linear/Datadog Operational Command Center) */}
-        <m.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="p-5 rounded-xl bg-card border border-border shadow-2xs space-y-4"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-sm text-foreground tracking-tight">Subscription & Monetization Yield</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Tier distribution across user base and revenue run-rate</p>
-            </div>
-            <span className="text-xs font-mono font-medium px-2 py-0.5 rounded border border-border bg-muted/50 text-foreground">
-              {planBreakdown.conversion}% Conversion
-            </span>
-          </div>
-
-          {/* Segmented Proportional Visual Distribution Bar */}
-          <div className="space-y-1.5 pt-1">
-            <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-              <span>Tier Distribution</span>
-              <span>{planBreakdown.total} Total Users</span>
-            </div>
-            <div className="h-2.5 w-full rounded-md bg-muted overflow-hidden flex border border-border/60">
-              <div
-                style={{ width: `${pct(planBreakdown.free)}%` }}
-                className="bg-muted-foreground/30 hover:opacity-90 transition-all"
-                title={`Free: ${planBreakdown.free} (${pct(planBreakdown.free).toFixed(1)}%)`}
-              />
-              <div
-                style={{ width: `${pct(planBreakdown.go)}%` }}
-                className="bg-cyan-500/70 hover:opacity-90 transition-all"
-                title={`GO: ${planBreakdown.go} (${pct(planBreakdown.go).toFixed(1)}%)`}
-              />
-              <div
-                style={{ width: `${pct(planBreakdown.plus)}%` }}
-                className="bg-foreground hover:opacity-90 transition-all"
-                title={`PLUS: ${planBreakdown.plus} (${pct(planBreakdown.plus).toFixed(1)}%)`}
-              />
-              <div
-                style={{ width: `${pct(planBreakdown.enterprise)}%` }}
-                className="bg-emerald-500 hover:opacity-90 transition-all"
-                title={`Enterprise: ${planBreakdown.enterprise} (${pct(planBreakdown.enterprise).toFixed(1)}%)`}
-              />
-            </div>
-          </div>
-
-          {/* Tier users + MRR bar chart */}
-          <div className="pt-1">
-            <div className="flex items-center gap-4 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#3B82F6]" /> Users
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#10B981]" /> MRR
-              </span>
-            </div>
-            <ResponsiveContainer width="100%" height={190}>
-              <BarChart data={tierData} margin={{ top: 12, right: 4, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis
-                  dataKey="tier"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={11}
-                  tickLine={false}
-                />
-                <YAxis
-                  yAxisId="left"
-                  allowDecimals={false}
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v: any) => `$${v}`}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                  }}
-                  formatter={(value: any, name: any) =>
-                    name === 'MRR' ? [`$${Number(value).toFixed(2)}`, name] : [value, name]
-                  }
-                />
-                <Bar yAxisId="left" dataKey="users" name="Users" fill="#3B82F6" radius={[3, 3, 0, 0]} barSize={20} />
-                <Bar yAxisId="right" dataKey="mrr" name="MRR" fill="#10B981" radius={[3, 3, 0, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Total Paid Accounts: <strong className="text-foreground font-mono">{planBreakdown.paid}</strong>
-            </span>
-            <span>
-              Annualized Run-Rate: <strong className="text-foreground font-mono">${(planBreakdown.mrr * 12).toFixed(2)}/yr</strong>
-            </span>
-          </div>
-        </m.div>
-
-        {/* AI Research & Compute Telemetry Card (Linear/Datadog Operational Command Center) */}
-        <m.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="p-5 rounded-xl bg-card border border-border shadow-2xs space-y-4"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-sm text-foreground tracking-tight">AI Compute & Gateway Telemetry</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Token consumption, latency health, and reasoning engine load</p>
-            </div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-mono font-medium px-2 py-0.5 rounded border border-border bg-muted/50 text-foreground">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Operational</span>
-            </span>
-          </div>
-
-          {/* Contextual Metrics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-            <div className="p-3 rounded-lg border border-border bg-muted/20">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Invocations</p>
-              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{aiTelemetry.requests}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">Agent executions</p>
-            </div>
-            <div className="p-3 rounded-lg border border-border bg-muted/20">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Total Tokens</p>
-              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">
-                {(aiTelemetry.totalTokens / 1000).toFixed(1)}k
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
-                {aiTelemetry.requests > 0 ? Math.round(aiTelemetry.totalTokens / aiTelemetry.requests) : 0} tok/req avg
-              </p>
-            </div>
-            <div className="p-3 rounded-lg border border-border bg-muted/20">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Avg Latency</p>
-              <p className="text-lg font-bold font-mono tabular-nums mt-1 text-foreground">{aiTelemetry.avgLatency}ms</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
-                {aiTelemetry.avgLatency < 500 ? 'Optimal response' : 'Standard lane'}
-              </p>
-            </div>
-            <div className="p-3 rounded-lg border border-border bg-muted/20">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Top Engine</p>
-              <p className="text-xs font-bold font-mono truncate mt-2 text-foreground" title={aiTelemetry.topModel}>
-                {aiTelemetry.topModel.replace('gemini-', '').replace('llama-', '')}
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">Primary model</p>
-            </div>
-          </div>
-
-          {/* Token Breakdown Bar */}
-          <div className="p-3 rounded-lg border border-border bg-muted/10 space-y-2">
-            <div className="flex items-center justify-between text-xs font-mono">
-              <span className="text-muted-foreground">Prompt vs Completion Tokens</span>
-              <span className="text-foreground">
-                In: {((aiTelemetry.inputTokens || 0) / 1000).toFixed(1)}k · Out: {((aiTelemetry.outputTokens || 0) / 1000).toFixed(1)}k
-              </span>
-            </div>
-            <div className="h-2 w-full rounded bg-muted overflow-hidden flex border border-border/50">
-              <div
-                style={{
-                  width: `${aiTelemetry.totalTokens > 0 ? ((aiTelemetry.inputTokens || 0) / aiTelemetry.totalTokens) * 100 : 50}%`,
-                }}
-                className="bg-muted-foreground/60 transition-all"
-                title="Input/Prompt tokens"
-              />
-              <div
-                style={{
-                  width: `${aiTelemetry.totalTokens > 0 ? ((aiTelemetry.outputTokens || 0) / aiTelemetry.totalTokens) * 100 : 50}%`,
-                }}
-                className="bg-foreground transition-all"
-                title="Output/Completion tokens"
-              />
-            </div>
-          </div>
-
-          {/* 7-day token usage trend */}
-          <div className="pt-1">
-            <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground mb-1">
-              <span>Token Usage · Last 7 Days</span>
-              <span>
-                {aiTelemetry.totalTokens > 0
-                  ? `${(aiTelemetry.totalTokens / 1000).toFixed(1)}k total`
-                  : 'No traffic'}
-              </span>
-            </div>
-            <ResponsiveContainer width="100%" height={110}>
-              <AreaChart data={aiTrend} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                />
-                <YAxis hide />
-                <Tooltip
-                  contentStyle={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                  }}
-                  formatter={(value: any) => [`${Number(value).toLocaleString()} tokens`, 'Tokens']}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="tokens"
-                  stroke="#8B5CF6"
-                  fill="#8B5CF6"
-                  fillOpacity={0.12}
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="pt-2 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-            <span>Gateway Policy: Max 20 req/min/user</span>
-            <span className="text-foreground font-mono">Queue Delay: 0ms (Dedicated)</span>
-          </div>
-        </m.div>
-      </div>
-
-      {/* Ecosystem Composition & Platform Funnel */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Role composition donut */}
-        <m.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.22 }}
-          className="p-5 rounded-xl bg-card border border-border shadow-2xs"
-        >
-          <h3 className="font-semibold text-sm text-foreground tracking-tight">Ecosystem Composition</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">User roles across the platform</p>
-          <div className="flex flex-col sm:flex-row items-center gap-6 mt-3">
-            <div className="relative w-[170px] h-[170px] shrink-0">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={roleBreakdown.active}
-                    dataKey="value"
-                    innerRadius={54}
-                    outerRadius={76}
-                    paddingAngle={3}
-                    stroke="none"
-                  >
-                    {roleBreakdown.active.map((role) => (
-                      <Cell key={role.name} fill={role.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: 'hsl(var(--card))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '12px',
-                      fontSize: '12px',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-xl font-bold font-mono tabular-nums text-foreground">
-                  {roleBreakdown.total}
-                </span>
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Users</span>
-              </div>
-            </div>
-            <div className="flex-1 w-full space-y-2.5">
-              {roleBreakdown.roles.map((role) => (
-                <div key={role.name} className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: role.color }} />
-                    {role.name}
+      {/* Pipeline */}
+      <Panel title="Pipeline" meta="All time">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+          {pipeline.map((stage, index) => (
+            <Fragment key={stage.label}>
+              {index > 0 && (
+                <div className="flex items-center justify-center gap-2 sm:w-32">
+                  <span className="hidden h-px flex-1 bg-border sm:block" />
+                  <span className="whitespace-nowrap font-mono text-[11px] tabular-nums text-muted-foreground">
+                    {stage.rate}
                   </span>
-                  <span className="font-mono tabular-nums text-foreground">
-                    {role.value}
-                    <span className="text-muted-foreground ml-2">
-                      {pct(role.value).toFixed(0)}%
-                    </span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </m.div>
-
-        {/* Platform funnel */}
-        <m.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.24 }}
-          className="p-5 rounded-xl bg-card border border-border shadow-2xs"
-        >
-          <h3 className="font-semibold text-sm text-foreground tracking-tight">Platform Funnel</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Postings → applications → issued certificates</p>
-          <div className="mt-3">
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart
-                data={funnelData}
-                layout="vertical"
-                margin={{ top: 4, right: 28, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-                <XAxis type="number" hide />
-                <YAxis
-                  type="category"
-                  dataKey="stage"
-                  width={92}
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  cursor={{ fill: 'hsl(var(--muted))', opacity: 0.4 }}
-                  contentStyle={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                  }}
-                  formatter={(value: any) => [value, 'Total']}
-                />
-                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20}>
-                  {funnelData.map((stage) => (
-                    <Cell key={stage.stage} fill={stage.color} />
-                  ))}
-                  <LabelList
-                    dataKey="value"
-                    position="right"
-                    fontSize={11}
-                    fill="hsl(var(--foreground))"
+                  <ArrowRight
+                    className="h-4 w-4 rotate-90 text-muted-foreground/50 sm:rotate-0"
+                    strokeWidth={1.5}
                   />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Application rate:{' '}
-              <strong className="text-foreground font-mono">
-                {internshipsCount > 0 ? Math.round((appsCount / internshipsCount) * 100) : 0}%
-              </strong>
-            </span>
-            <span>
-              Certificate rate:{' '}
-              <strong className="text-foreground font-mono">
-                {appsCount > 0 ? Math.round((certsCount / appsCount) * 100) : 0}%
-              </strong>
-            </span>
-          </div>
-        </m.div>
-      </div>
-
-      {/* Main Grid: Trends & Queues */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* User Growth Chart */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="bg-card rounded-2xl border border-border shadow-xs p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="font-semibold text-sm">User Registration Growth</h3>
-                <p className="text-xs text-muted-foreground">Cumulative signups over the last 6 months</p>
-              </div>
-              <Link
-                to="/admin/analytics"
-                className="text-xs font-medium text-accent hover:underline flex items-center gap-1"
-              >
-                Analytics Details <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={userGrowthData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Tooltip
-                  contentStyle={{
-                    background: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '12px',
-                    fontSize: '12px',
-                  }}
-                />
-                <Area type="monotone" dataKey="students" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.08} strokeWidth={2} />
-                <Area type="monotone" dataKey="companies" stroke="#10B981" fill="#10B981" fillOpacity={0.08} strokeWidth={2} />
-                <Area type="monotone" dataKey="mentors" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.08} strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </m.div>
-
-          {/* Recent Activity / Audit Feed */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card rounded-2xl border border-border shadow-xs overflow-hidden"
-          >
-            <div className="p-5 border-b border-border flex items-center justify-between bg-muted/20">
-              <div>
-                <h3 className="font-semibold text-sm">Live Platform & Governance Feed</h3>
-                <p className="text-xs text-muted-foreground">Recent actions, approvals, and credential events</p>
-              </div>
-              <Link
-                to="/admin/logs"
-                className="text-xs font-medium text-accent hover:underline flex items-center gap-1"
-              >
-                Full Audit Logs <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            <div className="divide-y divide-border">
-              {activities.length > 0 ? (
-                activities.map((activity) => (
-                  <div key={activity.id} className="p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors">
-                    <img
-                      src={
-                        activity.user?.avatar_url ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(activity.user?.full_name || 'System')}`
-                      }
-                      alt=""
-                      className="w-8 h-8 rounded-full flex-shrink-0 object-cover border border-border"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-foreground">
-                        <span className="font-semibold">{activity.user?.full_name || 'System / Admin'}</span>{' '}
-                        <span className="text-muted-foreground">{activity.action}</span>
-                      </p>
-                      {activity.details && (
-                        <p className="text-xs font-medium text-muted-foreground mt-0.5 truncate">
-                          {activity.details}
-                        </p>
-                      )}
-                      {activity.reason && (
-                        <p className="text-[11px] text-accent/90 italic mt-0.5">
-                          Note: {activity.reason}
-                        </p>
-                      )}
-                      <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {new Date(activity.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 text-center text-xs text-muted-foreground">
-                  No recent activities recorded in the audit ledger.
+                  <span className="hidden h-px flex-1 bg-border sm:block" />
                 </div>
               )}
-            </div>
-          </m.div>
+              <div className="flex-1 rounded-lg border border-border px-5 py-4">
+                <p className="font-mono text-[11px] text-muted-foreground">{stage.label}</p>
+                <div className="mt-2 flex items-center gap-3">
+                  <p
+                    className={`font-mono text-[26px] font-medium leading-none tabular-nums ${
+                      stage.seal ? 'text-accent' : ''
+                    }`}
+                  >
+                    {nf.format(stage.value)}
+                  </p>
+                  {stage.seal && (
+                    <img src="/seal.png" alt="" width={56} height={56} className="h-14 w-14" />
+                  )}
+                </div>
+              </div>
+            </Fragment>
+          ))}
         </div>
+      </Panel>
 
-        {/* Right Sidebar: Moderation Backlogs & Health */}
-        <div className="space-y-6">
-          {/* Operational Moderation Queues */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-card rounded-2xl border border-border shadow-xs p-5 space-y-4"
-          >
-            <h3 className="font-semibold text-sm">Moderation Queues</h3>
-            <div className="space-y-2.5">
-              <Link
-                to="/admin/companies"
-                className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted/70 transition-colors border border-border"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Building2 className="w-4 h-4 text-emerald-500" />
-                  <span className="text-xs font-medium">Pending Companies</span>
-                </div>
-                <span
-                  className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                    pendingCompanies > 0
-                      ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {pendingCompanies}
-                </span>
-              </Link>
+      {/* Signups + roles */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Panel
+          className="lg:col-span-2"
+          title="Signups"
+          action={
+            <Link
+              to="/admin/analytics"
+              className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Analytics <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+            </Link>
+          }
+        >
+          <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-muted-foreground">
+            <span className="flex items-center gap-2">
+              <span className="h-px w-4 bg-accent" /> Students
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="h-px w-4 bg-foreground/45" /> Companies
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="w-4 border-t border-dashed border-foreground/30" /> Mentors
+            </span>
+            <span className="ml-auto">Cumulative, last 6 months</span>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={userGrowthData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+              <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="2 4" vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                dy={6}
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))', fontFamily: 'JetBrains Mono, monospace' }}
+              />
+              <YAxis
+                allowDecimals={false}
+                tickLine={false}
+                axisLine={false}
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))', fontFamily: 'JetBrains Mono, monospace' }}
+              />
+              <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: 'hsl(var(--muted-foreground))' }} />
+              <Line
+                type="monotone"
+                dataKey="students"
+                name="Students"
+                stroke="hsl(var(--accent))"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 3 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="companies"
+                name="Companies"
+                stroke="hsl(var(--foreground) / 0.45)"
+                strokeWidth={1.5}
+                dot={false}
+                activeDot={{ r: 3 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="mentors"
+                name="Mentors"
+                stroke="hsl(var(--foreground) / 0.25)"
+                strokeWidth={1.5}
+                strokeDasharray="4 3"
+                dot={false}
+                activeDot={{ r: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Panel>
 
-              <Link
-                to="/admin/tools"
-                className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted/70 transition-colors border border-border"
-              >
-                <div className="flex items-center gap-2.5">
-                  <Wrench className="w-4 h-4 text-cyan-500" />
-                  <span className="text-xs font-medium">ToolHub Submissions</span>
-                </div>
-                <span
-                  className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                    pendingToolsCount > 0
-                      ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {pendingToolsCount}
-                </span>
-              </Link>
-
-              <Link
-                to="/admin/applications"
-                className="flex items-center justify-between p-3 rounded-xl bg-muted/40 hover:bg-muted/70 transition-colors border border-border"
-              >
-                <div className="flex items-center gap-2.5">
-                  <FileCheck className="w-4 h-4 text-blue-500" />
-                  <span className="text-xs font-medium">Total Applications</span>
-                </div>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                  {appsCount}
-                </span>
-              </Link>
-            </div>
-          </m.div>
-
-          {/* System Health */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35 }}
-            className="bg-card rounded-2xl border border-border shadow-xs p-5"
-          >
-            <h3 className="font-semibold text-sm mb-3.5">Infrastructure Status</h3>
-            <div className="space-y-2.5">
-              {systemHealth.map((service, i) => (
-                <div
-                  key={i}
-                  className="flex items-center justify-between p-2.5 bg-muted/40 rounded-xl border border-border"
-                >
-                  <div className="flex items-center gap-2">
-                    <service.icon className={`w-3.5 h-3.5 ${service.color}`} />
-                    <span className="text-xs">{service.name}</span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                    {service.status}
+        <Panel title="Roles" meta={`${nf.format(roleBreakdown.total)} users`}>
+          <div className="space-y-4">
+            {roleBreakdown.roles.map((role) => (
+              <div key={role.name} className="space-y-1.5">
+                <div className="flex items-baseline justify-between text-[13px]">
+                  <span>{role.name}</span>
+                  <span className="font-mono text-[12px] tabular-nums">
+                    {nf.format(role.value)}
+                    <span className="ml-2 text-muted-foreground">{pct(role.value).toFixed(0)}%</span>
                   </span>
                 </div>
-              ))}
-            </div>
-          </m.div>
-
-          {/* Quick Shortcuts */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-card rounded-2xl border border-border shadow-xs p-5"
-          >
-            <h3 className="font-semibold text-sm mb-3">Governance Portals</h3>
-            <div className="grid grid-cols-2 gap-2.5">
-              {[
-                { label: 'Users & Plans', icon: Users, href: '/admin/users' },
-                { label: 'Partners', icon: FolderOpen, href: '/admin/companies' },
-                { label: 'Audit Logs', icon: Shield, href: '/admin/logs' },
-                { label: 'Analytics', icon: TrendingUp, href: '/admin/analytics' },
-              ].map((action, i) => (
-                <Link
-                  key={i}
-                  to={action.href}
-                  className="flex flex-col items-center gap-1.5 p-3 bg-muted/40 rounded-xl hover:bg-accent/10 transition-colors border border-border text-center"
-                >
-                  <action.icon className="w-4 h-4 text-accent" />
-                  <span className="text-xs font-semibold">{action.label}</span>
-                </Link>
-              ))}
-            </div>
-          </m.div>
-        </div>
+                <Meter value={role.value} max={roleBreakdown.total} />
+              </div>
+            ))}
+          </div>
+        </Panel>
       </div>
-    </div>
+
+      {/* Subscriptions + review queues */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Panel
+          className="lg:col-span-2"
+          title="Subscriptions"
+          meta={`${planBreakdown.conversion}% conversion`}
+        >
+          <div className="flex items-end justify-between gap-4 border-b border-border pb-4">
+            <div>
+              <p className="font-mono text-[11px] text-muted-foreground">Est. MRR</p>
+              <p className="mt-1 font-mono text-[26px] font-medium leading-none tabular-nums">
+                {money(planBreakdown.mrr)}
+              </p>
+            </div>
+            <p className="text-[12px] text-muted-foreground">
+              {money(planBreakdown.mrr * 12)} annual run-rate
+            </p>
+          </div>
+          <div className="divide-y divide-border">
+            {tierData.map((tier) => (
+              <div key={tier.tier} className="flex h-11 items-center gap-4">
+                <span className="w-16 shrink-0 text-[13px] sm:w-24">{tier.tier}</span>
+                <Meter value={tier.users} max={planBreakdown.total} />
+                <span className="w-8 shrink-0 text-right font-mono text-[12px] tabular-nums sm:w-10">
+                  {nf.format(tier.users)}
+                </span>
+                <span className="hidden w-20 shrink-0 text-right font-mono text-[12px] tabular-nums text-muted-foreground sm:block">
+                  {tier.mrr > 0 ? money(tier.mrr) : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel title="Needs review" meta="Open queues">
+          <div className="divide-y divide-border">
+            {[
+              { label: 'Pending companies', value: pendingCompanies, href: '/admin/companies', alert: true },
+              { label: 'ToolHub submissions', value: pendingToolsCount, href: '/admin/tools', alert: true },
+              { label: 'Applications', value: appsCount, href: '/admin/applications', alert: false },
+            ].map((row) => (
+              <Link
+                key={row.label}
+                to={row.href}
+                className="group flex h-12 items-center justify-between gap-4 text-[13px]"
+              >
+                <span className="text-muted-foreground transition-colors group-hover:text-foreground">
+                  {row.label}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span
+                    className={`font-mono text-[13px] tabular-nums ${
+                      row.alert && row.value > 0 ? 'text-amber-600 dark:text-amber-400' : ''
+                    }`}
+                  >
+                    {nf.format(row.value)}
+                  </span>
+                  <ArrowUpRight
+                    className="h-4 w-4 text-muted-foreground/40 transition-colors group-hover:text-foreground"
+                    strokeWidth={1.5}
+                  />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Panel>
+      </div>
+
+      {/* Activity + AI usage */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Panel
+          className="lg:col-span-2"
+          title="Recent activity"
+          action={
+            <Link
+              to="/admin/logs"
+              className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Audit logs <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+            </Link>
+          }
+        >
+          {activities.length === 0 ? (
+            <p className="py-6 text-center text-[13px] text-muted-foreground">No activity recorded yet</p>
+          ) : (
+            <table className="w-full text-[13px]">
+              <thead>
+                <tr className="border-b border-border text-left font-mono text-[11px] text-muted-foreground">
+                  <th className="hidden w-32 pb-2 font-normal sm:table-cell">Time</th>
+                  <th className="pb-2 font-normal">Actor</th>
+                  <th className="pb-2 font-normal">Action</th>
+                  <th className="hidden pb-2 font-normal md:table-cell">Detail</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {activities.map((activity) => {
+                  const detail = [activity.details, activity.reason].filter(Boolean).join(' · ');
+                  return (
+                    <tr key={activity.id}>
+                      <td className="hidden py-2.5 pr-4 font-mono text-[11px] tabular-nums text-muted-foreground sm:table-cell">
+                        {shortDate(activity.created_at)}
+                      </td>
+                      <td className="whitespace-nowrap py-2.5 pr-4">{activity.user?.full_name || 'System'}</td>
+                      <td className="py-2.5 pr-4 text-muted-foreground">{activity.action}</td>
+                      <td
+                        className="hidden max-w-[280px] truncate py-2.5 text-muted-foreground md:table-cell"
+                        title={detail || undefined}
+                      >
+                        {detail || '—'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </Panel>
+
+        <Panel title="AI usage" meta="Last 7 days">
+          <div className="divide-y divide-border text-[13px]">
+            {[
+              { label: 'Calls', value: nf.format(aiTelemetry.requests) },
+              {
+                label: 'Tokens',
+                value: `${compact(aiTelemetry.totalTokens)} · ${compact(aiTelemetry.inputTokens)} in / ${compact(aiTelemetry.outputTokens)} out`,
+              },
+              { label: 'Latency', value: `${nf.format(aiTelemetry.avgLatency)}ms avg` },
+              { label: 'Top model', value: aiTelemetry.topModel },
+            ].map((row) => (
+              <div key={row.label} className="flex h-10 items-center justify-between gap-4">
+                <span className="text-muted-foreground">{row.label}</span>
+                <span className="truncate font-mono text-[12px] tabular-nums" title={row.value}>
+                  {row.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5">
+            <div className="flex h-16 items-end gap-1.5">
+              {aiTrend.map((day) => {
+                const height = peakDayTokens > 0 ? Math.max(2, Math.round((day.tokens / peakDayTokens) * 64)) : 2;
+                return (
+                  <div
+                    key={day.key}
+                    className={`flex-1 rounded-sm ${day.tokens > 0 && day.tokens === peakDayTokens ? 'bg-accent' : 'bg-foreground/15'}`}
+                    style={{ height }}
+                    title={`${nf.format(day.tokens)} tokens`}
+                  />
+                );
+              })}
+            </div>
+            <div className="mt-1.5 flex gap-1.5 font-mono text-[10px] text-muted-foreground">
+              {aiTrend.map((day) => (
+                <span key={day.key} className="flex-1 text-center">
+                  {day.day.slice(0, 1)}
+                </span>
+              ))}
+            </div>
+            {aiTelemetry.totalTokens === 0 && (
+              <p className="mt-3 text-[12px] text-muted-foreground">No usage in the last 7 days</p>
+            )}
+          </div>
+        </Panel>
+      </div>
+    </m.div>
   );
 }

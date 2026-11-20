@@ -68,7 +68,7 @@
     --secondary-foreground: 0 0% 100%;
     --muted: 60 12% 91%;             /* #EAEAE4 - Toggle track & subtle surfaces */
     --muted-foreground: 60 3% 45%;   /* #757570 - Sub-labels & secondary text */
-    --accent: 217 91% 60%;
+    --accent: 215 100% 38%;          /* #0051C3 - ZYR0 Work sapphire */
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -78,7 +78,7 @@
     --warning-foreground: 0 0% 100%;
     --border: 60 9% 87%;             /* #E2E2DC - Warm sand border */
     --input: 60 9% 87%;              /* #E2E2DC - Inputs */
-    --ring: 217 91% 60%;
+    --ring: 215 100% 38%;
     --radius: 0.5rem;
     --sidebar-background: 60 17% 98%;
     --sidebar-foreground: 60 6% 13%;
@@ -179,13 +179,13 @@
     --secondary-foreground: 210 40% 98%;
     --muted: 30 3% 20%;              /* #343332 - Toggle track & subtle surfaces */
     --muted-foreground: 36 4% 65%;   /* #A6A5A0 - Sub-labels & secondary text */
-    --accent: 217.2 91.2% 59.8%;
+    --accent: 215 90% 62%;           /* Sapphire lifted for dark surfaces */
     --accent-foreground: 222 47% 11%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 40 3% 23%;             /* #3D3C3A - Warm stone border */
     --input: 40 3% 23%;              /* #3D3C3A - Inputs */
-    --ring: 217.2 91.2% 59.8%;
+    --ring: 215 90% 62%;
     --sidebar-background: 30 2% 16%;
     --sidebar-foreground: 48 10% 94%;
     --sidebar-primary: 217.2 91.2% 59.8%;
