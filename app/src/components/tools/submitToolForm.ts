@@ -1,7 +1,7 @@
 import type { ToolItemType } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
 
-export type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
+type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
 
 export const TOOL_FORM_CATEGORIES: ToolFormCategory[] = [
   'AI & Agents',
@@ -132,6 +132,7 @@ export interface ToolDraft {
   imageUrl: string;
   commands: ToolInstallCommand[];
   installInstructions: string;
+  magicPrompt: string;
   tagsInput: string;
   capabilitiesInput: string;
   version: string;
@@ -159,6 +160,7 @@ export function isDraftEmpty(draft: ToolDraft): boolean {
     !draft.imageUrl.trim() &&
     !draft.version.trim() &&
     !draft.installInstructions.trim() &&
+    !draft.magicPrompt?.trim() &&
     !draft.authorUrl.trim() &&
     !draft.slug.trim() &&
     !draft.seoTitle.trim() &&
@@ -231,6 +233,7 @@ export function loadToolDraft(userId: string): ToolDraft | null {
       imageUrl: text('imageUrl'),
       commands: commands.length > 0 ? commands : [{ label: 'CLI', command: '' }],
       installInstructions: text('installInstructions'),
+      magicPrompt: text('magicPrompt'),
       tagsInput: text('tagsInput'),
       capabilitiesInput: text('capabilitiesInput'),
       version: text('version'),

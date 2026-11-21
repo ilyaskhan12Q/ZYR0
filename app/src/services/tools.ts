@@ -1,7 +1,9 @@
 import { supabase } from '@/lib/supabase';
 import { slugify } from '@/lib/slug';
-import { TOOLS_DATA, type ToolItem, type ToolCategory, type ToolItemType } from '@/data/tools';
+import { type ToolItem, type ToolItemType } from '@/data/tools';
 import type { DbTool, ToolSubmissionStatus, ToolInstallCommand } from '@/lib/database.types';
+import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
+import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
 
 export interface SubmitToolInput {
   name: string;
@@ -22,6 +24,7 @@ export interface SubmitToolInput {
   install_command?: string;
   install_commands?: ToolInstallCommand[];
   install_instructions?: string;
+  magic_prompt?: string;
   version?: string;
   author_name: string;
   author_url?: string;
@@ -60,6 +63,7 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
     installCommand: dbTool.install_command || installCommands[0]?.command || undefined,
     installCommands: installCommands.length > 0 ? installCommands : undefined,
     installInstructions: dbTool.install_instructions || undefined,
+    magicPrompt: dbTool.magic_prompt || undefined,
     version: dbTool.version || undefined,
     seoTitle: dbTool.seo_title || undefined,
     seoDescription: dbTool.seo_description || undefined,
@@ -74,7 +78,7 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
  * Fetch all approved community tools from Supabase.
  * Falls back gracefully to empty array if table or network is unavailable.
  */
-export async function getApprovedCommunityTools(): Promise<ToolItem[]> {
+async function getApprovedCommunityTools(): Promise<ToolItem[]> {
   try {
     const { data, error } = await supabase
       .from('tools')
@@ -95,31 +99,165 @@ export async function getApprovedCommunityTools(): Promise<ToolItem[]> {
 }
 
 /**
- * Fetches all approved public tools directly from Supabase.
+ * Fetches all approved public tools with request deduplication and memory caching.
  */
-export async function getAllPublicTools(): Promise<ToolItem[]> {
-  const communityTools = await getApprovedCommunityTools();
-  return communityTools || [];
+export async function getAllPublicTools(useCache = true): Promise<ToolItem[]> {
+  const cacheKey = createRequestKey('public_tools', 'all');
+  if (useCache) {
+    const cached = getCachedData<ToolItem[]>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const fetchFn = async () => {
+    const communityTools = await getApprovedCommunityTools();
+    return communityTools || [];
+  };
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+  if (Array.isArray(res)) {
+    setCachedData(cacheKey, res);
+  }
+  return res || [];
+}
+
+/**
+ * Pure recommendation ranking algorithm:
+ * Weights:
+ * - featured: +10
+ * - official/verified badge: +5; trending/popular: +4; other badge: +2
+ * - actionable execution (commands / magic prompt): +3
+ * - preferredType match (e.g. 'skill' or 'tool_skill'): +3
+ * - rich metadata (capabilities count up to +2)
+ *
+ * Applies category diversity so recommendations represent multiple domains.
+ */
+export function rankRecommendedTools(
+  tools: ToolItem[],
+  maxItems = 4,
+  preferredType: 'skill' | 'tool' | 'all' = 'skill'
+): ToolItem[] {
+  if (!tools || tools.length === 0) return [];
+
+  const scored = tools.map((tool) => {
+    let score = 0;
+
+    // 1. Featured status (highest weight)
+    if (tool.featured) score += 10;
+
+    // 2. Verified / Official / Trending badges
+    if (tool.badge) {
+      const b = tool.badge.toLowerCase();
+      if (b.includes('official') || b.includes('verified')) score += 5;
+      else if (b.includes('trending') || b.includes('popular')) score += 4;
+      else score += 2;
+    }
+
+    // 3. Execution readiness: ready commands or magic prompt
+    if (tool.installCommands?.length || tool.installCommand || tool.magicPrompt) {
+      score += 3;
+    }
+
+    // 4. Type relevance
+    if (preferredType === 'skill') {
+      if (tool.item_type === 'skill') score += 4;
+      else if (tool.item_type === 'tool_skill') score += 3;
+      else score += 1;
+    } else if (preferredType === 'tool') {
+      if (tool.item_type === 'tool') score += 4;
+      else if (tool.item_type === 'tool_skill') score += 3;
+      else score += 1;
+    } else {
+      score += 2;
+    }
+
+    // 5. Metadata depth
+    if (tool.capabilities?.length) {
+      score += Math.min(tool.capabilities.length * 0.25, 2);
+    }
+    if (tool.description && tool.description.length > 100) {
+      score += 1;
+    }
+
+    return { tool, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  // Diverse category pass: pick highest scoring per category first
+  const selected: ToolItem[] = [];
+  const seenCategories = new Set<string>();
+
+  for (const item of scored) {
+    if (!seenCategories.has(item.tool.category) && selected.length < maxItems) {
+      selected.push(item.tool);
+      seenCategories.add(item.tool.category);
+    }
+  }
+
+  // Fill remaining slots
+  for (const item of scored) {
+    if (selected.length >= maxItems) break;
+    if (!selected.some((s) => s.id === item.tool.id)) {
+      selected.push(item.tool);
+    }
+  }
+
+  return selected;
+}
+
+/**
+ * Fetch top recommended tools using the ranking algorithm.
+ */
+export async function getRecommendedTools(
+  maxItems = 4,
+  preferredType: 'skill' | 'tool' | 'all' = 'skill',
+  useCache = true
+): Promise<ToolItem[]> {
+  const cacheKey = createRequestKey('recommended_tools', `${preferredType}:${maxItems}`);
+  if (useCache) {
+    const cached = getCachedData<ToolItem[]>(cacheKey);
+    if (cached) return cached;
+  }
+
+  const all = await getAllPublicTools(useCache);
+  const ranked = rankRecommendedTools(all, maxItems, preferredType);
+
+  setCachedData(cacheKey, ranked);
+  return ranked;
 }
 
 /**
  * Fetch a single approved tool by its URL slug for the detail page.
  * Returns null if the tool does not exist or is not approved (prevents detail pages for pending/rejected).
  */
-export async function getToolBySlug(slug: string): Promise<ToolItem | null> {
-  try {
-    const { data, error } = await supabase
-      .from('tools')
-      .select('*')
-      .eq('slug', slug)
-      .eq('status', 'approved')
-      .single();
-
-    if (error || !data) return null;
-    return mapDbToolToToolItem(data as DbTool);
-  } catch {
-    return null;
+export async function getToolBySlug(slug: string, useCache = true): Promise<ToolItem | null> {
+  const cacheKey = createRequestKey('tool_by_slug', slug);
+  if (useCache) {
+    const cached = getCachedData<ToolItem | null>(cacheKey);
+    if (cached !== null) return cached;
   }
+
+  const fetchFn = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tools')
+        .select('*')
+        .eq('slug', slug)
+        .eq('status', 'approved')
+        .single();
+
+      if (error || !data) return null;
+      return mapDbToolToToolItem(data as DbTool);
+    } catch {
+      return null;
+    }
+  };
+
+  const res = await dedupRequest(cacheKey, fetchFn);
+  if (res) {
+    setCachedData(cacheKey, res);
+  }
+  return res;
 }
 
 /** Shared field mapping so inserts and edits cannot drift apart. */
@@ -143,6 +281,7 @@ function buildToolPayload(input: SubmitToolInput, forInsert: boolean): Partial<D
     install_command: hasCommands ? input.install_commands![0].command : input.install_command?.trim() || null,
     install_commands: hasCommands ? input.install_commands : null,
     install_instructions: input.install_instructions?.trim() || null,
+    magic_prompt: input.magic_prompt?.trim() || null,
     version: input.version?.trim() || null,
     author_name: input.author_name.trim(),
     author_url: input.author_url?.trim() || null,
@@ -182,6 +321,8 @@ export async function submitTool(input: SubmitToolInput, ownerId: string): Promi
     throw new Error(error.message || 'Failed to submit tool for review');
   }
 
+  clearCache('public_tools');
+  clearCache('recommended_tools');
   return data as DbTool;
 }
 
@@ -214,6 +355,9 @@ export async function updateTool(toolId: string, input: SubmitToolInput): Promis
     throw new Error(error.message || 'Failed to update listing');
   }
 
+  clearCache('public_tools');
+  clearCache('recommended_tools');
+  clearCache(createRequestKey('tool_by_slug', slug));
   return data as DbTool;
 }
 
@@ -288,6 +432,8 @@ export async function updateToolStatusAdmin(
     throw new Error(error.message || 'Failed to update tool status');
   }
 
+  clearCache('public_tools');
+  clearCache('recommended_tools');
   return data as DbTool;
 }
 
@@ -303,4 +449,7 @@ export async function deleteToolAdmin(toolId: string): Promise<void> {
   if (error) {
     throw new Error(error.message || 'Failed to delete tool');
   }
+
+  clearCache('public_tools');
+  clearCache('recommended_tools');
 }

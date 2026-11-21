@@ -26,6 +26,7 @@ export interface ToolItem {
   installCommand?: string;
   installCommands?: ToolInstallCommand[];
   installInstructions?: string;
+  magicPrompt?: string;
   version?: string;
   seoTitle?: string;
   seoDescription?: string;
@@ -43,8 +44,6 @@ export const TOOL_CATEGORIES: ToolCategory[] = [
   'Research & Docs',
   'Productivity',
 ];
-
-export const TOOLS_DATA: ToolItem[] = [];
 
 /**
  * Gradient background for card/preview heroes. Custom admin color wins when valid;

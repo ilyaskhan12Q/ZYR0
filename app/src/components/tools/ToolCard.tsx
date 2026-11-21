@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ExternalLink, Terminal, Sparkles, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -7,10 +7,9 @@ import { type ToolItem, coverGradient } from '@/data/tools';
 
 interface ToolCardProps {
   tool: ToolItem;
-  onPreview: (tool: ToolItem) => void;
 }
 
-export function ToolCard({ tool, onPreview }: ToolCardProps) {
+export function ToolCard({ tool }: ToolCardProps) {
   const navigate = useNavigate();
   const [imgFailed, setImgFailed] = useState(false);
   const showImage = Boolean(tool.imageUrl) && !imgFailed;

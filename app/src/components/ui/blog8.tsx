@@ -14,6 +14,7 @@ interface Post {
   author: string;
   published: string;
   url: string;
+  actionLabel?: string;
   image?: string;
   coverColor?: string;
   tags?: string[];
@@ -77,10 +78,11 @@ const Blog8 = ({
                   <div className="mt-6 flex items-center space-x-2 md:mt-8">
                     <Link
                       to={post.url}
-                      className="inline-flex items-center font-semibold hover:underline md:text-base"
+                      className="inline-flex items-center font-semibold hover:underline md:text-base text-[var(--zyro-accent)] hover:text-[var(--zyro-sapphire)] transition-colors"
+                      aria-label={`${post.actionLabel || 'Inspect'} ${post.title}`}
                     >
-                      <span>Read more</span>
-                      <ArrowRight className="ml-2 size-4 transition-transform" />
+                      <span>{post.actionLabel || 'Read more'}</span>
+                      <ArrowRight className="ml-2 size-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
                 </div>

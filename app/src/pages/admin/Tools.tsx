@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
-  Wrench, CheckCircle2, XCircle, Clock, Star, ExternalLink,
-  Search, ShieldAlert, Sparkles, AlertCircle, Trash2, Edit3, Eye, Plus
+  CheckCircle2, XCircle, Star, ExternalLink,
+  Search, Trash2, Eye, Plus, Edit3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

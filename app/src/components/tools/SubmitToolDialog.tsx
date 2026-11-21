@@ -63,7 +63,7 @@ const SEARCH_PREVIEW_DOMAIN = BASE_URL.replace(/^https?:\/\//, '').replace(/\/+$
 
 const STAGES: { id: Stage; label: string; hint: string }[] = [
   { id: 1, label: 'Basics', hint: 'Source, name, tagline' },
-  { id: 2, label: 'Listing content', hint: 'Description, install, details' },
+  { id: 2, label: 'Listing content', hint: 'Description, commands, details' },
   { id: 3, label: 'Review', hint: 'Completeness & preview' },
 ];
 
@@ -85,9 +85,30 @@ const MARKDOWN_TOOLS: { label: string; icon: React.ElementType; action: Markdown
   { label: 'Code block', icon: Code2, action: { kind: 'inline', before: '```\n', after: '\n```', placeholder: 'code' } },
 ];
 
-function FieldError({ msg }: { msg?: string }) {
+function commandPlaceholder(label: string) {
+  const value = label.toLowerCase();
+  if (value.includes('update')) return 'npm update -g example';
+  if (value.includes('run')) return 'npx example';
+  if (value.includes('invoke')) return 'npx example --help';
+  if (value.includes('uninstall')) return 'npm uninstall -g example';
+  if (value.includes('setup')) return 'npx example setup';
+  if (value.includes('build')) return 'npm run build';
+  if (value.includes('test')) return 'npm test';
+  if (value.includes('pip')) return 'pip install example';
+  if (value.includes('docker')) return 'docker run -p 8080:8080 example';
+  return 'npm install -g example';
+}
+
+const COMMAND_LABEL_DEFAULTS = ['Installation command', 'Update command', 'Run command', 'Setup command'];
+
+function defaultCommandLabel(itemType: ItemType, index: number) {
+  if (itemType === 'skill') return index === 0 ? 'Invocation command' : 'Run command';
+  return COMMAND_LABEL_DEFAULTS[Math.min(index, COMMAND_LABEL_DEFAULTS.length - 1)];
+}
+
+function FieldError({ id, msg }: { id?: string; msg?: string }) {
   return msg ? (
-    <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
+    <p id={id} className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
       <AlertCircle className="h-3 w-3 shrink-0" />
       {msg}
     </p>
@@ -109,19 +130,21 @@ function FieldLabel({
     <div className="mb-1.5 flex items-baseline justify-between gap-3">
       <label htmlFor={htmlFor} className="text-xs font-semibold text-foreground">
         {children}
-        {required && <span className="ml-0.5 text-red-500">*</span>}
+        {required && (
+          <>
+            <span aria-hidden="true" className="ml-0.5 text-red-500">*</span>
+            <span className="sr-only"> (required)</span>
+          </>
+        )}
       </label>
       {hint && <span className="shrink-0 text-[10px] text-muted-foreground">{hint}</span>}
     </div>
   );
 }
 
-function StageHeading({ step, title, description }: { step: Stage; title: string; description: string }) {
+function StageHeading({ title, description }: { title: string; description: string }) {
   return (
     <div className="space-y-1">
-      <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
-        Step {step} of 3
-      </span>
       <h3 className="text-lg font-semibold tracking-tight text-foreground">{title}</h3>
       <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
     </div>
@@ -186,7 +209,10 @@ function ListingPreview({
   const tags = parseTags(draft.tagsInput);
   const capabilities = parseLines(draft.capabilitiesInput);
   const commands = draft.commands
-    .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
+    .map((command) => ({
+      label: command.label.trim() || (draft.itemType === 'skill' ? 'Invocation command' : 'Installation command'),
+      command: command.command.trim(),
+    }))
     .filter((command) => command.command);
   const initials = (draft.name.trim() || '?')
     .split(/\s+/)
@@ -276,6 +302,31 @@ function ListingPreview({
           )}
         </div>
 
+        {commands.length > 0 && (
+          <section>
+            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Commands</h4>
+            <div className="space-y-1.5">
+              {commands.map((command) => (
+                <div key={`${command.label}-${command.command}`} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950">
+                  <div className="border-b border-neutral-800 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-400">
+                    {command.label}
+                  </div>
+                  <pre className="overflow-x-auto p-2.5 font-mono text-[11px] text-emerald-300">
+                    <span className="select-none text-neutral-500">$ </span>
+                    {command.command}
+                  </pre>
+                </div>
+              ))}
+            </div>
+            {draft.installInstructions.trim() && (
+              <p className="mt-2 flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                <Info className="mt-px h-3 w-3 shrink-0 text-[var(--zyro-accent)]" />
+                <span>{draft.installInstructions}</span>
+              </p>
+            )}
+          </section>
+        )}
+
         <section>
           <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">About</h4>
           {draft.description.trim() ? (
@@ -315,33 +366,6 @@ function ListingPreview({
                 );
               })}
             </ul>
-          </section>
-        )}
-
-        {commands.length > 0 && (
-          <section>
-            <h4 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              {draft.itemType === 'skill' ? 'Invocation' : 'Installation'}
-            </h4>
-            <div className="space-y-1.5">
-              {commands.map((command) => (
-                <div key={`${command.label}-${command.command}`} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950">
-                  <div className="border-b border-neutral-800 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-400">
-                    {command.label}
-                  </div>
-                  <pre className="overflow-x-auto p-2.5 font-mono text-[11px] text-emerald-300">
-                    <span className="select-none text-neutral-500">$ </span>
-                    {command.command}
-                  </pre>
-                </div>
-              ))}
-            </div>
-            {draft.installInstructions.trim() && (
-              <p className="mt-2 flex items-start gap-1.5 text-[11px] text-muted-foreground">
-                <Info className="mt-px h-3 w-3 shrink-0 text-[var(--zyro-accent)]" />
-                <span>{draft.installInstructions}</span>
-              </p>
-            )}
           </section>
         )}
 
@@ -425,8 +449,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   const [sourceUrl, setSourceUrl] = useState('');
   const [docUrl, setDocUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [commands, setCommands] = useState<ToolInstallCommand[]>([{ label: 'CLI', command: '' }]);
+  const [commands, setCommands] = useState<ToolInstallCommand[]>([{ label: 'Installation command', command: '' }]);
   const [installInstructions, setInstallInstructions] = useState('');
+  const [magicPrompt, setMagicPrompt] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [capabilitiesInput, setCapabilitiesInput] = useState('');
   const [version, setVersion] = useState('');
@@ -471,6 +496,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
       imageUrl,
       commands,
       installInstructions,
+      magicPrompt,
       tagsInput,
       capabilitiesInput,
       version,
@@ -486,7 +512,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     }),
     [
       itemType, name, tagline, description, category, source, sourceUrl, docUrl, imageUrl,
-      commands, installInstructions, tagsInput, capabilitiesInput, version, authorName,
+      commands, installInstructions, magicPrompt, tagsInput, capabilitiesInput, version, authorName,
       authorUrl, slug, seoTitle, seoDescription, adminStatus, adminFeatured, adminBadge, adminCoverColor,
     ]
   );
@@ -494,7 +520,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   const previewTags = parseTags(tagsInput);
   const previewCapabilities = parseLines(capabilitiesInput);
   const validCommands = commands
-    .map((command) => ({ label: command.label.trim() || 'Install', command: command.command.trim() }))
+    .map((command) => ({
+      label: command.label.trim() || (itemType === 'skill' ? 'Invocation command' : 'Installation command'),
+      command: command.command.trim(),
+    }))
     .filter((command) => Boolean(command.command));
   const hasContent = !isDraftEmpty(draft);
 
@@ -548,7 +577,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setSourceUrl('');
     setDocUrl('');
     setImageUrl('');
-    setCommands([{ label: 'CLI', command: '' }]);
+    setCommands([{ label: 'Installation command', command: '' }]);
     setInstallInstructions('');
     setTagsInput('');
     setCapabilitiesInput('');
@@ -597,11 +626,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setCommands(
       tool.install_commands && tool.install_commands.length > 0
         ? tool.install_commands
-        : tool.install_command
-          ? [{ label: tool.item_type === 'skill' ? 'Invocation' : 'CLI', command: tool.install_command }]
-          : [{ label: 'CLI', command: '' }]
+        : [{ label: defaultCommandLabel(tool.item_type, 0), command: tool.install_command || '' }]
     );
     setInstallInstructions(tool.install_instructions || '');
+    setMagicPrompt(tool.magic_prompt || '');
     setTagsInput((tool.tags || []).join(', '));
     setCapabilitiesInput((tool.capabilities || []).join('\n'));
     setVersion(tool.version || '');
@@ -644,8 +672,9 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setDocUrl(saved.docUrl);
     setImageUrl(saved.imageUrl);
     setImageState(saved.imageUrl.trim() ? 'loading' : 'idle');
-    setCommands(saved.commands.length > 0 ? saved.commands : [{ label: 'CLI', command: '' }]);
+    setCommands(saved.commands.length > 0 ? saved.commands : [{ label: defaultCommandLabel(saved.itemType, 0), command: '' }]);
     setInstallInstructions(saved.installInstructions);
+    setMagicPrompt(saved.magicPrompt || '');
     setTagsInput(saved.tagsInput);
     setCapabilitiesInput(saved.capabilitiesInput);
     setVersion(saved.version);
@@ -754,7 +783,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   };
 
   const handleAddCommand = () => {
-    setCommands((previous) => [...previous, { label: itemType === 'skill' ? 'Agent Setup' : 'CLI', command: '' }]);
+    setCommands((previous) => [...previous, { label: defaultCommandLabel(itemType, previous.length), command: '' }]);
   };
 
   const handleRemoveCommand = (index: number) => {
@@ -848,6 +877,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
         install_command: validCommands[0]?.command || undefined,
         install_commands: validCommands.length > 0 ? validCommands : undefined,
         install_instructions: installInstructions.trim() || undefined,
+        magic_prompt: magicPrompt.trim() || undefined,
         version: version.trim() || undefined,
         author_name: authorName.trim() || profile?.full_name || 'Community Builder',
         author_url: authorUrl.trim() ? normalizeUrl(authorUrl) : undefined,
@@ -964,6 +994,21 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     coverColor: isAdmin ? adminCoverColor : tool?.cover_color || undefined,
   };
 
+  const reviewTitle = tool
+    ? 'Review and save'
+    : isAdmin && adminStatus === 'approved'
+      ? 'Review and publish'
+      : 'Review and submit';
+  const finalActionLabel = tool
+    ? isAdmin && adminStatus === 'approved'
+      ? 'Save and publish'
+      : 'Save changes'
+    : isAdmin
+      ? adminStatus === 'approved'
+        ? 'Publish live'
+        : 'Submit as pending'
+      : 'Submit for review';
+
   const successLive = isAdmin && adminStatus === 'approved';
   const successTitle = tool ? 'Listing updated!' : successLive ? 'Tool published live!' : 'Submission queued!';
   const successBody = tool
@@ -977,7 +1022,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="flex max-h-[94vh] flex-col gap-0 overflow-hidden border-border/80 bg-card p-0 sm:max-w-6xl">
-        <DialogHeader className="shrink-0 space-y-1.5 border-b border-border/60 px-5 pb-3 pt-5 pr-14 text-left sm:px-7">
+        <DialogHeader className="shrink-0 space-y-1.5 border-b border-border/60 bg-gradient-to-br from-[var(--zyro-accent-muted)] via-card to-card px-5 pb-3 pt-5 pr-14 text-left sm:px-7">
           <div className="inline-flex w-fit items-center gap-1.5 rounded-md border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
             <Sparkles className="h-3 w-3" />
             <span>Community Registry</span>
@@ -996,9 +1041,20 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
           </DialogDescription>
 
           {user && !submittedSuccess && (
-            <nav aria-label="Submission steps" className="grid grid-cols-3 gap-1 pt-1.5">
-              {STAGES.map((item) => stageItem(item.id))}
-            </nav>
+            <>
+              <p className="pt-1 text-[10px] text-muted-foreground">
+                <span className="text-red-500">*</span> Required field
+              </p>
+              <nav aria-label="Submission steps" className="grid grid-cols-3 gap-1">
+                {STAGES.map((item) => stageItem(item.id))}
+              </nav>
+              <div className="h-1 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                <div
+                  className="h-full rounded-full bg-[var(--zyro-accent)] transition-all duration-300"
+                  style={{ width: `${(stage / 3) * 100}%` }}
+                />
+              </div>
+            </>
           )}
         </DialogHeader>
 
@@ -1057,60 +1113,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
                   <div className="min-w-0 space-y-5">
                     <StageHeading
-                      step={1}
                       title="Basic information"
-                      description="Start with the source and the essentials people will see first."
+                      description="Name it, describe it in one line, then point to the source."
                     />
                     {draftBanner}
-
-                    <div className="space-y-1.5">
-                      <FieldLabel htmlFor="st-source-url" required hint="GitHub shorthand like org/repo works">
-                        Source URL
-                      </FieldLabel>
-                      <input
-                        id="st-source-url"
-                        type="text"
-                        inputMode="url"
-                        placeholder="https://github.com/org/repo"
-                        value={sourceUrl}
-                        onChange={(event) => {
-                          setSourceUrl(event.target.value);
-                          clearError('sourceUrl');
-                        }}
-                        aria-invalid={Boolean(errors.sourceUrl)}
-                        aria-describedby={errors.sourceUrl ? 'st-source-url-error' : undefined}
-                        className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
-                      />
-                      <div id="st-source-url-error">
-                        <FieldError msg={errors.sourceUrl} />
-                      </div>
-                      <p className="text-[11px] leading-relaxed text-muted-foreground">
-                        The repository, package, or official page this listing is based on.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <FieldLabel required>Item classification</FieldLabel>
-                      <div role="radiogroup" aria-label="Item classification" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                        {ITEM_TYPES.map((type) => (
-                          <button
-                            key={type.id}
-                            type="button"
-                            role="radio"
-                            aria-checked={itemType === type.id}
-                            onClick={() => setItemType(type.id)}
-                            className={`rounded-xl border p-3 text-left transition-colors ${
-                              itemType === type.id
-                                ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent-muted)] ring-1 ring-[var(--zyro-accent)]'
-                                : 'border-border/70 bg-card hover:bg-muted/40'
-                            }`}
-                          >
-                            <span className="block text-xs font-semibold text-foreground">{type.label}</span>
-                            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{type.desc}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div className="space-y-1.5">
@@ -1127,9 +1133,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                             clearError('name');
                           }}
                           aria-invalid={Boolean(errors.name)}
+                          aria-describedby={errors.name ? 'st-name-error' : undefined}
                           className={`${inputCls} ${errors.name ? inputErrorCls : ''}`}
                         />
-                        <FieldError msg={errors.name} />
+                        <FieldError id="st-name-error" msg={errors.name} />
                       </div>
 
                       <div className="space-y-1.5">
@@ -1165,9 +1172,81 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                           clearError('tagline');
                         }}
                         aria-invalid={Boolean(errors.tagline)}
+                        aria-describedby={errors.tagline ? 'st-tagline-error' : undefined}
                         className={`${inputCls} ${errors.tagline ? inputErrorCls : ''}`}
                       />
-                      <FieldError msg={errors.tagline} />
+                      <FieldError id="st-tagline-error" msg={errors.tagline} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-foreground">
+                        Item classification
+                        <span aria-hidden="true" className="ml-0.5 text-red-500">*</span>
+                        <span className="sr-only"> (required)</span>
+                      </p>
+                      <div role="radiogroup" aria-label="Item classification" aria-required="true" className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        {ITEM_TYPES.map((type) => (
+                          <button
+                            key={type.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={itemType === type.id}
+                            onClick={() => setItemType(type.id)}
+                            className={`rounded-xl border p-3 text-left transition-colors ${
+                              itemType === type.id
+                                ? 'border-[var(--zyro-accent)] bg-[var(--zyro-accent-muted)] ring-1 ring-[var(--zyro-accent)]'
+                                : 'border-border/70 bg-card hover:bg-muted/40'
+                            }`}
+                          >
+                            <span className="block text-xs font-semibold text-foreground">{type.label}</span>
+                            <span className="mt-0.5 block text-[11px] leading-snug text-muted-foreground">{type.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-source" required>
+                          Source platform
+                        </FieldLabel>
+                        <select
+                          id="st-source"
+                          value={source}
+                          onChange={(event) => setSource(event.target.value)}
+                          className={`${inputCls} cursor-pointer`}
+                        >
+                          {TOOL_FORM_SOURCES.map((option) => (
+                            <option key={option} value={option}>
+                              {option === 'ZYR0 Native' ? 'ZYR0 Native (Built-in)' : option === 'Web' ? 'Official website' : option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-source-url" required hint="GitHub shorthand like org/repo works">
+                          Source URL
+                        </FieldLabel>
+                        <input
+                          id="st-source-url"
+                          type="text"
+                          inputMode="url"
+                          placeholder="https://github.com/org/repo"
+                          value={sourceUrl}
+                          onChange={(event) => {
+                            setSourceUrl(event.target.value);
+                            clearError('sourceUrl');
+                          }}
+                          aria-invalid={Boolean(errors.sourceUrl)}
+                          aria-describedby={errors.sourceUrl ? 'st-source-url-error' : undefined}
+                          className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
+                        />
+                        <FieldError id="st-source-url-error" msg={errors.sourceUrl} />
+                        <p className="text-[11px] leading-relaxed text-muted-foreground">
+                          The repository, package, or official page this listing is based on.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -1181,9 +1260,8 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
                   <div className="min-w-0 space-y-5">
                     <StageHeading
-                      step={2}
                       title="Listing content"
-                      description="Write the description first. Installation, discovery, and technical details stay tucked away until you need them."
+                      description="Write the description, then add commands and the details that help people trust and find it."
                     />
                     {draftBanner}
 
@@ -1255,7 +1333,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                                 clearError('description');
                               }}
                               aria-invalid={Boolean(errors.description)}
-                              aria-describedby="st-desc-help"
+                              aria-describedby={errors.description ? 'st-desc-help st-desc-error' : 'st-desc-help'}
                               className="min-h-[300px] w-full resize-y border-0 bg-transparent p-3.5 font-mono text-[13px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground md:min-h-[420px]"
                             />
                           </div>
@@ -1279,41 +1357,47 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                         <span className="font-mono">- lists</span>, <span className="font-mono">`code`</span>, and{' '}
                         <span className="font-mono">[links](url)</span>. The original Markdown is saved as written.
                       </p>
-                      <FieldError msg={errors.description} />
+                      <FieldError id="st-desc-error" msg={errors.description} />
                     </section>
 
                     <FormSection
                       icon={Terminal}
-                      title="Installation"
-                      hint="How people add or invoke this tool"
-                      summary={validCommands.length > 0 ? `${validCommands.length} method${validCommands.length > 1 ? 's' : ''}` : 'Optional'}
+                      title="Commands"
+                      hint="Install, update, run, or invoke"
+                      summary={validCommands.length > 0 ? `${validCommands.length} command${validCommands.length > 1 ? 's' : ''}` : 'Optional'}
                       defaultOpen
                     >
                       <div>
-                        <div className="mb-2 flex items-center justify-between gap-3">
-                          <p className="text-xs font-semibold text-foreground">
-                            {itemType === 'skill'
-                              ? 'Skill invocation commands'
-                              : itemType === 'tool_skill'
-                              ? 'Install & execution commands'
-                              : 'Installation commands'}
-                          </p>
+                        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-semibold text-foreground">Command labels</p>
+                            <p className="mt-0.5 max-w-md text-[11px] leading-relaxed text-muted-foreground">
+                              Give each command a clear label. Labels become the public detail page tabs, so use Installation command, Update command, or Run command. Pick a suggestion or type your own.
+                            </p>
+                          </div>
                           <button
                             type="button"
                             onClick={handleAddCommand}
                             className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--zyro-accent)] hover:underline"
                           >
                             <Plus className="h-3 w-3" />
-                            Add method
+                            Add command
                           </button>
                         </div>
 
                         <datalist id="command-labels">
-                          {['Agent Setup', 'CLI', 'npm', 'pnpm', 'yarn', 'bun', 'pip', 'cargo', 'Docker', 'Brew'].map(
-                            (label) => (
-                              <option key={label} value={label} />
-                            )
-                          )}
+                          {[
+                            'Installation command',
+                            'Update command',
+                            'Run command',
+                            'Invoke command',
+                            'Setup command',
+                            'Uninstall command',
+                            'Build command',
+                            'Test command',
+                          ].map((label) => (
+                            <option key={label} value={label} />
+                          ))}
                         </datalist>
 
                         <div className="space-y-2.5">
@@ -1325,23 +1409,16 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                                   list="command-labels"
                                   value={command.label}
                                   onChange={(event) => handleCommandChange(index, 'label', event.target.value)}
-                                  placeholder="Label"
-                                  aria-label={`Installation method ${index + 1} label`}
-                                  className="w-32 shrink-0 rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-foreground outline-none focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20"
+                                  placeholder="Command type"
+                                  aria-label={`Command ${index + 1} type`}
+                                  className="w-full rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-foreground outline-none focus-visible:border-[var(--zyro-accent)] focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/20 sm:w-52"
                                 />
-                                <span className="flex-1 text-[10px] text-muted-foreground">
-                                  {command.label === 'Agent Setup'
-                                    ? 'Agent setup step'
-                                    : command.label.toLowerCase().includes('npm') || command.label.toLowerCase().includes('bun')
-                                    ? 'Package manager command'
-                                    : 'Terminal command'}
-                                </span>
                                 {commands.length > 1 && (
                                   <button
                                     type="button"
                                     onClick={() => handleRemoveCommand(index)}
                                     className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500"
-                                    aria-label={`Remove installation method ${index + 1}`}
+                                    aria-label={`Remove command ${index + 1}`}
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </button>
@@ -1351,18 +1428,8 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                                 rows={2}
                                 value={command.command}
                                 onChange={(event) => handleCommandChange(index, 'command', event.target.value)}
-                                placeholder={
-                                  command.label === 'Agent Setup'
-                                    ? 'npx rea-agents setup'
-                                    : command.label === 'npm'
-                                    ? 'npm install -g example'
-                                    : command.label === 'pip'
-                                    ? 'pip install example'
-                                    : command.label === 'Docker'
-                                    ? 'docker run -p 8080:8080 example'
-                                    : 'npx tool-pkg'
-                                }
-                                aria-label={`Installation method ${index + 1} command`}
+                                placeholder={commandPlaceholder(command.label)}
+                                aria-label={`Command ${index + 1} text`}
                                 className="w-full resize-y rounded-md border border-neutral-800 bg-neutral-950 px-2.5 py-2 font-mono text-xs text-emerald-300 outline-none placeholder:text-neutral-600 focus-visible:ring-2 focus-visible:ring-[var(--zyro-accent)]/40"
                               />
                             </div>
@@ -1381,6 +1448,23 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                           value={installInstructions}
                           onChange={(event) => setInstallInstructions(event.target.value)}
                           className={`${inputCls} resize-y`}
+                        />
+                      </div>
+
+                      <div className="space-y-1.5 pt-2">
+                        <FieldLabel htmlFor="st-magic-prompt" hint="Optional AI Prompt">
+                          Magic Agent Prompt
+                        </FieldLabel>
+                        <p className="text-[11px] text-muted-foreground">
+                          Custom instruction for AI agents (Claude, Gemini, Cursor, etc.). Leave blank to automatically generate one from your listing details.
+                        </p>
+                        <textarea
+                          id="st-magic-prompt"
+                          rows={3}
+                          placeholder="e.g. You are an expert AI assistant. Integrate and invoke this skill by..."
+                          value={magicPrompt}
+                          onChange={(event) => setMagicPrompt(event.target.value)}
+                          className={`${inputCls} resize-y font-mono text-xs`}
                         />
                       </div>
                     </FormSection>
@@ -1466,49 +1550,11 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
 
                     <FormSection
                       icon={FolderGit2}
-                      title="Technical & source details"
-                      hint="Platform, links, version, cover image"
-                      summary={`${source}${version.trim() ? ` · ${version.trim()}` : ''}`}
+                      title="Links & media"
+                      hint="Docs, version, cover image"
+                      summary={version.trim() || 'Optional'}
                     >
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div className="space-y-1.5">
-                          <FieldLabel htmlFor="st-source" required>
-                            Source platform
-                          </FieldLabel>
-                          <select
-                            id="st-source"
-                            value={source}
-                            onChange={(event) => setSource(event.target.value)}
-                            className={`${inputCls} cursor-pointer`}
-                          >
-                            {TOOL_FORM_SOURCES.map((option) => (
-                              <option key={option} value={option}>
-                                {option === 'ZYR0 Native' ? 'ZYR0 Native (Built-in)' : option === 'Web' ? 'Official website' : option}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div className="space-y-1.5">
-                          <FieldLabel htmlFor="st-repo-url" required hint="Same as Source URL">
-                            Repository or primary URL
-                          </FieldLabel>
-                          <input
-                            id="st-repo-url"
-                            type="text"
-                            inputMode="url"
-                            placeholder="https://github.com/org/repo"
-                            value={sourceUrl}
-                            onChange={(event) => {
-                              setSourceUrl(event.target.value);
-                              clearError('sourceUrl');
-                            }}
-                            aria-invalid={Boolean(errors.sourceUrl)}
-                            className={`${inputCls} font-mono ${errors.sourceUrl ? inputErrorCls : ''}`}
-                          />
-                          <FieldError msg={errors.sourceUrl} />
-                        </div>
-
                         <div className="space-y-1.5">
                           <FieldLabel htmlFor="st-doc" hint="Optional">
                             Documentation URL
@@ -1554,9 +1600,10 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                           value={imageUrl}
                           onChange={(event) => handleImageUrlChange(event.target.value)}
                           aria-invalid={Boolean(errors.imageUrl)}
+                          aria-describedby={errors.imageUrl ? 'st-image-error' : undefined}
                           className={`${inputCls} font-mono ${errors.imageUrl ? inputErrorCls : ''}`}
                         />
-                        <FieldError msg={errors.imageUrl} />
+                        <FieldError id="st-image-error" msg={errors.imageUrl} />
                         {imageUrl.trim() && (
                           <div className="relative mt-1 aspect-video w-full max-w-[220px] overflow-hidden rounded-lg border border-border/70 bg-muted/40">
                             {imageState === 'loading' && (
@@ -1728,10 +1775,11 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                             onBlur={handleSlugBlur}
                             placeholder="your-listing"
                             aria-invalid={Boolean(errors.slug)}
+                            aria-describedby={errors.slug ? 'st-slug-error' : undefined}
                             className="min-w-0 flex-1 border-0 bg-transparent px-2.5 py-2 font-mono text-sm text-foreground outline-none placeholder:text-muted-foreground"
                           />
                         </div>
-                        <FieldError msg={errors.slug} />
+                        <FieldError id="st-slug-error" msg={errors.slug} />
                         <p className="text-[10px] text-muted-foreground">
                           Page H1 stays the official listing name: <span className="font-medium text-foreground">{name.trim() || 'your listing name'}</span>
                         </p>
@@ -1768,8 +1816,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
               {stage === 3 && (
                 <div className="space-y-5">
                   <StageHeading
-                    step={3}
-                    title={tool ? 'Review changes' : 'Review and submit'}
+                    title={reviewTitle}
                     description={
                       tool
                         ? 'Check the updated listing, fix anything flagged, then save your changes.'
@@ -1827,7 +1874,11 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
 
                       <section className="space-y-2">
                         <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Before you submit
+                          {tool
+                            ? 'Before you save'
+                            : isAdmin && adminStatus === 'approved'
+                              ? 'Before you publish'
+                              : 'Before you submit'}
                         </h4>
                         {missingRequired.length === 0 ? (
                           <p className="flex items-start gap-2 rounded-lg border border-emerald-500/25 bg-emerald-500/5 px-3 py-2 text-[11px] text-emerald-700 dark:text-emerald-400">
@@ -1880,8 +1931,13 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
 
                       <section className="rounded-lg border border-border/60 bg-muted/20 px-3 py-2 text-[11px] text-muted-foreground">
                         <p>
-                          Submissions are reviewed by moderators before appearing publicly. Your work is also saved as a
-                          draft on this device while you edit.
+                          {tool
+                            ? isAdmin && adminStatus === 'approved'
+                              ? 'Your changes publish immediately when you save.'
+                              : 'Your changes stay queued for moderator review until approved.'
+                            : isAdmin && adminStatus === 'approved'
+                              ? 'Your listing publishes immediately. Your work is also saved as a draft on this device while you edit.'
+                              : 'Submissions are reviewed by moderators before appearing publicly. Your work is also saved as a draft on this device while you edit.'}
                           {draftSavedAt && ` Last saved ${draftSavedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}.`}
                         </p>
                       </section>
@@ -2002,13 +2058,16 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                     </div>
 
                     <div className="min-w-0">
-                      <div className="mb-2 flex items-center justify-between">
+                      <div className="mb-2 flex items-center justify-between gap-3">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Final listing preview
+                          Directory card preview
                         </span>
-                        <span className="text-[10px] text-muted-foreground">Exactly what visitors will see</span>
+                        <span className="text-right text-[10px] text-muted-foreground">How your card appears in ToolHub</span>
                       </div>
                       <ListingPreview {...previewProps} />
+                      <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+                        Your public detail page is generated from these same fields.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -2022,7 +2081,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                 size="sm"
                 onClick={() => handleOpenChange(false)}
                 disabled={submitting}
-                className="h-8 text-xs text-muted-foreground"
+                className="h-9 text-xs text-muted-foreground"
               >
                 Cancel
               </Button>
@@ -2032,7 +2091,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                 size="sm"
                 onClick={handleSaveDraft}
                 disabled={!hasContent || submitting}
-                className={`h-8 gap-1.5 text-xs ${tool ? 'hidden' : ''}`}
+                className={`h-9 gap-1.5 text-xs ${tool ? 'hidden' : ''}`}
               >
                 <Save className="h-3.5 w-3.5" />
                 Save draft
@@ -2051,7 +2110,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                     size="sm"
                     onClick={() => setStage((stage - 1) as Stage)}
                     disabled={submitting}
-                    className="h-8 flex-1 gap-1 sm:flex-none"
+                    className="h-9 flex-1 gap-1 text-xs sm:flex-none"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     Back
@@ -2060,29 +2119,27 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                 {stage < 3 ? (
                   <Button
                     type="submit"
-                    size="sm"
                     disabled={submitting}
-                    className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
+                    className="h-10 flex-1 gap-1.5 px-5 text-sm font-semibold shadow-sm bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
                   >
                     {stage === 1 ? 'Continue' : tool ? 'Review changes' : 'Review listing'}
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    size="sm"
                     disabled={submitting}
-                    className="h-8 flex-1 gap-1.5 bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
+                    className="h-10 flex-1 gap-2 px-5 text-sm font-semibold shadow-sm bg-[var(--zyro-accent)] text-white hover:bg-[var(--zyro-sapphire)] sm:flex-none"
                   >
                     {submitting ? (
                       <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        {tool ? 'Saving...' : 'Submitting...'}
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {tool ? 'Saving...' : isAdmin && adminStatus === 'approved' ? 'Publishing...' : 'Submitting...'}
                       </>
                     ) : (
                       <>
-                        {tool ? <Pencil className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
-                        {tool ? 'Save changes' : 'Submit for review'}
+                        {tool ? <Pencil className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+                        {finalActionLabel}
                       </>
                     )}
                   </Button>

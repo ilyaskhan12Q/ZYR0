@@ -4,38 +4,101 @@ import { ArrowRight, PlusCircle, Wrench } from 'lucide-react';
 import { Blog8 } from '@/components/ui/blog8';
 import { Button } from '@/components/ui/button';
 import Reveal from './Reveal';
-import { getAllPublicTools } from '@/services/tools';
+import { getRecommendedTools } from '@/services/tools';
 import type { ToolItem } from '@/data/tools';
 
+/**
+ * Resilient destination builder:
+ * Directs directly to the canonical detail page /tools/:slug when available.
+ * Gracefully falls back to /tools?type=skill or /tools if slug is missing.
+ */
+function getToolDestination(tool?: Partial<ToolItem> | null): string {
+  if (tool?.slug && tool.slug.trim().length > 0) {
+    return `/tools/${encodeURIComponent(tool.slug.trim())}`;
+  }
+  if (tool?.item_type === 'skill') {
+    return '/tools?type=skill';
+  }
+  return '/tools';
+}
+
+function getActionLabel(itemType?: string): string {
+  if (itemType === 'skill') return 'Inspect skill';
+  if (itemType === 'tool_skill') return 'Inspect skill & tool';
+  return 'Inspect tool';
+}
+
+// Resilient fallback posts in the rare event of offline state or empty initial database
+const FALLBACK_SHOWCASE_TOOLS: ToolItem[] = [
+  {
+    id: 'fallback-ecc',
+    slug: 'ecc-redu',
+    name: 'ECC (Engineering Capability Cortex)',
+    tagline: 'Plans before it builds, verifies changes with tests, and turns repeated wins into reusable agent skills.',
+    description: 'ECC gives AI coding agents a coordinated engineering system with 71 agents and 300+ skills.',
+    item_type: 'skill',
+    category: 'AI & Agents',
+    tags: ['Agent', 'Skills', 'DeveloperTools'],
+    source: 'GitHub',
+    sourceUrl: 'https://github.com/affaan-m/ecc',
+    badge: 'Verified',
+    featured: true,
+    capabilities: ['71 Specialized Agents', '302 Production Skills', 'AgentShield Scanning'],
+    author: { name: 'Affan Mustafa' },
+  },
+  {
+    id: 'fallback-rea',
+    slug: 'rea-reverse-engineer-anything-8bcq',
+    name: 'REA (Reverse Engineer Anything)',
+    tagline: 'Connects AI coding agents to local reverse engineering tools over Model Context Protocol (MCP).',
+    description: 'Reverse engineer native binaries, Electron apps, .NET assemblies, and Android APKs with complete evidence.',
+    item_type: 'tool',
+    category: 'Developer Tools',
+    tags: ['Reverse Engineering', 'MCP Server', 'Claude Code'],
+    source: 'GitHub',
+    sourceUrl: 'https://github.com/morluto/rea',
+    badge: 'Trending',
+    featured: true,
+    capabilities: ['Native Binary Analysis', 'JavaScript & Electron Analysis', 'MCP Server Integration'],
+    author: { name: 'morluto' },
+  },
+];
+
 export default function SkillsSection() {
-  const [skills, setSkills] = useState<ToolItem[]>([]);
+  const [tools, setTools] = useState<ToolItem[]>([]);
 
   useEffect(() => {
     let mounted = true;
-    getAllPublicTools().then((tools) => {
+
+    getRecommendedTools(4, 'skill').then((items) => {
       if (!mounted) return;
-      const skillItems = tools
-        .filter((t) => t.item_type === 'skill' || t.item_type === 'tool_skill')
-        .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)))
-        .slice(0, 4);
-      setSkills(skillItems);
+      if (items && items.length > 0) {
+        setTools(items);
+      } else {
+        // Fallback to static items if DB has zero approved records
+        setTools(FALLBACK_SHOWCASE_TOOLS);
+      }
     });
+
     return () => {
       mounted = false;
     };
   }, []);
 
-  const posts = skills.map((s) => ({
+  const displayItems = tools.length > 0 ? tools : FALLBACK_SHOWCASE_TOOLS;
+
+  const posts = displayItems.map((s) => ({
     id: s.id,
     title: s.name,
     summary: s.tagline || s.description,
     label: s.category,
     author: s.author?.name || s.source,
-    published: s.featured ? 'Featured' : 'Skill',
-    url: `/tools?type=skill&q=${encodeURIComponent(s.name)}`,
+    published: s.featured ? 'Featured' : s.badge || (s.item_type === 'skill' ? 'Skill' : 'Tool'),
+    url: getToolDestination(s),
+    actionLabel: getActionLabel(s.item_type),
     image: s.imageUrl,
     coverColor: s.coverColor,
-    tags: [s.category, s.featured ? 'Featured' : 'Community', s.source],
+    tags: [s.category, s.featured ? 'Featured' : 'Verified', s.source],
   }));
 
   return (
