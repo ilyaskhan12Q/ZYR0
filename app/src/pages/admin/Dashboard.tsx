@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { ArrowRight, ArrowUpRight, Users } from 'lucide-react';
@@ -7,6 +7,17 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { supabase } from '@/lib/supabase';
+
+/** Blinking live indicator — one slow opacity pulse, nothing else. */
+function LiveDot() {
+  return (
+    <span
+      className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"
+      style={{ animation: 'liveDotPulse 2.4s ease-in-out infinite' }}
+      aria-label="Live"
+    />
+  );
+}
 
 const nf = new Intl.NumberFormat('en-US');
 const money = (n: number) => `$${nf.format(Math.round(n))}`;
@@ -23,6 +34,14 @@ const tooltipStyle = {
   padding: '8px 10px',
   fontSize: 12,
 };
+
+// Inject the live-dot keyframe once into the document
+if (typeof document !== 'undefined' && !document.getElementById('live-dot-style')) {
+  const s = document.createElement('style');
+  s.id = 'live-dot-style';
+  s.textContent = '@keyframes liveDotPulse { 0%,100%{opacity:1} 50%{opacity:0.25} }';
+  document.head.appendChild(s);
+}
 
 /** A panel: section title over a hairline rule, mono meta on the right. */
 function Panel({ title, meta, action, className = '', children }: {
@@ -347,35 +366,6 @@ export default function AdminDashboard() {
     };
   }, [profiles, companies]);
 
-  const vitals = useMemo(() => [
-    { label: 'Users', value: nf.format(profiles.length), note: `+${last30.users} in 30 days` },
-    {
-      label: 'Students',
-      value: nf.format(profiles.filter((p) => p.role === 'student').length),
-      note: `+${last30.students} in 30 days`,
-    },
-    {
-      label: 'Mentors',
-      value: nf.format(profiles.filter((p) => p.role === 'mentor').length),
-      note: `+${last30.mentors} in 30 days`,
-    },
-    {
-      label: 'Companies',
-      value: nf.format(companies.length),
-      note: `${pendingCompanies} pending review`,
-    },
-    {
-      label: 'Est. MRR',
-      value: money(planBreakdown.mrr),
-      note: `${planBreakdown.paid} paid of ${planBreakdown.total}`,
-    },
-    {
-      label: 'AI tokens',
-      value: compact(aiTelemetry.totalTokens),
-      note: `${aiTelemetry.requests} calls · ${aiTelemetry.avgLatency}ms avg`,
-    },
-  ], [profiles, companies, last30, pendingCompanies, planBreakdown, aiTelemetry]);
-
   // Postings → applications → certificates
   const pipeline = useMemo(() => {
     // Applications can outnumber postings, so a bare % reads wrong above 100
@@ -440,8 +430,9 @@ export default function AdminDashboard() {
       {/* Page header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-heading text-[28px] font-medium leading-[1.15] tracking-[-0.01em]">
+          <h1 className="flex items-center gap-2.5 font-heading text-[28px] font-medium leading-[1.15] tracking-[-0.01em]">
             Platform overview
+            <LiveDot />
           </h1>
           <p className="mt-1 text-[13px] text-muted-foreground">
             Users, revenue, compute and review load across ZYR0
@@ -456,10 +447,27 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Vitals */}
-      <section className="rounded-xl border border-border bg-card">
+      {/* Vitals — MRR leads, then four compact cells */}
+      <section className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="flex flex-col divide-y divide-border xl:flex-row xl:divide-x xl:divide-y-0">
-          {vitals.map((vital) => (
+          {/* Lead cell: Est. MRR — wider, accent figure */}
+          <div className="xl:w-56 shrink-0 px-6 py-5 flex flex-col justify-between">
+            <p className="font-mono text-[11px] text-muted-foreground">Est. MRR</p>
+            <p className="mt-2 font-mono text-[32px] font-medium leading-none tabular-nums text-accent">
+              {money(planBreakdown.mrr)}
+            </p>
+            <p className="mt-2 text-[12px] text-muted-foreground">
+              {planBreakdown.paid} paid · {planBreakdown.conversion}% conversion
+            </p>
+          </div>
+          {/* Compact cells */}
+          {[
+            { label: 'Users', value: nf.format(profiles.length), note: `+${last30.users} this month` },
+            { label: 'Students', value: nf.format(profiles.filter((p) => p.role === 'student').length), note: `+${last30.students} this month` },
+            { label: 'Mentors', value: nf.format(profiles.filter((p) => p.role === 'mentor').length), note: `+${last30.mentors} this month` },
+            { label: 'Companies', value: nf.format(companies.length), note: `${last30.companies} new · ${pendingCompanies} pending` },
+            { label: 'AI tokens', value: compact(aiTelemetry.totalTokens), note: `${aiTelemetry.requests} calls · ${aiTelemetry.avgLatency}ms avg` },
+          ].map((vital) => (
             <div key={vital.label} className="flex-1 px-6 py-5">
               <p className="font-mono text-[11px] text-muted-foreground">{vital.label}</p>
               <p className="mt-2 font-mono text-[26px] font-medium leading-none tabular-nums">
@@ -471,119 +479,144 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* Pipeline */}
-      <Panel title="Pipeline" meta="All time">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-          {pipeline.map((stage, index) => (
-            <Fragment key={stage.label}>
-              {index > 0 && (
-                <div className="flex items-center justify-center gap-2 sm:w-32">
-                  <span className="hidden h-px flex-1 bg-border sm:block" />
-                  <span className="whitespace-nowrap font-mono text-[11px] tabular-nums text-muted-foreground">
-                    {stage.rate}
-                  </span>
-                  <ArrowRight
-                    className="h-4 w-4 rotate-90 text-muted-foreground/50 sm:rotate-0"
-                    strokeWidth={1.5}
+      {/* Pipeline — funnel in one panel, proportional bars */}
+      <Panel title="Internship pipeline" meta="All time">
+        <div className="space-y-3">
+          {pipeline.map((stage) => {
+            const pct = pipeline[0].value > 0
+              ? Math.max(4, Math.round((stage.value / pipeline[0].value) * 100))
+              : 0;
+            return (
+              <div key={stage.label} className="flex items-center gap-4">
+                <span className="w-28 shrink-0 text-[13px] text-muted-foreground">{stage.label}</span>
+                <div className="flex-1 overflow-hidden rounded-sm bg-muted h-2">
+                  <div
+                    className={`h-full rounded-sm transition-[width] duration-500 ${stage.seal ? 'bg-accent' : 'bg-foreground/30'}`}
+                    style={{ width: `${pct}%` }}
                   />
-                  <span className="hidden h-px flex-1 bg-border sm:block" />
                 </div>
-              )}
-              <div className="flex-1 rounded-lg border border-border px-5 py-4">
-                <p className="font-mono text-[11px] text-muted-foreground">{stage.label}</p>
-                <div className="mt-2 flex items-center gap-3">
-                  <p
-                    className={`font-mono text-[26px] font-medium leading-none tabular-nums ${
-                      stage.seal ? 'text-accent' : ''
-                    }`}
-                  >
+                <div className="flex items-center gap-2 w-36 shrink-0 justify-end">
+                  <span className={`font-mono text-[14px] font-medium tabular-nums ${stage.seal ? 'text-accent' : ''}`}>
                     {nf.format(stage.value)}
-                  </p>
+                  </span>
+                  {stage.rate && (
+                    <span className="font-mono text-[11px] text-muted-foreground">{stage.rate}</span>
+                  )}
                   {stage.seal && (
-                    <img src="/seal.png" alt="" width={56} height={56} className="h-14 w-14" />
+                    <img src="/seal.png" alt="" width={20} height={20} className="h-5 w-5 opacity-80" />
                   )}
                 </div>
               </div>
-            </Fragment>
-          ))}
+            );
+          })}
         </div>
       </Panel>
 
-      {/* Signups + roles */}
+      {/* Signups chart — full width, dominant */}
+      <Panel
+        title="Signups"
+        action={
+          <Link
+            to="/admin/analytics"
+            className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Analytics <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </Link>
+        }
+      >
+        <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-2">
+            <span className="h-px w-4 bg-accent" /> Students
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="h-px w-4 bg-foreground/45" /> Companies
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-4 border-t border-dashed border-foreground/30" /> Mentors
+          </span>
+          <span className="ml-auto">Cumulative, last 6 months</span>
+        </div>
+        <ResponsiveContainer width="100%" height={260}>
+          <LineChart data={userGrowthData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+            <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="2 4" vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              dy={6}
+              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))', fontFamily: 'JetBrains Mono, monospace' }}
+            />
+            <YAxis
+              allowDecimals={false}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))', fontFamily: 'JetBrains Mono, monospace' }}
+            />
+            <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: 'hsl(var(--muted-foreground))' }} />
+            <Line
+              type="monotone"
+              dataKey="students"
+              name="Students"
+              stroke="hsl(var(--accent))"
+              strokeWidth={2}
+              dot={false}
+              activeDot={{ r: 3 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="companies"
+              name="Companies"
+              stroke="hsl(var(--foreground) / 0.45)"
+              strokeWidth={1.5}
+              dot={false}
+              activeDot={{ r: 3 }}
+            />
+            <Line
+              type="monotone"
+              dataKey="mentors"
+              name="Mentors"
+              stroke="hsl(var(--foreground) / 0.25)"
+              strokeWidth={1.5}
+              strokeDasharray="4 3"
+              dot={false}
+              activeDot={{ r: 3 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </Panel>
+
+      {/* Subscriptions + roles + review — three columns */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Panel
-          className="lg:col-span-2"
-          title="Signups"
-          action={
-            <Link
-              to="/admin/analytics"
-              className="inline-flex items-center gap-1 font-mono text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Analytics <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-            </Link>
-          }
-        >
-          <div className="mb-4 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] text-muted-foreground">
-            <span className="flex items-center gap-2">
-              <span className="h-px w-4 bg-accent" /> Students
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="h-px w-4 bg-foreground/45" /> Companies
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="w-4 border-t border-dashed border-foreground/30" /> Mentors
-            </span>
-            <span className="ml-auto">Cumulative, last 6 months</span>
+        {/* Subscriptions — 1 col */}
+        <Panel title="Subscriptions" meta={`${planBreakdown.conversion}% conversion`}>
+          <div className="flex items-end justify-between gap-4 border-b border-border pb-4 mb-4">
+            <div>
+              <p className="font-mono text-[11px] text-muted-foreground">Est. MRR</p>
+              <p className="mt-1 font-mono text-[26px] font-medium leading-none tabular-nums">
+                {money(planBreakdown.mrr)}
+              </p>
+            </div>
+            <p className="text-[12px] text-muted-foreground">
+              {money(planBreakdown.mrr * 12)} annual run-rate
+            </p>
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={userGrowthData} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
-              <CartesianGrid stroke="hsl(var(--border))" strokeDasharray="2 4" vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                axisLine={false}
-                dy={6}
-                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))', fontFamily: 'JetBrains Mono, monospace' }}
-              />
-              <YAxis
-                allowDecimals={false}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))', fontFamily: 'JetBrains Mono, monospace' }}
-              />
-              <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: 'hsl(var(--muted-foreground))' }} />
-              <Line
-                type="monotone"
-                dataKey="students"
-                name="Students"
-                stroke="hsl(var(--accent))"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 3 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="companies"
-                name="Companies"
-                stroke="hsl(var(--foreground) / 0.45)"
-                strokeWidth={1.5}
-                dot={false}
-                activeDot={{ r: 3 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="mentors"
-                name="Mentors"
-                stroke="hsl(var(--foreground) / 0.25)"
-                strokeWidth={1.5}
-                strokeDasharray="4 3"
-                dot={false}
-                activeDot={{ r: 3 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="divide-y divide-border">
+            {tierData.map((tier) => (
+              <div key={tier.tier} className="flex h-11 items-center gap-4">
+                <span className="w-20 shrink-0 text-[13px]">{tier.tier}</span>
+                <Meter value={tier.users} max={planBreakdown.total} />
+                <span className="w-8 shrink-0 text-right font-mono text-[12px] tabular-nums">
+                  {nf.format(tier.users)}
+                </span>
+                <span className="hidden w-20 shrink-0 text-right font-mono text-[12px] tabular-nums text-muted-foreground sm:block">
+                  {tier.mrr > 0 ? money(tier.mrr) : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
         </Panel>
 
+        {/* Roles — 1 col */}
         <Panel title="Roles" meta={`${nf.format(roleBreakdown.total)} users`}>
           <div className="space-y-4">
             {roleBreakdown.roles.map((role) => (
@@ -600,42 +633,8 @@ export default function AdminDashboard() {
             ))}
           </div>
         </Panel>
-      </div>
 
-      {/* Subscriptions + review queues */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Panel
-          className="lg:col-span-2"
-          title="Subscriptions"
-          meta={`${planBreakdown.conversion}% conversion`}
-        >
-          <div className="flex items-end justify-between gap-4 border-b border-border pb-4">
-            <div>
-              <p className="font-mono text-[11px] text-muted-foreground">Est. MRR</p>
-              <p className="mt-1 font-mono text-[26px] font-medium leading-none tabular-nums">
-                {money(planBreakdown.mrr)}
-              </p>
-            </div>
-            <p className="text-[12px] text-muted-foreground">
-              {money(planBreakdown.mrr * 12)} annual run-rate
-            </p>
-          </div>
-          <div className="divide-y divide-border">
-            {tierData.map((tier) => (
-              <div key={tier.tier} className="flex h-11 items-center gap-4">
-                <span className="w-16 shrink-0 text-[13px] sm:w-24">{tier.tier}</span>
-                <Meter value={tier.users} max={planBreakdown.total} />
-                <span className="w-8 shrink-0 text-right font-mono text-[12px] tabular-nums sm:w-10">
-                  {nf.format(tier.users)}
-                </span>
-                <span className="hidden w-20 shrink-0 text-right font-mono text-[12px] tabular-nums text-muted-foreground sm:block">
-                  {tier.mrr > 0 ? money(tier.mrr) : '—'}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
+        {/* Needs review — 1 col */}
         <Panel title="Needs review" meta="Open queues">
           <div className="divide-y divide-border">
             {[
