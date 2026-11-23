@@ -72,6 +72,7 @@ export default function AdminTools() {
           t.name.toLowerCase().includes(q) ||
           t.tagline.toLowerCase().includes(q) ||
           t.category.toLowerCase().includes(q) ||
+          (t.subcategory || '').toLowerCase().includes(q) ||
           t.author_name.toLowerCase().includes(q)
         );
       }
@@ -235,6 +236,7 @@ export default function AdminTools() {
                   </Badge>
                   <span className="text-xs font-medium px-2 py-0.5 rounded bg-muted text-muted-foreground">
                     {tool.category}
+                    {tool.subcategory ? ` · ${tool.subcategory}` : ''}
                   </span>
                   <span className="text-xs font-mono text-muted-foreground">
                     Source: {tool.source}

@@ -325,6 +325,9 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                 <dl className="p-4 space-y-3 text-xs">
                   {[
                     { label: 'Category', value: <span className="font-medium text-foreground">{tool.category}</span> },
+                    tool.subcategory
+                      ? { label: 'Subcategory', value: <span className="font-medium text-foreground">{tool.subcategory}</span> }
+                      : null,
                     { label: 'Source', value: <span className="font-medium text-foreground">{tool.source}</span> },
                     tool.version
                       ? { label: 'Version', value: <span className="font-mono font-medium text-foreground">{tool.version}</span> }

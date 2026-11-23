@@ -1,4 +1,4 @@
-import type { ToolItemType } from '@/data/tools';
+import { TOOL_SUBCATEGORIES, type ToolItemType, type ToolSubcategory } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
 
 type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
@@ -126,6 +126,7 @@ export interface ToolDraft {
   tagline: string;
   description: string;
   category: ToolFormCategory;
+  subcategory: ToolSubcategory | '';
   source: string;
   sourceUrl: string;
   docUrl: string;
@@ -171,6 +172,7 @@ export function isDraftEmpty(draft: ToolDraft): boolean {
     !draft.commands.some((command) => command.command.trim()) &&
     draft.itemType === 'tool' &&
     draft.category === 'AI & Agents' &&
+    !draft.subcategory &&
     draft.source === 'GitHub' &&
     !draft.adminFeatured &&
     draft.adminCoverColor === '#7B7BDC'
@@ -217,6 +219,9 @@ export function loadToolDraft(userId: string): ToolDraft | null {
     const category = TOOL_FORM_CATEGORIES.includes(data.category as ToolFormCategory)
       ? (data.category as ToolFormCategory)
       : 'AI & Agents';
+    const subcategory = TOOL_SUBCATEGORIES.includes(data.subcategory as ToolSubcategory)
+      ? (data.subcategory as ToolSubcategory)
+      : '';
     const source = typeof data.source === 'string' && (TOOL_FORM_SOURCES as readonly string[]).includes(data.source)
       ? data.source
       : 'GitHub';
@@ -227,6 +232,7 @@ export function loadToolDraft(userId: string): ToolDraft | null {
       tagline: text('tagline'),
       description: text('description'),
       category,
+      subcategory,
       source,
       sourceUrl: text('sourceUrl'),
       docUrl: text('docUrl'),

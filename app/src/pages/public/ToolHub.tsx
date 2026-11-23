@@ -5,7 +5,7 @@ import {
   ArrowUpDown, Filter
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
-import { TOOL_CATEGORIES, type ToolItem, type ToolCategory } from '@/data/tools';
+import { TOOL_CATEGORIES, TOOL_SUBCATEGORIES, type ToolItem, type ToolCategory, type ToolSubcategory } from '@/data/tools';
 import { ToolCard } from '@/components/tools/ToolCard';
 import { SubmitToolDialog } from '@/components/tools/SubmitToolDialog';
 import { ToolEmptyState } from '@/components/tools/ToolEmptyState';
@@ -26,6 +26,7 @@ type SortOption = 'featured' | 'newest' | 'az' | 'popular';
 export default function ToolHub() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = (searchParams.get('category') as ToolCategory) || 'All';
+  const activeSubcategory = (searchParams.get('subcategory') as ToolSubcategory | 'All') || 'All';
   const activeType = (searchParams.get('type') as 'all' | 'tool' | 'skill') || 'all';
   const searchQuery = searchParams.get('q') || '';
   const sortBy = (searchParams.get('sort') as SortOption) || 'featured';
@@ -61,6 +62,16 @@ export default function ToolHub() {
       searchParams.delete('category');
     } else {
       searchParams.set('category', cat);
+    }
+    setSearchParams(searchParams);
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
+
+  const handleSubcategoryChange = (subcat: ToolSubcategory | 'All') => {
+    if (subcat === 'All') {
+      searchParams.delete('subcategory');
+    } else {
+      searchParams.set('subcategory', subcat);
     }
     setSearchParams(searchParams);
     setVisibleCount(ITEMS_PER_PAGE);
@@ -127,6 +138,11 @@ export default function ToolHub() {
         return false;
       }
 
+      // Subcategory filter (discipline / use case)
+      if (activeSubcategory !== 'All' && tool.subcategory !== activeSubcategory) {
+        return false;
+      }
+
       // Search query filter (matches name, tagline, description, tags, source, author, capabilities)
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
@@ -160,7 +176,7 @@ export default function ToolHub() {
       }
       return 0;
     });
-  }, [tools, activeCategory, activeType, searchQuery, sortBy]);
+  }, [tools, activeCategory, activeSubcategory, activeType, searchQuery, sortBy]);
 
   // Paginated visible tools (9 initial, Load More adds 9)
   const displayedTools = useMemo(() => {
@@ -174,7 +190,7 @@ export default function ToolHub() {
   };
 
   // Featured flagship tools for top showcase (only on default All view with no active search or filter)
-  const isDefaultView = activeCategory === 'All' && activeType === 'all' && !searchQuery.trim() && sortBy === 'featured';
+  const isDefaultView = activeCategory === 'All' && activeSubcategory === 'All' && activeType === 'all' && !searchQuery.trim() && sortBy === 'featured';
   const featuredTools = useMemo(() => {
     return tools.filter((t) => t.featured);
   }, [tools]);
@@ -301,6 +317,25 @@ export default function ToolHub() {
                 </Select>
               </div>
 
+              {/* Subcategory Dropdown */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Subcategory:</span>
+                <Select value={activeSubcategory} onValueChange={(val: any) => handleSubcategoryChange(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[160px]">
+                    <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Subcategory" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="text-xs">
+                    <SelectItem value="All">All Subcategories</SelectItem>
+                    {TOOL_SUBCATEGORIES.map((subcat) => (
+                      <SelectItem key={subcat} value={subcat}>
+                        {subcat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Sort Selector */}
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Sort:</span>
@@ -343,13 +378,14 @@ export default function ToolHub() {
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">
               {activeCategory === 'All' ? 'All Curated Directory' : `${activeCategory} Tools`}
+              {activeSubcategory !== 'All' && <span className="text-muted-foreground"> / {activeSubcategory}</span>}
             </h2>
             <span className="text-xs font-mono text-muted-foreground px-2 py-0.5 rounded bg-muted">
               {filteredTools.length}
             </span>
           </div>
 
-          {(activeCategory !== 'All' || activeType !== 'all' || searchQuery || sortBy !== 'featured') && (
+          {(activeCategory !== 'All' || activeSubcategory !== 'All' || activeType !== 'all' || searchQuery || sortBy !== 'featured') && (
             <button
               onClick={handleClearFilters}
               className="text-xs text-muted-foreground hover:text-foreground hover:underline"

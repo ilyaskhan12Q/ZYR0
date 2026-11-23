@@ -147,6 +147,7 @@ export default function ToolDetail() {
           .map((candidate) => {
             let score = 0;
             if (candidate.category === data.category) score += 4;
+            if (candidate.subcategory && candidate.subcategory === data.subcategory) score += 2;
             const currentTags = new Set(data.tags.map((t) => t.toLowerCase()));
             score += candidate.tags.filter((t) => currentTags.has(t.toLowerCase())).length * 2;
             if (candidate.item_type && candidate.item_type === data.item_type) score += 1;
@@ -238,6 +239,7 @@ export default function ToolDetail() {
   const facts = [
     { label: 'type', value: getTypeLabel(tool.item_type) },
     { label: 'category', value: tool.category },
+    ...(tool.subcategory ? [{ label: 'subcategory', value: tool.subcategory }] : []),
     ...(tool.version ? [{ label: 'version', value: tool.version }] : []),
     { label: 'source', value: tool.source },
     ...(tool.author?.name ? [{ label: 'author', value: tool.author.name }] : []),

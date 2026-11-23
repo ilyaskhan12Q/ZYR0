@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { slugify } from '@/lib/slug';
-import { type ToolItem, type ToolItemType } from '@/data/tools';
+import { type ToolItem, type ToolItemType, type ToolSubcategory } from '@/data/tools';
 import type { DbTool, ToolSubmissionStatus, ToolInstallCommand } from '@/lib/database.types';
 import { getCachedData, setCachedData, clearCache } from '@/lib/cache';
 import { dedupRequest, createRequestKey } from '@/lib/cache/requestRegistry';
@@ -11,6 +11,7 @@ export interface SubmitToolInput {
   description: string;
   item_type: ToolItemType;
   category: 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
+  subcategory?: ToolSubcategory | null;
   slug?: string;
   seo_title?: string;
   seo_description?: string;
@@ -51,6 +52,7 @@ export function mapDbToolToToolItem(dbTool: DbTool): ToolItem {
     description: dbTool.description,
     item_type: dbTool.item_type,
     category: dbTool.category,
+    subcategory: (dbTool.subcategory as ToolSubcategory) || null,
     tags: dbTool.tags || [],
     source: (dbTool.source as any) || 'Web',
     sourceUrl: dbTool.source_url,
@@ -270,6 +272,7 @@ function buildToolPayload(input: SubmitToolInput, forInsert: boolean): Partial<D
     description: input.description.trim(),
     item_type: input.item_type,
     category: input.category,
+    subcategory: input.subcategory || null,
     tags: input.tags,
     source: input.source.trim(),
     source_url: input.source_url.trim(),

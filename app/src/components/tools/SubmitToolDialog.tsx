@@ -17,7 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { submitTool, updateTool, type SubmitToolInput } from '@/services/tools';
-import { coverGradient } from '@/data/tools';
+import { coverGradient, TOOL_SUBCATEGORIES, type ToolSubcategory } from '@/data/tools';
 import type { DbTool, ToolInstallCommand } from '@/lib/database.types';
 import { slugify } from '@/lib/slug';
 import { splitCapability } from '@/lib/capability';
@@ -53,7 +53,7 @@ interface SubmitToolDialogProps {
 
 type Stage = 1 | 2 | 3;
 type ItemType = 'tool' | 'skill' | 'tool_skill';
-type FieldKey = 'name' | 'tagline' | 'description' | 'sourceUrl' | 'imageUrl' | 'slug';
+type FieldKey = 'name' | 'tagline' | 'description' | 'sourceUrl' | 'imageUrl' | 'slug' | 'subcategory';
 type FieldErrors = Partial<Record<FieldKey, string>>;
 
 const inputCls =
@@ -293,7 +293,7 @@ function ListingPreview({
       <div className="space-y-5 p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="rounded-full border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-[var(--zyro-accent)]">
-            {draft.category}
+            {draft.category}{draft.subcategory ? ` · ${draft.subcategory}` : ''}
           </span>
           {draft.version.trim() && (
             <span className="rounded-full border border-border/60 bg-muted/50 px-2 py-0.5 text-[10px] font-mono text-muted-foreground">
@@ -445,6 +445,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   const [tagline, setTagline] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<(typeof TOOL_FORM_CATEGORIES)[number]>('AI & Agents');
+  const [subcategory, setSubcategory] = useState<ToolSubcategory | ''>('');
   const [source, setSource] = useState<string>('GitHub');
   const [sourceUrl, setSourceUrl] = useState('');
   const [docUrl, setDocUrl] = useState('');
@@ -490,6 +491,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
       tagline,
       description,
       category,
+      subcategory,
       source,
       sourceUrl,
       docUrl,
@@ -511,7 +513,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
       adminCoverColor,
     }),
     [
-      itemType, name, tagline, description, category, source, sourceUrl, docUrl, imageUrl,
+      itemType, name, tagline, description, category, subcategory, source, sourceUrl, docUrl, imageUrl,
       commands, installInstructions, magicPrompt, tagsInput, capabilitiesInput, version, authorName,
       authorUrl, slug, seoTitle, seoDescription, adminStatus, adminFeatured, adminBadge, adminCoverColor,
     ]
@@ -550,6 +552,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
   const missingRequired: { label: string; stage: 1 | 2 }[] = [];
   if (!name.trim()) missingRequired.push({ label: 'Tool / Skill name', stage: 1 });
   if (!tagline.trim()) missingRequired.push({ label: 'One-sentence tagline', stage: 1 });
+  if (!subcategory) missingRequired.push({ label: 'Subcategory', stage: 1 });
   if (!sourceUrl.trim()) missingRequired.push({ label: 'Source URL', stage: 1 });
   if (!description.trim()) missingRequired.push({ label: 'Detailed description', stage: 2 });
   if (!effectiveSlug) missingRequired.push({ label: 'URL slug', stage: 2 });
@@ -564,6 +567,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     sourceUrl: 'Source URL',
     imageUrl: 'Cover image URL',
     slug: 'URL slug',
+    subcategory: 'Subcategory',
   };
 
   const resetForm = () => {
@@ -573,6 +577,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setTagline('');
     setDescription('');
     setCategory('AI & Agents');
+    setSubcategory('');
     setSource('GitHub');
     setSourceUrl('');
     setDocUrl('');
@@ -618,6 +623,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setTagline(tool.tagline);
     setDescription(tool.description);
     setCategory(tool.category);
+    setSubcategory((tool.subcategory as ToolSubcategory) || '');
     setSource(tool.source);
     setSourceUrl(tool.source_url);
     setDocUrl(tool.documentation_url || '');
@@ -667,6 +673,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     setTagline(saved.tagline);
     setDescription(saved.description);
     setCategory(saved.category);
+    setSubcategory(saved.subcategory);
     setSource(saved.source);
     setSourceUrl(saved.sourceUrl);
     setDocUrl(saved.docUrl);
@@ -725,6 +732,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
     } else if (cleanSlug.length < 2) {
       next.slug = 'Use at least 2 characters';
     }
+    if (!subcategory) next.subcategory = 'Subcategory is required';
     return next;
   };
 
@@ -865,6 +873,7 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
         description: description.trim(),
         item_type: itemType,
         category,
+        subcategory: subcategory || undefined,
         slug: effectiveSlug,
         seo_title: effectiveSeoTitle,
         seo_description: effectiveSeoDescription,
@@ -1155,6 +1164,31 @@ export function SubmitToolDialog({ open, onOpenChange, onSuccess, tool }: Submit
                             </option>
                           ))}
                         </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <FieldLabel htmlFor="st-subcategory" required hint="Discipline / use case">
+                          Subcategory
+                        </FieldLabel>
+                        <select
+                          id="st-subcategory"
+                          value={subcategory}
+                          onChange={(event) => {
+                            setSubcategory(event.target.value as ToolSubcategory);
+                            clearError('subcategory');
+                          }}
+                          aria-invalid={Boolean(errors.subcategory)}
+                          aria-describedby={errors.subcategory ? 'st-subcategory-error' : undefined}
+                          className={`${inputCls} cursor-pointer ${errors.subcategory ? inputErrorCls : ''}`}
+                        >
+                          <option value="">Select subcategory</option>
+                          {TOOL_SUBCATEGORIES.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                        <FieldError id="st-subcategory-error" msg={errors.subcategory} />
                       </div>
                     </div>
 
