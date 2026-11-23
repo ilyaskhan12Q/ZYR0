@@ -1,28 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import {
-  ArrowLeft, ExternalLink, Terminal, Copy, Check,
-  Sparkles, Tag, ChevronRight, BookOpen, Layers,
-  Info, ShieldCheck, User, Globe, Code2, Zap,
-  Package, AlertCircle, Share2
-} from 'lucide-react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { AlertCircle, ArrowLeft, Wand2 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownContent } from '@/components/markdown/MarkdownContent';
 import { BASE_URL } from '@/config/seo';
 import { copyToClipboard } from '@/lib/clipboard';
 import { splitCapability } from '@/lib/capability';
-import { type ToolItem, coverGradient } from '@/data/tools';
+import { getEffectiveMagicPrompt } from '@/lib/magicPrompt';
+import { type ToolItem } from '@/data/tools';
 import { getToolBySlug, getAllPublicTools } from '@/services/tools';
 import { toast } from 'sonner';
-
-function getTypeBadgeClass(type?: string) {
-  if (type === 'skill') return '!border-purple-300/40 !bg-purple-500/25 !text-purple-700 dark:!text-purple-200';
-  if (type === 'tool_skill') return '!border-emerald-300/40 !bg-emerald-500/25 !text-emerald-700 dark:!text-emerald-200';
-  return '!border-blue-300/40 !bg-blue-500/15 !text-blue-700 dark:!text-blue-200';
-}
+import '@/styles/tool-detail.css';
 
 function getTypeLabel(type?: string) {
   if (type === 'tool_skill') return 'Tool + Skill';
@@ -35,6 +25,38 @@ function isExternalUrl(url?: string) {
 
 function externalProps(url: string) {
   return isExternalUrl(url) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+}
+
+function delay(seconds: number): CSSProperties {
+  return { '--t': `${seconds}s` } as CSSProperties;
+}
+
+function isJsonLike(command: string) {
+  const trimmed = command.trim();
+  return trimmed.startsWith('{') || trimmed.startsWith('[');
+}
+
+function prettyJson(command: string) {
+  try {
+    return JSON.stringify(JSON.parse(command), null, 2);
+  } catch {
+    return command;
+  }
+}
+
+function renderJson(code: string) {
+  return code.split('\n').map((line, index) => {
+    const match = line.match(/^(\s*)("(?:[^"\\]|\\.)*")(\s*:)?(.*)$/);
+    if (!match) return <div key={index}>{line}</div>;
+    return (
+      <div key={index}>
+        {match[1]}
+        <b>{match[2]}</b>
+        {match[3]}
+        {match[4]}
+      </div>
+    );
+  });
 }
 
 function ToolDetailSkeleton() {
@@ -67,7 +89,7 @@ function ToolNotFound() {
   return (
     <div className="min-h-page flex items-center justify-center bg-background px-4">
       <SEO
-        title="Tool Not Found — ZYR0 ToolHub"
+        title="Tool Not Found | ZYR0 ToolHub"
         description="The tool or skill you are looking for does not exist or is no longer available."
         path="/tools"
         noIndex
@@ -91,95 +113,15 @@ function ToolNotFound() {
   );
 }
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-      {children}
-    </h2>
-  );
-}
-
-function RecommendedCard({ tool }: { tool: ToolItem }) {
-  const [imgFailed, setImgFailed] = useState(false);
-  const showImage = Boolean(tool.imageUrl) && !imgFailed;
-  const initials = tool.name.split(/\s+/).map((n) => n[0]).slice(0, 2).join('').toUpperCase();
-
-  return (
-    <Link
-      to={`/tools/${tool.slug}`}
-      className="group flex flex-col justify-between overflow-hidden rounded-xl border border-border/70 bg-card transition-all duration-200 hover:border-[var(--zyro-accent)]/50 hover:shadow-md"
-    >
-      <div>
-        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-border/40 bg-[var(--zyro-twilight)]">
-          {showImage ? (
-            <>
-              <img
-                src={tool.imageUrl}
-                alt={`${tool.name} cover`}
-                onError={() => setImgFailed(true)}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" aria-hidden="true" />
-            </>
-          ) : (
-            <>
-              <div className="absolute inset-0" style={{ background: coverGradient(tool.coverColor) }} aria-hidden="true" />
-              <div className="absolute inset-0 flex items-center justify-center opacity-[0.16] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:16px_16px]" aria-hidden="true" />
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <span className="select-none font-serif text-4xl text-white/15">{initials}</span>
-              </div>
-            </>
-          )}
-
-          <div className="absolute left-2.5 top-2.5 flex items-center gap-1.5">
-            <Badge variant="outline" className="h-5 border-white/30 bg-white/15 text-[10px] text-white backdrop-blur-sm">
-              {tool.source}
-            </Badge>
-            {tool.item_type && (
-              <Badge variant="outline" className="h-5 border-white/30 bg-white/15 text-[10px] font-mono capitalize text-white backdrop-blur-sm">
-                {getTypeLabel(tool.item_type)}
-              </Badge>
-            )}
-          </div>
-
-          <div className="absolute inset-x-0 bottom-0 p-3">
-            <h3 className="line-clamp-1 text-sm font-bold tracking-tight text-white drop-shadow-sm">{tool.name}</h3>
-            <p className="mt-0.5 line-clamp-1 text-xs text-white/80">{tool.tagline}</p>
-          </div>
-        </div>
-
-        <div className="p-3">
-          <div className="flex flex-wrap gap-1">
-            {tool.tags.slice(0, 3).map((tag) => (
-              <span key={tag} className="rounded border border-border/40 bg-muted/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between border-t border-border/40 bg-muted/20 p-3 pt-2 text-xs text-muted-foreground group-hover:text-foreground">
-        <span className="flex items-center gap-1 font-medium text-[var(--zyro-accent)]">
-          View listing
-          <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-        </span>
-        <span className="font-mono text-[10px]">{tool.category}</span>
-      </div>
-    </Link>
-  );
-}
-
 export default function ToolDetail() {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
 
   const [tool, setTool] = useState<ToolItem | null | 'loading'>('loading');
   const [recommended, setRecommended] = useState<ToolItem[]>([]);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [activeCommand, setActiveCommand] = useState(0);
+  const [copiedCommand, setCopiedCommand] = useState<string | null>(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -188,7 +130,10 @@ export default function ToolDetail() {
     }
     let mounted = true;
     setTool('loading');
-    setImgFailed(false);
+    setActiveCommand(0);
+    setCopiedCommand(null);
+    setCopiedPrompt(false);
+    setLinkCopied(false);
 
     getToolBySlug(slug).then((data) => {
       if (!mounted) return;
@@ -202,6 +147,7 @@ export default function ToolDetail() {
           .map((candidate) => {
             let score = 0;
             if (candidate.category === data.category) score += 4;
+            if (candidate.subcategory && candidate.subcategory === data.subcategory) score += 2;
             const currentTags = new Set(data.tags.map((t) => t.toLowerCase()));
             score += candidate.tags.filter((t) => currentTags.has(t.toLowerCase())).length * 2;
             if (candidate.item_type && candidate.item_type === data.item_type) score += 1;
@@ -232,18 +178,28 @@ export default function ToolDetail() {
       return;
     }
     setLinkCopied(true);
-    toast.success('Listing link copied');
     window.setTimeout(() => setLinkCopied(false), 2000);
   };
 
-  const handleCopyCommand = async (command: string, index: number) => {
+  const handleCopyCommand = async (command: string, key: string) => {
     if (!(await copyToClipboard(command))) {
       toast.error('Failed to copy command');
       return;
     }
-    setCopiedIndex(index);
-    toast.success('Command copied');
-    window.setTimeout(() => setCopiedIndex(null), 2000);
+    setCopiedCommand(key);
+    window.setTimeout(() => {
+      setCopiedCommand((current) => (current === key ? null : current));
+    }, 1600);
+  };
+
+  const handleCopyMagicPrompt = async (promptText: string) => {
+    if (!(await copyToClipboard(promptText))) {
+      toast.error('Failed to copy Magic Prompt');
+      return;
+    }
+    setCopiedPrompt(true);
+    toast.success('Magic Prompt copied! Paste into your AI agent.');
+    window.setTimeout(() => setCopiedPrompt(false), 2000);
   };
 
   if (tool === 'loading') {
@@ -256,19 +212,15 @@ export default function ToolDetail() {
 
   if (!tool) return <ToolNotFound />;
 
-  const showImage = Boolean(tool.imageUrl) && !imgFailed;
-  const initials = tool.name.split(/\s+/).map((n) => n[0]).slice(0, 2).join('').toUpperCase();
-  const canonicalPath = `/tools/${tool.slug}`;
   const isSkill = tool.item_type === 'skill';
-  const isHybrid = tool.item_type === 'tool_skill';
-  const noun = isSkill ? 'Skill' : isHybrid ? 'Tool + Skill' : 'Tool';
-
   const commands =
     tool.installCommands && tool.installCommands.length > 0
       ? tool.installCommands
       : tool.installCommand
-        ? [{ label: isSkill ? 'Invocation' : 'Quick install', command: tool.installCommand }]
+        ? [{ label: isSkill ? 'Invocation command' : 'Installation command', command: tool.installCommand }]
         : [];
+  const active = commands[activeCommand] ?? commands[0];
+  const hasCommands = commands.length > 0;
 
   const seoTitle = tool.seoTitle || `${tool.name} | ${getTypeLabel(tool.item_type)} in ${tool.category}`;
   const seoDescription = tool.seoDescription || tool.tagline;
@@ -284,6 +236,17 @@ export default function ToolDetail() {
     }
   })();
 
+  const facts = [
+    { label: 'type', value: getTypeLabel(tool.item_type) },
+    { label: 'category', value: tool.category },
+    ...(tool.subcategory ? [{ label: 'subcategory', value: tool.subcategory }] : []),
+    ...(tool.version ? [{ label: 'version', value: tool.version }] : []),
+    { label: 'source', value: tool.source },
+    ...(tool.author?.name ? [{ label: 'author', value: tool.author.name }] : []),
+    ...(tool.badge ? [{ label: 'badge', value: tool.badge }] : []),
+  ];
+
+  const canonicalPath = `/tools/${tool.slug}`;
   const structuredData = [
     {
       '@context': 'https://schema.org',
@@ -314,8 +277,12 @@ export default function ToolDetail() {
     },
   ];
 
+  const commandDescription = isSkill
+    ? 'Run this in your agent to invoke the skill.'
+    : 'Run the command that matches your setup.';
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="tdp" data-theme="dark">
       <SEO
         title={seoTitle}
         description={seoDescription}
@@ -325,423 +292,214 @@ export default function ToolDetail() {
         structuredData={structuredData}
       />
 
-      <div className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6 sm:pt-12 lg:px-8 lg:pt-14">
-        <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Link to="/" className="transition-colors hover:text-foreground">Home</Link>
-          <ChevronRight className="h-3 w-3" />
-          <Link to="/tools" className="transition-colors hover:text-foreground">ToolHub</Link>
-          <ChevronRight className="h-3 w-3" />
-          <span className="line-clamp-1 font-medium text-foreground">{tool.name}</span>
-        </nav>
-
-        {/* Header */}
-        <header className="relative mb-10 overflow-hidden rounded-2xl border border-border/40 bg-[var(--zyro-twilight)]">
-          <div className="absolute inset-0" aria-hidden="true">
-            {showImage ? (
-              <>
-                <img
-                  src={tool.imageUrl}
-                  alt=""
-                  onError={() => setImgFailed(true)}
-                  className="h-full w-full object-cover"
-                  loading="eager"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/15" />
-              </>
-            ) : (
-              <>
-                <div className="absolute inset-0" style={{ background: coverGradient(tool.coverColor) }} />
-                <div className="absolute inset-0 opacity-[0.12] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:20px_20px]" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="select-none font-serif text-[9rem] leading-none text-white/10">{initials}</span>
-                </div>
-              </>
-            )}
+      <div className="wrap">
+        <div className="top in">
+          <span>
+            <Link to="/tools">toolhub</Link> / {tool.category.toLowerCase()} / {tool.slug}
+          </span>
+          <div className="top-actions">
+            <button type="button" onClick={handleCopyLink}>
+              {linkCopied ? 'link copied' : 'copy link'}
+            </button>
+            <a href={tool.sourceUrl} {...externalProps(tool.sourceUrl)}>
+              {sourceLabel.toLowerCase()} ↗
+            </a>
           </div>
-
-          <div className="relative z-10 flex min-h-[380px] flex-col justify-between gap-10 p-5 sm:min-h-[400px] sm:p-7">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="border-white/30 bg-white/15 text-[11px] font-medium text-white backdrop-blur-sm">
-                {tool.source}
-              </Badge>
-              {tool.item_type && (
-                <Badge variant="outline" className={`text-[11px] font-mono capitalize backdrop-blur-sm ${getTypeBadgeClass(tool.item_type)}`}>
-                  {getTypeLabel(tool.item_type)}
-                </Badge>
-              )}
-              {tool.featured && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-                  <Sparkles className="h-3 w-3" />
-                  Featured
-                </span>
-              )}
-              {tool.badge && (
-                <span className="rounded-full bg-[var(--zyro-accent)] px-2.5 py-1 text-[11px] font-semibold text-white shadow-sm">
-                  {tool.badge}
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-white/70">
-                <Link
-                  to={`/tools?category=${encodeURIComponent(tool.category)}`}
-                  className="inline-flex items-center gap-1 transition-colors hover:text-white"
-                >
-                  <Package className="h-3 w-3" />
-                  {tool.category}
-                </Link>
-                {tool.version && (
-                  <span className="inline-flex items-center gap-1 font-mono">
-                    <Code2 className="h-3 w-3" />
-                    {tool.version}
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1">
-                  <ShieldCheck className="h-3 w-3 text-emerald-400" />
-                  Approved listing
-                </span>
-              </div>
-
-              <h1 className="max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md sm:text-4xl lg:text-5xl">
-                {tool.name}
-              </h1>
-              <p className="max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">{tool.tagline}</p>
-
-              {tool.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {tool.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      to={`/tools?q=${encodeURIComponent(tag)}`}
-                      className="rounded-md border border-white/15 bg-white/10 px-2 py-0.5 font-mono text-[10px] text-white/75 backdrop-blur-sm transition-colors hover:border-white/30 hover:text-white"
-                    >
-                      #{tag}
-                    </Link>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex flex-wrap items-center gap-2 pt-2">
-                <Button asChild size="sm" className="gap-2 rounded-xl border border-white/25 bg-white text-[var(--zyro-twilight)] shadow-md hover:bg-white/90">
-                  <a href={tool.sourceUrl} aria-label={`${sourceLabel}: ${tool.name}`} {...externalProps(tool.sourceUrl)}>
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    {sourceLabel}
-                  </a>
-                </Button>
-                {tool.documentationUrl && (
-                  <Button
-                    asChild
-                    size="sm"
-                    variant="outline"
-                    className="gap-2 rounded-xl border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
-                  >
-                    <a href={tool.documentationUrl} aria-label={`Documentation: ${tool.name}`} {...externalProps(tool.documentationUrl)}>
-                      <BookOpen className="h-3.5 w-3.5" />
-                      Documentation
-                    </a>
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-12">
-          {/* Main content */}
-          <div className="min-w-0 space-y-10">
-            {tool.description.trim() && (
-              <section>
-                <SectionHeading>
-                  <Info className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  Overview
-                </SectionHeading>
-                <MarkdownContent content={tool.description} />
-              </section>
-            )}
-
-            {tool.capabilities.length > 0 && (
-              <section className="border-t border-border/60 pt-8">
-                <SectionHeading>
-                  <Zap className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  {isSkill ? 'Capabilities' : 'Key features'}
-                </SectionHeading>
-                <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                  {tool.capabilities.map((capability, index) => {
-                    const [label, value] = splitCapability(capability);
-                    return (
-                      <li
-                        key={`${capability}-${index}`}
-                        className="flex items-start justify-between gap-3 rounded-xl border border-border/60 bg-muted/20 p-3.5"
-                      >
-                        <span className="flex min-w-0 items-start gap-2.5">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                          <span className="text-sm leading-snug text-foreground/85">{label}</span>
-                        </span>
-                        {value && (
-                          <span className="shrink-0 rounded-md border border-border/50 bg-muted px-2 py-0.5 font-mono text-xs font-semibold text-foreground">
-                            {value}
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            )}
-
-            {commands.length > 0 && (
-              <section className="border-t border-border/60 pt-8">
-                <SectionHeading>
-                  <Terminal className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  {isSkill ? 'Setup & usage' : 'Installation'}
-                </SectionHeading>
-                <div className="space-y-3">
-                  {commands.map((command, index) => (
-                    <div key={`${command.label}-${index}`} className="overflow-hidden rounded-xl border border-neutral-800 bg-[#0d1117]">
-                      <div className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2">
-                        <span className="font-mono text-[10px] uppercase tracking-wider text-neutral-400">
-                          {command.label || (isSkill ? 'Invocation' : 'Install')}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCommand(command.command, index)}
-                          className="inline-flex items-center gap-1.5 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                          aria-label={`Copy ${command.label || 'install'} command`}
-                        >
-                          {copiedIndex === index ? (
-                            <>
-                              <Check className="h-3 w-3 text-emerald-400" />
-                              <span className="text-emerald-400">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-3 w-3" />
-                              Copy
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-emerald-300 sm:text-sm">
-                        <span className="select-none text-neutral-500">$ </span>
-                        {command.command}
-                      </pre>
-                    </div>
-                  ))}
-                </div>
-                {tool.installInstructions && (
-                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--zyro-accent)]/20 bg-[var(--zyro-accent-muted)] px-3.5 py-3 text-xs leading-relaxed text-foreground/85">
-                    <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[var(--zyro-accent)]" />
-                    <p className="whitespace-pre-line">{tool.installInstructions}</p>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {commands.length === 0 && tool.installInstructions && (
-              <section className="border-t border-border/60 pt-8">
-                <SectionHeading>
-                  <Info className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  Requirements &amp; setup notes
-                </SectionHeading>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/85">{tool.installInstructions}</p>
-              </section>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
-            <section className="rounded-2xl border border-border/70 bg-card p-5">
-              <SectionHeading>
-                <Layers className="h-4 w-4 text-[var(--zyro-accent)]" />
-                Details
-              </SectionHeading>
-              <dl className="divide-y divide-border/50 text-xs">
-                <div className="flex items-center justify-between gap-3 py-2">
-                  <dt className="text-muted-foreground">Type</dt>
-                  <dd>
-                    <Badge variant="outline" className={`h-5 text-[10px] capitalize ${getTypeBadgeClass(tool.item_type)}`}>
-                      {getTypeLabel(tool.item_type)}
-                    </Badge>
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between gap-3 py-2">
-                  <dt className="text-muted-foreground">Category</dt>
-                  <dd className="text-right font-medium text-foreground">{tool.category}</dd>
-                </div>
-                {tool.version && (
-                  <div className="flex items-center justify-between gap-3 py-2">
-                    <dt className="text-muted-foreground">Version</dt>
-                    <dd className="font-mono font-medium text-foreground">{tool.version}</dd>
-                  </div>
-                )}
-                <div className="flex items-center justify-between gap-3 py-2">
-                  <dt className="text-muted-foreground">Source</dt>
-                  <dd className="flex items-center gap-1 text-right font-medium text-foreground">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
-                    {tool.source}
-                  </dd>
-                </div>
-                {tool.author?.name && (
-                  <div className="flex items-center justify-between gap-3 py-2">
-                    <dt className="text-muted-foreground">Author</dt>
-                    <dd className="text-right font-medium text-foreground">
-                      {tool.author.url ? (
-                        <a
-                          href={tool.author.url}
-                          {...externalProps(tool.author.url)}
-                          className="inline-flex items-center gap-1 text-[var(--zyro-accent)] hover:underline"
-                        >
-                          {tool.author.name}
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      ) : (
-                        tool.author.name
-                      )}
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            </section>
-
-            <section className="rounded-2xl border border-border/70 bg-card p-5">
-              <SectionHeading>
-                <Globe className="h-4 w-4 text-[var(--zyro-accent)]" />
-                Links
-              </SectionHeading>
-              <div className="space-y-2">
-                <a
-                  href={tool.sourceUrl}
-                  {...externalProps(tool.sourceUrl)}
-                  className="group flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3 transition-all hover:border-[var(--zyro-accent)]/40 hover:bg-muted/40"
-                >
-                  <span className="flex items-center gap-2.5">
-                    <Code2 className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-xs font-medium text-foreground">{sourceLabel}</span>
-                  </span>
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-[var(--zyro-accent)]" />
-                </a>
-
-                {tool.documentationUrl && (
-                  <a
-                    href={tool.documentationUrl}
-                    {...externalProps(tool.documentationUrl)}
-                    className="group flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3 transition-all hover:border-[var(--zyro-accent)]/40 hover:bg-muted/40"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <span className="text-xs font-medium text-foreground">Documentation</span>
-                    </span>
-                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-[var(--zyro-accent)]" />
-                  </a>
-                )}
-
-                {tool.author?.url && (
-                  <a
-                    href={tool.author.url}
-                    {...externalProps(tool.author.url)}
-                    className="group flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3 transition-all hover:border-[var(--zyro-accent)]/40 hover:bg-muted/40"
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <User className="h-4 w-4 shrink-0 text-muted-foreground" />
-                      <span className="text-xs font-medium text-foreground">Author profile</span>
-                    </span>
-                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-[var(--zyro-accent)]" />
-                  </a>
-                )}
-
-                <Link
-                  to="/tools"
-                  className="group flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 p-3 transition-all hover:border-[var(--zyro-accent)]/40 hover:bg-muted/40"
-                >
-                  <span className="flex items-center gap-2.5">
-                    <Layers className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-xs font-medium text-foreground">All tools &amp; skills</span>
-                  </span>
-                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground transition-colors group-hover:text-[var(--zyro-accent)]" />
-                </Link>
-              </div>
-            </section>
-
-            {tool.tags.length > 0 && (
-              <section className="rounded-2xl border border-border/70 bg-card p-5">
-                <SectionHeading>
-                  <Tag className="h-4 w-4 text-[var(--zyro-accent)]" />
-                  Tags
-                </SectionHeading>
-                <div className="flex flex-wrap gap-1.5">
-                  {tool.tags.map((tag) => (
-                    <Link
-                      key={tag}
-                      to={`/tools?q=${encodeURIComponent(tag)}`}
-                      className="rounded-lg border border-border/50 bg-muted/60 px-2.5 py-1 font-mono text-xs text-muted-foreground transition-all hover:border-[var(--zyro-accent)]/50 hover:bg-muted hover:text-[var(--zyro-accent)]"
-                    >
-                      #{tag}
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopyLink}
-              className="w-full gap-2 border-border/70 text-xs font-medium hover:border-[var(--zyro-accent)]/50"
-            >
-              {linkCopied ? (
-                <>
-                  <Check className="h-3.5 w-3.5 text-emerald-500" />
-                  Link copied
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-3.5 w-3.5" />
-                  Share this {noun.toLowerCase()}
-                </>
-              )}
-            </Button>
-          </aside>
         </div>
 
-        {recommended.length > 0 && (
-          <section className="mt-14 border-t border-border/60 pt-10">
-            <div className="mb-6 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-              <div>
-                <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-foreground">
-                  <Sparkles className="h-5 w-5 text-[var(--zyro-accent)]" />
-                  Related tools &amp; skills
-                </h2>
-                <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-                  More listings from the same category and tag ecosystem
-                </p>
-              </div>
-              <Link to="/tools" className="flex shrink-0 items-center gap-1 text-xs font-medium text-[var(--zyro-accent)] hover:underline sm:text-sm">
-                Browse all
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
+        <header>
+          <h1 className="in" style={delay(0.05)}>
+            {tool.name}
+          </h1>
+          <p className="lede in" style={delay(0.15)}>
+            {tool.tagline}
+          </p>
+          {hasCommands && (
+            <div className="hero-cmd in" style={delay(0.3)}>
+              <code>
+                <i>$ </i>
+                {commands[0].command}
+              </code>
+              <button
+                type="button"
+                className={`cp${copiedCommand === 'hero' ? ' ok' : ''}`}
+                onClick={() => handleCopyCommand(commands[0].command, 'hero')}
+              >
+                {copiedCommand === 'hero' ? 'copied' : 'copy'}
+              </button>
             </div>
+          )}
+          <dl className="facts in" style={delay(0.45)}>
+            {facts.map((fact) => (
+              <div key={fact.label}>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </header>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {recommended.map((item) => (
-                <RecommendedCard key={item.id} tool={item} />
-              ))}
+        <section className="row" id="magic-prompt">
+          <div className="lab">magic prompt</div>
+          <div>
+            <h2>Run with AI Agent</h2>
+            <p>
+              Copy and paste this prompt directly into your AI agent (Claude Code, Gemini CLI, Cursor, Antigravity, or ChatGPT). The agent will configure, execute, and follow best practices automatically.
+            </p>
+            {(() => {
+              const promptText = getEffectiveMagicPrompt(tool);
+              return (
+                <div className="magic-blk">
+                  <div className="magic-bh">
+                    <span className="magic-badge">
+                      <Wand2 className="h-3.5 w-3.5" />
+                      Agent Instructions
+                    </span>
+                    <button
+                      type="button"
+                      className={copiedPrompt ? 'ok' : ''}
+                      onClick={() => handleCopyMagicPrompt(promptText)}
+                    >
+                      {copiedPrompt ? 'copied prompt!' : 'copy magic prompt'}
+                    </button>
+                  </div>
+                  <pre className="magic-pre">{promptText}</pre>
+                </div>
+              );
+            })()}
+          </div>
+        </section>
+
+        {hasCommands && (
+          <section className="row" id="install">
+            <div className="lab">install</div>
+            <div>
+              <h2>{isSkill ? 'How to invoke it' : 'Pick how you want to run it'}</h2>
+              <div className="tabs" role="tablist" aria-label="Commands">
+                {commands.map((command, index) => (
+                  <button
+                    key={`${command.label}-${index}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === activeCommand}
+                    onClick={() => setActiveCommand(index)}
+                  >
+                    {command.label || (isSkill ? 'Invocation command' : 'Installation command')}
+                  </button>
+                ))}
+              </div>
+              <div role="tabpanel">
+                <p>{commandDescription}</p>
+                {active && (
+                  <div className="blk">
+                    <div className="bh">
+                      <span>{active.label || (isSkill ? 'Invocation command' : 'Installation command')}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyCommand(active.command, `cmd-${activeCommand}`)}
+                      >
+                        {copiedCommand === `cmd-${activeCommand}` ? 'copied' : 'copy'}
+                      </button>
+                    </div>
+                    <pre>
+                      {isJsonLike(active.command)
+                        ? renderJson(prettyJson(active.command))
+                        : active.command.split('\n').map((line, index) => (
+                            <div key={index}>
+                              <i>$ </i>
+                              {line}
+                            </div>
+                          ))}
+                    </pre>
+                  </div>
+                )}
+              </div>
+              {tool.installInstructions && (
+                <div className="notes">
+                  <p className="note">install notes</p>
+                  <p className="pre-line">{tool.installInstructions}</p>
+                </div>
+              )}
             </div>
           </section>
         )}
 
-        <div className="mt-12 flex items-center justify-between border-t border-border/60 pt-8">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </button>
-          <Link to="/tools" className="text-sm font-medium text-[var(--zyro-accent)] hover:underline">
-            Browse all listings →
-          </Link>
+        {!hasCommands && tool.installInstructions && (
+          <section className="row" id="notes">
+            <div className="lab">setup notes</div>
+            <div>
+              <h2>Before you install</h2>
+              <p className="pre-line">{tool.installInstructions}</p>
+            </div>
+          </section>
+        )}
+
+        {tool.description.trim() && (
+          <section className="row" id="overview">
+            <div className="lab">overview</div>
+            <div className="rd">
+              <MarkdownContent content={tool.description} />
+            </div>
+          </section>
+        )}
+
+        {tool.capabilities.length > 0 && (
+          <section className="row" id="capabilities">
+            <div className="lab">capabilities</div>
+            <div>
+              <h2>{isSkill ? 'What it can do' : 'Key features'}</h2>
+              <ul className="agents">
+                {tool.capabilities.map((capability, index) => {
+                  const [label, value] = splitCapability(capability);
+                  return (
+                    <li key={`${capability}-${index}`}>
+                      {label}
+                      {value ? <span className="cap-value">{value}</span> : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        {recommended.length > 0 && (
+          <section className="row" id="related">
+            <div className="lab">related</div>
+            <div>
+              <h2>More from ToolHub</h2>
+              <div className="related">
+                {recommended.map((item) => (
+                  <Link key={item.id} to={`/tools/${item.slug}`}>
+                    <span className="related-name">{item.name}</span>
+                    <span className="related-tagline">{item.tagline}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        <div className="side">
+          {tool.tags.map((tag) => (
+            <Link key={tag} to={`/tools?q=${encodeURIComponent(tag)}`}>
+              #{tag}
+            </Link>
+          ))}
+          <a href={tool.sourceUrl} {...externalProps(tool.sourceUrl)}>
+            {sourceLabel.toLowerCase()} ↗
+          </a>
+          {tool.documentationUrl && (
+            <a href={tool.documentationUrl} {...externalProps(tool.documentationUrl)}>
+              documentation ↗
+            </a>
+          )}
+          {tool.author?.url && (
+            <a href={tool.author.url} {...externalProps(tool.author.url)}>
+              {tool.author.name.toLowerCase()} ↗
+            </a>
+          )}
+          <Link to="/tools">browse all →</Link>
         </div>
       </div>
     </div>

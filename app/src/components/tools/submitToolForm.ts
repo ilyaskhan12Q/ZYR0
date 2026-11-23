@@ -1,7 +1,7 @@
-import type { ToolItemType } from '@/data/tools';
+import { TOOL_SUBCATEGORIES, type ToolItemType, type ToolSubcategory } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
 
-export type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
+type ToolFormCategory = 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
 
 export const TOOL_FORM_CATEGORIES: ToolFormCategory[] = [
   'AI & Agents',
@@ -126,12 +126,14 @@ export interface ToolDraft {
   tagline: string;
   description: string;
   category: ToolFormCategory;
+  subcategory: ToolSubcategory | '';
   source: string;
   sourceUrl: string;
   docUrl: string;
   imageUrl: string;
   commands: ToolInstallCommand[];
   installInstructions: string;
+  magicPrompt: string;
   tagsInput: string;
   capabilitiesInput: string;
   version: string;
@@ -159,6 +161,7 @@ export function isDraftEmpty(draft: ToolDraft): boolean {
     !draft.imageUrl.trim() &&
     !draft.version.trim() &&
     !draft.installInstructions.trim() &&
+    !draft.magicPrompt?.trim() &&
     !draft.authorUrl.trim() &&
     !draft.slug.trim() &&
     !draft.seoTitle.trim() &&
@@ -169,6 +172,7 @@ export function isDraftEmpty(draft: ToolDraft): boolean {
     !draft.commands.some((command) => command.command.trim()) &&
     draft.itemType === 'tool' &&
     draft.category === 'AI & Agents' &&
+    !draft.subcategory &&
     draft.source === 'GitHub' &&
     !draft.adminFeatured &&
     draft.adminCoverColor === '#7B7BDC'
@@ -215,6 +219,9 @@ export function loadToolDraft(userId: string): ToolDraft | null {
     const category = TOOL_FORM_CATEGORIES.includes(data.category as ToolFormCategory)
       ? (data.category as ToolFormCategory)
       : 'AI & Agents';
+    const subcategory = TOOL_SUBCATEGORIES.includes(data.subcategory as ToolSubcategory)
+      ? (data.subcategory as ToolSubcategory)
+      : '';
     const source = typeof data.source === 'string' && (TOOL_FORM_SOURCES as readonly string[]).includes(data.source)
       ? data.source
       : 'GitHub';
@@ -225,12 +232,14 @@ export function loadToolDraft(userId: string): ToolDraft | null {
       tagline: text('tagline'),
       description: text('description'),
       category,
+      subcategory,
       source,
       sourceUrl: text('sourceUrl'),
       docUrl: text('docUrl'),
       imageUrl: text('imageUrl'),
       commands: commands.length > 0 ? commands : [{ label: 'CLI', command: '' }],
       installInstructions: text('installInstructions'),
+      magicPrompt: text('magicPrompt'),
       tagsInput: text('tagsInput'),
       capabilitiesInput: text('capabilitiesInput'),
       version: text('version'),

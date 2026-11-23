@@ -6,6 +6,34 @@ export type ToolItemType = 'tool' | 'skill' | 'tool_skill';
 
 export type ToolCategory = 'All' | 'ZYR0 Native' | 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
 
+/** Discipline/use-case taxonomy, independent of the top-level category. */
+export type ToolSubcategory =
+  | 'Design & UI/UX'
+  | 'Engineering'
+  | 'AI & LLMs'
+  | 'Data & Analytics'
+  | 'Writing & Content'
+  | 'Marketing & Growth'
+  | 'Research'
+  | 'Productivity'
+  | 'Security'
+  | 'Business & Ops'
+  | 'Education';
+
+export const TOOL_SUBCATEGORIES: ToolSubcategory[] = [
+  'Design & UI/UX',
+  'Engineering',
+  'AI & LLMs',
+  'Data & Analytics',
+  'Writing & Content',
+  'Marketing & Growth',
+  'Research',
+  'Productivity',
+  'Security',
+  'Business & Ops',
+  'Education',
+];
+
 export interface ToolItem {
   id: string;
   slug: string;
@@ -14,6 +42,7 @@ export interface ToolItem {
   description: string;
   item_type?: ToolItemType;
   category: Exclude<ToolCategory, 'All' | 'ZYR0 Native'>;
+  subcategory?: ToolSubcategory | null;
   tags: string[];
   source: ToolSource;
   sourceUrl: string;
@@ -26,6 +55,7 @@ export interface ToolItem {
   installCommand?: string;
   installCommands?: ToolInstallCommand[];
   installInstructions?: string;
+  magicPrompt?: string;
   version?: string;
   seoTitle?: string;
   seoDescription?: string;
@@ -43,8 +73,6 @@ export const TOOL_CATEGORIES: ToolCategory[] = [
   'Research & Docs',
   'Productivity',
 ];
-
-export const TOOLS_DATA: ToolItem[] = [];
 
 /**
  * Gradient background for card/preview heroes. Custom admin color wins when valid;

@@ -756,6 +756,32 @@ function generateBodyHtml(routePath, data = {}) {
         </div>
       </section>
 
+      <section style="padding: 4rem 2rem; max-width: 1000px; margin: 0 auto; font-family: sans-serif;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 0.5rem;">Publish &amp; Install Autonomous Skills</h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 2.5rem; font-size: 1.05rem;">Supercharge ZYR0 Studio, School OS, and the Research Agent. Discover curated tools and skills or publish your own.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #7c3aed; display: block; margin-bottom: 0.5rem;">Autonomous Skill</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 0.5rem 0;">
+              <a href="/tools/ecc-redu" style="color: inherit; text-decoration: none;">ECC (Engineering Capability Cortex)</a>
+            </h3>
+            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">Plans before it builds, verifies changes with tests, and turns repeated wins into reusable agent skills.</p>
+            <a href="/tools/ecc-redu" style="color: #2563eb; font-weight: 600; font-size: 0.9rem; text-decoration: none;">Inspect skill &rarr;</a>
+          </div>
+          <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #ffffff;">
+            <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #2563eb; display: block; margin-bottom: 0.5rem;">Developer Tool</span>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a; margin: 0 0 0.5rem 0;">
+              <a href="/tools/rea-reverse-engineer-anything-8bcq" style="color: inherit; text-decoration: none;">REA (Reverse Engineer Anything)</a>
+            </h3>
+            <p style="color: #64748b; font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">Connects AI coding agents to local reverse engineering tools over Model Context Protocol (MCP).</p>
+            <a href="/tools/rea-reverse-engineer-anything-8bcq" style="color: #2563eb; font-weight: 600; font-size: 0.9rem; text-decoration: none;">Inspect tool &rarr;</a>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <a href="/tools" style="color: #2563eb; font-weight: 600; text-decoration: none; font-size: 0.95rem;">Browse all skills and developer tools in ZYR0 ToolHub &rarr;</a>
+        </div>
+      </section>
+
       <section style="padding: 4rem 2rem; max-width: 800px; margin: 0 auto; font-family: sans-serif;">
         <h2 style="font-size: 2rem; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 2.5rem;">Built for Every Stage</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SearchX, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {

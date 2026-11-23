@@ -3,7 +3,7 @@ import { MarkdownContent } from '@/components/markdown/MarkdownContent';
 import { copyToClipboard } from '@/lib/clipboard';
 import {
   ExternalLink, Terminal, Copy, Check, BookOpen, Tag,
-  Layers, Info, FileText, ArrowUpRight
+  Layers, Info, FileText, ArrowUpRight, Wand2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import type { ToolItem } from '@/data/tools';
 import type { ToolInstallCommand } from '@/lib/database.types';
 import { coverGradient } from '@/data/tools';
+import { getEffectiveMagicPrompt } from '@/lib/magicPrompt';
 import { toast } from 'sonner';
 
 interface ToolPreviewDialogProps {
@@ -34,6 +35,7 @@ const SectionTitle = ({ icon: Icon, children }: { icon: React.ElementType; child
 
 export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialogProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
   const [activeCmdIdx, setActiveCmdIdx] = useState(0);
 
@@ -62,6 +64,16 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
     setCopied(true);
     toast.success('Copied to clipboard');
     window.setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyMagicPrompt = async (promptText: string) => {
+    if (!(await copyToClipboard(promptText))) {
+      toast.error('Failed to copy Magic Prompt');
+      return;
+    }
+    setCopiedPrompt(true);
+    toast.success('Magic Prompt copied! Paste into your AI agent.');
+    window.setTimeout(() => setCopiedPrompt(false), 2000);
   };
 
   const getSourceBadge = () => {
@@ -192,6 +204,40 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                 </section>
               )}
 
+              {/* Magic Agent Prompt */}
+              {(() => {
+                const promptText = getEffectiveMagicPrompt(tool);
+                return (
+                  <section>
+                    <div className="flex items-center justify-between mb-2">
+                      <SectionTitle icon={Wand2}>Run with AI Agent (Magic Prompt)</SectionTitle>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyMagicPrompt(promptText)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-[var(--zyro-accent)] hover:bg-[var(--zyro-sapphire)] text-white transition-colors cursor-pointer"
+                      >
+                        {copiedPrompt ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Copied Prompt</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy Magic Prompt</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="rounded-xl overflow-hidden border border-border/70 bg-muted/30">
+                      <pre className="p-3 bg-muted/40 text-foreground font-mono text-[11px] leading-relaxed max-h-40 overflow-y-auto whitespace-pre-wrap select-all">
+                        {promptText}
+                      </pre>
+                    </div>
+                  </section>
+                );
+              })()}
+
               {/* Install command(s) — full width in content column so long commands breathe */}
               {commands.length > 0 && (
                 <section>
@@ -279,6 +325,9 @@ export function ToolPreviewDialog({ tool, open, onOpenChange }: ToolPreviewDialo
                 <dl className="p-4 space-y-3 text-xs">
                   {[
                     { label: 'Category', value: <span className="font-medium text-foreground">{tool.category}</span> },
+                    tool.subcategory
+                      ? { label: 'Subcategory', value: <span className="font-medium text-foreground">{tool.subcategory}</span> }
+                      : null,
                     { label: 'Source', value: <span className="font-medium text-foreground">{tool.source}</span> },
                     tool.version
                       ? { label: 'Version', value: <span className="font-mono font-medium text-foreground">{tool.version}</span> }

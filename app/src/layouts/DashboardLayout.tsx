@@ -33,6 +33,8 @@ interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
+  /** Group heading rendered above this item when it differs from the previous item. */
+  section?: string;
   /** Count shown in the sidebar pill, keyed into the live useSidebarCounts data. */
   badgeKey?: 'applications' | 'tasks' | 'messages';
   children?: { label: string; href: string }[];
@@ -83,18 +85,18 @@ const navConfig: Record<UserRole, NavItem[]> = {
     { label: 'Profile', href: '/mentor/profile', icon: User },
   ],
   admin: [
-    { label: 'Dashboard', href: '/admin/dashboard', icon: Home },
+    { label: 'Dashboard', href: '/admin/dashboard', icon: Home, section: 'Overview' },
     { label: 'Users', href: '/admin/users', icon: Users },
     { label: 'Companies', href: '/admin/companies', icon: Building2 },
     { label: 'Internships', href: '/admin/internships', icon: FolderOpen },
-    { label: 'Certificates', href: '/admin/certificates', icon: Award },
+    { label: 'Certificates', href: '/admin/certificates', icon: Award, section: 'Records' },
     { label: 'Offer Letters', href: '/admin/offer-letters', icon: FileText },
     { label: 'Applications', href: '/admin/applications', icon: FileCheck },
     { label: 'Team Applications', href: '/admin/team-applications', icon: Rocket },
-    { label: 'Site Banners', href: '/admin/site-banners', icon: Megaphone },
+    { label: 'Site Banners', href: '/admin/site-banners', icon: Megaphone, section: 'Content' },
     { label: 'Blog CMS', href: '/admin/blogs', icon: BookOpen },
     { label: 'ToolHub Queue', href: '/admin/tools', icon: Wrench },
-    { label: 'Inbox', href: '/admin/inbox', icon: MessageSquare },
+    { label: 'Inbox', href: '/admin/inbox', icon: MessageSquare, section: 'System' },
     { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
     { label: 'Reports', href: '/admin/reports', icon: Flag },
     { label: 'Settings', href: '/admin/settings', icon: Settings },
@@ -162,6 +164,9 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
   const location = useLocation();
   const navigate = useNavigate();
   const navItems = useCompanyNavItems(role, companyAccess);
+  const currentNav = navItems.find(
+    (item) => location.pathname === item.href || location.pathname.startsWith(item.href + '/')
+  );
   const sidebarCounts = useSidebarCounts(role === 'company' ? companyAccess?.company?.id ?? null : null);
   const planMeta = useActivePlan();
   const [planStatusOpen, setPlanStatusOpen] = useState(false);
@@ -391,7 +396,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 h-screen bg-card border-r border-border z-50 flex flex-col transition-all duration-300 ${sidebarWidth} ${
+        className={`fixed lg:sticky top-0 left-0 h-screen bg-card border-r border-border z-50 flex flex-col ${sidebarWidth} ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
@@ -424,10 +429,11 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
         {/* Navigation */}
         <nav data-tour="sidebar-nav" className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/');
             const hasChildren = item.children && item.children.length > 0;
             const isExpanded = expandedSections.includes(item.label);
+            const showSection = !collapsed && !!item.section && item.section !== navItems[index - 1]?.section;
             
             const isItemRestricted = profile && !profileCompleted && profile.role !== 'admin' && !(role === 'company' && companyAccess && !companyAccess.isOwner) && (
               (RESTRICTED_ROUTES[profile.role] || []).some(route => item.href === route || item.href.startsWith(route + '/'))
@@ -435,6 +441,11 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
 
             return (
               <div key={item.href}>
+                {showSection && (
+                  <p className={`px-3 pb-1 font-mono text-[11px] text-muted-foreground ${index === 0 ? '' : 'pt-5'}`}>
+                    {item.section}
+                  </p>
+                )}
                 <Link
                   to={item.href}
                   data-tour={item.tourTarget}
@@ -446,19 +457,19 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                       setMobileOpen(false);
                     }
                   }}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex h-9 items-center gap-3 px-3 rounded-lg text-sm font-medium transition-colors duration-150 ${
                     isActive
-                      ? 'bg-accent/10 text-accent'
+                      ? 'bg-accent/[0.08] text-accent ring-1 ring-inset ring-accent/20'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   } ${isItemRestricted ? 'opacity-75' : ''}`}
                   title={collapsed ? item.label : undefined}
                 >
-                  <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                  <item.icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-accent' : ''}`} strokeWidth={1.5} />
                   {!collapsed && (
                     <>
                       <span className="flex-1 whitespace-nowrap">{item.label}</span>
                       {item.badgeKey && sidebarCounts[item.badgeKey] && !isItemRestricted && (
-                        <span className="min-w-[20px] h-5 px-1.5 bg-accent text-white text-xs rounded-full flex items-center justify-center">
+                        <span className="min-w-[20px] h-5 px-1.5 bg-accent text-accent-foreground font-mono text-[11px] tabular-nums rounded-full flex items-center justify-center">
                           {sidebarCounts[item.badgeKey]}
                         </span>
                       )}
@@ -528,7 +539,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                   }}
                   className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors w-full text-left"
                 >
-                  <Building2 className="w-5 h-5 flex-shrink-0" />
+                  <Building2 className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
                   <span>Switch to {c.company.name} Workspace</span>
                 </button>
               ))
@@ -541,7 +552,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                 }}
                 className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
               >
-                <Building2 className="w-5 h-5 flex-shrink-0" />
+                <Building2 className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
                 <span>Switch to {companyAccess.company?.name || 'Company'} Workspace</span>
               </Link>
             )
@@ -555,7 +566,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
               }}
               className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors"
             >
-              <User className="w-5 h-5 flex-shrink-0" />
+              <User className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
               <span>Switch to {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Workspace</span>
             </Link>
           )}
@@ -571,7 +582,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
                   }}
                   className="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-accent hover:bg-accent/10 transition-colors w-full text-left"
                 >
-                  <Building2 className="w-5 h-5 flex-shrink-0" />
+                  <Building2 className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
                   <span>Switch to {c.company.name} Workspace</span>
                 </button>
               ))
@@ -645,7 +656,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             }`}
             title={collapsed ? 'Home' : undefined}
           >
-            <Home className="w-5 h-5 flex-shrink-0" />
+            <Home className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
             {!collapsed && <span>Home</span>}
           </Link>
           <Link
@@ -657,7 +668,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             }`}
             title={collapsed ? 'Settings' : undefined}
           >
-            <Settings className="w-5 h-5 flex-shrink-0" />
+            <Settings className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
             {!collapsed && <span>Settings</span>}
           </Link>
           <button
@@ -669,7 +680,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600 transition-colors"
             title={collapsed ? 'Sign Out' : undefined}
           >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <LogOut className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
             {!collapsed && <span>Sign Out</span>}
           </button>
         </div>
@@ -687,7 +698,15 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
             >
               <Menu className="w-5 h-5" />
             </button>
-            {/* Breadcrumb could go here */}
+            <div className="hidden items-center gap-2 text-[13px] sm:flex">
+              <span className="text-muted-foreground">{role.charAt(0).toUpperCase() + role.slice(1)}</span>
+              {currentNav && (
+                <>
+                  <span className="text-muted-foreground/40">/</span>
+                  <span className="font-medium text-foreground">{currentNav.label}</span>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -703,7 +722,7 @@ export default function DashboardLayout({ role }: { role: UserRole }) {
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
                 )}
               </button>
               

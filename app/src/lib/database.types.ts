@@ -462,6 +462,7 @@ export interface DbTool {
   description: string;
   item_type: 'tool' | 'skill' | 'tool_skill';
   category: 'AI & Agents' | 'Developer Tools' | 'Research & Docs' | 'Productivity';
+  subcategory: string | null;
   tags: string[];
   source: string;
   source_url: string;
@@ -474,6 +475,7 @@ export interface DbTool {
   install_command: string | null;
   install_commands?: ToolInstallCommand[] | null;
   install_instructions: string | null;
+  magic_prompt?: string | null;
   version: string | null;
   seo_title: string | null;
   seo_description: string | null;

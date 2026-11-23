@@ -1,13 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Search, X, Sparkles, Compass, Plus, ChevronDown, Check,
+  Search, X, Sparkles, Plus, ChevronDown,
   ArrowUpDown, Filter
 } from 'lucide-react';
 import { SEO } from '@/components/SEO';
-import { TOOL_CATEGORIES, type ToolItem, type ToolCategory } from '@/data/tools';
+import { TOOL_CATEGORIES, TOOL_SUBCATEGORIES, type ToolItem, type ToolCategory, type ToolSubcategory } from '@/data/tools';
 import { ToolCard } from '@/components/tools/ToolCard';
-import { ToolPreviewDialog } from '@/components/tools/ToolPreviewDialog';
 import { SubmitToolDialog } from '@/components/tools/SubmitToolDialog';
 import { ToolEmptyState } from '@/components/tools/ToolEmptyState';
 import { getAllPublicTools } from '@/services/tools';
@@ -27,13 +26,12 @@ type SortOption = 'featured' | 'newest' | 'az' | 'popular';
 export default function ToolHub() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = (searchParams.get('category') as ToolCategory) || 'All';
+  const activeSubcategory = (searchParams.get('subcategory') as ToolSubcategory | 'All') || 'All';
   const activeType = (searchParams.get('type') as 'all' | 'tool' | 'skill') || 'all';
   const searchQuery = searchParams.get('q') || '';
   const sortBy = (searchParams.get('sort') as SortOption) || 'featured';
 
   const [tools, setTools] = useState<ToolItem[]>([]);
-  const [previewTool, setPreviewTool] = useState<ToolItem | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
 
@@ -64,6 +62,16 @@ export default function ToolHub() {
       searchParams.delete('category');
     } else {
       searchParams.set('category', cat);
+    }
+    setSearchParams(searchParams);
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
+
+  const handleSubcategoryChange = (subcat: ToolSubcategory | 'All') => {
+    if (subcat === 'All') {
+      searchParams.delete('subcategory');
+    } else {
+      searchParams.set('subcategory', subcat);
     }
     setSearchParams(searchParams);
     setVisibleCount(ITEMS_PER_PAGE);
@@ -104,11 +112,6 @@ export default function ToolHub() {
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
-  const handleOpenPreview = (tool: ToolItem) => {
-    setPreviewTool(tool);
-    setDialogOpen(true);
-  };
-
   // Filtered & sorted tools
   const filteredTools = useMemo(() => {
     const list = tools.filter((tool) => {
@@ -132,6 +135,11 @@ export default function ToolHub() {
         activeCategory !== 'ZYR0 Native' &&
         tool.category !== activeCategory
       ) {
+        return false;
+      }
+
+      // Subcategory filter (discipline / use case)
+      if (activeSubcategory !== 'All' && tool.subcategory !== activeSubcategory) {
         return false;
       }
 
@@ -168,7 +176,7 @@ export default function ToolHub() {
       }
       return 0;
     });
-  }, [tools, activeCategory, activeType, searchQuery, sortBy]);
+  }, [tools, activeCategory, activeSubcategory, activeType, searchQuery, sortBy]);
 
   // Paginated visible tools (9 initial, Load More adds 9)
   const displayedTools = useMemo(() => {
@@ -182,7 +190,7 @@ export default function ToolHub() {
   };
 
   // Featured flagship tools for top showcase (only on default All view with no active search or filter)
-  const isDefaultView = activeCategory === 'All' && activeType === 'all' && !searchQuery.trim() && sortBy === 'featured';
+  const isDefaultView = activeCategory === 'All' && activeSubcategory === 'All' && activeType === 'all' && !searchQuery.trim() && sortBy === 'featured';
   const featuredTools = useMemo(() => {
     return tools.filter((t) => t.featured);
   }, [tools]);
@@ -202,16 +210,8 @@ export default function ToolHub() {
           {/* Subtle Ambient Radial Lighting (Unboxed & Fluid) */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-gradient-to-b from-[var(--zyro-accent)]/15 via-[var(--zyro-accent)]/8 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-          {/* Top Bar: Live Status Pill & Independent Submit CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-[var(--zyro-accent-muted)] text-[var(--zyro-accent)] border border-[var(--zyro-accent)]/20 backdrop-blur-md shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--zyro-accent)] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--zyro-accent)]"></span>
-              </span>
-              <span>TOOLS & SKILLS</span>
-            </div>
-
+          {/* Top Bar: Independent Submit CTA */}
+          <div className="flex items-center justify-end gap-4 mb-6">
             {/* Separated Submit Action Button */}
             <Button
               onClick={() => setSubmitDialogOpen(true)}
@@ -238,9 +238,8 @@ export default function ToolHub() {
           {/* Centered Command Search Input */}
           <div className="max-w-2xl mx-auto">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[var(--zyro-hyacinth)] via-[var(--zyro-accent)] to-[var(--zyro-sapphire)] rounded-2xl blur-md opacity-20 group-hover:opacity-35 group-focus-within:opacity-50 transition duration-300 pointer-events-none" />
-              <div className="relative flex items-center bg-card border border-border/80 group-focus-within:border-[var(--zyro-accent)] rounded-2xl shadow-xl overflow-hidden transition-all p-1.5">
-                <Search className="w-5 h-5 ml-3.5 text-muted-foreground group-focus-within:text-[var(--zyro-accent)] transition-colors shrink-0" />
+              <div className="relative flex items-center bg-card border border-border/80 group-focus-within:border-[var(--zyro-accent)] rounded-full shadow-xl overflow-hidden transition-all p-1.5">
+                <Search className="w-5 h-5 ml-3.5 text-foreground/80 group-focus-within:text-[var(--zyro-accent)] transition-colors shrink-0" />
                 <input
                   id="toolhub-search"
                   type="text"
@@ -267,9 +266,9 @@ export default function ToolHub() {
           </div>
 
           {/* Discovery Toolbar: Type Toggle (Left) + Category & Sort Dropdowns (Right) */}
-          <div className="mt-8 pt-6 border-t border-border/60 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="mt-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             {/* Segmented Type Toggle (All vs Tools vs Skills) */}
-            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-xl shrink-0 self-start md:self-auto">
+            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-full shrink-0 self-start md:self-auto">
               {[
                 { id: 'all', label: 'All' },
                 { id: 'tool', label: 'Tools' },
@@ -278,9 +277,9 @@ export default function ToolHub() {
                 <button
                   key={t.id}
                   onClick={() => handleTypeChange(t.id as any)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                     activeType === t.id
-                      ? 'bg-card text-foreground shadow-xs font-semibold'
+                      ? 'bg-[var(--zyro-accent)] text-white shadow-xs font-semibold'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -293,9 +292,9 @@ export default function ToolHub() {
             <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">
               {/* Category Dropdown */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Category:</span>
+                
                 <Select value={activeCategory} onValueChange={(val: any) => handleCategoryChange(val)}>
-                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[145px]">
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-full px-2.5 gap-2 min-w-[145px]">
                     <Filter className="w-3.5 h-3.5 text-muted-foreground" />
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
@@ -309,11 +308,30 @@ export default function ToolHub() {
                 </Select>
               </div>
 
+              {/* Subcategory Dropdown */}
+              <div className="flex items-center gap-2">
+                
+                <Select value={activeSubcategory} onValueChange={(val: any) => handleSubcategoryChange(val)}>
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-full px-2.5 gap-2 min-w-[160px]">
+                    <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Subcategory" />
+                  </SelectTrigger>
+                  <SelectContent align="end" className="text-xs">
+                    <SelectItem value="All">All Subcategories</SelectItem>
+                    {TOOL_SUBCATEGORIES.map((subcat) => (
+                      <SelectItem key={subcat} value={subcat}>
+                        {subcat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Sort Selector */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Sort:</span>
+                
                 <Select value={sortBy} onValueChange={(val: any) => handleSortChange(val)}>
-                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[140px]">
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-full px-2.5 gap-2 min-w-[140px]">
                     <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -333,18 +351,13 @@ export default function ToolHub() {
         {isDefaultView && featuredTools.length > 0 && (
           <div className="mb-14 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
-                Featured Flagships
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Featured
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-border/60 bg-muted/20">
               {featuredTools.map((tool) => (
-                <ToolCard
-                  key={tool.id}
-                  tool={tool}
-                  onPreview={handleOpenPreview}
-                />
+                <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
           </div>
@@ -355,13 +368,14 @@ export default function ToolHub() {
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">
               {activeCategory === 'All' ? 'All Curated Directory' : `${activeCategory} Tools`}
+              {activeSubcategory !== 'All' && <span className="text-muted-foreground"> / {activeSubcategory}</span>}
             </h2>
             <span className="text-xs font-mono text-muted-foreground px-2 py-0.5 rounded bg-muted">
               {filteredTools.length}
             </span>
           </div>
 
-          {(activeCategory !== 'All' || activeType !== 'all' || searchQuery || sortBy !== 'featured') && (
+          {(activeCategory !== 'All' || activeSubcategory !== 'All' || activeType !== 'all' || searchQuery || sortBy !== 'featured') && (
             <button
               onClick={handleClearFilters}
               className="text-xs text-muted-foreground hover:text-foreground hover:underline"
@@ -381,13 +395,9 @@ export default function ToolHub() {
           />
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-border/60 bg-muted/20">
               {displayedTools.map((tool) => (
-                <ToolCard
-                  key={tool.id}
-                  tool={tool}
-                  onPreview={handleOpenPreview}
-                />
+                <ToolCard key={tool.id} tool={tool} />
               ))}
             </div>
 
@@ -440,13 +450,6 @@ export default function ToolHub() {
           </Button>
         </div>
       </div>
-
-      {/* Tool Preview Compact Dialog */}
-      <ToolPreviewDialog
-        tool={previewTool}
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-      />
 
       {/* Submit Tool Dialog */}
       <SubmitToolDialog

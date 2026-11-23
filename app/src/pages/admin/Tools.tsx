@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
-  Wrench, CheckCircle2, XCircle, Clock, Star, ExternalLink,
-  Search, ShieldAlert, Sparkles, AlertCircle, Trash2, Edit3, Eye, Plus
+  CheckCircle2, XCircle, Star, ExternalLink,
+  Search, Trash2, Eye, Plus, Edit3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -72,6 +72,7 @@ export default function AdminTools() {
           t.name.toLowerCase().includes(q) ||
           t.tagline.toLowerCase().includes(q) ||
           t.category.toLowerCase().includes(q) ||
+          (t.subcategory || '').toLowerCase().includes(q) ||
           t.author_name.toLowerCase().includes(q)
         );
       }
@@ -235,6 +236,7 @@ export default function AdminTools() {
                   </Badge>
                   <span className="text-xs font-medium px-2 py-0.5 rounded bg-muted text-muted-foreground">
                     {tool.category}
+                    {tool.subcategory ? ` · ${tool.subcategory}` : ''}
                   </span>
                   <span className="text-xs font-mono text-muted-foreground">
                     Source: {tool.source}
