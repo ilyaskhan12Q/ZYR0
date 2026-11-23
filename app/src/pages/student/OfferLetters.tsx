@@ -241,7 +241,11 @@ export default function StudentOfferLetters() {
         {filtered.map((offer, i) => {
           const cfg    = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
           const Icon   = cfg.icon;
-          const canAct = offer.status === 'Sent';
+          // Pending offers are actionable too: the company pipeline inserts
+          // the record as Pending and only flips it to Sent after the email
+          // step succeeds, so a failed email used to leave the student with
+          // no Accept/Reject buttons at all.
+          const canAct = offer.status === 'Sent' || offer.status === 'Pending';
 
           return (
             <m.div
@@ -420,7 +424,9 @@ function OfferLetterModal({ offer, onClose, onAccept, onReject, onDownload, resp
   const navigate = useNavigate();
   const cfg  = STATUS_CONFIG[offer.status] ?? STATUS_CONFIG.Pending;
   const Icon = cfg.icon;
-  const canAct = offer.status === 'Sent';
+  // Pending is actionable for the same reason as on the card: an offer stuck
+  // in Pending (email step failed) must still be acceptable.
+  const canAct = offer.status === 'Sent' || offer.status === 'Pending';
   const [viewTab, setViewTab] = useState<'document' | 'details'>('document');
 
   return (
