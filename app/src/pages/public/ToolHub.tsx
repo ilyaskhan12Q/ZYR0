@@ -210,16 +210,8 @@ export default function ToolHub() {
           {/* Subtle Ambient Radial Lighting (Unboxed & Fluid) */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[720px] h-[340px] bg-gradient-to-b from-[var(--zyro-accent)]/15 via-[var(--zyro-accent)]/8 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-          {/* Top Bar: Live Status Pill & Independent Submit CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-[var(--zyro-accent-muted)] text-[var(--zyro-accent)] border border-[var(--zyro-accent)]/20 backdrop-blur-md shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--zyro-accent)] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--zyro-accent)]"></span>
-              </span>
-              <span>TOOLS & SKILLS</span>
-            </div>
-
+          {/* Top Bar: Independent Submit CTA */}
+          <div className="flex items-center justify-end gap-4 mb-6">
             {/* Separated Submit Action Button */}
             <Button
               onClick={() => setSubmitDialogOpen(true)}
@@ -246,9 +238,8 @@ export default function ToolHub() {
           {/* Centered Command Search Input */}
           <div className="max-w-2xl mx-auto">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[var(--zyro-hyacinth)] via-[var(--zyro-accent)] to-[var(--zyro-sapphire)] rounded-2xl blur-md opacity-20 group-hover:opacity-35 group-focus-within:opacity-50 transition duration-300 pointer-events-none" />
-              <div className="relative flex items-center bg-card border border-border/80 group-focus-within:border-[var(--zyro-accent)] rounded-2xl shadow-xl overflow-hidden transition-all p-1.5">
-                <Search className="w-5 h-5 ml-3.5 text-muted-foreground group-focus-within:text-[var(--zyro-accent)] transition-colors shrink-0" />
+              <div className="relative flex items-center bg-card border border-border/80 group-focus-within:border-[var(--zyro-accent)] rounded-full shadow-xl overflow-hidden transition-all p-1.5">
+                <Search className="w-5 h-5 ml-3.5 text-foreground/80 group-focus-within:text-[var(--zyro-accent)] transition-colors shrink-0" />
                 <input
                   id="toolhub-search"
                   type="text"
@@ -275,9 +266,9 @@ export default function ToolHub() {
           </div>
 
           {/* Discovery Toolbar: Type Toggle (Left) + Category & Sort Dropdowns (Right) */}
-          <div className="mt-8 pt-6 border-t border-border/60 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="mt-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             {/* Segmented Type Toggle (All vs Tools vs Skills) */}
-            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-xl shrink-0 self-start md:self-auto">
+            <div className="flex items-center gap-1 p-1 bg-muted/60 border border-border/60 rounded-full shrink-0 self-start md:self-auto">
               {[
                 { id: 'all', label: 'All' },
                 { id: 'tool', label: 'Tools' },
@@ -286,9 +277,9 @@ export default function ToolHub() {
                 <button
                   key={t.id}
                   onClick={() => handleTypeChange(t.id as any)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                     activeType === t.id
-                      ? 'bg-card text-foreground shadow-xs font-semibold'
+                      ? 'bg-[var(--zyro-accent)] text-white shadow-xs font-semibold'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -301,9 +292,9 @@ export default function ToolHub() {
             <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">
               {/* Category Dropdown */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Category:</span>
+                
                 <Select value={activeCategory} onValueChange={(val: any) => handleCategoryChange(val)}>
-                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[145px]">
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-full px-2.5 gap-2 min-w-[145px]">
                     <Filter className="w-3.5 h-3.5 text-muted-foreground" />
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
@@ -319,9 +310,9 @@ export default function ToolHub() {
 
               {/* Subcategory Dropdown */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Subcategory:</span>
+                
                 <Select value={activeSubcategory} onValueChange={(val: any) => handleSubcategoryChange(val)}>
-                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[160px]">
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-full px-2.5 gap-2 min-w-[160px]">
                     <Filter className="w-3.5 h-3.5 text-muted-foreground" />
                     <SelectValue placeholder="Subcategory" />
                   </SelectTrigger>
@@ -338,9 +329,9 @@ export default function ToolHub() {
 
               {/* Sort Selector */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground hidden sm:inline font-medium">Sort:</span>
+                
                 <Select value={sortBy} onValueChange={(val: any) => handleSortChange(val)}>
-                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-lg px-2.5 gap-2 min-w-[140px]">
+                  <SelectTrigger className="h-8 text-xs bg-card border-border/70 rounded-full px-2.5 gap-2 min-w-[140px]">
                     <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
@@ -360,12 +351,11 @@ export default function ToolHub() {
         {isDefaultView && featuredTools.length > 0 && (
           <div className="mb-14 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[var(--zyro-accent)]" />
-                Featured Flagships
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Featured
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-border/60 bg-muted/20">
               {featuredTools.map((tool) => (
                 <ToolCard key={tool.id} tool={tool} />
               ))}
@@ -405,7 +395,7 @@ export default function ToolHub() {
           />
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl border border-border/60 bg-muted/20">
               {displayedTools.map((tool) => (
                 <ToolCard key={tool.id} tool={tool} />
               ))}

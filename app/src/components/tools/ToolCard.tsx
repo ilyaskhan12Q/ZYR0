@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { ExternalLink, Terminal, Sparkles, ArrowRight } from 'lucide-react';
+import GitHubIcon from '@/components/icons/GitHubIcon';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { type ToolItem, coverGradient } from '@/data/tools';
 
@@ -52,7 +53,7 @@ export function ToolCard({ tool }: ToolCardProps) {
   };
 
   return (
-    <Card className="group flex flex-col justify-between rounded-xl border border-border/70 bg-card hover:border-[var(--zyro-accent)]/45 hover:shadow-lg hover:shadow-[var(--zyro-accent-muted)] transition-all duration-200 overflow-hidden py-0 gap-0">
+    <Card className="group flex flex-col justify-between rounded-xl border border-border/60 bg-card hover:border-[var(--zyro-accent)]/50 hover:shadow-sm transition-all duration-200 overflow-hidden py-0 gap-0">
       <div>
         {/* ============ HERO MEDIA BAND (same language as ToolPreviewDialog) ============ */}
         <div className="relative w-full aspect-[16/9] overflow-hidden bg-[var(--zyro-twilight)] border-b border-border/40">
@@ -83,6 +84,12 @@ export function ToolCard({ tool }: ToolCardProps) {
           )}
 
           {/* Badges row */}
+          {tool.source === 'GitHub' && (
+            <div className="absolute top-2 right-2 flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded px-1 py-0.5 text-xs text-white z-10">
+              GitHub
+            </div>
+          )}
+          
           <div className="absolute top-3 left-3.5 flex flex-wrap items-center gap-1.5">
             {renderSourceBadge()}
             {tool.item_type && (
@@ -130,19 +137,6 @@ export function ToolCard({ tool }: ToolCardProps) {
             </p>
           </div>
         </div>
-
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-1">
-            {tool.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground border border-border/40"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </CardContent>
       </div>
 
       <CardFooter className="p-4 pt-2 border-t border-border/40 bg-muted/20 flex items-center justify-between">
@@ -150,7 +144,7 @@ export function ToolCard({ tool }: ToolCardProps) {
           onClick={() => navigate(`/tools/${tool.slug}`)}
           className="text-xs font-medium text-foreground hover:text-[var(--zyro-accent)] transition-colors inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring rounded py-1 px-1 -mx-1"
         >
-          <span>Inspect</span>
+          <span>View Details</span>
           <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
         </button>
 
