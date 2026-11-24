@@ -27,6 +27,8 @@ interface LegalPageProps {
   updated: string;
   sections: LegalSection[];
   related?: { label: string; to: string }[];
+  contactNote?: string;
+  contactEmail?: string;
 }
 
 const DEFAULT_RELATED = [
@@ -104,6 +106,8 @@ export function LegalPage({
   updated,
   sections,
   related = DEFAULT_RELATED,
+  contactNote = 'Questions about this policy?',
+  contactEmail = 'privacy@zyroo.org',
 }: LegalPageProps) {
   const [activeId, setActiveId] = useState(sections[0]?.id ?? '');
 
@@ -237,9 +241,9 @@ export function LegalPage({
 
             <footer className="border-t border-border/70 pt-8">
               <p className="text-sm text-muted-foreground">
-                Questions about this policy? Write to us at{' '}
-                <a href="mailto:privacy@zyroo.org" className="font-medium text-foreground underline-offset-4 hover:underline">
-                  privacy@zyroo.org
+                {contactNote} Write to us at{' '}
+                <a href={`mailto:${contactEmail}`} className="font-medium text-foreground underline-offset-4 hover:underline">
+                  {contactEmail}
                 </a>
                 .
               </p>
