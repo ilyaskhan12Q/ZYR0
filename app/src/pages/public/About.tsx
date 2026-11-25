@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { m } from 'framer-motion';
-import { Target, Eye, Shield, Zap, Users, Award, Globe, Heart, Lightbulb, MapPin, GraduationCap, Building2, ArrowRight } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { BASE_URL } from '@/config/seo';
 
@@ -18,251 +18,419 @@ const aboutStructuredData = [
     '@type': 'Organization',
     name: 'ZYR0',
     url: `${BASE_URL}/`,
-    description: 'ZYR0 is a structured internship management platform connecting students, companies, and mentors for verifiable professional experiences.',
+    description:
+      'ZYR0 is a product ecosystem for people who build, learn, research and work, with Studio, School, Research, Work, ToolHub and the Blog.',
     foundingDate: '2023',
-    founders: [{ '@type': 'Person', name: '[Awaiting verified content]' }],
-    slogan: 'Structured internships. Verified careers.',
+    slogan: 'Build, learn, research, work.',
+    sameAs: ['https://linkedin.com/company/zyr0-co'],
+  },
+];
+
+const products = [
+  {
+    name: 'Studio',
+    verb: 'build',
+    to: '/studio',
+    desc: 'A focused workspace for building and shipping software.',
+  },
+  {
+    name: 'School',
+    verb: 'run',
+    to: '/school',
+    desc: 'One operating system for schools and programs.',
+  },
+  {
+    name: 'Research',
+    verb: 'find',
+    to: '/research',
+    desc: 'Ask better questions and turn sources into reports.',
+  },
+  {
+    name: 'Work',
+    verb: 'start',
+    to: '/internships',
+    desc: 'Internships, cohorts and verified certificates in one place.',
+  },
+  {
+    name: 'ToolHub',
+    verb: 'keep',
+    to: '/tools',
+    desc: 'A curated shelf of tools, skills and resources.',
+  },
+  {
+    name: 'Blog',
+    verb: 'think',
+    to: '/blog',
+    desc: 'Notes on building, learning and the work in between.',
+  },
+];
+
+const reasons = [
+  {
+    title: 'Most tools stop at one step',
+    text: 'A student writes an application in one place, a teacher tracks classes in another, a team ships code somewhere else. ZYR0 connects those steps so the work carries forward instead of starting over.',
+  },
+  {
+    title: 'Trust has to be built in',
+    text: 'Verification, clear permissions and honest pricing are not extras. They are the reason a certificate means something and the reason people are willing to put their work on a platform.',
+  },
+  {
+    title: 'Access should not depend on geography',
+    text: 'Good tools and real opportunities are still concentrated in a few cities and a few institutions. We build for the people outside those circles, starting in Pakistan and growing from there.',
   },
 ];
 
 const values = [
-  { icon: Shield, title: 'Trust', desc: 'We verify every certificate and validate every experience to maintain platform integrity for students, employers, and institutions.' },
-  { icon: Zap, title: 'Innovation', desc: 'We continuously improve our platform with modern technology and direct feedback from the community we serve.' },
-  { icon: Users, title: 'Community', desc: 'We foster meaningful connections between students, mentors, and companies to create lasting professional relationships.' },
-  { icon: Award, title: 'Excellence', desc: 'We set high standards for internship quality, mentor engagement, and professional development outcomes.' },
-  { icon: Lightbulb, title: 'Transparency', desc: 'We believe every stage of an internship — from applications to certificates — should be visible and auditable by all parties.' },
-  { icon: Globe, title: 'Accessibility', desc: 'We are committed to making quality internship opportunities accessible to students across Pakistan regardless of their university or location.' },
+  {
+    title: 'Clarity over noise',
+    text: 'Every screen should explain itself. If a feature needs a manual, we have not finished it.',
+  },
+  {
+    title: 'Small, sharp tools',
+    text: 'We would rather ship one thing that works well than five that almost do.',
+  },
+  {
+    title: 'Proof over promises',
+    text: 'Certificates, reviews and public pages are verifiable. Claims should be too.',
+  },
+  {
+    title: 'Privacy by default',
+    text: 'Private work stays private. Public pages are a choice, not the default.',
+  },
+  {
+    title: 'Room for everyone',
+    text: 'Students, teachers, researchers, companies and mentors all deserve a product that respects their time.',
+  },
+  {
+    title: 'Keep learning in public',
+    text: 'We write about what we build, including the parts that did not work.',
+  },
+];
+
+const principles = [
+  {
+    title: 'Ship the smallest useful thing',
+    text: 'A feature earns its place by solving a real problem today. We cut the rest, then improve what people actually use.',
+  },
+  {
+    title: 'Make the safe choice the easy one',
+    text: 'Sensible defaults for privacy, permissions and data. You should not have to hunt through settings to be protected.',
+  },
+  {
+    title: 'Keep the door open',
+    text: 'The core of ZYR0 stays free to use. Ads on public pages help pay for the parts that cost us money to run, and paid plans add capacity rather than locking people out.',
+  },
 ];
 
 const milestones = [
-  { year: '2023', title: 'Founded', desc: 'ZYR0 was founded to address the lack of structured, verifiable internship experiences available to students in Pakistan.' },
-  { year: '2024', title: 'Platform Launch', desc: 'Launched the first version of the platform with dedicated student, company, and mentor portals.' },
-  { year: '2024', title: '10,000 Users', desc: 'Reached 10,000 active users across partner universities and companies in Pakistan.' },
-  { year: '2025', title: 'Certificate System', desc: 'Introduced a secure digital certificate system with unique credential IDs for instant verification.' },
-  { year: '2026', title: 'Structured Workflows', desc: 'Expanded milestone tracking, mentor feedback loops, and cohort management features for enterprise partners.' },
+  {
+    year: '2023',
+    title: 'Founded',
+    text: 'ZYR0 started with a simple observation: the gap between education and work is mostly a gap in tooling.',
+  },
+  {
+    year: '2024',
+    title: 'First products',
+    text: 'Student, company and mentor portals launched, giving internship programs a shared place to run.',
+  },
+  {
+    year: '2025',
+    title: 'Verification',
+    text: 'Certificates gained unique IDs and a public verification page, so a completed program could be checked in seconds.',
+  },
+  {
+    year: '2026',
+    title: 'One ecosystem',
+    text: 'Studio, School, Research, Work, ToolHub and the Blog came together under one account and one design language.',
+  },
 ];
+
+function CornerMarks() {
+  return (
+    <>
+      <span aria-hidden="true" className="absolute -left-px -top-px h-2.5 w-2.5 border-l border-t border-zyro-accent/60" />
+      <span aria-hidden="true" className="absolute -right-px -top-px h-2.5 w-2.5 border-r border-t border-zyro-accent/60" />
+      <span aria-hidden="true" className="absolute -bottom-px -left-px h-2.5 w-2.5 border-b border-l border-zyro-accent/60" />
+      <span aria-hidden="true" className="absolute -bottom-px -right-px h-2.5 w-2.5 border-b border-r border-zyro-accent/60" />
+    </>
+  );
+}
+
+interface PlateProps {
+  index: string;
+  label: string;
+  title: string;
+  children: ReactNode;
+}
+
+function Plate({ index, label, title, children }: PlateProps) {
+  return (
+    <section>
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-12 sm:px-6 md:grid-cols-[140px_minmax(0,1fr)] md:gap-12 md:py-16 lg:px-8">
+        <div className="md:sticky md:top-[calc(var(--zyro-header-h)+2rem)] md:self-start">
+          <p className="font-label text-[11px] tabular-nums text-zyro-accent">{index}</p>
+          <p className="mt-1 font-label text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+        </div>
+        <div>
+          <h2 className="max-w-2xl font-heading text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {title}
+          </h2>
+          <div className="mt-6">{children}</div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function About() {
   return (
-    <div className="pb-16">
+    <div className="pb-24">
       <SEO
-        title="About ZYR0 — Mission, Vision & Philosophy"
-        description="Learn about ZYR0's mission to bridge the gap between education and industry in Pakistan. Discover our structured internship platform connecting students, companies, and mentors with verified digital certificates."
+        title="About ZYR0 — One Ecosystem for Builders, Learners and Teams"
+        description="ZYR0 is a product ecosystem for people who build, learn, research and work. Meet Studio, School, Research, Work, ToolHub and the Blog."
         path="/about"
-        keywords="about ZYR0, internship platform Pakistan, career ecosystem, digital certificates, student mentorship, internship management, Pakistan internship problem"
+        keywords="about ZYR0, product ecosystem, Studio, School, Research, Work, ToolHub, Pakistan technology"
         structuredData={aboutStructuredData}
       />
-      {/* Hero */}
-      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-4xl sm:text-5xl font-bold">About ZYR0</h1>
-            <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              ZYR0 is a modern internship management platform that connects students, companies, mentors, and educational institutions in a single ecosystem. We believe every student deserves a meaningful, structured internship experience that translates into real career growth.
-            </p>
-          </m.div>
-        </div>
-      </section>
 
-      {/* The Problem We Address */}
-      <section className="px-4 py-16 bg-muted/30 border-b border-border">
-        <div className="max-w-5xl mx-auto">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">The Challenge</span>
-            <h2 className="text-3xl font-bold mt-3">Why internship infrastructure matters</h2>
-          </m.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
-              <div className="w-12 h-12 bg-red-100 dark:bg-red-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-6 h-6 text-red-500" />
-              </div>
-              <h3 className="font-bold mb-2">Limited Access</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Quality internship opportunities in Pakistan are concentrated in major cities and a handful of universities. Students outside these networks lack visibility into available positions and struggle to find structured programs that build real skills.
-              </p>
-            </m.div>
-            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
-              className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
-              <div className="w-12 h-12 bg-orange-100 dark:bg-orange-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <GraduationCap className="w-6 h-6 text-orange-500" />
-              </div>
-              <h3 className="font-bold mb-2">Unverifiable Credentials</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Traditional internship certificates are easy to forge and difficult for employers to validate. Students who complete genuine programs struggle to prove their experience, undermining the value of their hard work.
-              </p>
-            </m.div>
-            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
-              className="bg-card rounded-xl border border-border p-6 shadow-sm text-center">
-              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-950/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Building2 className="w-6 h-6 text-amber-500" />
-              </div>
-              <h3 className="font-bold mb-2">Fragmented Processes</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Companies manage internships through ad-hoc email chains, shared spreadsheets, and manual tracking. This creates inconsistent experiences for interns and administrative overhead for employers that discourages them from offering structured programs.
-              </p>
-            </m.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Mission & Vision */}
-      <section className="px-4 py-16">
-        <div className="max-w-5xl mx-auto">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Purpose</span>
-            <h2 className="text-3xl font-bold mt-3">What drives us</h2>
-          </m.div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              className="bg-card rounded-xl border border-border p-8 shadow-sm">
-              <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4">
-                <Target className="w-6 h-6 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Our Mission</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                To bridge the gap between education and industry by providing a structured, technology-driven platform for internship management that ensures real learning, measurable progress, and trusted certification for every participant.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mt-4">
-                We are building the infrastructure that makes internships reliable — where students receive consistent mentorship and clear goals, companies can scale their talent pipelines, and every completed program produces a credential that employers can verify instantly.
-              </p>
-            </m.div>
-            <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              className="bg-card rounded-xl border border-border p-8 shadow-sm">
-              <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mb-4">
-                <Eye className="w-6 h-6 text-accent" />
-              </div>
-              <h3 className="text-xl font-bold mb-3">Our Vision</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                To become Pakistan&apos;s most trusted career ecosystem, supporting students from every university and background in launching successful professional careers through quality internships, mentorship, and verified credentials that open doors.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mt-4">
-                We envision a future where geographic location and institutional affiliation no longer determine a student&apos;s access to meaningful professional experience — where any motivated student can find, complete, and prove a high-quality internship on a level playing field.
-              </p>
-            </m.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Values */}
-      <section className="px-4 py-16 bg-muted/50">
-        <div className="max-w-5xl mx-auto">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Our Values</h2>
-            <p className="mt-3 text-muted-foreground">The principles that guide everything we do</p>
-          </m.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {values.map((v, i) => (
-              <m.div key={i} role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="bg-card rounded-xl border border-border p-6 text-center shadow-sm">
-                <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <v.icon className="w-6 h-6 text-accent" />
-                </div>
-                <h3 className="font-semibold">{v.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{v.desc}</p>
-              </m.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Our Philosophy */}
-      <section className="px-4 py-16 border-b border-border">
-        <div className="max-w-4xl mx-auto">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Our Philosophy</span>
-            <h2 className="text-3xl font-bold mt-3">How we approach internships</h2>
-          </m.div>
-          <div className="space-y-6">
-            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-              className="bg-card rounded-xl border border-border p-8 shadow-sm">
-              <h3 className="text-xl font-bold mb-3">Structure creates accountability</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                We believe that unstructured internships benefit neither the student nor the organization. Without clear milestones, defined deliverables, and regular feedback cycles, interns often leave without meaningful skills and companies cannot measure the impact of their programs. ZYR0 provides the framework that makes every internship productive for both sides.
-              </p>
-            </m.div>
-            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}
-              className="bg-card rounded-xl border border-border p-8 shadow-sm">
-              <h3 className="text-xl font-bold mb-3">Credentials must be trustworthy</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                An internship certificate is only valuable if employers trust it. Our verification system attaches a unique credential ID to every completed program, allowing anyone — from HR teams to hiring managers — to confirm authenticity in seconds. This protects the integrity of every student&apos;s hard work and gives companies confidence when evaluating candidates.
-              </p>
-            </m.div>
-            <m.div role="article" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
-              className="bg-card rounded-xl border border-border p-8 shadow-sm">
-              <h3 className="text-xl font-bold mb-3">Mentorship scales with the right tools</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Effective mentorship requires more than occasional check-ins. Our platform gives mentors structured access to intern submissions, progress data, and feedback history — enabling them to provide targeted guidance across multiple mentees without losing context. This makes quality mentorship viable even for busy industry professionals.
-              </p>
-            </m.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline */}
-      <section className="px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Our Journey</h2>
-            <p className="mt-3 text-muted-foreground">Key milestones in our growth</p>
-          </m.div>
-          <div className="relative">
-            <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-border md:-translate-x-px" />
-            {milestones.map((ms, i) => (
-              <m.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                className={`relative flex items-start gap-6 mb-10 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                <div className={`flex-1 ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                  <div className="bg-card rounded-xl border border-border p-5 shadow-sm ml-10 md:ml-0">
-                    <span className="text-accent font-bold">{ms.year}</span>
-                    <h4 className="font-semibold mt-1">{ms.title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1">{ms.desc}</p>
-                  </div>
-                </div>
-                <div className="absolute left-4 md:left-1/2 w-3 h-3 bg-accent rounded-full border-4 border-background -translate-x-1.5 mt-5" />
-                <div className="hidden md:block flex-1" />
-              </m.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team / Founder — placeholder until verified */}
-      <section className="px-4 py-16 bg-muted/30 border-b border-border">
-        <div className="max-w-3xl mx-auto text-center">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-border">
-              <Users className="w-8 h-8 text-muted-foreground" />
+      {/* Hero and figure share one sapphire block, the card overlaps the split */}
+      <div className="relative bg-[#0051C3]">
+        <header className="relative">
+          <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between font-label text-[10px] uppercase tracking-[0.18em] text-white/70">
+              <span>ZYR0 / About</span>
+              <span>Rev 2026.11</span>
             </div>
-            <span className="px-3 py-1 text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 rounded-full mb-4 inline-block">
-              Awaiting Verified Content
-            </span>
-            <h2 className="text-3xl font-bold">Our Team</h2>
-            <p className="mt-4 text-muted-foreground max-w-xl mx-auto leading-relaxed">
-              Founder and team profiles are being prepared for this section. We believe in transparency about who is building ZYR0 and will share verified information here as soon as it is available.
+          </div>
+          <div className="mx-auto max-w-6xl px-4 pb-12 pt-12 sm:px-6 lg:px-8 lg:pb-16 lg:pt-16">
+            <h1 className="max-w-4xl font-serif text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              We started ZYR0 because the gap between education and work is mostly a gap in tooling.
+            </h1>
+            <p className="mt-6 max-w-2xl font-serif text-[17px] leading-8 text-white/80 first-letter:float-left first-letter:mr-2 first-letter:text-[3.4rem] first-letter:leading-[0.85] first-letter:text-white">
+              Studio, School, Research, Work, ToolHub and the Blog share one account and one standard. Each product is useful on its own. Together they remove the handoffs that make people start over.
             </p>
-          </m.div>
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <a
+                href="#ecosystem"
+                className="inline-flex items-center gap-2 border-b border-white pb-0.5 text-sm font-medium text-white transition-opacity hover:opacity-70"
+              >
+                The ecosystem
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 border-b border-white/30 pb-0.5 text-sm font-medium text-white/80 transition-colors hover:border-white hover:text-white"
+              >
+                Talk to us
+              </Link>
+            </div>
+          </div>
+        </header>
+
+        {/* FIG. 01 — card straddles the sapphire and paper halves */}
+        <section id="ecosystem" className="relative scroll-mt-[calc(var(--zyro-header-h)+2rem)]">
+          <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-background" />
+          <div className="relative mx-auto grid max-w-6xl gap-6 px-4 py-12 sm:px-6 md:grid-cols-[140px_minmax(0,1fr)] md:gap-12 md:py-16 lg:px-8">
+            <div className="md:sticky md:top-[calc(var(--zyro-header-h)+2rem)] md:self-start">
+              <p className="font-label text-[11px] tabular-nums text-white">FIG. 01</p>
+              <p className="mt-1 font-label text-[11px] uppercase tracking-[0.16em] text-white/70">
+                The ecosystem
+              </p>
+            </div>
+            <div
+              className="relative rounded-lg border border-border/70 bg-background p-5 sm:p-8"
+              style={{
+                backgroundImage:
+                  'linear-gradient(to right, hsl(var(--border) / 0.3) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.3) 1px, transparent 1px)',
+                backgroundSize: '48px 48px',
+              }}
+            >
+            <CornerMarks />
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="font-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                One account, six products
+              </p>
+              <p className="font-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                Fig. 01
+              </p>
+            </div>
+            <ul className="mt-4">
+              {products.map((product, index) => (
+                <li key={product.name} className="border-t border-border/60 first:border-t-0">
+                  <Link
+                    to={product.to}
+                    className="group flex items-baseline gap-3 py-4 sm:gap-4"
+                  >
+                    <span className="font-label text-[11px] tabular-nums text-zyro-accent">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <span className="w-20 font-heading text-base font-semibold text-foreground sm:w-24">
+                      {product.name}
+                    </span>
+                    <span className="hidden font-label text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:inline">
+                      {product.verb}
+                    </span>
+                    <span aria-hidden="true" className="mx-1 flex-1 border-b border-dotted border-border/80" />
+                    <span className="hidden max-w-xs text-right text-sm leading-6 text-muted-foreground md:block">
+                      {product.desc}
+                    </span>
+                    <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground" />
+                  </Link>
+                  <p className="pb-3 text-sm leading-6 text-muted-foreground md:hidden">{product.desc}</p>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-5 border-t border-border/60 pt-4 font-label text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+              All six share the same account
+            </p>
+          </div>
+        </div>
+        </section>
+      </div>
+
+      <Plate index="01" label="Why we exist" title="The journey is connected. The tools should be too.">
+        <div className="grid gap-10 md:grid-cols-3">
+          {reasons.map((reason, index) => (
+            <div key={reason.title} className="border-t border-border pt-5">
+              <span className="font-label text-[11px] tabular-nums text-zyro-accent">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3 className="mt-2 font-heading text-base font-semibold text-foreground">{reason.title}</h3>
+              <p className="mt-2 font-serif text-[15px] leading-7 text-foreground/70">{reason.text}</p>
+            </div>
+          ))}
+        </div>
+      </Plate>
+
+      <Plate index="02" label="Mission and vision" title="Serious work, easier to start and easier to prove.">
+        <div className="grid gap-10 md:grid-cols-2 md:gap-0 md:divide-x md:divide-border">
+          <div className="md:pr-10">
+            <p className="font-label text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Mission</p>
+            <p className="mt-3 font-serif text-[17px] leading-8 text-foreground/75">
+              We build the everyday tools that sit between learning and doing: a place to write, a place to run a program, a place to find work, and a place to show what you finished.
+            </p>
+          </div>
+          <div className="md:pl-10">
+            <p className="font-label text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Vision</p>
+            <p className="mt-3 font-serif text-[17px] leading-8 text-foreground/75">
+              A level field for anyone willing to do the work. Location, institution and connections should not decide who gets a real chance.
+            </p>
+          </div>
+        </div>
+      </Plate>
+
+      {/* Pull quote */}
+      <section className="bg-muted/30">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+          <blockquote className="max-w-4xl font-serif text-2xl italic leading-snug tracking-tight text-foreground sm:text-3xl lg:text-4xl">
+            “Good software should feel calm, fast and honest. The rest is detail we can argue about later.”
+          </blockquote>
+          <p className="mt-5 font-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Working note, ZYR0
+          </p>
         </div>
       </section>
+
+      <Plate index="03" label="Values" title="What we optimise for.">
+        <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+          {values.map((value) => (
+            <div key={value.title} className="border-t border-border pt-5">
+              <h3 className="font-heading text-base font-semibold text-foreground">{value.title}</h3>
+              <p className="mt-2 font-serif text-[15px] leading-7 text-foreground/70">{value.text}</p>
+            </div>
+          ))}
+        </div>
+      </Plate>
+
+      <Plate index="04" label="How we work" title="Three rules we keep coming back to.">
+        <div className="space-y-8">
+          {principles.map((principle, index) => (
+            <div key={principle.title} className="flex gap-5 border-t border-border pt-6">
+              <span className="font-label text-[11px] tabular-nums text-zyro-accent">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3 className="font-heading text-base font-semibold text-foreground">{principle.title}</h3>
+                <p className="mt-2 max-w-2xl font-serif text-[15px] leading-7 text-foreground/70">{principle.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Plate>
+
+      <Plate index="05" label="Journey" title="How we got here.">
+        <div className="hidden md:grid md:grid-cols-4 md:gap-6">
+          {milestones.map((milestone) => (
+            <div key={milestone.year} className="relative border-t border-border pt-5">
+              <span aria-hidden="true" className="absolute -top-[5px] left-0 h-2.5 w-2.5 rounded-full border border-zyro-accent bg-background" />
+              <p className="font-label text-[11px] tabular-nums text-zyro-accent">{milestone.year}</p>
+              <h3 className="mt-2 font-heading text-sm font-semibold text-foreground">{milestone.title}</h3>
+              <p className="mt-1.5 font-serif text-sm leading-6 text-foreground/70">{milestone.text}</p>
+            </div>
+          ))}
+        </div>
+        <ol className="space-y-7 border-l border-border pl-5 md:hidden">
+          {milestones.map((milestone) => (
+            <li key={milestone.year} className="relative">
+              <span aria-hidden="true" className="absolute -left-[26px] top-1.5 h-2.5 w-2.5 rounded-full border border-zyro-accent bg-background" />
+              <p className="font-label text-[11px] tabular-nums text-zyro-accent">{milestone.year}</p>
+              <h3 className="mt-1 font-heading text-sm font-semibold text-foreground">{milestone.title}</h3>
+              <p className="mt-1.5 font-serif text-sm leading-6 text-foreground/70">{milestone.text}</p>
+            </li>
+          ))}
+        </ol>
+      </Plate>
+
+      <Plate index="06" label="Team" title="A small team, building in the open.">
+        <p className="max-w-2xl font-serif text-[17px] leading-8 text-foreground/75">
+          Team profiles are being verified before we publish them. In the meantime, the work is public: read the blog, try the products, or write to us directly. We answer.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center gap-5">
+          <Link
+            to="/careers"
+            className="inline-flex items-center gap-2 border-b border-border pb-0.5 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground hover:text-foreground"
+          >
+            Open roles
+          </Link>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 border-b border-border pb-0.5 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground hover:text-foreground"
+          >
+            Contact
+          </Link>
+        </div>
+        <p className="mt-10 font-agbalumo text-2xl text-foreground/80">the ZYR0 team</p>
+      </Plate>
 
       {/* CTA */}
-      <section className="px-4 py-16 bg-muted/50">
-        <div className="max-w-3xl mx-auto text-center">
-          <m.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <Heart className="w-10 h-10 text-accent mx-auto mb-4" />
-            <h2 className="text-3xl font-bold">Join the ZYR0 Community</h2>
-            <p className="mt-4 text-muted-foreground">Whether you are a student, company, mentor, or university — there is a place for you in our ecosystem.</p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link to="/internships" className="inline-flex items-center gap-2 bg-accent text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
-                Browse Internships <ArrowRight className="w-4 h-4" />
+      <section className="bg-muted/30">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
+          <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+            <div>
+              <p className="font-label text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Start anywhere</p>
+              <h2 className="mt-3 max-w-2xl font-serif text-3xl leading-tight tracking-tight text-foreground sm:text-4xl">
+                One account. Six products. The whole journey.
+              </h2>
+              <p className="mt-4 max-w-xl font-serif text-[16px] leading-7 text-foreground/70">
+                Create an account and move between Studio, School, Research, Work, ToolHub and the Blog without signing up again.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-5 md:justify-end">
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 border-b border-foreground pb-0.5 text-sm font-medium text-foreground transition-opacity hover:opacity-70"
+              >
+                Create an account
+                <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/companies" className="inline-flex items-center gap-2 border border-border px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-muted transition-colors">
-                View Partner Companies
-              </Link>
-              <Link to="/contact" className="inline-flex items-center gap-2 border border-border px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-muted transition-colors">
-                Contact Us
+              <Link
+                to="/tools"
+                className="inline-flex items-center gap-2 border-b border-border pb-0.5 text-sm font-medium text-foreground/70 transition-colors hover:border-foreground hover:text-foreground"
+              >
+                Explore ToolHub
               </Link>
             </div>
-          </m.div>
+          </div>
         </div>
       </section>
     </div>
