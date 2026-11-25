@@ -30,7 +30,7 @@ const mobilePillClass = (scrolled: boolean) =>
   }`;
 
 const triggerClass = (open: boolean, scrolled: boolean = false) =>
-  `flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+  `relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
     scrolled
       ? open
         ? 'text-white bg-white/10 font-medium'
@@ -39,6 +39,8 @@ const triggerClass = (open: boolean, scrolled: boolean = false) =>
         ? 'text-foreground bg-foreground/10 font-medium'
         : 'text-foreground/85 hover:text-foreground hover:bg-foreground/5'
   }`;
+
+const activeIndicator = 'after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-[#0051C3]';
 
 const panelClass = (width: string, align: 'left' | 'right' = 'left') =>
   `absolute top-full ${align === 'left' ? 'left-0' : 'right-0'} mt-2 ${width} bg-card rounded-xl border border-border shadow-2xl backdrop-blur-xl p-1.5 z-50`;
@@ -68,6 +70,15 @@ export default function SiteNav() {
   const navRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const isSectionActive = (hrefs: string[]) =>
+    hrefs.some((href) => location.pathname === href || location.pathname.startsWith(`${href}/`));
+  const productsActive = isSectionActive(productsNav.map((item) => item.href));
+  const companyActive = isSectionActive(companyNav.map((item) => item.href));
+  const resourcesActive =
+    !productsActive &&
+    !companyActive &&
+    isSectionActive(resourcesNav.map((item) => item.href).filter((href) => href !== '/pricing'));
 
   useEffect(() => setMounted(true), []);
 
@@ -122,7 +133,7 @@ export default function SiteNav() {
   const redirect = encodeURIComponent(location.pathname);
   const previewProduct = productsNav.find((p) => p.id === previewId) ?? productsNav[0];
 
-  const dropdownButton = (id: 'products' | 'resources' | 'company', label: string) => (
+  const dropdownButton = (id: 'products' | 'resources' | 'company', label: string, active = false) => (
     <button
       type="button"
       onClick={() => toggle(id)}
@@ -130,7 +141,7 @@ export default function SiteNav() {
       aria-haspopup="true"
       aria-expanded={openMenu === id}
       aria-controls={`nav-${id}-menu`}
-      className={triggerClass(openMenu === id, scrolled)}
+      className={`${triggerClass(openMenu === id, scrolled)} ${active ? activeIndicator : ''}`}
     >
       {label}
       <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${openMenu === id ? 'rotate-180' : ''}`} />
@@ -144,13 +155,13 @@ export default function SiteNav() {
         <div className={`w-full transition-all duration-300 ${scrolled ? 'max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 pt-3' : 'px-0 pt-0'}`}>
           <div className={desktopPillClass(scrolled)}>
             <Link to="/" className="flex items-center gap-2.5 shrink-0">
-              <img src="/zyro-logo.webp" alt="" width="28" height="28" className="w-7 h-7 object-contain rounded-md" />
+              <img src="/zyro-logo.webp" alt="" width="28" height="28" className="w-7 h-7 object-contain rounded-md bg-[#0051C3]/10 ring-1 ring-[#0051C3]/30" />
               <span className={`text-xl font-display tracking-tight transition-colors ${scrolled ? 'text-white' : 'text-foreground'}`}>ZYR0</span>
             </Link>
 
           <nav className="flex items-center gap-0.5" aria-label="Primary">
             <div>
-              {dropdownButton('products', 'Products')}
+              {dropdownButton('products', 'Products', productsActive)}
               <AnimatePresence>
                 {openMenu === 'products' && (
                   <m.div
@@ -239,13 +250,17 @@ export default function SiteNav() {
 
             <Link
               to="/pricing"
-              className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${location.pathname === '/pricing' ? 'text-accent bg-accent/10' : triggerClass(false, scrolled)}`}
+              className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                location.pathname === '/pricing'
+                  ? `${scrolled ? 'text-white bg-white/10' : 'text-[#0051C3] bg-[#0051C3]/10'} ${activeIndicator}`
+                  : triggerClass(false, scrolled)
+              }`}
             >
               Pricing
             </Link>
 
             <div className="relative">
-              {dropdownButton('company', 'Company')}
+              {dropdownButton('company', 'Company', companyActive)}
               <AnimatePresence>
                 {openMenu === 'company' && (
                   <m.div
@@ -270,7 +285,7 @@ export default function SiteNav() {
             </div>
 
             <div className="relative">
-              {dropdownButton('resources', 'Resources')}
+              {dropdownButton('resources', 'Resources', resourcesActive)}
               <AnimatePresence>
                 {openMenu === 'resources' && (
                   <m.div
@@ -432,7 +447,7 @@ export default function SiteNav() {
       <div className="md:hidden max-w-7xl mx-auto px-4 pt-4 pointer-events-auto">
         <div className={mobilePillClass(scrolled)}>
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <img src="/zyro-logo.webp" alt="" width="24" height="24" className="w-6 h-6 object-contain rounded-md" />
+            <img src="/zyro-logo.webp" alt="" width="24" height="24" className="w-6 h-6 object-contain rounded-md bg-[#0051C3]/10 ring-1 ring-[#0051C3]/30" />
             <span className="text-lg font-display tracking-tight text-white">ZYR0</span>
           </Link>
           <div className="flex items-center gap-1.5 sm:gap-2">
@@ -520,7 +535,7 @@ export default function SiteNav() {
             >
               <div className="flex items-center justify-between px-5 h-16">
                 <Link to="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2">
-                  <img src="/zyro-logo.webp" alt="" width="24" height="24" className="w-6 h-6 object-contain rounded-md" />
+                  <img src="/zyro-logo.webp" alt="" width="24" height="24" className="w-6 h-6 object-contain rounded-md bg-[#0051C3]/10 ring-1 ring-[#0051C3]/30" />
                   <span className="text-lg font-display tracking-tight text-foreground">ZYR0</span>
                 </Link>
                 <button
@@ -613,9 +628,12 @@ export default function SiteNav() {
                   <Link
                     to="/pricing"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center min-h-12 text-sm font-semibold ${location.pathname === '/pricing' ? 'text-accent' : 'text-foreground'}`}
+                    className={`flex items-center justify-between min-h-12 text-sm font-semibold ${location.pathname === '/pricing' ? 'text-[#0051C3]' : 'text-foreground'}`}
                   >
                     Pricing
+                    {location.pathname === '/pricing' && (
+                      <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-[#0051C3]" />
+                    )}
                   </Link>
                 </div>
 
