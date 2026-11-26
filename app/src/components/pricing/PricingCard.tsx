@@ -31,14 +31,9 @@ export interface PricingCardData {
 interface PricingCardProps {
   card: PricingCardData;
   interval: BillingInterval;
-  layout?: 'three' | 'two';
 }
 
-export default function PricingCard({
-  card,
-  interval,
-  layout = 'three',
-}: PricingCardProps) {
+export default function PricingCard({ card, interval }: PricingCardProps) {
   const isHighlighted = card.highlighted;
   const isYearly = interval === 'yearly';
 
@@ -51,13 +46,8 @@ export default function PricingCard({
         : '/mo';
   const Icon = card.ctaIcon || ArrowRight;
 
-  const layoutClasses =
-    layout === 'two'
-      ? 'border-t border-border pt-8 first:border-t-0 first:pt-0 md:border-t-0 md:border-l md:pt-0 md:px-8 md:first:border-l-0 md:first:pl-0 md:last:pr-0'
-      : 'border-t border-border pt-8 first:border-t-0 first:pt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:px-8 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0';
-
   const buttonBase =
-    'inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full px-6 py-2.5 text-xs sm:text-sm font-semibold transition-colors';
+    'inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-xs sm:text-sm font-semibold transition-colors';
 
   const getButtonClasses = () => {
     if (isHighlighted || card.ctaVariant === 'primary') {
@@ -71,16 +61,22 @@ export default function PricingCard({
 
   return (
     <div
-      className={`relative flex flex-col justify-between pb-8 ${layoutClasses} ${
-        isHighlighted ? 'bg-gradient-to-b from-accent/[0.08] to-transparent' : ''
+      className={`relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-card p-6 sm:p-7 ${
+        isHighlighted ? 'border-accent/50' : 'border-border'
       }`}
     >
+      {isHighlighted && (
+        <div className="absolute inset-x-0 top-0 h-1 bg-accent" />
+      )}
+
       <div>
         {card.badge && (
           <div className="mb-3">
             <span
-              className={`font-mono text-[10px] uppercase tracking-[0.14em] ${
-                isHighlighted ? 'text-accent' : 'text-muted-foreground'
+              className={`inline-flex items-center rounded-full px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.14em] ${
+                isHighlighted
+                  ? 'bg-accent/10 text-accent'
+                  : 'border border-border text-muted-foreground'
               }`}
             >
               {card.badge}
@@ -132,9 +128,7 @@ export default function PricingCard({
             </p>
           )}
 
-        <div className="my-6 h-px bg-border" />
-
-        <ul className="space-y-2.5">
+        <ul className="mt-6 space-y-2.5">
           {card.features.map((feat, idx) => (
             <li
               key={idx}
