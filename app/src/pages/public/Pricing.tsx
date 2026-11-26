@@ -229,7 +229,7 @@ export default function Pricing() {
       <main className="pt-14 sm:pt-20 lg:pt-24 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="mx-auto max-w-4xl mb-16 text-center sm:mb-20">
-          <h1 className="font-serif text-5xl font-normal leading-[1.02] tracking-tight text-foreground sm:text-7xl">
+          <h1 className="font-display text-5xl font-extrabold tracking-tight text-foreground sm:text-7xl">
             Pricing
           </h1>
 
