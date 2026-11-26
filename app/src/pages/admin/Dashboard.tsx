@@ -269,7 +269,7 @@ export default function AdminDashboard() {
     const enterprise = profiles.filter((p) => p.plan_tier === 'enterprise').length;
     const total = profiles.length;
     const paid = go + plus + enterprise;
-    const mrr = go * 4.99 + plus * 9.99;
+    const mrr = go * 4.99 + plus * 19.99;
     const conversion = total > 0 ? Math.round((paid / total) * 1000) / 10 : 0;
     return { free, go, plus, enterprise, paid, mrr, conversion, total };
   }, [profiles]);
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
     () => [
       { tier: 'Free', users: planBreakdown.free, mrr: 0 },
       { tier: 'GO', users: planBreakdown.go, mrr: planBreakdown.go * 4.99 },
-      { tier: 'PLUS', users: planBreakdown.plus, mrr: planBreakdown.plus * 9.99 },
+      { tier: 'PLUS', users: planBreakdown.plus, mrr: planBreakdown.plus * 19.99 },
       { tier: 'Enterprise', users: planBreakdown.enterprise, mrr: 0 },
     ],
     [planBreakdown]

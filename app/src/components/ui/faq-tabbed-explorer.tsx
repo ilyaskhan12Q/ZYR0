@@ -103,7 +103,7 @@ const FAQ_DATA: FAQItem[] = [
     category: 'billing',
     question: 'What does ZYR0 Pro include?',
     answer:
-      'ZYR0 Pro is $9.99/month (or $95.90/year, saving ~20%) and covers eligible benefits across the ecosystem — including deep multi-step Research synthesis, priority compute queue, unlimited session history, and VIP early access to upcoming ZYR0 Studio app builder features.',
+      'ZYR0 Pro is $19.99/month (or $191.90/year, saving ~20%) and covers eligible benefits across the ecosystem — including deep multi-step Research synthesis, priority compute queue, unlimited session history, and VIP early access to upcoming ZYR0 Studio app builder features.',
   },
   {
     id: 'b3',

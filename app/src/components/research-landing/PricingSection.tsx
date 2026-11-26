@@ -14,7 +14,7 @@ const PLANS = [
   },
   {
     name: 'Pro',
-    price: '$9.99',
+    price: '$19.99',
     period: '/mo',
     description: 'Extended depth and priority model compute across the ecosystem.',
     features: ['Deep multi-step reasoning', 'Full academic & web ledger', 'Priority compute queue', 'Unlimited session history', 'Studio & Work early access'],

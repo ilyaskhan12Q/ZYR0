@@ -78,9 +78,9 @@ export default function Pricing() {
       badge: 'Most Popular',
       highlighted: true,
       description: 'The flagship power experience with deep multi-step AI reasoning and priority Studio builder access.',
-      monthlyPrice: '$9.99',
-      yearlyPrice: '$7.99',
-      yearlySubtext: '$95.90 billed annually (Save ~20%)',
+      monthlyPrice: '$19.99',
+      yearlyPrice: '$15.99',
+      yearlySubtext: '$191.90 billed annually (Save ~20%)',
       ctaLabel: 'Upgrade to PLUS',
       ctaHref: user ? undefined : '/register?plan=plus',
       onCtaClick: user ? () => handleOpenUpgrade('plus') : undefined,
@@ -198,7 +198,7 @@ export default function Pricing() {
   const faqs = [
     {
       q: 'What is the difference between ZYR0 GO and ZYR0 PLUS?',
-      a: 'ZYR0 GO ($4.99/mo) is designed for students and creators who want expanded research capacity, faster synthesis, and verified application status. ZYR0 PLUS ($9.99/mo) is the full flagship tier with deep multi-step reasoning, priority compute queues, unlimited session history, and VIP early access to the upcoming ZYR0 Studio autonomous app builder and code exports.',
+      a: 'ZYR0 GO ($4.99/mo) is designed for students and creators who want expanded research capacity, faster synthesis, and verified application status. ZYR0 PLUS ($19.99/mo) is the full flagship tier with deep multi-step reasoning, priority compute queues, unlimited session history, and VIP early access to the upcoming ZYR0 Studio autonomous app builder and code exports.',
     },
     {
       q: 'Is the Teams plan really $0/month?',
@@ -222,7 +222,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200 overflow-x-clip">
       <SEO
         title="Pricing & Plans | ZYR0 Ecosystem"
-        description="Transparent pricing for students, creators, and organizations. Start free with ZYR0 Work & Research, unlock ZYR0 GO ($4.99) or ZYR0 PLUS ($9.99), or scale with Teams and Custom solutions."
+        description="Transparent pricing for students, creators, and organizations. Start free with ZYR0 Work & Research, unlock ZYR0 GO ($4.99) or ZYR0 PLUS ($19.99), or scale with Teams and Custom solutions."
         path="/pricing"
       />
 
@@ -305,7 +305,7 @@ export default function Pricing() {
                       GO ($4.99)
                     </th>
                     <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-accent text-center bg-accent/[0.04]">
-                      PLUS ($9.99)
+                      PLUS ($19.99)
                     </th>
                     <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
                       Teams

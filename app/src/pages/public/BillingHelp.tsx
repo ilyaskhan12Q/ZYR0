@@ -77,7 +77,7 @@ const POLICY_SECTIONS: PolicySection[] = [
     points: [
       {
         heading: 'Upfront Annual Charge',
-        body: 'Selecting annual billing bills your payment method for the full 12-month term upfront ($47.90/year for ZYR0 GO; $95.90/year for ZYR0 PLUS), securing a discounted effective monthly rate.',
+        body: 'Selecting annual billing bills your payment method for the full 12-month term upfront ($47.90/year for ZYR0 GO; $191.90/year for ZYR0 PLUS), securing a discounted effective monthly rate.',
       },
       {
         heading: 'Commitment Term & Non-Refundability',
@@ -126,7 +126,7 @@ const POLICY_SECTIONS: PolicySection[] = [
         body: 'Grants 5× faster synthesis throughput and report exports for individual academic, student, and creator usage. Candidate priority status highlights applications on verified boards, but does not guarantee employment or interview offers from third-party companies.',
       },
       {
-        heading: 'ZYR0 PLUS ($9.99/month)',
+        heading: 'ZYR0 PLUS ($19.99/month)',
         body: 'Deep reasoning models utilize multi-step inference chains. Peak-hour priority queue access grants prioritized compute slot allocation. Upcoming features labeled "Early Access" (Studio app builder, code export) are actively evolving developer previews.',
       },
       {

@@ -42,7 +42,7 @@ const ROLES: { id: UserRole; label: string; icon: React.ElementType; color: stri
 const PLANS: { id: PlanTier; label: string; desc: string; badge: string; color: string }[] = [
   { id: 'free', label: 'Free', desc: 'Standard access (20 req/min)', badge: 'Default', color: 'border-border' },
   { id: 'go', label: 'ZYR0 GO', desc: '5× faster synthesis, verified exports', badge: '$4.99/mo', color: 'border-cyan-500/40 bg-cyan-500/5 text-cyan-600 dark:text-cyan-400' },
-  { id: 'plus', label: 'ZYR0 PLUS', desc: 'Deep reasoning, priority compute queue', badge: '$9.99/mo', color: 'border-amber-500/40 bg-amber-500/5 text-amber-600 dark:text-amber-400' },
+  { id: 'plus', label: 'ZYR0 PLUS', desc: 'Deep reasoning, priority compute queue', badge: '$19.99/mo', color: 'border-amber-500/40 bg-amber-500/5 text-amber-600 dark:text-amber-400' },
   { id: 'enterprise', label: 'Enterprise', desc: 'Custom institutional access & SchoolOS', badge: 'Custom', color: 'border-emerald-500/40 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400' },
 ];
 
