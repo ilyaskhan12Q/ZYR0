@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import type { BillingInterval } from './BillingToggle';
 
 export interface PricingFeature {
@@ -31,52 +31,81 @@ export interface PricingCardData {
 interface PricingCardProps {
   card: PricingCardData;
   interval: BillingInterval;
+  index?: number;
+  layout?: 'three' | 'two';
 }
 
-export default function PricingCard({ card, interval }: PricingCardProps) {
+export default function PricingCard({
+  card,
+  interval,
+  index,
+  layout = 'three',
+}: PricingCardProps) {
   const isHighlighted = card.highlighted;
   const isYearly = interval === 'yearly';
 
   const price = isYearly ? card.yearlyPrice : card.monthlyPrice;
-  const period = card.periodText !== undefined ? card.periodText : (card.monthlyPrice === 'Custom' ? '' : '/mo');
+  const period =
+    card.periodText !== undefined
+      ? card.periodText
+      : card.monthlyPrice === 'Custom'
+        ? ''
+        : '/mo';
   const Icon = card.ctaIcon || ArrowRight;
+
+  const layoutClasses =
+    layout === 'two'
+      ? 'border-t border-border pt-8 first:border-t-0 first:pt-0 md:border-t-0 md:border-l md:pt-0 md:px-8 md:first:border-l-0 md:first:pl-0 md:last:pr-0'
+      : 'border-t border-border pt-8 first:border-t-0 first:pt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:px-8 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0';
+
+  const buttonBase =
+    'inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full px-6 py-2.5 text-xs sm:text-sm font-semibold transition-colors';
 
   const getButtonClasses = () => {
     if (isHighlighted || card.ctaVariant === 'primary') {
-      return 'bg-accent text-white hover:bg-accent/90 shadow-sm';
+      return 'bg-accent text-white hover:bg-accent/90';
     }
     if (card.ctaVariant === 'soft-accent') {
-      return 'bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20';
+      return 'bg-accent/10 text-accent hover:bg-accent/15';
     }
-    return 'border border-border text-foreground hover:bg-muted';
+    return 'border border-border text-foreground hover:border-foreground/40';
   };
 
   return (
     <div
-      className={`relative rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-all duration-300 bg-card ${
-        isHighlighted
-          ? 'border-2 border-accent/60 ring-1 ring-accent/30 shadow-xl shadow-accent/5 hover:-translate-y-1'
-          : 'border border-border hover:border-foreground/20 shadow-sm hover:shadow-md hover:-translate-y-1'
+      className={`relative flex flex-col justify-between pb-8 ${layoutClasses} ${
+        isHighlighted ? 'bg-gradient-to-b from-accent/[0.08] to-transparent' : ''
       }`}
     >
-      {/* Top Badge (if any) */}
-      {card.badge && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest bg-foreground text-background font-semibold shadow-sm">
-            {isHighlighted && <Sparkles className="w-3 h-3" />}
-            {card.badge}
-          </span>
-        </div>
-      )}
-
       <div>
-        {/* Top Product Suite Tags (Enterprise / Business) */}
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+            {index !== undefined ? `Plan ${String(index + 1).padStart(2, '0')}` : 'Plan'}
+          </span>
+          {card.badge && (
+            <span
+              className={`font-mono text-[10px] uppercase tracking-[0.14em] ${
+                isHighlighted ? 'text-accent' : 'text-muted-foreground'
+              }`}
+            >
+              {card.badge}
+            </span>
+          )}
+        </div>
+
+        <h3 className="mt-3 font-serif text-3xl leading-none text-foreground">
+          {card.name}
+        </h3>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          {card.description}
+        </p>
+
         {card.topProducts && card.topProducts.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {card.topProducts.map((p) => (
               <span
                 key={p}
-                className="inline-block text-[10px] font-mono font-medium px-2 py-0.5 rounded-md border border-border bg-muted/60 text-muted-foreground"
+                className="inline-block rounded-full border border-border px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground"
               >
                 {p}
               </span>
@@ -84,92 +113,76 @@ export default function PricingCard({ card, interval }: PricingCardProps) {
           </div>
         )}
 
-        {/* Tier Header */}
-        <div className="mb-4">
-          <h3 className="text-xl font-bold font-display tracking-tight text-foreground">
-            {card.name}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed min-h-[34px]">
-            {card.description}
-          </p>
-        </div>
-
-        {/* Pricing Display */}
-        <div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-4xl sm:text-5xl font-extrabold tracking-tight font-display text-foreground">
-              {price}
+        <div className="mt-6 flex items-baseline gap-2">
+          <span className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-[42px]">
+            {price}
+          </span>
+          {period && (
+            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+              {period}
             </span>
-            {period && (
-              <span className="text-sm font-medium text-muted-foreground">
-                {period}
-              </span>
-            )}
-          </div>
-          {isYearly && card.yearlySubtext && (
-            <p className="text-[11px] font-medium text-muted-foreground mt-1.5">
-              {card.yearlySubtext}
-            </p>
           )}
-          {!isYearly && card.yearlySubtext && card.monthlyPrice !== '$0' && card.monthlyPrice !== 'Custom' && (
-            <p className="text-[11px] text-muted-foreground mt-1.5">
+        </div>
+        {isYearly && card.yearlySubtext && (
+          <p className="mt-1.5 text-[11px] text-muted-foreground">
+            {card.yearlySubtext}
+          </p>
+        )}
+        {!isYearly &&
+          card.yearlySubtext &&
+          card.monthlyPrice !== '$0' &&
+          card.monthlyPrice !== 'Custom' && (
+            <p className="mt-1.5 text-[11px] text-muted-foreground">
               Billed monthly. Cancel anytime.
             </p>
           )}
-        </div>
 
-        {/* Action Button (Positioned Below Price) */}
-        <div className="mt-5 mb-6">
-          {card.onCtaClick ? (
-            <button
-              type="button"
-              onClick={card.onCtaClick}
-              className={`w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${getButtonClasses()}`}
-            >
-              <span>{card.ctaLabel}</span>
-              <Icon className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <Link
-              to={card.ctaHref || '/register'}
-              className={`w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${getButtonClasses()}`}
-            >
-              <span>{card.ctaLabel}</span>
-              <Icon className="w-3.5 h-3.5" />
-            </Link>
-          )}
-        </div>
+        <div className="my-6 h-px bg-border" />
 
-        {/* Feature List */}
-        <div className="pt-6 border-t border-border">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold block mb-3">
-            Included Capabilities
-          </span>
-          <ul className="space-y-2.5">
-            {card.features.map((feat, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-xs text-foreground/90">
-                <Check
-                  className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${
-                    isHighlighted ? 'text-accent' : 'text-foreground'
-                  }`}
-                />
-                <div className="flex-1 leading-snug">
-                  {feat.highlight && (
-                    <span className="font-semibold text-foreground mr-1.5">
-                      {feat.highlight}
-                    </span>
-                  )}
-                  <span>{feat.text}</span>
-                  {feat.badge && (
-                    <span className="ml-1.5 text-[10px] font-mono text-muted-foreground">
-                      ({feat.badge})
-                    </span>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="space-y-2.5">
+          {card.features.map((feat, idx) => (
+            <li
+              key={idx}
+              className="flex items-start gap-2.5 text-xs leading-snug text-muted-foreground"
+            >
+              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+              <div className="flex-1">
+                {feat.highlight && (
+                  <span className="mr-1.5 font-semibold text-foreground">
+                    {feat.highlight}
+                  </span>
+                )}
+                <span>{feat.text}</span>
+                {feat.badge && (
+                  <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">
+                    ({feat.badge})
+                  </span>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="mt-8">
+        {card.onCtaClick ? (
+          <button
+            type="button"
+            onClick={card.onCtaClick}
+            className={`${buttonBase} ${getButtonClasses()} cursor-pointer`}
+          >
+            <span>{card.ctaLabel}</span>
+            <Icon className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          <Link
+            to={card.ctaHref || '/register'}
+            className={`${buttonBase} ${getButtonClasses()}`}
+          >
+            <span>{card.ctaLabel}</span>
+            <Icon className="h-3.5 w-3.5" />
+          </Link>
+        )}
       </div>
     </div>
   );

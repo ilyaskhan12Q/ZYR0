@@ -13,22 +13,24 @@ export default function BillingToggle({ interval, onChange }: BillingToggleProps
       <div
         role="tablist"
         aria-label="Billing frequency"
-        className="relative inline-flex items-center p-1 rounded-2xl border border-border bg-muted/80 backdrop-blur-md shadow-sm"
+        className="relative inline-flex items-center rounded-full border border-border p-1"
       >
         <button
           type="button"
           role="radio"
           aria-checked={interval === 'monthly'}
           onClick={() => onChange('monthly')}
-          className={`relative z-10 px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold transition-colors duration-200 rounded-xl cursor-pointer ${
-            interval === 'monthly' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+          className={`relative z-10 rounded-full px-4 py-2 text-xs font-semibold transition-colors duration-200 cursor-pointer ${
+            interval === 'monthly'
+              ? 'text-background'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           {interval === 'monthly' && (
             <m.div
               layoutId="billing-pill"
               transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              className="absolute inset-0 rounded-xl bg-card shadow-sm border border-border -z-10"
+              className="absolute inset-0 -z-10 rounded-full bg-foreground"
             />
           )}
           Monthly
@@ -39,19 +41,27 @@ export default function BillingToggle({ interval, onChange }: BillingToggleProps
           role="radio"
           aria-checked={interval === 'yearly'}
           onClick={() => onChange('yearly')}
-          className={`relative z-10 px-4 sm:px-5 py-2 text-xs sm:text-sm font-semibold transition-colors duration-200 rounded-xl flex items-center gap-2 cursor-pointer ${
-            interval === 'yearly' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+          className={`relative z-10 flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition-colors duration-200 cursor-pointer ${
+            interval === 'yearly'
+              ? 'text-background'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           {interval === 'yearly' && (
             <m.div
               layoutId="billing-pill"
               transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-              className="absolute inset-0 rounded-xl bg-card shadow-sm border border-border -z-10"
+              className="absolute inset-0 -z-10 rounded-full bg-foreground"
             />
           )}
           <span>Yearly</span>
-          <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium tracking-wide uppercase rounded-md border border-border text-foreground bg-card">
+          <span
+            className={`inline-flex items-center rounded-full border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide ${
+              interval === 'yearly'
+                ? 'border-background/30 text-background'
+                : 'border-border text-muted-foreground'
+            }`}
+          >
             Save ~20%
           </span>
         </button>

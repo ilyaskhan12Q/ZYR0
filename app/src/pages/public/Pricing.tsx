@@ -10,9 +10,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   Check,
   Minus,
-  Sparkles,
+  Plus,
   Building2,
-  ChevronDown,
   CreditCard,
   ArrowRight,
 } from 'lucide-react';
@@ -222,81 +221,89 @@ export default function Pricing() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-200 overflow-x-clip">
       <SEO
-        title="Pricing & Plans — ZYR0 Ecosystem"
+        title="Pricing & Plans | ZYR0 Ecosystem"
         description="Transparent pricing for students, creators, and organizations. Start free with ZYR0 Work & Research, unlock ZYR0 GO ($4.99) or ZYR0 PLUS ($9.99), or scale with Teams and Custom solutions."
         path="/pricing"
       />
 
-      <main className="pt-8 sm:pt-12 lg:pt-14 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className="pt-10 sm:pt-14 lg:pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono tracking-widest uppercase border border-border bg-muted text-muted-foreground mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-accent" />
-            Transparent Ecosystem Pricing
-          </div>
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight text-foreground leading-[1.1]">
-            One Platform.{' '}
-            <span className="italic" style={{ color: 'var(--zyro-accent)' }}>
-              Every Tier of Ambition.
-            </span>
+        <div className="max-w-4xl mb-12 sm:mb-16">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            Pricing / 001
+          </span>
+          <h1 className="mt-4 font-serif text-4xl font-normal leading-[1.02] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            One platform. Every tier of{' '}
+            <span className="italic text-accent">ambition.</span>
           </h1>
-          <p className="mt-4 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Choose Personal plans for individual students, researchers, and creators — or Business plans for hiring teams, schools, and enterprise deployments.
+          <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Choose Personal plans for individual students, researchers, and creators, or Business plans for hiring teams, schools, and enterprise deployments.
           </p>
 
-          {/* Audience Switcher (Personal vs Business) */}
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
             <AudienceToggle audience={audience} onChange={setAudience} />
+            {audience === 'personal' && (
+              <BillingToggle interval={interval} onChange={setInterval} />
+            )}
+            <Link
+              to="/billing-help"
+              className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-accent sm:ml-auto"
+            >
+              <span>Billing help</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="mb-24">
+        <div className="mb-20 sm:mb-24">
           {audience === 'personal' ? (
-            <div className="max-w-6xl mx-auto">
-              {/* Billing Toggle aligned to left above Free card + Link to Billing Help on right */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-                <BillingToggle interval={interval} onChange={setInterval} />
-                <Link
-                  to="/billing-help"
-                  className="text-[11px] font-mono text-muted-foreground hover:text-accent transition-colors inline-flex items-center gap-1 self-start sm:self-auto"
-                >
-                  <span>See billing help & policies</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
-                {personalCards.map((card) => (
-                  <PricingCard key={card.id} card={card} interval={interval} />
+            <div className="mx-auto max-w-6xl">
+              <div className="grid grid-cols-1 items-stretch border-t border-border lg:grid-cols-3">
+                {personalCards.map((card, index) => (
+                  <PricingCard
+                    key={card.id}
+                    card={card}
+                    interval={interval}
+                    index={index}
+                    layout="three"
+                  />
                 ))}
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto items-stretch">
-              {businessCards.map((card) => (
-                <PricingCard key={card.id} card={card} interval={interval} />
+            <div className="mx-auto grid max-w-4xl grid-cols-1 items-stretch border-t border-border md:grid-cols-2">
+              {businessCards.map((card, index) => (
+                <PricingCard
+                  key={card.id}
+                  card={card}
+                  interval={interval}
+                  index={index}
+                  layout="two"
+                />
               ))}
             </div>
           )}
         </div>
 
         {/* Feature Comparison Section */}
-        <div className="mb-24 max-w-5xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">
-              Detailed Breakdown
+        <div className="mb-20 sm:mb-24 max-w-5xl mx-auto">
+          <div className="mb-8 flex items-end justify-between gap-4 border-b border-border pb-3">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                Detailed breakdown
+              </span>
+              <h2 className="mt-2 font-serif text-2xl font-normal text-foreground sm:text-3xl">
+                Compare features across tiers
+              </h2>
+            </div>
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:block">
+              Spec sheet / 02
             </span>
-            <h2 className="text-2xl sm:text-4xl font-serif font-normal text-foreground mt-2">
-              Compare Features Across Tiers
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-2">
-              Complete transparency on live capabilities versus upcoming rollout features.
-            </p>
           </div>
 
-          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full table-fixed text-left text-xs border-collapse">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] table-fixed border-collapse border-t-2 border-foreground text-left text-xs">
                 <colgroup>
                   <col className="w-[40%]" />
                   <col className="w-[12%]" />
@@ -306,23 +313,23 @@ export default function Pricing() {
                   <col className="w-[12%]" />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-border bg-muted/60">
-                    <th className="py-3.5 px-4 sm:px-6 font-semibold text-foreground text-left">
+                  <tr className="border-b border-border">
+                    <th className="py-3.5 px-4 sm:px-6 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-left">
                       Capability
                     </th>
-                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
                       Free
                     </th>
-                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
                       GO ($4.99)
                     </th>
-                    <th className="py-3.5 px-2 font-semibold text-accent text-center">
+                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-accent text-center bg-accent/[0.04]">
                       PLUS ($9.99)
                     </th>
-                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
                       Teams
                     </th>
-                    <th className="py-3.5 px-2 font-semibold text-foreground text-center">
+                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
                       Custom
                     </th>
                   </tr>
@@ -330,10 +337,10 @@ export default function Pricing() {
                 <tbody>
                   {comparisonCategories.map((cat, catIdx) => (
                     <Fragment key={catIdx}>
-                      <tr className="bg-muted/40 border-t border-b border-border">
+                      <tr className="border-t border-border">
                         <td
                           colSpan={6}
-                          className="py-2.5 px-4 sm:px-6 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+                          className="py-2.5 px-4 sm:px-6 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground"
                         >
                           {cat.category}
                         </td>
@@ -341,9 +348,9 @@ export default function Pricing() {
                       {cat.rows.map((row, rowIdx) => (
                         <tr
                           key={`row-${catIdx}-${rowIdx}`}
-                          className="border-b border-border/60 hover:bg-muted/20 transition-colors"
+                          className="border-b border-border hover:bg-muted/20 transition-colors"
                         >
-                          <td className="py-3 px-4 sm:px-6 text-foreground font-medium align-middle">
+                          <td className="py-3 px-4 sm:px-6 text-[12.5px] text-foreground font-medium align-middle">
                             <div className="flex items-center gap-2">
                               <span>{row.feature}</span>
                               {row.status !== 'Live' && (
@@ -383,7 +390,7 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-center align-middle bg-accent/[0.02]">
+                          <td className="py-3 px-2 text-center align-middle bg-accent/[0.04]">
                             <div className="flex items-center justify-center">
                               {typeof row.plus === 'boolean' ? (
                                 row.plus ? (
@@ -433,48 +440,46 @@ export default function Pricing() {
                     </Fragment>
                   ))}
                 </tbody>
-              </table>
-            </div>
+            </table>
           </div>
         </div>
 
         {/* FAQ Accordion Section */}
-        <div className="mb-24 max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground font-semibold">
-              Frequently Asked Questions
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-serif font-normal text-foreground mt-2">
-              Everything You Need to Know
-            </h2>
+        <div className="mb-20 sm:mb-24 max-w-4xl mx-auto">
+          <div className="mb-2 flex items-end justify-between gap-4 border-b border-border pb-3">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                FAQ / 03
+              </span>
+              <h2 className="mt-2 font-serif text-2xl font-normal text-foreground sm:text-3xl">
+                Questions
+              </h2>
+            </div>
           </div>
 
-          <div className="space-y-3">
+          <div>
             {faqs.map((faq, idx) => {
               const isOpen = openFaq === idx;
               return (
-                <div
-                  key={idx}
-                  className="rounded-xl border border-border bg-card overflow-hidden transition-all duration-200"
-                >
+                <div key={idx} className="border-b border-border">
                   <button
                     type="button"
                     onClick={() => toggleFaq(idx)}
-                    className="w-full py-4 px-5 flex items-center justify-between text-left gap-4 hover:bg-muted/40 transition-colors cursor-pointer"
+                    className="flex w-full items-center justify-between gap-4 py-5 text-left cursor-pointer"
                   >
-                    <span className="text-xs sm:text-sm font-semibold text-foreground">
+                    <span className="font-serif text-lg leading-snug text-foreground sm:text-xl">
                       {faq.q}
                     </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform duration-200 ${
-                        isOpen ? 'rotate-180 text-accent' : ''
-                      }`}
-                    />
+                    {isOpen ? (
+                      <Minus className="h-4 w-4 shrink-0 text-accent" />
+                    ) : (
+                      <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    )}
                   </button>
                   {isOpen && (
-                    <div className="px-5 pb-4 text-xs leading-relaxed text-muted-foreground border-t border-border/60 pt-3">
+                    <p className="max-w-2xl pb-5 text-sm leading-relaxed text-muted-foreground">
                       {faq.a}
-                    </div>
+                    </p>
                   )}
                 </div>
               );
@@ -482,22 +487,22 @@ export default function Pricing() {
           </div>
 
           {/* See Billing Help Callout Banner */}
-          <div className="mt-8 p-5 rounded-2xl border border-border bg-card flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-left space-y-1">
-              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-accent" />
+          <div className="mt-10 flex flex-col justify-between gap-4 border-b border-border pb-6 sm:flex-row sm:items-center">
+            <div className="space-y-1">
+              <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                <CreditCard className="h-3.5 w-3.5 text-accent" />
                 Questions about payments, renewals, or compute refunds?
               </span>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Review our complete, transparent subscription lifecycle, compute consumption terms, and fair use guidelines.
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Review our complete subscription lifecycle, compute consumption terms, and fair use guidelines.
               </p>
             </div>
             <Link
               to="/billing-help"
-              className="text-xs font-semibold text-accent hover:underline flex items-center gap-1 shrink-0"
+              className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-accent hover:underline"
             >
-              <span>See billing help & policies</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Billing help</span>
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
