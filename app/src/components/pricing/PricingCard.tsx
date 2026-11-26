@@ -31,14 +31,12 @@ export interface PricingCardData {
 interface PricingCardProps {
   card: PricingCardData;
   interval: BillingInterval;
-  index?: number;
   layout?: 'three' | 'two';
 }
 
 export default function PricingCard({
   card,
   interval,
-  index,
   layout = 'three',
 }: PricingCardProps) {
   const isHighlighted = card.highlighted;
@@ -78,11 +76,8 @@ export default function PricingCard({
       }`}
     >
       <div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-            {index !== undefined ? `Plan ${String(index + 1).padStart(2, '0')}` : 'Plan'}
-          </span>
-          {card.badge && (
+        {card.badge && (
+          <div className="mb-3">
             <span
               className={`font-mono text-[10px] uppercase tracking-[0.14em] ${
                 isHighlighted ? 'text-accent' : 'text-muted-foreground'
@@ -90,10 +85,10 @@ export default function PricingCard({
             >
               {card.badge}
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
-        <h3 className="mt-3 font-serif text-3xl leading-none text-foreground">
+        <h3 className="font-serif text-3xl leading-none text-foreground">
           {card.name}
         </h3>
         <p className="mt-2 text-xs leading-relaxed text-muted-foreground">

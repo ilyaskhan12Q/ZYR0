@@ -260,12 +260,11 @@ export default function Pricing() {
           {audience === 'personal' ? (
             <div className="mx-auto max-w-6xl">
               <div className="grid grid-cols-1 items-stretch border-t border-border lg:grid-cols-3">
-                {personalCards.map((card, index) => (
+                {personalCards.map((card) => (
                   <PricingCard
                     key={card.id}
                     card={card}
                     interval={interval}
-                    index={index}
                     layout="three"
                   />
                 ))}
@@ -273,12 +272,11 @@ export default function Pricing() {
             </div>
           ) : (
             <div className="mx-auto grid max-w-4xl grid-cols-1 items-stretch border-t border-border md:grid-cols-2">
-              {businessCards.map((card, index) => (
+              {businessCards.map((card) => (
                 <PricingCard
                   key={card.id}
                   card={card}
                   interval={interval}
-                  index={index}
                   layout="two"
                 />
               ))}
