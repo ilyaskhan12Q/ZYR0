@@ -142,19 +142,7 @@ export default function Pricing() {
 
   const comparisonCategories = [
     {
-      category: 'ZYR0 Work (Internships & Workforce)',
-      rows: [
-        { feature: 'Internship discovery & search filters', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
-        { feature: 'Direct internship applications & tracking', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
-        { feature: 'PR-style task submission workspace', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
-        { feature: 'Cryptographic completion certificates', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
-        { feature: 'Featured applicant profile placement', free: false, go: true, plus: true, teams: false, ent: true, status: 'Live' },
-        { feature: 'Company internship posting & applicant review', free: false, go: false, plus: false, teams: true, ent: true, status: 'Live' },
-        { feature: 'Company multi-member team permissions', free: false, go: false, plus: false, teams: true, ent: true, status: 'Live' },
-      ],
-    },
-    {
-      category: 'ZYR0 Research (Autonomous AI Agent)',
+      category: '',
       rows: [
         { feature: 'Standard research chat & question answering', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
         { feature: 'Verifiable citations (OpenAlex, arXiv, PubMed)', free: true, go: true, plus: true, teams: true, ent: true, status: 'Live' },
@@ -269,22 +257,8 @@ export default function Pricing() {
 
         {/* Feature Comparison Section */}
         <div className="mb-24 sm:mb-32 max-w-5xl mx-auto">
-          <div className="mb-8 flex items-end justify-between gap-4 border-b border-border pb-3">
-            <div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                Detailed breakdown
-              </span>
-              <h2 className="mt-2 font-serif text-2xl font-normal text-foreground sm:text-3xl">
-                Compare features across tiers
-              </h2>
-            </div>
-            <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground sm:block">
-              Spec sheet / 02
-            </span>
-          </div>
-
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] table-fixed border-collapse border-t-2 border-foreground text-left text-xs">
+            <table className="w-full min-w-[760px] table-fixed border-collapse text-left text-xs">
                 <colgroup>
                   <col className="w-[40%]" />
                   <col className="w-[12%]" />
@@ -294,23 +268,23 @@ export default function Pricing() {
                   <col className="w-[12%]" />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="py-3.5 px-4 sm:px-6 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-left">
-                      Capability
+                  <tr className="border-b-2 border-foreground">
+                    <th className="py-4 px-4 sm:px-6 font-mono text-xs uppercase tracking-[0.06em] font-medium text-muted-foreground/70 text-left">
+                      Compare features across tiers
                     </th>
-                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
+                    <th className="py-4 px-2 font-mono text-xs uppercase tracking-[0.06em] font-medium text-muted-foreground/70 text-center">
                       Free
                     </th>
-                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
+                    <th className="py-4 px-2 font-mono text-xs uppercase tracking-[0.06em] font-medium text-muted-foreground/70 text-center">
                       GO ($4.99)
                     </th>
-                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-accent text-center bg-accent/[0.04]">
+                    <th className="py-4 px-2 font-mono text-xs uppercase tracking-[0.06em] font-medium text-accent/70 text-center bg-accent/[0.04]">
                       PLUS ($19.99)
                     </th>
-                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
+                    <th className="py-4 px-2 font-mono text-xs uppercase tracking-[0.06em] font-medium text-muted-foreground/70 text-center">
                       Teams
                     </th>
-                    <th className="py-3.5 px-2 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground text-center">
+                    <th className="py-4 px-2 font-mono text-xs uppercase tracking-[0.06em] font-medium text-muted-foreground/70 text-center">
                       Custom
                     </th>
                   </tr>
@@ -318,20 +292,22 @@ export default function Pricing() {
                 <tbody>
                   {comparisonCategories.map((cat, catIdx) => (
                     <Fragment key={catIdx}>
-                      <tr className="border-t border-border">
-                        <td
-                          colSpan={6}
-                          className="py-2.5 px-4 sm:px-6 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground"
-                        >
-                          {cat.category}
-                        </td>
-                      </tr>
+                      {cat.category && (
+                        <tr className="border-t border-border/60">
+                          <td
+                            colSpan={6}
+                            className="py-2.5 px-4 sm:px-6 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground/60"
+                          >
+                            {cat.category}
+                          </td>
+                        </tr>
+                      )}
                       {cat.rows.map((row, rowIdx) => (
                         <tr
                           key={`row-${catIdx}-${rowIdx}`}
-                          className="border-b border-border hover:bg-muted/20 transition-colors"
+                          className="border-b border-border/60 hover:bg-muted/20 transition-colors"
                         >
-                          <td className="py-3 px-4 sm:px-6 text-[12.5px] text-foreground font-medium align-middle">
+                          <td className="py-4 px-4 sm:px-6 text-[13.5px] leading-relaxed text-muted-foreground align-middle">
                             <div className="flex items-center gap-2">
                               <span>{row.feature}</span>
                               {row.status !== 'Live' && (
@@ -341,13 +317,15 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-center align-middle">
+                          <td className="py-4 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
                               {typeof row.free === 'boolean' ? (
                                 row.free ? (
-                                  <Check className="w-4 h-4 text-foreground" />
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+  <Check className="h-3 w-3 text-background" />
+</span>
                                 ) : (
-                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                  <span className="font-mono text-[11px] text-muted-foreground">×</span>
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-muted-foreground">
@@ -356,13 +334,15 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-center align-middle">
+                          <td className="py-4 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
                               {typeof row.go === 'boolean' ? (
                                 row.go ? (
-                                  <Check className="w-4 h-4 text-foreground" />
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+  <Check className="h-3 w-3 text-background" />
+</span>
                                 ) : (
-                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                  <span className="font-mono text-[11px] text-muted-foreground">×</span>
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-muted-foreground">
@@ -371,13 +351,15 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-center align-middle bg-accent/[0.04]">
+                          <td className="py-4 px-2 text-center align-middle bg-accent/[0.04]">
                             <div className="flex items-center justify-center">
                               {typeof row.plus === 'boolean' ? (
                                 row.plus ? (
-                                  <Check className="w-4 h-4 text-accent" />
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+  <Check className="h-3 w-3 text-background" />
+</span>
                                 ) : (
-                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                  <span className="font-mono text-[11px] text-muted-foreground">×</span>
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-accent font-medium">
@@ -386,13 +368,15 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-center align-middle">
+                          <td className="py-4 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
                               {typeof row.teams === 'boolean' ? (
                                 row.teams ? (
-                                  <Check className="w-4 h-4 text-foreground" />
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+  <Check className="h-3 w-3 text-background" />
+</span>
                                 ) : (
-                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                  <span className="font-mono text-[11px] text-muted-foreground">×</span>
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-foreground font-medium">
@@ -401,13 +385,15 @@ export default function Pricing() {
                               )}
                             </div>
                           </td>
-                          <td className="py-3 px-2 text-center align-middle">
+                          <td className="py-4 px-2 text-center align-middle">
                             <div className="flex items-center justify-center">
                               {typeof row.ent === 'boolean' ? (
                                 row.ent ? (
-                                  <Check className="w-4 h-4 text-foreground" />
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-foreground">
+  <Check className="h-3 w-3 text-background" />
+</span>
                                 ) : (
-                                  <Minus className="w-4 h-4 text-muted-foreground/30" />
+                                  <span className="font-mono text-[11px] text-muted-foreground">×</span>
                                 )
                               ) : (
                                 <span className="font-mono text-[11px] text-foreground font-medium">

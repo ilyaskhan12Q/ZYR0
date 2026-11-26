@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Check, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { BillingInterval } from './BillingToggle';
 
 export interface PricingFeature {
@@ -61,7 +61,7 @@ export default function PricingCard({ card, interval }: PricingCardProps) {
 
   return (
     <div
-      className={`relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border bg-card p-6 sm:p-7 ${
+      className={`relative flex h-full flex-col overflow-hidden rounded-2xl border bg-card p-7 sm:p-8 ${
         isHighlighted ? 'border-accent/50' : 'border-border'
       }`}
     >
@@ -104,7 +104,7 @@ export default function PricingCard({ card, interval }: PricingCardProps) {
           </div>
         )}
 
-        <div className="mt-6 flex items-baseline gap-2">
+        <div className="mt-7 flex items-baseline gap-2">
           <span className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-[42px]">
             {price}
           </span>
@@ -128,50 +128,47 @@ export default function PricingCard({ card, interval }: PricingCardProps) {
             </p>
           )}
 
-        <ul className="mt-6 space-y-2.5">
+        <div className="mt-5">
+          {card.onCtaClick ? (
+            <button
+              type="button"
+              onClick={card.onCtaClick}
+              className={`${buttonBase} ${getButtonClasses()} cursor-pointer`}
+            >
+              <span>{card.ctaLabel}</span>
+              <Icon className="h-3.5 w-3.5" />
+            </button>
+          ) : (
+            <Link
+              to={card.ctaHref || '/register'}
+              className={`${buttonBase} ${getButtonClasses()}`}
+            >
+              <span>{card.ctaLabel}</span>
+              <Icon className="h-3.5 w-3.5" />
+            </Link>
+          )}
+        </div>
+
+        <ul className="mt-7 space-y-4">
           {card.features.map((feat, idx) => (
             <li
               key={idx}
-              className="flex items-start gap-2.5 text-xs leading-snug text-muted-foreground"
+              className="text-sm leading-relaxed text-muted-foreground"
             >
-              <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-              <div className="flex-1">
-                {feat.highlight && (
-                  <span className="mr-1.5 font-semibold text-foreground">
-                    {feat.highlight}
-                  </span>
-                )}
-                <span>{feat.text}</span>
-                {feat.badge && (
-                  <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">
-                    ({feat.badge})
-                  </span>
-                )}
-              </div>
+              {feat.highlight && (
+                <span className="mr-1.5 font-semibold text-foreground/80">
+                  {feat.highlight}
+                </span>
+              )}
+              <span>{feat.text}</span>
+              {feat.badge && (
+                <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">
+                  ({feat.badge})
+                </span>
+              )}
             </li>
           ))}
         </ul>
-      </div>
-
-      <div className="mt-8">
-        {card.onCtaClick ? (
-          <button
-            type="button"
-            onClick={card.onCtaClick}
-            className={`${buttonBase} ${getButtonClasses()} cursor-pointer`}
-          >
-            <span>{card.ctaLabel}</span>
-            <Icon className="h-3.5 w-3.5" />
-          </button>
-        ) : (
-          <Link
-            to={card.ctaHref || '/register'}
-            className={`${buttonBase} ${getButtonClasses()}`}
-          >
-            <span>{card.ctaLabel}</span>
-            <Icon className="h-3.5 w-3.5" />
-          </Link>
-        )}
       </div>
     </div>
   );
