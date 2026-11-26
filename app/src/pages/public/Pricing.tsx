@@ -226,47 +226,40 @@ export default function Pricing() {
         path="/pricing"
       />
 
-      <main className="pt-10 sm:pt-14 lg:pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className="pt-14 sm:pt-20 lg:pt-24 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero Section */}
-        <div className="max-w-4xl mb-12 sm:mb-16">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-            Pricing / 001
-          </span>
-          <h1 className="mt-4 font-serif text-4xl font-normal leading-[1.02] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            One platform. Every tier of{' '}
-            <span className="italic text-accent">ambition.</span>
+        <div className="mx-auto max-w-4xl mb-16 text-center sm:mb-20">
+          <h1 className="font-serif text-5xl font-normal leading-[1.02] tracking-tight text-foreground sm:text-7xl">
+            Pricing
           </h1>
-          <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Choose Personal plans for individual students, researchers, and creators, or Business plans for hiring teams, schools, and enterprise deployments.
-          </p>
 
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="mt-8 flex justify-center">
             <AudienceToggle audience={audience} onChange={setAudience} />
-            {audience === 'personal' && (
-              <BillingToggle interval={interval} onChange={setInterval} />
-            )}
-            <Link
-              to="/billing-help"
-              className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-accent sm:ml-auto"
-            >
-              <span>Billing help</span>
-              <ArrowRight className="h-3 w-3" />
-            </Link>
           </div>
+          <Link
+            to="/billing-help"
+            className="mt-4 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-accent"
+          >
+            <span>Billing help</span>
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </div>
 
         {/* Pricing Cards Grid */}
-        <div className="mb-20 sm:mb-24">
+        <div className="mb-24 sm:mb-32">
           {audience === 'personal' ? (
             <div className="mx-auto max-w-6xl">
-              <div className="grid grid-cols-1 items-stretch gap-5 sm:gap-6 lg:grid-cols-3">
+              <div className="grid grid-cols-1 items-stretch gap-6 sm:gap-8 lg:grid-cols-3">
                 {personalCards.map((card) => (
                   <PricingCard key={card.id} card={card} interval={interval} />
                 ))}
               </div>
+              <div className="mt-10 flex justify-center">
+                <BillingToggle interval={interval} onChange={setInterval} />
+              </div>
             </div>
           ) : (
-            <div className="mx-auto grid max-w-4xl grid-cols-1 items-stretch gap-5 sm:gap-6 md:grid-cols-2">
+            <div className="mx-auto grid max-w-4xl grid-cols-1 items-stretch gap-6 sm:gap-8 md:grid-cols-2">
               {businessCards.map((card) => (
                 <PricingCard key={card.id} card={card} interval={interval} />
               ))}
@@ -275,7 +268,7 @@ export default function Pricing() {
         </div>
 
         {/* Feature Comparison Section */}
-        <div className="mb-20 sm:mb-24 max-w-5xl mx-auto">
+        <div className="mb-24 sm:mb-32 max-w-5xl mx-auto">
           <div className="mb-8 flex items-end justify-between gap-4 border-b border-border pb-3">
             <div>
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
@@ -433,7 +426,7 @@ export default function Pricing() {
         </div>
 
         {/* FAQ Accordion Section */}
-        <div className="mb-20 sm:mb-24 max-w-4xl mx-auto">
+        <div className="mb-24 sm:mb-32 max-w-4xl mx-auto">
           <div className="mb-2 flex items-end justify-between gap-4 border-b border-border pb-3">
             <div>
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
