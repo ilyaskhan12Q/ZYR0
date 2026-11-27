@@ -97,12 +97,20 @@ const AdminPortal = lazy(() => import('@/pages/admin/AdminPortal'));
 
 const LazyDashboardLayout = lazy(() => import('@/layouts/DashboardLayout'));
 
+const PROTECTED_PATH = /^\/(student|company|mentor|admin|research-agent)(\/|$)/;
+
 function SubdomainRedirect() {
   const location = useLocation();
   useEffect(() => {
     window.location.href = `https://zyroo.org${location.pathname}${location.search}`;
   }, [location]);
   return <RouteLoading />;
+}
+
+/** Public pages load without the dot loader; protected areas keep it. */
+function RouteFallback() {
+  const location = useLocation();
+  return PROTECTED_PATH.test(location.pathname) ? <RouteLoading /> : null;
 }
 
 export default function App() {
@@ -256,7 +264,7 @@ export default function App() {
       <CompanyAccessProvider>
         <ScrollToTop />
         <ErrorBoundary>
-          <Suspense fallback={<RouteLoading />}>
+          <Suspense fallback={<RouteFallback />}>
             <Routes>
             {/* ZYR0 Research Agent (protected app page — no public chrome) */}
             <Route

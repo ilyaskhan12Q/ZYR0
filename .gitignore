@@ -74,3 +74,6 @@ skills-lock.json
 # Brag launch video deliverables & working files
 brag-output/
 brag-output-*/
+
+# Local tool/skill curation directory (untracked, used for SQL ingestion)
+tools/

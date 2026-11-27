@@ -42,6 +42,7 @@ export default function PublicLayout() {
       style={{ '--zyro-header-h': `${headerHeight}px` } as CSSProperties}
     >
       <header ref={headerRef} className="fixed top-0 left-0 right-0 z-50">
+        <div aria-hidden="true" className="h-0.5 w-full bg-[#0051C3]" />
         <SiteBannerBar />
         <SiteNav />
       </header>

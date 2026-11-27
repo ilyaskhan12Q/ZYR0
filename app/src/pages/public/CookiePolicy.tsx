@@ -1,164 +1,146 @@
-import { Link } from 'react-router-dom';
-import { m } from 'framer-motion';
-import { Cookie, Settings, BarChart2, Shield, ToggleRight, Mail, FileText } from 'lucide-react';
-import { SEO } from '@/components/SEO';
+import { LegalPage, type LegalSection } from '@/components/legal/LegalPage';
 
-const cookieTypes = [
+const sections: LegalSection[] = [
   {
-    icon: Shield,
-    title: 'Strictly Necessary Cookies',
-    badge: 'Always Active',
-    badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
-    desc: 'These cookies are essential for the platform to function correctly. They enable core features like authentication, session management, and security. Without them, the Service cannot be provided.',
-    examples: ['Authentication session token', 'CSRF protection token', 'Theme preference (light/dark mode)', 'Cookie consent state'],
+    id: 'about',
+    title: 'About this policy',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'Cookies are small files a site stores in your browser. We also use local storage and similar technologies to keep you signed in, remember preferences, understand how the products are used, and show ads on public pages.',
+      },
+      {
+        kind: 'p',
+        text: 'This policy covers zyroo.org and every ZYR0 subdomain, including Studio, School, Research, Work, ToolHub and the Blog. It should be read together with our Privacy Policy.',
+      },
+    ],
   },
   {
-    icon: BarChart2,
-    title: 'Analytics Cookies',
-    badge: 'Optional',
-    badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
-    desc: 'We use analytics data to understand how users interact with the platform so we can improve features and usability. This data is aggregated and does not personally identify you.',
-    examples: ['Pages visited and time spent', 'Feature usage frequency', 'Error and crash reporting', 'Device and browser type'],
+    id: 'categories',
+    title: 'The categories we use',
+    blocks: [
+      {
+        kind: 'table',
+        headers: ['Category', 'What it does', 'Required'],
+        rows: [
+          ['Strictly necessary', 'Sign in, session security, fraud prevention, and remembering your cookie choices.', 'Yes'],
+          ['Preferences', 'Remembers settings such as theme and layout so the interface feels the same next time.', 'No'],
+          ['Analytics', 'Helps us see which pages and features are used and where things break.', 'No'],
+          ['Advertising', 'Lets Google and its partners show and measure ads on public pages.', 'No'],
+        ],
+      },
+      {
+        kind: 'p',
+        text: 'Strictly necessary cookies are needed for the platform to work. The others are optional, and where the law requires consent we ask before setting them.',
+      },
+    ],
   },
   {
-    icon: Settings,
-    title: 'Preference Cookies',
-    badge: 'Optional',
-    badgeColor: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
-    desc: 'These cookies remember your preferences and settings to provide a more personalized experience each time you return to the platform.',
-    examples: ['Language and locale settings', 'Dashboard layout preferences', 'Notification preferences', 'Last visited section'],
+    id: 'cookies-we-use',
+    title: 'Cookies you may see',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'The exact names can change as we update providers, but these are the ones you are most likely to find.',
+      },
+      {
+        kind: 'table',
+        headers: ['Name', 'Set by', 'Purpose', 'Duration'],
+        rows: [
+          ['sb-*-auth-token', 'Supabase', 'Keeps you signed in and refreshes your session securely.', 'Session, renewed while signed in'],
+          ['ph_*_posthog', 'PostHog', 'Product analytics, feature flags, and error context.', 'Up to 1 year'],
+          ['__cf_bm', 'Cloudflare', 'Distinguishes people from bots and protects the network.', '30 minutes'],
+          ['zyro-theme', 'ZYR0', 'Remembers light or dark mode. Stored in local storage.', 'Until you clear it'],
+          ['__gads, __gpi', 'Google AdSense', 'Measures ad performance and limits how often you see the same ad.', 'Up to 13 months'],
+          ['IDE', 'Google DoubleClick', 'Used by Google to serve and personalise ads across sites.', 'Up to 13 months'],
+        ],
+      },
+      {
+        kind: 'callout',
+        title: 'No tracking on private pages',
+        text: 'We do not run advertising cookies inside signed in dashboards, application forms, or verification pages. Ads appear on public content only.',
+      },
+    ],
+  },
+  {
+    id: 'advertising',
+    title: 'Advertising cookies',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'Public pages may use Google AdSense. Google and its partners use cookies to show ads based on your visits to this and other websites, and to measure how those ads perform. Depending on your region and your choices, ads may be personalised or non personalised.',
+      },
+      {
+        kind: 'p',
+        text: 'You can turn off personalised advertising in Google Ads Settings at google.com/settings/ads, and opt out of many participating vendors at aboutads.info and youronlinechoices.eu.',
+      },
+      {
+        kind: 'p',
+        text: 'Blocking advertising cookies does not remove ads. It usually means the ads you see are less relevant to you.',
+      },
+    ],
+  },
+  {
+    id: 'analytics',
+    title: 'Analytics',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'We use PostHog to understand product usage and Cloudflare to understand traffic and performance. These tools help us fix problems and decide what to build next. They collect technical and aggregated data, not the contents of your account.',
+      },
+    ],
+  },
+  {
+    id: 'managing',
+    title: 'Managing cookies',
+    blocks: [
+      {
+        kind: 'list',
+        items: [
+          'Use the consent message on the site to accept or refuse optional cookies, and to change your choice later.',
+          'Every major browser lets you block or delete cookies in its settings. Blocking strictly necessary cookies will stop sign in from working.',
+          'Private or incognito windows usually clear cookies when you close them.',
+          'Browser extensions that block ads or trackers may affect analytics and advertising cookies.',
+          'We do not change our behaviour when a browser sends a Do Not Track signal, but the consent controls above always apply.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'changes',
+    title: 'Changes to this policy',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'We update this policy when our providers or the law change. The date at the top shows the current version, and significant changes will be announced on the platform or by email.',
+      },
+    ],
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'Questions about cookies or this policy: privacy@zyroo.org. For general help, use the Help Center or write to support@zyroo.org.',
+      },
+    ],
   },
 ];
 
 export default function CookiePolicy() {
   return (
-    <div className="pb-16">
-      <SEO
-        title="Cookie Policy — How ZYR0 Uses Cookies"
-        description="Learn how ZYR0 uses cookies to keep you logged in, remember your preferences, and improve your experience. Find out which cookies are strictly necessary and which are optional."
-        path="/cookies"
-        keywords="ZYR0 cookie policy, cookies, website cookies, analytics cookies, strictly necessary cookies"
-      />
-      {/* Hero */}
-      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Cookie className="w-12 h-12 mx-auto mb-4 text-white/70" />
-            <h1 className="text-4xl sm:text-5xl font-bold">Cookie Policy</h1>
-            <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              This policy explains how ZYR0 uses cookies and similar technologies to provide, improve, and protect our platform.
-            </p>
-            <p className="mt-3 text-sm text-white/50">Last updated: July 2025</p>
-          </m.div>
-        </div>
-      </section>
-
-      {/* What are cookies */}
-      <section className="px-4 py-16">
-        <div className="max-w-3xl mx-auto">
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-card rounded-xl border border-border p-8 shadow-sm mb-10"
-          >
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Cookie className="w-5 h-5 text-accent" />
-              </div>
-              <h2 className="text-xl font-bold">What Are Cookies?</h2>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Cookies are small text files placed on your device by websites you visit. They are widely used to make websites work efficiently, to remember your preferences, and to provide information to site operators. ZYR0 uses cookies to keep you logged in, remember your settings, and understand how the platform is used.
-            </p>
-          </m.div>
-
-          {/* Cookie Types */}
-          <div className="space-y-6">
-            {cookieTypes.map((type, i) => (
-              <m.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-card rounded-xl border border-border p-8 shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <type.icon className="w-5 h-5 text-accent" />
-                    </div>
-                    <h2 className="text-lg font-bold">{type.title}</h2>
-                  </div>
-                  <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${type.badgeColor}`}>
-                    {type.badge}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">{type.desc}</p>
-                <div className="border-t border-border pt-4">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Examples</p>
-                  <ul className="space-y-1">
-                    {type.examples.map((ex, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent/60 flex-shrink-0" />
-                        {ex}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </m.div>
-            ))}
-          </div>
-
-          {/* Controls */}
-          <m.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-card rounded-xl border border-border p-8 shadow-sm mt-10"
-          >
-            <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                <ToggleRight className="w-5 h-5 text-accent" />
-              </div>
-              <h2 className="text-xl font-bold">Managing Cookies</h2>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              You can control and manage cookies through your browser settings. Most browsers allow you to view, delete, or block cookies from specific websites.
-            </p>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Please note that blocking strictly necessary cookies will impair the platform&apos;s functionality. You will not be able to log in or use role-specific features without them.
-            </p>
-            <div className="flex items-start gap-3 mt-4 p-4 bg-muted/50 rounded-lg">
-              <Mail className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-muted-foreground">
-                For questions about our cookie usage, contact us at <span className="text-accent">privacy@zyroo.org</span>.
-              </p>
-            </div>
-          </m.div>
-        </div>
-      </section>
-
-      {/* Related Policies */}
-      <section className="px-4 pb-16">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-card rounded-xl border border-border p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">Review our other policies:</p>
-            <div className="flex gap-3">
-              <Link to="/privacy" className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
-                <Shield className="w-4 h-4 text-accent" /> Privacy Policy
-              </Link>
-              <Link to="/terms" className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
-                <FileText className="w-4 h-4 text-accent" /> Terms of Service
-              </Link>
-              <Link to="/contact" className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
-                Contact Us
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+    <LegalPage
+      title="Cookie Policy"
+      summary="How ZYR0 uses cookies and local storage across the ecosystem, what each one does, and how to control them."
+      path="/cookies"
+      metaTitle="Cookie Policy"
+      metaDescription="Which cookies ZYR0 uses, what they do, how long they last, and how to control them, including advertising and analytics cookies."
+      keywords="ZYR0 cookie policy, advertising cookies, analytics cookies, Google AdSense cookies, manage cookies"
+      updated="24 November 2026"
+      sections={sections}
+      contactNote="Questions about cookies?"
+      contactEmail="privacy@zyroo.org"
+    />
   );
 }

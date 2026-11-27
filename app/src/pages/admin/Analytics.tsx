@@ -141,7 +141,7 @@ export default function AdminAnalytics() {
     const plusUsers = filteredProfiles.filter(p => p.plan_tier === 'plus').length;
     const enterpriseUsers = filteredProfiles.filter(p => p.plan_tier === 'enterprise').length;
     const paidUsers = goUsers + plusUsers + enterpriseUsers;
-    const mrr = (goUsers * 4.99) + (plusUsers * 9.99);
+    const mrr = (goUsers * 4.99) + (plusUsers * 19.99);
     const conversion = Math.round((paidUsers / (totalUsers || 1)) * 1000) / 10;
     setPlanBreakdown({ free: freeUsers, go: goUsers, plus: plusUsers, enterprise: enterpriseUsers, paid: paidUsers, mrr, conversion });
 
@@ -520,7 +520,7 @@ export default function AdminAnalytics() {
               <span className="text-right font-mono text-muted-foreground">
                 {(((planBreakdown.plus) / ((planBreakdown.free + planBreakdown.paid) || 1)) * 100).toFixed(0)}%
               </span>
-              <span className="text-right font-mono font-medium text-foreground">${(planBreakdown.plus * 9.99).toFixed(2)}</span>
+              <span className="text-right font-mono font-medium text-foreground">${(planBreakdown.plus * 19.99).toFixed(2)}</span>
             </div>
             <div className="grid grid-cols-4 p-2.5 text-xs items-center">
               <span className="font-medium text-foreground flex items-center gap-1.5">

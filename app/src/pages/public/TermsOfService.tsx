@@ -1,149 +1,272 @@
-import { Link } from 'react-router-dom';
-import { m } from 'framer-motion';
-import { FileText, Users, AlertCircle, ShieldCheck, Scale, Mail, Shield, Cookie } from 'lucide-react';
-import { SEO } from '@/components/SEO';
+import { LegalPage, type LegalSection } from '@/components/legal/LegalPage';
 
-const sections = [
+const sections: LegalSection[] = [
   {
-    icon: FileText,
-    title: 'Acceptance of Terms',
-    content: [
-      'By accessing or using the ZYR0 platform ("Service"), you agree to be bound by these Terms of Service ("Terms").',
-      'If you do not agree with any part of these Terms, you may not access or use the Service.',
-      'These Terms apply to all users of the Service including students, companies, mentors, and administrators.',
-      'ZYR0 reserves the right to update these Terms at any time. Continued use of the Service after changes constitutes acceptance of the revised Terms.',
+    id: 'acceptance',
+    title: 'Acceptance of these terms',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'These terms govern your use of zyroo.org and every ZYR0 subdomain, including Studio, School, Research, Work, ToolHub and the Blog. By creating an account or using any of those products, you agree to these terms and to our Privacy Policy and Cookie Policy.',
+      },
+      {
+        kind: 'p',
+        text: 'If you do not agree, please do not use the platform. If you use ZYR0 for an organisation, you confirm that you are allowed to accept these terms on its behalf.',
+      },
     ],
   },
   {
-    icon: Users,
-    title: 'User Accounts & Roles',
-    content: [
-      'You must register for an account to access most features. You are responsible for maintaining the confidentiality of your account credentials.',
-      'Each account is assigned one of four roles: Student, Company, Mentor, or Admin. Role-specific features and permissions are enforced throughout the platform.',
-      'You must provide accurate and complete information during registration. Providing false information may result in immediate account suspension.',
-      'Students must be at least 16 years old to register. Company accounts must represent a legitimate organization.',
-      'You may not create multiple accounts for the same role or attempt to access features restricted to other roles.',
+    id: 'accounts',
+    title: 'Accounts',
+    blocks: [
+      {
+        kind: 'list',
+        items: [
+          'You must be at least 16 years old to create an account.',
+          'You agree to provide accurate information and keep it up to date.',
+          'You are responsible for your password and for activity under your account. Tell us right away if you suspect unauthorised access.',
+          'One person or organisation should hold one account per role. Do not create accounts to avoid limits or bans.',
+          'We may ask you to verify your email or identity before enabling certain features.',
+        ],
+      },
     ],
   },
   {
-    icon: ShieldCheck,
-    title: 'Platform Usage',
-    content: [
-      'The platform must be used for legitimate internship management purposes as described in our product documentation.',
-      'Companies are responsible for the accuracy of internship listings they publish, including job scope, compensation, and requirements.',
-      'Students agree to submit genuine work through GitHub repositories. Plagiarism or misrepresentation of work is grounds for account termination.',
-      'All users agree to communicate respectfully. Harassment, discrimination, or abusive behavior will result in immediate suspension.',
-      'You may not reverse engineer, scrape, or attempt to extract data from the platform through automated means.',
-      'Certificates issued by ZYR0 represent completed internship programs. Fraudulent use of certificates is prohibited.',
+    id: 'products',
+    title: 'The products and how they change',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'ZYR0 is a growing ecosystem, so products are added, improved and sometimes retired. We may change or remove features, and we may move a feature between products. When a change materially affects paid features, we will give reasonable notice.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Free features are provided as they are, without a guarantee of uptime or of permanent availability.',
+          'Beta or preview features may be incomplete and can change without notice.',
+          'We may set fair use limits to keep the platform stable for everyone.',
+        ],
+      },
     ],
   },
   {
-    icon: AlertCircle,
-    title: 'Intellectual Property',
-    content: [
-      'ZYR0 retains ownership of all platform software, design, branding, and documentation.',
-      'Student project work submitted via GitHub remains the intellectual property of the student, unless otherwise agreed with the sponsoring company.',
-      'Certificates issued by ZYR0 remain verifiable indefinitely. The verification system and certificate design are the intellectual property of ZYR0.',
-      'Content you upload to the platform (profile photos, documents) is licensed to ZYR0 for the purpose of providing the Service.',
+    id: 'acceptable-use',
+    title: 'Acceptable use',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'Use ZYR0 for its intended purpose and treat other people with respect. You agree not to do any of the following.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Break the law, infringe someone else, or help others do so.',
+          'Harass, threaten, discriminate against, or impersonate another person.',
+          'Upload malware, spam, or content that is deliberately misleading.',
+          'Scrape, crawl, or extract data with automated tools except where we allow it in writing or through a public API.',
+          'Reverse engineer, probe, or attempt to bypass security, rate limits, or access controls.',
+          'Sell, rent, or transfer your account without our permission.',
+          'Use the platform to send unsolicited commercial messages.',
+        ],
+      },
     ],
   },
   {
-    icon: Scale,
-    title: 'Liability & Warranties',
-    content: [
-      'The Service is provided "as is" without warranties of any kind, express or implied.',
-      'ZYR0 acts as a platform facilitating connections between students and companies. We are not responsible for the outcomes of internship relationships.',
-      'We do not guarantee that internship listings are accurate, that applications will result in offers, or that all internships will be completed.',
-      'To the maximum extent permitted by law, ZYR0 is not liable for indirect, incidental, or consequential damages arising from use of the Service.',
-      'Our total liability for any claim arising from these Terms or use of the Service shall not exceed the amount you paid us in the 12 months preceding the claim.',
+    id: 'content',
+    title: 'Your content',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'You keep ownership of the content you create on ZYR0, including projects, listings, posts, and profile details. You give us a non exclusive licence to host, display, and share that content as needed to run the products you use.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'You confirm that you have the rights to everything you upload.',
+          'Public content, such as published tools, blog posts, company profiles, and certificates, can be seen and shared by anyone.',
+          'We may remove content that breaks these terms, the law, or the rights of others.',
+          'If you delete content, some copies may remain for a short time in backups or where the law requires retention.',
+        ],
+      },
     ],
   },
   {
-    icon: Mail,
-    title: 'Termination & Contact',
-    content: [
-      'You may terminate your account at any time by contacting us at support@zyroo.org.',
-      'ZYR0 may suspend or terminate accounts that violate these Terms, with or without notice.',
-      'Upon termination, your access to the Service will cease. Issued certificates remain verifiable through the public verification system.',
-      'These Terms are governed by applicable law. Any disputes shall be resolved through binding arbitration.',
-      'For questions about these Terms, contact us at legal@zyroo.org.',
+    id: 'work',
+    title: 'ZYR0 Work and internships',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'ZYR0 Work connects students, companies, and mentors, and helps teams run internship programs. It is one product inside the ecosystem, not an employment agency.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Companies are responsible for the accuracy of their listings, including scope, duration, compensation, and requirements.',
+          'Students are responsible for the work they submit and for the repositories they link.',
+          'A certificate confirms that a program was completed on ZYR0. It is not a guarantee of skill, employment, or an offer.',
+          'We do not guarantee that an application leads to an offer, or that a listing stays open for any length of time.',
+          'Any arrangement between a student and a company is between those parties. ZYR0 is not a party to it.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'tools',
+    title: 'ToolHub listings',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'ToolHub collects tools, skills, and resources from ZYR0 and from public sources such as GitHub and Hugging Face. Listings are for discovery, and a listing is not an endorsement.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Always check the licence and the source of a tool before you use it in your own work.',
+          'We are not responsible for third party code, its security, or its behaviour on your machine.',
+          'If you submit a listing, you confirm that the information is accurate and that you are allowed to share it.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'payments',
+    title: 'Paid plans and billing',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'Some features are paid. Prices, billing periods, and what each plan includes are shown before you buy. Payments are handled by our payment provider, and by buying a plan you also accept their terms.',
+      },
+      {
+        kind: 'list',
+        items: [
+          'Subscriptions renew automatically until you cancel, unless the checkout says otherwise.',
+          'You can cancel at any time, and access continues until the end of the paid period.',
+          'Refunds are handled case by case where the law requires them or where we state otherwise on the checkout page.',
+          'You are responsible for any taxes that apply to your purchase.',
+          'If a payment fails, we may suspend paid features until it is resolved.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ip',
+    title: 'Intellectual property',
+    blocks: [
+      {
+        kind: 'list',
+        items: [
+          'ZYR0 owns the platform, its design, branding, documentation, and the certificate system.',
+          'Your project work stays yours unless you agree otherwise with a company or client.',
+          'You may not copy or reuse our branding without written permission.',
+          'If you send us feedback or ideas, we may use them without restriction or payment.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'third-parties',
+    title: 'Third party services and links',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'ZYR0 links to and integrates with services we do not control, such as GitHub, Google, LinkedIn, and external tool sources. Their terms and privacy policies apply when you use them, and we are not responsible for their content or availability.',
+      },
+    ],
+  },
+  {
+    id: 'ads',
+    title: 'Advertising',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'Some public pages show ads through Google AdSense to keep free access possible. Ads are labelled, and we do not give advertisers your account details. See our Privacy Policy and Cookie Policy for how advertising data works and how to control it.',
+      },
+    ],
+  },
+  {
+    id: 'disclaimers',
+    title: 'Disclaimers',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'The products are provided as they are and as available, without warranties of any kind, whether express or implied. We do not promise that the platform will be uninterrupted, error free, or fit for a particular purpose.',
+      },
+    ],
+  },
+  {
+    id: 'liability',
+    title: 'Limitation of liability',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'To the fullest extent allowed by law, ZYR0 is not liable for indirect, incidental, special, or consequential losses, or for lost profits, data, or opportunities. Our total liability for a claim is limited to the amount you paid us in the twelve months before the claim, or one hundred US dollars if you use only free features.',
+      },
+      {
+        kind: 'p',
+        text: 'Nothing here limits liability that cannot be limited by law.',
+      },
+    ],
+  },
+  {
+    id: 'termination',
+    title: 'Suspension and termination',
+    blocks: [
+      {
+        kind: 'list',
+        items: [
+          'You can stop using ZYR0 at any time and ask us to delete your account.',
+          'We may suspend or close an account that breaks these terms, poses a security risk, or is used for fraud or abuse.',
+          'Where it is reasonable, we will tell you why before or after taking action.',
+          'Certificates already issued stay verifiable through the public verification page.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'changes',
+    title: 'Changes to these terms',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'We update these terms when the products or the law change. The date at the top shows the current version. For significant changes we will notify you by email or with a notice on the platform. Continuing to use ZYR0 after a change means you accept the updated terms.',
+      },
+    ],
+  },
+  {
+    id: 'law',
+    title: 'Governing law',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'These terms are governed by the applicable laws of the country where ZYR0 operates, without regard to conflict of law rules. Before starting formal proceedings, both sides agree to try to resolve the issue in good faith.',
+      },
+    ],
+  },
+  {
+    id: 'contact',
+    title: 'Contact',
+    blocks: [
+      {
+        kind: 'p',
+        text: 'For questions about these terms or a legal request, write to legal@zyroo.org. For general help, use the Help Center or write to support@zyroo.org.',
+      },
     ],
   },
 ];
 
 export default function TermsOfService() {
   return (
-    <div className="pb-16">
-      <SEO
-        title="Terms of Service — ZYR0 Platform Usage Agreement"
-        description="Review ZYR0's Terms of Service. These terms govern your access and use of the ZYR0 internship management platform, including rights, responsibilities, and limitations for students, companies, and mentors."
-        path="/terms"
-        keywords="ZYR0 terms of service, platform terms, usage agreement, internship platform terms, user agreement"
-      />
-      {/* Hero */}
-      <section className="hero-under-header px-4 pb-16 bg-gradient-to-b from-primary to-primary/90 dark:from-slate-950 dark:to-slate-900 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <FileText className="w-12 h-12 mx-auto mb-4 text-white/70" />
-            <h1 className="text-4xl sm:text-5xl font-bold">Terms of Service</h1>
-            <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto leading-relaxed">
-              Please read these terms carefully before using the ZYR0 platform. They govern your access and use of our Service.
-            </p>
-            <p className="mt-3 text-sm text-white/50">Last updated: July 2026</p>
-          </m.div>
-        </div>
-      </section>
-
-      {/* Sections */}
-      <section className="px-4 py-16">
-        <div className="max-w-3xl mx-auto space-y-10">
-          {sections.map((section, i) => (
-            <m.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="bg-card rounded-xl border border-border p-8 shadow-sm"
-            >
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <section.icon className="w-5 h-5 text-accent" />
-                </div>
-                <h2 className="text-xl font-bold">{section.title}</h2>
-              </div>
-              <ul className="space-y-3">
-                {section.content.map((item, j) => (
-                  <li key={j} className="flex items-start gap-2 text-sm text-muted-foreground leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent/60 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </m.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Related Policies */}
-      <section className="px-4 pb-16">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-card rounded-xl border border-border p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">Review our other policies:</p>
-            <div className="flex gap-3">
-              <Link to="/privacy" className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
-                <Shield className="w-4 h-4 text-accent" /> Privacy Policy
-              </Link>
-              <Link to="/cookies" className="inline-flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-sm font-medium hover:bg-muted transition-colors">
-                <Cookie className="w-4 h-4 text-accent" /> Cookie Policy
-              </Link>
-              <Link to="/contact" className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
-                Contact Us
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+    <LegalPage
+      title="Terms of Service"
+      summary="The rules for using ZYR0 across Studio, School, Research, Work, ToolHub and the Blog."
+      path="/terms"
+      metaTitle="Terms of Service"
+      metaDescription="The terms that govern your use of ZYR0 across Studio, School, Research, Work, ToolHub, and the Blog."
+      keywords="ZYR0 terms of service, platform agreement, user terms, acceptable use"
+      updated="24 November 2026"
+      sections={sections}
+      contactNote="Questions about these terms?"
+      contactEmail="legal@zyroo.org"
+    />
   );
 }

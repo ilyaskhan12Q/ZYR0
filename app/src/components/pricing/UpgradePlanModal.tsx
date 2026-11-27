@@ -49,9 +49,9 @@ const PLAN_DETAILS = {
     id: 'plus',
     name: 'ZYR0 PLUS',
     badge: 'Most Popular',
-    monthlyPrice: '$9.99',
-    yearlyPrice: '$7.99',
-    yearlyBilled: '$95.90/year (Save ~20%)',
+    monthlyPrice: '$19.99',
+    yearlyPrice: '$15.99',
+    yearlyBilled: '$191.90/year (Save ~20%)',
     description: 'Deep multi-step reasoning, zero queue delays, and VIP Studio code builder access.',
     highlights: [
       'Deep reasoning AI models for complex multi-step queries',
