@@ -413,15 +413,10 @@ export default function Pricing() {
 
         {/* FAQ Accordion Section */}
         <div className="mb-24 sm:mb-32 max-w-4xl mx-auto">
-          <div className="mb-2 flex items-end justify-between gap-4 border-b border-border pb-3">
-            <div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
-                FAQ / 03
-              </span>
-              <h2 className="mt-2 font-serif text-2xl font-normal text-foreground sm:text-3xl">
-                Questions
-              </h2>
-            </div>
+          <div className="mb-2 border-b border-border pb-3">
+            <h2 className="text-center font-serif text-2xl font-bold text-foreground sm:text-3xl">
+              Questions
+            </h2>
           </div>
 
           <div>
